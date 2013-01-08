@@ -13,10 +13,13 @@
 #include <iostream>
 #include <cassert>
 
+#include "nfs.h"
 #include "tcp_ip_headers.h"
 
 static const char *default_interface = "em1";
 static const char *default_port = "2049";
+// the last is for # of operations
+static uint32_t nfs3_op_stat[NFSPROC3_NOOP + 1] = {0};
 
 #define SNAPLEN 300
 
@@ -96,11 +99,35 @@ uint32_t validate_tcp_packet(uint32_t packetlen, const u_char *packet)
 
 uint32_t validate_sunrpc_packet(uint32_t packetlen, const u_char *packet)
 {
+    if (packetlen < 8)
+        return 0;
+
 	struct sunrpc_msg *rpcp = (sunrpc_msg*)packet;
 	
 	/* make sure that we have the critical parts of the call header */
-	if(packetlen < (8 + 16))
+    uint32_t rpc_msg_type = ntohl(rpcp->rm_direction);
+
+    if (rpc_msg_type == SUNRPC_REPLY) {
+        packetlen -= 8;
+        uint32_t rpc_reply_stat = ntohl(rpcp->rm_reply.rp_stat);
+        if (rpc_reply_stat == 0) {
+            if (packetlen < 4)
+                return 0;
+            return packetlen - 4;
+        }
+        else {
+            uint32_t size = 4 + sizeof(sunrpc_reject_stat);
+            if (packetlen < size)
+                return 0;
+            return packetlen - size;
+        }
+    }
+
+    uint32_t size = 8 + 16;
+    if(packetlen < size)
 		return 0;
+    packetlen -= size;
+
 	uint32_t rpcvers = ntohl(rpcp->rm_call.cb_rpcvers);
 	uint32_t prog = ntohl(rpcp->rm_call.cb_prog);
 	uint32_t vers = ntohl(rpcp->rm_call.cb_vers);
@@ -112,14 +139,44 @@ uint32_t validate_sunrpc_packet(uint32_t packetlen, const u_char *packet)
 		return 0;
 	if (vers != 3)
 	    return 0;
-	
+
+    size = sizeof(sunrpc_opaque_auth) + (rpcp->rm_call.cb_cred.oa_len);
+    if (rpcp->rm_call.cb_cred.oa_len % sizeof(uint32_t))
+        size += (4 - (rpcp->rm_call.cb_cred.oa_len % sizeof(uint32_t)));
+    if (packetlen < size)
+        return 0;
+    packetlen -= size;
+
 	return packetlen;
 }
 
-void process_sunrpc_packet(const sunrpc_msg *packet)
+const char *proc_names[] = {
+  "null", "getattr", "setattr", "lookup",
+  "access", "readlink", "read", "write", 
+  "create", "mkdir", "symlink", "mknod",
+  "remove", "rmdir", "rename", "link",
+  "readdir", "readdirplus", "fsstat", "fsinfo",
+  "pathconf", "commit", "noop", };
+
+
+void process_sunrpc_packet(const struct sunrpc_msg *packet)
 {
 	/* here all logic of rpc and nfs packets processing should be placed */
 	std::cout << "rpc nfs packet captured" << std::endl;
+    // skip replies
+    uint32_t rpc_msg_type = ntohl(packet->rm_direction);
+    if (rpc_msg_type == SUNRPC_REPLY)
+        return;
+
+    uint32_t proc = ntohl(packet->rm_call.cb_proc);
+    ++nfs3_op_stat[NFSPROC3_NOOP];
+    ++nfs3_op_stat[proc];
+    for (int i = 0; i < NFSPROC3_NOOP; ++i) {
+            std::cout << proc_names[i] << " " << nfs3_op_stat[i];
+            if (i % 10 == 0)
+                std::cout << std::endl;
+    }
+    std::cout << "______________" << std::endl;
 }
 
 void nfscallback(u_char *rock, const struct pcap_pkthdr *pkthdr, const u_char* packet)
@@ -147,6 +204,12 @@ void nfscallback(u_char *rock, const struct pcap_pkthdr *pkthdr, const u_char* p
 		return;
 	}
 	
+    uint32_t authlen = validate_sunrpc_packet(sunrpclen, packet + (len - sunrpclen));
+    if (!authlen)
+    {
+        std::cerr << "Incorrect rpc packet" << std::endl;
+        return;
+    }
 	process_sunrpc_packet((const sunrpc_msg*)(packet + (len - sunrpclen)));
 }
 
