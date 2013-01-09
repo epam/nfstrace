@@ -35,7 +35,7 @@ static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 
 const char *proc_names[] = {
   "null", "getattr", "setattr", "lookup",
-  "access", "readlink", "read", "write", 
+  "access", "readlink", "read", "write",
   "create", "mkdir", "symlink", "mknod",
   "remove", "rmdir", "rename", "link",
   "readdir", "readdirplus", "fsstat", "fsinfo",
@@ -50,26 +50,26 @@ void print_proc_names (const char **proc_names, int beg, int width, int noop)
 
 void* workload_thread(void *arg)
 {
-	/* blocking signals in this thread so the main thread handles them */
-	sigset_t sset;
+    /* blocking signals in this thread so the main thread handles them */
+    sigset_t sset;
     sigemptyset(&sset);
     sigaddset(&sset, SIGINT);
     sigaddset(&sset, SIGTERM);
     pthread_sigmask(SIG_BLOCK, &sset, NULL);
-	
-	uint32_t overall[NFSPROC3_NOOP + 1] = {};		//local storage for stats
-	while(1)
-	{
-		pthread_mutex_lock(&mut);
-		for(int i = 0; i < NFSPROC3_NOOP + 1; ++i)
-		{
-			overall[i] += nfs3_op_stat[i];
-			nfs3_op_stat[i] = 0;
-		}
-		pthread_mutex_unlock(&mut);
-		
-		//processing here
-		std::cout << setiosflags(std::ios::left);
+
+    uint32_t overall[NFSPROC3_NOOP + 1] = {};        //local storage for stats
+    while(1)
+    {
+        pthread_mutex_lock(&mut);
+        for(int i = 0; i < NFSPROC3_NOOP + 1; ++i)
+        {
+            overall[i] += nfs3_op_stat[i];
+            nfs3_op_stat[i] = 0;
+        }
+        pthread_mutex_unlock(&mut);
+
+        //processing here
+        std::cout << setiosflags(std::ios::left);
         bool is_proc_names = true;
         for (int i = 0; i < NFSPROC3_NOOP; ++i) {
             if (is_proc_names) {
@@ -84,15 +84,15 @@ void* workload_thread(void *arg)
         }
         std::cout << std::endl << "______________" << std::endl;
         std::cout << resetiosflags(std::ios::right);
-		sleep(5);
-	}
-	return NULL;
+        sleep(5);
+    }
+    return NULL;
 }
 
 static void pcap_error_trace(const char *function, const char *descr)
 {
     assert(function);
-    
+
     std::cerr << "pcap_error " << function;
     if(descr)
         std::cerr << " " << descr;
@@ -109,7 +109,7 @@ void cleanup(int signo)
         std::cout.flush();
         if(pcap_stats(pcapdev, &stat) < 0)
             pcap_error_trace("pcap_stats", pcap_geterr(pcapdev));
-        else 
+        else
             std::cout << stat.ps_recv << " packets received by filter" << std::endl
                       << stat.ps_drop << " packets dropped by kernel" << std::endl
                       << "stopped by signal " << signo << std::endl;
@@ -124,7 +124,7 @@ int add_signal_handler(int signo, void(*handler)(int))
     sigemptyset(&sset);
     sigaddset(&sset, signo);
     sigprocmask(SIG_UNBLOCK, &sset, NULL);
-    
+
     struct sigaction newaction;
     memset(&newaction, 0, sizeof(newaction));
     newaction.sa_handler = handler;
@@ -165,7 +165,7 @@ uint32_t validate_sunrpc_packet(uint32_t packetlen, const u_char *packet)
         return 0;
 
     struct sunrpc_msg *rpcp = (sunrpc_msg*)packet;
-    
+
     uint32_t rpc_msg_type = ntohl(rpcp->rm_direction);
 
     if (rpc_msg_type == SUNRPC_REPLY) {
@@ -200,7 +200,7 @@ uint32_t validate_sunrpc_packet(uint32_t packetlen, const u_char *packet)
     uint32_t prog = ntohl(rpcp->rm_call.cb_prog);
     uint32_t vers = ntohl(rpcp->rm_call.cb_vers);
     uint32_t proc = ntohl(rpcp->rm_call.cb_proc);
-    
+
     if(rpcvers != 2){
         //std::cout << "failed 4 with rpc vers " << rpcvers << std::endl;
         return 0;
@@ -235,7 +235,7 @@ void process_sunrpc_packet(const struct sunrpc_msg *packet)
         return;
 
     uint32_t proc = ntohl(packet->rm_call.cb_proc);
-    
+
     pthread_mutex_lock(&mut);
     ++nfs3_op_stat[NFSPROC3_NOOP];
     ++nfs3_op_stat[proc];
@@ -245,43 +245,43 @@ void process_sunrpc_packet(const struct sunrpc_msg *packet)
 void nfscallback(u_char *rock, const struct pcap_pkthdr *pkthdr, const u_char* packet)
 {
     uint32_t len = pkthdr->len;
-    
+
     uint32_t iplen = validate_eth_frame(len, packet);
     if(!iplen)
     {
         std::cerr << "Incorrect ethernet frame, not ip proto next" << std::endl;
         return;
     }
-    
+
     uint32_t tcplen = validate_ip_packet(iplen, packet + (len - iplen));
     if(!tcplen)
     {
         std::cerr << "Incorrect ip packet" << std::endl;
         return;
     }
-    
+
     uint32_t sunrpclen = validate_tcp_packet(tcplen, packet + (len - tcplen));
     if(!tcplen)
     {
         std::cerr << "Incorrect tcp packet" << std::endl;
         return;
     }
-    
+
     uint32_t authlen = validate_sunrpc_packet(sunrpclen, packet + (len - sunrpclen));
     if(!authlen)
     {
         //std::cerr << "Incorrect rpc packet" << std::endl;
         return;
     }
-    
+
     process_sunrpc_packet((const sunrpc_msg*)(packet + (len - sunrpclen)));
 }
 
 int main(int argc, char **argv)
 {
-    char *iface = NULL; 
+    char *iface = NULL;
     char *port = NULL;
-    
+
     /* very simple command line args parsing */
     if(argc == 2)
     {
@@ -298,9 +298,9 @@ int main(int argc, char **argv)
         iface = (char*)default_interface;
         port = (char*)default_port;
     }
-    
-    char pcaperrbuf[PCAP_ERRBUF_SIZE];
-    
+
+    char pcaperrbuf[PCAP_ERRBUF_SIZE] = {};
+
     /* open device for live sniffing */
     pcapdev = pcap_open_live(iface, SNAPLEN, 0, 0, pcaperrbuf);
     if(pcapdev == NULL)
@@ -308,7 +308,7 @@ int main(int argc, char **argv)
         pcap_error_trace("pcap_open_live", pcaperrbuf);
         exit(-1);
     }
-    
+
     /* find the IPv4 network number and netmask for a device */
     bpf_u_int32 localnet, netmask;
     if(pcap_lookupnet(iface, &localnet, &netmask, pcaperrbuf) < 0)
@@ -316,9 +316,9 @@ int main(int argc, char **argv)
         pcap_error_trace("pcap_lookupnet", pcaperrbuf);
         exit(-1);
     }
-    
+
     /* creating pcap filter */
-    struct bpf_program bpffilter;
+    struct bpf_program bpffilter = {};
     char filter[20] = "tcp port ";
     strcat(filter, port);
     if(pcap_compile(pcapdev, &bpffilter, filter, 1 /* optimize */, netmask) < 0)
@@ -333,13 +333,13 @@ int main(int argc, char **argv)
         pcap_error_trace("pcap_setfilter", pcap_geterr(pcapdev));
         exit(-1);
     }
-    
+
     /* free bpfprogramm */
     pcap_freecode(&bpffilter);
-    
+
     /* setting SIGINT and SIGTERM handlers */
     if(add_signal_handler(SIGINT, cleanup) < 0)
-    { 
+    {
         perror("sigaction");
         exit(-1);
     }
@@ -349,22 +349,23 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
+    std::cout << "Starting nfs packets capture on " << iface << ", port " << port << std::endl;
+
     /* starting output thread */
-	if(pthread_create(&tid, NULL, workload_thread, NULL))
+    if(pthread_create(&tid, NULL, workload_thread, NULL))
     {
-		perror("pthread_create");
-		exit(-1);
-	}
-	
-	std::cout << "Starting nfs packets capture on " << iface << ", port " << port << std::endl;
-    
+        perror("pthread_create");
+        exit(-1);
+    }
+
+
     /* starting sniffing loop */
     if(pcap_loop(pcapdev, 0, nfscallback, NULL) == -1)
     {
         pcap_error_trace("pcap_loop", pcap_geterr(pcapdev));
         exit(-1);
     }
-    
+
     pcap_close(pcapdev);
     return 0;
 }
