@@ -43,8 +43,10 @@ const char *proc_names[] = {
 
 void print_proc_names (const char **proc_names, int beg, int width, int noop)
 {
-    for (int i = 0; beg < noop && i < width; ++beg, ++i)
-        std::cout << std::setw(12) << proc_names[beg];
+    for (int i = 0; beg < noop && i < width; ++beg, ++i) {
+        std::cout << std::setw(11) << proc_names[beg] << std::setw(6);
+        beg < width ? std::cout << "%" : std::cout << " ";
+    }
     std::cout << std::endl;
 }
 
@@ -58,6 +60,7 @@ void* workload_thread(void *arg)
     pthread_sigmask(SIG_BLOCK, &sset, NULL);
 
     uint32_t overall[NFSPROC3_NOOP + 1] = {};        //local storage for stats
+    float prct = 0;
     while(1)
     {
         pthread_mutex_lock(&mut);
@@ -76,13 +79,19 @@ void* workload_thread(void *arg)
                 print_proc_names ( proc_names, i, 6, NFSPROC3_NOOP);
                 is_proc_names = false;
             }
-            std::cout << std::setw(12) <<  overall[i];
+            if (!overall[NFSPROC3_NOOP])
+                prct = 0;
+            else
+                prct = ( (float) overall[i]/overall[NFSPROC3_NOOP]) * 100;
+            std::cout << std::setw(11) << overall[i] << std::setprecision(2) 
+                << std::setw(6) << prct ;
+
             if ( (i + 1) % 6 == 0) {
                 is_proc_names = true;
                 std::cout << std::endl;
             }
         }
-        std::cout << std::endl << "______________" << std::endl;
+        std::cout << std::endl << std::endl;
         std::cout << resetiosflags(std::ios::right);
         sleep(5);
     }
