@@ -6,13 +6,14 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
-#include <netinet/if_ether.h> /* includes net/ethernet.h */
 #include <sys/types.h>
 #include <signal.h>
 #include <string.h>
 #include <iostream>
 #include <iomanip>
 #include <cassert>
+#include <pthread.h>
+#include <unistd.h>
 
 #include "nfs.h"
 #include "tcp_ip_headers.h"
@@ -23,10 +24,70 @@ static const char *default_port = "2049";
 static uint32_t nfs3_op_stat[NFSPROC3_NOOP + 1] = {0};
 
 #define SNAPLEN 300
+#define DEFAULT_SLEEP_INTERVAL 5
 
 /* pcap device and dumper handlers */
-pcap_t* pcapdev = NULL;
-//pcap_dumper_t *pcapdump = NULL;
+static pcap_t* pcapdev = NULL;
+
+/* output thread id */
+static pthread_t tid = 0;
+static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
+
+const char *proc_names[] = {
+  "null", "getattr", "setattr", "lookup",
+  "access", "readlink", "read", "write", 
+  "create", "mkdir", "symlink", "mknod",
+  "remove", "rmdir", "rename", "link",
+  "readdir", "readdirplus", "fsstat", "fsinfo",
+  "pathconf", "commit", "noop", };
+
+void print_proc_names (const char **proc_names, int beg, int width, int noop)
+{
+    for (int i = 0; beg < noop && i < width; ++beg, ++i)
+        std::cout << std::setw(12) << proc_names[beg];
+    std::cout << std::endl;
+}
+
+void* workload_thread(void *arg)
+{
+	/* blocking signals in this thread so the main thread handles them */
+	sigset_t sset;
+    sigemptyset(&sset);
+    sigaddset(&sset, SIGINT);
+    sigaddset(&sset, SIGTERM);
+    pthread_sigmask(SIG_BLOCK, &sset, NULL);
+	
+	uint32_t overall[NFSPROC3_NOOP + 1] = {};		//local storage for stats
+	while(1)
+	{
+		pthread_mutex_lock(&mut);
+		for(int i = 0; i < NFSPROC3_NOOP + 1; ++i)
+		{
+			overall[i] += nfs3_op_stat[i];
+			nfs3_op_stat[i] = 0;
+		}
+		pthread_mutex_unlock(&mut);
+		
+		//processing here
+		std::cout << setiosflags(std::ios::left);
+        bool is_proc_names = true;
+        for (int i = 0; i < NFSPROC3_NOOP; ++i) {
+            if (is_proc_names) {
+                print_proc_names ( proc_names, i, 6, NFSPROC3_NOOP);
+                is_proc_names = false;
+            }
+            std::cout << std::setw(12) <<  overall[i];
+            if ( (i + 1) % 6 == 0) {
+                is_proc_names = true;
+                std::cout << std::endl;
+            }
+        }
+        std::cout << std::endl << "______________" << std::endl;
+        std::cout << resetiosflags(std::ios::right);
+		sleep(5);
+	}
+	return NULL;
+}
 
 static void pcap_error_trace(const char *function, const char *descr)
 {
@@ -76,7 +137,7 @@ int add_signal_handler(int signo, void(*handler)(int))
 uint32_t validate_eth_frame(uint32_t framelen, const u_char *packet)
 {
     ethhdr *ehdr = (ethhdr*)packet;
-    if(ntohs(ehdr->h_proto) != ETH_P_IP)
+    if(ntohs(ehdr->ether_type) != ETH_P_IP)
         return 0;
     return framelen - sizeof(ethhdr) > 0 ? framelen - sizeof(ethhdr) : 0;
 }
@@ -111,23 +172,28 @@ uint32_t validate_sunrpc_packet(uint32_t packetlen, const u_char *packet)
         packetlen -= 8;
         uint32_t rpc_reply_stat = ntohl(rpcp->rm_reply.rp_stat);
         if (rpc_reply_stat == 0) {
-            if (packetlen < 4)
+            if (packetlen < 4) {
+                //std :: cout << "failed 1" << std::endl;
                 return 0;
+            }
             return packetlen - 4;
         }
         else {
             uint32_t size = 4 + sizeof(sunrpc_reject_stat);
-            if (packetlen < size)
+            if (packetlen < size) {
+                //std :: cout << "failed 2" << std::endl;
                 return 0;
+            }
             return packetlen - size;
         }
     }
 
     /* make sure that we have the critical parts of the call header */
     uint32_t size = 8 + 16;
-    if(packetlen < size)
+    if(packetlen < size) {
+        std :: cout << "failed 3" << std::endl;
         return 0;
-
+    }
     packetlen -= size;
 
     uint32_t rpcvers = ntohl(rpcp->rm_call.cb_rpcvers);
@@ -135,14 +201,18 @@ uint32_t validate_sunrpc_packet(uint32_t packetlen, const u_char *packet)
     uint32_t vers = ntohl(rpcp->rm_call.cb_vers);
     uint32_t proc = ntohl(rpcp->rm_call.cb_proc);
     
-    if(rpcvers != 2)
+    if(rpcvers != 2){
+        //std::cout << "failed 4 with rpc vers " << rpcvers << std::endl;
         return 0;
-
-    if (prog != 100003)
+    }
+    if (prog != 100003){
+        //std :: cout << "failed 5 wirh prog " << prog << std::endl;
         return 0;
-
-    if (vers != 3)
+    }
+    if (vers != 3){
+        //std :: cout << "failed 6 with nfs vers " << vers << std::endl;
         return 0;
+    }
 
     /*
     size = sizeof(sunrpc_opaque_auth) + (rpcp->rm_call.cb_cred.oa_len);
@@ -156,48 +226,20 @@ uint32_t validate_sunrpc_packet(uint32_t packetlen, const u_char *packet)
     return packetlen;
 }
 
-const char *proc_names[] = {
-  "null", "getattr", "setattr", "lookup",
-  "access", "readlink", "read", "write", 
-  "create", "mkdir", "symlink", "mknod",
-  "remove", "rmdir", "rename", "link",
-  "readdir", "readdirplus", "fsstat", "fsinfo",
-  "pathconf", "commit", "noop", };
-
-void print_proc_names (const char **proc_names, int beg, int width, int noop)
-{
-    for (int i = 0; beg < noop && i < width; ++beg, ++i)
-        std::cout << std::setw(12) << proc_names[beg];
-    std::cout << std::endl;
-}
-
 void process_sunrpc_packet(const struct sunrpc_msg *packet)
 {
-    
     /* here all logic of rpc and nfs packets processing should be placed */
     // skip replies
     uint32_t rpc_msg_type = ntohl(packet->rm_direction);
     if (rpc_msg_type == SUNRPC_REPLY)
         return;
 
-    std::cout << setiosflags(std::ios::left);
     uint32_t proc = ntohl(packet->rm_call.cb_proc);
+    
+    pthread_mutex_lock(&mut);
     ++nfs3_op_stat[NFSPROC3_NOOP];
     ++nfs3_op_stat[proc];
-    bool is_proc_names = true;
-    for (int i = 0; i < NFSPROC3_NOOP; ++i) {
-        if (is_proc_names) {
-            print_proc_names ( proc_names, i, 6, NFSPROC3_NOOP);
-            is_proc_names = false;
-        }
-        std::cout << std::setw(12) <<  nfs3_op_stat[i];
-        if ( (i + 1) % 6 == 0) {
-            is_proc_names = true;
-            std::cout << std::endl;
-        }
-    }
-    std::cout << std::endl << "______________" << std::endl;
-    std::cout << resetiosflags(std::ios::right);
+    pthread_mutex_unlock(&mut);
 }
 
 void nfscallback(u_char *rock, const struct pcap_pkthdr *pkthdr, const u_char* packet)
@@ -226,11 +268,12 @@ void nfscallback(u_char *rock, const struct pcap_pkthdr *pkthdr, const u_char* p
     }
     
     uint32_t authlen = validate_sunrpc_packet(sunrpclen, packet + (len - sunrpclen));
-    if (!authlen)
+    if(!authlen)
     {
-        std::cerr << "Incorrect rpc packet" << std::endl;
+        //std::cerr << "Incorrect rpc packet" << std::endl;
         return;
     }
+    
     process_sunrpc_packet((const sunrpc_msg*)(packet + (len - sunrpclen)));
 }
 
@@ -305,8 +348,15 @@ int main(int argc, char **argv)
         perror("sigaction");
         exit(-1);
     }
-    
-    std::cout << "Starting nfs packets capture on " << iface << ", port " << port << std::endl;
+
+    /* starting output thread */
+	if(pthread_create(&tid, NULL, workload_thread, NULL))
+    {
+		perror("pthread_create");
+		exit(-1);
+	}
+	
+	std::cout << "Starting nfs packets capture on " << iface << ", port " << port << std::endl;
     
     /* starting sniffing loop */
     if(pcap_loop(pcapdev, 0, nfscallback, NULL) == -1)

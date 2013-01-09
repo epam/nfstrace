@@ -7,7 +7,17 @@
 #include <arpa/inet.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
-#include <netinet/if_ether.h>
+
+
+#define ETH_ALEN	6		/* Octets in one ethernet addr	 */
+#define ETH_P_IP	0x0800		/* Internet Protocol packet	*/
+
+/* Ethernet header */
+struct ethhdr {
+		u_char ether_dhost[ETH_ALEN]; /* Destination host address */
+		u_char ether_shost[ETH_ALEN]; /* Source host address */
+		u_short ether_type; /* IP? ARP? RARP? etc */
+	} __attribute__((packed));
 
 struct nfstrace_ip {
   uint8_t ip_vhl;/* header length, version */
