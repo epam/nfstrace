@@ -26,7 +26,7 @@ static uint32_t nfs3_op_stat[NFSPROC3_NOOP + 1] = {0};
 #define SNAPLEN 300
 #define DEFAULT_SLEEP_INTERVAL 5
 
-/* pcap device and dumper handlers */
+/* pcap device handler */
 static pcap_t* pcapdev = NULL;
 
 /* output thread id */
@@ -200,7 +200,7 @@ uint32_t validate_sunrpc_packet(uint32_t packetlen, const u_char *packet)
     /* make sure that we have the critical parts of the call header */
     uint32_t size = 8 + 16;
     if(packetlen < size) {
-        std :: cout << "failed 3" << std::endl;
+        //std :: cout << "failed 3" << std::endl;
         return 0;
     }
     packetlen -= size;
@@ -292,23 +292,42 @@ int main(int argc, char **argv)
     char *port = NULL;
 
     /* very simple command line args parsing */
-    if(argc == 2)
+    int opt = 0;
+    int portfound = 0;
+    int iffound = 0;
+    while ((opt = getopt(argc, argv, "+i:p:h")) != -1)
     {
-        iface = argv[1];
-        port = (char*)default_port;
-    }
-    else if(argc == 3)
-    {
-        iface = argv[1];
-        port = argv[2];
-    }
-    else
-    {
-        iface = (char*)default_interface;
-        port = (char*)default_port;
+        switch (opt)
+        {
+        case 'i':
+            iface = (char*)optarg;
+            iffound = 1;
+            break;
+        case 'p':
+            port = (char*)optarg;
+            portfound = 1;
+            break;
+        case 'h':
+            std::cout << "Usage: " << argv[0] << " [-i interface] [-p port]" << std::endl;
+            exit(-1);
+        default: /* '?' */
+            std::cout << "Usage: " << argv[0] << " [-i interface] [-p port]" << std::endl;
+            exit(-1);
+        }
     }
 
     char pcaperrbuf[PCAP_ERRBUF_SIZE] = {};
+    
+    if(!iffound)
+    {
+        /* trying to find suitable iface for sniffing using pcap */
+        iface = pcap_lookupdev(pcaperrbuf);
+        if(!iface)
+        {
+            pcap_error_trace("pcap_lookupdev", pcaperrbuf);
+            exit(-1);
+        }
+    }
 
     /* open device for live sniffing */
     pcapdev = pcap_open_live(iface, SNAPLEN, 0, 0, pcaperrbuf);
@@ -328,8 +347,12 @@ int main(int argc, char **argv)
 
     /* creating pcap filter */
     struct bpf_program bpffilter = {};
-    char filter[20] = "tcp port ";
-    strcat(filter, port);
+    char filter[20] = "tcp";
+    if(port)
+    {
+		strcat(filter, " port ");
+        strcat(filter, port);
+	}
     if(pcap_compile(pcapdev, &bpffilter, filter, 1 /* optimize */, netmask) < 0)
     {
         pcap_error_trace("pcap_compile", pcap_geterr(pcapdev));
@@ -358,16 +381,18 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
-    std::cout << "Starting nfs packets capture on " << iface << ", port " << port << std::endl;
+  	std::cout << "Starting nfs packets capture on " << iface;
+  	if(port)
+  	   std::cout << ", port " << port;
+  	std::cout << std::endl;
 
     /* starting output thread */
-    if(pthread_create(&tid, NULL, workload_thread, NULL))
+	if(pthread_create(&tid, NULL, workload_thread, NULL))
     {
-        perror("pthread_create");
-        exit(-1);
-    }
-
-
+		perror("pthread_create");
+		exit(-1);
+	}
+    
     /* starting sniffing loop */
     if(pcap_loop(pcapdev, 0, nfscallback, NULL) == -1)
     {
