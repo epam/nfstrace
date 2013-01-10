@@ -18,8 +18,6 @@
 #include "nfs.h"
 #include "tcp_ip_headers.h"
 
-static const char *default_interface = "em1";
-static const char *default_port = "2049";
 // the last is for # of operations
 static uint32_t nfs3_op_stat[NFSPROC3_NOOP + 1] = {0};
 
@@ -83,8 +81,9 @@ void* workload_thread(void *arg)
                 prct = 0;
             else
                 prct = ( (float) overall[i]/overall[NFSPROC3_NOOP]) * 100;
+
             std::cout << std::setw(11) << overall[i] << std::setprecision(2) 
-                << std::setw(6) << prct ;
+                << std::setw(6) << std::fixed << prct ;
 
             if ( (i + 1) % 6 == 0) {
                 is_proc_names = true;
