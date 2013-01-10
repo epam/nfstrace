@@ -257,21 +257,21 @@ void nfscallback(u_char *rock, const struct pcap_pkthdr *pkthdr, const u_char* p
     uint32_t iplen = validate_eth_frame(len, packet);
     if(!iplen)
     {
-        std::cerr << "Incorrect ethernet frame, not ip proto next" << std::endl;
+        //std::cerr << "Incorrect ethernet frame, not ip proto next" << std::endl;
         return;
     }
 
     uint32_t tcplen = validate_ip_packet(iplen, packet + (len - iplen));
     if(!tcplen)
     {
-        std::cerr << "Incorrect ip packet" << std::endl;
+        //std::cerr << "Incorrect ip packet" << std::endl;
         return;
     }
 
     uint32_t sunrpclen = validate_tcp_packet(tcplen, packet + (len - tcplen));
     if(!tcplen)
     {
-        std::cerr << "Incorrect tcp packet" << std::endl;
+        //std::cerr << "Incorrect tcp packet" << std::endl;
         return;
     }
 
