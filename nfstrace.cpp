@@ -329,7 +329,7 @@ int main(int argc, char **argv)
     }
 
     /* open device for live sniffing */
-    pcapdev = pcap_open_live(iface, SNAPLEN, 0, 0, pcaperrbuf);
+    pcapdev = pcap_open_live(iface, SNAPLEN, 0, 32, pcaperrbuf);
     if(pcapdev == NULL)
     {
         pcap_error_trace("pcap_open_live", pcaperrbuf);
