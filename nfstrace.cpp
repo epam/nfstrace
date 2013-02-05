@@ -269,7 +269,7 @@ void nfscallback(u_char *rock, const struct pcap_pkthdr *pkthdr, const u_char* p
     }
 
     uint32_t sunrpclen = validate_tcp_packet(tcplen, packet + (len - tcplen));
-    if(!tcplen)
+    if(!sunrpclen)
     {
         //std::cerr << "Incorrect tcp packet" << std::endl;
         return;
@@ -316,7 +316,7 @@ int main(int argc, char **argv)
     }
 
     char pcaperrbuf[PCAP_ERRBUF_SIZE] = {};
-    
+
     if(!iffound)
     {
         /* trying to find suitable iface for sniffing using pcap */
@@ -349,9 +349,9 @@ int main(int argc, char **argv)
     char filter[20] = "tcp";
     if(port)
     {
-		strcat(filter, " port ");
+        strcat(filter, " port ");
         strcat(filter, port);
-	}
+    }
     if(pcap_compile(pcapdev, &bpffilter, filter, 1 /* optimize */, netmask) < 0)
     {
         pcap_error_trace("pcap_compile", pcap_geterr(pcapdev));
@@ -365,7 +365,7 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
-    /* free bpfprogramm */
+    /* free bpfprogram */
     pcap_freecode(&bpffilter);
 
     /* setting SIGINT and SIGTERM handlers */
@@ -380,18 +380,18 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
-  	std::cout << "Starting nfs packets capture on " << iface;
-  	if(port)
-  	   std::cout << ", port " << port;
-  	std::cout << std::endl;
+    std::cout << "Starting nfs packets capture on " << iface;
+    if(port)
+        std::cout << ", port " << port;
+    std::cout << std::endl;
 
     /* starting output thread */
-	if(pthread_create(&tid, NULL, workload_thread, NULL))
+    if(pthread_create(&tid, NULL, workload_thread, NULL))
     {
-		perror("pthread_create");
-		exit(-1);
-	}
-    
+        perror("pthread_create");
+        exit(-1);
+    }
+
     /* starting sniffing loop */
     if(pcap_loop(pcapdev, 0, nfscallback, NULL) == -1)
     {
