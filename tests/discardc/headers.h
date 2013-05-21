@@ -1,14 +1,19 @@
-#ifndef _TCP_IP_HEADERS_H_
-#define _TCP_IP_HEADERS_H_
-
+//------------------------------------------------------------------------------
+// Author: Pavel Karneliuk
+// Description: Definitions of network protocols' headers.
+// Copyright (c) 2013 EPAM Systems. All Rights Reserved.
+//------------------------------------------------------------------------------
+#ifndef HEADERS_H
+#define HEADERS_H
+//------------------------------------------------------------------------------
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
-
-
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 #define ETH_ALEN	6		/* Octets in one ethernet addr	 */
 #define ETH_P_IP	0x0800		/* Internet Protocol packet	*/
 
@@ -156,5 +161,6 @@ struct sunrpc_msg {
 #define rm_call         ru.RM_cmb
 #define rm_reply        ru.RM_rmb
 } __attribute__ ((__packed__));
-
-#endif
+//------------------------------------------------------------------------------
+#endif//HEADERS_H
+//------------------------------------------------------------------------------

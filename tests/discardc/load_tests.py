@@ -3,6 +3,22 @@
 import sys
 import subprocess as subprc
 
+# Python 2.6 hasn't check_output method
+if "check_output" not in dir( subprc ): # duck punch it in!
+    def f(*popenargs, **kwargs):
+        if 'stdout' in kwargs:
+            raise ValueError('stdout argument not allowed, it will be overridden.')
+        process = subprc.Popen(stdout=subprc.PIPE, *popenargs, **kwargs)
+        output, unused_err = process.communicate()
+        retcode = process.poll()
+        if retcode:
+            cmd = kwargs.get("args")
+            if cmd is None:
+                cmd = popenargs[0]
+            raise CalledProcessError(retcode, cmd)
+        return output
+    subprc.check_output = f
+
 def main (argv):
     if len(argv) != 2:
         print "load_tests [numb_of_oper] [mnt_dir]"
@@ -25,7 +41,6 @@ def main (argv):
             subprc.check_output(cd_op + "cat temp.file && mv -i\
                     temp.file temp", shell=True)
             subprc.check_output(cd_op + "cd .. && rm -rf hello", shell=True)
-
     except ValueError:
         print "data error - load_tests [numb_of_oper] [mnt_dir]"
 
