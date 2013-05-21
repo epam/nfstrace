@@ -9,7 +9,7 @@
 #include <string>
 #include <iostream>
 
-#include <pcap.h>
+#include <pcap/pcap.h>
 
 #include "pcap_error.h"
 //------------------------------------------------------------------------------
@@ -53,6 +53,7 @@ public:
     inline void break_loop() { pcap_breakloop(handle); }
 
     void print_statistic(std::ostream& out) const throw (PcapError);
+    void print_datalink (std::ostream& out) const;
 
     static const std::string get_default_device() throw (PcapError);
 

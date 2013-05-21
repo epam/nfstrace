@@ -77,6 +77,14 @@ void PacketCapture::print_statistic(std::ostream& out) const throw (PcapError)
     }
 }
 
+void PacketCapture::print_datalink(std::ostream& out) const
+{
+    int dlt = pcap_datalink(handle);
+
+    out << "datalink type:" << pcap_datalink_val_to_name(dlt) << std::endl;
+    out << "datalink description:" << pcap_datalink_val_to_description(dlt) << std::endl;
+}
+
 const std::string PacketCapture::get_default_device() throw (PcapError)
 {
     char errbuf[PCAP_ERRBUF_SIZE];

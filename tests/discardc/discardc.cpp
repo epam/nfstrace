@@ -10,7 +10,7 @@
 #include <cstring>
 #include <iostream>
 
-#include <pcap.h>
+#include <pcap/pcap.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/socket.h>
@@ -30,7 +30,7 @@ using NST::auxiliary::Spinlock;
 using NST::filter::PcapError;
 using NST::filter::PacketCapture;
 //------------------------------------------------------------------------------
-#define SNAPLEN 300
+#define SNAPLEN 0xFFFF // 65535
 #define SLEEP_INTERVAL 5
 
 PacketCapture* g_capture = NULL;  // used in signal handler
@@ -492,6 +492,8 @@ int main(int argc, char **argv)
 
         std::cout << "Starting NFS packets capture on " << iface
                   << " filtration by BPF: \"" << filter << '\"' << std::endl;
+
+        capture.print_datalink(std::cout);
 
         if(dump_mode)
         {
