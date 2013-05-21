@@ -22,16 +22,18 @@
 #include <iomanip>
 
 #include "headers.h"
-#include "../../src/filter/common/pcap_error.h"
 #include "../../src/auxiliary/spinlock.h"
+#include "../../src/filter/common/pcap_error.h"
+#include "../../src/filter/common/packet_capture.h"
 //------------------------------------------------------------------------------
-using NST::filter::PcapError;
 using NST::auxiliary::Spinlock;
+using NST::filter::PcapError;
+using NST::filter::PacketCapture;
 //------------------------------------------------------------------------------
 #define SNAPLEN 300
 #define SLEEP_INTERVAL 5
 
-class PacketCapture* g_capture = NULL;  // used in signal handler
+PacketCapture* g_capture = NULL;  // used in signal handler
 //------------------------------------------------------------------------------
 struct ProcNFS3 // counters definition for NFS v3 procedures. See: RFC 1813
 {
@@ -131,182 +133,6 @@ public:
 private:
     uint64_t accumulators[T::num];
     uint64_t collected   [T::num];
-};
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-class PacketCapture
-{
-public:
-    PacketCapture(const std::string& interface, const std::string& filter, int snaplen, int to_ms):handle(NULL)
-    {
-        char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
-        const char* device = interface.c_str();
-
-        bpf_u_int32 localnet, netmask;
-        if(pcap_lookupnet(device, &localnet, &netmask, errbuf) < 0)
-        {
-            throw PcapError("pcap_lookupnet", errbuf);
-        }
-
-        // open device
-        handle = pcap_open_live(device, snaplen, 0, to_ms, errbuf);
-        if(!handle)
-        {
-            throw PcapError("pcap_open_live", errbuf);
-        }
-
-        // creating BPF
-        PacketCapture::BPF bpf(handle, filter.c_str(), netmask);
-
-        //set BPF
-        if(pcap_setfilter(handle, bpf) < 0)
-        {
-            throw PcapError("pcap_setfilter", pcap_geterr(handle));
-        }
-    }
-    ~PacketCapture()
-    {
-    }
-
-    /*
-        Processor - class that implements following functions accessible from PacketCapture:
-            void before_callback(pcap_t* handle)
-            void  after_callback(pcap_t* handle)
-            u_char* get_user()
-     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
-
-        The before_callback() function will be called before call PacketCapture::loop().
-        The callback() function will be called for each packet filtered by BPF.
-        The result of get_user() will be passed to callback() as u_char *user.
-        The after_callback() function will be called after exit PacketCapture::loop().
-    */
-    template<class Processor>
-    inline bool loop(Processor& p, unsigned int count=0)
-    {
-        p.Processor::before_callback(handle);
-        bool result = loop(p.Processor::get_user(), &Processor::callback, count);
-        p.Processor::after_callback(handle);
-        return result;
-    }
-
-    inline bool loop(void* user, pcap_handler callback, unsigned int count=0)
-    {
-        int err = pcap_loop(handle, count, callback, (u_char*)user);
-        if(err == -1)
-        {
-            throw PcapError("pcap_loop", pcap_geterr(handle));
-        }
-        if(err == -2)   // pcap_breakloop() called
-        {
-            return false;
-        }
-        return true; // count iterations are done
-    }
-
-    inline void break_loop() { pcap_breakloop(handle); }
-
-    inline void print_statistic(std::ostream& out) const
-    {
-        struct pcap_stat stat;
-        if(pcap_stats(handle, &stat) < 0)
-        {
-            throw PcapError("pcap_stats", pcap_geterr(handle));
-        }
-        else
-        {
-            out << stat.ps_recv << " packets received by filter" << std::endl
-                << stat.ps_drop << " packets dropped by kernel" << std::endl;
-        }
-    }
-
-    static const std::string get_default_device()
-    {
-        char errbuf[PCAP_ERRBUF_SIZE];
-        const char* device = pcap_lookupdev(errbuf);
-        if(NULL == device)
-        {
-            throw PcapError("pcap_lookupdev", errbuf);
-        }
-        return device;
-    }
-
-private:
-    class BPF
-    {
-    public:
-        BPF(pcap_t* handle, const char* filter, bpf_u_int32 netmask)
-        {
-            if(pcap_compile(handle, &bpf, filter, 1 /*optimize*/, netmask) < 0)
-            {
-                throw PcapError("pcap_compile", pcap_geterr(handle));
-            }
-        }
-        ~BPF()
-        {
-            pcap_freecode(&bpf);
-        }
-        BPF(const BPF&);            // undefined
-        BPF& operator=(const BPF&); // undefined
-
-        inline operator bpf_program*() { return &bpf; }
-
-    private:
-        bpf_program bpf;
-    };
-
-    class Handle
-    {
-    public:
-        Handle(pcap_t* p):handle(p){}
-        ~Handle()
-        {
-            if(handle)
-            {
-                pcap_close(handle);
-            }
-        }
-        Handle(const Handle&);            // undefined
-        Handle& operator=(const Handle&); // undefined
-
-        inline void operator=(pcap_t* p) { handle = p; }
-        inline      operator bool   () { return NULL != handle; }
-        inline      operator pcap_t*() const { return handle; }
-
-    private:
-        pcap_t* handle;
-    };
-
-    Handle handle;
-};
-
-class SampleProcessor  // Sample of parameter to PacketCapture::loop<Processor>()
-{
-public:
-    SampleProcessor()
-    {
-    }
-    ~SampleProcessor()
-    {
-    }
-
-private:
-    friend class PacketCapture;
-
-    void before_callback(pcap_t* handle)
-    {
-    }
-    void after_callback(pcap_t* handle)
-    {
-    }
-
-    u_char* get_user()
-    {
-        return (u_char*)this;
-    }
-
-    static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
-    {
-    }
 };
 //------------------------------------------------------------------------------
 class CountProcessor  // Identify and count packets (accepted and discarded)
