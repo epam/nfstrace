@@ -25,6 +25,8 @@ public:
     PacketCapture(const std::string& interface, const std::string& filter, int snaplen, int to_ms) throw (PcapError);
     ~PacketCapture();
 
+    bool set_buffer_size(int size);
+
     /*
         Processor - class that implements following functions accessible from PacketCapture:
             void before_callback(pcap_t* handle)

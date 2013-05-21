@@ -44,6 +44,11 @@ PacketCapture::~PacketCapture()
 {
 }
 
+bool PacketCapture::set_buffer_size(int size)
+{
+    return 0 == pcap_set_buffer_size(handle, size);
+}
+
 bool PacketCapture::loop(void* user, pcap_handler callback, unsigned int count) throw (PcapError)
 {
     int err = pcap_loop(handle, count, callback, (u_char*)user);
