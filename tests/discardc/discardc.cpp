@@ -22,10 +22,10 @@
 #include <iomanip>
 
 #include "headers.h"
-#include "../../src/auxiliary/exception.h"
+#include "../../src/filter/common/pcap_error.h"
 #include "../../src/auxiliary/spinlock.h"
 //------------------------------------------------------------------------------
-using NST::auxiliary::Exception;
+using NST::filter::PcapError;
 using NST::auxiliary::Spinlock;
 //------------------------------------------------------------------------------
 #define SNAPLEN 300
@@ -133,12 +133,6 @@ private:
     uint64_t collected   [T::num];
 };
 //------------------------------------------------------------------------------
-class PcapError:public Exception
-{
-public:
-    explicit PcapError(const char* func, const char errbuf[PCAP_ERRBUF_SIZE])
-        : Exception(std::string(func)+"():"+std::string(errbuf)) { }
-};
 //------------------------------------------------------------------------------
 class PacketCapture
 {
