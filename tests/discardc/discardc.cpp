@@ -30,7 +30,6 @@ using NST::auxiliary::Spinlock;
 using NST::filter::PcapError;
 using NST::filter::PacketCapture;
 //------------------------------------------------------------------------------
-#define SNAPLEN 0xFFFF // 65535
 #define SLEEP_INTERVAL 5
 
 PacketCapture* g_capture = NULL;  // used in signal handler
@@ -436,10 +435,11 @@ int main(int argc, char **argv)
 
     std::string iface;
     std::string port;
+    unsigned short snaplen = 512; // [0..65535]
     bool dump_mode = false;
 
     int opt = 0;
-    while ((opt = getopt(argc, argv, "+i:p:dh")) != -1)
+    while ((opt = getopt(argc, argv, "+i:p:s:dh")) != -1)
     {
         switch (opt)
         {
@@ -449,12 +449,15 @@ int main(int argc, char **argv)
         case 'p':
             port = (char*)optarg;
             break;
+        case 's':
+            snaplen = atoi(optarg);
+            break;
         case 'd':
             dump_mode = true;
             break;
         case 'h':
         default:
-            std::cout << "Usage: " << argv[0] << " [-i interface] [-p port] [-d]" << std::endl;
+            std::cout << "Usage: " << argv[0] << " [-i interface] [-p port] [-s 0..65535] [-d]" << std::endl;
             exit(-1);
         }
     }
@@ -475,7 +478,7 @@ int main(int argc, char **argv)
             filter = "tcp port " + port;
         }
 
-        PacketCapture capture(iface, filter, SNAPLEN, 32);
+        PacketCapture capture(iface, filter, snaplen, 32);
         g_capture = &capture;
 
         /* setting SIGINT and SIGTERM handlers */
