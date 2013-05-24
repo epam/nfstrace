@@ -25,6 +25,13 @@ namespace controller
 namespace cmdline
 {
 
+class CLIError:public Exception
+{
+public:
+    explicit CLIError(const std::string& msg)
+        : Exception(msg) { }
+};
+
 struct Arg
 {
     class Value
@@ -67,7 +74,7 @@ public:
     CmdlineParser() {}
     ~CmdlineParser() {}
 
-    void parse(int argc, char** argv) throw (Exception);
+    void parse(int argc, char** argv) throw (CLIError);
 
     const Arg::Value operator[](typename Args::Names name) const
     {
@@ -109,7 +116,7 @@ private:
 };
 
 template <typename Args>
-void CmdlineParser<Args>::parse(int argc, char** argv) throw (Exception)
+void CmdlineParser<Args>::parse(int argc, char** argv) throw (CLIError)
 {
     // generate input data for getopt_long()
     option long_opts[Args::num + 1]; // +1 for NULL-option
@@ -172,7 +179,7 @@ void CmdlineParser<Args>::parse(int argc, char** argv) throw (Exception)
         case '?':
         {
             std::string unkn = build_name(optopt, std::string(argv[optind - 1]));
-            throw Exception(std::string("Unrecognized option: ") + unkn);
+            throw CLIError(std::string("Unrecognized option: ") + unkn);
         }
 
         case ':':
@@ -186,7 +193,7 @@ void CmdlineParser<Args>::parse(int argc, char** argv) throw (Exception)
             else
             {
                 std::string miss = build_name(optopt, std::string(argv[optind - 1]));
-                throw Exception(std::string("Missing argument of: ") + miss);
+                throw CLIError(std::string("Missing argument of: ") + miss);
             }
             break;
         }
@@ -218,7 +225,7 @@ void CmdlineParser<Args>::parse(int argc, char** argv) throw (Exception)
             {
                 std::string long_opt = a.long_opt ? std::string("--") + a.long_opt : "";
                 std::string name = build_name(a.short_opt, long_opt);
-                throw Exception(std::string("Missing required option: ") + name);
+                throw CLIError(std::string("Missing required option: ") + name);
             }
         }
     }
@@ -271,7 +278,7 @@ void CmdlineParser<Args>::print_usage(std::ostream& out, const char* name)
         while(text.size() > 42) // wrap text at 80'th character
         {
             out << text.substr(0, 42) << std::endl;
-            out << std::string(80-42, ' ');
+            out << std::string(80 - 42, ' ');
             text = text.substr(42);
         }
         out << text << std::endl;
