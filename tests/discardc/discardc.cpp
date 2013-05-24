@@ -23,6 +23,7 @@
 
 #include "headers.h"
 #include "../../src/auxiliary/spinlock.h"
+#include "../../src/controller/cmdline_parser.h"
 #include "../../src/filter/common/pcap_error.h"
 #include "../../src/filter/common/packet_capture.h"
 //------------------------------------------------------------------------------
@@ -413,7 +414,7 @@ void cleanup(int signo)
 
 int add_signal_handler(int signo, void(*handler)(int))
 {
-    /* unmask signal */
+    // unmask signal
     sigset_t sset;
     sigemptyset(&sset);
     sigaddset(&sset, signo);
@@ -426,101 +427,107 @@ int add_signal_handler(int signo, void(*handler)(int))
     return sigaction(signo, &newaction, NULL);
 }
 
-int main(int argc, char **argv)
+using namespace NST::controller::cmdline;
+
+struct CLI
 {
-//    NST::controller::Params params(arc, argv);
-//    const std::string iface = params[Params::INTERFACE];
-//    const std::string port  = params[Params::PORT];
-//    const bool dump_mode    = params[Params::DUMP_MODE].to_bool();
+    enum Names { INTERFACE, PORT, SNAPLEN, DUMP_MODE, HELP, num };
+    static Arg arguments[num];
+};
 
-    std::string iface;
-    std::string port;
-    unsigned short snaplen = 512; // [0..65535]
-    bool dump_mode = false;
+Arg CLI::arguments[CLI::num] = {
+{ 'i', "interface", Arg::REQUIRED, NULL,    "interface for capturing" },
+{ 'd', "port",      Arg::OPTIONAL, "2049",  "NFS filtration port" },
+{ 's', "snaplen",   Arg::OPTIONAL, "512",   "length of packet snapshot", "(0..65535)" },
+{ 'd', "dump",      Arg::NO,       "false", "enable dump packet mode" },
+{ 'h', "help",      Arg::NO,       "false", "show this information" },
+};
 
-    int opt = 0;
-    while ((opt = getopt(argc, argv, "+i:p:s:dh")) != -1)
-    {
-        switch (opt)
-        {
-        case 'i':
-            iface = (char*)optarg;
-            break;
-        case 'p':
-            port = (char*)optarg;
-            break;
-        case 's':
-            snaplen = atoi(optarg);
-            break;
-        case 'd':
-            dump_mode = true;
-            break;
-        case 'h':
-        default:
-            std::cout << "Usage: " << argv[0] << " [-i interface] [-p port] [-s 0..65535] [-d]" << std::endl;
-            exit(-1);
-        }
-    }
-
-    std::cout << pcap_lib_version() << std::endl;
+int main(int argc, char **argv) try
+{
+    CmdlineParser<CLI> params;
 
     try
     {
-        if(iface.empty())
-        {
-            iface = PacketCapture::get_default_device();
-            std::cout << "use default device:" << iface << std::endl;
-        }
-        
-        std::string filter = "any";
-        if(!port.empty())
-        {
-            filter = "tcp port " + port;
-        }
-
-        PacketCapture capture(iface, filter, snaplen, 32);
-        g_capture = &capture;
-
-        /* setting SIGINT and SIGTERM handlers */
-        if(add_signal_handler(SIGINT, cleanup) < 0)
-        {
-            perror("sigaction");
-            exit(-1);
-        }
-        if(add_signal_handler(SIGTERM, cleanup) < 0)
-        {
-            perror("sigaction");
-            exit(-1);
-        }
-
-        std::cout << "Starting NFS packets capture on " << iface
-                  << " filtration by BPF: \"" << filter << '\"' << std::endl;
-
-        capture.print_datalink(std::cout);
-
-        if(dump_mode)
-        {
-            DumpToFileProcessor dumper(iface+"-tcp-"+port+".dmp");
-            capture.loop(dumper);
-        }
-        else
-        {
-            CountProcessor counter(SLEEP_INTERVAL);
-            capture.loop(counter);
-        }
-
-        capture.print_statistic(std::cout);
+        params.parse(argc, argv);
     }
-    catch(PcapError e)
+    catch(CLIError e)  // invalid cmd-line arguments
     {
         std::cerr << e.what() << std::endl;
-        throw;
-    }
-    catch(...)
-    {
+        CmdlineParser<CLI>::print_usage(std::cerr, argv[0]);
         exit(-1);
     }
 
+    if(params[CLI::HELP].to_bool())
+    {
+        CmdlineParser<CLI>::print_usage(std::cerr, argv[0]);
+        return 0;
+    }
+
+    std::string iface       = params[CLI::INTERFACE];
+    std::string port        = params[CLI::PORT];
+    std::string snaplen_str = params[CLI::SNAPLEN];
+    unsigned short snaplen  = params[CLI::SNAPLEN].to_int();
+    bool dump_mode          = params[CLI::DUMP_MODE].to_bool();
+
+    std::cout << pcap_lib_version() << std::endl;
+
+    if(iface.empty())
+    {
+        iface = PacketCapture::get_default_device();
+        std::cout << "use default device:" << iface << std::endl;
+    }
+    
+    std::string filter = "any";
+    if(!port.empty())
+    {
+        filter = "tcp port " + port;
+    }
+
+    std::cout << "Starting NFS packets capture on " << iface
+              << " filtration by BPF: \"" << filter << '\"'
+              << " snaplen: " << snaplen << std::endl;
+
+    PacketCapture capture(iface, filter, snaplen, 32);
+    g_capture = &capture;
+
+    // setting SIGINT and SIGTERM handlers
+    if(add_signal_handler(SIGINT, cleanup) < 0)
+    {
+        perror("sigaction");
+        exit(-1);
+    }
+    if(add_signal_handler(SIGTERM, cleanup) < 0)
+    {
+        perror("sigaction");
+        exit(-1);
+    }
+
+    capture.print_datalink(std::cout);
+
+    if(dump_mode)
+    {
+        DumpToFileProcessor dumper(iface+"-tcp-"+port+"-snaplen-"+snaplen_str+".dmp");
+        capture.loop(dumper);
+    }
+    else
+    {
+        CountProcessor counter(SLEEP_INTERVAL);
+        capture.loop(counter);
+    }
+
+    capture.print_statistic(std::cout);
+
     return 0;
+}
+catch(std::exception& e)
+{
+    std::cerr << e.what() << std::endl;
+    throw;
+}
+catch(...)
+{
+    std::cerr << "unknown error" << std::endl;
+    exit(-1);
 }
 //------------------------------------------------------------------------------
