@@ -53,9 +53,10 @@ struct Arg
     char short_opt;
     const char* long_opt;
     Type type;
-    const char* value;
+    const char* deflt;
     const char* description;
     const char* value_pattern;
+    const char* value;
 };
 
 
@@ -63,8 +64,10 @@ template <typename Args>
 class CmdlineParser
 {
 public:
-    explicit CmdlineParser(int argc, char** argv);
+    CmdlineParser() {}
     ~CmdlineParser() {}
+
+    void parse(int argc, char** argv) throw (Exception);
 
     const Arg::Value operator[](typename Args::Names name) const
     {
@@ -74,56 +77,80 @@ public:
     static void print_usage(std::ostream& out, const char* executable);
 
 private:
-    int short_opt_index(char c) const;
+    void set_value(int index)const
+    {
+        Arg& a = Args::arguments[index];
+        // if option argument specified (by global optarg) - set it
+        // otherwise set valid default for no-args options OR "true"
+        a.value = optarg ? optarg : (a.deflt && a.type != Arg::NO ? a.deflt : "true");
+    }
 
-    /* making class noncopyable */
+    std::string build_name(char short_name, const std::string& long_name)const
+    {
+       return std::string("\'") +
+              (short_name ? std::string("-") + char(short_name) : long_name) + '\'';
+    }
+
+    int short_opt_index(char c) const
+    {
+        for(int i = 0; i < Args::num; ++i)
+        {
+            if(Args::arguments[i].short_opt == c)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // making class noncopyable
     CmdlineParser(const CmdlineParser &parser);
     const CmdlineParser& operator=(const CmdlineParser &parser);
-
 };
 
 template <typename Args>
-CmdlineParser<Args>::CmdlineParser(int argc, char** argv)
+void CmdlineParser<Args>::parse(int argc, char** argv) throw (Exception)
 {
-    // generate input data for getopt_long
+    // generate input data for getopt_long()
     option long_opts[Args::num + 1]; // +1 for NULL-option
-    char short_opts[Args::num * 3 + 2] = {0};
+    char short_opts[Args::num * 2 + 2] = {0};
 
     short_opts[0] = ':';
 
     char *short_p = &short_opts[1];
     for (int i = 0; i < Args::num; ++i)
     {
-        long_opts[i].name = Args::arguments[i].long_opt;
-        long_opts[i].has_arg = Args::arguments[i].type;
-        long_opts[i].flag = 0;
-        long_opts[i].val = 0;
+        const Arg& a = Args::arguments[i];
 
-        if(Args::arguments[i].short_opt)
+        long_opts[i].name    = a.long_opt;
+        long_opts[i].has_arg = a.type;
+        long_opts[i].flag = 0;
+        long_opts[i].val = a.short_opt;
+
+/*
+    The FreeBSD doesn't support GNU extension for optional arguments of short options,
+    like "i::", see:
+    http://www.unix.com/man-page/freebsd/3/getopt/
+    http://www.unix.com/man-page/FreeBSD/3/getopt_long/
+
+    We are emulate this behavior, each short option will be marked that its arg is required
+*/
+        if(a.short_opt)
         {
-            *short_p = Args::arguments[i].short_opt;
+            *short_p = a.short_opt;
             ++short_p;
-            switch(long_opts[i].has_arg)
+            if(a.type != Arg::NO)
             {
-            case 1:
-                *short_p = ':';
+                *short_p = ':'; // argument to option is required
                 ++short_p;
-                break;
-            case 2:
-                *short_p = ':';
-                ++short_p;
-                *short_p = ':';
-                ++short_p;
-                break;
-            default:
-                break;
             }
         }
     }
+
     // fill last element
     memset(&long_opts[Args::num], 0, sizeof(long_opts[Args::num]));
 
-    /* Assuming that argc and argv are the same as those passed to program */
+    // assuming that argc and argv are the same as those passed to program
     int opt = 0;
     int opt_index = 0;
 
@@ -139,68 +166,81 @@ CmdlineParser<Args>::CmdlineParser(int argc, char** argv)
         {
         case 0:
             // store long option
-            Args::arguments[opt_index].value = optarg ? optarg : "true";
+            set_value(opt_index);
             break;
 
         case '?':
-            {
-                std::string failed_opt = optopt? std::string(1, optopt)
-                    : std::string(argv[optind - 1]);
-                throw Exception(std::string("unrecognized option \'")
-                    + failed_opt + std::string("\'\n"));
-            }
-            break;
+        {
+            std::string unkn = build_name(optopt, std::string(argv[optind - 1]));
+            throw Exception(std::string("Unrecognized option: ") + unkn);
+        }
 
         case ':':
+        {
+            int i = short_opt_index(optopt);
+            Arg& a = Args::arguments[i];
+            if(a.type == Arg::NO)
             {
-                std::string missed_opt = optopt? std::string(1, optopt)
-                    : std::string(argv[optind - 1]);
-                throw Exception(std::string("missing argument: -- \'")
-                    + missed_opt + std::string("\'\n"));
+                a.value = "true";
+            }
+            else
+            {
+                std::string miss = build_name(optopt, std::string(argv[optind - 1]));
+                throw Exception(std::string("Missing argument of: ") + miss);
             }
             break;
+        }
 
         default:
-            // short opt found
+        {
+            // store short option
             int index = short_opt_index(opt);
-            Args::arguments[index].value = optarg ? optarg : "true";
+            if(index != -1)
+            {
+                set_value(index);
+            }
             break;
         }
-    }
-}
-
-template <typename Args>
-int CmdlineParser<Args>::short_opt_index(char c) const
-{
-    for(int i = 0; i < Args::num; ++i)
-    {
-        if(Args::arguments[i].short_opt == c)
-        {
-            return i;
         }
     }
-    return -1;
+
+    // validate Args::arguments[i].value. NULL isn't valid!
+    for(int i = 0; i < Args::num; ++i)
+    {
+        Arg& a = Args::arguments[i];
+        if(a.value == NULL) // is value still uninitialized?
+        {
+            if(a.deflt) // try to substitute by default value
+            {
+                a.value = a.deflt;
+            }
+            else
+            {
+                std::string long_opt = a.long_opt ? std::string("--") + a.long_opt : "";
+                std::string name = build_name(a.short_opt, long_opt);
+                throw Exception(std::string("Missing required option: ") + name);
+            }
+        }
+    }
 }
 
 template <typename Args>
 void CmdlineParser<Args>::print_usage(std::ostream& out, const char* name)
 {
-    out << "Usage: " << name << " [OPTION]..." << std::endl;
-    out << "Mandatory arguments to long options are "
-           "mandatory for short options too." << std::endl;
+    out << "Usage: " << name << " [OPTIONS]..." << std::endl;
 
     for(int i = 0; i < Args::num; ++i)
     {
         const Arg& a = Args::arguments[i];
         std::string s_opt;
         std::string l_opt;
-        std::string descr;
+        std::string text;
 
         if(a.short_opt != 0)
         {
             char tmp[] = { '-', a.short_opt, ' ', '\0' };
             if(a.long_opt) tmp[2] = ',';
-            s_opt = tmp;
+            s_opt = std::string("   ") + tmp; //indentation
         }
         if(a.long_opt)
         {
@@ -212,20 +252,29 @@ void CmdlineParser<Args>::print_usage(std::ostream& out, const char* name)
                 l_opt += a.value_pattern;
             }
         }
-        if(a.description)
+        if(a.deflt) // has default value?
         {
-            descr = a.description;
+            text = std::string("default(")+a.deflt + ") ";
+        }
+        else
+        {
+            text = "(required) ";
         }
 
-        out << std::setiosflags(std::ios::right) << std::setw(6) << s_opt;
-        out << std::resetiosflags(std::ios::adjustfield);
-        out << std::setiosflags(std::ios::left) << std::setw(32) << l_opt;
-        while(descr.size() > 48)
+        if(a.description)
         {
-            out << descr.substr(0, 48) << std::endl;
-            descr = descr.substr(48);
+            text += a.description;
         }
-        out << descr << std::endl;
+
+        out << std::setw(6) << s_opt;
+        out << std::setiosflags(std::ios::left) << std::setw(32) << l_opt;
+        while(text.size() > 42) // wrap text at 80'th character
+        {
+            out << text.substr(0, 42) << std::endl;
+            out << std::string(80-42, ' ');
+            text = text.substr(42);
+        }
+        out << text << std::endl;
     }
 }
 
