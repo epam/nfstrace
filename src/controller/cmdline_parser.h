@@ -133,7 +133,7 @@ void CmdlineParser<Args>::parse(int argc, char** argv) throw (Exception)
     http://www.unix.com/man-page/freebsd/3/getopt/
     http://www.unix.com/man-page/FreeBSD/3/getopt_long/
 
-    We are emulate this behavior, each short option will be marked that its arg is required
+    We are emulate this behavior via 'type' member of an argument
 */
         if(a.short_opt)
         {
