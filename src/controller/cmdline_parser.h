@@ -32,7 +32,7 @@ public:
         : Exception(msg) { }
 };
 
-struct Arg
+struct Opt
 {
     class Value
     {
@@ -54,20 +54,21 @@ struct Arg
     {
         NO       = no_argument,
         REQUIRED = required_argument,
-        OPTIONAL = optional_argument,
+        OPTIONAL = optional_argument, // not yet supported
     };
 
-    char short_opt;
-    const char* long_opt;
-    Type type;
-    const char* deflt;
+    const char short_opt;   // a character for short option, can be 0
+    const char* long_opt;   // a string long option, can be NULL
+    const Type type;
+    const char* deflt;      // default value
     const char* description;
     const char* value_pattern;
     const char* value;
+    bool passed;            // is option parsed
 };
 
 
-template <typename Args>
+template <typename CLI>
 class CmdlineParser
 {
 public:
@@ -76,9 +77,20 @@ public:
 
     void parse(int argc, char** argv) throw (CLIError);
 
-    const Arg::Value operator[](typename Args::Names name) const
+    const Opt::Value operator[](typename CLI::Names name) const
     {
-        return Arg::Value(Args::arguments[name].value);
+        return Opt::Value(CLI::options[name].value);
+    }
+
+    bool is_passed(typename CLI::Names name) const
+    {
+        return CLI::options[name].passed;
+    }
+
+    bool is_default(typename CLI::Names name) const
+    {
+        const Opt& a = CLI::options[name];
+        return a.value == a.deflt;
     }
 
     static void print_usage(std::ostream& out, const char* executable);
@@ -86,10 +98,11 @@ public:
 private:
     void set_value(int index)const
     {
-        Arg& a = Args::arguments[index];
+        Opt& a = CLI::options[index];
         // if option argument specified (by global optarg) - set it
-        // otherwise set valid default for no-args options OR "true"
-        a.value = optarg ? optarg : (a.deflt && a.type != Arg::NO ? a.deflt : "true");
+        // otherwise set valid default OR "true" for no-args options
+        a.value = optarg ? optarg : (a.deflt && a.type != Opt::NO ? a.deflt : "true");
+        a.passed = true;
     }
 
     std::string build_name(char short_name, const std::string& long_name)const
@@ -100,9 +113,9 @@ private:
 
     int short_opt_index(char c) const
     {
-        for(int i = 0; i < Args::num; ++i)
+        for(int i = 0; i < CLI::num; ++i)
         {
-            if(Args::arguments[i].short_opt == c)
+            if(CLI::options[i].short_opt == c)
             {
                 return i;
             }
@@ -115,38 +128,36 @@ private:
     const CmdlineParser& operator=(const CmdlineParser &parser);
 };
 
-template <typename Args>
-void CmdlineParser<Args>::parse(int argc, char** argv) throw (CLIError)
+template <typename CLI>
+void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
 {
     // generate input data for getopt_long()
-    option long_opts[Args::num + 1]; // +1 for NULL-option
-    char short_opts[Args::num * 2 + 2] = {0};
+    option long_opts[CLI::num + 1]; // +1 for NULL-option
+    char short_opts[CLI::num * 2 + 2] = {0};
 
     short_opts[0] = ':';
 
     char *short_p = &short_opts[1];
-    for (int i = 0; i < Args::num; ++i)
+    for (int i = 0; i < CLI::num; ++i)
     {
-        const Arg& a = Args::arguments[i];
+        const Opt& a = CLI::options[i];
 
         long_opts[i].name    = a.long_opt;
         long_opts[i].has_arg = a.type;
-        long_opts[i].flag = 0;
-        long_opts[i].val = a.short_opt;
+        long_opts[i].flag    = 0;
+        long_opts[i].val     = 0;
 
 /*
     The FreeBSD doesn't support GNU extension for optional arguments of short options,
     like "i::", see:
     http://www.unix.com/man-page/freebsd/3/getopt/
     http://www.unix.com/man-page/FreeBSD/3/getopt_long/
-
-    We are emulate this behavior via 'type' member of an argument
 */
         if(a.short_opt)
         {
             *short_p = a.short_opt;
             ++short_p;
-            if(a.type != Arg::NO)
+            if(a.type == Opt::REQUIRED)
             {
                 *short_p = ':'; // argument to option is required
                 ++short_p;
@@ -155,7 +166,7 @@ void CmdlineParser<Args>::parse(int argc, char** argv) throw (CLIError)
     }
 
     // fill last element
-    memset(&long_opts[Args::num], 0, sizeof(long_opts[Args::num]));
+    memset(&long_opts[CLI::num], 0, sizeof(long_opts[CLI::num]));
 
     // assuming that argc and argv are the same as those passed to program
     int opt = 0;
@@ -184,18 +195,8 @@ void CmdlineParser<Args>::parse(int argc, char** argv) throw (CLIError)
 
         case ':':
         {
-            int i = short_opt_index(optopt);
-            Arg& a = Args::arguments[i];
-            if(a.type == Arg::NO)
-            {
-                a.value = "true";
-            }
-            else
-            {
-                std::string miss = build_name(optopt, std::string(argv[optind - 1]));
-                throw CLIError(std::string("Missing argument of: ") + miss);
-            }
-            break;
+            std::string miss = build_name(optopt, std::string(argv[optind - 1]));
+            throw CLIError(std::string("Missing argument of: ") + miss);
         }
 
         default:
@@ -212,14 +213,15 @@ void CmdlineParser<Args>::parse(int argc, char** argv) throw (CLIError)
     }
 
     // validate Args::arguments[i].value. NULL isn't valid!
-    for(int i = 0; i < Args::num; ++i)
+    for(int i = 0; i < CLI::num; ++i)
     {
-        Arg& a = Args::arguments[i];
+        Opt& a = CLI::options[i];
         if(a.value == NULL) // is value still uninitialized?
         {
             if(a.deflt) // try to substitute by default value
             {
                 a.value = a.deflt;
+                a.passed = false;
             }
             else
             {
@@ -231,14 +233,14 @@ void CmdlineParser<Args>::parse(int argc, char** argv) throw (CLIError)
     }
 }
 
-template <typename Args>
-void CmdlineParser<Args>::print_usage(std::ostream& out, const char* name)
+template <typename CLI>
+void CmdlineParser<CLI>::print_usage(std::ostream& out, const char* name)
 {
     out << "Usage: " << name << " [OPTIONS]..." << std::endl;
 
-    for(int i = 0; i < Args::num; ++i)
+    for(int i = 0; i < CLI::num; ++i)
     {
-        const Arg& a = Args::arguments[i];
+        const Opt& a = CLI::options[i];
         std::string s_opt;
         std::string l_opt;
         std::string text;
@@ -261,7 +263,7 @@ void CmdlineParser<Args>::print_usage(std::ostream& out, const char* name)
         }
         if(a.deflt) // has default value?
         {
-            text = std::string("default(")+a.deflt + ") ";
+            text = std::string("(default:")+a.deflt + ") ";
         }
         else
         {

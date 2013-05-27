@@ -26,19 +26,19 @@ struct Args
     };
 
 private:
-    static Arg arguments[num];
+    static Opt options[num];
 
     explicit Args();  // undefined
 };
 
 // Struct Arg defined in cmdline_parser.h
-Arg Args::arguments[Args::num] =
+Opt Args::options[Args::num] =
 {
-    {'i', "interface", Arg::REQUIRED, NULL,    "This is a very long comment "
+    {'i', "interface", Opt::REQUIRED, NULL,    "This is a very long comment "
         "that let us see how option description is splitted on rows", "ITRF", NULL},
-    {'p', "port",      Arg::REQUIRED, "2049",  "port of nfs connection", NULL},
-    {0,   "help",      Arg::NO,       "false", "get help message",       NULL},
-    {'v', "verbose",   Arg::NO,       "false", "interactive mode",       NULL},
+    {'p', "port",      Opt::REQUIRED, "2049",  "port of nfs connection", NULL},
+    {0,   "help",      Opt::NO,       "false", "get help message",       NULL},
+    {'v', "verbose",   Opt::NO,       "false", "interactive mode",       NULL},
 };
 
 /** This utility function is defined since getopt_long uses external variables
