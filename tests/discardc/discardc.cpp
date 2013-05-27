@@ -431,16 +431,16 @@ using namespace NST::controller::cmdline;
 
 struct CLI
 {
-    enum Names { INTERFACE, PORT, SNAPLEN, DUMP_MODE, HELP, num };
-    static Arg arguments[num];
+    enum Names { INTERFACE, PORT, SNAPLEN, DUMP, HELP, num };
+    static Opt options[num];
 };
 
-Arg CLI::arguments[CLI::num] = {
-{ 'i', "interface", Arg::REQUIRED, NULL,    "interface for capturing" },
-{ 'd', "port",      Arg::OPTIONAL, "2049",  "NFS filtration port" },
-{ 's', "snaplen",   Arg::OPTIONAL, "512",   "length of packet snapshot", "(0..65535)" },
-{ 'd', "dump",      Arg::NO,       "false", "enable dump packet mode" },
-{ 'h', "help",      Arg::NO,       "false", "show this information" },
+Opt CLI::options[CLI::num] = {
+{ 'i', "interface", Opt::REQUIRED,  NULL,   "interface for capturing", "INTERFACE" },
+{ 'p', "port",      Opt::REQUIRED, "2049",  "NFS filtration port", "PORT" },
+{ 's', "snaplen",   Opt::REQUIRED, "512",   "length of packet snapshot", "(0..65535)" },
+{ 'd', "dump",      Opt::OPTIONAL, "INTERFACE-tcp-PORT-SNAPLEN.dmp", "dump packets to file", "PATH" },
+{ 'h', "help",      Opt::NO,       "false", "show this information" },
 };
 
 int main(int argc, char **argv) try
@@ -468,7 +468,6 @@ int main(int argc, char **argv) try
     std::string port        = params[CLI::PORT];
     std::string snaplen_str = params[CLI::SNAPLEN];
     unsigned short snaplen  = params[CLI::SNAPLEN].to_int();
-    bool dump_mode          = params[CLI::DUMP_MODE].to_bool();
 
     std::cout << pcap_lib_version() << std::endl;
 
@@ -505,9 +504,12 @@ int main(int argc, char **argv) try
 
     capture.print_datalink(std::cout);
 
-    if(dump_mode)
+    if(params.is_passed(CLI::DUMP))
     {
-        DumpToFileProcessor dumper(iface+"-tcp-"+port+"-snaplen-"+snaplen_str+".dmp");
+        const std::string path = params.is_default(CLI::DUMP) ?
+                            iface+"-tcp-"+port+"-snaplen-"+snaplen_str+".dmp" :
+                            params[CLI::DUMP];
+        DumpToFileProcessor dumper(path);
         capture.loop(dumper);
     }
     else
