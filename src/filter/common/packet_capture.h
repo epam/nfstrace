@@ -51,6 +51,7 @@ public:
     bool loop(void* user, pcap_handler callback, unsigned int count=0) throw (PcapError);
 
     inline void break_loop() { pcap_breakloop(handle); }
+    inline int  datalink  () { return pcap_datalink(handle); }
 
     void print_statistic(std::ostream& out) const throw (PcapError);
     void print_datalink (std::ostream& out) const;
