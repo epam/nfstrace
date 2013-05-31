@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Definition of ethernet family protocol headers.
+// Description: Definition of Ethernet family protocol headers.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef ETHERNET_HEADER_H
