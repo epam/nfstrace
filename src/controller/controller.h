@@ -19,7 +19,6 @@ public:
     Controller();
     ~Controller();
 
-    void parse_cmdline_args(int argc, char* argv[]);
 
 };
 

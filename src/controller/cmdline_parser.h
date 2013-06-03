@@ -96,7 +96,7 @@ public:
     static void print_usage(std::ostream& out, const char* executable);
 
 private:
-    void set_value(int index)const
+    void set_value(int index) const
     {
         Opt& a = CLI::options[index];
         // if option argument specified (by global optarg) - set it
@@ -105,7 +105,7 @@ private:
         a.passed = true;
     }
 
-    std::string build_name(char short_name, const std::string& long_name)const
+    std::string build_name(char short_name, const std::string& long_name) const
     {
        return std::string("\'") +
               (short_name ? std::string("-") + char(short_name) : long_name) + '\'';
@@ -190,13 +190,13 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
         case '?':
         {
             std::string unkn = build_name(optopt, std::string(argv[optind - 1]));
-            throw CLIError(std::string("Unrecognized option: ") + unkn);
+            throw CLIError(std::string("unrecognized option: ") + unkn);
         }
 
         case ':':
         {
             std::string miss = build_name(optopt, std::string(argv[optind - 1]));
-            throw CLIError(std::string("Missing argument of: ") + miss);
+            throw CLIError(std::string("option requires an argument: ") + miss);
         }
 
         default:
@@ -210,6 +210,15 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
             break;
         }
         }
+    }
+
+    // if we get non-ontion element in args, throw exception
+    if(optind != argc)
+    {
+        // quote non-option
+        std::string name = build_name(0, std::string(argv[optind]));
+        throw CLIError(std::string("unexpected operand on command line: ")
+                + name);
     }
 
     // validate Args::arguments[i].value. NULL isn't valid!

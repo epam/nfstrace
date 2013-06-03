@@ -22,11 +22,6 @@ Controller::~Controller()
 {
 }
 
-
-void Controller::parse_cmdline_args(int argc, char* argv[])
-{
-}
-
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------

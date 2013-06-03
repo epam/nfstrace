@@ -82,7 +82,7 @@ void check_arguments_conversions()
         assert(p[Args::HELP].to_bool() == true);
         assert(p[Args::VERBOSE].to_bool() == false);
     }
-    catch(CLIError e)
+    catch(const CLIError& e)
     {
         std::cerr << e.what() << std::endl;
         exit(2);
@@ -115,19 +115,85 @@ void check_unrecognized_option()
     }
     catch(const CLIError& e)
     {
-        std::string expected_msg = "Unrecognized option: '--wrong'";
+        std::string expected_msg = "unrecognized option: '--wrong'";
         assert(expected_msg == e.what());
         return;
     }
     assert(false);
 }
 
+/**
+ * Test checking for missing argument
+ */
+void check_missing_argument()
+{
+    // generate input arguments for tests
+    // convert every member to char* to prevent warnings
+    char* test_argv[] =
+    {
+        (char*)"cli_parser",
+        (char*)"-i",
+        (char*)"127.0.0.1",
+        (char*)"--port",      // option without required argument
+    };
+    // generate input data for tests
+    const int test_argc = sizeof(test_argv) / sizeof(test_argv[0]);
+
+    try
+    {
+        CmdlineParser<Args> p;
+        p.parse(test_argc, test_argv);
+    }
+    catch(const CLIError& e)
+    {
+        std::string expected_msg = "option requires an argument: '--port'";
+        assert(expected_msg == e.what());
+        return;
+    }
+    assert(false);
+}
+
+/**
+ * Test checking for unexpected non-options in command-line arguments
+ */
+void check_unexpected_operands()
+{
+    // generate input arguments for tests
+    // convert every member to char* to prevent warnings
+    char* test_argv[] =
+    {
+        (char*)"cli_parser",
+        (char*)"-i",
+        (char*)"127.0.0.1",
+        (char*)"unexpected_operand",  // unexpected operand
+    };
+
+    // generate input data for tests
+    const int test_argc = sizeof(test_argv) / sizeof(test_argv[0]);
+
+    try
+    {
+        CmdlineParser<Args> p;
+        p.parse(test_argc, test_argv);
+    }
+    catch(const CLIError& e)
+    {
+        std::string expected_msg = "unexpected operand on command line: 'unexpected_operand'";
+        assert(expected_msg == e.what());
+        return;
+    }
+    assert(false);
+}
 
 int main(int argc, char **argv)
 {
     check_arguments_conversions();
     reset_getopt_options();
     check_unrecognized_option();
+    reset_getopt_options();
+    check_missing_argument();
+    reset_getopt_options();
+    check_unexpected_operands();
 
     return 0;
 }
