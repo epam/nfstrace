@@ -6,6 +6,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 //------------------------------------------------------------------------------
+#include "cmdline_args.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -19,7 +20,10 @@ public:
     Controller();
     ~Controller();
 
+    int run(int argc, char** argv);
 
+private:
+    cmdline::Params params;
 };
 
 } // namespace controller

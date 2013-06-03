@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 #include <iostream>
 
-#include "cmdline_parser.h"
+#include "cmdline_args.h"
 #include "controller.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -22,7 +22,26 @@ Controller::~Controller()
 {
 }
 
+int Controller::run(int argc, char** argv)
+{
+    try
+    {
+        params.parse(argc, argv);
+        if(params[cmdline::Args::HELP].to_bool())
+        {
+            params.print_usage(std::cout, argv[0]);
+            return 0;
+        }
+        params.validate();
+    }
+    catch(const cmdline::CLIError& e)
+    {
+        std::cerr << argv[0] << ": " << e.what() << std::endl;
+        return -1;
+    }
+    return 0;
+}
+
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------
-//

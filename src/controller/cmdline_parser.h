@@ -76,6 +76,7 @@ public:
     ~CmdlineParser() {}
 
     void parse(int argc, char** argv) throw (CLIError);
+    void validate();
 
     const Opt::Value operator[](typename CLI::Names name) const
     {
@@ -212,7 +213,7 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
         }
     }
 
-    // if we get non-ontion element in args, throw exception
+    // if we get non-option element in args, throw exception
     if(optind != argc)
     {
         // quote non-option
@@ -221,7 +222,7 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
                 + name);
     }
 
-    // validate Args::arguments[i].value. NULL isn't valid!
+    // set default values
     for(int i = 0; i < CLI::num; ++i)
     {
         Opt& a = CLI::options[i];
@@ -232,12 +233,22 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
                 a.value = a.deflt;
                 a.passed = false;
             }
-            else
-            {
-                std::string long_opt = a.long_opt ? std::string("--") + a.long_opt : "";
-                std::string name = build_name(a.short_opt, long_opt);
-                throw CLIError(std::string("Missing required option: ") + name);
-            }
+        }
+    }
+}
+
+template <typename CLI>
+void CmdlineParser<CLI>::validate()
+{
+    // validate Args::arguments[i].value. NULL isn't valid!
+    for(int i = 0; i < CLI::num; ++i)
+    {
+        Opt& a = CLI::options[i];
+        if(a.value == NULL) // is value still uninitialized?
+        {
+            std::string long_opt = a.long_opt ? std::string("--") + a.long_opt : "";
+            std::string name = build_name(a.short_opt, long_opt);
+            throw CLIError(std::string("Missing required option: ") + name);
         }
     }
 }
