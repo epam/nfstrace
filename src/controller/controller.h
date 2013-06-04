@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 // Author: Yauheni Azaranka
-// Description: Class providing initializing of modules and control of the aplication
+// Description: Class providing initializing of modules and control
+// of the application.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef CONTROLLER_H
@@ -23,8 +24,11 @@ public:
     int run(int argc, char** argv);
 
 private:
-    static void set_signal_handlers() throw (std::runtime_error);
-    static int destroy();
+    bool set_signal_handlers();
+    static void signal_handler(int sig);
+    int parse_cmdline_args(int argc, char** argv);
+    void stop();
+    bool running;
     cmdline::Params params;
 };
 
