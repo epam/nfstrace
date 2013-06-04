@@ -1,35 +1,42 @@
 //------------------------------------------------------------------------------
 // Author: Yauheni Azaranka
-// Description: Class providing initializing of modules and control of the aplication
+// Description: Structure describing command-line arguments.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#ifndef CMDLINE_ARGS_H
+#define CMDLINE_ARGS_H
 //------------------------------------------------------------------------------
-#include "cmdline_args.h"
-//------------------------------------------------------------------------------
+#include "cmdline_parser.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
-
-class Controller
+namespace cmdline
 {
-public:
-    Controller();
-    ~Controller();
 
-    int run(int argc, char** argv);
+struct Args
+{
+    friend class CmdlineParser<Args>;
+
+    enum Names {
+        INTERFACE = 0,
+        PORT      = 1,
+        HELP      = 2,
+        num       = 3,
+    };
 
 private:
-    static void set_signal_handlers() throw (std::runtime_error);
-    static int destroy();
-    cmdline::Params params;
+    static Opt options[num];
+
+    explicit Args();  // undefined
 };
 
+typedef CmdlineParser<Args> Params;
+
+} // namespace cmdline
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif //CONTROLLER_H
+#endif //CMDLINE_PARSER_H
 //------------------------------------------------------------------------------

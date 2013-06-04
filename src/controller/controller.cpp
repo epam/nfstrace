@@ -22,6 +22,16 @@ Controller::~Controller()
 {
 }
 
+void Controller::set_signal_handlers() throw (std::runtime_error)
+{
+
+}
+
+int Controller::destroy()
+{
+
+}
+
 int Controller::run(int argc, char** argv)
 {
     try
