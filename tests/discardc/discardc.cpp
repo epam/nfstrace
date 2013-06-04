@@ -450,18 +450,18 @@ int main(int argc, char **argv) try
     try
     {
         params.parse(argc, argv);
+        if(params[CLI::HELP].to_bool())
+        {
+            CmdlineParser<CLI>::print_usage(std::cerr, argv[0]);
+            return 0;
+        }
+        params.validate();
     }
     catch(CLIError e)  // invalid cmd-line arguments
     {
         std::cerr << e.what() << std::endl;
         CmdlineParser<CLI>::print_usage(std::cerr, argv[0]);
         exit(-1);
-    }
-
-    if(params[CLI::HELP].to_bool())
-    {
-        CmdlineParser<CLI>::print_usage(std::cerr, argv[0]);
-        return 0;
     }
 
     std::string iface       = params[CLI::INTERFACE];

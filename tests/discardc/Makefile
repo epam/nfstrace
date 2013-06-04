@@ -11,12 +11,12 @@ EXTERNAL:=  ../../src/controller/cmdline_parser.h \
             ../../src/auxiliary/spinlock.h \
 
 
-.PHONY: all
+.PHONY: all clean
+
 all: $(TARGET)
 
 $(TARGET): discardc.cpp headers.h $(EXTERNAL)
 	$(CC) $(CFLAGS) $(LIBS) -o $@ $^
 
-.PHONY: clean
 clean:
 	rm -rf *.o $(TARGET)
