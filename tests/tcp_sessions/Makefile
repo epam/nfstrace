@@ -5,7 +5,7 @@ CFLAGS:=-O3
 LIBS:=-lpcap -lpthread
 
 EXTERNAL:=  ../../src/controller/cmdline_parser.h \
-            ../../src/filter/common/pcap_error.h \
+            ../../src/filter/pcap/pcap_error.h \
             ../../src/filter/common/packet_capture.h \
             ../../src/filter/common/packet_capture.cpp \
             ../../src/filter/common/packet_dumper.h \
@@ -14,13 +14,14 @@ EXTERNAL:=  ../../src/controller/cmdline_parser.h \
             ../../src/filter/tcp/tcp_header.h \
             ../../src/auxiliary/spinlock.h \
 
+.PHONY: all clean
 
-.PHONY: all
+
+
 all: $(TARGET)
 
 $(TARGET): tcp_sessions.cpp $(EXTERNAL)
 	$(CC) $(CFLAGS) $(LIBS) -o $@ $^
 
-.PHONY: clean
 clean:
 	rm -rf *.o $(TARGET)

@@ -5,7 +5,7 @@ CFLAGS:=-O3
 LIBS:=-lpcap -lpthread
 
 EXTERNAL:=  ../../src/controller/cmdline_parser.h \
-            ../../src/filter/common/pcap_error.h \
+            ../../src/filter/pcap/pcap_error.h \
             ../../src/filter/common/packet_capture.h \
             ../../src/filter/common/packet_capture.cpp \
             ../../src/auxiliary/spinlock.h \

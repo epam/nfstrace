@@ -24,11 +24,11 @@
 #include "headers.h"
 #include "../../src/auxiliary/spinlock.h"
 #include "../../src/controller/cmdline_parser.h"
-#include "../../src/filter/common/pcap_error.h"
+#include "../../src/filter/pcap/pcap_error.h"
 #include "../../src/filter/common/packet_capture.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Spinlock;
-using NST::filter::PcapError;
+using NST::filter::pcap::PcapError;
 using NST::filter::PacketCapture;
 //------------------------------------------------------------------------------
 #define SLEEP_INTERVAL 5

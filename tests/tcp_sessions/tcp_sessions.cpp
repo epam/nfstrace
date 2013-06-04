@@ -10,6 +10,7 @@
 #include <cstring>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include <map>
 #include <memory>
 #include <sstream>
@@ -30,7 +31,7 @@
 
 #include "../../src/auxiliary/spinlock.h"
 #include "../../src/controller/cmdline_parser.h"
-#include "../../src/filter/common/pcap_error.h"
+#include "../../src/filter/pcap/pcap_error.h"
 #include "../../src/filter/common/packet_capture.h"
 #include "../../src/filter/common/packet_dumper.h"
 #include "../../src/filter/ethernet/ethernet_header.h"
@@ -38,7 +39,7 @@
 #include "../../src/filter/tcp/tcp_header.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Spinlock;
-using NST::filter::PcapError;
+using NST::filter::pcap::PcapError;
 using NST::filter::PacketCapture;
 using NST::filter::PacketDumper;
 using NST::filter::ethernet::ethernet_header;
@@ -46,6 +47,7 @@ using NST::filter::ip::ipv4_header;
 using NST::filter::tcp::tcp_header;
 //------------------------------------------------------------------------------
 PacketCapture* g_capture = NULL;  // used in signal handler
+
 //------------------------------------------------------------------------------
 struct Discard // counters definition for discarded packets
 {
@@ -126,16 +128,17 @@ struct Packet // counters definition for packets per protocol
 
 const char* Packet::titles[Packet::num]={ "UNKNOWN", "Ethernet", "IPv4", "IPv6", "TCP", "UDP" };
 
-
-void print_ipv4(std::ostream& out, uint32_t ip /*host byte order*/ )
+std::string ipv4_string(uint32_t ip /*host byte order*/ )
 {
-    out << ((ip >> 24) & 0xFF);
-    out << '.';
-    out << ((ip >> 16) & 0xFF);
-    out << '.';
-    out << ((ip >> 8) & 0xFF);
-    out << '.';
-    out << ((ip >> 0) & 0xFF);
+    std::stringstream address(std::ios_base::out);
+    address << ((ip >> 24) & 0xFF);
+    address << '.';
+    address << ((ip >> 16) & 0xFF);
+    address << '.';
+    address << ((ip >> 8) & 0xFF);
+    address << '.';
+    address << ((ip >> 0) & 0xFF);
+    return address.str();
 }
 
 // Ethernet II (aka DIX v2.0 Ethernet)
@@ -218,6 +221,7 @@ struct TCP
         inline uint32_t   seq() const { return ntohl(tcp_seq); }
         inline uint32_t   ack() const { return ntohl(tcp_ack); }
         inline uint8_t offset() const { return (tcp_rsrvd_off & 0xf0) >> 2; }
+        inline bool is(tcp_header::Flag flag) const { return tcp_flags & flag; }
         inline uint16_t window()   const { return ntohs(tcp_win); }
         inline uint16_t checksum() const { return ntohs(tcp_sum); }
         inline uint16_t urgent()   const { return ntohs(tcp_urp); }
@@ -240,18 +244,205 @@ struct TCP
     }
 };
 
+struct TCPStream
+{
+//    uint32_t base_seq;  // base seq number (used by relative sequence numbers) or 0 if not yet known.
+
+    uint32_t fin;               // frame number of the final FIN
+    uint32_t lastack;           // last seen ack
+    struct timeval lastacktime; // Time of the last ack packet
+    uint32_t lastnondupack;     // frame number of last seen non dupack
+    uint32_t dupacknum;         // dupack number
+    uint32_t nextseq;           // highest seen nextseq
+    uint32_t maxseqtobeacked;// highest seen continuous seq number (without hole in the stream) from the fwd party,
+                             // this is the maximum seq number that can be acked by the rev party in normal case.
+                             // If the rev party sends an ACK beyond this seq number it indicates TCP_A_ACK_LOST_PACKET contition
+    uint32_t nextseqframe;      // frame number for segment with highest sequence number
+    struct timeval nextseqtime; // Time of the nextseq packet so we can  distinguish between retransmission,  fast retransmissions and outoforder
+    uint32_t window;            // last seen window
+    int16_t  win_scale;         // -1 is we dont know, -2 is window scaling is not used
+    int16_t  scps_capable;      // flow advertised scps capabilities
+    uint16_t maxsizeacked;      // 0 if not yet known
+    bool     valid_bif;         // if lost pkts, disable BiF until ACK is recvd
+    
+
+    void open(uint32_t src, uint32_t dst, uint16_t sport, uint16_t dport)
+    {
+        std::stringstream name(std::ios_base::out);
+        name << ipv4_string(src);
+        name << '-';
+        name << sport;
+        name << '-';
+        name << ipv4_string(dst);
+        name << '-';
+        name << dport;
+        name << ".tcp";
+
+        std::ios_base::openmode mode = std::ofstream::out | std::ofstream::binary | std::ofstream::trunc;
+        file = new std::ofstream(name.str().c_str(), mode);
+    }
+    
+    void write(const char* data, size_t len)
+    {
+        file->write(data, len);
+    }
+
+    void close()
+    {
+        if(file)
+        {
+            delete file;
+        }
+    }
+
+    TCPStream():seq(0)
+    {
+        close();
+    }
+    
+    uint32_t reassemble(uint32_t sequence, uint32_t acknowledgement, uint32_t length,
+                        const unsigned char* data, uint32_t data_length, int synflag)
+    {
+        // if we are here, we have already seen this src, let's
+        //try and figure out if this packet is in the right place
+        if( sequence < seq )
+        {
+            // this sequence number seems dated, but check the end to make sure
+            // it has no more info than we have already seen.
+            uint32_t newseq = sequence + length;
+            if( newseq > seq ) {
+
+              // this one has more than we have seen.let's get the payload that we have not seen.
+              const uint32_t known_len = seq - sequence;
+
+              if ( data_length <= known_len )
+              {
+                data = NULL;
+                data_length = 0;
+           //     incomplete_tcp_stream = TRUE;
+              }
+              else
+              {
+                data += known_len;
+                data_length -= known_len;
+              }
+              /*sc.dlen = */data_length;
+              sequence = seq;
+              length = newseq - seq;
+              // this will now appear to be right on time :)
+            }
+        }
+        
+        
+        
+        if( sequence == seq )    // right on time
+        {
+            seq += length;
+            if( synflag )
+            {
+                seq++;
+            }
+
+            if( data )
+            {
+                write((const char*)data, data_length);
+            }
+            // done with the packet, see if it caused a fragment to fit
+        //    while( check_fragments( src_index, &sc, 0 ) );
+        }
+    /*    else    // sequence > seq -- out of order packet
+        {
+            if(data_length > 0 && ((sequence - seq) > 0) )
+            {
+              tmp_frag = (tcp_frag *)g_malloc( sizeof( tcp_frag ) );
+              tmp_frag->data = (gchar *)g_malloc( data_length );
+              tmp_frag->seq = sequence;
+              tmp_frag->len = length;
+              tmp_frag->data_len = data_length;
+              memcpy( tmp_frag->data, data, data_length );
+              if( frags[src_index] ) {
+            tmp_frag->next = frags[src_index];
+              } else {
+            tmp_frag->next = NULL;
+              }
+              frags[src_index] = tmp_frag;
+            }*/
+     //   }
+
+        return 0;
+    }
+    
+    
+
+    uint32_t seq;
+
+    std::ofstream* file;
+
+    //tcp_unacked_t *segments;    // list of segments
+};
+
 // Represents conversation between node A and node B
 template
 <
-    typename Data,              // the Data of Session
     typename Address=uint32_t,
     typename Port=uint16_t
 >
 struct Session
 {
+    // Direction identifies the data flow direction between nodes A and B
+    // and who is source and who is destination.
+    enum Direction
+    {
+        AtoB = 0, // A -> B
+        BtoA = 1, // B -> A
+        num  = 2
+    };
+    /*
+        The ID contains source and destination address and ports
+        based on comparing source and destination
+
+        less address in A,
+        greater address in B
+        If addresses are equal, comparing the source and destination ports
+    */
     struct ID
     {
-        inline ID(const Address& a, const Address& b, const Port& pa, const Port& pb):addrA(a), addrB(b), portA(pa), portB(pb){}
+        Direction set(const Address& src_address, const Address& dst_address,
+                      const Port& src_port, const Port& dst_port)
+        {
+            if(src_address < dst_address)   // A is source, B is destination
+            {
+                addrA = src_address;
+                addrB = dst_address;
+                portA = src_port;
+                portB = dst_port;
+                return AtoB;
+            }
+            else
+            if(src_address > dst_address) // A is destination, B is source
+            {
+                addrA = dst_address;
+                addrB = src_address;
+                portA = dst_port;
+                portB = src_port;
+                return BtoA;
+            }
+            else
+            if (src_port < dst_port) // Ok, addresses are equal, compare ports
+            {
+                addrA = addrB = src_address;
+                portA = src_port;
+                portB = dst_port;
+                return AtoB;
+            }
+            else // src_port >= dst_port
+            {
+                addrA = addrB = src_address;
+                portA = dst_port;
+                portB = src_port;
+                return BtoA;
+            }
+        }
 
         size_t hash() const
         {
@@ -270,23 +461,20 @@ struct Session
 
         bool operator==(const ID& a) const
         {
-            // map the A -> B and A <- B to the same Session
-            if( addrA == a.addrA &&
-                addrB == a.addrB &&
-                portA == a.portA &&
-                portB == a.portB)
-            {
-                return true;
-            }
+            /*return addrA == a.addrA &&
+                   addrB == a.addrB &&
+                   portA == a.portA &&
+                   portB == a.portB;*/
+            return memcmp(this, &a, sizeof(ID)) == 0; // are equal?
+        }
 
-            if( addrA == a.addrB &&
-                addrB == a.addrA &&
-                portA == a.portB &&
-                portB == a.portA)
-            {
-                return true;
-            }
-            return false;
+        void print(std::ostream& out) const
+        {
+            out << ipv4_string(addrA);
+            out << ":" << portA;
+            out << " <-> ";
+            out << ipv4_string(addrB);
+            out << ":" << portB;
         }
 
         Address addrA;
@@ -295,15 +483,19 @@ struct Session
         Port    portB;
     };
 
-    Data data;
+    Session():num_segments(0)
+    {
+    }
+    ~Session()
+    {
+    }
+
+    TCPStream streams[num]; // one stream per each direction
+    uint32_t num_segments;
+    struct timeval start;
 };
 
-struct TCPStreams
-{
-    uint32_t num;
-};
-
-typedef Session<TCPStreams> TCPSession;
+typedef Session<> TCPSession;
 
 namespace std
 {
@@ -322,9 +514,11 @@ typedef std::tr1::unordered_map<TCPSession::ID, TCPSession> StreamMap;
 
 class TCPSessions: private StreamMap
 {
+public:
+
     typedef StreamMap::iterator it;
     typedef StreamMap::const_iterator cit;
-public:
+
     TCPSessions()
     {
     }
@@ -332,28 +526,34 @@ public:
     ~TCPSessions()
     {
     }
-    
-    void add(uint32_t src, uint32_t dst, uint16_t sport, uint16_t dport)
+
+    TCPStream& find_session_stream(uint32_t src, uint32_t dst, uint16_t sport, uint16_t dport)
     {
-        key_type key(src, dst, sport, dport);
+        TCPSession::ID key;
+        TCPSession::Direction direction = key.set(src, dst, sport, dport);
+
         it i = find(key);
         if(i == end())
         {
             std::cout << "add session" << std::endl;
             i = insert( StreamMap::value_type(key, TCPSession() )).first;
+
+            // open files to write
+            i->second.streams[0].open(src, dst, sport, dport);
+            i->second.streams[1].open(dst, src, dport, sport);
         }
 
-        i->second.data.num++;
+        ++(i->second.num_segments);
+
+        return i->second.streams[direction];
     }
 
     void print(std::ostream& out) const
     {
-       for(cit i = begin(); i != end(); ++i)
+        for(cit i = begin(); i != end(); ++i)
         {
-            print_ipv4(std::cout, i->first.addrA);
-            std::cout << " -> ";
-            print_ipv4(std::cout, i->first.addrB);
-            std::cout << " packets: " << i->second.data.num << std::endl;
+            i->first.print(std::cout);
+            std::cout << " packets: " << i->second.num_segments << std::endl;
         }
     }
 
@@ -413,7 +613,6 @@ private:
 
         // prepare processing
         packets.reset(new PacketDumper(handle, file.c_str()));
-        unknown.reset(new PacketDumper(handle, "unknown.dmp"));
         captured_size = 0;
         invalid = 0;
 
@@ -433,7 +632,6 @@ private:
         discard.print(std::cout);
 
         // reset processing
-        unknown.release();
         packets.release();
     }
 
@@ -489,8 +687,12 @@ private:
                 {
                 }
         }
-        
-        p.sessions.add(ip->src(), ip->dst(), tcp->sport(), tcp->dport());
+
+        TCPStream& stream = p.sessions.find_session_stream(ip->src(), ip->dst(), tcp->sport(), tcp->dport());
+
+
+        stream.reassemble(tcp->seq(), tcp->ack(), size, data, size, /* TODO: the len and the data_len (captured may be different!)*/
+                tcp->is(tcp_header::SYN));
 
         p.invalid += size;
         header.caplen = size;
@@ -499,8 +701,7 @@ private:
     }
 
     std::string file;
-    std::auto_ptr<PacketDumper> packets;
-    std::auto_ptr<PacketDumper> unknown; // unknown packets
+    std::auto_ptr<PacketDumper> packets; // all captured packets
     pthread_t workload_tid;
     Packet::Type datalink;
 

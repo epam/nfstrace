@@ -11,8 +11,9 @@
 
 #include <pcap/pcap.h>
 
-#include "pcap_error.h"
+#include "../pcap/pcap_error.h"
 //------------------------------------------------------------------------------
+using NST::filter::pcap::PcapError;
 //------------------------------------------------------------------------------
 namespace NST
 {

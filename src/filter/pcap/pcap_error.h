@@ -18,6 +18,8 @@ namespace NST
 {
 namespace filter
 {
+namespace pcap
+{
 
 class PcapError:public Exception
 {
@@ -26,6 +28,7 @@ public:
         : Exception(std::string(func)+"():"+std::string(errbuf)) { }
 };
 
+} // namespace pcap
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
