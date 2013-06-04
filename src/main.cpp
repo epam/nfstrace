@@ -20,7 +20,7 @@ int main(int argc, char **argv) try
 catch(const std::exception& e)
 {
     std::cerr << e.what() << std::endl;
-    throw;
+    exit(-1);
 }
 catch(...)
 {
