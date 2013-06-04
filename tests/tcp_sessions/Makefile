@@ -6,6 +6,8 @@ LIBS:=-lpcap -lpthread
 
 EXTERNAL:=  ../../src/controller/cmdline_parser.h \
             ../../src/filter/pcap/pcap_error.h \
+            ../../src/filter/pcap/network_interfaces.h \
+            ../../src/filter/pcap/network_interfaces.cpp \
             ../../src/filter/common/packet_capture.h \
             ../../src/filter/common/packet_capture.cpp \
             ../../src/filter/common/packet_dumper.h \
