@@ -22,14 +22,14 @@
 #include <signal.h>
 #include <iomanip>
 #include "../../src/auxiliary/spinlock.h"
-#include "../../src/filter/common/pcap_error.h"
-#include "../../src/filter/common/packet_capture.h"
-#include "../../src/filter/common/packet_reader.h"
-#include "../../src/filter/common/i_packet_reader.h"
+#include "../../src/filter/pcap/pcap_error.h"
+#include "../../src/filter/pcap/packet_capture.h"
+#include "../../src/filter/pcap/packet_reader.h"
+#include "../../src/filter/pcap/i_packet_reader.h"
 #include <ostream>
 
 using NST::auxiliary::Spinlock;
-using NST::filter::PcapError;
+using NST::filter::pcap::PcapError;
 using NST::filter::pcap::PacketCapture;
 using NST::filter::pcap::PacketReader;
 using NST::filter::pcap::IPacketReader;

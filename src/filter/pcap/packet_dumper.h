@@ -8,13 +8,14 @@
 //------------------------------------------------------------------------------
 #include <pcap/pcap.h>
 
-#include "../pcap/pcap_error.h"
+#include "pcap_error.h"
 //------------------------------------------------------------------------------
-using NST::filter::pcap::PcapError;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filter
+{
+namespace pcap
 {
 
 class PacketDumper
@@ -47,6 +48,8 @@ private:
     pcap_dumper_t* dumper;
 };
 
+
+} // namespace pcap
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
