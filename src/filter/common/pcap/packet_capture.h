@@ -1,18 +1,19 @@
 //------------------------------------------------------------------------------
-// Author: Pavel Karneliuk
-// Description: Special exception for libpcap errors.
+// Author: Pavel Karneliuk (Dzianis Huznou)
+// Description: Move data from interface passing info Processor.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef PCAP_ERROR_H
-#define PCAP_ERROR_H
+#ifndef PACKET_CAPTURE
+#define PACKET_CAPTURE
 //------------------------------------------------------------------------------
-#include <string>
+#include <pcap/pcap.h>
+#include <iostream>
 
-#include <pcap.h>
-
-#include "../../auxiliary/exception.h"
+#include "i_packet_reader.h"
+#include "handle.h"
+#include "bpf.h"
+#include "pcap_error.h"
 //------------------------------------------------------------------------------
-using NST::auxiliary::Exception;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -20,17 +21,22 @@ namespace filter
 {
 namespace pcap
 {
-
-class PcapError:public Exception
+class PacketCapture : public IPacketReader
 {
 public:
-    explicit PcapError(const char* func, const char errbuf[PCAP_ERRBUF_SIZE])
-        : Exception(std::string(func)+"():"+std::string(errbuf)) { }
+    PacketCapture(const std::string& interface, const std::string& filter, int snaplen, int to_ms) throw (PcapError);
+    ~PacketCapture();
+
+    bool set_buffer_size(int size);
+
+    inline int  datalink  () { return pcap_datalink(handle); }
+    void        print_statistic(std::ostream& out) const throw (PcapError);
+    void        print_datalink (std::ostream& out) const;
 };
 
 } // namespace pcap
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//PCAP_ERROR_H
+#endif//PACKET_CAPTURE
 //------------------------------------------------------------------------------

@@ -10,9 +10,10 @@ namespace NST
 {
 namespace filter
 {
-
+namespace pcap
+{
 PacketCapture::PacketCapture(const std::string& interface, const std::string& filter, int snaplen, int to_ms) throw (PcapError) 
-    :handle(NULL)
+    :IPacketReader()
 {
     char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
     const char* device = interface.c_str();
@@ -31,7 +32,7 @@ PacketCapture::PacketCapture(const std::string& interface, const std::string& fi
     }
 
     // creating BPF
-    PacketCapture::BPF bpf(handle, filter.c_str(), netmask);
+    BPF bpf(handle, filter.c_str(), netmask);
 
     //set BPF
     if(pcap_setfilter(handle, bpf) < 0)
@@ -47,20 +48,6 @@ PacketCapture::~PacketCapture()
 bool PacketCapture::set_buffer_size(int size)
 {
     return 0 == pcap_set_buffer_size(handle, size);
-}
-
-bool PacketCapture::loop(void* user, pcap_handler callback, unsigned int count) throw (PcapError)
-{
-    int err = pcap_loop(handle, count, callback, (u_char*)user);
-    if(err == -1)
-    {
-        throw PcapError("pcap_loop", pcap_geterr(handle));
-    }
-    if(err == -2)   // pcap_breakloop() called
-    {
-        return false;
-    }
-    return true; // count iterations are done
 }
 
 void PacketCapture::print_statistic(std::ostream& out) const throw (PcapError)
@@ -85,17 +72,8 @@ void PacketCapture::print_datalink(std::ostream& out) const
     out << "datalink description:" << pcap_datalink_val_to_description(dlt) << std::endl;
 }
 
-const std::string PacketCapture::get_default_device() throw (PcapError)
-{
-    char errbuf[PCAP_ERRBUF_SIZE];
-    const char* device = pcap_lookupdev(errbuf);
-    if(NULL == device)
-    {
-        throw PcapError("pcap_lookupdev", errbuf);
-    }
-    return device;
-}
 
+} // namespace pcap
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
