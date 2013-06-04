@@ -7,6 +7,8 @@
 #define NETWORK_INTERFACES_H
 //------------------------------------------------------------------------------
 #include <pcap/pcap.h>
+
+#include "pcap_error.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -25,16 +27,16 @@ public:
         friend class NetworkInterfaces;
     public:
 
-        operator bool() const { return ptr != NULL; }
+        inline    operator bool() const { return ptr != NULL; }
         inline const char* name() const { return ptr->name; }
         inline const char* dscr() const { return ptr->description; }
         inline bool is_loopback() const { return ptr->flags & PCAP_IF_LOOPBACK; }
 
         iterator& next(){ ptr = ptr->next; }
-    private:
 
+        iterator(const iterator& i):ptr(i.ptr){}
+    private:
         iterator(pcap_if_t* p):ptr(p){}
-        iterator(const iterator&);
         iterator& operator=(const iterator&);
 
         pcap_if_t* ptr;

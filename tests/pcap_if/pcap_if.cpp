@@ -14,14 +14,12 @@ using NST::filter::pcap::PcapError;
 //------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
-    std::cout << "Note: Reading list of network interface may require that you have special privileges. Try super-user" << std::endl;
+    std::cout << "Note: Reading list of network interface may require that you have special privileges." << std::endl;
     try
     {
         NetworkInterfaces interfaces;
-
         NetworkInterfaces::iterator it = interfaces.first();
-        
-        NetworkInterfaces::iterator d = it;
+
         for(unsigned int i=1; it; i++)
         {
             std::cout << i << '.' << it.name();

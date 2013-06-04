@@ -5,7 +5,6 @@ CFLAGS:=-O3
 LIBS:=-lpcap
 
 EXTERNAL:=  ../../src/filter/pcap/network_interfaces.h \
-            ../../src/filter/pcap/network_interfaces.cpp \
             ../../src/filter/pcap/pcap_error.h \
 
 
