@@ -9,7 +9,7 @@
 #include <pcap/pcap.h>
 #include <iostream>
 
-#include "i_packet_reader.h"
+#include "base_reader.h"
 #include "handle.h"
 #include "bpf.h"
 #include "pcap_error.h"
@@ -21,7 +21,7 @@ namespace filter
 {
 namespace pcap
 {
-class PacketCapture : public IPacketReader
+class PacketCapture : public BaseReader
 {
 public:
     PacketCapture(const std::string& interface, const std::string& filter, int snaplen, int to_ms) throw (PcapError);

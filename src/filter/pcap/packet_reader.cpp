@@ -13,7 +13,7 @@ namespace filter
 namespace pcap
 {
 PacketReader::PacketReader(const std::string& file, const std::string& filter, int netmask) throw (PcapError)
-    :IPacketReader()
+    :BaseReader()
 {
     char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
     const char* path = file.c_str();

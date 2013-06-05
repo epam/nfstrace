@@ -25,11 +25,13 @@
 #include "../../src/auxiliary/spinlock.h"
 #include "../../src/controller/cmdline_parser.h"
 #include "../../src/filter/pcap/pcap_error.h"
-#include "../../src/filter/common/packet_capture.h"
+#include "../../src/filter/pcap/packet_capture.h"
+#include "../../src/filter/pcap/base_reader.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Spinlock;
 using NST::filter::pcap::PcapError;
-using NST::filter::PacketCapture;
+using NST::filter::pcap::BaseReader;
+using NST::filter::pcap::PacketCapture;
 //------------------------------------------------------------------------------
 #define SLEEP_INTERVAL 5
 
@@ -146,7 +148,7 @@ public:
     }
 
 private:
-    friend class PacketCapture;
+    friend class BaseReader;
 
     // thread for printing counters
     static void* workload_thread(void *arg)
@@ -368,7 +370,7 @@ public:
     }
 
 private:
-    friend class PacketCapture;
+    friend class BaseReader;
 
     void before_callback(pcap_t* handle)
     {
@@ -471,12 +473,6 @@ int main(int argc, char **argv) try
 
     std::cout << pcap_lib_version() << std::endl;
 
-    if(iface.empty())
-    {
-        iface = PacketCapture::get_default_device();
-        std::cout << "use default device:" << iface << std::endl;
-    }
-    
     std::string filter = "any";
     if(!port.empty())
     {

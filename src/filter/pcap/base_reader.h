@@ -3,8 +3,8 @@
 // Description: High level interface for passing info Processor.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef I_PACKET_READER_H
-#define I_PACKET_READER_H
+#ifndef BASE_READER_H
+#define BASE_READER_H
 //------------------------------------------------------------------------------
 #include <pcap/pcap.h>
 
@@ -18,23 +18,23 @@ namespace filter
 {
 namespace pcap
 {
-class IPacketReader
+class BaseReader
 {
 public:
-    IPacketReader() {}
-    virtual ~IPacketReader() {}
+    BaseReader() {}
+    virtual ~BaseReader() {}
 
     /*
-       Processor - class that implements following functions accessible from IPacketReader:
+       Processor - class that implements following functions accessible from BaseReader:
        void before_callback(pcap_t* handle)
        void  after_callback(pcap_t* handle)
        u_char* get_user()
        static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
 
-       The before_callback() function will be called before call IPacketReader::loop().
+       The before_callback() function will be called before call BaseReader::loop().
        The callback() function will be called for each packet filtered by BPF.
        The result of get_user() will be passed to callback() as u_char *user.
-       The after_callback() function will be called after exit IPacketReader::loop().
+       The after_callback() function will be called after exit BaseReader::loop().
     */
     template<class Processor>
     inline bool loop(Processor& p, unsigned int count=0)
@@ -69,5 +69,5 @@ protected:
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//I_PACKET_READER_H
+#endif//BASE_READER_H
 //------------------------------------------------------------------------------

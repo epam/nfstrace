@@ -25,14 +25,14 @@
 #include "../../src/filter/pcap/pcap_error.h"
 #include "../../src/filter/pcap/packet_capture.h"
 #include "../../src/filter/pcap/packet_reader.h"
-#include "../../src/filter/pcap/i_packet_reader.h"
+#include "../../src/filter/pcap/base_reader.h"
 #include <ostream>
 
 using NST::auxiliary::Spinlock;
 using NST::filter::pcap::PcapError;
 using NST::filter::pcap::PacketCapture;
 using NST::filter::pcap::PacketReader;
-using NST::filter::pcap::IPacketReader;
+using NST::filter::pcap::BaseReader;
 
 class PrintProcessor
 {
@@ -41,7 +41,7 @@ public:
     ~PrintProcessor() {}
 
 private:
-    friend class IPacketReader;
+    friend class BaseReader;
 
     void before_callback(pcap_t* handle) {}
     void after_callback(pcap_t* handle) {}

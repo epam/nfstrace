@@ -13,7 +13,7 @@ namespace filter
 namespace pcap
 {
 PacketCapture::PacketCapture(const std::string& interface, const std::string& filter, int snaplen, int to_ms) throw (PcapError) 
-    :IPacketReader()
+    :BaseReader()
 {
     char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
     const char* device = interface.c_str();
