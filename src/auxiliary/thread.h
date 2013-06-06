@@ -32,9 +32,10 @@ public:
     {
         Thread& thread = *(Thread *)(usr_data);
         thread.run();
+        return NULL;
     }
 
-    bool create() 
+    bool create()
     {
         return pthread_create(&thread, NULL, thread_function, (void*)this) == 0;
     }
