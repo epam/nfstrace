@@ -7,7 +7,7 @@
 #define THREAD_H
 //------------------------------------------------------------------------------
 #include <pthread.h>
-//#include <unistd.h>
+#include <signal.h>
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -37,7 +37,17 @@ public:
 
     bool create()
     {
-        return pthread_create(&thread, NULL, thread_function, (void*)this) == 0;
+        /*
+        sigset_t parent_mask, child_mask;
+        sigfillset(&child_mask);
+        pthread_sigmask(SIG_SETMASK, NULL, &parent_mask);   // Saving main thread mask
+        pthread_sigmask(SIG_BLOCK, &child_mask, NULL);      // Apply new mask, all signals will be blocked
+        */
+        // Create child thread
+        bool res = pthread_create(&thread, NULL, thread_function, (void*)this) == 0;
+
+        //pthread_sigmask(SIG_SETMASK, &parent_mask, NULL);   // Restoring main thread mask
+        return res;
     }
     virtual void run() = 0;
     virtual void stop() = 0;
