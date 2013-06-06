@@ -6,10 +6,6 @@
 #ifndef PROCESSING_THREAD_H
 #define PROCESSING_THREAD_H
 //------------------------------------------------------------------------------
-#include <pcap/pcap.h>
-#include "pcap/pcap_error.h"
-#include <unistd.h>
-
 #include "../auxiliary/thread.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Thread;
@@ -34,18 +30,18 @@ public:
         delete reader;
         delete proc;
     }
+
     virtual void run()
     {
         reader->loop(*proc);
     }
+
     virtual void stop()
     {
         reader->break_loop();
     }
+
 private:
-    /*
-     * Pointers must be rewrite to SmartPointers ASAP
-     */
     Reader* reader;
     Processor* proc;
 };
