@@ -12,6 +12,7 @@ namespace filter
 {
 namespace pcap
 {
+
 PacketCapture::PacketCapture(const std::string& interface, const std::string& filter, int snaplen, int to_ms) throw (PcapError) 
     :BaseReader()
 {
@@ -59,19 +60,19 @@ void PacketCapture::print_statistic(std::ostream& out) const throw (PcapError)
     }
     else
     {
-        out << stat.ps_recv << " packets received by filter" << std::endl
-            << stat.ps_drop << " packets dropped by kernel" << std::endl;
+        out << stat.ps_recv   << " packets received by filter"   << std::endl
+            << stat.ps_drop   << " packets dropped by kernel"    << std::endl
+            << stat.ps_ifdrop << " packets dropped by interface" << std::endl;
     }
 }
 
 void PacketCapture::print_datalink(std::ostream& out) const
 {
-    int dlt = pcap_datalink(handle);
+    const int dlt = pcap_datalink(handle);
 
     out << "datalink type:" << pcap_datalink_val_to_name(dlt) << std::endl;
     out << "datalink description:" << pcap_datalink_val_to_description(dlt) << std::endl;
 }
-
 
 } // namespace pcap
 } // namespace filter
