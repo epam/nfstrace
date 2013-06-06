@@ -1,38 +1,52 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Interface for passing info from file to Processor.
+// Author: Pavel Karneliuk
+// Description: Wrapper arround thread.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef PACKET_READER
-#define PACKET_READER
+#ifndef THREAD_H
+#define THREAD_H
 //------------------------------------------------------------------------------
-#include <pcap/pcap.h>
-#include <iostream>
-
-#include "base_reader.h"
-#include "handle.h"
-#include "bpf.h"
-#include "pcap_error.h"
+#include <pthread.h>
+//#include <unistd.h>
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace filter
+namespace auxiliary
 {
-namespace pcap
-{
-class PacketReader : public BaseReader
+
+class Thread
 {
 public:
-    PacketReader(const std::string& file) throw (PcapError);
-    ~PacketReader();
+    Thread() : thread(0)
+    {
+    }
+    virtual ~Thread()
+    {
+        if(thread)
+        {
+            pthread_join(thread, NULL);
+        }
+    }
+    static void* thread_function(void* usr_data)
+    {
+        Thread& thread = *(Thread *)(usr_data);
+        thread.run();
+    }
 
-    FILE* get_file() { return pcap_file(handle); }
+    bool create() 
+    {
+        return pthread_create(&thread, NULL, thread_function, (void*)this) == 0;
+    }
+    virtual void run() = 0;
+    virtual void stop() = 0;
+
+private:
+    pthread_t thread;
 };
 
-} // namespace pcap
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//PACKET_READER
+#endif//THREAD_H
 //------------------------------------------------------------------------------
