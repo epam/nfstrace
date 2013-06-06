@@ -77,7 +77,7 @@ struct rpc_opaque_auth
     uint32_t oa_flavor; // flavor of auth
     uint32_t oa_len;    // length of opaque body
     // up to 400 bytes of body
-};
+} __attribute__ ((__packed__));
 
 // Reply part of an rpc exchange
 
@@ -103,7 +103,7 @@ struct rpc_accepted_reply
         } results;
         // and many other null cases
     } reply_data;
-};
+} __attribute__ ((__packed__));
 
 // Reply to an rpc request that was rejected by the server.
 struct rpc_rejected_reply
@@ -118,7 +118,7 @@ struct rpc_rejected_reply
         } mismatch_info;
         uint32_t auth_stat;  // enum AuthStat
     } reply_data;
-};
+} __attribute__ ((__packed__));
 
 // Body of a reply to an rpc request.
 struct rpc_reply_body
@@ -129,7 +129,7 @@ struct rpc_reply_body
         struct rpc_accepted_reply areply;
         struct rpc_rejected_reply rreply;
     } reply_body;
-};
+} __attribute__ ((__packed__));
 
 // Body of an rpc request call.
 struct rpc_call_body
@@ -141,7 +141,7 @@ struct rpc_call_body
     struct rpc_opaque_auth cb_cred;
     struct rpc_opaque_auth cb_verf;
     /* procedure specific parameters start here */
-};
+} __attribute__ ((__packed__));
 
 // The rpc message.
 struct rpc_msg
@@ -153,7 +153,7 @@ struct rpc_msg
         struct rpc_call_body  cbody;
         struct rpc_reply_body rbody;
     } body;
-};
+} __attribute__ ((__packed__));
 
 } // namespace rpc
 } // namespace filter
