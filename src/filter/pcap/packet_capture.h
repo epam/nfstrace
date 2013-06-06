@@ -21,15 +21,24 @@ namespace filter
 {
 namespace pcap
 {
+
 class PacketCapture : public BaseReader
 {
 public:
+    enum Direction
+    {
+        IO = PCAP_D_INOUT,
+        I  = PCAP_D_IN,
+        O  = PCAP_D_OUT,
+    };
+
     PacketCapture(const std::string& interface, const std::string& filter, int snaplen, int to_ms) throw (PcapError);
     ~PacketCapture();
 
-    bool set_buffer_size(int size);
+    inline bool set_buffer_size(int size) { return 0 == pcap_set_buffer_size(handle, size); }
+    inline void set_direction(Direction d) { pcap_setdirection(handle,(pcap_direction_t)d); }
 
-    inline int  datalink  () { return pcap_datalink(handle); }
+    inline int  datalink       () { return pcap_datalink(handle); }
     void        print_statistic(std::ostream& out) const throw (PcapError);
     void        print_datalink (std::ostream& out) const;
 };

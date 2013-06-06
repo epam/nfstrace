@@ -45,21 +45,14 @@ public:
         return result;
     }
 
-    bool loop(void* user, pcap_handler callback, unsigned int count=0) throw (PcapError)
+    bool loop(void* user, pcap_handler callback, unsigned int count=0)
     {
-        int err = pcap_loop(handle, count, callback, (u_char*)user);
-        if(err == -1)
-        {
-            throw PcapError("pcap_loop", pcap_geterr(handle));
-        }
-        if(err == -2)   // pcap_breakloop() called
-        {
-            return false;
-        }
-        return true; // count iterations are done
+        return -1 != pcap_loop(handle, count, callback, (u_char*)user);
     }
 
     inline void break_loop() { pcap_breakloop(handle); }
+
+    std::string last_error() const { return std::string(pcap_geterr(handle)); }
 
 protected:
     Handle handle;

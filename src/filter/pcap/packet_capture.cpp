@@ -46,11 +46,6 @@ PacketCapture::~PacketCapture()
 {
 }
 
-bool PacketCapture::set_buffer_size(int size)
-{
-    return 0 == pcap_set_buffer_size(handle, size);
-}
-
 void PacketCapture::print_statistic(std::ostream& out) const throw (PcapError)
 {
     struct pcap_stat stat;
