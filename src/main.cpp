@@ -4,10 +4,8 @@
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #include <iostream>
-#include <string>
+#include <exception>
 
-#include "controller/cmdline_parser.h"
-#include "controller/cmdline_args.h"
 #include "controller/controller.h"
 //------------------------------------------------------------------------------
 using namespace NST::controller;
