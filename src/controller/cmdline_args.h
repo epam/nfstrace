@@ -20,10 +20,13 @@ struct Args
     friend class CmdlineParser<Args>;
 
     enum Names {
-        INTERFACE = 0,
-        PORT      = 1,
-        HELP      = 2,
-        num       = 3,
+        INTERFACE,
+        PORT,
+        SNAPLEN,
+        DUMP,
+        OFILE,
+        HELP,
+        num,
     };
 
 private:
