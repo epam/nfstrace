@@ -32,18 +32,20 @@
 #include "../../src/auxiliary/spinlock.h"
 #include "../../src/controller/cmdline_parser.h"
 #include "../../src/filter/pcap/pcap_error.h"
-#include "../../src/filter/common/packet_capture.h"
-#include "../../src/filter/common/packet_dumper.h"
+#include "../../src/filter/pcap/packet_capture.h"
+#include "../../src/filter/pcap/packet_dumper.h"
 #include "../../src/filter/ethernet/ethernet_header.h"
 #include "../../src/filter/ip/ipv4_header.h"
+#include "../../src/filter/rpc/rpc_message.h"
 #include "../../src/filter/tcp/tcp_header.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Spinlock;
 using NST::filter::pcap::PcapError;
-using NST::filter::PacketCapture;
-using NST::filter::PacketDumper;
+using NST::filter::pcap::PacketCapture;
+using NST::filter::pcap::PacketDumper;
 using NST::filter::ethernet::ethernet_header;
 using NST::filter::ip::ipv4_header;
+using namespace NST::filter::rpc;
 using NST::filter::tcp::tcp_header;
 //------------------------------------------------------------------------------
 PacketCapture* g_capture = NULL;  // used in signal handler
@@ -121,12 +123,14 @@ struct Packet // counters definition for packets per protocol
         // Transport layer
         TCP,
         UDP,
+        RPC_CALL,
+        RPC_REPLY,
         num,
     };
     static const char* titles[num];
 };
 
-const char* Packet::titles[Packet::num]={ "UNKNOWN", "Ethernet", "IPv4", "IPv6", "TCP", "UDP" };
+const char* Packet::titles[Packet::num]={ "UNKNOWN", "Ethernet", "IPv4", "IPv6", "TCP", "UDP", "RPC_CALL", "RPC_REPLY" };
 
 std::string ipv4_string(uint32_t ip /*host byte order*/ )
 {
@@ -244,6 +248,49 @@ struct TCP
     }
 };
 
+struct RPC
+{
+    static inline const rpc_msg* parse(Packet::Type& type, const u_char*& ptr, uint32_t& len)
+    {
+        rpc_msg *msg = (rpc_msg*)ptr;
+
+        if (len < (sizeof(msg->xid) + sizeof(msg->mtype))) return NULL;
+
+        MsgType mtype = (MsgType) ntohl(msg->mtype);
+
+        if (mtype == SUNRPC_REPLY)
+        {
+            size_t offset = sizeof(msg->xid) + sizeof(msg->mtype);
+
+            type = Packet::RPC_REPLY;
+            ptr = ptr + offset;
+            len = len - offset;
+            return msg;
+        }
+
+        if (mtype == SUNRPC_CALL)
+        {
+            size_t offset = sizeof(msg->xid) + sizeof(msg->mtype) + sizeof(msg->body.cbody);
+            if(len < offset) return NULL;
+
+            const uint32_t rpcvers= ntohl(msg->body.cbody.cb_rpcvers);
+            const uint32_t prog   = ntohl(msg->body.cbody.cb_prog);
+            const uint32_t vers   = ntohl(msg->body.cbody.cb_vers);
+            const uint32_t proc   = ntohl(msg->body.cbody.cb_proc);
+
+            if(rpcvers != 2)    return NULL;
+            if(prog!= 100003)   return NULL;    // portmap NFS v3 TCP 2049
+            if(vers != 3)       return NULL;    // NFS v3
+
+            type = Packet::RPC_CALL;
+            ptr = ptr + offset;
+            len = len - offset;
+            return msg;
+        }
+        return NULL;
+    }
+};
+
 struct TCPStream
 {
 //    uint32_t base_seq;  // base seq number (used by relative sequence numbers) or 0 if not yet known.
@@ -303,83 +350,16 @@ struct TCPStream
     uint32_t reassemble(uint32_t sequence, uint32_t acknowledgement, uint32_t length,
                         const unsigned char* data, uint32_t data_length, int synflag)
     {
-        // if we are here, we have already seen this src, let's
-        //try and figure out if this packet is in the right place
-        if( sequence < seq )
-        {
-            // this sequence number seems dated, but check the end to make sure
-            // it has no more info than we have already seen.
-            uint32_t newseq = sequence + length;
-            if( newseq > seq ) {
-
-              // this one has more than we have seen.let's get the payload that we have not seen.
-              const uint32_t known_len = seq - sequence;
-
-              if ( data_length <= known_len )
-              {
-                data = NULL;
-                data_length = 0;
-           //     incomplete_tcp_stream = TRUE;
-              }
-              else
-              {
-                data += known_len;
-                data_length -= known_len;
-              }
-              /*sc.dlen = */data_length;
-              sequence = seq;
-              length = newseq - seq;
-              // this will now appear to be right on time :)
-            }
-        }
-        
-        
-        
-        if( sequence == seq )    // right on time
-        {
-            seq += length;
-            if( synflag )
-            {
-                seq++;
-            }
-
-            if( data )
-            {
-                write((const char*)data, data_length);
-            }
-            // done with the packet, see if it caused a fragment to fit
-        //    while( check_fragments( src_index, &sc, 0 ) );
-        }
-    /*    else    // sequence > seq -- out of order packet
-        {
-            if(data_length > 0 && ((sequence - seq) > 0) )
-            {
-              tmp_frag = (tcp_frag *)g_malloc( sizeof( tcp_frag ) );
-              tmp_frag->data = (gchar *)g_malloc( data_length );
-              tmp_frag->seq = sequence;
-              tmp_frag->len = length;
-              tmp_frag->data_len = data_length;
-              memcpy( tmp_frag->data, data, data_length );
-              if( frags[src_index] ) {
-            tmp_frag->next = frags[src_index];
-              } else {
-            tmp_frag->next = NULL;
-              }
-              frags[src_index] = tmp_frag;
-            }*/
-     //   }
-
         return 0;
     }
-    
-    
-
     uint32_t seq;
 
     std::ofstream* file;
 
     //tcp_unacked_t *segments;    // list of segments
 };
+
+
 
 // Represents conversation between node A and node B
 template
@@ -538,7 +518,7 @@ public:
             std::cout << "add session" << std::endl;
             i = insert( StreamMap::value_type(key, TCPSession() )).first;
 
-            // open files to write
+            // open files to write tcp streams
             i->second.streams[0].open(src, dst, sport, dport);
             i->second.streams[1].open(dst, src, dport, sport);
         }
@@ -564,35 +544,11 @@ public:
 class ReassembleTCPSessions
 {
 public:
-    ReassembleTCPSessions(const std::string& path):file(path), workload_tid(0), datalink(Packet::UNKNOWN), captured_size(0), invalid(0)
+    ReassembleTCPSessions(const std::string& path):file(path), workload_tid(0), datalink(Packet::UNKNOWN), captured(0), discarded(0)
     {
     }
     ~ReassembleTCPSessions()
     {
-    }
-
-private:
-    friend class PacketCapture;
-
-    // thread for printing workload
-    static void* workload_thread(void *arg)
-    {
-        const ReassembleTCPSessions& p = *(ReassembleTCPSessions*)arg;
-        // blocking signals in this thread so the main thread handles them
-        sigset_t sset;
-        sigemptyset(&sset);
-        sigaddset(&sset, SIGINT);
-        sigaddset(&sset, SIGTERM);
-        pthread_sigmask(SIG_BLOCK, &sset, NULL);
-        while(1)
-        {
-
-            std::cout << "\rdumped: " << p.captured_size << " invalid: " << p.invalid;
-            std::cout.flush();
-
-            sleep(5); // cancellation point
-        }
-        return NULL;
     }
 
     void before_callback(pcap_t* handle)
@@ -613,8 +569,8 @@ private:
 
         // prepare processing
         packets.reset(new PacketDumper(handle, file.c_str()));
-        captured_size = 0;
-        invalid = 0;
+        captured    = 0;
+        discarded   = 0;
 
         // start thread
         pthread_create(&workload_tid, NULL, workload_thread, this);
@@ -644,10 +600,8 @@ private:
     {
         ReassembleTCPSessions& p = *(ReassembleTCPSessions*) user;
 
-        pcap_pkthdr header = *pkthdr;
         // dump everything
         p.packets->dump(pkthdr, packet);
-        p.captured_size += pkthdr->caplen;
 
         // payload data
         const u_char* data = packet;
@@ -688,16 +642,36 @@ private:
                 }
         }
 
-        TCPStream& stream = p.sessions.find_session_stream(ip->src(), ip->dst(), tcp->sport(), tcp->dport());
+        rpc_msg* msg = RPC::parse(type, data, size);
 
+        if(msg)
+        {
+            captured++;
+            discarded--;
+            p.packets->dump(pkthdr, packet);
+        }
+    }
 
-        stream.reassemble(tcp->seq(), tcp->ack(), size, data, size, /* TODO: the len and the data_len (captured may be different!)*/
-                tcp->is(tcp_header::SYN));
+private:
+    // thread for printing workload
+    static void* workload_thread(void *arg)
+    {
+        const ReassembleTCPSessions& p = *(ReassembleTCPSessions*)arg;
+        // blocking signals in this thread so the main thread handles them
+        sigset_t sset;
+        sigemptyset(&sset);
+        sigaddset(&sset, SIGINT);
+        sigaddset(&sset, SIGTERM);
+        pthread_sigmask(SIG_BLOCK, &sset, NULL);
+        while(1)
+        {
 
-        p.invalid += size;
-        header.caplen = size;
-        //p.unknown->dump(&header, data);
+            std::cout << "\rdumped: " << p.captured_size << " invalid: " << p.invalid;
+            std::cout.flush();
 
+            sleep(5); // cancellation point
+        }
+        return NULL;
     }
 
     std::string file;
@@ -705,12 +679,10 @@ private:
     pthread_t workload_tid;
     Packet::Type datalink;
 
-    TCPSessions sessions;
-
     Counters<Packet> discard;
 
-    uint64_t captured_size;
-    uint32_t invalid;
+    uint64_t captured;
+    uint32_t discarded;
 };
 //------------------------------------------------------------------------------
 void cleanup(int signo)
@@ -782,12 +754,6 @@ int main(int argc, char **argv) try
     std::string filter      = "tcp port " + port;
 
     std::cout << pcap_lib_version() << std::endl;
-
-    if(iface.empty())
-    {
-        iface = PacketCapture::get_default_device();
-        std::cout << "use default device:" << iface << std::endl;
-    }
 
     const std::string dump_path = params.is_default(CLI::DUMP) ?
                         iface+"-tcp-"+port+"-snaplen-"+snaplen_str+".dmp" :

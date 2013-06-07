@@ -6,13 +6,12 @@ LIBS:=-lpcap -lpthread
 
 EXTERNAL:=  ../../src/controller/cmdline_parser.h \
             ../../src/filter/pcap/pcap_error.h \
-            ../../src/filter/pcap/network_interfaces.h \
-            ../../src/filter/pcap/network_interfaces.cpp \
-            ../../src/filter/common/packet_capture.h \
-            ../../src/filter/common/packet_capture.cpp \
-            ../../src/filter/common/packet_dumper.h \
+            ../../src/filter/pcap/packet_capture.h \
+            ../../src/filter/pcap/packet_capture.cpp \
+            ../../src/filter/pcap/packet_dumper.h \
             ../../src/filter/ethernet/ethernet_header.h \
             ../../src/filter/ip/ipv4_header.h \
+            ../../src/filter/rpc/rpc_message.h \
             ../../src/filter/tcp/tcp_header.h \
             ../../src/auxiliary/spinlock.h \
 
