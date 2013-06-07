@@ -18,7 +18,8 @@ namespace NST
 namespace controller
 {
 
-// comment
+typedef cmdline::Args CLI;  // short alias for structure of cli-arguments
+
 static Controller* g_controller = NULL;
 
 Controller::Controller() : running(false)
@@ -34,7 +35,7 @@ int Controller::parse_cmdline_args(int argc, char** argv)
     try
     {
         params.parse(argc, argv);
-        if(params[cmdline::Args::HELP].to_bool())
+        if(params[CLI::HELP].to_bool())
         {
             params.print_usage(std::cout, argv[0]);
             return 0;
@@ -76,6 +77,7 @@ void Controller::signal_handler(int sig)
 
 void Controller::stop()
 {
+    filtration.stop();
     running = false;
 }
 
@@ -92,12 +94,37 @@ int Controller::run(int argc, char** argv)
     {
         return -1;
     }
+    
+    
+    if(params[CLI::DUMP].to_bool())   // online dump mode
+    {
+        init_online_dump();
+    }
+
+    // start modules to processing
+    filtration.start();
+
     while(running)
     {
         sleep(1);
     }
 
     return 0;
+}
+
+void Controller::init_online_dump()
+{
+    const std::string iface = params[CLI::INTERFACE];
+    const std::string port  = params[CLI::PORT];
+    const std::string slen  = params[CLI::SNAPLEN];
+    unsigned short snaplen  = params[CLI::SNAPLEN].to_int();
+    const std::string filter= "tcp port " + port;
+    
+    const std::string ofile = params.is_default(CLI::OFILE) ?
+                                iface+"-"+port+"-"+slen+".pcap" :
+                                params[CLI::OFILE];
+
+    filtration.dump_to_file(iface, filter, snaplen, 100, ofile);
 }
 
 } // namespace controller

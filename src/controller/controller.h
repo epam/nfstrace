@@ -30,9 +30,14 @@ private:
     bool set_signal_handlers();
     static void signal_handler(int sig);
     int parse_cmdline_args(int argc, char** argv);
+    
+    void init_online_dump();
+
     void stop();
     bool running;
+
     cmdline::Params params;
+    FiltrationManager filtration;
 };
 
 } // namespace controller

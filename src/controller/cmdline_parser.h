@@ -296,13 +296,14 @@ void CmdlineParser<CLI>::print_usage(std::ostream& out, const char* name)
         }
 
         out << std::setw(6) << s_opt;
-        out << std::setiosflags(std::ios::left) << std::setw(32) << l_opt;
-        while(text.size() > 42) // wrap text at 80'th character
+        out << std::setiosflags(std::ios::left) << std::setw(25) << l_opt;
+        /* don't wrap text description
+        while(text.size() > 49) // wrap text at 80'th character
         {
-            out << text.substr(0, 42) << std::endl;
-            out << std::string(80 - 42, ' ');
-            text = text.substr(42);
-        }
+            out << text.substr(0, 49) << std::endl;
+            out << std::string(80 - 49, ' ');
+            text = text.substr(49);
+        }*/
         out << text << std::endl;
     }
 }

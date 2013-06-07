@@ -13,10 +13,9 @@
 #include <pcap/pcap.h>
 
 #include "../auxiliary/thread_group.h"
-#include "../auxiliary/thread.h"
+#include "common/simply_nfs_filtrator.h"
 #include "pcap/packet_capture.h"
 #include "pcap/packet_reader.h"
-//#inlclude "pcap/processor.h" // Will be added after creation of appropriate processor
 #include "processing_thread.h"
 #include "pcap/base_reader.h" // Will be removed after creation of appropriate processor
 #include "pcap/pcap_error.h" // Will be removed after creation of appropriate processor
@@ -33,72 +32,25 @@ namespace NST
 {
 namespace filter
 {
-//------------------------------------------------------------------------------
-// WILL BE REMOVED AFTER CREATING APPROPRIATE PROCESSOR
-class DumpToFileProcessor
-{
-public:
-    DumpToFileProcessor(const std::string& path_to_file): path(path_to_file),dumper(NULL)
-    {
-    }
-    ~DumpToFileProcessor()
-    {
-        if(dumper)
-        {
-            pcap_dump_close(dumper);
-        }
-    }
-
-    void before_callback(pcap_t* handle)
-    {
-        dumper = pcap_dump_open(handle, path.c_str());
-        if(NULL == dumper)
-        {
-            throw PcapError("pcap_dump_open", pcap_geterr(handle));
-        }
-    }
-
-    void after_callback(pcap_t* handle)
-    {
-        pcap_dump_flush(dumper);
-        pcap_dump_close(dumper);
-        dumper = NULL;
-    }
-
-    u_char* get_user()
-    {
-        return (u_char*)dumper;
-    }
-
-    static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
-    {
-        pcap_dumper_t* dumper = (pcap_dumper_t*) user;
-
-        pcap_dump((u_char*)dumper, pkthdr, packet);
-    }
-
-private:
-    const std::string path;
-    pcap_dumper_t* dumper;
-};
-//------------------------------------------------------------------------------
 
 class FiltrationManager
 {
-    typedef ProcessingThread<PacketCapture, DumpToFileProcessor> OnlineDumpingThread;
+    typedef ProcessingThread<PacketCapture, SimplyNFSFiltrator> OnlineDumpingThread;
     // OnlineAnalyzingThread and OfflineAnalyzingThread typedefs will be added later.
 public:
-    FiltrationManager() {}
+    FiltrationManager()
+    {
+    }
 
     ~FiltrationManager()
     {
-        thread_group.stop(); 
+        thread_group.stop();
     }
 
     void dump_to_file(const std::string &interface, const std::string &filter, int snaplen, int ms, const std::string &file)
     {
         std::auto_ptr<PacketCapture>        reader      (new PacketCapture(interface, filter, snaplen, ms));
-        std::auto_ptr<DumpToFileProcessor>  processor   (new DumpToFileProcessor(file));
+        std::auto_ptr<SimplyNFSFiltrator>   processor   (new SimplyNFSFiltrator(file));
         std::auto_ptr<OnlineDumpingThread>  proc_thread (new OnlineDumpingThread(reader.release(), processor.release()));
 
         thread_group.add((Thread*)proc_thread.release());

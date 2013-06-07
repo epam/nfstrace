@@ -79,7 +79,8 @@ struct rpc_opaque_auth
     // up to 400 bytes of body
 } __attribute__ ((__packed__));
 
-// Reply part of an rpc exchange
+
+// Reply part of an RPC exchange
 
 /*
  * Reply to an rpc request that was accepted by the server.
@@ -105,7 +106,7 @@ struct rpc_accepted_reply
     } reply_data;
 } __attribute__ ((__packed__));
 
-// Reply to an rpc request that was rejected by the server.
+// Reply to an RPC request that was rejected by the server.
 struct rpc_rejected_reply
 {
     uint32_t rej_stat;   // enum RejectStat
@@ -120,7 +121,7 @@ struct rpc_rejected_reply
     } reply_data;
 } __attribute__ ((__packed__));
 
-// Body of a reply to an rpc request.
+// Body of a reply to an RPC request.
 struct rpc_reply_body
 {
     uint32_t stat;   // enum ReplyStat
