@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Yauheni Azaranka
-// Description: Command-line arguments parser
+// Description: Command-line arguments parser.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef CMDLINE_PARSER_H
@@ -202,7 +202,7 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
 
         default:
         {
-            // store short option
+            // short option
             int index = short_opt_index(opt);
             if(index != -1)
             {
