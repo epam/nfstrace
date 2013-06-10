@@ -70,13 +70,12 @@ bool Controller::set_signal_handlers()
 
 void Controller::signal_handler(int sig)
 {
-    // here we correctly signal_handler all nested objects and exit
     g_controller->stop();
-    //std::cout << "signal_handler" << std::endl;
 }
 
 void Controller::stop()
 {
+    // here we try to stop modules correctly
     filtration.stop();
     running = false;
 }
@@ -94,8 +93,8 @@ int Controller::run(int argc, char** argv)
     {
         return -1;
     }
-    
-    
+
+
     if(params[CLI::DUMP].to_bool())   // online dump mode
     {
         init_online_dump();
@@ -119,7 +118,7 @@ void Controller::init_online_dump()
     const std::string slen  = params[CLI::SNAPLEN];
     unsigned short snaplen  = params[CLI::SNAPLEN].to_int();
     const std::string filter= "tcp port " + port;
-    
+
     const std::string ofile = params.is_default(CLI::OFILE) ?
                                 iface+"-"+port+"-"+slen+".pcap" :
                                 params[CLI::OFILE];

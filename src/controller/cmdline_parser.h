@@ -25,7 +25,7 @@ namespace controller
 namespace cmdline
 {
 
-class CLIError:public Exception
+class CLIError : public Exception
 {
 public:
     explicit CLIError(const std::string& msg)
@@ -202,7 +202,7 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
 
         default:
         {
-            // short option
+            // if short option found
             int index = short_opt_index(opt);
             if(index != -1)
             {
@@ -283,7 +283,7 @@ void CmdlineParser<CLI>::print_usage(std::ostream& out, const char* name)
         }
         if(a.deflt) // has default value?
         {
-            text = std::string("(default:")+a.deflt + ") ";
+            text = std::string("(default:") + a.deflt + ") ";
         }
         else
         {

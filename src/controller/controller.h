@@ -30,13 +30,16 @@ private:
     bool set_signal_handlers();
     static void signal_handler(int sig);
     int parse_cmdline_args(int argc, char** argv);
-    
+
     void init_online_dump();
 
     void stop();
     bool running;
 
+    // this object stores command-line parameters of the application
     cmdline::Params params;
+
+    // Controller contains instances of modules
     FiltrationManager filtration;
 };
 

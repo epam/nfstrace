@@ -13,6 +13,7 @@ namespace controller
 namespace cmdline
 {
 
+// Structure of elements of this array is decribed in cmdline_parser.h
 Opt Args::options[Args::num] =
 {
     {'i', "interface", Opt::REQUIRED,  NULL,   "listen interface", "INTERFACE"},
