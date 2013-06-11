@@ -6,7 +6,10 @@
 #ifndef RPC_MESSAGE_H
 #define RPC_MESSAGE_H
 //------------------------------------------------------------------------------
+#include <iostream>
 #include <stdint.h>
+
+#include <arpa/inet.h> // for ntohl() by Single UNIX ® Specification, Version 2
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -71,12 +74,18 @@ enum AuthStat
     SUNRPC_AUTH_FAILED      =7  /* reason unknown                   */
 };
 
+enum AuthFlavor
+{
+     AUTH_NONE       = 0,
+     AUTH_SYS        = 1,
+     AUTH_SHORT      = 2,
+};
+
 // Authentication info. Opaque to client.
 struct rpc_opaque_auth
 {
     uint32_t oa_flavor; // flavor of auth
-    uint32_t oa_len;    // length of opaque body
-    // up to 400 bytes of body
+    uint32_t oa_len;    // length of opaque body, not to exceed MAX_AUTH_BYTES
 } __attribute__ ((__packed__));
 
 
@@ -155,6 +164,149 @@ struct rpc_msg
         struct rpc_reply_body rbody;
     } body;
 } __attribute__ ((__packed__));
+
+
+
+struct MessageHeader; // forward declaration
+
+struct RecordMark   //  RFC 1831 section.10
+{
+    inline const bool            is_last() const { return ntohl(mark) & 0x80000000; /*1st bit*/  }
+    inline const uint32_t   fragment_len() const { return ntohl(mark) & 0x7FFFFFFF; /*31 bits*/  }
+    inline const MessageHeader* fragment() const { return (MessageHeader*)(this+1);              }
+private:
+    RecordMark(); // undefined
+
+    uint32_t mark;
+}__attribute__ ((__packed__));
+
+
+struct OpaqueAuthHeader
+{
+    inline const uint32_t   flavor() const { return ntohl(m_flavor);  }
+    inline const uint32_t      len() const { return ntohl(m_len);     }
+    inline const char* opaque_data() const { return (char*)(this+1);  }
+private:
+    OpaqueAuthHeader(); // undefined
+
+    uint32_t m_flavor;
+    uint32_t m_len;
+
+}__attribute__ ((__packed__));
+
+
+struct MessageHeader
+{
+    inline const uint32_t xid () const { return ntohl(m_xid);  }
+    inline const uint32_t type() const { return ntohl(m_type); }
+private:
+    MessageHeader(); // undefined
+
+    uint32_t m_xid;
+    uint32_t m_type;
+} __attribute__ ((__packed__));
+
+
+struct CallHeader: public MessageHeader
+{
+    inline const uint32_t rpcvers() const { return ntohl(m_rpcvers);  }
+    inline const uint32_t    prog() const { return ntohl(m_prog); }
+    inline const uint32_t    vers() const { return ntohl(m_vers); }
+    inline const uint32_t    proc() const { return ntohl(m_proc); }
+
+    inline const OpaqueAuthHeader* credential() const
+    {
+        return (OpaqueAuthHeader*)(this+1);
+    }
+    inline const OpaqueAuthHeader*   verifier() const
+    {
+        const OpaqueAuthHeader* cred = credential();
+        return (OpaqueAuthHeader*)(cred->opaque_data() + cred->len());
+    }
+private:
+    CallHeader(); // undefined
+
+    uint32_t m_rpcvers;  // must be equal to two (2)
+    uint32_t m_prog;
+    uint32_t m_vers;
+    uint32_t m_proc;
+} __attribute__ ((__packed__));
+
+
+// TODO: finish definitions of RPC replies!
+struct ReplyHeader: public MessageHeader
+{
+    inline const uint32_t stat() const { return ntohl(m_stat); }
+
+private:
+    ReplyHeader(); // undefined
+
+    uint32_t m_stat;   // enum ReplyStat
+};
+
+
+struct AcceptedReplyHeader: public ReplyHeader
+{
+    inline const OpaqueAuthHeader* verifier() const
+    {
+        return (OpaqueAuthHeader*)(this);
+    }
+    inline const uint32_t stat() const
+    {
+        const OpaqueAuthHeader* verf = verifier();
+        const uint32_t* stat = (uint32_t*)(verf->opaque_data() + verf->len());
+        return ntohl(*stat);
+    }
+    inline const char* reply_data() const
+    {
+        const OpaqueAuthHeader* verf = verifier();
+        return (verf->opaque_data() + verf->len() + sizeof(uint32_t)/*stat*/);
+    }
+private:
+    AcceptedReplyHeader(); // undefined
+};
+
+
+struct RejectedReplyHeader: public ReplyHeader
+{
+    inline const uint32_t    stat() const { return ntohl(m_stat);         }
+    inline const char* reply_data() const { return (const char*)(this+1); }
+private:
+    RejectedReplyHeader(); // undefined
+
+    uint32_t m_stat;   // enum RejectStat
+};
+
+
+class AuthSYS  // RFC1831 appendix A: System Authentication
+{
+public:
+    AuthSYS(const OpaqueAuthHeader* header);
+
+    inline const uint32_t           stamp() const { return m_stamp;       }
+    inline const std::string& machinename() const { return m_machinename; }
+    inline const uint32_t             uid() const { return m_uid; }
+    inline const uint32_t             gid() const { return m_gid; }
+    inline const uint32_t      guid_count() const { return m_guid_count; }
+    inline const uint32_t*          guids() const { return m_guids; }
+
+private:
+    uint32_t m_stamp;
+    std::string m_machinename;  // TODO: there is performance drop in memory allocation
+    uint32_t m_uid;
+    uint32_t m_gid;
+    uint32_t m_guid_count;
+    uint32_t m_guids[16];
+};
+
+
+uint32_t rpc_roundup(uint32_t a); // round up uint32_t to near multiplicity of 4
+
+// some functions for print out structures
+std::ostream& operator<<(std::ostream& out, const OpaqueAuthHeader& a);
+std::ostream& operator<<(std::ostream& out, const AuthSYS& a);
+std::ostream& operator<<(std::ostream& out, const CallHeader& a);
+
 
 } // namespace rpc
 } // namespace filter

@@ -117,54 +117,57 @@ public:
     {
         struct tcp_header *tcppacket = (tcp_header*)packet;
         uint32_t tcphdrlen = (tcppacket->tcp_rsrvd_off & 0xf0) >> 2;
-        tcphdrlen += 4;
         return packetlen - tcphdrlen > 0 ? packetlen - tcphdrlen : 0;
     }
 
     static uint32_t validate_sunrpc_nfsv3_2049_packet(uint32_t packetlen, const u_char *packet)
     {
-        if (packetlen < 8)
-            return 0;
+        if(packetlen < sizeof(RecordMark)) return 0;
+        packetlen -= sizeof(RecordMark);
 
-        struct rpc_msg *rpcp = (rpc_msg*)packet;
+        const RecordMark* rm = (RecordMark*)packet;
 
-        uint32_t rpc_msg_type = ntohl(rpcp->mtype);
+        if(packetlen < rm->fragment_len()) return 0; // RPC message are fragmented
 
-        if (rpc_msg_type == SUNRPC_REPLY) {
-            packetlen -= 8;
-            uint32_t rpc_reply_stat = ntohl(rpcp->body.rbody.stat);
-            if (rpc_reply_stat == 0) {
-                if (packetlen < 4) {
-                    //std :: cout << "failed 1" << std::endl;
-                    return 0;
-                }
-                return packetlen - 4;
+        const MessageHeader* msg = rm->fragment();
+        switch(msg->type())
+        {
+            case SUNRPC_CALL:
+            {
+                const CallHeader* call = static_cast<const CallHeader*>(msg);
+
+                uint32_t rpcvers = call->rpcvers();
+                uint32_t prog = call->prog();
+                uint32_t vers = call->vers();
+                //uint32_t proc = call->proc();
+
+                if(rpcvers != 2)    return 0;
+                if(prog != 100003)  return 0;  // portmap NFS v3 TCP 2049
+                if(vers != 3)       return 0;  // NFS v3
+
+                std::cout << *call << std::endl;
+
             }
-            else {
-                uint32_t size = 4 + sizeof(RejectStat);
-                if (packetlen < size) {
-                    //std :: cout << "failed 2" << std::endl;
-                    return 0;
+            break;
+            case SUNRPC_REPLY:
+            {
+                const ReplyHeader* reply = static_cast<const ReplyHeader*>(msg);
+                switch(reply->stat())
+                {
+                    case SUNRPC_MSG_ACCEPTED:
+                    {
+                        // TODO: check accepted reply
+                    }
+                    break;
+                    case SUNRPC_MSG_DENIED:
+                    {
+                        // TODO: check rejected reply
+                    }
+                    break;
                 }
-                return packetlen - size;
             }
+            break;
         }
-
-        /* make sure that we have the critical parts of the call header */
-        uint32_t size = 8 + 16;
-        if(packetlen < size) {
-            return 0;
-        }
-        packetlen -= size;
-
-        uint32_t rpcvers = ntohl(rpcp->body.cbody.cb_rpcvers);
-        //uint32_t prog = ntohl(rpcp->body.cbody.cb_prog);
-        uint32_t vers = ntohl(rpcp->body.cbody.cb_vers);
-        //uint32_t proc = ntohl(rpcp->body.cbody.cb_proc);
-
-        if(rpcvers != 2)    return 0;
-      //  if(prog != 100003)  return 0;  // portmap NFS v3 TCP 2049
-        if(vers != 3)       return 0;  // NFS v3
 
         return packetlen;
     }
