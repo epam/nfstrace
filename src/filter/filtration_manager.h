@@ -6,26 +6,17 @@
 #ifndef FILTRATION_MANAGER_H
 #define FILTRATION_MANAGER_H
 //------------------------------------------------------------------------------
-#include <algorithm> // std::for_each macros
 #include <memory> // std::auto_ptr
-#include <vector> // std::vector
-
-#include <pcap/pcap.h>
 
 #include "../controller/running_status.h"
 #include "common/simply_nfs_filtrator.h"
 #include "../auxiliary/thread_group.h"
 #include "pcap/packet_capture.h"
-#include "pcap/packet_reader.h"
 #include "processing_thread.h"
-#include "pcap/base_reader.h" // Will be removed after creation of appropriate processor
-#include "pcap/pcap_error.h" // Will be removed after creation of appropriate processor
 //------------------------------------------------------------------------------
 using NST::controller::RunningStatus;
 using NST::filter::pcap::PacketCapture;
-using NST::filter::pcap::PacketReader;
 using NST::filter::ProcessingThread;
-using NST::filter::pcap::BaseReader; // Will be removed after creation of appropriate processor
 using NST::filter::pcap::PcapError;
 using NST::auxiliary::ThreadGroup;
 using NST::auxiliary::Thread;

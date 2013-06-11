@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Thread protected container for exceptions.
+// Description: Container for storing threads' exceptions.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef RUNNING_STATUS_H
@@ -32,11 +32,11 @@ public:
     {
         Mutex::Lock lock(mutex);
 
-        List::iterator i_beg = fifo.begin();
-        List::iterator i_end = fifo.end();
-        for(; i_beg != i_end; ++i_beg)
+        List::iterator i = fifo.begin();
+        List::iterator end = fifo.end();
+        for(; i != end; ++i)
         {
-            delete *i_beg;
+            delete *i;
         }
     }
 
@@ -55,19 +55,22 @@ public:
             condition.wait(mutex);
         }
         std::exception* e = fifo.front();
-        fifo.pop_front();    
+        fifo.pop_front();
         return e;
     }
-    
+
     void print(std::ostream& out)
     {
         Mutex::Lock lock(mutex);
-
-        List::iterator i_beg = fifo.begin();
-        List::iterator i_end = fifo.end();
-        for(; i_beg != i_end; ++i_beg)
+        if(!fifo.empty())
         {
-            out << (*i_beg)->what() << std::endl;
+            List::iterator i = fifo.begin();
+            List::iterator end = fifo.end();
+            out << "list of caught exceptions:" << std::endl;
+            for(; i != end; ++i)
+            {
+                out << '\t' << (*i)->what() << std::endl;
+            }
         }
     }
 

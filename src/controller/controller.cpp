@@ -64,11 +64,9 @@ int Controller::run(int argc, char** argv)
     // Start modules to processing
     filtration.start();
 
-    /*
-     * Handle exception in additional class.
-     */
-    std::auto_ptr<std::exception> e(excpts_holder.pop_wait()); // Waiting some exception or user-signal
-    std::cerr << "* " << e->what() << std::endl;
+    // Waiting some exception or user-signal for handling
+    std::auto_ptr<std::exception> e(excpts_holder.pop_wait());
+    std::cerr << e->what() << std::endl;
 
     // Stop all modules here
     filtration.stop();

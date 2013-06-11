@@ -6,6 +6,8 @@
 #ifndef SYNCHRONOUS_SIGNAL_HANDLING_H
 #define SYNCHRONOUS_SIGNAL_HANDLING_H
 //------------------------------------------------------------------------------
+#include <sstream>
+
 #include <unistd.h>
 
 #include "../auxiliary/thread.h"
@@ -22,7 +24,7 @@ namespace controller
 {
 
 /*
- * Manage whole process for reading and processing data from interfaces.
+ * Handle all signals passed to the application.
  */
 class SynchronousSignalHandling : public Thread
 {
@@ -44,7 +46,7 @@ public:
 
         int signo = 0;
         Exception* exception = NULL;
-        
+
         while(true)
         {
             // Synchronously wait of the signals
@@ -54,7 +56,9 @@ public:
             {
                 return NULL;
             }
-            exception = new Exception(std::string("User signal was catched."));
+            std::stringstream msg;
+            msg << "got signal: " << signo;
+            exception = new Exception(msg.str());
             excpts_holder.push(exception);
         }
         return NULL;
@@ -62,9 +66,8 @@ public:
 
     virtual void stop()
     {
-        pid_t pid = getpid();
-        // Send signal ourself to stop thread execution
-        kill(pid, SIGUSR2);
+        // Send signal ourself to stop thread execution via unblock sigwait()
+        kill(getpid(), SIGUSR2);
     }
 
 private:

@@ -145,7 +145,7 @@ public:
                 if(prog != 100003)  return 0;  // portmap NFS v3 TCP 2049
                 if(vers != 3)       return 0;  // NFS v3
 
-                std::cout << *call << std::endl;
+                //std::cout << *call << std::endl;
 
             }
             break;

@@ -28,7 +28,6 @@ public:
         : Exception(std::string(func)+"():"+std::string(errbuf)) { }
 };
 
-
 } // namespace pcap
 } // namespace filter
 } // namespace NST
