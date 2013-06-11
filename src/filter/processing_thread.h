@@ -7,8 +7,10 @@
 #define PROCESSING_THREAD_H
 //------------------------------------------------------------------------------
 #include "../auxiliary/thread.h"
+#include "../controller/running_status.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Thread;
+using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -22,7 +24,7 @@ template<typename Reader, typename Processor>
 class ProcessingThread : public Thread
 {
 public:
-    ProcessingThread(Reader* r, Processor* p) : reader(r), proc(p)
+    ProcessingThread(Reader* r, Processor* p, RunningStatus &running_status) : reader(r), proc(p), excpts_holder(running_status)
     {
     }
     ~ProcessingThread()
@@ -31,9 +33,17 @@ public:
         delete proc;
     }
 
-    virtual void run()
-    {
-        reader->loop(*proc);
+    virtual void* run()
+    {   
+        try
+        {
+            reader->loop(*proc);
+        }
+        catch(std::exception* exception)
+        {
+            excpts_holder.push(exception);
+        }
+        return NULL;
     }
 
     virtual void stop()
@@ -44,6 +54,7 @@ public:
 private:
     Reader* reader;
     Processor* proc;
+    RunningStatus& excpts_holder;
 };
 
 } // namespace filter

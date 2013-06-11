@@ -4,10 +4,7 @@
 // of the application.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include <csignal>
 #include <iostream>
-
-#include <unistd.h>
 
 #include "cmdline_args.h"
 #include "controller.h"
@@ -20,9 +17,7 @@ namespace controller
 
 typedef cmdline::Args CLI;  // short alias for structure of cli-arguments
 
-static Controller* g_controller = NULL;
-
-Controller::Controller() : running(false)
+Controller::Controller() : sig_handler(excpts_holder), filtration(excpts_holder)
 {
 }
 
@@ -50,63 +45,35 @@ int Controller::parse_cmdline_args(int argc, char** argv)
     return 1;
 }
 
-bool Controller::set_signal_handlers()
-{
-    if(g_controller)
-    {
-        return false;
-    }
-
-    g_controller = this;
-
-    if(signal(SIGINT,  Controller::signal_handler) == SIG_ERR
-    || signal(SIGTERM, Controller::signal_handler) == SIG_ERR
-    || signal(SIGPIPE, Controller::signal_handler) == SIG_ERR)
-    {
-        return false;
-    }
-    return true;
-}
-
-void Controller::signal_handler(int sig)
-{
-    g_controller->stop();
-}
-
-void Controller::stop()
-{
-    // here we try to stop modules correctly
-    filtration.stop();
-    running = false;
-}
-
 int Controller::run(int argc, char** argv)
 {
-    running = true;
     int parse_res = parse_cmdline_args(argc, argv);
     if(parse_res <= 0)
     {
         return parse_res;
     }
 
-    if(!Controller::set_signal_handlers())
-    {
-        return -1;
-    }
-
-
     if(params[CLI::DUMP].to_bool())   // online dump mode
     {
         init_online_dump();
     }
 
-    // start modules to processing
+    // Start handling user signals
+    sig_handler.create();
+    
+    // Start modules to processing
     filtration.start();
 
-    while(running)
-    {
-        sleep(1);
-    }
+    /*
+     * Handle exception in additional class.
+     */
+    std::auto_ptr<std::exception> e(excpts_holder.pop_wait()); // Waiting some exception or user-signal
+    std::cerr << "* " << e->what() << std::endl;
+
+    // Stop all modules here
+    filtration.stop();
+    excpts_holder.print(std::cerr);
+    sig_handler.stop();
 
     return 0;
 }

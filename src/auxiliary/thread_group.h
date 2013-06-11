@@ -7,6 +7,7 @@
 #define TREAD_GROUP_H
 //------------------------------------------------------------------------------
 #include <list>
+#include <iostream>
 
 #include "thread.h"
 //------------------------------------------------------------------------------
@@ -17,26 +18,42 @@ namespace auxiliary
 {
 
 class ThreadGroup
-{
+{    
+    typedef std::list<Thread*> list;
+
 public:
     ThreadGroup()
     {
     }
-
     ~ThreadGroup()
     {
         stop(); // Additional checking before cleaning table
-        for_each(threads.begin(), threads.end(), destroy_thread);
+        list::iterator i_beg = threads.begin();
+        list::iterator i_end = threads.end();
+        for(;i_beg != i_end; ++i_beg)
+        {
+            delete *i_beg;
+        }
     }
 
     void start()
     {
-        std::for_each(threads.begin(), threads.end(), start_thread);
+        list::iterator i_beg = threads.begin();
+        list::iterator i_end = threads.end();
+        for(;i_beg != i_end; ++i_beg)
+        {
+            (*i_beg)->create();
+        }
     }
 
     void stop()
     {
-        std::for_each(threads.begin(), threads.end(), stop_thread);
+        list::iterator i_beg = threads.begin();
+        list::iterator i_end = threads.end();
+        for(;i_beg != i_end; ++i_beg)
+        {
+            (*i_beg)->stop();
+        }
     }
 
     void add(Thread *thread)
@@ -45,22 +62,7 @@ public:
     }
 
 private:
-    static void destroy_thread(Thread *thread)
-    {
-        delete thread;
-    }
-
-    static void stop_thread(Thread* thread)
-    {
-        thread->stop();
-    }
-
-    static void start_thread(Thread* thread)
-    {
-        thread->create();
-    }
-private:
-    std::list<Thread*> threads;
+    list threads;
 };
 
 } // namespace auxiliary

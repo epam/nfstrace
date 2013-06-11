@@ -22,7 +22,7 @@ catch(const std::exception& e)
 }
 catch(...)
 {
-    std::cerr << "unknown error" << std::endl;
+    std::cerr << "Unknown error" << std::endl;
     exit(-1);
 }
 //------------------------------------------------------------------------------

@@ -10,6 +10,8 @@
 #include "cmdline_args.h"
 
 #include "../filter/filtration_manager.h"
+#include "synchronous_signal_handling.h"
+#include "running_status.h"
 //------------------------------------------------------------------------------
 using NST::filter::FiltrationManager;
 //------------------------------------------------------------------------------
@@ -27,17 +29,18 @@ public:
     int run(int argc, char** argv);
 
 private:
-    bool set_signal_handlers();
-    static void signal_handler(int sig);
     int parse_cmdline_args(int argc, char** argv);
 
     void init_online_dump();
 
-    void stop();
-    bool running;
-
     // this object stores command-line parameters of the application
     cmdline::Params params;
+
+    // Container for generated exceptions
+    RunningStatus excpts_holder;
+
+    // Signal handler. Working in its own thread.
+    SynchronousSignalHandling sig_handler;
 
     // Controller contains instances of modules
     FiltrationManager filtration;

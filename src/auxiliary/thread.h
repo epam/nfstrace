@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 #include <pthread.h>
 #include <signal.h>
+#include <iostream>
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -18,42 +19,48 @@ namespace auxiliary
 class Thread
 {
 public:
-    Thread() : thread(0)
+    Thread(bool detached = false) : thread(0), is_detached(detached)
     {
     }
     virtual ~Thread()
     {
-        if(thread)
+        if((thread != 0) && (!is_detached)) 
         {
-            pthread_join(thread, NULL);
+            join();
         }
     }
+
     static void* thread_function(void* usr_data)
     {
-        Thread& thread = *(Thread *)(usr_data);
-        thread.run();
-        return NULL;
+        return ((Thread *)(usr_data))->run();
     }
 
     bool create()
-    {
-        /*
-        sigset_t parent_mask, child_mask;
-        sigfillset(&child_mask);
-        pthread_sigmask(SIG_SETMASK, NULL, &parent_mask);   // Saving main thread mask
-        pthread_sigmask(SIG_BLOCK, &child_mask, NULL);      // Apply new mask, all signals will be blocked
-        */
-        // Create child thread
-        bool res = pthread_create(&thread, NULL, thread_function, (void*)this) == 0;
-
-        //pthread_sigmask(SIG_SETMASK, &parent_mask, NULL);   // Restoring main thread mask
-        return res;
+    {   
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+        if(is_detached) 
+        {
+            pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+        }
+        int ret = pthread_create(&thread, &attr, thread_function, (void*)this);
+        pthread_attr_destroy(&attr);
+        return ret == 0;
     }
-    virtual void run() = 0;
+
+    void* join()
+    {
+        void* retval = NULL;
+        pthread_join(thread, &retval);
+        return retval;
+    }
+
+    virtual void* run() = 0;
     virtual void stop() = 0;
 
 private:
     pthread_t thread;
+    bool is_detached;
 };
 
 } // namespace filter

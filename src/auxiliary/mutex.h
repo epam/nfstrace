@@ -17,6 +17,7 @@ namespace auxiliary
 class Mutex
 {
 public:
+    friend class ConditionalVariable;
     Mutex()
     {
         pthread_mutex_init(&mutex, NULL);
@@ -40,10 +41,12 @@ public:
 
         Lock(const Lock&);              // undefined
         Lock& operator=(const Lock&);   // undefined
+
     private:
         const Mutex& locked;
     };
 
+private:
     Mutex(const Mutex&);            // undefined
     Mutex& operator=(const Mutex&); // undefined
 
