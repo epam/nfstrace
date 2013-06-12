@@ -9,6 +9,7 @@ su -                         pass: 123qwe
 python load_tests.py 20 /mnt/fedora_share/
 
 on fedora:
+<Control-C>   interrupt dumper 
 scp *.pcap  <destination on the host with wireshark>
 
 on host:
