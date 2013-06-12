@@ -7,7 +7,6 @@
 #define CONDITIONAL_VARIABLE_H
 //------------------------------------------------------------------------------
 #include <pthread.h>
-#include <error.h>
 
 #include "exception.h"
 #include "mutex.h"
