@@ -1,0 +1,16 @@
+
+ssh nst@10.6.137.24      pass: nst
+cd avere/NST/trunk/
+su                                     pass: 123qwe
+./build/nfstrace -i eth0
+
+ssh nst@epbyminw3644t5.minsk.epam.com       pass: nst
+su -                         pass: 123qwe
+python load_tests.py 20 /mnt/fedora_share/
+
+on fedora:
+scp *.pcap  <destination on the host with wireshark>
+
+on host:
+wireshark
+
