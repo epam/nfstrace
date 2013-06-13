@@ -53,7 +53,7 @@ int Controller::run(int argc, char** argv)
         return parse_res;
     }
 
-    if(params[CLI::DUMP].to_bool())   // online dump mode
+    if(params[CLI::MODE].is("dump"))   // online dump mode
     {
         init_online_dump();
     }
