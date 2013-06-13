@@ -53,10 +53,7 @@ int Controller::run(int argc, char** argv)
         return parse_res;
     }
 
-    if(params[CLI::MODE].is("dump"))   // online dump mode
-    {
-        init_online_dump();
-    }
+    init_runing();
 
     // Start handling user signals
     sig_handler.create();
@@ -76,19 +73,29 @@ int Controller::run(int argc, char** argv)
     return 0;
 }
 
-void Controller::init_online_dump()
+void Controller::init_runing()
 {
+    const std::string mode  = params[CLI::MODE];
     const std::string iface = params[CLI::INTERFACE];
     const std::string port  = params[CLI::PORT];
     const std::string slen  = params[CLI::SNAPLEN];
     unsigned short snaplen  = params[CLI::SNAPLEN].to_int();
     const std::string filter= "tcp port " + port;
 
-    const std::string ofile = params.is_default(CLI::OFILE) ?
+    if(mode == "dump")   // online dump mode
+    {
+        const std::string ofile = params.is_default(CLI::OFILE) ?
                                 iface+"-"+port+"-"+slen+".pcap" :
                                 params[CLI::OFILE];
 
-    filtration.dump_to_file(iface, filter, snaplen, 100, ofile);
+        filtration.dump_to_file(iface, filter, snaplen, 100, ofile);
+    }
+    else if(mode == "mon")   // online monitoring mode
+    {
+    }
+    else if(mode == "stat")   // offline analysis mode
+    {
+    }
 }
 
 } // namespace controller
