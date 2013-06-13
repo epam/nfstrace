@@ -39,7 +39,6 @@ $(OBJS): $$(patsubst $(OBJ_DIR)/%.o, $(SRC_DIR)/%.cpp, $$@)
 
 .SECONDEXPANSION:
 $(DEPS): $$(patsubst $(DEP_DIR)/%.d, $(SRC_DIR)/%.cpp, $$@)
-	echo $^
 	@mkdir -p $(dir $@)
 	$(CC) $< -MM -MF $@ \
 		-MT $(patsubst $(DEP_DIR)/%.d, $(OBJ_DIR)/%.o, $@) -MT $@
