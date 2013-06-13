@@ -1,36 +1,31 @@
--include config.mk
-SRC_DIR:=src
-DEPS_DIR:=deps
-OBJ_DIR:=obj
+include config.mk
 
 ifndef TARGET
 TARGET:=out
 endif
 
+ifeq "$(MAKECMDGOALS)" "debug"
+CFLAGS+=$(DEBUG_FLAGS)
+OUT_DIR:=debug
+else
+CFLAGS+=$(RELEASE_FLAGS)
+OUT_DIR:=release
+endif
+
+
+SRC_DIR:=src
+OBJ_DIR:=$(OUT_DIR)/obj
+DEP_DIR:=$(OUT_DIR)/dep
+
 SRCS:=$(shell find $(SRC_DIR)/ -type f -name *.cpp)
-DEPS:=$(patsubst $(SRC_DIR)/%.cpp, $(DEPS_DIR)/%.d, $(SRCS))
+DEPS:=$(patsubst $(SRC_DIR)/%.cpp, $(DEP_DIR)/%.d, $(SRCS))
 OBJS:=$(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
+CC:=g++
 
-CC:=gcc
-CFLAGS+=-Wall
-LIBS+=-lstdc++
+.PHONY: release debug clean
 
-#builds release version in release folder with command 'make release' or just 'make'
-.PHONY: release
-release: CFLAGS+=$(RELEASE_FLAGS)
-release: OBJ_DIR:=obj
-release: OUT_DIR=release
-release: all
-
-#does the same thing that release target, but with -g flag and in debug folder
-.PHONY: debug
-debug: OBJ_DIR:=obj-debug
-debug: CFLAGS+=$(DEBUG_FLAGS)
-debug: OUT_DIR=debug
-debug: all
-
-.PHONY: all
-all: $(TARGET)
+release: $(TARGET)
+debug: $(TARGET)
 
 $(TARGET):$(OBJS)
 	@mkdir -p $(OUT_DIR)
@@ -43,14 +38,14 @@ $(OBJS): $$(patsubst $(OBJ_DIR)/%.o, $(SRC_DIR)/%.cpp, $$@)
 	$(CC) -c $(CFLAGS) $< -o $@ $(LIBS)
 
 .SECONDEXPANSION:
-$(DEPS): $$(patsubst $(DEPS_DIR)/%.d, $(SRC_DIR)/%.cpp, $$@)
+$(DEPS): $$(patsubst $(DEP_DIR)/%.d, $(SRC_DIR)/%.cpp, $$@)
+	echo $^
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $< -MM -MF $@ \
-		-MT $(patsubst $(DEPS_DIR)/%.d, $(OBJ_DIR)/%.o, $@) -MT $@ $(LIBS)
+	$(CC) $< -MM -MF $@ \
+		-MT $(patsubst $(DEP_DIR)/%.d, $(OBJ_DIR)/%.o, $@) -MT $@
 
-.PHONY: clean
 clean:
-	@rm -rf debug release obj $(OBJ_DIR) $(DEPS_DIR)
+	@rm -rf debug release
 
 ifneq "$(MAKECMDGOALS)" "clean"
 -include $(DEPS)

@@ -1,4 +1,7 @@
 TARGET:=nfstrace
-LIBS+=-lpcap -lpthread
-CFLAGS+=-O3
+LIBS   += -lstdc++ -lpthread -lpcap
+CFLAGS += -static-libgcc -Wall
+
+RELEASE_FLAGS += -O3
+DEBUG_FLAGS   += -O0 -g -DDEBUG
 
