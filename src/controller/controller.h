@@ -31,7 +31,7 @@ public:
 private:
     int parse_cmdline_args(int argc, char** argv);
 
-    void init_online_dump();
+    void init_runing();
 
     // this object stores command-line parameters of the application
     cmdline::Params params;
