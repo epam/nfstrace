@@ -41,10 +41,10 @@ struct Opt
         {
         }
 
-        operator const char*() const { return value; }
-        operator std::string() const { return std::string(value); }
-        int           to_int() const { return atoi(value); }
+        operator std::string() const { return std::string(value);           }
+        int           to_int() const { return atoi(value);                  }
         bool         to_bool() const { return std::string(value) == "true"; }
+        bool is(const char* s) const { return strcmp(value, s) == 0;        }
 
     private:
         const char* const value;

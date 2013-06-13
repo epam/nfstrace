@@ -23,7 +23,7 @@ struct Args
         INTERFACE,
         PORT,
         SNAPLEN,
-        DUMP,
+        MODE,
         OFILE,
         HELP,
         num,
