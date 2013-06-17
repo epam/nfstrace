@@ -29,6 +29,7 @@
 #include <signal.h>
 #include <iomanip>
 
+#include "../../src/analyzer/nfs_data.h"
 #include "../../src/auxiliary/spinlock.h"
 #include "../../src/controller/cmdline_parser.h"
 #include "../../src/filter/pcap/pcap_error.h"
@@ -39,6 +40,7 @@
 #include "../../src/filter/rpc/rpc_message.h"
 #include "../../src/filter/tcp/tcp_header.h"
 //------------------------------------------------------------------------------
+using NST::analyzer::NFSData;
 using NST::auxiliary::Spinlock;
 using NST::filter::pcap::PcapError;
 using NST::filter::pcap::PacketCapture;
@@ -583,7 +585,6 @@ public:
         pthread_cancel(workload_tid);
         pthread_join(workload_tid, &res);
 
-        sessions.print(std::cout);
         discard.collect();
         discard.print(std::cout);
 
@@ -642,12 +643,12 @@ public:
                 }
         }
 
-        rpc_msg* msg = RPC::parse(type, data, size);
+        const rpc_msg* msg = RPC::parse(type, data, size);
 
         if(msg)
         {
-            captured++;
-            discarded--;
+            p.captured++;
+            p.discarded--;
             p.packets->dump(pkthdr, packet);
         }
     }
@@ -666,7 +667,7 @@ private:
         while(1)
         {
 
-            std::cout << "\rdumped: " << p.captured_size << " invalid: " << p.invalid;
+            std::cout << "\rcaptured: " << p.captured << " discarded: " << p.discarded;
             std::cout.flush();
 
             sleep(5); // cancellation point
