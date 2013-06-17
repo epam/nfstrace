@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: BlockAllocatorManagerManager redirect requests to appropriate 
-//              BlockAllocatorManager and make 
+// Description: BlockAllocatorManager redirect requests to appropriate 
+//              BlockAllocator
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef BLOCK_ALLOCATOR_MANAGER_H
@@ -29,51 +29,51 @@ class BlockAllocatorManager
         BlockAllocator allocator;
         Spinlock spinlock;
     };
+
 public:
-    BlockAllocatorManager(uint32_t min_size, uint32_t step_size, uint32_t step_n, uint16_t block_size = 128, uint16_t block_limit = 3) : min(min_size), step(step_size), count(step_n)
+    BlockAllocatorManager(uint32_t min_size, uint32_t step_size, uint32_t step_n, uint16_t block_size = 128, uint16_t block_limit = 8) : min(min_size), step(step_size), count(step_n), pools(NULL)
     {
-        pools = new LockedAllocator[count]; 
+        pools = new LockedAllocator[count];
         for(uint16_t i = 0; i < count; ++i)
         {
-            pools[i].allocator.init_allocation(min + i * step + sizeof(BlockAllocator*), block_size, block_limit);
+            pools[i].allocator.init_allocation(min + i * step + sizeof(LockedAllocator*), block_size, block_limit);
         }
     }
 
     ~BlockAllocatorManager()
     {
-        delete pools;
+        delete[] pools;
     }
 
     inline void* allocate(size_t size)
     {
-        int i = 0;
-        if(size > min)
-        {
-            i = (size - min) / step + 1;
-        }
+        int i = (size - min) / step;
+
         if(i > count)
         {
             return NULL;
         }
-        
-        void* ptr = NULL;
 
+        void* ptr = NULL;
         {
             Spinlock::Lock lock(pools[i].spinlock);
             ptr = pools[i].allocator.allocate();
         }
 
-        if(!ptr)
-            return NULL;
-        *(LockedAllocator**)ptr = &pools[i];
-        return ((LockedAllocator*)ptr) + 1;
+        if(ptr == NULL) return NULL;
+
+        LockedAllocator** lp = ((LockedAllocator**)ptr);
+        *lp = &pools[i];
+        return lp + 1;
     }
 
     inline void deallocate(void* ptr)
     {
-        LockedAllocator* p = ((LockedAllocator*)ptr) - 1;
-        Spinlock::Lock lock(p->spinlock);
-        p->allocator.deallocate((BlockAllocator::Chunk*) p);
+        LockedAllocator** lp = ((LockedAllocator**)ptr) - 1;
+        LockedAllocator* pool = *lp;
+
+        Spinlock::Lock lock(pool->spinlock);
+        pool->allocator.deallocate((BlockAllocator::Chunk*) lp);
     }
 
 private:

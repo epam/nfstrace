@@ -22,19 +22,12 @@ class BlockAllocator
 public:
     struct Chunk
     {
-        friend class BlockAllocator;
+    friend class BlockAllocator;
         inline char*const ptr() const { return (char*)this; }
 
     private:
-        Chunk* next;        // used only for list chunks in list
+        Chunk* next; // used only for list chunks in list
     };
-
-    BlockAllocator(uint32_t chunk_size, uint16_t block_size, uint16_t block_limit) : limit(block_limit), block(block_size), chunk(chunk_size), allocated(0)
-    {
-        blocks = new Chunk*[limit];
-        memset(blocks, 0, sizeof(Chunk*)*limit);
-        list = blocks[0] = new_block();
-    }
 
     BlockAllocator() : limit(0), block(0), chunk(0), allocated(0), blocks(NULL), list(NULL)
     {
@@ -46,14 +39,14 @@ public:
         {
             delete blocks[i];
         }
-        delete blocks;
+        delete[] blocks;
     }
 
-    void init_allocation(uint32_t chunk_size, uint16_t block_size, uint16_t block_limit)
+    void init_allocation(uint32_t chunk_size, uint32_t block_size, uint32_t block_limit)
     {
-        limit = block_limit;
-        block = block_size;
         chunk = chunk_size;
+        block = block_size;
+        limit = block_limit;
 
         blocks = new Chunk*[limit];
         memset(blocks, 0, sizeof(Chunk*)*limit);
@@ -100,12 +93,12 @@ private:
         return (Chunk*) ptr;
     }
 
-    uint16_t limit;       // max blocks
-    uint16_t block;       // num chunks in block
     uint32_t chunk;       // chunk size
-    uint16_t allocated;         // num of allocated blocks
-    Chunk** blocks;             // array of blocks
-    Chunk* list;                // list chunks
+    uint32_t block;       // num chunks in block
+    uint32_t limit;       // max blocks
+    uint32_t allocated;   // num of allocated blocks, up to limit
+    Chunk** blocks;       // array of blocks
+    Chunk* list;          // list of free chunks
 };
 
 } // auxiliary
