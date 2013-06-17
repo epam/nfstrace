@@ -6,9 +6,8 @@
 #ifndef BLOCK_ALLOCATOR_H
 #define BLOCK_ALLOCATOR_H
 //------------------------------------------------------------------------------
-#include <cstring>  // for memset()
-
-#include "spinlock.h"
+#include <cstring>       // for memset()
+#include <inttypes.h>    // for uintXX_t
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -16,93 +15,85 @@ namespace NST
 namespace auxiliary
 {
 
-// return NULL when limit is reached
-// may throw std::bad_alloc() when memory is not enough
-template
-<
-unsigned int chunk, // len of chunk in bytes
-unsigned int limit  // max blocks
->
+// Return NULL when limit is reached
+// May throw std::bad_alloc() when memory is not enough
 class BlockAllocator
 {
 public:
     struct Chunk
     {
-    friend class BlockAllocator;
-
-    inline char*const ptr() const { return u.data; }
+        friend class BlockAllocator;
+        inline char*const ptr() const { return (char*)this; }
 
     private:
         union
         {
             Chunk* next;        // used only for free chunks in list
-            char   data[chunk]; // payload
         } u;
     };
 
-    BlockAllocator(unsigned int size):block(size), allocated(0)
+    BlockAllocator(uint32_t chunk_size, uint16_t block_size, uint16_t block_limit) : limit(block_limit), block(block_size), chunk(chunk_size), allocated(0)
     {
-        memset(&blocks, 0, sizeof(blocks));
-        list = blocks[0] = new_block();
+        blocks = new Chunk*[limit];
+        memset(blocks, 0, sizeof(Chunk*)*limit);
+        free = blocks[0] = new_block();
     }
 
     ~BlockAllocator()
     {
-        for(unsigned int i=0; i<limit; i++)
+        for(uint16_t i = 0; i<limit; i++)
         {
             delete blocks[i];
         }
+        delete blocks;
     }
 
     inline Chunk* allocate()
     {
-        Spinlock::Lock lock(spinlock);
-            if(list == NULL)
+        if(free == NULL)
+        {
+            if(allocated < limit)
             {
-                unsigned int i = limit - allocated; // index of avaliable block
-                if(i)
-                {
-                    list = blocks[i] = new_block();
-                }
-                else return NULL; // all blocks are allocated!
+                free = blocks[allocated] =  new_block();
             }
+            else return NULL; // all blocks are allocated!
+        }
 
-            Chunk* c = list;
-            list = list->u.next;
-            return c;
+        Chunk* c = free;
+        free = free->u.next;
+        return c;
     }
 
     inline void deallocate(Chunk* c)
     {
-        Spinlock::Lock lock(spinlock);
-            c->u.next = list;
-            list = c;
+        c->u.next = free;
+        free = c;
     }
 
     // limits
-    inline const unsigned int max_chunks() const { return block*limit;               }
-    inline const unsigned int max_memory() const { return block*limit*sizeof(Chunk); }
-    inline const unsigned int max_stdnew() const { return limit;                     }
+    inline const unsigned int max_chunks() const { return block*limit;       }
+    inline const unsigned int max_memory() const { return block*limit*chunk; }
+    inline const unsigned int max_blocks() const { return limit;             }
 
 private:
-
     Chunk* new_block()
     {
-        Chunk* ptr = new Chunk[block];
-        for(unsigned int i=0; i<block-1; ++i)
+        char* ptr = new char[block*chunk];
+        for(uint16_t i = 0; i<block-1; ++i)
         {
-            ptr[i].u.next = ptr+i+1;
+            ((Chunk*) &ptr[i * chunk])->u.next = (Chunk*) &ptr[(i + 1) * chunk];
         }
-        ptr[block-1].u.next = NULL; // set last
+        ((Chunk*) &ptr[(block - 1) * chunk])->u.next = NULL;
         ++allocated;
-        return ptr;
+        return (Chunk*) ptr;
     }
 
-    Chunk* blocks[limit];       // array of blocks
-    const unsigned int block;   // num chunks in block
-    unsigned int allocated;     // num of allocated blocks
-    Chunk* list;                // free chunks
-    Spinlock spinlock;
+    const uint16_t limit;       // max blocks
+    const uint16_t block;       // num chunks in block
+    const uint32_t chunk;       // chunk size
+    uint16_t allocated;         // num of allocated blocks
+    Chunk** blocks;             // array of blocks
+    Chunk* free;                // free chunks
 };
 
 } // auxiliary
