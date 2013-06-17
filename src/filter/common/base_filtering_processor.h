@@ -1,58 +1,52 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Implements dummy filtrator for NFS Calls and Replies.
+// Description: Generic data structures for filtration raw pcap packets.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef SIMPLY_NFS_FILTRATOR_H
-#define SIMPLY_NFS_FILTRATOR_H
+#ifndef BASE_FILTERING_PROCESSOR_H
+#define BASE_FILTERING_PROCESSOR_H
 //------------------------------------------------------------------------------
-#include <memory> // for std::auto_ptr
 #include <string>
 
 #include <pcap/pcap.h>
-
-#include "../pcap/packet_dumper.h"
 
 #include "../ethernet/ethernet_header.h"
 #include "../ip/ipv4_header.h"
 #include "../rpc/rpc_message.h"
 #include "../tcp/tcp_header.h"
 //------------------------------------------------------------------------------
-using NST::filter::pcap::PacketDumper;
-
 using namespace NST::filter::rpc;
-using NST::filter::ethernet::ethernet_header;
-using NST::filter::ip::ipv4_header;
-using NST::filter::tcp::tcp_header;
+using namespace NST::filter::ethernet;
+using namespace NST::filter::ip;
+using namespace NST::filter::tcp;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filter
 {
 
-class SimplyNFSFiltrator
+class BaseFilteringProcessor
 {
 public:
-    SimplyNFSFiltrator(const std::string& path):file(path), captured(0), discarded(0)
+
+    struct FiltrationData
+    {
+        const pcap_pkthdr*  header;
+        const uint8_t*      packet;
+    };
+
+    BaseFilteringProcessor()
     {
     }
-    ~SimplyNFSFiltrator()
+    virtual ~BaseFilteringProcessor()
     {
     }
 
-    void before_callback(pcap_t* handle)
-    {
-        // prepare packet dumper
-        packets.reset(new PacketDumper(handle, file.c_str()));
-        captured    = 0;
-        discarded   = 0;
-    }
+    virtual void before_callback(pcap_t* handle){}
+    virtual void after_callback (pcap_t* handle){}
 
-    void after_callback(pcap_t* handle)
-    {
-        // destroy packet dumper
-        packets.release();
-    }
+    virtual void discard(const FiltrationData& data)=0;
+    virtual void collect(const FiltrationData& data)=0;
 
     u_char* get_user()
     {
@@ -61,9 +55,7 @@ public:
 
     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
     {
-        SimplyNFSFiltrator& processor = *(SimplyNFSFiltrator*) user;
-
-        processor.discarded++;
+        BaseFilteringProcessor& processor = *(BaseFilteringProcessor*) user;
 
         uint32_t len = pkthdr->len;
         uint32_t iplen = validate_eth_frame(len, packet);
@@ -90,9 +82,12 @@ public:
             return;
         }
 
-        processor.captured++;
-        processor.discarded--;
-        processor.packets->dump(pkthdr, packet);
+        FiltrationData data;
+
+        data.header = pkthdr;
+        data.packet = packet;
+
+        processor.collect(data);
     }
 
     // validation methods return packet length without header they validate or 0 on error
@@ -145,8 +140,6 @@ public:
                 if(prog != 100003)  return 0;  // portmap NFS v3 TCP 2049
                 if(vers != 3)       return 0;  // NFS v3
 
-                //std::cout << *call << std::endl;
-
             }
             break;
             case SUNRPC_REPLY:
@@ -174,15 +167,10 @@ public:
 
 private:
 
-    std::string file;
-    std::auto_ptr<PacketDumper> packets;
-
-    uint64_t captured;
-    uint32_t discarded;
 };
 
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//SIMPLY_NFS_FILTRATOR_H
+#endif//BASE_FILTERING_PROCESSOR_H
 //------------------------------------------------------------------------------
