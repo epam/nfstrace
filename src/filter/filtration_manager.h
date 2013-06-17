@@ -8,18 +8,18 @@
 //------------------------------------------------------------------------------
 #include <memory> // std::auto_ptr
 
-#include "../controller/running_status.h"
-#include "common/simply_nfs_filtrator.h"
 #include "../auxiliary/thread_group.h"
+#include "../controller/running_status.h"
+#include "common/dumping_processor.h"
+#include "common/queueing_processor.h"
 #include "pcap/packet_capture.h"
+#include "pcap/packet_reader.h"
 #include "processing_thread.h"
 //------------------------------------------------------------------------------
 using NST::controller::RunningStatus;
 using NST::filter::pcap::PacketCapture;
-using NST::filter::ProcessingThread;
-using NST::filter::pcap::PcapError;
+using NST::filter::pcap::PacketReader;
 using NST::auxiliary::ThreadGroup;
-using NST::auxiliary::Thread;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -28,34 +28,51 @@ namespace filter
 
 class FiltrationManager
 {
-    typedef ProcessingThread<PacketCapture, SimplyNFSFiltrator> OnlineDumpingThread;
-    // OnlineAnalyzingThread and OfflineAnalyzingThread typedefs will be added later.
 public:
-    FiltrationManager(RunningStatus &running_status) : excpts_holder(running_status)
+    FiltrationManager(RunningStatus &s) : status(s)
     {
     }
     ~FiltrationManager()
     {
-        thread_group.stop();
+        threads.stop();
     }
 
-    void dump_to_file(const std::string &interface, const std::string &filter, int snaplen, int ms, const std::string &file)
+    void dump_to_file(const std::string &file, const std::string &interface, const std::string &filter, int snaplen, int ms)
     {
-        std::auto_ptr<PacketCapture>        reader      (new PacketCapture(interface, filter, snaplen, ms));
-        std::auto_ptr<SimplyNFSFiltrator>   processor   (new SimplyNFSFiltrator(file));
-        std::auto_ptr<OnlineDumpingThread>  proc_thread (new OnlineDumpingThread(reader.release(), processor.release(), excpts_holder));
+        typedef ProcessingThread<PacketCapture, DumpingProcessor>  OnlineDumping;
 
-        thread_group.add((Thread*)proc_thread.release());
+        std::auto_ptr<PacketCapture>    reader    (new PacketCapture(interface, filter, snaplen, ms));
+        std::auto_ptr<DumpingProcessor> processor (new DumpingProcessor(file));
+        std::auto_ptr<OnlineDumping>    thread    (new OnlineDumping(reader.release(), processor.release(), status));
+
+        threads.add(thread.release());
+    }
+
+    void capture_to_queue(/*queue*/ const std::string &interface, const std::string &filter, int snaplen, int ms)
+    {
+        typedef ProcessingThread<PacketCapture, QueueingProcessor> OnlineAnalyzing;
+
+        std::auto_ptr<PacketCapture>    reader    (new PacketCapture(interface, filter, snaplen, ms));
+        std::auto_ptr<QueueingProcessor>processor (new QueueingProcessor(/*queue*/));
+        std::auto_ptr<OnlineAnalyzing>  thread    (new OnlineAnalyzing(reader.release(), processor.release(), status));
+
+        threads.add(thread.release());
+    }
+
+    void read_from_file(const std::string &file)
+    {
+        typedef ProcessingThread<PacketReader, QueueingProcessor> OfflineAnalyzing;
+        // TODO: implement Offline analyzing mode
     }
 
     void start()
     {
-        thread_group.start();
+        threads.start();
     }
 
     void stop()
     {
-        thread_group.stop();
+        threads.stop();
     }
 
 private:
@@ -63,8 +80,8 @@ private:
     FiltrationManager& operator=(const FiltrationManager& object); // Uncopyable object
 
 private:
-    ThreadGroup thread_group;
-    RunningStatus &excpts_holder;
+    ThreadGroup threads;
+    RunningStatus &status;
 };
 
 } // namespace filter

@@ -81,6 +81,7 @@ void Controller::init_runing()
     const std::string slen  = params[CLI::SNAPLEN];
     unsigned short snaplen  = params[CLI::SNAPLEN].to_int();
     const std::string filter= "tcp port " + port;
+    const unsigned int ms   = 100;
 
     if(mode == "dump")   // online dump mode
     {
@@ -88,10 +89,11 @@ void Controller::init_runing()
                                 iface+"-"+port+"-"+slen+".pcap" :
                                 params[CLI::OFILE];
 
-        filtration.dump_to_file(iface, filter, snaplen, 100, ofile);
+        filtration.dump_to_file(ofile, iface, filter, snaplen, ms);
     }
     else if(mode == "mon")   // online monitoring mode
     {
+        filtration.capture_to_queue(/*queue*/ iface, filter, snaplen, ms);
     }
     else if(mode == "stat")   // offline analysis mode
     {
