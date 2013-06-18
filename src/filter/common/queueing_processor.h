@@ -45,7 +45,9 @@ public:
 
     virtual void collect(const FiltrationData& data)
     {
-        //NFSData nfs;
+        NFSData nfs;
+
+        nfs.timestamp = data.header->ts;
         // TODO:push data to queue
     }
 
