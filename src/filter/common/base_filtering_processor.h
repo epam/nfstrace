@@ -34,11 +34,11 @@ public:
         // libpcap structures
         const pcap_pkthdr*              header;
         const uint8_t*                  packet;
-        // TODO: WARNING!All pointers points to packet array!
-        
+        // TODO: WARNING!All pointers points to packet data!
+
         // Ethernet II
         const ethernet::EthernetHeader* eth_header;
-        
+
         // IP version 4
         const ip::IPv4Header*           ipv4_header;
 
@@ -71,8 +71,12 @@ public:
     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
     {
         BaseFilteringProcessor* processor = (BaseFilteringProcessor*) user;
-        
-        // TODO: this code must be totally refactored
+
+        // TODO: THIS CODE MUSN BE TOTALLY REFACTORED!
+        // TODO: 1) Design and implement the Readers for each layer
+        //       2) Add multiple sessions with separate reades for each session.
+        //       3) Detect placement of NFS Op data and drop it ASAP
+        //       4) Pass filtered NFS Op headers (RPC messages) to Analysis
 
         FiltrationData data = {0};
 
@@ -81,26 +85,46 @@ public:
 
         const uint32_t len = pkthdr->len;
 
-        uint32_t iplen = validate_eth(data, pkthdr->len, packet);
-        if(!iplen)
+        // parse Data Link Layer
+        uint32_t payload = validate_eth(data, len, packet);
+        if(!payload)
         {
             return processor->discard(data);
         }
 
-        uint32_t tcplen = validate_ipv4(data, iplen, packet + (len - iplen));
-        if(!tcplen)
-        {;
+        // parse Internet Layer
+        switch(data.eth_header->type())
+        {
+        case ethernet_header::IP:
+            payload = validate_ipv4(data, payload, packet + (len - payload));
+            break;
+        case ethernet_header::IPV6: // TODO: implement IPv6
+        default:
+            payload = 0;
+        }
+        if(!payload)
+        {
             return processor->discard(data);
         }
 
-        uint32_t sunrpclen = validate_tcp(data, tcplen, packet + (len - tcplen));
-        if(!sunrpclen)
-        {;
+        // parse Transport Layer
+        switch(data.ipv4_header->protocol())
+        {
+        case ipv4_header::TCP:
+            payload = validate_tcp(data, payload, packet + (len - payload));
+            break;
+        case ipv4_header::UDP: // TODO: implement UDP
+        default:
+            payload = 0;
+        }
+        if(!payload)
+        {
             return processor->discard(data);
         }
 
-        uint32_t nfslen = validate_sunrpc(data, sunrpclen, packet + (len - sunrpclen));
-        if(!nfslen)
+        // parse Application Layer
+        payload = validate_sunrpc(data, payload, packet + (len - payload));
+        if(!payload)
         {
             return processor->discard(data);
         }
@@ -114,8 +138,6 @@ public:
         if(len < sizeof(EthernetHeader)) return 0;
 
         EthernetHeader* header = (EthernetHeader*)packet;
-
-        if(header->type() != ethernet_header::IP) return 0; // TODO: fix it for IPv6
 
         // fill out
         data.eth_header = header;
@@ -132,11 +154,6 @@ public:
         const uint16_t total_len = header->length();
 
         if(header->version() != 4 || total_len > len) // fragmented payload
-        {
-            return 0;
-        }
-
-        if(header->protocol() != ipv4_header::TCP) // TODO: support TCP and UDP
         {
             return 0;
         }
@@ -170,7 +187,7 @@ public:
 
         const RecordMark* rm = (RecordMark*)packet;
 
-        // TODO: Now skip fragmented messages, it isnt well
+        // TODO: handle fragmented messages
         if(len < rm->fragment_len()) return 0; // RPC message are fragmented
 
         const MessageHeader* msg = rm->fragment();

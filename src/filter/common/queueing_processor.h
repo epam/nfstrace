@@ -57,7 +57,7 @@ public:
         NFSData nfs;
 
         nfs.timestamp = data.header->ts;
-        
+
         // TODO: addresses and ports must be ordered for correct TCP sessions matching
         if(data.ipv4_header)
         {
@@ -72,14 +72,12 @@ public:
             nfs.session.port[0] = data.tcp_header->sport();
             nfs.session.port[1] = data.tcp_header->dport();
         }
-        
+
         nfs.rpc_len = std::min(data.rpc_length, sizeof(nfs.rpc_message));
         memcpy(nfs.rpc_message, data.rpc_header, nfs.rpc_len);
-        
-        /*std::cout << "queued RPC bytes: " << nfs.rpc_len << std::endl;
-        std::cout << "port: " << nfs.session.port[0] << " " << nfs.session.port[1] << std::endl;
-        */
-        
+
+        // std::cout << "queued RPC bytes: " << nfs.rpc_len << std::endl;
+        // std::cout << "port: " << nfs.session.port[0] << " " << nfs.session.port[1] << std::endl;
         // TODO:push data to queue
     }
 
