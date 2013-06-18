@@ -82,6 +82,20 @@ struct ipv4_header
     struct in_addr ipv4_dst;    // destination address
 } __attribute__ ((__packed__));
 
+struct IPv4Header:private ipv4_header
+{
+    inline uint8_t  version()  const { return (ipv4_vhl & 0xf0) >> 4; }
+    inline uint8_t  ihl()      const { return (ipv4_vhl & 0x0f)*4;  }
+    inline uint16_t length()   const { return ntohs(ipv4_len);      }
+    inline uint16_t offset()   const { return ipv4_fragmentation & OFFMASK; }
+    inline uint8_t  protocol() const { return ipv4_protocol;        }
+    inline uint32_t src()      const { return ntohl(ipv4_src.s_addr); }
+    inline uint32_t dst()      const { return ntohl(ipv4_dst.s_addr); }
+    inline uint16_t checksum() const { return ntohs(ipv4_checksum); }
+
+    inline const bool is_fragmented()const { return ipv4_fragmentation & (MF | OFFMASK); }
+} __attribute__ ((__packed__));
+
 } //namespace ip
 } // namespace filter
 } // namespace NST

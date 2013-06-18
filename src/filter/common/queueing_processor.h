@@ -59,6 +59,13 @@ public:
         nfs.timestamp = data.header->ts;
         
         // TODO: addresses and ports must be ordered for correct TCP sessions matching
+        if(data.ipv4_header)
+        {
+            nfs.session.ip_type = NFSData::Session::v4;
+            nfs.session.ip.v4.addr[0] = data.ipv4_header->src();
+            nfs.session.ip.v4.addr[1] = data.ipv4_header->dst();
+        }
+
         if(data.tcp_header)
         {
             nfs.session.type = NFSData::Session::TCP;
