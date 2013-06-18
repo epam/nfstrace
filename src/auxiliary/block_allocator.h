@@ -29,13 +29,13 @@ public:
         Chunk* next; // used only for list chunks in list
     };
 
-    BlockAllocator() : limit(0), block(0), chunk(0), allocated(0), blocks(NULL), list(NULL)
+    BlockAllocator() : chunk(0), block(0), limit(0), allocated(0), blocks(NULL), list(NULL)
     {
     }
 
     ~BlockAllocator()
     {
-        for(uint16_t i = 0; i<limit; i++)
+        for(uint32_t i = 0; i<limit; i++)
         {
             delete blocks[i];
         }
@@ -84,7 +84,7 @@ private:
     Chunk* new_block()
     {
         char* ptr = new char[block*chunk];
-        for(uint16_t i = 0; i<block-1; ++i)
+        for(uint32_t i = 0; i<block-1; ++i)
         {
             ((Chunk*) &ptr[i * chunk])->next = (Chunk*) &ptr[(i + 1) * chunk];
         }

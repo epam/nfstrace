@@ -20,6 +20,8 @@ struct NFSData
 {
 public:
 
+    struct timeval timestamp;
+
     struct Session
     {
         enum IPType
@@ -50,15 +52,8 @@ public:
 
     } __attribute__ ((__packed__)) session;
 
-    struct timeval timestamp;
-
-    // TODO: implement variable length of RPC NFS data
-    struct RPC // Sun RPC  v2 calls fields
-    {
-        uint32_t xid;   // XID
-        uint32_t prog;  // RPC program number
-        uint32_t proc;  // RPC procedure number
-    } __attribute__ ((__packed__)) rpc;
+    uint32_t rpc_len;   // length of captured RPC message data with NFS payload
+    //char rpc_data[rpc_len]
 };
 
 } // namespace analyzer

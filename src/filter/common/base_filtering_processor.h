@@ -55,39 +55,39 @@ public:
 
     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
     {
-        BaseFilteringProcessor& processor = *(BaseFilteringProcessor*) user;
+        BaseFilteringProcessor* processor = (BaseFilteringProcessor*) user;
+
+        FiltrationData data = {0};
+
+        data.header = pkthdr;
+        data.packet = packet;
 
         uint32_t len = pkthdr->len;
-        uint32_t iplen = validate_eth_frame(len, packet);
+        uint32_t iplen = validate_eth_frame(pkthdr->len, packet);
         if(!iplen)
         {
-            return;
+            return processor->discard(data);
         }
 
         uint32_t tcplen = validate_ip_packet(iplen, packet + (len - iplen));
         if(!tcplen)
         {;
-            return;
+            return processor->discard(data);
         }
 
         uint32_t sunrpclen = validate_tcp_packet(tcplen, packet + (len - tcplen));
         if(!sunrpclen)
         {;
-            return;
+            return processor->discard(data);
         }
 
         uint32_t authlen = validate_sunrpc_nfsv3_2049_packet(sunrpclen, packet + (len - sunrpclen));
         if(!authlen)
         {
-            return;
+            return processor->discard(data);
         }
 
-        FiltrationData data;
-
-        data.header = pkthdr;
-        data.packet = packet;
-
-        processor.collect(data);
+        processor->collect(data);
     }
 
     // validation methods return packet length without header they validate or 0 on error
