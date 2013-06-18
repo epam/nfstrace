@@ -31,8 +31,14 @@ public:
 
     struct FiltrationData
     {
-        const pcap_pkthdr*  header;
-        const uint8_t*      packet;
+        // libpcap structures
+        const pcap_pkthdr*          header;
+        const uint8_t*              packet;
+        // TODO: WARNING!All pointers points to packet array!
+
+        // Sun RPC
+        const rpc::MessageHeader*   rpc_header;
+        size_t                      rpc_length;
     };
 
     BaseFilteringProcessor()
@@ -81,8 +87,8 @@ public:
             return processor->discard(data);
         }
 
-        uint32_t authlen = validate_sunrpc_nfsv3_2049_packet(sunrpclen, packet + (len - sunrpclen));
-        if(!authlen)
+        len = validate_sunrpc(data, sunrpclen, packet + (len - sunrpclen));
+        if(!len)
         {
             return processor->discard(data);
         }
@@ -115,14 +121,15 @@ public:
         return packetlen - tcphdrlen > 0 ? packetlen - tcphdrlen : 0;
     }
 
-    static uint32_t validate_sunrpc_nfsv3_2049_packet(uint32_t packetlen, const u_char *packet)
+    static uint32_t validate_sunrpc(FiltrationData& data/*out*/, uint32_t len, const uint8_t* packet)
     {
-        if(packetlen < sizeof(RecordMark)) return 0;
-        packetlen -= sizeof(RecordMark);
+        if(len < sizeof(RecordMark)) return 0;
+        len -= sizeof(RecordMark);
 
         const RecordMark* rm = (RecordMark*)packet;
 
-        if(packetlen < rm->fragment_len()) return 0; // RPC message are fragmented
+        // TODO: Now skip fragmented messages, it isnt well
+        if(len < rm->fragment_len()) return 0; // RPC message are fragmented
 
         const MessageHeader* msg = rm->fragment();
         switch(msg->type())
@@ -134,7 +141,6 @@ public:
                 uint32_t rpcvers = call->rpcvers();
                 uint32_t prog = call->prog();
                 uint32_t vers = call->vers();
-                //uint32_t proc = call->proc();
 
                 if(rpcvers != 2)    return 0;
                 if(prog != 100003)  return 0;  // portmap NFS v3 TCP 2049
@@ -144,6 +150,7 @@ public:
             break;
             case SUNRPC_REPLY:
             {
+                // TODO: check reply via XID before passing replies further
                 const ReplyHeader* reply = static_cast<const ReplyHeader*>(msg);
                 switch(reply->stat())
                 {
@@ -160,9 +167,14 @@ public:
                 }
             }
             break;
+            default: return 0;  // unknown RPC message
         }
 
-        return packetlen;
+        // fill out
+        data.rpc_header = msg;
+        data.rpc_length = len;
+
+        return len;
     }
 
 private:
