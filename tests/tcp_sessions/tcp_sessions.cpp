@@ -30,7 +30,6 @@
 #include <iomanip>
 
 #include "../../src/analyzer/nfs_data.h"
-#include "../../src/auxiliary/queue.h"
 #include "../../src/auxiliary/spinlock.h"
 #include "../../src/controller/cmdline_parser.h"
 #include "../../src/filter/pcap/pcap_error.h"
@@ -728,41 +727,9 @@ Opt CLI::options[CLI::num] = {
 { 'h', "help",      Opt::NO,       "false", "show this information" },
 };
 
-struct Data
-{
-    int value;
-};
-
 int main(int argc, char **argv) try
 {
     CmdlineParser<CLI> params;
-
-
-
-    typedef NST::auxiliary::Queue<Data> Queue;
-    
-    Queue queue(10, 1);
-    
-    for(unsigned int i=0; i<42; i++)
-    {
-        Data* data = queue.allocate();
-        if(data == NULL) break;
-
-        data->value = i;
-
-        queue.push(data);
-    }
-
-    Queue::List list = queue.pop_list();
-
-    while(list)
-    {
-        Data* i = list.get();
-        std::cout << i->value << std::endl;
-        queue.deallocate(i);
-    }
-
-    return 0;
 
     try
     {
