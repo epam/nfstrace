@@ -89,10 +89,15 @@ public:
     
     inline List pop_list() // take out list of all queued elements
     {
-        Spinlock::Lock lock(q_spinlock);
-            last->prev = NULL;  // set end of list
-            last = NULL;
-            return List(first);
+        Element* list = NULL;
+        if(last)    // a reader will check this pointer without locking spinlock
+        {
+            Spinlock::Lock lock(q_spinlock);
+                last->prev = NULL;  // set end of list
+                list = first;
+                last = first = NULL;
+        }
+        return List(list);
     }
 
 private:
