@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 #include <stdint.h>
 
+#include <arpa/inet.h>  // for ntohs()/ntohl()
 #include <netinet/in.h> // for in_addr
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -82,7 +83,7 @@ struct ipv4_header
     struct in_addr ipv4_dst;    // destination address
 } __attribute__ ((__packed__));
 
-struct IPv4Header:private ipv4_header
+struct IPv4Header : private ipv4_header
 {
     inline uint8_t  version()  const { return (ipv4_vhl & 0xf0) >> 4; }
     inline uint8_t  ihl()      const { return (ipv4_vhl & 0x0f)*4;  }

@@ -7,6 +7,7 @@
 #define ETHERNET_HEADER_H
 //------------------------------------------------------------------------------
 #include <stdint.h>
+#include <arpa/inet.h>  // for ntohs()
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -40,6 +41,13 @@ struct ethernet_header
     uint8_t  eth_shost[ADDR_LEN];   // source host address
     uint16_t eth_type;              // protocol (EtherType values)
 } __attribute__((packed));
+
+struct EthernetHeader : private ethernet_header
+{
+    inline const uint8_t*  dst() const { return eth_dhost;       }
+    inline const uint8_t*  src() const { return eth_shost;       }
+    inline const uint16_t type() const { return ntohs(eth_type); }
+} __attribute__ ((__packed__));
 
 } //namespace ethernet
 } // namespace filter
