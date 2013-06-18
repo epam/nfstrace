@@ -16,6 +16,7 @@ namespace NST
 namespace analyzer
 {
 
+// TODO: fix memory placement of this structure to align to 4k
 struct NFSData
 {
 public:
@@ -36,25 +37,28 @@ public:
             UDP=1,
         } type:16;    //16 bit for alignment following integers
 
-        union ip
+        union
         {
-            struct v4
+            struct
             {
                 uint32_t addr[2];   // 2 IPv4 addresses in host byte order
-            };
-            struct v6
+            } v4;
+            struct
             {
                 uint8_t addr[2][16];// 2 IPv6 addresses in host byte order
-            };
-        };
+            } v6;
+        } ip;
 
         uint16_t port[2];           // 2 ports in host byte order
 
     } __attribute__ ((__packed__)) session;
 
-    uint32_t rpc_len;   // length of captured RPC message data with NFS payload
-    //char rpc_data[rpc_len]
-};
+    uint32_t rpc_len;   // length of captured RPC message with NFS payload
+
+    // a header of RPC message related to NFS procedures (calls and replies)
+    char rpc_message[4000]; // raw NFS data in network byte order
+
+} __attribute__ ((__packed__));
 
 } // namespace analyzer
 } // namespace NST
