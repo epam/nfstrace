@@ -42,6 +42,20 @@ struct tcp_header
     uint16_t tcp_urp;       // urgent pointer
 } __attribute__ ((__packed__));
 
+struct TCPHeader:private tcp_header
+{
+    inline uint16_t sport() const { return ntohs(tcp_sport); }
+    inline uint16_t dport() const { return ntohs(tcp_dport); }
+    inline uint32_t   seq() const { return ntohl(tcp_seq); }
+    inline uint32_t   ack() const { return ntohl(tcp_ack); }
+    inline uint8_t offset() const { return (tcp_rsrvd_off & 0xf0) >> 2; }
+    inline bool is(tcp_header::Flag flag) const { return tcp_flags & flag; }
+    inline uint16_t window()   const { return ntohs(tcp_win); }
+    inline uint16_t checksum() const { return ntohs(tcp_sum); }
+    inline uint16_t urgent()   const { return ntohs(tcp_urp); }
+
+} __attribute__ ((__packed__));
+
 } //namespace tcp
 } // namespace filter
 } // namespace NST

@@ -36,6 +36,9 @@ public:
         const uint8_t*              packet;
         // TODO: WARNING!All pointers points to packet array!
 
+        // TCP
+        const tcp::TCPHeader*       tcp_header;
+
         // Sun RPC
         const rpc::MessageHeader*   rpc_header;
         size_t                      rpc_length;
@@ -81,14 +84,14 @@ public:
             return processor->discard(data);
         }
 
-        uint32_t sunrpclen = validate_tcp_packet(tcplen, packet + (len - tcplen));
+        uint32_t sunrpclen = validate_tcp(data, tcplen, packet + (len - tcplen));
         if(!sunrpclen)
         {;
             return processor->discard(data);
         }
 
-        len = validate_sunrpc(data, sunrpclen, packet + (len - sunrpclen));
-        if(!len)
+        uint32_t nfslen = validate_sunrpc(data, sunrpclen, packet + (len - sunrpclen));
+        if(!nfslen)
         {
             return processor->discard(data);
         }
@@ -114,11 +117,20 @@ public:
         return packetlen - iphdrlen > 0 ? packetlen - iphdrlen : 0;
     }
 
-    static uint32_t validate_tcp_packet(uint32_t packetlen, const u_char *packet)
+    static uint32_t validate_tcp(FiltrationData& data/*out*/, uint32_t len, const uint8_t* packet)
     {
-        struct tcp_header *tcppacket = (tcp_header*)packet;
-        uint32_t tcphdrlen = (tcppacket->tcp_rsrvd_off & 0xf0) >> 2;
-        return packetlen - tcphdrlen > 0 ? packetlen - tcphdrlen : 0;
+        if(len < sizeof(TCPHeader)) return 0;   // fragmented TCP header
+
+        TCPHeader* header = (TCPHeader*)packet;
+        uint8_t offset = header->offset();
+        if(offset < 20 || offset > 60) return 0; // invalid length of TCP header
+
+        if(len < offset) return 0;
+
+        // fill out
+        data.tcp_header = header;
+
+        return len - offset;
     }
 
     static uint32_t validate_sunrpc(FiltrationData& data/*out*/, uint32_t len, const uint8_t* packet)
