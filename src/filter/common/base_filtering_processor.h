@@ -35,6 +35,10 @@ public:
         const pcap_pkthdr*          header;
         const uint8_t*              packet;
         // TODO: WARNING!All pointers points to packet array!
+        
+        
+        // IP version 4
+        const ip::IPv4Header*       ipv4_header;
 
         // TCP
         const tcp::TCPHeader*       tcp_header;
@@ -65,6 +69,8 @@ public:
     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
     {
         BaseFilteringProcessor* processor = (BaseFilteringProcessor*) user;
+        
+        // TODO: this code must be totally refactored
 
         FiltrationData data = {0};
 
@@ -78,7 +84,7 @@ public:
             return processor->discard(data);
         }
 
-        uint32_t tcplen = validate_ip_packet(iplen, packet + (len - iplen));
+        uint32_t tcplen = validate_ipv4(data, iplen, packet + (len - iplen));
         if(!tcplen)
         {;
             return processor->discard(data);
@@ -108,13 +114,28 @@ public:
         return framelen - sizeof(ethernet_header) > 0 ? framelen - sizeof(ethernet_header) : 0;
     }
 
-    static uint32_t validate_ip_packet(uint32_t packetlen, const u_char *packet)
+    static uint32_t validate_ipv4(FiltrationData& data/*out*/, uint32_t len, const u_char *packet)
     {
-        ipv4_header *ippacket = (ipv4_header*)packet;
-        uint32_t iphdrlen = (ippacket->ipv4_vhl & 0x0f) * 4;
-        if(ippacket->ipv4_protocol != ipv4_header::TCP)
+        if(len < sizeof(IPv4Header)) return 0;   // fragmented IPv4 header
+        
+        IPv4Header* header = (IPv4Header*)packet;
+        
+        const uint16_t total_len = header->length();
+
+        if(header->version() != 4 || total_len > len) // fragmented payload
+        {
             return 0;
-        return packetlen - iphdrlen > 0 ? packetlen - iphdrlen : 0;
+        }
+
+        if(header->protocol() != ipv4_header::TCP) // TODO: support TCP and UDP
+        {
+            return 0;
+        }
+
+        // fill out
+        data.ipv4_header = header;
+
+        return len - header->ihl();
     }
 
     static uint32_t validate_tcp(FiltrationData& data/*out*/, uint32_t len, const uint8_t* packet)
