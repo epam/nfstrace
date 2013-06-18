@@ -32,20 +32,22 @@ public:
     struct FiltrationData
     {
         // libpcap structures
-        const pcap_pkthdr*          header;
-        const uint8_t*              packet;
+        const pcap_pkthdr*              header;
+        const uint8_t*                  packet;
         // TODO: WARNING!All pointers points to packet array!
         
+        // Ethernet II
+        const ethernet::EthernetHeader* eth_header;
         
         // IP version 4
-        const ip::IPv4Header*       ipv4_header;
+        const ip::IPv4Header*           ipv4_header;
 
         // TCP
-        const tcp::TCPHeader*       tcp_header;
+        const tcp::TCPHeader*           tcp_header;
 
         // Sun RPC
-        const rpc::MessageHeader*   rpc_header;
-        size_t                      rpc_length;
+        const rpc::MessageHeader*       rpc_header;
+        size_t                          rpc_length;
     };
 
     BaseFilteringProcessor()
@@ -77,8 +79,9 @@ public:
         data.header = pkthdr;
         data.packet = packet;
 
-        uint32_t len = pkthdr->len;
-        uint32_t iplen = validate_eth_frame(pkthdr->len, packet);
+        const uint32_t len = pkthdr->len;
+
+        uint32_t iplen = validate_eth(data, pkthdr->len, packet);
         if(!iplen)
         {
             return processor->discard(data);
@@ -106,15 +109,21 @@ public:
     }
 
     // validation methods return packet length without header they validate or 0 on error
-    static uint32_t validate_eth_frame(uint32_t framelen, const u_char *packet)
+    static uint32_t validate_eth(FiltrationData& data/*out*/, uint32_t len, const uint8_t* packet)
     {
-        ethernet_header *ehdr = (ethernet_header*)packet;
-        if(ntohs(ehdr->eth_type) != ethernet_header::IP)
-            return 0;
-        return framelen - sizeof(ethernet_header) > 0 ? framelen - sizeof(ethernet_header) : 0;
+        if(len < sizeof(EthernetHeader)) return 0;
+
+        EthernetHeader* header = (EthernetHeader*)packet;
+
+        if(header->type() != ethernet_header::IP) return 0; // TODO: fix it for IPv6
+
+        // fill out
+        data.eth_header = header;
+
+        return len - sizeof(EthernetHeader);
     }
 
-    static uint32_t validate_ipv4(FiltrationData& data/*out*/, uint32_t len, const u_char *packet)
+    static uint32_t validate_ipv4(FiltrationData& data/*out*/, uint32_t len, const uint8_t* packet)
     {
         if(len < sizeof(IPv4Header)) return 0;   // fragmented IPv4 header
         
