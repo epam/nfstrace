@@ -74,7 +74,7 @@ public:
 
         // TODO: THIS CODE MUST BE TOTALLY REFACTORED!
         // TODO: 1) Design and implement the Readers for each layer
-        //       2) Add multiple sessions with separate reades for each session.
+        //       2) Manage separate reades for each session
         //       3) Detect placement of NFS Op data and drop it ASAP
         //       4) Pass filtered NFS Op headers (RPC messages) to Analysis
 
