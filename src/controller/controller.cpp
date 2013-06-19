@@ -67,8 +67,8 @@ int Controller::run(int argc, char** argv)
     std::cerr << e->what() << std::endl;
 
     // Stop all modules here
-    analyse.stop();
     filtration.stop();
+    analyse.stop();
     status.print(std::cerr);
     sig_handler.stop();
 
