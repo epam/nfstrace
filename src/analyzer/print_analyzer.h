@@ -64,10 +64,12 @@ public:
 
     virtual void process(NFSData* data)
     {
-        std::cout << "###\n";
-        std::cout << "Source: " << session_addr(NFSData::Session::Source, data) << ";";
-        std::cout << "Destination: " << session_addr(NFSData::Session::Destination, data) << "\n";
-        std::cout << rpc_info(data) << "\n";
+        if(data->rpc_len < sizeof(MessageHeader))
+        {
+            return;
+        }
+
+        std::cout << "Src: " << session_addr(NFSData::Session::Source, data) << " Dst: " << session_addr(NFSData::Session::Destination, data) << rpc_info(data) << "\n";
     }
     virtual void result()
     {
@@ -83,6 +85,11 @@ private:
         {
             case SUNRPC_CALL:
             {
+                if(data->rpc_len < sizeof(CallHeader))
+                {
+                    return std::string();
+                }
+
                 const CallHeader* call = static_cast<const CallHeader*>(msg);
 
                 uint32_t rpcvers = call->rpcvers();
@@ -99,6 +106,11 @@ private:
             break;
             case SUNRPC_REPLY:
             {
+                if(data->rpc_len < sizeof(ReplyHeader))
+                {
+                    return std::string();
+                }
+
                 const ReplyHeader* reply = static_cast<const ReplyHeader*>(msg);
                 switch(reply->stat())
                 {
