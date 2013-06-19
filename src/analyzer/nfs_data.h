@@ -20,11 +20,16 @@ namespace analyzer
 struct NFSData
 {
 public:
-
     struct timeval timestamp;
 
     struct Session
     {
+        enum Direction
+        {
+            Source      =0,
+            Destination =1
+        }:16;
+
         enum IPType
         {
             v4=0,

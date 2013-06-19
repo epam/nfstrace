@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Manager for all instances created inside filter module.
+// Description: Manager for all instances created inside analyzer module.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef ANALYSE_MANAGER_H
@@ -9,56 +9,97 @@
 #include <memory> // std::auto_ptr
 
 #include "../controller/running_status.h"
+#include "../auxiliary/exception.h"
 #include "../auxiliary/thread.h"
 #include "../auxiliary/queue.h"
+#include "print_analyzer.h"
+#include "analyzers.h"
+#include "nfs_data.h"
 //------------------------------------------------------------------------------
 using NST::controller::RunningStatus;
+using NST::auxiliary::Exception;
 using NST::auxiliary::Thread;
 using NST::auxiliary::Queue;
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace filter
+namespace analyzer
 {
 
-class AnalyseManager
+class AnalyseManager : public Thread
 {
-    // OnlineAnalyzingThread and OfflineAnalyzingThread typedefs will be added later.
+    typedef Queue<NFSData> Buffer;
 public:
-    AnalyseManager(RunningStatus &running_status, Queue &q) : excpts_holder(running_status), queue(q)
+    AnalyseManager(RunningStatus &running_status, uint32_t queue_size = 256, uint32_t queue_limit = 16) : status(running_status), exec(false), queue(queue_size, queue_limit)
     {
     }
     ~AnalyseManager()
     {
-        thread_group.stop();
     }
 
-    // STUB
-    void status_analyzer()
+    void print_analyzer()
     {
-        // Creating real status_analyzer and r
+        std::auto_ptr<BaseAnalyzer> a(new PrintAnalyzer);
+        analyzers.add(a.release());
     }
 
-    void start()
+    void* run()
     {
-        thread_group.start();
+        // Allow processing data contained in the queue
+        exec = true;
+
+        try
+        {          
+            process();
+        }
+        catch(std::exception* exception)
+        {
+            status.push(exception);
+        }
+        return NULL;
     }
 
     void stop()
     {
-        thread_group.stop();
+        
+        exec = false;   // Deny processing data
+        join(); 
+    }
+    
+    Buffer& get_queue()
+    {
+        return queue;
     }
 
 private:
-    AnalyseManager(const AnalyseManager& object); // Uncopyable object
+    AnalyseManager(const AnalyseManager& object);            // Uncopyable object
     AnalyseManager& operator=(const AnalyseManager& object); // Uncopyable object
 
+    inline void process()
+    {
+        while(exec)
+        {
+            Buffer::List list = queue.pop_list();
+
+            // Read all data from the received queue
+            while(list)
+            {
+                NFSData* data = list.get();
+
+                analyzers.process(data);
+                queue.deallocate(data);
+            }
+        }
+    }
+
 private:
-    RunningStatus &excpts_holder;
-    Queue &queue;
+    RunningStatus& status;
+    Analyzers analyzers;
+    volatile bool exec;
+    Buffer queue;
 };
 
-} // namespace filter
+} // namespace analyzer
 } // namespace NST
 //------------------------------------------------------------------------------
 #endif//ANALYSE_MANAGER_H

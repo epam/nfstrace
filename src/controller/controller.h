@@ -10,10 +10,12 @@
 #include "cmdline_args.h"
 
 #include "../filter/filtration_manager.h"
+#include "../analyzer/analyse_manager.h"
 #include "synchronous_signal_handling.h"
 #include "running_status.h"
 //------------------------------------------------------------------------------
 using NST::filter::FiltrationManager;
+using NST::analyzer::AnalyseManager;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -37,13 +39,14 @@ private:
     cmdline::Params params;
 
     // Container for generated exceptions
-    RunningStatus excpts_holder;
+    RunningStatus status;
 
     // Signal handler. Working in its own thread.
     SynchronousSignalHandling sig_handler;
 
     // Controller contains instances of modules
     FiltrationManager filtration;
+    AnalyseManager analyse;
 };
 
 } // namespace controller
