@@ -49,7 +49,7 @@ public:
         exec = true;
 
         try
-        {          
+        {
             process();
         }
         catch(std::exception* exception)
@@ -61,9 +61,8 @@ public:
 
     void stop()
     {
-        
         exec = false;   // Deny processing data
-        join(); 
+        join();
     }
     
     Buffer& get_queue()

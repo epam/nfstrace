@@ -57,7 +57,7 @@ int Controller::run(int argc, char** argv)
 
     // Start handling user signals
     sig_handler.create();
-    
+
     // Start modules to processing
     filtration.start();
     analyse.create();       // TODO: Unify managers interfaces
