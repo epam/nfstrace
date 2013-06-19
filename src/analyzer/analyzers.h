@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Manager for all instances created inside filter module.
+// Description: Analyzers storage. 
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef ANALYZERS_H
@@ -8,10 +8,10 @@
 //------------------------------------------------------------------------------
 #include <list>
 
-#include <base_analyzer.h>
 #include "../controller/running_status.h"
+#include "base_analyzer.h"
+#include "nfs_data.h"
 //------------------------------------------------------------------------------
-using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -20,13 +20,15 @@ namespace analyzer
 
 class Analyzers
 {
+    typedef std::list<BaseAnalyzer*> Storage;
+public:
     Analyzers()
     {
     }
     ~Analyzers() 
     {
-        list<BaseAnalyzer*>::iterator i = analyzers.begin();
-        list<BaseAnalyzer*>::iterator end = analyzer.end();
+        Storage::iterator i = analyzers.begin();
+        Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
             delete *i;
@@ -38,20 +40,20 @@ class Analyzers
         analyzers.push_back(analyzer);
     }
 
-    void process()
+    void process(NFSData* data)
     {
-        list<BaseAnalyzer*>::iterator i = analyzers.begin();
-        list<BaseAnalyzer*>::iterator end = analyzer.end();
+        Storage::iterator i = analyzers.begin();
+        Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->process();
+            (*i)->process(data);
         }
     }
 
     void result()
     {
-        list<BaseAnalyzer*>::iterator i = analyzers.begin();
-        list<BaseAnalyzer*>::iterator end = analyzer.end();
+        Storage::iterator i = analyzers.begin();
+        Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
             (*i)->result();
@@ -59,10 +61,10 @@ class Analyzers
     }
 
 private:
-    list<BaseAnalyzer*> analyzers;
+    Storage analyzers;
 };
 
-} // namespace filter
+} // namespace analyzer
 } // namespace NST
 //------------------------------------------------------------------------------
 #endif//ANALYZERS_H

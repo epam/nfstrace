@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Push NFSData to queue filtered packets to .pcap file
+// Description: Push NFSData to buffer for further processing.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef QUEUEING_PROCESSOR_H
@@ -16,8 +16,10 @@
 
 #include "base_filtering_processor.h"
 #include "../../analyzer/nfs_data.h"
+#include "../../auxiliary/queue.h"
 //------------------------------------------------------------------------------
 using NST::analyzer::NFSData;
+using NST::auxiliary::Queue;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -26,8 +28,9 @@ namespace filter
 
 class QueueingProcessor : public BaseFilteringProcessor
 {
+    typedef Queue<NFSData> Buffer;
 public:
-    QueueingProcessor()
+    QueueingProcessor(Buffer& b) : buffer(b)
     {
     }
     ~QueueingProcessor()
@@ -82,7 +85,7 @@ public:
     }
 
 private:
-
+    Buffer& buffer;
 };
 
 } // namespace filter

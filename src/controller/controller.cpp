@@ -17,7 +17,7 @@ namespace controller
 
 typedef cmdline::Args CLI;  // short alias for structure of cli-arguments
 
-Controller::Controller() : sig_handler(excpts_holder), filtration(excpts_holder)
+Controller::Controller() : sig_handler(status), filtration(status), analyse(status)
 {
 }
 
@@ -60,14 +60,16 @@ int Controller::run(int argc, char** argv)
     
     // Start modules to processing
     filtration.start();
+    analyse.create();       // TODO: Unify managers interfaces
 
     // Waiting some exception or user-signal for handling
-    std::auto_ptr<std::exception> e(excpts_holder.pop_wait());
+    std::auto_ptr<std::exception> e(status.pop_wait());
     std::cerr << e->what() << std::endl;
 
     // Stop all modules here
+    analyse.stop();
     filtration.stop();
-    excpts_holder.print(std::cerr);
+    status.print(std::cerr);
     sig_handler.stop();
 
     return 0;
@@ -93,11 +95,14 @@ void Controller::init_runing()
     }
     else if(mode == "mon")   // online monitoring mode
     {
-        filtration.capture_to_queue(/*queue*/ iface, filter, snaplen, ms);
+        filtration.capture_to_queue(analyse.get_queue(), iface, filter, snaplen, ms);
     }
     else if(mode == "stat")   // offline analysis mode
     {
     }
+
+    // TODO: Create options in command line for supporting different analyzers
+    analyse.print_analyzer();
 }
 
 } // namespace controller

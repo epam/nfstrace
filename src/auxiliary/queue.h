@@ -53,6 +53,7 @@ public:
     }
     ~Queue()
     {
+        //TODO: Free all not requested data, pointed by 'last' and 'first'
     }
 
     inline T*const allocate()
