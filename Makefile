@@ -29,19 +29,17 @@ debug: $(TARGET)
 
 $(TARGET):$(OBJS)
 	@mkdir -p $(OUT_DIR)
-	@cd $(OUT_DIR);\
-	$(CC) $(CFLAGS) -o $@ $(addprefix ../,$^) $(LIBS)
+	$(CC) $(CFLAGS) -o $(OUT_DIR)/$@ $^ $(LIBS)
 
 .SECONDEXPANSION:
 $(OBJS): $$(patsubst $(OBJ_DIR)/%.o, $(SRC_DIR)/%.cpp, $$@)
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS) $< -o $@ $(LIBS)
+	$(CC) -c $(CFLAGS) $< -o $@
 
 .SECONDEXPANSION:
 $(DEPS): $$(patsubst $(DEP_DIR)/%.d, $(SRC_DIR)/%.cpp, $$@)
 	@mkdir -p $(dir $@)
-	$(CC) $< -MM -MF $@ \
-		-MT $(patsubst $(DEP_DIR)/%.d, $(OBJ_DIR)/%.o, $@) -MT $@
+	$(CC) $< -MM -MF $@ -MT $@ -MT $(patsubst $(DEP_DIR)/%.d, $(OBJ_DIR)/%.o, $@)
 
 clean:
 	@rm -rf debug release
