@@ -65,8 +65,8 @@ public:
     virtual void process(NFSData* data)
     {
         std::cout << "###\n";
-        std::cout << "Source:" << session_addr(NFSData::Session::Source, data) << "\n";
-        std::cout << "Destination:" << session_addr(NFSData::Session::Destination, data) << "\n";
+        std::cout << "Source: " << session_addr(NFSData::Session::Source, data) << ";";
+        std::cout << "Destination: " << session_addr(NFSData::Session::Destination, data) << "\n";
         std::cout << rpc_info(data) << "\n";
     }
     virtual void result()
@@ -78,7 +78,7 @@ private:
     {
         const MessageHeader* msg = (MessageHeader*)data->rpc_message;
         std::stringstream message(std::ios_base::out);
-        message << "XID: " << msg->xid();
+        message << "XID: " << msg->xid() << " ";
         switch(msg->type())
         {
             case SUNRPC_CALL:
