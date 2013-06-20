@@ -18,7 +18,10 @@ OBJS:=$(filter-out %/main.o, $(OBJS))
 
 all: $(DIRS)
 
-$(DIRS):
+$(OBJ_DIR):
+	@echo Tests requre debug objects of main sources. Please do: \'make debug\' for root of the sources.
+
+$(DIRS): $(OBJ_DIR)
 	@rm -f $@/$@
 	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $@/$@ $(shell find $@/ -type f -name "*.cpp" -o -name "*.h" )
 
