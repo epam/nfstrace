@@ -4,6 +4,8 @@ TESTS_DIR:=.
 SRC_DIR:=../src/
 OBJ_DIR:=../debug/obj/
 
+CFLAGS+=$(DEBUG_FLAGS)
+
 
 # list of all tests directories
 DIRS:=$(shell find $(TESTS_DIR) -maxdepth 1 -type d ! -name ".*" -printf "%f\n")
