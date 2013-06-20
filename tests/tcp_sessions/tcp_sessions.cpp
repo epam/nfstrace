@@ -278,7 +278,7 @@ struct RPC
             const uint32_t rpcvers= ntohl(msg->body.cbody.cb_rpcvers);
             const uint32_t prog   = ntohl(msg->body.cbody.cb_prog);
             const uint32_t vers   = ntohl(msg->body.cbody.cb_vers);
-            const uint32_t proc   = ntohl(msg->body.cbody.cb_proc);
+            //const uint32_t proc   = ntohl(msg->body.cbody.cb_proc);
 
             if(rpcvers != 2)    return NULL;
             if(prog!= 100003)   return NULL;    // portmap NFS v3 TCP 2049

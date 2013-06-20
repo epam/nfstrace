@@ -1,4 +1,6 @@
 TARGET:=nfstrace
+CC:=g++
+
 LIBS   += -lstdc++ -lpthread -lpcap
 CFLAGS += -static-libgcc -Wall
 

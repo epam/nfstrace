@@ -32,7 +32,7 @@ public:
         inline const char* dscr() const { return ptr->description; }
         inline bool is_loopback() const { return ptr->flags & PCAP_IF_LOOPBACK; }
 
-        iterator& next(){ ptr = ptr->next; }
+        void next(){ ptr = ptr->next; }
 
         iterator(const iterator& i):ptr(i.ptr){}
     private:

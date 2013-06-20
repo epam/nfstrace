@@ -1,17 +1,26 @@
-ROOT_DIRECTORY:=.
-#get list of subdirectories
-DIRS:=$(shell find $(ROOT_DIRECTORY) -maxdepth 1 -type d ! -name ".*" -print)
+include ../config.mk
+
+TESTS_DIR:=.
+SRC_DIR:=../src/
+OBJ_DIR:=../debug/obj/
 
 
-.PHONY: all
-all:
-	@for dir in $(DIRS); do \
-		$(MAKE) -C $$dir; \
-	done
+# list of all tests directories
+DIRS:=$(shell find $(TESTS_DIR) -maxdepth 1 -type d ! -name ".*" -printf "%f\n")
 
-.PHONY: clean
+# find all object files in OBJ_DIR folder
+OBJS:=$(shell find $(OBJ_DIR) -type f -name "*.o" )
+# exclude main.o with main() function
+OBJS:=$(filter-out %/main.o, $(OBJS))
+
+
+.PHONY: all clean $(DIRS)
+
+all: $(DIRS)
+
+$(DIRS):
+	@rm -f $@/$@
+	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $@/$@ $(shell find $@/ -type f -name "*.cpp" -o -name "*.h" )
+
 clean:
-	@for dir in $(DIRS); do \
-		$(MAKE) -C $$dir clean; \
-	done
-
+	rm -f $(shell find $(TESTS_DIR) -maxdepth 1 -type d ! -name ".*" -printf "%f/%f\n")
