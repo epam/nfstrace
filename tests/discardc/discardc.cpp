@@ -301,7 +301,7 @@ private:
         uint32_t rpcvers = ntohl(rpcp->rm_call.cb_rpcvers);
         uint32_t prog = ntohl(rpcp->rm_call.cb_prog);
         uint32_t vers = ntohl(rpcp->rm_call.cb_vers);
-        uint32_t proc = ntohl(rpcp->rm_call.cb_proc);
+        //uint32_t proc = ntohl(rpcp->rm_call.cb_proc);
 
         if(rpcvers != 2){
             //std::cout << "failed 4 with rpc vers " << rpcvers << std::endl;

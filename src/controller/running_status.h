@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 #include <exception>
 #include <list>
+#include <ostream> // for std::endl;
 
 #include <pthread.h>
 
