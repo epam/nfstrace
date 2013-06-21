@@ -83,10 +83,10 @@ private:
             // Read all data from the received queue
             while(list)
             {
-                NFSData* data = list.get();
+                const NFSData& data = list.data();
 
                 analyzers.process(data);
-                queue.deallocate(data);
+                list.free_current();
             }
         }
     }

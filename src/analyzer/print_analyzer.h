@@ -62,9 +62,9 @@ public:
     {
     }
 
-    virtual void process(NFSData* data)
+    virtual void process(const NFSData& data)
     {
-        if(data->rpc_len < sizeof(MessageHeader))
+        if(data.rpc_len < sizeof(MessageHeader))
         {
             return;
         }
@@ -76,16 +76,16 @@ public:
     }
 
 private:
-    std::string rpc_info(NFSData* data)
+    std::string rpc_info(const NFSData& data)
     {
-        const MessageHeader* msg = (MessageHeader*)data->rpc_message;
+        const MessageHeader* msg = (MessageHeader*)data.rpc_message;
         std::stringstream message(std::ios_base::out);
         message << "XID: " << msg->xid() << " ";
         switch(msg->type())
         {
             case SUNRPC_CALL:
             {
-                if(data->rpc_len < sizeof(CallHeader))
+                if(data.rpc_len < sizeof(CallHeader))
                 {
                     return std::string();
                 }
@@ -106,7 +106,7 @@ private:
             break;
             case SUNRPC_REPLY:
             {
-                if(data->rpc_len < sizeof(ReplyHeader))
+                if(data.rpc_len < sizeof(ReplyHeader))
                 {
                     return std::string();
                 }
@@ -133,20 +133,20 @@ private:
         return message.str();
     }
 
-    std::string session_addr(NFSData::Session::Direction dir, NFSData* data)
+    std::string session_addr(NFSData::Session::Direction dir, const NFSData& data)
     {
         std::stringstream session(std::ios_base::out);
-        switch(data->session.ip_type)
+        switch(data.session.ip_type)
         {
             case NFSData::Session::v4:
-                session << ipv4_string(data->session.ip.v4.addr[dir]);
+                session << ipv4_string(data.session.ip.v4.addr[dir]);
                 break;
             case NFSData::Session::v6:
-                session << ipv6_string(data->session.ip.v6.addr[dir]);
+                session << ipv6_string(data.session.ip.v6.addr[dir]);
                 break;
         }
-        session << ":" << data->session.port[dir];
-        switch(data->session.type)
+        session << ":" << data.session.port[dir];
+        switch(data.session.type)
         {
             case NFSData::Session::TCP:
                 session << " (TCP)";
@@ -158,14 +158,14 @@ private:
         return session.str();
     }
 
-    std::string ipv6_string(uint8_t ip[16])
+    std::string ipv6_string(const uint8_t ip[16])
     {
         std::stringstream address(std::ios_base::out);
         address << "IPV6";
         return address.str();
     }
 
-    std::string ipv4_string(uint32_t ip /*host byte order*/ )
+    std::string ipv4_string(const uint32_t ip /*host byte order*/ )
     {
         std::stringstream address(std::ios_base::out);
         address << ((ip >> 24) & 0xFF);
