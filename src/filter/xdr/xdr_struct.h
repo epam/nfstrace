@@ -16,7 +16,7 @@ namespace filter
 namespace XDR
 {
 
-typedef unsigned char uchar_t;
+typedef unsigned char uint8_t;
 
 const size_t align = 4;
 
@@ -25,7 +25,6 @@ struct OpaqueDyn // Move to xdr
     std::vector<uchar_t> data;    // Size of 'size'
 };
 
-//template<size_t size>
 template<uint32_t size>
 struct OpaqueStat // Move to xdr
 {
