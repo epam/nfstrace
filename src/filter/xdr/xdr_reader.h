@@ -93,8 +93,7 @@ public:
 private:
     void arrange_check(size_t size)
     {
-        int offset = last - it;
-        if(offset < 0 || offset < size)
+        if(it+size > last)
         {
             throw std::out_of_range("XDRReader::read action cannot be done");
         }
