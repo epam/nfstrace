@@ -24,7 +24,7 @@ public:
     {
     }
 
-    virtual void process(NFSData* data) = 0;
+    virtual void process(const NFSData& data) = 0;
     virtual void result() = 0;
 
     // TODO: Add 

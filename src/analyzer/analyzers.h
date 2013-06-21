@@ -25,7 +25,7 @@ public:
     Analyzers()
     {
     }
-    ~Analyzers() 
+    ~Analyzers()
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
@@ -40,7 +40,7 @@ public:
         analyzers.push_back(analyzer);
     }
 
-    void process(NFSData* data)
+    void process(const NFSData& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
