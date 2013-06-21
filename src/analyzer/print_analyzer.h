@@ -64,11 +64,6 @@ public:
 
     virtual void process(const NFSData& data)
     {
-        if(data.rpc_len < sizeof(MessageHeader))
-        {
-            return;
-        }
-
         std::cout << "Src: " << session_addr(NFSData::Session::Source, data) << " Dst: " << session_addr(NFSData::Session::Destination, data) << rpc_info(data) << "\n";
     }
     virtual void result()

@@ -79,7 +79,6 @@ public:
         return *this;
     }
 
-    //template<size_t size>
     template<uint32_t size>
     XDRReader& operator>>(OpaqueStat<size>& obj)
     {
@@ -102,7 +101,7 @@ private:
     inline uint32_t calc_offset(uint32_t size)
     {
         uint32_t mod = size % align;
-        return (mod) ? size - mod + align : size;   
+        return (mod) ? size - mod + align : size;
     }
 
 private:

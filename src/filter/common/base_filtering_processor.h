@@ -188,7 +188,8 @@ public:
         const RecordMark* rm = (RecordMark*)packet;
 
         // TODO: handle fragmented messages
-        if(len < rm->fragment_len()) return 0; // RPC message are fragmented
+        const uint32_t fraglen = rm->fragment_len();
+        if(len < fraglen || fraglen == 0 || !rm->is_last()) return 0; // RPC message are fragmented or invalid
 
         const MessageHeader* msg = rm->fragment();
         switch(msg->type())
