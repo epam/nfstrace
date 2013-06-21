@@ -28,22 +28,37 @@ public:
 
     class List  // List of elements for client code
     {
+    friend class Queue;
     public:
 
-        inline operator bool() const { return ptr; }
-        inline T* get()
+        inline operator bool() const { return ptr;       } // is empty?
+        inline const T& data() const { return ptr->data; } // get data
+        inline void free_current() // deallocate element and switch to next
         {
-            T* data = &ptr->data;
-            ptr = ptr->prev;
-            return data;
+            Element* tmp = ptr->prev;
+            queue->deallocate(ptr);
+            ptr = tmp;
         }
 
-        inline List(Element* first):ptr(first){}
-        inline List(const List& a):ptr(a.ptr){}
+        inline List(Element* first, Queue* q):ptr(first),queue(q){}
+        inline List(const List& list):ptr(list.ptr),queue(list.queue)
+        {
+            // move elements from list to this, without deallocation in a
+            list.ptr   = NULL;
+            list.queue = NULL;
+        }
+        inline ~List()
+        {
+            while(ptr)
+            {
+                free_current();
+            }
+        }
     private:
-        List& operator=(const List&);   // undefined
+        List& operator=(const List&); // undefined
 
-        Element* ptr;
+        mutable Element* ptr;
+        mutable Queue* queue;
     };
 
 
@@ -65,16 +80,9 @@ public:
         return (e) ? &(e->data) : NULL;
     }
 
-    inline void deallocate(T* data)
-    {
-        Element* e = element(data);
-        Spinlock::Lock lock(a_spinlock);
-            allocator.deallocate((BlockAllocator::Chunk*)e);
-    }
-
     inline void push(T* data)
     {
-        Element* e = element(data);
+        Element* e = (Element*)( ((char*)data) - sizeof(Element*) );
         Spinlock::Lock lock(q_spinlock);
             if(last)
             {
@@ -86,7 +94,7 @@ public:
                 last = first = e;
             }
     }
-    
+
     inline List pop_list() // take out list of all queued elements
     {
         Element* list = NULL;
@@ -97,14 +105,14 @@ public:
                 list = first;
                 last = first = NULL;
         }
-        return List(list);
+        return List(list, this);
     }
 
 private:
-
-    static inline Element* element(T* data)
+    inline void deallocate(Element* e)  // accessible from Queue::List
     {
-        return (Element*)( ((char*)data) - sizeof(Element*) );
+        Spinlock::Lock lock(a_spinlock);
+            allocator.deallocate((BlockAllocator::Chunk*)e);
     }
 
     BlockAllocator allocator;
@@ -115,7 +123,6 @@ private:
     // queue filled: last->e<-e<-e<-e<-first
     Element* last;
     Element* first;
-
 };
 
 } // namespace auxiliary

@@ -15,15 +15,10 @@ struct Data
 
 typedef NST::auxiliary::Queue<Data> Queue;
 //------------------------------------------------------------------------------
-int main(int argc, char **argv)
+void push(Queue& queue, unsigned int n)
 {
-    Queue queue(10, 2); // two blocks of 10 elements
-
-    assert(queue.pop_list() == false); // empty queue
-
-    // FILL QUEUE BY ELEMENTS
     std::cout << "fill elements:   ";
-    for(unsigned int i=0; i<42; i++)    // try to push 42 elements
+    for(unsigned int i=0; i<n; i++)    // try to push 42 elements
     {
         Data* data = queue.allocate();  // allocate element of data
         if(data == NULL)
@@ -35,19 +30,38 @@ int main(int argc, char **argv)
         std::cout << data->value << " ";
         queue.push(data);   // push element to queue
     }
+    std::cout << std::endl;
+}
 
-    // READ ELEMENTS
+void pop_print(Queue& queue)
+{
     Queue::List list = queue.pop_list(); // take out list of all queued elements
     assert(queue.pop_list() == false); // empty queue
-    std::cout << "\nqueued elements: ";
+    std::cout << "queued elements: ";
     while(list) // loop over all taken elements
     {
-        Data* i = list.get();   // get first element
-        std::cout << i->value << " ";
-        queue.deallocate(i);    // free unused element
+        const Data& i = list.data();   // get first element
+        std::cout << i.value << " ";
+        list.free_current();    // free unused element
     }
     std::cout << std::endl;
+}
 
+int main(int argc, char **argv)
+{
+    Queue queue(10, 2); // two blocks of 10 elements
+
+    assert(queue.pop_list() == false); // empty queue
+
+    push(queue, 40);
+    {
+        Queue::List list = queue.pop_list();
+        assert(queue.pop_list() == false); // empty queue
+    }
+
+    push(queue, 40);
+
+    pop_print(queue);
     assert(queue.pop_list() == false); // empty queue
 
     return 0;
