@@ -28,8 +28,10 @@ namespace cmdline
 class CLIError : public Exception
 {
 public:
-    explicit CLIError(const std::string& msg)
-        : Exception(msg) { }
+    explicit CLIError(const std::string& msg) : Exception(msg) { }
+
+    virtual const CLIError* dynamic_clone() const { return new CLIError(*this); }
+    virtual void            dynamic_throw() const { throw *this; }
 };
 
 struct Opt
@@ -52,9 +54,9 @@ struct Opt
 
     enum Type
     {
-        NO       = no_argument,
-        REQUIRED = required_argument,
-        OPTIONAL = optional_argument, // not yet supported
+        NOA = no_argument,
+        REQ = required_argument,
+        OPT = optional_argument, // not yet supported
     };
 
     const char short_opt;   // a character for short option, can be 0
@@ -102,7 +104,7 @@ private:
         Opt& a = CLI::options[index];
         // if option argument specified (by global optarg) - set it
         // otherwise set valid default OR "true" for no-args options
-        a.value = optarg ? optarg : (a.deflt && a.type != Opt::NO ? a.deflt : "true");
+        a.value = optarg ? optarg : (a.deflt && a.type != Opt::NOA ? a.deflt : "true");
         a.passed = true;
     }
 
@@ -158,7 +160,7 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
         {
             *short_p = a.short_opt;
             ++short_p;
-            if(a.type == Opt::REQUIRED)
+            if(a.type == Opt::REQ)
             {
                 *short_p = ':'; // argument to option is required
                 ++short_p;

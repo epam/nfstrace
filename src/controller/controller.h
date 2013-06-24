@@ -28,10 +28,10 @@ public:
     Controller();
     ~Controller();
 
-    int run(int argc, char** argv);
+    bool cmdline_args(int argc, char** argv);
+    int run();
 
 private:
-    int parse_cmdline_args(int argc, char** argv);
 
     void init_runing();
 

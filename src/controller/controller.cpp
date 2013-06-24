@@ -25,34 +25,21 @@ Controller::~Controller()
 {
 }
 
-int Controller::parse_cmdline_args(int argc, char** argv)
+bool Controller::cmdline_args(int argc, char** argv)
 {
-    try
+    params.parse(argc, argv);
+    if(params[CLI::HELP].to_bool())
     {
-        params.parse(argc, argv);
-        if(params[CLI::HELP].to_bool())
-        {
-            params.print_usage(std::cout, argv[0]);
-            return 0;
-        }
-        params.validate();
+        params.print_usage(std::cout, argv[0]);
+        return false;
     }
-    catch(const cmdline::CLIError& e)
-    {
-        std::cerr << argv[0] << ": " << e.what() << std::endl;
-        return -1;
-    }
-    return 1;
+    params.validate();
+
+    return true;
 }
 
-int Controller::run(int argc, char** argv)
+int Controller::run()
 {
-    int parse_res = parse_cmdline_args(argc, argv);
-    if(parse_res <= 0)
-    {
-        return parse_res;
-    }
-
     init_runing();
 
     // Start handling user signals
@@ -63,28 +50,19 @@ int Controller::run(int argc, char** argv)
     analyse.create();       // TODO: Unify managers interfaces
 
     // Waiting some exception or user-signal for handling
+    // TODO: add code for recovery processing
     try
     {
         status.wait_and_rethrow_exception();
     }
-    catch(NST::filter::pcap::PcapError& e)
+    catch(...)
     {
-        std::cerr << "PcapError: " << e.what() << std::endl;
+        filtration.stop();
+        analyse.stop();
+        status.print(std::cerr);
+        sig_handler.stop();
+        throw;
     }
-    catch(NST::controller::SynchronousSignalHandling::Signal& e)
-    {
-        std::cerr << "Signal: " << e.what() << std::endl;
-    }
-    catch(NST::auxiliary::Exception& e)
-    {
-        std::cerr << "Exception: " << e.what() << std::endl;
-    }
-
-    // Stop all modules here
-    filtration.stop();
-    analyse.stop();
-    status.print(std::cerr);
-    sig_handler.stop();
 
     return 0;
 }
