@@ -18,15 +18,15 @@ namespace auxiliary
 class Exception : public std::exception
 {
 public:
-    explicit Exception(const std::string& what_arg)
-        : message(what_arg) { }
+    Exception(const std::string& msg)  : message(msg)      { }
+    Exception(const std::exception& e) : message(e.what()) { }
+    Exception(const Exception& e)      : message(e.what()) { }
 
     virtual ~Exception() throw() { }
 
-    virtual const char* what() const throw()
-    {
-        return message.c_str();
-    }
+    virtual const char*               what() const throw() { return message.c_str(); }
+    virtual const Exception* dynamic_clone() const { return new Exception(*this); }
+    virtual void             dynamic_throw() const { throw *this; }
 
 private:
     std::string message;

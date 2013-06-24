@@ -52,7 +52,7 @@ public:
         {
             process();
         }
-        catch(std::exception* exception)
+        catch(std::exception& exception)
         {
             status.push(exception);
         }

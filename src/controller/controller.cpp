@@ -63,8 +63,22 @@ int Controller::run(int argc, char** argv)
     analyse.create();       // TODO: Unify managers interfaces
 
     // Waiting some exception or user-signal for handling
-    std::auto_ptr<std::exception> e(status.pop_wait());
-    std::cerr << e->what() << std::endl;
+    try
+    {
+        status.wait_and_rethrow_exception();
+    }
+    catch(NST::filter::pcap::PcapError& e)
+    {
+        std::cerr << "PcapError: " << e.what() << std::endl;
+    }
+    catch(NST::controller::SynchronousSignalHandling::Signal& e)
+    {
+        std::cerr << "Signal: " << e.what() << std::endl;
+    }
+    catch(NST::auxiliary::Exception& e)
+    {
+        std::cerr << "Exception: " << e.what() << std::endl;
+    }
 
     // Stop all modules here
     filtration.stop();
