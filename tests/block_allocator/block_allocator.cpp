@@ -19,6 +19,7 @@ int main(int argc, char** argv)
         assert(allocator.max_memory() == CHUNK_SIZE * BLOCK_SIZE * MAX_BLOCK_COUNT);
         assert(allocator.max_chunks() == BLOCK_SIZE * MAX_BLOCK_COUNT);
         assert(allocator.max_blocks() == MAX_BLOCK_COUNT);
+        assert(allocator.free_chunks() == BLOCK_SIZE);
     }
     // Test for valid allocation
     {
@@ -29,25 +30,30 @@ int main(int argc, char** argv)
             assert(allocator.allocate() != NULL); // ERROR! Memory should be enough
         }
         assert(allocator.allocate() == NULL); // ERROR! Extra memory
+        assert(allocator.free_chunks() == 0);
     }
     // Test for memory utilization
     {
         BlockAllocator allocator;
         allocator.init_allocation(CHUNK_SIZE, BLOCK_SIZE, MAX_BLOCK_COUNT);
+        assert(allocator.free_chunks() == BLOCK_SIZE);
         BlockAllocator::Chunk* chunks[BLOCK_SIZE * MAX_BLOCK_COUNT];
         for(unsigned int i = 0; i < allocator.max_chunks(); ++i)
         {
             chunks[i] = allocator.allocate();
         }
+        assert(allocator.free_chunks() == 0);
         for(unsigned int i = 0; i < BLOCK_SIZE * MAX_BLOCK_COUNT; ++i)
         {
             allocator.deallocate(chunks[i]);
         }
+        assert(allocator.free_chunks() == BLOCK_SIZE * MAX_BLOCK_COUNT);
         for(unsigned int i = 0; i < allocator.max_chunks(); ++i)
         {
             assert(allocator.allocate() != NULL); // ERROR! Memory can not be reused
         }
         assert(allocator.allocate() == NULL); // ERROR! Extra memory appearenced
+        assert(allocator.free_chunks() == 0);
     }
     // Test for memory reusability
     {
@@ -70,6 +76,7 @@ int main(int argc, char** argv)
         BlockAllocator::Chunk* chunk = allocator.allocate();
         memcpy(chunk->ptr(), "Hello", 6);
         assert(strcmp(chunk->ptr(), "Hello") == 0); // Allocator cannot be used!!!
+        allocator.deallocate(chunk);
     }
     std::cout << "All test passed" << std::endl;
     return 0;
