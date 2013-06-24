@@ -30,7 +30,7 @@ public:
     class Signal : public Exception
     {
     public:
-        explicit Signal(int sig) : Exception(strsignal(sig)) { }
+        explicit Signal(int sig) : Exception(std::string("signal: ") + strsignal(sig)) { }
 
         virtual const Signal* dynamic_clone() const { return new Signal(*this); }
         virtual void          dynamic_throw() const { throw *this; }

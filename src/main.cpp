@@ -13,11 +13,17 @@ using namespace NST::controller;
 int main(int argc, char **argv) try
 {
     Controller controller;
-    return controller.run(argc, argv);
+
+    if(!controller.cmdline_args(argc, argv))
+    {
+        return 0; // -h was passed
+    }
+
+    return controller.run();
 }
 catch(const std::exception& e)
 {
-    std::cerr << e.what() << std::endl;
+    std::cerr << argv[0] << ": " << e.what() << std::endl;
     exit(-1);
 }
 catch(...)

@@ -34,11 +34,11 @@ private:
 // Struct Arg defined in cmdline_parser.h
 Opt Args::options[Args::num] =
 {
-    {'i', "interface", Opt::REQUIRED, NULL,    "This is a very long comment "
+    {'i', "interface", Opt::REQ, NULL,    "This is a very long comment "
         "that let us see how option description is splitted on rows", "ITRF", NULL},
-    {'p', "port",      Opt::REQUIRED, "2049",  "port of nfs connection", NULL},
-    {0,   "help",      Opt::NO,       "false", "get help message",       NULL},
-    {'v', "verbose",   Opt::NO,       "false", "interactive mode",       NULL},
+    {'p', "port",      Opt::REQ, "2049",  "port of nfs connection", NULL},
+    {0,   "help",      Opt::NOA, "false", "get help message",       NULL},
+    {'v', "verbose",   Opt::NOA, "false", "interactive mode",       NULL},
 };
 
 /** This utility function is defined since getopt_long uses external variables
@@ -77,7 +77,7 @@ void check_arguments_conversions()
         p.parse(test_argc, test_argv);
 
         // check arguments values
-        assert(p[Args::INTERFACE] == "127.0.0.1");
+        assert(p[Args::INTERFACE].is("127.0.0.1"));
         assert(p[Args::PORT].to_int() == 8080);
         assert(p[Args::HELP].to_bool() == true);
         assert(p[Args::VERBOSE].to_bool() == false);
