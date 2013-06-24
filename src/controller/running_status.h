@@ -6,15 +6,14 @@
 #ifndef RUNNING_STATUS_H
 #define RUNNING_STATUS_H
 //------------------------------------------------------------------------------
-#include <exception>
 #include <list>
-#include <ostream> // for std::endl;
-
-#include <pthread.h>
+#include <ostream>
 
 #include "../auxiliary/conditional_variable.h"
+#include "../auxiliary/exception.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::ConditionalVariable;
+using NST::auxiliary::Exception;
 using NST::auxiliary::Mutex;
 //------------------------------------------------------------------------------
 namespace NST
@@ -24,15 +23,13 @@ namespace controller
 
 class RunningStatus
 {
-    typedef std::list<std::exception* /*, Allocator*/> List;
+    typedef std::list<const Exception*> List;
 public:
     RunningStatus()
     {
     }
     ~RunningStatus()
     {
-        Mutex::Lock lock(mutex);
-
         List::iterator i = fifo.begin();
         List::iterator end = fifo.end();
         for(; i != end; ++i)
@@ -41,45 +38,65 @@ public:
         }
     }
 
-    void push(std::exception* exception)
+    inline void push(const Exception& e)
     {
-        Mutex::Lock lock(mutex);
-        fifo.push_back(exception);
-        condition.signal();
+        push(e.dynamic_clone());
     }
 
-    std::exception* pop_wait()
+    inline void push(const std::exception& e)
+    {
+        push(new Exception(e));
+    }
+
+    inline void push(const std::string& str)
+    {
+        push(new Exception(str));
+    }
+
+    const Exception* wait_exception() // return value must be deleted by client
     {
         Mutex::Lock lock(mutex);
-        while(fifo.empty())
-        {
-            condition.wait(mutex);
-        }
-        std::exception* e = fifo.front();
-        fifo.pop_front();
-        return e;
+            while(fifo.empty())
+            {
+                condition.wait(mutex);
+            }
+            const Exception* e = fifo.front();
+            fifo.pop_front();
+            return e;
+    }
+
+    void wait_and_rethrow_exception()
+    {
+        std::auto_ptr<const Exception> e(wait_exception());
+        e->dynamic_throw();
     }
 
     void print(std::ostream& out)
     {
         Mutex::Lock lock(mutex);
-        if(!fifo.empty())
-        {
-            List::iterator i = fifo.begin();
-            List::iterator end = fifo.end();
-            out << "list of caught exceptions:" << std::endl;
-            for(; i != end; ++i)
+            if(!fifo.empty())
             {
-                out << '\t' << (*i)->what() << std::endl;
+                List::iterator i = fifo.begin();
+                List::iterator end = fifo.end();
+                out << "list of collected exceptions:" << std::endl;
+                for(; i != end; ++i)
+                {
+                    out << '\t' << (*i)->what() << std::endl;
+                }
             }
-        }
     }
 
 private:
-    RunningStatus(const RunningStatus&); //Unrealized
-    RunningStatus& operator=(const RunningStatus&); //Unrealized
+    RunningStatus(const RunningStatus&);            // undefined
+    RunningStatus& operator=(const RunningStatus&); // undefined
 
-private:
+    void push(const Exception* e)
+    {
+        Mutex::Lock lock(mutex);
+            fifo.push_back(e);
+            condition.signal();
+    }
+
     List fifo;
     Mutex mutex; // Used for condition, show that 
     ConditionalVariable condition;

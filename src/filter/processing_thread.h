@@ -1,14 +1,16 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Manage eniter processing process.
+// Description: Manage entire filtration processes.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef PROCESSING_THREAD_H
 #define PROCESSING_THREAD_H
 //------------------------------------------------------------------------------
+#include "../auxiliary/exception.h"
 #include "../auxiliary/thread.h"
 #include "../controller/running_status.h"
 //------------------------------------------------------------------------------
+using NST::auxiliary::Exception;
 using NST::auxiliary::Thread;
 using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
@@ -24,7 +26,7 @@ template<typename Reader, typename Processor>
 class ProcessingThread : public Thread
 {
 public:
-    ProcessingThread(Reader* r, Processor* p, RunningStatus &running_status) : reader(r), proc(p), excpts_holder(running_status)
+    ProcessingThread(Reader* r, Processor* p, RunningStatus &s) : reader(r), proc(p), status(s)
     {
     }
     ~ProcessingThread()
@@ -34,14 +36,18 @@ public:
     }
 
     virtual void* run()
-    {   
+    {
         try
         {
             reader->loop(*proc);
         }
-        catch(std::exception* exception)
+        catch(Exception& e)
         {
-            excpts_holder.push(exception);
+            status.push(e);
+        }
+        catch(std::exception& e)
+        {
+            status.push(e);
         }
         return NULL;
     }
@@ -54,7 +60,7 @@ public:
 private:
     Reader* reader;
     Processor* proc;
-    RunningStatus& excpts_holder;
+    RunningStatus& status;
 };
 
 } // namespace filter

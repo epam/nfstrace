@@ -1,35 +1,42 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Design for handling all signals from user.
+// Description: Handling signals to the application an to map the to exceptions.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef SYNCHRONOUS_SIGNAL_HANDLING_H
 #define SYNCHRONOUS_SIGNAL_HANDLING_H
 //------------------------------------------------------------------------------
-#include <sstream>
-
 #include <unistd.h>
+#include <pthread.h>
+#include <signal.h>
+#include <string.h> // for strsignal()
 
-#include "../auxiliary/thread.h"
 #include "../auxiliary/exception.h"
-#include "../controller/running_status.h"
+#include "../auxiliary/thread.h"
+#include "running_status.h"
 //------------------------------------------------------------------------------
-using NST::auxiliary::Thread;
 using NST::auxiliary::Exception;
-using NST::controller::RunningStatus;
+using NST::auxiliary::Thread;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
 
-/*
- * Handle all signals passed to the application.
- */
 class SynchronousSignalHandling : public Thread
 {
 public:
-    SynchronousSignalHandling(RunningStatus &running_status) : excpts_holder(running_status)
+
+    class Signal : public Exception
+    {
+    public:
+        explicit Signal(int sig) : Exception(strsignal(sig)) { }
+
+        virtual const Signal* dynamic_clone() const { return new Signal(*this); }
+        virtual void          dynamic_throw() const { throw *this; }
+    };
+
+    SynchronousSignalHandling(RunningStatus &s) : status(s)
     {
         sigfillset(&mask);
         pthread_sigmask(SIG_BLOCK, &mask, NULL);
@@ -42,10 +49,10 @@ public:
     {
         sigemptyset(&mask);
         sigaddset(&mask, SIGINT);
+        sigaddset(&mask, SIGQUIT);
         sigaddset(&mask, SIGUSR2);
 
         int signo = 0;
-        Exception* exception = NULL;
 
         while(true)
         {
@@ -56,10 +63,7 @@ public:
             {
                 return NULL;
             }
-            std::stringstream msg;
-            msg << "got signal: " << signo;
-            exception = new Exception(msg.str());
-            excpts_holder.push(exception);
+            status.push(Signal(signo));
         }
         return NULL;
     }
@@ -72,7 +76,7 @@ public:
 
 private:
     sigset_t mask;
-    RunningStatus& excpts_holder;
+    RunningStatus& status;
 };
 
 } // namespace filter

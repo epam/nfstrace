@@ -21,11 +21,14 @@ namespace filter
 namespace pcap
 {
 
-class PcapError:public Exception
+class PcapError : public Exception
 {
 public:
     explicit PcapError(const char* func, const char errbuf[PCAP_ERRBUF_SIZE])
         : Exception(std::string(func)+"():"+std::string(errbuf)) { }
+
+    virtual const PcapError* dynamic_clone() const { return new PcapError(*this); }
+    virtual void             dynamic_throw() const { throw *this; }
 };
 
 } // namespace pcap
