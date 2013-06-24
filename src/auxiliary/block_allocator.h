@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: BlockAllocator for fixed length Chunks of memory
+// Description: BlockAllocator for fixed size Chunks of memory
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef BLOCK_ALLOCATOR_H
@@ -8,6 +8,8 @@
 //------------------------------------------------------------------------------
 #include <inttypes.h>    // for uintXX_t
 #include <cstring>       // for memset()
+
+#include "spinlock.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -26,7 +28,7 @@ public:
         inline char*const ptr() const { return (char*)this; }
 
     private:
-        Chunk* next; // used only for list chunks in list
+        Chunk* next; // used only for free chunks in list
     };
 
     BlockAllocator() : chunk(0), block(0), limit(0), allocated(0), blocks(NULL), list(NULL)
@@ -55,24 +57,26 @@ public:
 
     inline Chunk* allocate()
     {
-        if(list == NULL)
-        {
-            if(allocated < limit)
+        Spinlock::Lock lock(spinlock);
+            if(list == NULL)
             {
-                list = blocks[allocated] = new_block();
+                if(allocated < limit)
+                {
+                    list = blocks[allocated] = new_block();
+                }
+                else return NULL; // all blocks are allocated!
             }
-            else return NULL; // all blocks are allocated!
-        }
 
-        Chunk* c = list;
-        list = list->next;
-        return c;
+            Chunk* c = list;
+            list = list->next;
+            return c;
     }
 
     inline void deallocate(Chunk* c)
     {
-        c->next = list;
-        list = c;
+        Spinlock::Lock lock(spinlock);
+            c->next = list;
+            list = c;
     }
 
     // limits
@@ -99,6 +103,8 @@ private:
     uint32_t allocated;   // num of allocated blocks, up to limit
     Chunk** blocks;       // array of blocks
     Chunk* list;          // list of free chunks
+
+    Spinlock spinlock;    // for allocate/deallocate
 };
 
 } // auxiliary
