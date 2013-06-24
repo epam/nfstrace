@@ -31,7 +31,7 @@ public:
         Chunk* next; // used only for free chunks in list
     };
 
-    BlockAllocator() : chunk(0), block(0), limit(0), allocated(0), blocks(NULL), list(NULL)
+    BlockAllocator() : chunk(0), block(0), limit(0), nfree(0), allocated(0), blocks(NULL), list(NULL)
     {
     }
 
@@ -69,6 +69,7 @@ public:
 
             Chunk* c = list;
             list = list->next;
+            --nfree;
             return c;
     }
 
@@ -77,12 +78,15 @@ public:
         Spinlock::Lock lock(spinlock);
             c->next = list;
             list = c;
+            ++nfree;
     }
 
     // limits
     inline const unsigned int max_chunks() const { return block*limit;       }
     inline const unsigned int max_memory() const { return block*limit*chunk; }
     inline const unsigned int max_blocks() const { return limit;             }
+
+    inline const unsigned int free_chunks() const { return nfree; } // TODO: should we lock spinlock?
 
 private:
     Chunk* new_block()
@@ -94,12 +98,14 @@ private:
         }
         ((Chunk*) &ptr[(block - 1) * chunk])->next = NULL;
         ++allocated;
+        nfree += block;
         return (Chunk*) ptr;
     }
 
     uint32_t chunk;       // chunk size
     uint32_t block;       // num chunks in block
     uint32_t limit;       // max blocks
+    uint32_t nfree;       // num of avaliable chunks
     uint32_t allocated;   // num of allocated blocks, up to limit
     Chunk** blocks;       // array of blocks
     Chunk* list;          // list of free chunks
