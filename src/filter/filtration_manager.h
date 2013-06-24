@@ -8,22 +8,22 @@
 //------------------------------------------------------------------------------
 #include <memory> // std::auto_ptr
 
-#include "../controller/running_status.h"
-#include "../auxiliary/thread_group.h"
-#include "common/queueing_processor.h"
-#include "common/dumping_processor.h"
-#include "pcap/packet_capture.h"
 #include "../analyzer/nfs_data.h"
-#include "pcap/packet_reader.h"
 #include "../auxiliary/queue.h"
+#include "../auxiliary/thread_group.h"
+#include "../controller/running_status.h"
+#include "common/dumping_processor.h"
+#include "common/queueing_processor.h"
+#include "pcap/packet_capture.h"
+#include "pcap/packet_reader.h"
 #include "processing_thread.h"
 //------------------------------------------------------------------------------
+using NST::analyzer::NFSData;
+using NST::auxiliary::Queue;
+using NST::auxiliary::ThreadGroup;
 using NST::controller::RunningStatus;
 using NST::filter::pcap::PacketCapture;
 using NST::filter::pcap::PacketReader;
-using NST::auxiliary::ThreadGroup;
-using NST::analyzer::NFSData;
-using NST::auxiliary::Queue;
 //------------------------------------------------------------------------------
 namespace NST
 {
