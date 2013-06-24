@@ -92,6 +92,10 @@ void Controller::init_runing()
     else if(mode == "stat")   // offline analysis mode
     {
     }
+    else
+    {
+        throw cmdline::CLIError(std::string("unknown mode: ") + mode);
+    }
 
     // TODO: Create options in command line for supporting different analyzers
     analyse.print_analyzer();
