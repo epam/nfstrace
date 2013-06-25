@@ -47,7 +47,7 @@ public:
         typedef ProcessingThread<PacketCapture, DumpingProcessor>  OnlineDumping;
 
         std::auto_ptr<PacketCapture>    reader    (new PacketCapture(interface, filter, snaplen, ms));
-        std::auto_ptr<DumpingProcessor> processor (new DumpingProcessor(file));
+        std::auto_ptr<DumpingProcessor> processor (new DumpingProcessor(reader->get_handle(), file));
         std::auto_ptr<OnlineDumping>    thread    (new OnlineDumping(reader.release(), processor.release(), status));
 
         threads.add(thread.release());
