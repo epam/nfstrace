@@ -55,7 +55,7 @@ public:
         list = blocks[0] = new_block();
     }
 
-    inline Chunk* allocate()
+    inline void* allocate()
     {
         Spinlock::Lock lock(spinlock);
             if(list == NULL)
@@ -73,8 +73,9 @@ public:
             return c;
     }
 
-    inline void deallocate(Chunk* c)
+    inline void deallocate(void* ptr)
     {
+        Chunk* c = (Chunk*) ptr;
         Spinlock::Lock lock(spinlock);
             c->next = list;
             list = c;

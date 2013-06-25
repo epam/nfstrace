@@ -43,7 +43,7 @@ public:
         inline List(Element* first, Queue* q):ptr(first),queue(q){}
         inline List(const List& list):ptr(list.ptr),queue(list.queue)
         {
-            // move elements from list to this, without deallocation in a
+            // move elements from list to this, without deallocation in list
             list.ptr   = NULL;
             list.queue = NULL;
         }
