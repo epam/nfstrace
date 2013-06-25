@@ -31,14 +31,15 @@ public:
             pcap_close(handle);
         }
     }
-    Handle(const Handle&);            // undefined
-    Handle& operator=(const Handle&); // undefined
 
     inline void operator=(pcap_t* p) { handle = p; }
     inline      operator bool   () { return NULL != handle; }
     inline      operator pcap_t*() const { return handle; }
 
 private:
+    Handle(const Handle&);            // undefined
+    Handle& operator=(const Handle&); // undefined
+
     pcap_t* handle;
 };
 

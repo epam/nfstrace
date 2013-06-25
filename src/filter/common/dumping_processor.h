@@ -12,8 +12,10 @@
 #include <pcap/pcap.h>
 
 #include "base_filtering_processor.h"
+#include "../pcap/handle.h"
 #include "../pcap/packet_dumper.h"
 //------------------------------------------------------------------------------
+using NST::filter::pcap::Handle;
 using NST::filter::pcap::PacketDumper;
 //------------------------------------------------------------------------------
 namespace NST
@@ -24,23 +26,12 @@ namespace filter
 class DumpingProcessor : public BaseFilteringProcessor
 {
 public:
-    DumpingProcessor(const std::string& path) : file(path)
+    DumpingProcessor(const Handle& handle, const std::string& path)
     {
+        dumper.reset(new PacketDumper(handle, path.c_str()));
     }
     ~DumpingProcessor()
     {
-    }
-
-    virtual void before_callback(pcap_t* handle)
-    {
-        // prepare packet dumper
-        dumper.reset(new PacketDumper(handle, file.c_str()));
-    }
-
-    virtual void after_callback (pcap_t* handle)
-    {
-        // destroy packet dumper
-        dumper.release();
     }
 
     virtual void discard(const FiltrationData& data)
@@ -53,8 +44,6 @@ public:
     }
 
 private:
-
-    std::string file;
     std::auto_ptr<PacketDumper> dumper;
 };
 

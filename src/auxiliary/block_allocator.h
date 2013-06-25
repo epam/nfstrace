@@ -21,15 +21,11 @@ namespace auxiliary
 // May throw std::bad_alloc() when memory is not enough
 class BlockAllocator
 {
-public:
     struct Chunk
     {
-    friend class BlockAllocator;
-        inline char*const ptr() const { return (char*)this; }
-
-    private:
         Chunk* next; // used only for free chunks in list
     };
+public:
 
     BlockAllocator() : chunk(0), block(0), limit(0), nfree(0), allocated(0), blocks(NULL), list(NULL)
     {

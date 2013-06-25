@@ -142,9 +142,13 @@ class CountProcessor  // Identify and count packets (accepted and discarded)
 public:
     CountProcessor(unsigned int workload_sleep):workload_tid(0), sleep_secs(workload_sleep)
     {
+        pthread_create(&workload_tid, NULL, workload_thread, this);
     }
     ~CountProcessor()
     {
+        void *res;
+        pthread_cancel(workload_tid);
+        pthread_join(workload_tid, &res);
     }
 
 private:
@@ -179,18 +183,6 @@ private:
             sleep(counter.sleep_secs); // cancellation point
         }
         return NULL;
-    }
-
-
-    void before_callback(pcap_t*)   // start thread
-    {
-        pthread_create(&workload_tid, NULL, workload_thread, this);
-    }
-    void after_callback(pcap_t*)    // join thread
-    {
-        void *res;
-        pthread_cancel(workload_tid);
-        pthread_join(workload_tid, &res);
     }
 
     u_char* get_user()
@@ -358,21 +350,7 @@ public:
 class DumpToFileProcessor
 {
 public:
-    DumpToFileProcessor(const std::string& path_to_file): path(path_to_file),dumper(NULL)
-    {
-    }
-    ~DumpToFileProcessor()
-    {
-        if(dumper)
-        {
-            pcap_dump_close(dumper);
-        }
-    }
-
-private:
-    friend class BaseReader;
-
-    void before_callback(pcap_t* handle)
+    DumpToFileProcessor(const std::string& path, pcap_t* handle): dumper(NULL)
     {
         dumper = pcap_dump_open(handle, path.c_str());
         if(NULL == dumper)
@@ -380,13 +358,14 @@ private:
             throw PcapError("pcap_dump_open", pcap_geterr(handle));
         }
     }
-
-    void after_callback(pcap_t* handle)
+    ~DumpToFileProcessor()
     {
         pcap_dump_flush(dumper);
         pcap_dump_close(dumper);
-        dumper = NULL;
     }
+
+private:
+    friend class BaseReader;
 
     u_char* get_user()
     {
@@ -400,7 +379,6 @@ private:
         pcap_dump((u_char*)dumper, pkthdr, packet);
     }
 
-    const std::string path;
     pcap_dumper_t* dumper;
 };
 //------------------------------------------------------------------------------
@@ -505,7 +483,7 @@ int main(int argc, char **argv) try
         const std::string path = params.is_default(CLI::DUMP) ?
                             iface+"-tcp-"+port+"-snaplen-"+snaplen_str+".dmp" :
                             params[CLI::DUMP];
-        DumpToFileProcessor dumper(path);
+        DumpToFileProcessor dumper(path, capture.get_handle());
         capture.loop(dumper);
     }
     else

@@ -37,7 +37,7 @@ int main(int argc, char** argv)
         BlockAllocator allocator;
         allocator.init_allocation(CHUNK_SIZE, BLOCK_SIZE, MAX_BLOCK_COUNT);
         assert(allocator.free_chunks() == BLOCK_SIZE);
-        BlockAllocator::Chunk* chunks[BLOCK_SIZE * MAX_BLOCK_COUNT];
+        void* chunks[BLOCK_SIZE * MAX_BLOCK_COUNT];
         for(unsigned int i = 0; i < allocator.max_chunks(); ++i)
         {
             chunks[i] = allocator.allocate();
@@ -59,8 +59,8 @@ int main(int argc, char** argv)
     {
         BlockAllocator allocator;
         allocator.init_allocation(CHUNK_SIZE, BLOCK_SIZE, MAX_BLOCK_COUNT);
-        BlockAllocator::Chunk* temp = NULL;
-        BlockAllocator::Chunk* test = NULL;
+        void* temp = NULL;
+        void* test = NULL;
         for(unsigned int i = 0; i < allocator.max_chunks() / 3; ++i)
         {
             temp = test = allocator.allocate();
@@ -73,9 +73,9 @@ int main(int argc, char** argv)
     {
         BlockAllocator allocator;
         allocator.init_allocation(CHUNK_SIZE, BLOCK_SIZE, MAX_BLOCK_COUNT);
-        BlockAllocator::Chunk* chunk = allocator.allocate();
-        memcpy(chunk->ptr(), "Hello", 6);
-        assert(strcmp(chunk->ptr(), "Hello") == 0); // Allocator cannot be used!!!
+        void* chunk = allocator.allocate();
+        memcpy(chunk, "Hello", 6);
+        assert(strcmp((const char*)chunk, "Hello") == 0); // Allocator cannot be used!!!
         allocator.deallocate(chunk);
     }
     std::cout << "All test passed" << std::endl;
