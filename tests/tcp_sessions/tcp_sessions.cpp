@@ -720,11 +720,11 @@ struct CLI
 };
 
 Opt CLI::options[CLI::num] = {
-{ 'i', "interface", Opt::REQUIRED,  NULL,   "interface for capturing", "INTERFACE" },
-{ 'p', "port",      Opt::REQUIRED, "2049",  "NFS filtration port", "PORT" },
-{ 's', "snaplen",   Opt::REQUIRED, "512",   "length of packet snapshot", "(0..65535)" },
-{ 'd', "dump",      Opt::OPTIONAL, "INTERFACE-tcp-PORT-SNAPLEN.dmp", "dump packets to file", "PATH" },
-{ 'h', "help",      Opt::NO,       "false", "show this information" },
+{ 'i', "interface", Opt::REQ,  NULL,   "interface for capturing", "INTERFACE" },
+{ 'p', "port",      Opt::REQ, "2049",  "NFS filtration port", "PORT" },
+{ 's', "snaplen",   Opt::REQ, "512",   "length of packet snapshot", "(0..65535)" },
+{ 'd', "dump",      Opt::OPT, "INTERFACE-tcp-PORT-SNAPLEN.dmp", "dump packets to file", "PATH" },
+{ 'h', "help",      Opt::NOA, "false", "show this information" },
 };
 
 int main(int argc, char **argv) try
