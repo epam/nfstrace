@@ -7,7 +7,10 @@
 #define XDR_STRUCT_H
 //------------------------------------------------------------------------------
 #include <cstring> // size_t
+#include <stdint.h> // uintxx_t
 #include <vector>
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 namespace NST
 {
@@ -16,19 +19,17 @@ namespace filter
 namespace XDR
 {
 
-typedef unsigned char uint8_t;
-
 const size_t align = 4;
 
 struct OpaqueDyn // Move to xdr
 {
-    std::vector<uchar_t> data;    // Size of 'size'
+    std::vector<uint8_t> data;    // Size of 'size'
 };
 
 template<uint32_t size>
 struct OpaqueStat // Move to xdr
 {
-    uchar_t data[size];
+    uint8_t data[size];
 };
 
 }

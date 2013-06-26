@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: BlockAllocator for fixed size Chunks of memory
+// Description: BlockAllocator for fixed length Chunks of memory
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef BLOCK_ALLOCATOR_H
@@ -8,8 +8,6 @@
 //------------------------------------------------------------------------------
 #include <inttypes.h>    // for uintXX_t
 #include <cstring>       // for memset()
-
-#include "spinlock.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -21,13 +19,17 @@ namespace auxiliary
 // May throw std::bad_alloc() when memory is not enough
 class BlockAllocator
 {
+public:
     struct Chunk
     {
-        Chunk* next; // used only for free chunks in list
-    };
-public:
+    friend class BlockAllocator;
+        inline char*const ptr() const { return (char*)this; }
 
-    BlockAllocator() : chunk(0), block(0), limit(0), nfree(0), allocated(0), blocks(NULL), list(NULL)
+    private:
+        Chunk* next; // used only for list chunks in list
+    };
+
+    BlockAllocator() : chunk(0), block(0), limit(0), allocated(0), blocks(NULL), list(NULL)
     {
     }
 
@@ -51,39 +53,32 @@ public:
         list = blocks[0] = new_block();
     }
 
-    inline void* allocate()
+    inline Chunk* allocate()
     {
-        Spinlock::Lock lock(spinlock);
-            if(list == NULL)
+        if(list == NULL)
+        {
+            if(allocated < limit)
             {
-                if(allocated < limit)
-                {
-                    list = blocks[allocated] = new_block();
-                }
-                else return NULL; // all blocks are allocated!
+                list = blocks[allocated] = new_block();
             }
+            else return NULL; // all blocks are allocated!
+        }
 
-            Chunk* c = list;
-            list = list->next;
-            --nfree;
-            return c;
+        Chunk* c = list;
+        list = list->next;
+        return c;
     }
 
-    inline void deallocate(void* ptr)
+    inline void deallocate(Chunk* c)
     {
-        Chunk* c = (Chunk*) ptr;
-        Spinlock::Lock lock(spinlock);
-            c->next = list;
-            list = c;
-            ++nfree;
+        c->next = list;
+        list = c;
     }
 
     // limits
     inline const unsigned int max_chunks() const { return block*limit;       }
     inline const unsigned int max_memory() const { return block*limit*chunk; }
     inline const unsigned int max_blocks() const { return limit;             }
-
-    inline const unsigned int free_chunks() const { return nfree; } // TODO: should we lock spinlock?
 
 private:
     Chunk* new_block()
@@ -95,19 +90,15 @@ private:
         }
         ((Chunk*) &ptr[(block - 1) * chunk])->next = NULL;
         ++allocated;
-        nfree += block;
         return (Chunk*) ptr;
     }
 
     uint32_t chunk;       // chunk size
     uint32_t block;       // num chunks in block
     uint32_t limit;       // max blocks
-    uint32_t nfree;       // num of avaliable chunks
     uint32_t allocated;   // num of allocated blocks, up to limit
     Chunk** blocks;       // array of blocks
     Chunk* list;          // list of free chunks
-
-    Spinlock spinlock;    // for allocate/deallocate
 };
 
 } // auxiliary

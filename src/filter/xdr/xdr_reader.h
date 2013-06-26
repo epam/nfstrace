@@ -31,7 +31,7 @@ public:
     XDRReader() : it(NULL), last(NULL)
     {
     }
-    XDRReader(uchar_t* beg, size_t num) : it(beg), last(beg + num)
+    XDRReader(uint8_t* beg, size_t num) : it(beg), last(beg + num)
     {
     }
     ~XDRReader()
@@ -105,8 +105,8 @@ private:
     }
 
 private:
-    uchar_t* it;
-    uchar_t* last;
+    uint8_t* it;
+    uint8_t* last;
 };
 
 }

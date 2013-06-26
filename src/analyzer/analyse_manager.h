@@ -26,9 +26,9 @@ namespace NST
 namespace analyzer
 {
 
-class AnalyseManager : public Thread
+class AnalyseManager
 {
-    typedef Queue<NFSData> Buffer;
+    typedef Queue<NFSData> NFSQueue;
 public:
     AnalyseManager(RunningStatus &running_status, uint32_t queue_size = 256, uint32_t queue_limit = 16) : status(running_status), exec(false), queue(queue_size, queue_limit)
     {
@@ -65,7 +65,7 @@ public:
         join();
     }
     
-    Buffer& get_queue()
+    NFSQueue& get_queue()
     {
         return queue;
     }
@@ -78,7 +78,7 @@ private:
     {
         while(exec)
         {
-            Buffer::List list = queue.pop_list();
+            NFSQueue::List list = queue.pop_list();
 
             // Read all data from the received queue
             while(list)
@@ -95,7 +95,7 @@ private:
     RunningStatus& status;
     Analyzers analyzers;
     volatile bool exec;
-    Buffer queue;
+    NFSQueue queue;
 };
 
 } // namespace analyzer
