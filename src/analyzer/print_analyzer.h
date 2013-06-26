@@ -19,7 +19,7 @@ using namespace NST::filter::rpc;
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace analyzer 
+namespace analyzer
 {
 
 class PrintAnalyzer : public BaseAnalyzer

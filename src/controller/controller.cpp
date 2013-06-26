@@ -93,6 +93,7 @@ void Controller::init_runing()
     }
     else if(mode == "stat")   // offline analysis mode
     {
+        throw cmdline::CLIError(std::string("unimplemented mode: ") + mode);
     }
     else
     {
