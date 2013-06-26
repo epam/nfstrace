@@ -43,7 +43,7 @@ public:
         inline List(Element* first, Queue* q):ptr(first),queue(q){}
         inline List(const List& list):ptr(list.ptr),queue(list.queue)
         {
-            // move elements from list to this, without deallocation in a
+            // move elements from list to this, without deallocation in list
             list.ptr   = NULL;
             list.queue = NULL;
         }
@@ -70,13 +70,9 @@ public:
     {
     }
 
-    inline T*const allocate()
+    inline T* const allocate()
     {
-        Element* e;
-        {
-            Spinlock::Lock lock(a_spinlock);
-                e = (Element*)allocator.allocate();
-        }
+        Element* e = (Element*)allocator.allocate();
         return (e) ? &(e->data) : NULL;
     }
 
@@ -111,12 +107,10 @@ public:
 private:
     inline void deallocate(Element* e)  // accessible from Queue::List
     {
-        Spinlock::Lock lock(a_spinlock);
-            allocator.deallocate((BlockAllocator::Chunk*)e);
+        allocator.deallocate((BlockAllocator::Chunk*)e);
     }
 
     BlockAllocator allocator;
-    Spinlock a_spinlock; // for memory reusage allocate/deallocate
     Spinlock q_spinlock; // for queue push/pop
 
     // queue empty:  last->NULL<-first
