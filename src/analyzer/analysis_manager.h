@@ -46,8 +46,8 @@ public:
 
     NFSQueue& init(uint32_t q_size = 256, uint32_t q_limit = 16)
     {
-        queue = std::auto_ptr<NFSQueue>(new NFSQueue(q_size, q_limit));
-        parser_thread = std::auto_ptr<Thread>(new NFSParserThread(*queue, analyzers, status));
+        queue.reset(new NFSQueue(q_size, q_limit));
+        parser_thread.reset(new NFSParserThread(*queue, analyzers, status));
         return *queue;
     }
 

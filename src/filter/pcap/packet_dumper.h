@@ -48,7 +48,6 @@ private:
     pcap_dumper_t* dumper;
 };
 
-
 } // namespace pcap
 } // namespace filter
 } // namespace NST
