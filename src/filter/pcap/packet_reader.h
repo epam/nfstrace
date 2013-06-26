@@ -21,13 +21,14 @@ namespace filter
 {
 namespace pcap
 {
+
 class PacketReader : public BaseReader
 {
 public:
-    PacketReader(const std::string& file) throw (PcapError);
+    PacketReader(const std::string& file);
     ~PacketReader();
 
-    FILE* get_file() { return pcap_file(handle); }
+    inline FILE* get_file() { return pcap_file(handle); }
 };
 
 } // namespace pcap
