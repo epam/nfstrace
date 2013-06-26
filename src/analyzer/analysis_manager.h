@@ -8,19 +8,19 @@
 //------------------------------------------------------------------------------
 #include <memory> // std::auto_ptr
 
-#include "../controller/running_status.h"
 #include "../auxiliary/exception.h"
 #include "../auxiliary/thread.h"
 #include "../auxiliary/queue.h"
-#include "nfs_parser_thread.h"
-#include "print_analyzer.h"
+#include "../controller/running_status.h"
 #include "analyzers.h"
 #include "nfs_data.h"
+#include "nfs_parser_thread.h"
+#include "print_analyzer.h"
 //------------------------------------------------------------------------------
-using NST::controller::RunningStatus;
 using NST::auxiliary::Exception;
 using NST::auxiliary::Thread;
 using NST::auxiliary::Queue;
+using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -53,19 +53,24 @@ public:
 
     void start()
     {
-        parser_thread->create();
+        if(parser_thread.get())
+        {
+            parser_thread->create();
+        }
     }
 
     void stop()
     {
-        parser_thread->stop();
+        if(parser_thread.get())
+        {
+            parser_thread->stop();
+        }
     }
 
 private:
     AnalysisManager(const AnalysisManager& object);            // Uncopyable object
     AnalysisManager& operator=(const AnalysisManager& object); // Uncopyable object
 
-private:
     std::auto_ptr<Thread> parser_thread;
     std::auto_ptr<NFSQueue> queue;
     RunningStatus& status;

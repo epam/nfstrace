@@ -17,7 +17,7 @@ using namespace NST::filter::NFS3;
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace analyzer 
+namespace analyzer
 {
 
 class Analyzers
