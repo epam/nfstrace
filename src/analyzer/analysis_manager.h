@@ -12,6 +12,7 @@
 #include "../auxiliary/exception.h"
 #include "../auxiliary/thread.h"
 #include "../auxiliary/queue.h"
+#include "nfs_parser_thread.h"
 #include "print_analyzer.h"
 #include "analyzers.h"
 #include "nfs_data.h"
@@ -26,14 +27,14 @@ namespace NST
 namespace analyzer
 {
 
-class AnalyseManager
+class AnalysisManager
 {
     typedef Queue<NFSData> NFSQueue;
 public:
-    AnalyseManager(RunningStatus &running_status, uint32_t queue_size = 256, uint32_t queue_limit = 16) : status(running_status), exec(false), queue(queue_size, queue_limit)
+    AnalysisManager(RunningStatus& running_status) : parser_thread(NULL), queue(NULL), status(running_status)
     {
     }
-    ~AnalyseManager()
+    ~AnalysisManager()
     {
     }
 
@@ -43,59 +44,32 @@ public:
         analyzers.add(a.release());
     }
 
-    void* run()
+    NFSQueue& init(uint32_t q_size = 256, uint32_t q_limit = 16)
     {
-        // Allow processing data contained in the queue
-        exec = true;
+        queue = std::auto_ptr<NFSQueue>(new NFSQueue(q_size, q_limit));
+        parser_thread = std::auto_ptr<Thread>(new NFSParserThread(*queue, analyzers, status));
+        return *queue;
+    }
 
-        try
-        {
-            process();
-        }
-        catch(std::exception& exception)
-        {
-            status.push(exception);
-        }
-        return NULL;
+    void start()
+    {
+        parser_thread->create();
     }
 
     void stop()
     {
-        exec = false;   // Deny processing data
-        join();
-    }
-    
-    NFSQueue& get_queue()
-    {
-        return queue;
+        parser_thread->stop();
     }
 
 private:
-    AnalyseManager(const AnalyseManager& object);            // Uncopyable object
-    AnalyseManager& operator=(const AnalyseManager& object); // Uncopyable object
-
-    inline void process()
-    {
-        while(exec)
-        {
-            NFSQueue::List list = queue.pop_list();
-
-            // Read all data from the received queue
-            while(list)
-            {
-                const NFSData& data = list.data();
-
-                analyzers.process(data);
-                list.free_current();
-            }
-        }
-    }
+    AnalysisManager(const AnalysisManager& object);            // Uncopyable object
+    AnalysisManager& operator=(const AnalysisManager& object); // Uncopyable object
 
 private:
+    std::auto_ptr<Thread> parser_thread;
+    std::auto_ptr<NFSQueue> queue;
     RunningStatus& status;
     Analyzers analyzers;
-    volatile bool exec;
-    NFSQueue queue;
 };
 
 } // namespace analyzer

@@ -1,18 +1,23 @@
-#include "print_analyzer.h"
+#include "nfs_struct.h"
 
 namespace NST
 {
-namespace analyzer 
+namespace filter 
+{
+namespace NFS3
 {
     
-const char* ProcNFS3::titles[ProcNFS3::num] = {
+const char* Proc::titles[Proc::num] = {
       "null",       "getattr",      "setattr",  "lookup",
       "access",     "readlink",     "read",     "write",
       "create",     "mkdir",        "symlink",  "mknod",
       "remove",     "rmdir",        "rename",   "link",
       "readdir",    "readdirplus",  "fsstat",   "fsinfo",
-      "pathconf",   "commit",
+      "pathconf",   "commit"
 };
 
-} // namespace analyzer
+
+} // namespace NFS3
+} // namespace filter
 } // namespace NST
+
