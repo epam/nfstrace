@@ -32,8 +32,9 @@ def main (argv):
             cd_op = "cd " + argv[1]
             subprc.check_output(cd_op + "&& ls", shell=True)
             subprc.check_output(cd_op + "&& mkdir hello", shell=True)
+            subprc.check_output("sleep 1", shell=True)
             cd_op += "/hello &&"
-            subprc.check_output(cd_op + "dd if=/dev/zero of=temp.file bs=1M count=1", shell=True)
+            subprc.check_output(cd_op + "dd if=/dev/random of=temp.file bs=1M count=1", shell=True)
             subprc.check_output(cd_op + "cd .. && rm -rf hello", shell=True)
     except ValueError:
         print "data error - load_tests [numb_of_oper] [mnt_dir]"
