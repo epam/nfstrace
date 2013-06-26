@@ -47,7 +47,7 @@ int Controller::run()
 
     // Start modules to processing
     filtration.start();
-    analyse.create();       // TODO: Unify managers interfaces
+    analyse.start();
 
     // Waiting some exception or user-signal for handling
     // TODO: add code for recovery processing
@@ -87,7 +87,9 @@ void Controller::init_runing()
     }
     else if(mode == "mon")   // online monitoring mode
     {
-        filtration.capture_to_queue(analyse.get_queue(), iface, filter, snaplen, ms);
+        NFSQueue& queue = analyse.init();
+        filtration.capture_to_queue(queue, iface, filter, snaplen, ms);
+        analyse.print_analyzer();
     }
     else if(mode == "stat")   // offline analysis mode
     {
@@ -96,9 +98,6 @@ void Controller::init_runing()
     {
         throw cmdline::CLIError(std::string("unknown mode: ") + mode);
     }
-
-    // TODO: Create options in command line for supporting different analyzers
-    analyse.print_analyzer();
 }
 
 } // namespace controller

@@ -37,6 +37,14 @@ public:
     {
     }
 
+    virtual void before_callback(pcap_t* handle)
+    {
+    }
+
+    virtual void after_callback (pcap_t* handle)
+    {
+    }
+
     virtual void discard(const FiltrationData& data)
     {
     }

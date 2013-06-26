@@ -10,9 +10,11 @@
 #include <sstream>
 
 #include "../filter/rpc/rpc_message.h"
+#include "../filter/nfs/nfs_struct.h"
 #include "base_analyzer.h"
 #include "nfs_data.h"
 //------------------------------------------------------------------------------
+using namespace NST::filter::NFS3;
 using namespace NST::filter::rpc;
 //------------------------------------------------------------------------------
 namespace NST
@@ -20,40 +22,9 @@ namespace NST
 namespace analyzer 
 {
 
-struct ProcNFS3 // counters definition for NFS v3 procedures. See: RFC 1813
-{
-    enum Ops
-    {
-        NFS_NULL        = 0,
-        NFS_GETATTR     = 1,
-        NFS_SETATTR     = 2,
-        NFS_LOOKUP      = 3,
-        NFS_ACCESS      = 4,
-        NFS_READLINK    = 5,
-        NFS_READ        = 6,
-        NFS_WRITE       = 7,
-        NFS_CREATE      = 8,
-        NFS_MKDIR       = 9,
-        NFS_SYMLINK     = 10,
-        NFS_MKNOD       = 11,
-        NFS_REMOVE      = 12,
-        NFS_RMDIR       = 13,
-        NFS_RENAME      = 14,
-        NFS_LINK        = 15,
-        NFS_READDIR     = 16,
-        NFS_READDIRPLUS = 17,
-        NFS_FSSTAT      = 18,
-        NFS_FSINFO      = 19,
-        NFS_PATHCONF    = 20,
-        NFS_COMMIT      = 21,
-        num             = 22,
-    };
-
-    static const char* titles[num];
-};
-
 class PrintAnalyzer : public BaseAnalyzer
 {
+    typedef NFSData::Session Session;
 public:
     PrintAnalyzer()
     {
@@ -62,105 +33,177 @@ public:
     {
     }
 
-    virtual void process(const NFSData& data)
+    virtual bool call_null(const Session& session/*, const TypeData() data*/)
     {
-        std::cout << "Src: " << session_addr(NFSData::Session::Source, data) << " Dst: " << session_addr(NFSData::Session::Destination, data) << rpc_info(data) << "\n";
+        std::cout << get_session(session) << " -- NFS Call Null" << std::endl;
+        return true;
     }
-    virtual void result()
+    virtual bool call_getattr(const Session& session/*, const TypeData() data*/)
     {
+        std::cout << get_session(session) << " -- NFS Call GetAttr" << std::endl;
+        return true;
+    }
+    virtual bool call_setattr(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call SetAttr" << std::endl;
+        return true;
+    }
+    virtual bool call_lookup(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call LookUp" << std::endl;
+        return true;
+    }
+    virtual bool call_access(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call Access" << std::endl;
+        return true;
+    }
+    virtual bool call_readlink(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call ReadLink" << std::endl;
+        return true;
+    }
+    virtual bool call_read(const Session& session, const ReadArgs& ra)
+    {
+        std::cout << get_session(session) << " -- NFS Call Read XID: " << ra.get_xid() << " Offset: " << ra.get_offset() << " Count: " << ra.get_count() << std::endl;
+        return true;
+    }
+    virtual bool call_write(const Session& session, const WriteArgs& wa)
+    {
+        std::cout << get_session(session) << " -- NFS Call Write XID: " << wa.get_xid() << " Offset: " << wa.get_offset() << " Count: " << wa.get_count() << " Type: ";
+        switch(wa.get_stable())
+        {
+        case 0:
+            {
+                std::cout << "Unstable";
+            }
+            break;
+        case 1:
+            {
+                std::cout << "Data Sync";
+            }
+            break;
+        case 2:
+            {
+                std::cout << "File Sync";
+            }
+            break;
+        }
+        std::cout << std::endl;
+        return true;
+    }
+    virtual bool call_create(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call Create" << std::endl;
+        return true;;
+    }
+    virtual bool call_mkdir(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call MKDir" << std::endl;
+        return true;;
+    }
+    virtual bool call_symlink(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call SymLink" << std::endl;
+        return true;;
+    }
+    virtual bool call_mknod(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call MKNod" << std::endl;
+        return true;;
+    }
+    virtual bool call_remove(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call Remove" << std::endl;
+        return true;;
+    }
+    virtual bool call_rmdir(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call RMDir" << std::endl;
+        return true;;
+    }
+    virtual bool call_rename(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call Rename" << std::endl;
+        return true;;
+    }
+    virtual bool call_link(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call Link" << std::endl;
+        return true;;
+    }
+    virtual bool call_readdir(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call ReadDir" << std::endl;
+        return true;;
+    }
+    virtual bool call_readdirplus(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call ReadDirPlus" << std::endl;
+        return true;;
+    }
+    virtual bool call_fsstat(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call FSStat" << std::endl;
+        return true;;
+    }
+    virtual bool call_fsinfo(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call FSInfo" << std::endl;
+        return true;;
+    }
+    virtual bool call_pathconf(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call PathConf" << std::endl;
+        return true;;
+    }
+    virtual bool call_commit(const Session& session/*, const TypeData() data*/)
+    {
+        std::cout << get_session(session) << " -- NFS Call Commit" << std::endl;
+        return true;;
     }
 
 private:
-    std::string rpc_info(const NFSData& data)
+    std::string get_session(const Session& session) const
     {
-        const MessageHeader* msg = (MessageHeader*)data.rpc_message;
-        std::stringstream message(std::ios_base::out);
-        message << "XID: " << msg->xid() << " ";
-        switch(msg->type())
-        {
-            case SUNRPC_CALL:
-            {
-                if(data.rpc_len < sizeof(CallHeader))
-                {
-                    return std::string();
-                }
-
-                const CallHeader* call = static_cast<const CallHeader*>(msg);
-
-                uint32_t rpcvers = call->rpcvers();
-                uint32_t prog = call->prog();
-                uint32_t vers = call->vers();
-                uint32_t proc = call->proc();
-
-                if(rpcvers != 2)    return 0;
-                if(prog != 100003)  return 0;  // portmap NFS v3 TCP 2049
-                if(vers != 3)       return 0;  // NFS v3
-
-                message << "Call: " << ProcNFS3::titles[proc];
-            }
-            break;
-            case SUNRPC_REPLY:
-            {
-                if(data.rpc_len < sizeof(ReplyHeader))
-                {
-                    return std::string();
-                }
-
-                const ReplyHeader* reply = static_cast<const ReplyHeader*>(msg);
-                switch(reply->stat())
-                {
-                    case SUNRPC_MSG_ACCEPTED:
-                    {
-                        message << "Reply accepted.";
-                        // TODO: check accepted reply
-                    }
-                    break;
-                    case SUNRPC_MSG_DENIED:
-                    {
-                        message << "Reply denied.";
-                        // TODO: check rejected reply
-                    }
-                    break;
-                }
-            }
-            break;
-        }
-        return message.str();
+        std::stringstream s(std::ios_base::out);
+        s << "Src: " << session_addr(NFSData::Session::Source, session) << " Dst: " << session_addr(NFSData::Session::Destination, session);
+        return s.str();
     }
 
-    std::string session_addr(NFSData::Session::Direction dir, const NFSData& data)
+    std::string session_addr(NFSData::Session::Direction dir, const Session& session) const
     {
-        std::stringstream session(std::ios_base::out);
-        switch(data.session.ip_type)
+        std::stringstream s(std::ios_base::out);
+        switch(session.ip_type)
         {
             case NFSData::Session::v4:
-                session << ipv4_string(data.session.ip.v4.addr[dir]);
+                s << ipv4_string(session.ip.v4.addr[dir]);
                 break;
             case NFSData::Session::v6:
-                session << ipv6_string(data.session.ip.v6.addr[dir]);
+                s << ipv6_string(session.ip.v6.addr[dir]);
                 break;
         }
-        session << ":" << data.session.port[dir];
-        switch(data.session.type)
+        s << ":" << session.port[dir];
+        switch(session.type)
         {
             case NFSData::Session::TCP:
-                session << " (TCP)";
+                s << " (TCP)";
                 break;
             case NFSData::Session::UDP:
-                session << " (UPD)";
+                s << " (UPD)";
                 break;
         }
-        return session.str();
+        return s.str();
     }
 
-    std::string ipv6_string(const uint8_t ip[16])
+    std::string ipv6_string(const uint8_t ip[16]) const
     {
         std::stringstream address(std::ios_base::out);
         address << "IPV6";
         return address.str();
     }
 
-    std::string ipv4_string(const uint32_t ip /*host byte order*/ )
+    std::string ipv4_string(const uint32_t ip /*host byte order*/ ) const
     {
         std::stringstream address(std::ios_base::out);
         address << ((ip >> 24) & 0xFF);

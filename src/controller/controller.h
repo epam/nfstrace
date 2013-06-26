@@ -10,12 +10,12 @@
 #include "cmdline_args.h"
 
 #include "../filter/filtration_manager.h"
-#include "../analyzer/analyse_manager.h"
+#include "../analyzer/analysis_manager.h"
 #include "synchronous_signal_handling.h"
 #include "running_status.h"
 //------------------------------------------------------------------------------
 using NST::filter::FiltrationManager;
-using NST::analyzer::AnalyseManager;
+using NST::analyzer::AnalysisManager;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -24,6 +24,7 @@ namespace controller
 
 class Controller
 {
+    typedef Queue<NFSData> NFSQueue;
 public:
     Controller();
     ~Controller();
@@ -46,7 +47,7 @@ private:
 
     // Controller contains instances of modules
     FiltrationManager filtration;
-    AnalyseManager analyse;
+    AnalysisManager analyse;
 };
 
 } // namespace controller
