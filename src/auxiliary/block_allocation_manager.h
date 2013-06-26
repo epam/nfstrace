@@ -73,7 +73,7 @@ public:
         LockedAllocator* pool = *lp;
 
         Spinlock::Lock lock(pool->spinlock);
-        pool->allocator.deallocate((BlockAllocator::Chunk*) lp);
+        pool->allocator.deallocate(lp);
     }
 
 private:
