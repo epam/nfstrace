@@ -1,11 +1,12 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Generic data structures for filtration raw pcap packets.
+// Description: Generic processor for filtration raw pcap packets.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef BASE_FILTERING_PROCESSOR_H
-#define BASE_FILTERING_PROCESSOR_H
+#ifndef FILTRATION_PROCESSOR_H
+#define FILTRATION_PROCESSOR_H
 //------------------------------------------------------------------------------
+#include <memory>
 #include <string>
 
 #include <pcap/pcap.h>
@@ -25,49 +26,74 @@ namespace NST
 namespace filter
 {
 
-class BaseFilteringProcessor
+struct FiltrationData
+{
+    // libpcap structures
+    const pcap_pkthdr*              header;
+    const uint8_t*                  packet;
+    // TODO: WARNING!All pointers points to packet data!
+
+    // Ethernet II
+    const ethernet::EthernetHeader* eth_header;
+
+    // IP version 4
+    const ip::IPv4Header*           ipv4_header;
+
+    // TCP
+    const tcp::TCPHeader*           tcp_header;
+
+    // Sun RPC
+    const rpc::MessageHeader*       rpc_header;
+    size_t                          rpc_length;
+};
+
+template
+<
+    typename Reader,
+    typename Filter,
+    typename Writer
+>
+class FiltrationProcessor
 {
 public:
 
-    struct FiltrationData
-    {
-        // libpcap structures
-        const pcap_pkthdr*              header;
-        const uint8_t*                  packet;
-        // TODO: WARNING!All pointers points to packet data!
-
-        // Ethernet II
-        const ethernet::EthernetHeader* eth_header;
-
-        // IP version 4
-        const ip::IPv4Header*           ipv4_header;
-
-        // TCP
-        const tcp::TCPHeader*           tcp_header;
-
-        // Sun RPC
-        const rpc::MessageHeader*       rpc_header;
-        size_t                          rpc_length;
-    };
-
-    BaseFilteringProcessor()
+    FiltrationProcessor(std::auto_ptr<Reader>& r,
+                        std::auto_ptr<Filter>& f,
+                        std::auto_ptr<Writer>& w) : reader(r), filter(f), writer(w)
     {
     }
-    virtual ~BaseFilteringProcessor()
+    ~FiltrationProcessor()
     {
     }
 
-    virtual void discard(const FiltrationData& data)=0;
-    virtual void collect(const FiltrationData& data)=0;
+    void run()
+    {
+        reader->loop(*this);
+    }
+
+    void stop()
+    {
+        reader->break_loop();
+    }
 
     u_char* get_user()
     {
         return (u_char*)this;
     }
 
+    inline void discard(const FiltrationData& data)
+    {
+        writer->discard(data);
+    }
+
+    inline void collect(const FiltrationData& data)
+    {
+        writer->collect(data);
+    }
+
     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
     {
-        BaseFilteringProcessor* processor = (BaseFilteringProcessor*) user;
+        FiltrationProcessor* processor = (FiltrationProcessor*) user;
 
         // TODO: THIS CODE MUST BE TOTALLY REFACTORED!
         // TODO: 1) Design and implement the Readers for each layer
@@ -235,11 +261,13 @@ public:
     }
 
 private:
-
+    std::auto_ptr<Reader> reader;
+    std::auto_ptr<Filter> filter;
+    std::auto_ptr<Writer> writer;
 };
 
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//BASE_FILTERING_PROCESSOR_H
+#endif//FILTRATION_PROCESSOR_H
 //------------------------------------------------------------------------------

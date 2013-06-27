@@ -11,7 +11,7 @@
 
 #include <pcap/pcap.h>
 
-#include "base_filtering_processor.h"
+#include "filtration_processor.h"
 #include "../pcap/handle.h"
 #include "../pcap/packet_dumper.h"
 //------------------------------------------------------------------------------
@@ -23,27 +23,30 @@ namespace NST
 namespace filter
 {
 
-class DumpingProcessor : public BaseFilteringProcessor
+class DumpingTransmission
 {
 public:
-    DumpingProcessor(const Handle& handle, const std::string& path)
+    DumpingTransmission(const Handle& handle, const std::string& path)
     {
         dumper.reset(new PacketDumper(handle, path.c_str()));
     }
-    ~DumpingProcessor()
+    ~DumpingTransmission()
     {
     }
 
-    virtual void discard(const FiltrationData& data)
+    void discard(const FiltrationData& data)
     {
     }
 
-    virtual void collect(const FiltrationData& data)
+    void collect(const FiltrationData& data)
     {
         dumper->dump(data.header, data.packet);
     }
 
 private:
+    DumpingTransmission(const DumpingTransmission&);            // undefined
+    DumpingTransmission& operator=(const DumpingTransmission&); // undefined
+
     std::auto_ptr<PacketDumper> dumper;
 };
 

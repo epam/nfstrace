@@ -1,9 +1,11 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Class for capturing libpcap packets and pass them to a Processor.
+// Description: Class for capturing libpcap packets and pass them to filtration
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include "packet_capture.h"
+#include "bpf.h"
+#include "capture_reader.h"
+#include "pcap_error.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -13,7 +15,7 @@ namespace filter
 namespace pcap
 {
 
-PacketCapture::PacketCapture(const std::string& interface, const std::string& filter, int snaplen, int to_ms) throw (PcapError) 
+CaptureReader::CaptureReader(const std::string& interface, const std::string& filter, int snaplen, int to_ms)
     :BaseReader()
 {
     char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
@@ -42,11 +44,11 @@ PacketCapture::PacketCapture(const std::string& interface, const std::string& fi
     }
 }
 
-PacketCapture::~PacketCapture()
+CaptureReader::~CaptureReader()
 {
 }
 
-void PacketCapture::print_statistic(std::ostream& out) const throw (PcapError)
+void CaptureReader::print_statistic(std::ostream& out) const
 {
     struct pcap_stat stat;
     if(pcap_stats(handle, &stat) < 0)
@@ -61,7 +63,7 @@ void PacketCapture::print_statistic(std::ostream& out) const throw (PcapError)
     }
 }
 
-void PacketCapture::print_datalink(std::ostream& out) const
+void CaptureReader::print_datalink(std::ostream& out) const
 {
     const int dlt = pcap_datalink(handle);
 

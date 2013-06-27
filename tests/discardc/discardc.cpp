@@ -25,17 +25,16 @@
 #include "../../src/auxiliary/spinlock.h"
 #include "../../src/controller/cmdline_parser.h"
 #include "../../src/filter/pcap/pcap_error.h"
-#include "../../src/filter/pcap/packet_capture.h"
-#include "../../src/filter/pcap/base_reader.h"
+#include "../../src/filter/pcap/capture_reader.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Spinlock;
 using NST::filter::pcap::PcapError;
 using NST::filter::pcap::BaseReader;
-using NST::filter::pcap::PacketCapture;
+using NST::filter::pcap::CaptureReader;
 //------------------------------------------------------------------------------
 #define SLEEP_INTERVAL 5
 
-PacketCapture* g_capture = NULL;  // used in signal handler
+CaptureReader* g_capture = NULL;  // used in signal handler
 //------------------------------------------------------------------------------
 struct ProcNFS3 // counters definition for NFS v3 procedures. See: RFC 1813
 {
@@ -461,7 +460,7 @@ int main(int argc, char **argv) try
               << " filtration by BPF: \"" << filter << '\"'
               << " snaplen: " << snaplen << std::endl;
 
-    PacketCapture capture(iface, filter, snaplen, 32);
+    CaptureReader capture(iface, filter, snaplen, 32);
     g_capture = &capture;
 
     // setting SIGINT and SIGTERM handlers
