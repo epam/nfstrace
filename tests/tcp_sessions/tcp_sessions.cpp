@@ -33,7 +33,7 @@
 #include "../../src/auxiliary/spinlock.h"
 #include "../../src/controller/cmdline_parser.h"
 #include "../../src/filter/pcap/pcap_error.h"
-#include "../../src/filter/pcap/packet_capture.h"
+#include "../../src/filter/pcap/capture_reader.h"
 #include "../../src/filter/pcap/packet_dumper.h"
 #include "../../src/filter/ethernet/ethernet_header.h"
 #include "../../src/filter/ip/ipv4_header.h"
@@ -43,14 +43,14 @@
 using NST::analyzer::NFSData;
 using NST::auxiliary::Spinlock;
 using NST::filter::pcap::PcapError;
-using NST::filter::pcap::PacketCapture;
+using NST::filter::pcap::CaptureReader;
 using NST::filter::pcap::PacketDumper;
 using NST::filter::ethernet::ethernet_header;
 using NST::filter::ip::ipv4_header;
 using namespace NST::filter::rpc;
 using NST::filter::tcp::tcp_header;
 //------------------------------------------------------------------------------
-PacketCapture* g_capture = NULL;  // used in signal handler
+CaptureReader* g_capture = NULL;  // used in signal handler
 
 //------------------------------------------------------------------------------
 struct Discard // counters definition for discarded packets
@@ -764,7 +764,7 @@ int main(int argc, char **argv) try
               << " filtration by BPF: \"" << filter << '\"'
               << " snaplen: " << snaplen << std::endl;
 
-    PacketCapture capture(iface, filter, snaplen, 32);
+    CaptureReader capture(iface, filter, snaplen, 32);
     g_capture = &capture;
 
     // setting SIGINT and SIGTERM handlers

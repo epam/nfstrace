@@ -1,9 +1,10 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Interface for passing data from file to Processor.
+// Description: Interface for passing data from file to filtration.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include "packet_reader.h"
+#include "file_reader.h"
+#include "pcap_error.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -13,7 +14,7 @@ namespace filter
 namespace pcap
 {
 
-PacketReader::PacketReader(const std::string& file) : BaseReader()
+FileReader::FileReader(const std::string& file) : BaseReader()
 {
     char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
 
@@ -25,7 +26,7 @@ PacketReader::PacketReader(const std::string& file) : BaseReader()
     }
 }
 
-PacketReader::~PacketReader()
+FileReader::~FileReader()
 {
 }
 

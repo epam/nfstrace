@@ -3,8 +3,8 @@
 // Description: Push NFSData to buffer for further processing.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef QUEUEING_PROCESSOR_H
-#define QUEUEING_PROCESSOR_H
+#ifndef QUEUEING_TRANSMISSION_H
+#define QUEUEING_TRANSMISSION_H
 //------------------------------------------------------------------------------
 #include <algorithm> // for std::min()
 #include <memory> // for std::auto_ptr
@@ -12,9 +12,7 @@
 
 #include <iostream>
 
-#include <pcap/pcap.h>
-
-#include "base_filtering_processor.h"
+#include "filtration_processor.h"
 #include "../../analyzer/nfs_data.h"
 #include "../../auxiliary/queue.h"
 //------------------------------------------------------------------------------
@@ -26,22 +24,22 @@ namespace NST
 namespace filter
 {
 
-class QueueingProcessor : public BaseFilteringProcessor
+class QueueingTransmission
 {
     typedef Queue<NFSData> Buffer;
 public:
-    QueueingProcessor(Buffer& b) : buffer(b)
+    QueueingTransmission(Buffer& b) : buffer(b)
     {
     }
-    ~QueueingProcessor()
-    {
-    }
-
-    virtual void discard(const FiltrationData& data)
+    ~QueueingTransmission()
     {
     }
 
-    virtual void collect(const FiltrationData& data)
+    void discard(const FiltrationData& data)
+    {
+    }
+
+    void collect(const FiltrationData& data)
     {
         NFSData* nfs = buffer.allocate();
 
@@ -70,11 +68,14 @@ public:
     }
 
 private:
+    QueueingTransmission(const QueueingTransmission&);            // undefined
+    QueueingTransmission& operator=(const QueueingTransmission&); // undefined
+
     Buffer& buffer;
 };
 
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//QUEUEING_PROCESSOR_H
+#endif//QUEUEING_TRANSMISSION_H
 //------------------------------------------------------------------------------

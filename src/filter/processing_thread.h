@@ -19,27 +19,22 @@ namespace NST
 namespace filter
 {
 
-/*
- * Manage whole process for reading and processing data from interfaces.
- */
-template<typename Reader, typename Processor>
+template<typename Processor>
 class ProcessingThread : public Thread
 {
 public:
-    ProcessingThread(Reader* r, Processor* p, RunningStatus &s) : reader(r), proc(p), status(s)
+    ProcessingThread(std::auto_ptr<Processor>& p, RunningStatus &s) : processor(p), status(s)
     {
     }
     ~ProcessingThread()
     {
-        delete reader;
-        delete proc;
     }
 
     virtual void* run()
     {
         try
         {
-            reader->loop(*proc);
+            processor->run();
         }
         catch(Exception& e)
         {
@@ -54,12 +49,14 @@ public:
 
     virtual void stop()
     {
-        reader->break_loop();
+        processor->stop();
     }
 
 private:
-    Reader* reader;
-    Processor* proc;
+    ProcessingThread(const ProcessingThread&);           // undefined
+    ProcessingThread& operator=(const ProcessingThread&);// undefined
+
+    std::auto_ptr<Processor> processor;
     RunningStatus& status;
 };
 

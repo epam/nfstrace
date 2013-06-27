@@ -1,18 +1,15 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Interface for passing info from file to Processor.
+// Description: Interface for passing info from file to filtration.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef PACKET_READER
-#define PACKET_READER
+#ifndef FILE_READER_H
+#define FILE_READER_H
 //------------------------------------------------------------------------------
-#include <pcap/pcap.h>
-#include <iostream>
+#include <cstdio>
+#include <string>
 
 #include "base_reader.h"
-#include "handle.h"
-#include "bpf.h"
-#include "pcap_error.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -22,11 +19,11 @@ namespace filter
 namespace pcap
 {
 
-class PacketReader : public BaseReader
+class FileReader : public BaseReader
 {
 public:
-    PacketReader(const std::string& file);
-    ~PacketReader();
+    FileReader(const std::string& file);
+    ~FileReader();
 
     inline FILE* get_file() { return pcap_file(handle); }
 };
@@ -35,5 +32,5 @@ public:
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//PACKET_READER
+#endif//FILE_READER_H
 //------------------------------------------------------------------------------
