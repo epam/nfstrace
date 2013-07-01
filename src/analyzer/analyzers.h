@@ -43,23 +43,23 @@ public:
         analyzers.push_back(analyzer);
     }
 
-    bool call_null(const Session& session/*, const TypeData() data*/)
+    bool call_null(const Session& session, const NullArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_null(session);
+            (*i)->call_null(session, data);
         }
         return true;
     }
-    bool call_getattr(const Session& session/*, const TypeData() data*/)
+    bool call_getattr(const Session& session, const GetAttrArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_getattr(session);
+            (*i)->call_getattr(session, data);
         }
         return true;
     }
@@ -73,33 +73,33 @@ public:
         }
         return true;
     }
-    bool call_lookup(const Session& session/*, const TypeData() data*/)
+    bool call_lookup(const Session& session, const LookUpArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_lookup(session);
+            (*i)->call_lookup(session, data);
         }
         return true;
     }
-    bool call_access(const Session& session/*, const TypeData() data*/)
+    bool call_access(const Session& session, const AccessArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_access(session);
+            (*i)->call_access(session, data);
         }
         return true;
     }
-    bool call_readlink(const Session& session/*, const TypeData() data*/)
+    bool call_readlink(const Session& session, const ReadLinkArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_readlink(session);
+            (*i)->call_readlink(session, data);
         }
         return true;
     }
@@ -163,103 +163,103 @@ public:
         }
         return true;
     }
-    virtual bool call_remove(const Session& session/*, const TypeData() data*/)
+    virtual bool call_remove(const Session& session, const RemoveArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_remove(session);
+            (*i)->call_remove(session, data);
         }
         return true;
     }
-    virtual bool call_rmdir(const Session& session/*, const TypeData() data*/)
+    virtual bool call_rmdir(const Session& session, const RmDirArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_rmdir(session);
+            (*i)->call_rmdir(session, data);
         }
         return true;
     }
-    virtual bool call_rename(const Session& session/*, const TypeData() data*/)
+    virtual bool call_rename(const Session& session, const RenameArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_rename(session);
+            (*i)->call_rename(session, data);
         }
         return true;
     }
-    virtual bool call_link(const Session& session/*, const TypeData() data*/)
+    virtual bool call_link(const Session& session, const LinkArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_link(session);
+            (*i)->call_link(session, data);
         }
         return true;
     }
-    virtual bool call_readdir(const Session& session/*, const TypeData() data*/)
+    virtual bool call_readdir(const Session& session, const ReadDirArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_readdir(session);
+            (*i)->call_readdir(session, data);
         }
         return true;
     }
-    virtual bool call_readdirplus(const Session& session/*, const TypeData() data*/)
+    virtual bool call_readdirplus(const Session& session, const ReadDirPlusArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_readdirplus(session);
+            (*i)->call_readdirplus(session, data);
         }
         return true;
     }
-    virtual bool call_fsstat(const Session& session/*, const TypeData() data*/)
+    virtual bool call_fsstat(const Session& session, const FSStatArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_fsstat(session);
+            (*i)->call_fsstat(session, data);
         }
         return true;
     }
-    virtual bool call_fsinfo(const Session& session/*, const TypeData() data*/)
+    virtual bool call_fsinfo(const Session& session, const FSInfoArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_fsinfo(session);
+            (*i)->call_fsinfo(session, data);
         }
         return true;
     }
-    virtual bool call_pathconf(const Session& session/*, const TypeData() data*/)
+    virtual bool call_pathconf(const Session& session, const PathConfArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_pathconf(session);
+            (*i)->call_pathconf(session, data);
         }
         return true;
     }
-    virtual bool call_commit(const Session& session/*, const TypeData() data*/)
+    virtual bool call_commit(const Session& session, const CommitArgs& data)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_commit(session);
+            (*i)->call_commit(session, data);
         }
         return true;
     }

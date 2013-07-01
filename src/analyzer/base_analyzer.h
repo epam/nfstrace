@@ -27,28 +27,28 @@ public:
     {
     }
 
-    virtual bool call_null      (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_getattr   (const Session& session/*, const TypeData& data*/) = 0;
+    virtual bool call_null      (const Session& session, const NullArgs& data) = 0;
+    virtual bool call_getattr   (const Session& session, const GetAttrArgs& data) = 0;
     virtual bool call_setattr   (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_lookup    (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_access    (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_readlink  (const Session& session/*, const TypeData& data*/) = 0;
+    virtual bool call_lookup    (const Session& session, const LookUpArgs& data) = 0;
+    virtual bool call_access    (const Session& session, const AccessArgs& data) = 0;
+    virtual bool call_readlink  (const Session& session, const ReadLinkArgs& data) = 0;
     virtual bool call_read      (const Session& session, const ReadArgs& ra) = 0;
     virtual bool call_write     (const Session& session, const WriteArgs& wa) = 0;
     virtual bool call_create    (const Session& session/*, const TypeData& data*/) = 0;
     virtual bool call_mkdir     (const Session& session/*, const TypeData& data*/) = 0;
     virtual bool call_symlink   (const Session& session/*, const TypeData& data*/) = 0;
     virtual bool call_mknod     (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_remove    (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_rmdir     (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_rename    (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_link      (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_readdir   (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_readdirplus(const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_fsstat    (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_fsinfo    (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_pathconf  (const Session& session/*, const TypeData& data*/) = 0;
-    virtual bool call_commit    (const Session& session/*, const TypeData& data*/) = 0;
+    virtual bool call_remove    (const Session& session, const RemoveArgs& data) = 0;
+    virtual bool call_rmdir     (const Session& session, const RmDirArgs& data) = 0;
+    virtual bool call_rename    (const Session& session, const RenameArgs& data) = 0;
+    virtual bool call_link      (const Session& session, const LinkArgs& data) = 0;
+    virtual bool call_readdir   (const Session& session, const ReadDirArgs& data) = 0;
+    virtual bool call_readdirplus(const Session& session, const ReadDirPlusArgs& data) = 0;
+    virtual bool call_fsstat    (const Session& session, const FSStatArgs& data) = 0;
+    virtual bool call_fsinfo    (const Session& session, const FSInfoArgs& data) = 0;
+    virtual bool call_pathconf  (const Session& session, const PathConfArgs& data) = 0;
+    virtual bool call_commit    (const Session& session, const CommitArgs& data) = 0;
 };
 
 } // namespace analyzer

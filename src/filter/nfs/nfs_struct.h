@@ -52,6 +52,129 @@ struct Proc // counters definition for NFS v3 procedures. See: RFC 1813
     static const char* titles[num];
 };
 
+/*
+class SAttr
+{
+public:
+    SAttr(XDRReader& in)
+    {
+
+    }
+
+
+private:
+    uint32_t mode;
+    uint32_t uid;
+    uint32_t gid;
+    uint64_t size;
+};
+*/
+
+class NullArgs : public RPCCall
+{
+public:
+    NullArgs(XDRReader& in) : RPCCall(in)
+    {
+    }
+};
+
+class GetAttrArgs : public RPCCall
+{
+public:
+    GetAttrArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> file;
+    }
+
+    const OpaqueDyn& get_file() const
+    {
+        return file;
+    }
+
+private:
+    OpaqueDyn file;
+};
+
+/*
+class SetAttrArgs : public RPCCall
+{
+public:
+    SetAttrArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> file;
+    }
+    
+    const OpaqueDyn& get_file() const
+    {
+        return file;
+    }
+
+private:
+    OpaqueDyn file;
+};
+*/
+
+class LookUpArgs : public RPCCall
+{
+public:
+    LookUpArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> dir >> name;
+    }
+    
+    const OpaqueDyn& get_dir() const
+    {
+        return dir;
+    }
+    const OpaqueDyn& get_name() const
+    {
+        return name;
+    }
+
+private:
+    OpaqueDyn dir;
+    OpaqueDyn name;
+};
+
+class AccessArgs : public RPCCall
+{
+public:
+    AccessArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> object >> access;
+    }
+
+    const OpaqueDyn& get_object() const
+    {
+        return object;
+    }
+    uint32_t get_access() const
+    {
+        return access;
+    }
+
+private:
+    OpaqueDyn object;
+    uint32_t access;
+};
+
+class ReadLinkArgs : public RPCCall
+{
+public:
+    ReadLinkArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> symlink;
+    }
+
+    const OpaqueDyn& get_symlink() const
+    {
+        return symlink;
+    }
+
+private:
+    OpaqueDyn symlink;
+};
+
 class ReadArgs : public RPCCall
 {
 public:
@@ -112,16 +235,266 @@ private:
     //OpaqueDyn data; Represent real writeargs request
 };
 
-class GetAttrArgs : public RPCCall
+/*
+class CreateArgs : public RPCCall
 {
 public:
-    GetAttrArgs(XDRReader& in) : RPCCall(in)
+    CreateArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> file;
+    }
+
+private:
+};
+*/
+
+class RemoveArgs : public RPCCall
+{
+public:
+    RemoveArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> dir >> name;
+    }
+    
+    const OpaqueDyn& get_dir() const
+    {
+        return dir;
+    }
+    const OpaqueDyn& get_name() const
+    {
+        return name;
+    }
+
+private:
+    OpaqueDyn dir;
+    OpaqueDyn name;
+}; 
+
+class RmDirArgs : public RPCCall
+{
+public:
+    RmDirArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> dir >> name;
+    }
+    
+    const OpaqueDyn& get_dir() const
+    {
+        return dir;
+    }
+    const OpaqueDyn& get_name() const
+    {
+        return name;
+    }
+
+private:
+    OpaqueDyn dir;
+    OpaqueDyn name;
+};
+
+class RenameArgs : public RPCCall
+{
+public:
+    RenameArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> from_dir >> from_name >> to_dir >> to_name;
+    }
+    
+    const OpaqueDyn& get_from_dir() const
+    {
+        return from_dir;
+    }
+    const OpaqueDyn& get_from_name() const
+    {
+        return from_name;
+    }
+    const OpaqueDyn& get_to_dir() const
+    {
+        return to_dir;
+    }
+    const OpaqueDyn& get_to_name() const
+    {
+        return to_name;
+    }
+
+private:
+    OpaqueDyn from_dir;
+    OpaqueDyn from_name;
+    OpaqueDyn to_dir;
+    OpaqueDyn to_name;
+}; 
+
+class LinkArgs : public RPCCall
+{
+public:
+    LinkArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> file >> dir >> name;
+    }
+    
+    const OpaqueDyn& get_file() const
+    {
+        return file;
+    }
+    const OpaqueDyn& get_dir() const
+    {
+        return dir;
+    }
+    const OpaqueDyn& get_name() const
+    {
+        return name;
     }
 
 private:
     OpaqueDyn file;
+    OpaqueDyn dir;
+    OpaqueDyn name;
+};
+
+class ReadDirArgs : public RPCCall
+{
+public:
+    ReadDirArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> dir >> cookie >> cookieverf >> count;
+    }
+    
+    const OpaqueDyn& get_dir() const
+    {
+        return dir;
+    }
+    uint64_t get_cookie() const
+    {
+        return cookie;
+    }
+    const OpaqueStat<8>& get_cookieverf() const
+    {
+        return cookieverf;
+    }
+    uint32_t get_count() const
+    {
+        return count;
+    }
+
+private:
+    OpaqueDyn dir;
+    uint64_t cookie;
+    OpaqueStat<8> cookieverf;
+    uint32_t count;
+};
+
+class ReadDirPlusArgs : public RPCCall
+{
+public:
+    ReadDirPlusArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> dir >> cookie >> cookieverf >> dir_count >> max_count;
+    }
+    
+    const OpaqueDyn& get_dir() const
+    {
+        return dir;
+    }
+    uint64_t get_cookie() const
+    {
+        return cookie;
+    }
+    const OpaqueStat<8>& get_cookieverf() const
+    {
+        return cookieverf;
+    }
+    uint32_t get_dir_count() const
+    {
+        return dir_count;
+    }
+    uint32_t get_max_count() const
+    {
+        return max_count;
+    }
+
+private:
+    OpaqueDyn dir;
+    uint64_t cookie;
+    OpaqueStat<8> cookieverf;
+    uint32_t dir_count;
+    uint32_t max_count;
+};
+
+class FSStatArgs : public RPCCall
+{
+public:
+    FSStatArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> fs_root;
+    }
+    
+    const OpaqueDyn& get_fs_root() const
+    {
+        return fs_root;
+    }
+
+private:
+    OpaqueDyn fs_root;
+};
+
+class FSInfoArgs : public RPCCall
+{
+public:
+    FSInfoArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> fs_root;
+    }
+    
+    const OpaqueDyn& get_fs_root() const
+    {
+        return fs_root;
+    }
+
+private:
+    OpaqueDyn fs_root;
+};
+
+class PathConfArgs : public RPCCall
+{
+public:
+    PathConfArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> object;
+    }
+
+    const OpaqueDyn& get_object() const
+    {
+        return object;
+    }
+
+private:
+    OpaqueDyn object;
+};
+
+class CommitArgs : public RPCCall
+{
+public:
+    CommitArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> file >> offset >> count;
+    }
+
+    const OpaqueDyn& get_file() const
+    {
+        return file;
+    }
+    uint64_t get_offset() const
+    {
+        return offset;
+    }
+    uint32_t get_count() const
+    {
+        return count;
+    }
+
+private:
+    OpaqueDyn file;
+    uint64_t offset;
+    uint32_t count;
 };
 
 } // namespace NFS3
