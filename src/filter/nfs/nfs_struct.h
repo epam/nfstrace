@@ -252,21 +252,26 @@ class RemoveArgs : public RPCCall
 public:
     RemoveArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> dir >> name;
+        in >> dir;
+        // in >> name;
+
+        OpaqueDyn tmp;
+        in >> tmp;
+        name = std::string(tmp.data.begin(), tmp.data.end());
     }
     
     const OpaqueDyn& get_dir() const
     {
         return dir;
     }
-    const OpaqueDyn& get_name() const
+    const std::string& get_name() const
     {
         return name;
     }
 
 private:
     OpaqueDyn dir;
-    OpaqueDyn name;
+    std::string name;
 }; 
 
 class RmDirArgs : public RPCCall
