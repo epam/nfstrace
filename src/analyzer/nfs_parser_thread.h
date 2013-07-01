@@ -88,22 +88,37 @@ private:
         switch(ops)
         {
         case Proc::NFS_NULL:
-            analyzers.call_null(data.session);
+            {
+                NullArgs args(reader);
+                analyzers.call_null(data.session, args);
+            }
             break;
         case Proc::NFS_GETATTR:
-            analyzers.call_getattr(data.session);
+            {
+                GetAttrArgs args(reader);
+                analyzers.call_getattr(data.session, args);
+            }
             break;
         case Proc::NFS_SETATTR:
             analyzers.call_setattr(data.session);
             break;
         case Proc::NFS_LOOKUP:
-            analyzers.call_lookup(data.session);
+            {
+                LookUpArgs args(reader);
+                analyzers.call_lookup(data.session, args);
+            }
             break;
         case Proc::NFS_ACCESS:
-            analyzers.call_access(data.session);
+            {
+                AccessArgs args(reader);
+                analyzers.call_access(data.session, args);
+            }
             break;
         case Proc::NFS_READLINK:
-            analyzers.call_readlink(data.session);
+            {
+                ReadLinkArgs args(reader);
+                analyzers.call_readlink(data.session, args);
+            }
             break;
         case Proc::NFS_READ:
             {
@@ -130,34 +145,64 @@ private:
             analyzers.call_mknod(data.session);
             break;
         case Proc::NFS_REMOVE:
-            analyzers.call_remove(data.session);
+            {
+                RemoveArgs args(reader);
+                analyzers.call_remove(data.session, args);
+            }
             break;
         case Proc::NFS_RMDIR:
-            analyzers.call_rmdir(data.session);
+            {
+                RmDirArgs args(reader);
+                analyzers.call_rmdir(data.session, args);
+            }
             break;
         case Proc::NFS_RENAME:
-            analyzers.call_rename(data.session);
+            {
+                RenameArgs args(reader);
+                analyzers.call_rename(data.session, args);
+            }
             break;
         case Proc::NFS_LINK:
-            analyzers.call_link(data.session);
+            {
+                LinkArgs args(reader);
+                analyzers.call_link(data.session, args);
+            }
             break;
         case Proc::NFS_READDIR:
-            analyzers.call_readdir(data.session);
+            {
+                ReadDirArgs args(reader);
+                analyzers.call_readdir(data.session, args);
+            }
             break;
         case Proc::NFS_READDIRPLUS:
-            analyzers.call_readdirplus(data.session);
+            {
+                ReadDirPlusArgs args(reader);
+                analyzers.call_readdirplus(data.session, args);
+            }
             break;
         case Proc::NFS_FSSTAT:
-            analyzers.call_fsstat(data.session);
+            {
+                FSStatArgs args(reader);
+                analyzers.call_fsstat(data.session, args);
+            }
             break;
         case Proc::NFS_FSINFO:
-            analyzers.call_fsinfo(data.session);
+            {
+                FSInfoArgs args(reader);
+                analyzers.call_fsinfo(data.session, args);
+            }
             break;
         case Proc::NFS_PATHCONF:
-            analyzers.call_pathconf(data.session);
+            {
+                PathConfArgs args(reader);
+                analyzers.call_pathconf(data.session, args);
+            }
             break;
         case Proc::NFS_COMMIT:
-            analyzers.call_commit(data.session);
+            {
+                CommitArgs args(reader);
+                analyzers.call_commit(data.session, args);
+            }
             break;
         default:
             break;
