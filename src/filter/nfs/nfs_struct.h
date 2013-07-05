@@ -9,6 +9,7 @@
 #include "../rpc/rpc_struct.h"
 #include "../xdr/xdr_struct.h"
 #include "../xdr/xdr_reader.h"
+#include "nfs_procedures.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::XDR;
 using namespace NST::filter::RPC;
@@ -20,60 +21,13 @@ namespace filter
 namespace NFS3
 {
 
-struct Proc // counters definition for NFS v3 procedures. See: RFC 1813
-{
-    enum Ops
-    {
-        NFS_NULL        = 0,
-        NFS_GETATTR     = 1,
-        NFS_SETATTR     = 2,
-        NFS_LOOKUP      = 3,
-        NFS_ACCESS      = 4,
-        NFS_READLINK    = 5,
-        NFS_READ        = 6,
-        NFS_WRITE       = 7,
-        NFS_CREATE      = 8,
-        NFS_MKDIR       = 9,
-        NFS_SYMLINK     = 10,
-        NFS_MKNOD       = 11,
-        NFS_REMOVE      = 12,
-        NFS_RMDIR       = 13,
-        NFS_RENAME      = 14,
-        NFS_LINK        = 15,
-        NFS_READDIR     = 16,
-        NFS_READDIRPLUS = 17,
-        NFS_FSSTAT      = 18,
-        NFS_FSINFO      = 19,
-        NFS_PATHCONF    = 20,
-        NFS_COMMIT      = 21,
-        num             = 22
-    };
-
-    static const char* titles[num];
-};
-
-/*
-class SAttr
-{
-public:
-    SAttr(XDRReader& in)
-    {
-
-    }
-
-
-private:
-    uint32_t mode;
-    uint32_t uid;
-    uint32_t gid;
-    uint64_t size;
-};
-*/
-
 class NullArgs : public RPCCall
 {
 public:
     NullArgs(XDRReader& in) : RPCCall(in)
+    {
+    }
+    virtual ~NullArgs()
     {
     }
 };
@@ -85,6 +39,9 @@ public:
     {
         in >> file;
     }
+    virtual ~GetAttrArgs()
+    {
+    }
 
     const OpaqueDyn& get_file() const
     {
@@ -92,48 +49,36 @@ public:
     }
 
 private:
-    OpaqueDyn file;
+    OpaqueDyn file;     // File handle
 };
-
-/*
-class SetAttrArgs : public RPCCall
-{
-public:
-    SetAttrArgs(XDRReader& in) : RPCCall(in)
-    {
-        in >> file;
-    }
-    
-    const OpaqueDyn& get_file() const
-    {
-        return file;
-    }
-
-private:
-    OpaqueDyn file;
-};
-*/
 
 class LookUpArgs : public RPCCall
 {
 public:
     LookUpArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> dir >> name;
+        in >> dir;
+
+        OpaqueDyn tmp;
+        in >> tmp;
+        name = std::string(tmp.data.begin(), tmp.data.end());
+    }
+    virtual ~LookUpArgs()
+    {
     }
     
     const OpaqueDyn& get_dir() const
     {
         return dir;
     }
-    const OpaqueDyn& get_name() const
+    const std::string& get_name() const
     {
         return name;
     }
 
 private:
-    OpaqueDyn dir;
-    OpaqueDyn name;
+    OpaqueDyn dir;      // File handle
+    std::string name;   // File name
 };
 
 class AccessArgs : public RPCCall
@@ -142,6 +87,9 @@ public:
     AccessArgs(XDRReader& in) : RPCCall(in)
     {
         in >> object >> access;
+    }
+    virtual ~AccessArgs()
+    {
     }
 
     const OpaqueDyn& get_object() const
@@ -154,7 +102,7 @@ public:
     }
 
 private:
-    OpaqueDyn object;
+    OpaqueDyn object;   // File handle
     uint32_t access;
 };
 
@@ -165,6 +113,9 @@ public:
     {
         in >> symlink;
     }
+    virtual ~ReadLinkArgs()
+    {
+    }
 
     const OpaqueDyn& get_symlink() const
     {
@@ -172,7 +123,7 @@ public:
     }
 
 private:
-    OpaqueDyn symlink;
+    OpaqueDyn symlink;  // File handle
 };
 
 class ReadArgs : public RPCCall
@@ -181,6 +132,9 @@ public:
     ReadArgs(XDRReader& in) : RPCCall(in)
     {
         in >> file >> offset >> count;
+    }
+    virtual ~ReadArgs()
+    {
     }
     
     const OpaqueDyn& get_file() const
@@ -197,7 +151,7 @@ public:
     }
 
 private:
-    OpaqueDyn file;
+    OpaqueDyn file;     // File handle
     uint64_t  offset;
     uint32_t  count;
 };
@@ -208,6 +162,9 @@ public:
     WriteArgs(XDRReader& in) : RPCCall(in)
     {
         in >> file >> offset >> count >> stable;
+    }
+    virtual ~WriteArgs()
+    {
     }
 
     const OpaqueDyn& get_file() const
@@ -228,24 +185,11 @@ public:
     }
     
 private:
-    OpaqueDyn file;
+    OpaqueDyn file;     // File handle
     uint64_t  offset;
     uint32_t  count;
     uint32_t  stable;
-    //OpaqueDyn data; Represent real writeargs request
 };
-
-/*
-class CreateArgs : public RPCCall
-{
-public:
-    CreateArgs(XDRReader& in) : RPCCall(in)
-    {
-    }
-
-private:
-};
-*/
 
 class RemoveArgs : public RPCCall
 {
@@ -253,11 +197,13 @@ public:
     RemoveArgs(XDRReader& in) : RPCCall(in)
     {
         in >> dir;
-        // in >> name;
 
         OpaqueDyn tmp;
         in >> tmp;
         name = std::string(tmp.data.begin(), tmp.data.end());
+    }
+    virtual ~RemoveArgs()
+    {
     }
     
     const OpaqueDyn& get_dir() const
@@ -270,8 +216,8 @@ public:
     }
 
 private:
-    OpaqueDyn dir;
-    std::string name;
+    OpaqueDyn dir;      // File handle
+    std::string name;   // File name
 }; 
 
 class RmDirArgs : public RPCCall
@@ -279,21 +225,28 @@ class RmDirArgs : public RPCCall
 public:
     RmDirArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> dir >> name;
+        in >> dir;
+
+        OpaqueDyn tmp;
+        in >> tmp;
+        name = std::string(tmp.data.begin(), tmp.data.end());
+    }
+    virtual ~RmDirArgs()
+    {
     }
     
     const OpaqueDyn& get_dir() const
     {
         return dir;
     }
-    const OpaqueDyn& get_name() const
+    const std::string& get_name() const
     {
         return name;
     }
 
 private:
-    OpaqueDyn dir;
-    OpaqueDyn name;
+    OpaqueDyn dir;      // File handle
+    std::string name;   // File name
 };
 
 class RenameArgs : public RPCCall
@@ -301,14 +254,29 @@ class RenameArgs : public RPCCall
 public:
     RenameArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> from_dir >> from_name >> to_dir >> to_name;
+        in >> from_dir;
+        {
+            OpaqueDyn tmp;
+            in >> tmp;
+            from_name = std::string(tmp.data.begin(), tmp.data.end());
+        }
+
+        in >> to_dir;
+        {
+            OpaqueDyn tmp;
+            in >> tmp;
+            to_name = std::string(tmp.data.begin(), tmp.data.end());
+        }
+    }
+    virtual ~RenameArgs()
+    {
     }
     
     const OpaqueDyn& get_from_dir() const
     {
         return from_dir;
     }
-    const OpaqueDyn& get_from_name() const
+    const std::string& get_from_name() const
     {
         return from_name;
     }
@@ -316,16 +284,16 @@ public:
     {
         return to_dir;
     }
-    const OpaqueDyn& get_to_name() const
+    const std::string& get_to_name() const
     {
         return to_name;
     }
 
 private:
-    OpaqueDyn from_dir;
-    OpaqueDyn from_name;
-    OpaqueDyn to_dir;
-    OpaqueDyn to_name;
+    OpaqueDyn from_dir; // File handle
+    std::string from_name;
+    OpaqueDyn to_dir;   // File handle
+    std::string to_name;
 }; 
 
 class LinkArgs : public RPCCall
@@ -333,7 +301,14 @@ class LinkArgs : public RPCCall
 public:
     LinkArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> file >> dir >> name;
+        in >> file >> dir;
+
+        OpaqueDyn tmp;
+        in >> tmp;
+        name = std::string(tmp.data.begin(), tmp.data.end());
+    }
+    virtual ~LinkArgs()
+    {
     }
     
     const OpaqueDyn& get_file() const
@@ -344,15 +319,15 @@ public:
     {
         return dir;
     }
-    const OpaqueDyn& get_name() const
+    const std::string& get_name() const
     {
         return name;
     }
 
 private:
-    OpaqueDyn file;
-    OpaqueDyn dir;
-    OpaqueDyn name;
+    OpaqueDyn file;     // File handle
+    OpaqueDyn dir;      // File handle
+    std::string name;
 };
 
 class ReadDirArgs : public RPCCall
@@ -361,6 +336,9 @@ public:
     ReadDirArgs(XDRReader& in) : RPCCall(in)
     {
         in >> dir >> cookie >> cookieverf >> count;
+    }
+    virtual ~ReadDirArgs()
+    {
     }
     
     const OpaqueDyn& get_dir() const
@@ -381,7 +359,7 @@ public:
     }
 
 private:
-    OpaqueDyn dir;
+    OpaqueDyn dir;      // File handle
     uint64_t cookie;
     OpaqueStat<8> cookieverf;
     uint32_t count;
@@ -393,6 +371,9 @@ public:
     ReadDirPlusArgs(XDRReader& in) : RPCCall(in)
     {
         in >> dir >> cookie >> cookieverf >> dir_count >> max_count;
+    }
+    virtual ~ReadDirPlusArgs()
+    {
     }
     
     const OpaqueDyn& get_dir() const
@@ -417,7 +398,7 @@ public:
     }
 
 private:
-    OpaqueDyn dir;
+    OpaqueDyn dir;      // File handle
     uint64_t cookie;
     OpaqueStat<8> cookieverf;
     uint32_t dir_count;
@@ -431,6 +412,9 @@ public:
     {
         in >> fs_root;
     }
+    virtual ~FSStatArgs()
+    {
+    }
     
     const OpaqueDyn& get_fs_root() const
     {
@@ -438,7 +422,7 @@ public:
     }
 
 private:
-    OpaqueDyn fs_root;
+    OpaqueDyn fs_root;  // File handle
 };
 
 class FSInfoArgs : public RPCCall
@@ -448,6 +432,9 @@ public:
     {
         in >> fs_root;
     }
+    virtual ~FSInfoArgs()
+    {
+    }
     
     const OpaqueDyn& get_fs_root() const
     {
@@ -455,7 +442,7 @@ public:
     }
 
 private:
-    OpaqueDyn fs_root;
+    OpaqueDyn fs_root;  // File handle
 };
 
 class PathConfArgs : public RPCCall
@@ -465,6 +452,9 @@ public:
     {
         in >> object;
     }
+    virtual ~PathConfArgs()
+    {
+    }
 
     const OpaqueDyn& get_object() const
     {
@@ -472,7 +462,7 @@ public:
     }
 
 private:
-    OpaqueDyn object;
+    OpaqueDyn object;   // File handle
 };
 
 class CommitArgs : public RPCCall
@@ -481,6 +471,9 @@ public:
     CommitArgs(XDRReader& in) : RPCCall(in)
     {
         in >> file >> offset >> count;
+    }
+    virtual ~CommitArgs()
+    {
     }
 
     const OpaqueDyn& get_file() const
@@ -497,7 +490,7 @@ public:
     }
 
 private:
-    OpaqueDyn file;
+    OpaqueDyn file;     // File handle
     uint64_t offset;
     uint32_t count;
 };

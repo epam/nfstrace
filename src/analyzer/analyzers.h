@@ -7,8 +7,10 @@
 #define ANALYZERS_H
 //------------------------------------------------------------------------------
 #include <list>
+#include <vector>
 
 #include "../controller/running_status.h"
+#include "../filter/nfs/nfs_operation.h"
 #include "../filter/nfs/nfs_struct.h"
 #include "base_analyzer.h"
 #include "nfs_data.h"
@@ -24,9 +26,34 @@ class Analyzers
 {
     typedef std::list<BaseAnalyzer*> Storage;
     typedef NFSData::Session Session;
+    typedef bool (BaseAnalyzer::*Method)(const Session& session, const NFSOperation& operation);
 public:
     Analyzers()
     {
+        methods.resize(22);
+
+        methods[0] = &BaseAnalyzer::call_null;
+        methods[1] = &BaseAnalyzer::call_getattr;
+        //methods[2] = &BaseAnalyzer::call_setattr;
+        methods[3] = &BaseAnalyzer::call_lookup;
+        methods[4] = &BaseAnalyzer::call_access;
+        methods[5] = &BaseAnalyzer::call_readlink;
+        methods[6] = &BaseAnalyzer::call_read;
+        methods[7] = &BaseAnalyzer::call_write;
+        //methods[8] = &BaseAnalyzer::call_create;
+        //methods[9] = &BaseAnalyzer::call_mkdir;
+        //methods[10] = &BaseAnalyzer::call_symlink;
+        //methods[11] = &BaseAnalyzer::call_mknod;
+        methods[12] = &BaseAnalyzer::call_remove;
+        methods[13] = &BaseAnalyzer::call_rmdir;
+        methods[14] = &BaseAnalyzer::call_rename;
+        methods[15] = &BaseAnalyzer::call_link;
+        methods[16] = &BaseAnalyzer::call_readdir;
+        methods[17] = &BaseAnalyzer::call_readdirplus;
+        methods[18] = &BaseAnalyzer::call_fsstat;
+        methods[19] = &BaseAnalyzer::call_fsinfo;
+        methods[20] = &BaseAnalyzer::call_pathconf;
+        methods[21] = &BaseAnalyzer::call_commit;
     }
     ~Analyzers()
     {
@@ -43,27 +70,7 @@ public:
         analyzers.push_back(analyzer);
     }
 
-    bool call_null(const Session& session, const NullArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_null(session, data);
-        }
-        return true;
-    }
-    bool call_getattr(const Session& session, const GetAttrArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_getattr(session, data);
-        }
-        return true;
-    }
-    bool call_setattr(const Session& session/*, const TypeData() data*/)
+    bool call_setattr(const Session& session/*, const NFSOperation& operation*/)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
@@ -73,57 +80,7 @@ public:
         }
         return true;
     }
-    bool call_lookup(const Session& session, const LookUpArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_lookup(session, data);
-        }
-        return true;
-    }
-    bool call_access(const Session& session, const AccessArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_access(session, data);
-        }
-        return true;
-    }
-    bool call_readlink(const Session& session, const ReadLinkArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_readlink(session, data);
-        }
-        return true;
-    }
-    bool call_read(const Session& session, const ReadArgs& ra)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_read(session, ra);
-        }
-        return true;
-    }
-    bool call_write(const Session& session, const WriteArgs& wa)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_write(session, wa);
-        }
-        return true;
-    }
-    virtual bool call_create(const Session& session/*, const TypeData() data*/)
+    virtual bool call_create(const Session& session/*, const NFSOperation& operation*/)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
@@ -133,7 +90,7 @@ public:
         }
         return true;
     }
-    virtual bool call_mkdir(const Session& session/*, const TypeData() data*/)
+    virtual bool call_mkdir(const Session& session/*, const NFSOperation& operation*/)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
@@ -143,7 +100,7 @@ public:
         }
         return true;
     }
-    virtual bool call_symlink(const Session& session/*, const TypeData() data*/)
+    virtual bool call_symlink(const Session& session/*, const NFSOperation& operation*/)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
@@ -153,7 +110,7 @@ public:
         }
         return true;
     }
-    virtual bool call_mknod(const Session& session/*, const TypeData() data*/)
+    virtual bool call_mknod(const Session& session/*, const NFSOperation& operation*/)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
@@ -163,109 +120,20 @@ public:
         }
         return true;
     }
-    virtual bool call_remove(const Session& session, const RemoveArgs& data)
+    virtual bool call(const Session& session, const NFSOperation& operation)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            (*i)->call_remove(session, data);
-        }
-        return true;
-    }
-    virtual bool call_rmdir(const Session& session, const RmDirArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_rmdir(session, data);
-        }
-        return true;
-    }
-    virtual bool call_rename(const Session& session, const RenameArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_rename(session, data);
-        }
-        return true;
-    }
-    virtual bool call_link(const Session& session, const LinkArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_link(session, data);
-        }
-        return true;
-    }
-    virtual bool call_readdir(const Session& session, const ReadDirArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_readdir(session, data);
-        }
-        return true;
-    }
-    virtual bool call_readdirplus(const Session& session, const ReadDirPlusArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_readdirplus(session, data);
-        }
-        return true;
-    }
-    virtual bool call_fsstat(const Session& session, const FSStatArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_fsstat(session, data);
-        }
-        return true;
-    }
-    virtual bool call_fsinfo(const Session& session, const FSInfoArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_fsinfo(session, data);
-        }
-        return true;
-    }
-    virtual bool call_pathconf(const Session& session, const PathConfArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_pathconf(session, data);
-        }
-        return true;
-    }
-    virtual bool call_commit(const Session& session, const CommitArgs& data)
-    {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            (*i)->call_commit(session, data);
+            ((*i)->*methods[operation])(session, operation);
         }
         return true;
     }
 
 private:
     Storage analyzers;
+    std::vector<Method> methods;
 };
 
 } // namespace analyzer
