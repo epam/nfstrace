@@ -69,7 +69,7 @@ public:
         analyzers.push_back(analyzer);
     }
 
-    virtual bool call(const BaseAnalyzer::Session& session, const NFSOperation& operation)
+    bool call(const BaseAnalyzer::Session& session, const NFSOperation& operation)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();

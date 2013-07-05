@@ -3,6 +3,12 @@
 // Description: Created for demonstration purpose only.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
+#include <iostream>
+#include <sstream>
+
+#include "../filter/nfs/nfs_operation.h"
+#include "../filter/nfs/nfs_procedures.h"
+#include "../filter/nfs/nfs_struct.h"
 #include "print_analyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
