@@ -21,6 +21,7 @@ Opt Args::options[Args::num] =
     {'s', "snaplen",   Opt::REQ, "65535", "max length of raw captured packet", "0..65535"},
     {'m', "mode",      Opt::REQ, "dump",  "set runing mode", "dump|mon|stat"},
     {'w', "wfile",     Opt::REQ, "INTERFACE-PORT-SNAPLEN.pcap",  "path to output file", "PATH"},
+    {'v', "verbose",   Opt::NOA, "true",  "print out additional information"},
     {'h', "help",      Opt::NOA, "false", "print this help message and exit"},
 };
 

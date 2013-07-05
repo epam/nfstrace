@@ -27,7 +27,7 @@ class PrintAnalyzer : public BaseAnalyzer
 {
     typedef NFSData::Session Session;
 public:
-    PrintAnalyzer()
+    PrintAnalyzer(std::ostream& o):out(o)
     {
     }
     virtual ~PrintAnalyzer()
@@ -280,6 +280,8 @@ private:
         address << ((ip >> 0) & 0xFF);
         return address.str();
     }
+
+    std::ostream& out;
 };
 
 } // namespace analyzer
