@@ -7,6 +7,7 @@
 #define XDR_READER_H
 //------------------------------------------------------------------------------
 #include <stdexcept>
+#include <string>
 
 #include <arpa/inet.h> // ntohl()
 #if defined(__linux__)
@@ -40,7 +41,7 @@ public:
 
     XDRReader& operator>>(uint16_t& obj)
     {
-        const size_t size = 2;
+        const size_t size = sizeof(obj);
         arrange_check(size);
 
         obj = ntohl(*(uint16_t*)it);
@@ -50,7 +51,7 @@ public:
 
     XDRReader& operator>>(uint32_t& obj)
     {
-        const size_t size = 4;
+        const size_t size = sizeof(obj);
         arrange_check(size);
 
         obj = ntohl(*(uint32_t*)it);
@@ -60,11 +61,24 @@ public:
 
     XDRReader& operator>>(uint64_t& obj)
     {
-        const size_t size = 8;
+        const size_t size = sizeof(obj);
         arrange_check(size);
 
         obj = be64toh(*(uint64_t*)it);
         it += size;
+        return *this;
+    }
+
+    XDRReader& operator>>(std::string& obj)
+    {
+        uint32_t len = 0;
+        operator>>(len);
+        arrange_check(len);
+
+        obj.reserve(len);
+        obj.assign((std::string::value_type*)it, len);
+        it += calc_offset(len);
+
         return *this;
     }
 
@@ -90,7 +104,7 @@ public:
     }
     
 private:
-    void arrange_check(size_t size)
+    inline void arrange_check(size_t size)
     {
         if(it+size > last)
         {
@@ -105,8 +119,8 @@ private:
     }
 
 private:
-    uint8_t* it;
-    uint8_t* last;
+    const uint8_t* it;
+    const uint8_t* last;
 };
 
 } // namespace XDR
