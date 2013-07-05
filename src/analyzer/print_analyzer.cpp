@@ -4,7 +4,8 @@
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #include "print_analyzer.h"
-
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace analyzer
@@ -228,28 +229,28 @@ std::string PrintAnalyzer::print_fh(const OpaqueDyn& fh) const
 std::string PrintAnalyzer::get_session(const Session& session) const
 {
     std::stringstream s(std::ios_base::out);
-    s << session_addr(NFSData::Session::Source, session) << " --> " << session_addr(NFSData::Session::Destination, session);
+    s << session_addr(Session::Source, session) << " --> " << session_addr(Session::Destination, session);
     switch(session.type)
     {
-        case NFSData::Session::TCP:
+        case Session::TCP:
             s << " (TCP)";
             break;
-        case NFSData::Session::UDP:
+        case Session::UDP:
             s << " (UPD)";
             break;
     }
     return s.str();
 }
 
-std::string PrintAnalyzer::session_addr(NFSData::Session::Direction dir, const Session& session) const
+std::string PrintAnalyzer::session_addr(Session::Direction dir, const Session& session) const
 {
     std::stringstream s(std::ios_base::out);
     switch(session.ip_type)
     {
-        case NFSData::Session::v4:
+        case Session::v4:
             s << ipv4_string(session.ip.v4.addr[dir]);
             break;
-        case NFSData::Session::v6:
+        case Session::v6:
             s << ipv6_string(session.ip.v6.addr[dir]);
             break;
     }
@@ -279,3 +280,4 @@ std::string PrintAnalyzer::ipv4_string(const uint32_t ip) const
 
 } // namespace analyzer
 } // namespace NST
+//------------------------------------------------------------------------------

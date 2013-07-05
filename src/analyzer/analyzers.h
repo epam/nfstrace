@@ -13,7 +13,6 @@
 #include "../filter/nfs/nfs_operation.h"
 #include "../filter/nfs/nfs_struct.h"
 #include "base_analyzer.h"
-#include "nfs_data.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::NFS3;
 //------------------------------------------------------------------------------
@@ -25,8 +24,8 @@ namespace analyzer
 class Analyzers
 {
     typedef std::list<BaseAnalyzer*> Storage;
-    typedef NFSData::Session Session;
-    typedef bool (BaseAnalyzer::*Method)(const Session& session, const NFSOperation& operation);
+
+    typedef bool (BaseAnalyzer::*Method)(const BaseAnalyzer::Session& session, const NFSOperation& operation);
 public:
     Analyzers()
     {
@@ -70,7 +69,7 @@ public:
         analyzers.push_back(analyzer);
     }
 
-    virtual bool call(const Session& session, const NFSOperation& operation)
+    virtual bool call(const BaseAnalyzer::Session& session, const NFSOperation& operation)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();

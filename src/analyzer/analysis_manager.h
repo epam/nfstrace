@@ -8,18 +8,18 @@
 //------------------------------------------------------------------------------
 #include <memory> // std::auto_ptr
 
+#include "../auxiliary/filtered_data.h"
 #include "../auxiliary/exception.h"
 #include "../auxiliary/thread.h"
-#include "../auxiliary/queue.h"
 #include "../controller/running_status.h"
 #include "analyzers.h"
-#include "nfs_data.h"
 #include "nfs_parser_thread.h"
 #include "print_analyzer.h"
 //------------------------------------------------------------------------------
+using NST::auxiliary::FilteredData;
+using NST::auxiliary::FilteredDataQueue;
 using NST::auxiliary::Exception;
 using NST::auxiliary::Thread;
-using NST::auxiliary::Queue;
 using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
 namespace NST
@@ -29,7 +29,6 @@ namespace analyzer
 
 class AnalysisManager
 {
-    typedef Queue<NFSData> NFSQueue;
 public:
     AnalysisManager(RunningStatus& running_status) : parser_thread(NULL), queue(NULL), status(running_status)
     {
@@ -38,9 +37,9 @@ public:
     {
     }
 
-    NFSQueue& init(bool verbose, uint32_t q_size = 256, uint32_t q_limit = 16)
+    FilteredDataQueue& init(bool verbose, uint32_t q_size = 256, uint32_t q_limit = 16)
     {
-        queue.reset(new NFSQueue(q_size, q_limit));
+        queue.reset(new FilteredDataQueue(q_size, q_limit));
         parser_thread.reset(new NFSParserThread(*queue, analyzers, status));
 
         if(verbose) // add special analyzer for trace out RPC calls
@@ -73,7 +72,7 @@ private:
     AnalysisManager& operator=(const AnalysisManager& object); // Uncopyable object
 
     std::auto_ptr<Thread> parser_thread;
-    std::auto_ptr<NFSQueue> queue;
+    std::auto_ptr<FilteredDataQueue> queue;
     RunningStatus& status;
     Analyzers analyzers;
 };

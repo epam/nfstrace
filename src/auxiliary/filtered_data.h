@@ -1,23 +1,24 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Structure for passing filtered NFS data to Analyser module.
+// Description: Structure for passing filtered data to Analyser module.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef NFS_DATA_H
-#define NFS_DATA_H
+#ifndef FILTERED_DATA_H
+#define FILTERED_DATA_H
 //------------------------------------------------------------------------------
 #include <stdint.h>
 
 #include <sys/time.h>
+
+#include "queue.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace analyzer
+namespace auxiliary
 {
 
-// TODO: fix memory placement of this structure to align to 4k
-struct NFSData
+struct FilteredData
 {
 public:
     struct timeval timestamp;
@@ -58,15 +59,15 @@ public:
 
     } __attribute__ ((__packed__)) session;
 
-    uint32_t rpc_len;   // length of captured RPC message with NFS payload
-
-    // a header of RPC message related to NFS procedures (calls and replies)
-    char rpc_message[4000]; // raw NFS data in network byte order
+    uint32_t dlen;       // length of filtered payload
+    uint8_t  data[4000]; // raw filtered data in network byte order
 
 } __attribute__ ((__packed__));
 
-} // namespace analyzer
+typedef Queue<FilteredData> FilteredDataQueue;
+
+} // namespace auxiliary
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif //NFS_DATA_H
+#endif //FILTERED_DATA_H
 //------------------------------------------------------------------------------

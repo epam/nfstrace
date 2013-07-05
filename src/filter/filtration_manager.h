@@ -8,8 +8,7 @@
 //------------------------------------------------------------------------------
 #include <memory> // std::auto_ptr
 
-#include "../analyzer/nfs_data.h"
-#include "../auxiliary/queue.h"
+#include "../auxiliary/filtered_data.h"
 #include "../auxiliary/thread_group.h"
 #include "../controller/running_status.h"
 #include "common/filtration_processor.h"
@@ -19,8 +18,7 @@
 #include "pcap/file_reader.h"
 #include "processing_thread.h"
 //------------------------------------------------------------------------------
-using NST::analyzer::NFSData;
-using NST::auxiliary::Queue;
+using NST::auxiliary::FilteredDataQueue;
 using NST::auxiliary::ThreadGroup;
 using NST::controller::RunningStatus;
 using NST::filter::pcap::CaptureReader;
@@ -33,7 +31,6 @@ namespace filter
 
 class FiltrationManager
 {
-    typedef Queue<NFSData> NFSQueue;
 public:
     FiltrationManager(RunningStatus& s) : status(s)
     {
@@ -57,7 +54,7 @@ public:
         threads.add(thread.release());
     }
 
-    void capture_to_queue(NFSQueue& queue, const std::string& interface, const std::string& bpf, int snaplen, int ms)
+    void capture_to_queue(FilteredDataQueue& queue, const std::string& interface, const std::string& bpf, int snaplen, int ms)
     {
         typedef FiltrationProcessor<CaptureReader, QueueingTransmission> Processor;
         typedef ProcessingThread<Processor> OnlineAnalyzing;
