@@ -6,17 +6,11 @@
 #ifndef PRINT_ANALYZER_H
 #define PRINT_ANALYZER_H
 //------------------------------------------------------------------------------
-#include <iostream>
-#include <sstream>
+#include <string>
 
-//#include "../filter/rpc/rpc_message.h"
-#include "../filter/nfs/nfs_operation.h"
-#include "../filter/nfs/nfs_procedures.h"
-#include "../filter/nfs/nfs_struct.h"
 #include "base_analyzer.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::NFS3;
-//using namespace NST::filter::rpc;
 //------------------------------------------------------------------------------
 namespace NST
 {
