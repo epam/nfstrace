@@ -15,7 +15,6 @@
 #include "common/filtration_processor.h"
 #include "common/dumping_transmission.h"
 #include "common/queueing_transmission.h"
-#include "common/stateless_filtration.h"
 #include "pcap/capture_reader.h"
 #include "pcap/file_reader.h"
 #include "processing_thread.h"
@@ -46,14 +45,13 @@ public:
 
     void dump_to_file(const std::string& file, const std::string& interface, const std::string& bpf, int snaplen, int ms)
     {
-        typedef FiltrationProcessor<CaptureReader, StatelessFiltration, DumpingTransmission> Processor;
+        typedef FiltrationProcessor<CaptureReader, DumpingTransmission> Processor;
         typedef ProcessingThread<Processor> OnlineDumping;
 
         std::auto_ptr<CaptureReader>        reader (new CaptureReader(interface, bpf, snaplen, ms));
-        std::auto_ptr<StatelessFiltration>  filter (new StatelessFiltration());
         std::auto_ptr<DumpingTransmission>  writer (new DumpingTransmission(reader->get_handle(), file));
 
-        std::auto_ptr<Processor>      processor (new Processor(reader, filter, writer));
+        std::auto_ptr<Processor>      processor (new Processor(reader, writer));
         std::auto_ptr<OnlineDumping>  thread    (new OnlineDumping(processor, status));
 
         threads.add(thread.release());
@@ -61,14 +59,13 @@ public:
 
     void capture_to_queue(NFSQueue& queue, const std::string& interface, const std::string& bpf, int snaplen, int ms)
     {
-        typedef FiltrationProcessor<CaptureReader, StatelessFiltration, QueueingTransmission> Processor;
+        typedef FiltrationProcessor<CaptureReader, QueueingTransmission> Processor;
         typedef ProcessingThread<Processor> OnlineAnalyzing;
 
         std::auto_ptr<CaptureReader>        reader (new CaptureReader(interface, bpf, snaplen, ms));
-        std::auto_ptr<StatelessFiltration>  filter (new StatelessFiltration());
         std::auto_ptr<QueueingTransmission> writer (new QueueingTransmission(queue));
 
-        std::auto_ptr<Processor>     processor (new Processor(reader, filter, writer));
+        std::auto_ptr<Processor>     processor (new Processor(reader, writer));
         std::auto_ptr<OnlineAnalyzing>  thread (new OnlineAnalyzing(processor, status));
 
         threads.add(thread.release());

@@ -18,6 +18,8 @@
 //------------------------------------------------------------------------------
 using NST::analyzer::NFSData;
 using NST::auxiliary::Queue;
+
+typedef NST::analyzer::NFSData::Session NFSSession;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -64,7 +66,27 @@ public:
         memcpy(nfs->rpc_message, data.rpc_header, nfs->rpc_len);
 
         buffer.push(nfs);
+    }
 
+    void collect(Nodes::Direction d, const Nodes& key, RPCReader& reader)
+    {
+        Queue<NFSData>::Allocated nfs(buffer);
+
+        nfs->session.ip_type = NFSData::Session::v4;
+        nfs->session.ip.v4.addr[0] = key.src_address(d);
+        nfs->session.ip.v4.addr[1] = key.dst_address(d);
+
+        nfs->session.type = NFSData::Session::TCP;
+        nfs->session.port[0] = key.src_port(d);
+        nfs->session.port[1] = key.dst_port(d);
+
+        nfs->rpc_len = sizeof(nfs->rpc_message);
+        
+        uint32_t& size = nfs->rpc_len;
+
+        reader.readto(size, (uint8_t*)nfs->rpc_message);
+
+        //nfs->timestamp = data.header->ts;
     }
 
 private:

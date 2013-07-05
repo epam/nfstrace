@@ -28,7 +28,7 @@ public:
         {
             Source      =0,
             Destination =1
-        }:16;
+        };
 
         enum IPType
         {

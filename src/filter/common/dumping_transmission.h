@@ -14,9 +14,13 @@
 #include "filtration_processor.h"
 #include "../pcap/handle.h"
 #include "../pcap/packet_dumper.h"
+
+#include "../../analyzer/nfs_data.h"
 //------------------------------------------------------------------------------
 using NST::filter::pcap::Handle;
 using NST::filter::pcap::PacketDumper;
+
+typedef NST::analyzer::NFSData::Session NFSSession;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -41,6 +45,15 @@ public:
     void collect(const FiltrationData& data)
     {
         dumper->dump(data.header, data.packet);
+    }
+
+    void collect(const NFSSession& session, const FiltrationData& data)
+    {
+        dumper->dump(data.header, data.packet);
+    }
+    
+    void collect(Nodes::Direction d, const Nodes& key, RPCReader& reader)
+    {
     }
 
 private:
