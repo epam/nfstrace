@@ -3,8 +3,8 @@
 // Description: Enumeration of the NFS procedures.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef NFS_PROCEDURE_H
-#define NFS_PROCEDURE_H
+#ifndef NFS_PROCEDURES_H
+#define NFS_PROCEDURES_H
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -51,5 +51,5 @@ struct Proc // counters definition for NFS v3 procedures. See: RFC 1813
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS_PROCEDURE_H
+#endif//NFS_PROCEDURES_H
 //------------------------------------------------------------------------------

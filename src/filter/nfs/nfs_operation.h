@@ -61,7 +61,7 @@ public:
         return reply != NULL;
     }
 
-    inline operator int() const // Allow us use NFSOperation inside switch-block
+    inline operator uint32_t() const // Allow us use NFSOperation inside switch-block
     {
         return call->get_proc();
     }

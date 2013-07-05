@@ -89,27 +89,27 @@ public:
     {
     }
 
-    uint32_t get_rpcvers() const
+    inline uint32_t get_rpcvers() const
     {
         return rpcvers;
     }
-    uint32_t get_prog() const
+    inline uint32_t get_prog() const
     {
         return prog;
     }
-    uint32_t get_vers() const
+    inline uint32_t get_vers() const
     {
         return vers;
-    }         
-    uint32_t get_proc() const
+    }
+    inline uint32_t get_proc() const
     {
         return proc;
     }
-    const OpaqueAuth& get_cred() const
+    inline const OpaqueAuth& get_cred() const
     {
         return cred;
     }
-    const OpaqueAuth& get_verf() const
+    inline const OpaqueAuth& get_verf() const
     {
         return verf;
     }

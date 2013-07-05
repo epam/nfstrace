@@ -57,11 +57,7 @@ class LookUpArgs : public RPCCall
 public:
     LookUpArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> dir;
-
-        OpaqueDyn tmp;
-        in >> tmp;
-        name = std::string(tmp.data.begin(), tmp.data.end());
+        in >> dir >> name;
     }
     virtual ~LookUpArgs()
     {
@@ -196,11 +192,7 @@ class RemoveArgs : public RPCCall
 public:
     RemoveArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> dir;
-
-        OpaqueDyn tmp;
-        in >> tmp;
-        name = std::string(tmp.data.begin(), tmp.data.end());
+        in >> dir >> name;
     }
     virtual ~RemoveArgs()
     {
@@ -225,11 +217,7 @@ class RmDirArgs : public RPCCall
 public:
     RmDirArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> dir;
-
-        OpaqueDyn tmp;
-        in >> tmp;
-        name = std::string(tmp.data.begin(), tmp.data.end());
+        in >> dir >> name;
     }
     virtual ~RmDirArgs()
     {
@@ -254,19 +242,8 @@ class RenameArgs : public RPCCall
 public:
     RenameArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> from_dir;
-        {
-            OpaqueDyn tmp;
-            in >> tmp;
-            from_name = std::string(tmp.data.begin(), tmp.data.end());
-        }
-
-        in >> to_dir;
-        {
-            OpaqueDyn tmp;
-            in >> tmp;
-            to_name = std::string(tmp.data.begin(), tmp.data.end());
-        }
+        in >> from_dir >> from_name;
+        in >> to_dir >> to_name;
     }
     virtual ~RenameArgs()
     {
@@ -301,11 +278,7 @@ class LinkArgs : public RPCCall
 public:
     LinkArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> file >> dir;
-
-        OpaqueDyn tmp;
-        in >> tmp;
-        name = std::string(tmp.data.begin(), tmp.data.end());
+        in >> file >> dir >> name;
     }
     virtual ~LinkArgs()
     {
