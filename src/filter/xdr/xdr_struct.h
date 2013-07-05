@@ -7,8 +7,8 @@
 #define XDR_STRUCT_H
 //------------------------------------------------------------------------------
 #include <cstring> // size_t
-#include <vector>
 #include <iostream>
+#include <vector>
 
 #include <stdint.h> // uintxx_t
 //------------------------------------------------------------------------------
@@ -22,12 +22,12 @@ namespace XDR
 
 const size_t align = 4;
 
-struct OpaqueDyn // Move to xdr
+struct OpaqueDyn
 {
 private:
     typedef std::vector<uint8_t> Opaque;
 public:
-    std::vector<uint8_t> data;    // Size of 'size'
+    std::vector<uint8_t> data;    // XDR specific size
 
     friend std::ostream& operator<<(std::ostream& out, const OpaqueDyn& opaque)
     {
@@ -35,14 +35,14 @@ public:
         Opaque::const_iterator end = opaque.data.end();
         for(;i != end; ++i)
         {
-            out << std::hex << static_cast<uint32_t>(*i);
+            out << static_cast<uint32_t>(*i);
         }
         return out;
     }
 };
 
 template<uint32_t size>
-struct OpaqueStat // Move to xdr
+struct OpaqueStat
 {
     uint8_t data[size];
 
@@ -50,7 +50,7 @@ struct OpaqueStat // Move to xdr
     {
         for(uint32_t i = 0; i != size; ++i)
         {
-            out << std::hex << static_cast<uint32_t>(opaque.data[i]);
+            out << static_cast<uint32_t>(opaque.data[i]);
         }
         return out;
     }

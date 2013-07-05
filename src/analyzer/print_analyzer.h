@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include "../filter/rpc/rpc_message.h"
+#include "../filter/nfs/nfs_operation.h"
 #include "../filter/nfs/nfs_struct.h"
 #include "base_analyzer.h"
 #include "nfs_data.h"
@@ -33,46 +34,58 @@ public:
     {
     }
 
-    virtual bool call_null(const Session& session, const NullArgs& data)
+    virtual bool call_null(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call Null" << std::endl;
+        const NullArgs& data = static_cast<const NullArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call Null. XID: " << data.get_xid() << std::endl;
         return true;
     }
-    virtual bool call_getattr(const Session& session, const GetAttrArgs& data)
+    virtual bool call_getattr(const Session& session, const NFSOperation& operation)
     {
-        
-        std::cout << get_session(session) << " -- NFS Call GetAttr. File: " << data.get_file() << std::endl;
+        const GetAttrArgs& data = static_cast<const GetAttrArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call GetAttr. XID: " << data.get_xid() << " File: ";
+        std::cout << print_fh(data.get_file()) << std::endl;
         return true;
     }
-    virtual bool call_setattr(const Session& session/*, const TypeData() data*/)
+    virtual bool call_setattr(const Session& session/*, const NFSOperation& operation*/)
     {
-        std::cout << get_session(session) << " -- NFS Call SetAttr" << std::endl;
+        std::cout << get_session(session) << " -- NFS Call SetAttr." << std::endl;
         return true;
     }
-    virtual bool call_lookup(const Session& session, const LookUpArgs& data)
+    virtual bool call_lookup(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call LookUp. Dir: " << data.get_dir() << " Name: " << data.get_name() << std::endl;
+        const LookUpArgs& data = static_cast<const LookUpArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call LookUp. XID: " << data.get_xid() << " Dir: ";
+        std::cout << print_fh(data.get_dir());
+        std::cout << " Name: " << data.get_name() << std::endl;
         return true;
     }
-    virtual bool call_access(const Session& session, const AccessArgs& data)
+    virtual bool call_access(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call Access. Object: " << data.get_object() << " Access: " << data.get_access() << std::endl;
+        const AccessArgs& data = static_cast<const AccessArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call Access. XID: " << data.get_xid() << " Object: ";
+        std::cout << print_fh(data.get_object());
+        std::cout << " Access: " << data.get_access() << std::endl;
         return true;
     }
-    virtual bool call_readlink(const Session& session, const ReadLinkArgs& data)
+    virtual bool call_readlink(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call ReadLink. Symlink: " << data.get_symlink() << std::endl;
+        const ReadLinkArgs& data = static_cast<const ReadLinkArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call ReadLink. XID: " << data.get_xid() << " Symlink: ";
+        std::cout << print_fh(data.get_symlink()) << std::endl;
         return true;
     }
-    virtual bool call_read(const Session& session, const ReadArgs& ra)
+    virtual bool call_read(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call Read XID: " << ra.get_xid() << " Offset: " << ra.get_offset() << " Count: " << ra.get_count() << std::endl;
+        const ReadArgs& data = static_cast<const ReadArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call Read. XID: " << data.get_xid() << " Offset: " << data.get_offset() << " Count: " << data.get_count() << std::endl;
         return true;
     }
-    virtual bool call_write(const Session& session, const WriteArgs& wa)
+    virtual bool call_write(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call Write XID: " << wa.get_xid() << " Offset: " << wa.get_offset() << " Count: " << wa.get_count() << " Type: ";
-        switch(wa.get_stable())
+        const WriteArgs& data = static_cast<const WriteArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call Write. XID: " << data.get_xid() << " Offset: " << data.get_offset() << " Count: " << data.get_count() << " Type: ";
+        switch(data.get_stable())
         {
         case 0:
             {
@@ -93,82 +106,142 @@ public:
         std::cout << std::endl;
         return true;
     }
-    virtual bool call_create(const Session& session/*, const TypeData() data*/)
+    virtual bool call_create(const Session& session/*, const NFSOperation& operation*/)
     {
         std::cout << get_session(session) << " -- NFS Call Create" << std::endl;
-        return true;;
+        return true;
     }
-    virtual bool call_mkdir(const Session& session/*, const TypeData() data*/)
+    virtual bool call_mkdir(const Session& session/*, const NFSOperation& operation*/)
     {
         std::cout << get_session(session) << " -- NFS Call MKDir" << std::endl;
-        return true;;
+        return true;
     }
-    virtual bool call_symlink(const Session& session/*, const TypeData() data*/)
+    virtual bool call_symlink(const Session& session/*, const NFSOperation& operation*/)
     {
         std::cout << get_session(session) << " -- NFS Call SymLink" << std::endl;
-        return true;;
+        return true;
     }
-    virtual bool call_mknod(const Session& session/*, const TypeData() data*/)
+    virtual bool call_mknod(const Session& session/*, const NFSOperation& operation*/)
     {
         std::cout << get_session(session) << " -- NFS Call MKNod" << std::endl;
-        return true;;
+        return true;
     }
-    virtual bool call_remove(const Session& session, const RemoveArgs& data)
+    virtual bool call_remove(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call Remove. Dir: " << data.get_dir() << " Name: " << data.get_name() << std::endl;
-        return true;;
+        const RemoveArgs& data = static_cast<const RemoveArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call Remove. XID: " << data.get_xid() << " Dir: ";
+        std::cout << print_fh(data.get_dir());
+        std::cout << " Name: " << data.get_name() << std::endl;
+        return true;
     }
-    virtual bool call_rmdir(const Session& session, const RmDirArgs& data)
+    virtual bool call_rmdir(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call RMDir. Dir: " << data.get_dir() << " Name: " << data.get_name() << std::endl;
-        return true;;
+        const RmDirArgs& data = static_cast<const RmDirArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call RMDir. XID: " << data.get_xid() << " Dir: ";
+        std::cout << print_fh(data.get_dir());
+        std::cout << " Name: " << data.get_name() << std::endl;
+        return true;
     }
-    virtual bool call_rename(const Session& session, const RenameArgs& data)
+    virtual bool call_rename(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call Rename. From Dir: " << data.get_from_dir() << " From Name: " << data.get_from_name() << " To Dir: " << data.get_to_dir() << " To Name: " << data.get_to_name() << std::endl;
-        return true;;
+        const RenameArgs& data = static_cast<const RenameArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call Rename. XID: " << data.get_xid() << " From Dir: ";
+        std::cout << print_fh(data.get_from_dir());
+        std::cout << " From Name: " << data.get_from_name() << " To Dir: ";
+        std::cout << print_fh(data.get_to_dir());
+        std::cout << " To Name: " << data.get_to_name() << std::endl;
+        return true;
     }
-    virtual bool call_link(const Session& session, const LinkArgs& data)
+    virtual bool call_link(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call Link. File: " << data.get_file() << " Dir: " << data.get_dir() << " Name: " << data.get_name() << std::endl;
-        return true;;
+        const LinkArgs& data = static_cast<const LinkArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call Link. XID: " << data.get_xid() << " File: ";
+        std::cout << print_fh(data.get_file());
+        std::cout << " Dir: ";
+        std::cout << print_fh(data.get_dir());
+        std::cout << " Name: " << data.get_name() << std::endl;
+        return true;
     }
-    virtual bool call_readdir(const Session& session, const ReadDirArgs& data)
+    virtual bool call_readdir(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call ReadDir. Dir: " << data.get_dir() << " Cookie: " << data.get_cookie() << " CookieVerf: " << data.get_cookieverf() << " Count: " << data.get_count() << std::endl;
-        return true;;
+        const ReadDirArgs& data = static_cast<const ReadDirArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call ReadDir. XID: " << data.get_xid() << " Dir: ";
+        std::cout << print_fh(data.get_dir());
+        std::cout << " Cookie: " << data.get_cookie() << " CookieVerf: " << data.get_cookieverf() << " Count: " << data.get_count() << std::endl;
+        return true;
     }
-    virtual bool call_readdirplus(const Session& session, const ReadDirPlusArgs& data)
+    virtual bool call_readdirplus(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call ReadDirPlus. Dir: " << data.get_dir() << " Cookie: " << data.get_cookie() << " CookieVerf: " << data.get_cookieverf() << " Dir Count: " << data.get_dir_count() << " Max Count: " << data.get_max_count() << std::endl;
-        return true;;
+        const ReadDirPlusArgs& data = static_cast<const ReadDirPlusArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call ReadDirPlus. XID: " << data.get_xid() << " Dir: ";
+        std::cout << print_fh(data.get_dir());
+        std::cout << " Cookie: " << data.get_cookie() << " CookieVerf: " << data.get_cookieverf() << " Dir Count: " << data.get_dir_count() << " Max Count: " << data.get_max_count() << std::endl;
+        return true;
     }
-    virtual bool call_fsstat(const Session& session, const FSStatArgs& data)
+    virtual bool call_fsstat(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call FSStat. FS Root:" << data.get_fs_root() << std::endl;
-        return true;;
+        const FSStatArgs& data = static_cast<const FSStatArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call FSStat. XID: " << data.get_xid() << " FS Root:";
+        std::cout << print_fh(data.get_fs_root()) << std::endl;
+        return true;
     }
-    virtual bool call_fsinfo(const Session& session, const FSInfoArgs& data)
+    virtual bool call_fsinfo(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call FSInfo. FS Root:" << data.get_fs_root() << std::endl;
-        return true;;
+        const FSInfoArgs& data = static_cast<const FSInfoArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call FSInfo. XID: " << data.get_xid() << " FS Root:";
+        std::cout << print_fh(data.get_fs_root()) << std::endl;
+        return true;
     }
-    virtual bool call_pathconf(const Session& session, const PathConfArgs& data)
+    virtual bool call_pathconf(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call PathConf. Object: " << data.get_object() << std::endl;
-        return true;;
+        const PathConfArgs& data = static_cast<const PathConfArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call PathConf. XID : " << data.get_xid() << " Object: ";
+        std::cout << print_fh(data.get_object()) << std::endl;
+        return true;
     }
-    virtual bool call_commit(const Session& session, const CommitArgs& data)
+    virtual bool call_commit(const Session& session, const NFSOperation& operation)
     {
-        std::cout << get_session(session) << " -- NFS Call Commit. File: " << data.get_file() << " Offset: " << data.get_offset() << " Count: " << data.get_count()  << std::endl;
-        return true;;
+        const CommitArgs& data = static_cast<const CommitArgs&>(*operation.get_call());
+        std::cout << get_session(session) << " -- NFS Call Commit. XID: " << data.get_xid() << " File: ";
+        std::cout << print_fh(data.get_file());
+        std::cout << " Offset: " << data.get_offset() << " Count: " << data.get_count()  << std::endl;
+        return true;
     }
 
 private:
+    std::string print_fh(const OpaqueDyn& fh)
+    {
+        std::stringstream tmp;
+        tmp << fh;
+        std::string opaque = tmp.str();
+
+        tmp.str("");
+        for(int i = 0; i < 4; ++i)
+        {
+            tmp << opaque[i];
+        }
+        tmp << "...";
+        int len = fh.data.size();
+        for(int i = len - 4; i < len; ++i)
+        {
+            tmp << opaque[i];
+        }
+        return tmp.str();
+    }
+
     std::string get_session(const Session& session) const
     {
         std::stringstream s(std::ios_base::out);
-        s << "Src: " << session_addr(NFSData::Session::Source, session) << " Dst: " << session_addr(NFSData::Session::Destination, session);
+        s << session_addr(NFSData::Session::Source, session) << " --> " << session_addr(NFSData::Session::Destination, session);
+        switch(session.type)
+        {
+            case NFSData::Session::TCP:
+                s << " (TCP)";
+                break;
+            case NFSData::Session::UDP:
+                s << " (UPD)";
+                break;
+        }
         return s.str();
     }
 
@@ -185,15 +258,6 @@ private:
                 break;
         }
         s << ":" << session.port[dir];
-        switch(session.type)
-        {
-            case NFSData::Session::TCP:
-                s << " (TCP)";
-                break;
-            case NFSData::Session::UDP:
-                s << " (UPD)";
-                break;
-        }
         return s.str();
     }
 

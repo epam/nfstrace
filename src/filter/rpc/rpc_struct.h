@@ -57,6 +57,9 @@ public:
     {
         in >> xid >> type;
     }
+    virtual ~RPCMessage()
+    {
+    }
 
     uint32_t get_xid() const
     {
@@ -68,6 +71,9 @@ public:
     }
 
 private:
+    RPCMessage(const RPCMessage&);
+    void operator=(const RPCMessage&);
+
     uint32_t  xid;
     uint32_t  type;
 };
@@ -78,6 +84,9 @@ public:
     RPCCall(XDRReader& in) : RPCMessage(in)
     {
         in >> rpcvers >> prog >> vers >> proc >> cred >> verf;
+    }
+    virtual ~RPCCall()
+    {
     }
 
     uint32_t get_rpcvers() const
@@ -106,12 +115,31 @@ public:
     }
     
 private:
+    RPCCall(const RPCCall&);
+    void operator=(const RPCCall&);
+
     uint32_t rpcvers;
     uint32_t prog;
     uint32_t vers;
     uint32_t proc;
     OpaqueAuth cred;
     OpaqueAuth verf;
+};
+
+// STUB
+class RPCReply : public RPCMessage
+{
+public:
+    RPCReply(XDRReader& in) : RPCMessage(in)
+    {
+    }
+    virtual ~RPCReply()
+    {
+    }
+
+private:
+    RPCReply(const RPCReply&);
+    void operator=(const RPCReply&);
 };
 
 } // namespace RPC

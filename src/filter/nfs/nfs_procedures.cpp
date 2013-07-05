@@ -1,4 +1,4 @@
-#include "nfs_struct.h"
+#include "nfs_procedures.h"
 
 namespace NST
 {
@@ -15,7 +15,6 @@ const char* Proc::titles[Proc::num] = {
       "readdir",    "readdirplus",  "fsstat",   "fsinfo",
       "pathconf",   "commit"
 };
-
 
 } // namespace NFS3
 } // namespace filter
