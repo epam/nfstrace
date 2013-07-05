@@ -25,6 +25,7 @@ struct Args
         SNAPLEN,
         MODE,
         OFILE,
+        VERBOSE,
         HELP,
         num,
     };

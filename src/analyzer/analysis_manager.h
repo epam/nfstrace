@@ -38,16 +38,17 @@ public:
     {
     }
 
-    void print_analyzer()
-    {
-        std::auto_ptr<BaseAnalyzer> a(new PrintAnalyzer);
-        analyzers.add(a.release());
-    }
-
-    NFSQueue& init(uint32_t q_size = 256, uint32_t q_limit = 16)
+    NFSQueue& init(bool verbose, uint32_t q_size = 256, uint32_t q_limit = 16)
     {
         queue.reset(new NFSQueue(q_size, q_limit));
         parser_thread.reset(new NFSParserThread(*queue, analyzers, status));
+
+        if(verbose) // add special analyzer for trace out RPC calls
+        {
+            std::auto_ptr<BaseAnalyzer> a(new PrintAnalyzer(std::clog));
+            analyzers.add(a.release());
+        }
+
         return *queue;
     }
 

@@ -69,6 +69,7 @@ int Controller::run()
 
 void Controller::init_runing()
 {
+    const bool verbose      = params[CLI::VERBOSE].to_bool();
     const std::string mode  = params[CLI::MODE];
     const std::string iface = params[CLI::INTERFACE];
     const std::string port  = params[CLI::PORT];
@@ -87,9 +88,8 @@ void Controller::init_runing()
     }
     else if(mode == "mon")   // online monitoring mode
     {
-        NFSQueue& queue = analyse.init();
+        NFSQueue& queue = analyse.init(verbose);
         filtration.capture_to_queue(queue, iface, filter, snaplen, ms);
-        analyse.print_analyzer();
     }
     else if(mode == "stat")   // offline analysis mode
     {
