@@ -82,7 +82,7 @@ public:
 
         nfs->rpc_len = sizeof(nfs->rpc_message);
         
-        uint32_t& size = nfs->rpc_len;
+        uint32_t size = nfs->rpc_len;
 
         reader.readto(size, (uint8_t*)nfs->rpc_message);
 

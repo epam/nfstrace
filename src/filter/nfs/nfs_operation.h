@@ -6,6 +6,8 @@
 #ifndef NFS_OPERATION_H
 #define NFS_OPERATION_H
 //------------------------------------------------------------------------------
+#include <memory>
+
 #include "../rpc/rpc_struct.h"
 #include "nfs_procedures.h"
 //------------------------------------------------------------------------------
@@ -37,49 +39,37 @@ public:
         return call != NULL;
     }
 
-    bool set_call(RPCCall* c)
-    {
-        if(call) return false;
-        call = c;
-        return true;
-    }
-    const RPCCall* get_call() const
+    inline const RPCCall* get_call() const
     {
         return call;
     }
-    bool is_call() const
+    inline bool is_call() const
     {
         return call != NULL;
     }
-    bool set_reply(RPCReply* c)
+    inline bool set_reply(std::auto_ptr<RPCReply>& r)
     {
-        if(reply) return false;
-        reply = c;
-        return true;
+        reply = r.release();
+        return reply != NULL;
     }
-    const RPCReply* get_reply() const
+    inline const RPCReply* get_reply() const
     {
         return reply;
     }
-    bool is_reply() const
+    inline bool is_reply() const
     {
-        return (reply) ? true : false;
+        return reply != NULL;
     }
 
-    operator int() const // Allow us use NFSOperation inside switch-block
+    inline operator int() const // Allow us use NFSOperation inside switch-block
     {
-        return procedure;
-    }
-    void set_procedure(ProcedureType type)
-    {
-        procedure = type;
+        return call->get_proc();
     }
 
 private:
     NFSOperation(const NFSOperation&);
     void operator=(const NFSOperation&);
 
-    ProcedureType procedure;
     RPCCall* call;
     RPCReply* reply;
 };

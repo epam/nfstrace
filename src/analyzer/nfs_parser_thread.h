@@ -94,160 +94,32 @@ private:
 
         switch(ops)
         {
-        case Proc::NFS_NULL:
-            {
-                call.reset(new NullArgs(reader));
-            }
-            break;
-        case Proc::NFS_GETATTR:
-            {
-                std::auto_ptr<GetAttrArgs> args(new GetAttrArgs(reader));
-                operation.set_procedure(Proc::NFS_GETATTR);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_SETATTR:
-            analyzers.call_setattr(data.session);
-            break;
-        case Proc::NFS_LOOKUP:
-            {
-                std::auto_ptr<LookUpArgs> args(new LookUpArgs(reader));
-                operation.set_procedure(Proc::NFS_LOOKUP);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_ACCESS:
-            {
-                std::auto_ptr<AccessArgs> args(new AccessArgs(reader));
-                operation.set_procedure(Proc::NFS_ACCESS);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_READLINK:
-            {
-                std::auto_ptr<ReadLinkArgs> args(new ReadLinkArgs(reader));
-                operation.set_procedure(Proc::NFS_READLINK);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_READ:
-            {
-                std::auto_ptr<ReadArgs> args(new ReadArgs(reader));
-                operation.set_procedure(Proc::NFS_READ);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_WRITE:
-            {
-                std::auto_ptr<WriteArgs> args(new WriteArgs(reader));
-                operation.set_procedure(Proc::NFS_WRITE);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_CREATE:
-            analyzers.call_create(data.session);
-            break;
-        case Proc::NFS_MKDIR:
-            analyzers.call_mkdir(data.session);
-            break;
-        case Proc::NFS_SYMLINK:
-            analyzers.call_symlink(data.session);
-            break;
-        case Proc::NFS_MKNOD:
-            analyzers.call_mknod(data.session);
-            break;
-        case Proc::NFS_REMOVE:
-            {
-                std::auto_ptr<RemoveArgs> args(new RemoveArgs(reader));
-                operation.set_procedure(Proc::NFS_GETATTR);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_RMDIR:
-            {
-                std::auto_ptr<RmDirArgs> args(new RmDirArgs(reader));
-                operation.set_procedure(Proc::NFS_RMDIR);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_RENAME:
-            {
-                std::auto_ptr<RenameArgs> args(new RenameArgs(reader));
-                operation.set_procedure(Proc::NFS_RENAME);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_LINK:
-            {
-                std::auto_ptr<LinkArgs> args(new LinkArgs(reader));
-                operation.set_procedure(Proc::NFS_LINK);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_READDIR:
-            {
-                std::auto_ptr<ReadDirArgs> args(new ReadDirArgs(reader));
-                operation.set_procedure(Proc::NFS_READDIR);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_READDIRPLUS:
-            {
-                std::auto_ptr<ReadDirPlusArgs> args(new ReadDirPlusArgs(reader));
-                operation.set_procedure(Proc::NFS_READDIRPLUS);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_FSSTAT:
-            {
-                std::auto_ptr<FSStatArgs> args(new FSStatArgs(reader));
-                operation.set_procedure(Proc::NFS_FSSTAT);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_FSINFO:
-            {
-                std::auto_ptr<FSInfoArgs> args(new FSInfoArgs(reader));
-                operation.set_procedure(Proc::NFS_FSINFO);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_PATHCONF:
-            {
-                std::auto_ptr<PathConfArgs> args(new PathConfArgs(reader));
-                operation.set_procedure(Proc::NFS_PATHCONF);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        case Proc::NFS_COMMIT:
-            {
-                std::auto_ptr<CommitArgs> args(new CommitArgs(reader));
-                operation.set_procedure(Proc::NFS_COMMIT);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
-            }
-            break;
-        default:
-            break;
+        case Proc::NFS_NULL:    call.reset(new NullArgs(reader));        break;
+        case Proc::GETATTR:     call.reset(new GetAttrArgs(reader));     break;
+        case Proc::SETATTR:     call.reset(new RPCCall(reader));         break;
+        case Proc::LOOKUP:      call.reset(new LookUpArgs(reader));      break;
+        case Proc::ACCESS:      call.reset(new AccessArgs(reader));      break;
+        case Proc::READLINK:    call.reset(new ReadLinkArgs(reader));    break;
+        case Proc::READ:        call.reset(new ReadArgs(reader));        break;
+        case Proc::WRITE:       call.reset(new WriteArgs(reader));       break;
+        case Proc::CREATE:      call.reset(new RPCCall(reader));         break;
+        case Proc::MKDIR:       call.reset(new RPCCall(reader));         break;
+        case Proc::SYMLINK:     call.reset(new RPCCall(reader));         break;
+        case Proc::MKNOD:       call.reset(new RPCCall(reader));         break;
+        case Proc::REMOVE:      call.reset(new RemoveArgs(reader));      break;
+        case Proc::RMDIR:       call.reset(new RmDirArgs(reader));       break;
+        case Proc::RENAME:      call.reset(new RenameArgs(reader));      break;
+        case Proc::LINK:        call.reset(new LinkArgs(reader));        break;
+        case Proc::READDIR:     call.reset(new ReadDirArgs(reader));     break;
+        case Proc::READDIRPLUS: call.reset(new ReadDirPlusArgs(reader)); break;
+        case Proc::FSSTAT:      call.reset(new FSStatArgs(reader));      break;
+        case Proc::FSINFO:      call.reset(new FSInfoArgs(reader));      break;
+        case Proc::PATHCONF:    call.reset(new PathConfArgs(reader));    break;
+        case Proc::COMMIT:      call.reset(new CommitArgs(reader));      break;
+        default:    return;
         }
         
-        // TODO: fix all PROC!!!
-        if(call.get() != NULL && call->get_proc() == Proc::NFS_NULL)
+        if(call.get() != NULL)
         {
             operation.set_call(call);
             analyzers.call(data.session, operation);
@@ -297,7 +169,7 @@ private:
                 }
             }
             break;
-    }
+        }
     }
 
 private:

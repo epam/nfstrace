@@ -30,16 +30,16 @@ public:
 
     virtual bool call_null          (const Session& session, const NFSOperation& operation) = 0;
     virtual bool call_getattr       (const Session& session, const NFSOperation& operation) = 0;
-    virtual bool call_setattr       (const Session& session/*, const NFSOperation& operation*/) = 0;
+    virtual bool call_setattr       (const Session& session, const NFSOperation& operation) = 0;
     virtual bool call_lookup        (const Session& session, const NFSOperation& operation) = 0;
     virtual bool call_access        (const Session& session, const NFSOperation& operation) = 0;
     virtual bool call_readlink      (const Session& session, const NFSOperation& operation) = 0;
     virtual bool call_read          (const Session& session, const NFSOperation& operation) = 0;
     virtual bool call_write         (const Session& session, const NFSOperation& operation) = 0;
-    virtual bool call_create        (const Session& session/*, const NFSOperation& operation*/) = 0;
-    virtual bool call_mkdir         (const Session& session/*, const NFSOperation& operation*/) = 0;
-    virtual bool call_symlink       (const Session& session/*, const NFSOperation& operation*/) = 0;
-    virtual bool call_mknod         (const Session& session/*, const NFSOperation& operation*/) = 0;
+    virtual bool call_create        (const Session& session, const NFSOperation& operation) = 0;
+    virtual bool call_mkdir         (const Session& session, const NFSOperation& operation) = 0;
+    virtual bool call_symlink       (const Session& session, const NFSOperation& operation) = 0;
+    virtual bool call_mknod         (const Session& session, const NFSOperation& operation) = 0;
     virtual bool call_remove        (const Session& session, const NFSOperation& operation) = 0;
     virtual bool call_rmdir         (const Session& session, const NFSOperation& operation) = 0;
     virtual bool call_rename        (const Session& session, const NFSOperation& operation) = 0;

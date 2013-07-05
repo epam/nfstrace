@@ -8,12 +8,12 @@ namespace NFS3
 {
     
 const char* Proc::titles[Proc::num] = {
-      "null",       "getattr",      "setattr",  "lookup",
-      "access",     "readlink",     "read",     "write",
-      "create",     "mkdir",        "symlink",  "mknod",
-      "remove",     "rmdir",        "rename",   "link",
-      "readdir",    "readdirplus",  "fsstat",   "fsinfo",
-      "pathconf",   "commit"
+      "NULL",       "GETATTR",      "SETATTR",  "LOOKUP",
+      "ACCESS",     "READLINK",     "READ",     "WRITE",
+      "CREATE",     "MKDIR",        "SYMLINK",  "MKNOD",
+      "REMOVE",     "RMDIR",        "RENAME",   "LINK",
+      "READDIR",    "READDIRPLUS",  "FSSTAT",   "FSINFO",
+      "PATHCONF",   "COMMIT"
 };
 
 } // namespace NFS3
