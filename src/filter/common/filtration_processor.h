@@ -64,13 +64,13 @@ struct FiltrationData
 
         if(header->version() != 4) // fragmented payload
         {
-            std::cout << "is not IPv4" << std::endl;
+        //    std::cout << "is not IPv4" << std::endl;
             return 0;
         }
         
         if(total_len > len) // fragmented payload
         {
-            std::cout << "IPv4 packet is fragmented" << std::endl;
+        //    std::cout << "IPv4 packet is fragmented" << std::endl;
             return 0;
         }
 
@@ -404,7 +404,7 @@ public:
 
     inline void set_discard_size(const uint32_t n)
     {
-        std::clog << "set size of discard payload: " << n << std::endl;
+    //    std::clog << "set size of discard payload: " << n << std::endl;
         int32_t to_discard = n - length;
         if(to_discard > 0)
         {
@@ -528,20 +528,31 @@ public:
         return false;
     }
 
-    void readto(uint32_t& size, uint8_t*const data)
+    bool readto(FilteredData* ptr)
     {
-        size = std::min(hdr_len, size);
-        stream->readout(data, size);
-
-        assert(msg_len >= hdr_len);
-
-        uint32_t to_skip = msg_len - size;
-        if(to_skip)
+        Fragment* frag = stream->first;
+        assert(frag);
+        if(frag)
         {
-            stream->set_discard_size(to_skip);
-        }
+            ptr->timestamp = frag->pcap_header.ts; // set timestamp as ts of first fragment
 
-        msg_len = 0;
+            ptr->dlen = std::min(hdr_len, ptr->dlen);
+            stream->readout(ptr->data, ptr->dlen);
+
+            assert(msg_len >= hdr_len);
+
+            uint32_t to_skip = msg_len - ptr->dlen;
+            if(to_skip)
+            {
+                stream->set_discard_size(to_skip);
+            }
+
+            msg_len = 0;
+
+            return true;
+        }
+        
+        return false;
     }
 
 private:
@@ -626,17 +637,17 @@ private:
                     }
                     else
                     {
-                        std::cerr << "unknown RPC call(?) of program:" << call->prog()
+               /*         std::cerr << "unknown RPC call(?) of program:" << call->prog()
                                   << " v: "                            << call->vers()
                                   << " procedure: "                    << call->proc()
-                                  << '\n';
+                                  << '\n';*/
                         hdr_len = 0;  // dont collect header
                         return true;
                     }
                 }
                 else
                 {   // ERROR stream is corrupt
-                    std::cerr << "unknown RPC call(?)\n";
+               //     std::cerr << "unknown RPC call(?)\n";
                     msg_len = 0;
                     return false;
                 }
@@ -651,7 +662,7 @@ private:
                 }
                 else
                 {   // ERROR stream is corrupt
-                    std::cerr << "unknown RPC reply(?)\n";
+            //        std::cerr << "unknown RPC reply(?)\n";
                     msg_len = 0;
                     return false;
                 }
@@ -659,7 +670,7 @@ private:
             break;
             default:
             {
-                std::cerr << "unknown RPC message type(?)\n";
+            //    std::cerr << "unknown RPC message type(?)\n";
                 msg_len = 0;
                 return false;
             }

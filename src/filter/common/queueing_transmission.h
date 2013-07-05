@@ -7,7 +7,6 @@
 #define QUEUEING_TRANSMISSION_H
 //------------------------------------------------------------------------------
 #include <algorithm> // for std::min()
-#include <memory> // for std::auto_ptr
 #include <string>
 
 #include "../../auxiliary/filtered_data.h"
@@ -76,13 +75,10 @@ public:
 
         nfs->dlen = sizeof(nfs->data);
 
-        uint32_t& size = nfs->dlen;
-
-        reader.readto(size, (uint8_t*)nfs->data);
-
-        //nfs->timestamp = data.header->ts;
-
-        nfs.push();
+        if(reader.readto(nfs))
+        {
+            nfs.push();
+        }
     }
 
 private:
