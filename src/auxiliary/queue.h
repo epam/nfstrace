@@ -26,6 +26,29 @@ class Queue
 
 public:
 
+    class Allocated
+    {
+    public:
+        inline Allocated(Queue& q):queue(&q)
+        {
+            ptr = queue->allocate();
+        }
+        inline ~Allocated()
+        {
+            queue->push(ptr);
+        }
+
+        inline    operator T*const() const { return ptr; }
+        inline T*const operator ->() const { return ptr; }
+
+    private:
+        Allocated(const Allocated&);            // undefined
+        Allocated& operator=(const Allocated&); // undefined
+    
+        Queue*const queue;
+        T*            ptr;
+    };
+
     class List  // List of elements for client code
     {
     friend class Queue;

@@ -90,14 +90,13 @@ private:
         XDRReader reader((uint8_t*)data.rpc_message, data.rpc_len);
         NFSOperation operation;
 
+        std::auto_ptr<RPCCall> call;
+
         switch(ops)
         {
         case Proc::NFS_NULL:
             {
-                std::auto_ptr<NullArgs> args(new NullArgs(reader));
-                operation.set_procedure(Proc::NFS_NULL);
-                operation.set_call(args.release());
-                analyzers.call(data.session, operation);
+                call.reset(new NullArgs(reader));
             }
             break;
         case Proc::NFS_GETATTR:
@@ -245,6 +244,13 @@ private:
             break;
         default:
             break;
+        }
+        
+        // TODO: fix all PROC!!!
+        if(call.get() != NULL && call->get_proc() == Proc::NFS_NULL)
+        {
+            operation.set_call(call);
+            analyzers.call(data.session, operation);
         }
     }
 

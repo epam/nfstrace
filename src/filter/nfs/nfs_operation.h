@@ -31,6 +31,12 @@ public:
         delete reply;
     }
 
+    inline bool set_call(std::auto_ptr<RPCCall>& c)
+    {
+        call = c.release();
+        return call != NULL;
+    }
+
     bool set_call(RPCCall* c)
     {
         if(call) return false;
@@ -43,7 +49,7 @@ public:
     }
     bool is_call() const
     {
-        return (call) ? true : false;
+        return call != NULL;
     }
     bool set_reply(RPCReply* c)
     {

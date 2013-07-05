@@ -103,7 +103,7 @@ public:
     }         
     uint32_t get_proc() const
     {
-        return prog;
+        return proc;
     }
     const OpaqueAuth& get_cred() const
     {
