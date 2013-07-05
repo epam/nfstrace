@@ -8,6 +8,7 @@
 
 #include "cmdline_args.h"
 #include "controller.h"
+#include "../auxiliary/filtered_data.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -17,7 +18,7 @@ namespace controller
 
 typedef cmdline::Args CLI;  // short alias for structure of cli-arguments
 
-Controller::Controller() : sig_handler(status), filtration(status), analyse(status)
+Controller::Controller() : sig_handler(status), filtration(status), analysis(status)
 {
 }
 
@@ -47,7 +48,7 @@ int Controller::run()
 
     // Start modules to processing
     filtration.start();
-    analyse.start();
+    analysis.start();
 
     // Waiting some exception or user-signal for handling
     // TODO: add code for recovery processing
@@ -58,7 +59,7 @@ int Controller::run()
     catch(...)
     {
         filtration.stop();
-        analyse.stop();
+        analysis.stop();
         status.print(std::cerr);
         sig_handler.stop();
         throw;
@@ -88,7 +89,8 @@ void Controller::init_runing()
     }
     else if(mode == "mon")   // online monitoring mode
     {
-        NFSQueue& queue = analyse.init(verbose);
+        NST::auxiliary::FilteredDataQueue& queue = analysis.init(verbose);
+
         filtration.capture_to_queue(queue, iface, filter, snaplen, ms);
     }
     else if(mode == "stat")   // offline analysis mode

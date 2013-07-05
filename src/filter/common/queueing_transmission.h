@@ -10,16 +10,11 @@
 #include <memory> // for std::auto_ptr
 #include <string>
 
-#include <iostream>
-
+#include "../../auxiliary/filtered_data.h"
 #include "filtration_processor.h"
-#include "../../analyzer/nfs_data.h"
-#include "../../auxiliary/queue.h"
 //------------------------------------------------------------------------------
-using NST::analyzer::NFSData;
-using NST::auxiliary::Queue;
-
-typedef NST::analyzer::NFSData::Session NFSSession;
+using NST::auxiliary::FilteredData;
+using NST::auxiliary::FilteredDataQueue;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -28,9 +23,8 @@ namespace filter
 
 class QueueingTransmission
 {
-    typedef Queue<NFSData> Buffer;
 public:
-    QueueingTransmission(Buffer& b) : buffer(b)
+    QueueingTransmission(FilteredDataQueue& q) : queue(q)
     {
     }
     ~QueueingTransmission()
@@ -43,57 +37,59 @@ public:
 
     void collect(const FiltrationData& data)
     {
-        NFSData* nfs = buffer.allocate();
+        FilteredDataQueue::ElementPtr nfs(queue);
 
         nfs->timestamp = data.header->ts;
 
         // TODO: addresses and ports must be ordered for correct TCP sessions matching
         if(data.ipv4_header)
         {
-            nfs->session.ip_type = NFSData::Session::v4;
+            nfs->session.ip_type = FilteredData::Session::v4;
             nfs->session.ip.v4.addr[0] = data.ipv4_header->src();
             nfs->session.ip.v4.addr[1] = data.ipv4_header->dst();
         }
 
         if(data.tcp_header)
         {
-            nfs->session.type = NFSData::Session::TCP;
+            nfs->session.type = FilteredData::Session::TCP;
             nfs->session.port[0] = data.tcp_header->sport();
             nfs->session.port[1] = data.tcp_header->dport();
         }
 
-        nfs->rpc_len = std::min(data.rpc_length, sizeof(nfs->rpc_message));
-        memcpy(nfs->rpc_message, data.rpc_header, nfs->rpc_len);
+        nfs->dlen = std::min(data.rpc_length, sizeof(nfs->data));
+        memcpy(nfs->data, data.rpc_header, nfs->dlen);
 
-        buffer.push(nfs);
+        nfs.push();
     }
 
     void collect(Nodes::Direction d, const Nodes& key, RPCReader& reader)
     {
-        Queue<NFSData>::Allocated nfs(buffer);
+        FilteredDataQueue::ElementPtr nfs(queue);
 
-        nfs->session.ip_type = NFSData::Session::v4;
+        nfs->session.ip_type = FilteredData::Session::v4;
         nfs->session.ip.v4.addr[0] = key.src_address(d);
         nfs->session.ip.v4.addr[1] = key.dst_address(d);
 
-        nfs->session.type = NFSData::Session::TCP;
+        nfs->session.type = FilteredData::Session::TCP;
         nfs->session.port[0] = key.src_port(d);
         nfs->session.port[1] = key.dst_port(d);
 
-        nfs->rpc_len = sizeof(nfs->rpc_message);
-        
-        uint32_t size = nfs->rpc_len;
+        nfs->dlen = sizeof(nfs->data);
 
-        reader.readto(size, (uint8_t*)nfs->rpc_message);
+        uint32_t& size = nfs->dlen;
+
+        reader.readto(size, (uint8_t*)nfs->data);
 
         //nfs->timestamp = data.header->ts;
+
+        nfs.push();
     }
 
 private:
     QueueingTransmission(const QueueingTransmission&);            // undefined
     QueueingTransmission& operator=(const QueueingTransmission&); // undefined
 
-    Buffer& buffer;
+    FilteredDataQueue& queue;
 };
 
 } // namespace filter

@@ -6,9 +6,9 @@
 #ifndef BASE_ANALYZER_H
 #define BASE_ANALYZER_H
 //------------------------------------------------------------------------------
+#include "../auxiliary/filtered_data.h"
 #include "../filter/nfs/nfs_operation.h"
 #include "../filter/nfs/nfs_struct.h"
-#include "nfs_data.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::NFS3;
 //------------------------------------------------------------------------------
@@ -19,8 +19,9 @@ namespace analyzer
 
 class BaseAnalyzer
 {
-    typedef NFSData::Session Session;
 public:
+    typedef NST::auxiliary::FilteredData::Session Session;
+
     BaseAnalyzer()
     {
     }

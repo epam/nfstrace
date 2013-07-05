@@ -26,33 +26,53 @@ class Queue
 
 public:
 
-    class Allocated
+    class ElementPtr
     {
     public:
-        inline Allocated(Queue& q):queue(&q)
+        inline ElementPtr(Queue& q):queue(&q)
         {
             ptr = queue->allocate();
         }
-        inline ~Allocated()
+        inline ~ElementPtr()
+        {
+            if(ptr) // isn't explicitly pushed back to queue?
+            {
+                queue->deallocate(ptr);
+            }
+        }
+
+        inline void push()
         {
             queue->push(ptr);
+            ptr = NULL;
         }
 
         inline    operator T*const() const { return ptr; }
         inline T*const operator ->() const { return ptr; }
 
     private:
-        Allocated(const Allocated&);            // undefined
-        Allocated& operator=(const Allocated&); // undefined
+        ElementPtr(const ElementPtr&);            // undefined
+        ElementPtr& operator=(const ElementPtr&); // undefined
     
         Queue*const queue;
         T*            ptr;
     };
 
-    class List  // List of elements for client code
+    class ElementList  // List of elements for client code
     {
     friend class Queue;
     public:
+        inline ElementList(Queue& q):queue(&q)
+        {
+            ptr = queue->pop_list();
+        }
+        inline ~ElementList()
+        {
+            while(ptr)
+            {
+                free_current();
+            }
+        }
 
         inline operator bool() const { return ptr;       } // is empty?
         inline const T& data() const { return ptr->data; } // get data
@@ -62,23 +82,9 @@ public:
             queue->deallocate(ptr);
             ptr = tmp;
         }
-
-        inline List(Element* first, Queue* q):ptr(first),queue(q){}
-        inline List(const List& list):ptr(list.ptr),queue(list.queue)
-        {
-            // move elements from list to this, without deallocation in list
-            list.ptr   = NULL;
-            list.queue = NULL;
-        }
-        inline ~List()
-        {
-            while(ptr)
-            {
-                free_current();
-            }
-        }
     private:
-        List& operator=(const List&); // undefined
+        ElementList(const ElementList&);            // undefined
+        ElementList& operator=(const ElementList&); // undefined
 
         mutable Element* ptr;
         mutable Queue* queue;
@@ -99,6 +105,12 @@ public:
         return (e) ? &(e->data) : NULL;
     }
 
+    inline void deallocate(T* ptr)
+    {
+        Element* e = (Element*)( ((char*)ptr) - sizeof(Element*) );
+        deallocate(e);
+    }
+
     inline void push(T* data)
     {
         Element* e = (Element*)( ((char*)data) - sizeof(Element*) );
@@ -114,17 +126,20 @@ public:
             }
     }
 
-    inline List pop_list() // take out list of all queued elements
+    inline Element* pop_list() // take out list of all queued elements
     {
         Element* list = NULL;
-        if(last)    // a reader will check this pointer without locking spinlock
+        if(last)
         {
             Spinlock::Lock lock(q_spinlock);
-                last->prev = NULL;  // set end of list
-                list = first;
-                last = first = NULL;
+                if(last)
+                {
+                    list = first;
+                    last->prev = NULL;  // set end of list
+                    last = first = NULL;
+                }
         }
-        return List(list, this);
+        return list;
     }
 
 private:

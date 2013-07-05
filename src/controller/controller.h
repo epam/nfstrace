@@ -24,7 +24,6 @@ namespace controller
 
 class Controller
 {
-    typedef Queue<NFSData> NFSQueue;
 public:
     Controller();
     ~Controller();
@@ -39,15 +38,15 @@ private:
     // this object stores command-line parameters of the application
     cmdline::Params params;
 
-    // Container for generated exceptions
+    // container for generated exceptions
     RunningStatus status;
 
-    // Signal handler. Working in its own thread.
+    // signal handler. Working in its own thread
     SynchronousSignalHandling sig_handler;
 
-    // Controller contains instances of modules
+    // controller contains instances of modules
     FiltrationManager filtration;
-    AnalysisManager analyse;
+    AnalysisManager   analysis;
 };
 
 } // namespace controller

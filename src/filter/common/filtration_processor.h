@@ -12,21 +12,18 @@
 #include <string>
 #include <sstream>
 
-
 #include <tr1/unordered_map>
-
-
 
 #include <pcap/pcap.h>
 
-
-#include "../../analyzer/nfs_data.h"
+#include "../../auxiliary/filtered_data.h"
 #include "../ethernet/ethernet_header.h"
 #include "../ip/ipv4_header.h"
 #include "../rpc/rpc_message.h"
 #include "../tcp/tcp_header.h"
 //------------------------------------------------------------------------------
-using NST::analyzer::NFSData;
+using NST::auxiliary::FilteredData;
+using NST::auxiliary::FilteredDataQueue;
 using namespace NST::filter::rpc;
 using namespace NST::filter::ethernet;
 using namespace NST::filter::ip;
@@ -576,14 +573,14 @@ private:
         assert(msg_len == 0);
         //assert(hdr_len == 0);
         
-        
+        /*
         RPCValidator
         <
         100003, // SunRPC/NFS program
         3,      // v3
         0,      // NFSPROC3_NULL
         21      // NFSPROC3_COMMIT
-        > nfs3_validator;
+        > nfs3_validator;*/
 
         // required data size for validation next record mark and a RPC message
         static const uint32_t max_header = sizeof(RecordMark) + std::max(sizeof(CallHeader), sizeof(ReplyHeader));
