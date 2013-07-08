@@ -121,7 +121,6 @@ struct FiltrationData
     // Sun RPC
     const rpc::MessageHeader*       rpc_header;
     size_t                          rpc_length;
-    size_t                          msg_len;
 };
 
 
