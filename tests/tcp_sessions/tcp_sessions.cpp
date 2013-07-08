@@ -29,7 +29,6 @@
 #include <signal.h>
 #include <iomanip>
 
-#include "../../src/analyzer/nfs_data.h"
 #include "../../src/auxiliary/spinlock.h"
 #include "../../src/controller/cmdline_parser.h"
 #include "../../src/filter/pcap/pcap_error.h"
@@ -40,7 +39,6 @@
 #include "../../src/filter/rpc/rpc_message.h"
 #include "../../src/filter/tcp/tcp_header.h"
 //------------------------------------------------------------------------------
-using NST::analyzer::NFSData;
 using NST::auxiliary::Spinlock;
 using NST::filter::pcap::PcapError;
 using NST::filter::pcap::CaptureReader;

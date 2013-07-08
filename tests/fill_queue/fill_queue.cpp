@@ -35,7 +35,7 @@ void push(Queue& queue, unsigned int n)
 
 void pop_print(Queue& queue)
 {
-    Queue::List list = queue.pop_list(); // take out list of all queued elements
+    Queue::ElementList list(queue); // take out list of all queued elements
     assert(queue.pop_list() == false); // empty queue
     std::cout << "queued elements: ";
     while(list) // loop over all taken elements
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
     push(queue, 40);
     {
-        Queue::List list = queue.pop_list();
+        Queue::ElementList list(queue);
         assert(queue.pop_list() == false); // empty queue
     }
 

@@ -8,7 +8,7 @@ CFLAGS+=$(DEBUG_FLAGS)
 
 
 # list of all tests directories
-DIRS:=$(shell find $(TESTS_DIR) -maxdepth 1 -type d ! -name ".*" -printf "%f\n")
+DIRS:=$(shell find $(TESTS_DIR) -maxdepth 1 -type d ! -name ".*" -exec basename {} \;)
 
 # find all object files in OBJ_DIR folder
 OBJS:=$(shell find $(OBJ_DIR) -type f -name "*.o" )
