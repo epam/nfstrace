@@ -147,7 +147,7 @@ struct Fragment
 
         frag->len           = info.header->len;
         frag->data          = ((uint8_t*)pcap_data) + (info.data - info.packet);
-        frag->dlen          = info.dlen;// data.ipv4_header->length() - (data.ipv4_header->ihl() + data.tcp_header->offset());
+        frag->dlen          = info.dlen;
 
         return frag;
     }
@@ -227,7 +227,7 @@ public:
 
         if(discard)
         {
-            std::clog << "discard new fragment: " << fragment->dlen << std::endl;
+        //    std::clog << "discard new fragment: " << fragment->dlen << std::endl;
             if(discard >= fragment->dlen) // discard whole new fragment
             {
                 discard -= fragment->dlen;
@@ -726,10 +726,8 @@ public:
                             if ( current->dlen > new_pos )
                             {
                                 has_data = true;
-                                current->data     += new_pos;
+                                current->data += new_pos;
                                 current->dlen -= new_pos;
-                          //      sc->dlen = current->dlen - new_pos;
-                          //      write_packet_data( idx, sc, current->data + new_pos );
                             }
 
                         }
@@ -744,9 +742,7 @@ public:
                         {
                           fragments = current->next;
                         }
-                   //     g_free( current->data );
-                   //     g_free( current );
-                   
+
                         if(has_data)
                         {
                             stream.push(current);
@@ -778,9 +774,6 @@ public:
                         }
 
                         stream.push(current);
-                        
-                    //    g_free( current->data );
-                    //    g_free( current );
                         return true;
                     }
                     prev = current;
@@ -805,22 +798,18 @@ public:
             }
             return false;
         }
-        
-        
-        
+
         void reassemble(PacketInfo& info)
         {
             uint32_t seq = info.tcp->seq();
-            uint32_t len = info.ipv4->length() - (info.ipv4->ihl() + info.tcp->offset());
-            
-            //info.dlen;
+            uint32_t len = info.dlen;
 
             if( sequence == 0 ) // this is the first time we have seen this src's sequence number
             {
                 sequence = seq + len;
                 if( info.tcp->is(tcp_header::SYN) )
                 {
-            //        std::cout << "SYN flag" << '\n';
+                //    std::cout << "SYN flag!!!!!!!!!!!!!!!!!!!" << '\n';
                     sequence++;
                 }
             //    std::cout << "sequence number: " << sequence << '\n';
@@ -865,7 +854,7 @@ public:
                         info.data += new_len;
                         info.dlen -= new_len;
                     }
-               //     sc.dlen = tcp_dlen;
+
                     seq = sequence;
                     len = newseq - sequence;
 
@@ -881,10 +870,8 @@ public:
                 if( info.data && info.dlen > 0)
                 {
                     stream.push(info);
-                //    write_packet_data( src_index, &sc, data );
                 }
                 // done with the packet, see if it caused a fragment to fit
-            //    while( check_fragments( src_index, &sc, 0 ) );
                 while( check_fragments(0) );
             }
             else // out of order packet
@@ -893,12 +880,6 @@ public:
                 {
                     Fragment* frag = Fragment::create(info);
 
-             //       tmp_frag = (tcp_frag *)g_malloc( sizeof( tcp_frag ) );
-             //       tmp_frag->data = (gchar *)g_malloc( dlength );
-             //       tmp_frag->seq = sequence;
-             //       tmp_frag->len = length;
-             //       tmp_frag->dlen = dlength;
-             //       memcpy( tmp_frag->data, data, dlength );
                     if( fragments )
                     {
                         frag->next = fragments;
