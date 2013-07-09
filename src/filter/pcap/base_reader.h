@@ -6,6 +6,8 @@
 #ifndef BASE_READER_H
 #define BASE_READER_H
 //------------------------------------------------------------------------------
+#include <ostream>
+
 #include <pcap/pcap.h>
 
 #include "handle.h"
@@ -43,8 +45,12 @@ public:
         return -1 != pcap_loop(handle, count, callback, (u_char*)user);
     }
 
-    inline void          break_loop() { pcap_breakloop(handle); }
+    inline void          break_loop()       { pcap_breakloop(handle); }
     inline const Handle& get_handle() const { return handle; }
+
+    inline int             datalink() const { return pcap_datalink(handle); }
+    inline static const char* datalink_name        (const int dlt) { return pcap_datalink_val_to_name(dlt);        }
+    inline static const char* datalink_description (const int dlt) { return pcap_datalink_val_to_description(dlt); }
 
     std::string last_error() const { return std::string(pcap_geterr(handle)); }
 

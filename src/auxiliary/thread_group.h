@@ -6,8 +6,8 @@
 #ifndef TREAD_GROUP_H
 #define TREAD_GROUP_H
 //------------------------------------------------------------------------------
-#include <list>
 #include <iostream>
+#include <list>
 
 #include "thread.h"
 //------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ namespace auxiliary
 {
 
 class ThreadGroup
-{    
+{
     typedef std::list<Thread*> list;
 
 public:

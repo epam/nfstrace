@@ -24,7 +24,7 @@ public:
     }
     virtual ~Thread()
     {
-        if((thread != 0) && (!is_detached)) 
+        if((thread != 0) && (!is_detached))
         {
             join();
         }
@@ -39,7 +39,7 @@ public:
     {   
         pthread_attr_t attr;
         pthread_attr_init(&attr);
-        if(is_detached) 
+        if(is_detached)
         {
             pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
         }

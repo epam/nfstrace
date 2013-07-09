@@ -7,7 +7,7 @@
 #define CAPTURE_READER_H
 //------------------------------------------------------------------------------
 #include <string>
-#include <iostream>
+#include <ostream>
 
 #include "base_reader.h"
 //------------------------------------------------------------------------------
@@ -34,10 +34,7 @@ public:
 
     inline bool set_buffer_size(int size) { return 0 == pcap_set_buffer_size(handle, size); }
     inline void set_direction(Direction d) { pcap_setdirection(handle,(pcap_direction_t)d); }
-
-    inline int  datalink       () { return pcap_datalink(handle); }
     void        print_statistic(std::ostream& out) const;
-    void        print_datalink (std::ostream& out) const;
 };
 
 } // namespace pcap
