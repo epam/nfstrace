@@ -61,7 +61,9 @@ public:
 
     uint32_t dlen;       // length of filtered payload
     uint8_t  data[4000]; // raw filtered data in network byte order
-
+private:
+    FilteredData(const FilteredData&);
+    void operator=(const FilteredData&);
 } __attribute__ ((__packed__));
 
 typedef Queue<FilteredData> FilteredDataQueue;

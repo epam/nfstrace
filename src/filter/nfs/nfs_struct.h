@@ -52,6 +52,38 @@ private:
     OpaqueDyn file;     // File handle
 };
 
+class SetAttrArgs : public RPCCall
+{
+public:
+    SetAttrArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> object;
+        attr = "NOT IMPLEMENTED";
+        guard_attr = "NOT IMPLEMENTED";
+    }
+    virtual ~SetAttrArgs()
+    {
+    }
+
+    const OpaqueDyn& get_object() const
+    {
+        return object;
+    }
+    const std::string& get_attr() const
+    {
+        return attr;
+    }
+    const std::string& get_guard_attr() const
+    {
+        return guard_attr;
+    }
+
+private:
+    OpaqueDyn object;     // File handle
+    std::string attr;
+    std::string guard_attr;
+};
+
 class LookUpArgs : public RPCCall
 {
 public:
@@ -185,6 +217,37 @@ private:
     uint64_t  offset;
     uint32_t  count;
     uint32_t  stable;
+};
+
+class CreateArgs : public RPCCall
+{
+public:
+    CreateArgs(XDRReader& in) : RPCCall(in)
+    {
+    }
+    virtual ~CreateArgs()
+    {
+    }
+};
+
+class MkDirArgs : public RPCCall
+{
+public:
+    MkDirArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> dir;
+
+        OpaqueDyn tmp;
+        in >> tmp;
+        name = std::string(tmp.data.begin(), tmp.data.end());
+    }
+    virtual ~MkDirArgs()
+    {
+    }
+
+private:
+    OpaqueDyn dir;      // File handle
+    std::string name;   // File name
 };
 
 class RemoveArgs : public RPCCall

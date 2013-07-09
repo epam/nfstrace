@@ -18,6 +18,7 @@
 #include "../filter/nfs/nfs_struct.h"
 #include "../filter/xdr/xdr_reader.h"
 #include "analyzers.h"
+#include "rpc_sessions.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::NFS3; // enum Ops;
 using namespace NST::filter::XDR;
@@ -83,7 +84,7 @@ private:
             {
                 const FilteredData& data = list.data();
                 parse_rpc(data);
-                list.free_current();
+                //list.free_current();
             }
         }
     }
@@ -109,7 +110,12 @@ private:
                 if(vers != 3)       return;  // NFS v3
                 if(proc < 0 || proc > 21) return;
 
-                parse_rpc_call((Proc::Ops)proc, rpc);
+                std::auto_ptr<RPCCall> c = parse_rpc_call((Proc::Ops)proc, rpc);
+                if(c.get() != NULL)
+                {
+                    RPCSession* session = sessions.get_session(rpc.session, RPCSessions::DIRECT);
+                    session->register_call(c, rpc.timestamp);
+                }
             }
             break;
         case SUNRPC_REPLY:
@@ -121,6 +127,14 @@ private:
                     case SUNRPC_MSG_ACCEPTED:
                     {
                         // TODO: check accepted reply
+                        std::auto_ptr<RPCReply> r = parse_rpc_reply(rpc);
+                        if(r.get() != NULL)
+                        {
+                            RPCSession* session = sessions.get_session(rpc.session, RPCSessions::REVERSE);
+                            RPCSession::Iterator i = session->confirm_call(r, rpc.timestamp);
+                            //assert(i->second);
+                            analyzers.call(session->get_session(), *i->second);
+                        }
                     }
                     break;
                     case SUNRPC_MSG_DENIED:
@@ -134,10 +148,9 @@ private:
         }
     }
 
-    void parse_rpc_call(Proc::Ops ops, const FilteredData& rpc)
+    std::auto_ptr<RPCCall> parse_rpc_call(Proc::Ops ops, const FilteredData& rpc)
     {
         XDRReader reader((uint8_t*)rpc.data, rpc.dlen);
-
         std::auto_ptr<RPCCall> call;
 
         switch(ops)
@@ -164,21 +177,23 @@ private:
         case Proc::FSINFO:      call.reset(new FSInfoArgs     (reader)); break;
         case Proc::PATHCONF:    call.reset(new PathConfArgs   (reader)); break;
         case Proc::COMMIT:      call.reset(new CommitArgs     (reader)); break;
-        default:    return;
+        default:    break;
         }
-        
-        if(call.get() != NULL)
-        {
-            NFSOperation operation;
-            operation.set_call(call);
-            analyzers.call(rpc.session, operation);
-        }
+
+        return call;    
+    }
+    std::auto_ptr<RPCReply> parse_rpc_reply(const FilteredData& rpc)
+    {
+        XDRReader reader((uint8_t*)rpc.data, rpc.dlen);
+        std::auto_ptr<RPCReply> reply(new RPCReply(reader));
+        return reply;
     }
 
 private:
     RunningStatus& status;
     Analyzers& analyzers;
     FilteredDataQueue& queue;
+    RPCSessions sessions;
     volatile bool exec;
 };
 
