@@ -32,17 +32,9 @@ public:
     {
     }
 
-    void discard(const FiltrationData& data)
-    {
-    }
-
-    void collect(const FiltrationData& data)
-    {
-        dumper->dump(data.header, data.packet);
-    }
-
     void collect(Nodes::Direction d, const Nodes& key, RPCReader& reader)
     {
+        reader.readto(*dumper);
     }
 
 private:

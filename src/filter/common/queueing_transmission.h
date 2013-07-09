@@ -30,37 +30,6 @@ public:
     {
     }
 
-    void discard(const FiltrationData& data)
-    {
-    }
-
-    void collect(const FiltrationData& data)
-    {
-        FilteredDataQueue::ElementPtr nfs(queue);
-
-        nfs->timestamp = data.header->ts;
-
-        // TODO: addresses and ports must be ordered for correct TCP sessions matching
-        if(data.ipv4_header)
-        {
-            nfs->session.ip_type = FilteredData::Session::v4;
-            nfs->session.ip.v4.addr[0] = data.ipv4_header->src();
-            nfs->session.ip.v4.addr[1] = data.ipv4_header->dst();
-        }
-
-        if(data.tcp_header)
-        {
-            nfs->session.type = FilteredData::Session::TCP;
-            nfs->session.port[0] = data.tcp_header->sport();
-            nfs->session.port[1] = data.tcp_header->dport();
-        }
-
-        nfs->dlen = std::min(data.rpc_length, sizeof(nfs->data));
-        memcpy(nfs->data, data.rpc_header, nfs->dlen);
-
-        nfs.push();
-    }
-
     void collect(Nodes::Direction d, const Nodes& key, RPCReader& reader)
     {
         FilteredDataQueue::ElementPtr nfs(queue);

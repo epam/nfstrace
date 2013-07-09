@@ -63,14 +63,6 @@ void CaptureReader::print_statistic(std::ostream& out) const
     }
 }
 
-void CaptureReader::print_datalink(std::ostream& out) const
-{
-    const int dlt = pcap_datalink(handle);
-
-    out << "datalink type:" << pcap_datalink_val_to_name(dlt) << std::endl;
-    out << "datalink description:" << pcap_datalink_val_to_description(dlt) << std::endl;
-}
-
 } // namespace pcap
 } // namespace filter
 } // namespace NST

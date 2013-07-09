@@ -16,112 +16,21 @@
 
 #include <pcap/pcap.h>
 
+#include "../../auxiliary/exception.h"
 #include "../../auxiliary/filtered_data.h"
-#include "../ethernet/ethernet_header.h"
-#include "../ip/ipv4_header.h"
-#include "../rpc/rpc_message.h"
-#include "../tcp/tcp_header.h"
+#include "../packet_info.h"
+#include "../pcap/packet_dumper.h"
 //------------------------------------------------------------------------------
+using NST::auxiliary::Exception;
 using NST::auxiliary::FilteredData;
 using NST::auxiliary::FilteredDataQueue;
-using namespace NST::filter::rpc;
-using namespace NST::filter::ethernet;
-using namespace NST::filter::ip;
-using namespace NST::filter::tcp;
+using NST::filter::pcap::PacketDumper;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filter
 {
 
-struct FiltrationData
-{
-
-    // validation methods return packet length without header they validate or 0 on error
-    uint32_t validate_eth(uint32_t len, const uint8_t* packet)
-    {
-        if(len < sizeof(EthernetHeader)) return 0;
-
-        EthernetHeader* header = (EthernetHeader*)packet;
-
-        eth_header = header;
-
-        return len - sizeof(EthernetHeader);
-    }
-
-    uint32_t validate_ipv4(uint32_t len, const uint8_t* packet)
-    {
-        if(len < sizeof(IPv4Header)) return 0;   // fragmented IPv4 header
-        
-        IPv4Header* header = (IPv4Header*)packet;
-        
-        const uint16_t total_len = header->length();
-        
-     /*   if(total_len != len)
-        {
-            std::cout << "IP len: " << total_len << " RAW len: " << len << "\n";
-        }*/
-
-        if(header->version() != 4) // fragmented payload
-        {
-        //    std::cout << "is not IPv4" << std::endl;
-            return 0;
-        }
-        
-        if(total_len > len) // fragmented payload
-        {
-        //    std::cout << "IPv4 packet is fragmented" << std::endl;
-            return 0;
-        }
-
-        ipv4_header = header;
-
-        assert(ipv4_header->length() <= len);
-
-        return len - header->ihl();
-    }
-
-    uint32_t validate_tcp(uint32_t len, const uint8_t* packet)
-    {
-        if(len < sizeof(TCPHeader)) return 0;   // fragmented TCP header
-
-        TCPHeader* header = (TCPHeader*)packet;
-        uint8_t offset = header->offset();
-        if(offset < 20 || offset > 60) return 0; // invalid length of TCP header
-
-        if(len < offset) return 0;
-
-        tcp_header = header;
-
-        tcp_data = packet + offset;
-
-
-        tcp_dlen  = ipv4_header->length() - (ipv4_header->ihl() + offset);
-        //tcp_dlen = len - offset;
-
-        return len - offset;
-    }
-
-        // libpcap structures
-    const pcap_pkthdr*              header;
-    const uint8_t*                  packet;
-    // TODO: WARNING!All pointers points to packet data!
-
-    // Ethernet II
-    const ethernet::EthernetHeader* eth_header;
-
-    // IP version 4
-    const ip::IPv4Header*           ipv4_header;
-
-    // TCP
-    const tcp::TCPHeader*           tcp_header;
-    const uint8_t* tcp_data;
-    size_t tcp_dlen;
-
-    // Sun RPC
-    const rpc::MessageHeader*       rpc_header;
-    size_t                          rpc_length;
-};
 
 
 struct Nodes
@@ -227,18 +136,18 @@ struct Fragment
     inline const uint8_t* pcap_packet() const { return (const uint8_t*)(this+1); }
     // caplen data of PCAP frame followed by this structure
 
-    static Fragment* create(const FiltrationData& data)
+    static Fragment* create(const PacketInfo& info)
     {
-        Fragment* frag = (Fragment*) new uint8_t[sizeof(Fragment) + data.header->caplen];
+        Fragment* frag = (Fragment*) new uint8_t[sizeof(Fragment) + info.header->caplen];
         void* pcap_data = frag+1;
-        memcpy(pcap_data, data.packet, data.header->caplen);
-        frag->pcap_header   = *data.header;
+        memcpy(pcap_data, info.packet, info.header->caplen);
+        frag->pcap_header   = *info.header;
 
-        frag->seq           = data.tcp_header->seq();
+        frag->seq           = info.tcp->seq();
 
-        frag->len           = data.header->len;
-        frag->data          = ((uint8_t*)pcap_data) + (data.tcp_data - data.packet);
-        frag->dlen      = data.tcp_dlen;// data.ipv4_header->length() - (data.ipv4_header->ihl() + data.tcp_header->offset());
+        frag->len           = info.header->len;
+        frag->data          = ((uint8_t*)pcap_data) + (info.data - info.packet);
+        frag->dlen          = info.dlen;// data.ipv4_header->length() - (data.ipv4_header->ihl() + data.tcp_header->offset());
 
         return frag;
     }
@@ -265,7 +174,6 @@ public:
     {
         while(first)
         {
-            //std::clog << "free fragment of stream len: " << first->dlen << std::endl;
             Fragment* c = first;
             first = first->next;
             Fragment::destroy(c);
@@ -274,13 +182,52 @@ public:
 
     inline operator bool() const { return first != NULL; }
 
+    void push(PacketInfo& info)
+    {
+        assert(info.dlen != 0);
+
+        if(discard)
+        {
+        //    std::clog << "discard new info: " << info.dlen << std::endl;
+            if(discard >= info.dlen) // discard whole new fragment
+            {
+                discard -= info.dlen;
+                return;
+            }
+            else  // discard part of new fragment payload
+            {
+                info.dlen -= discard;
+                info.data += discard;
+                discard = 0;
+            }
+        }
+
+        Fragment* fragment = Fragment::create(info);
+
+        if(last != NULL)
+        {
+            last->next = fragment;
+            last = fragment;
+            fragment->next = NULL;
+        }
+        else // stream is empty
+        {
+            first = fragment;
+            last = fragment;
+            fragment->next = NULL;
+        }
+
+        length += fragment->dlen;
+    }
+
+
     void push(Fragment* fragment)
     {
         assert(fragment->dlen != 0);
 
         if(discard)
         {
-            //std::clog << "discard new fragment: " << fragment->dlen << std::endl;
+            std::clog << "discard new fragment: " << fragment->dlen << std::endl;
             if(discard >= fragment->dlen) // discard whole new fragment
             {
                 discard -= fragment->dlen;
@@ -551,6 +498,39 @@ public:
             return true;
         }
         
+        return false;
+    }
+
+    bool readto(PacketDumper& dumper)
+    {
+        uint32_t size = hdr_len;
+        while(size > 0)
+        {
+            Fragment* frag = stream->first;
+            
+            uint32_t dlen = frag->dlen;
+            
+            if(dlen <= size)
+            {
+                dumper.dump(&frag->pcap_header, frag->pcap_packet());
+                stream->skip(dlen);
+                size -= dlen;
+            }
+            else
+            {
+                assert("fragmented pcap datagram" == 0);
+            }
+
+        }
+        
+        uint32_t to_skip = msg_len - hdr_len;
+        if(to_skip)
+        {
+            stream->set_discard_size(to_skip);
+        }
+
+        msg_len = 0;
+
         return false;
     }
 
@@ -828,15 +808,17 @@ public:
         
         
         
-        void reassemble(FiltrationData& data)
+        void reassemble(PacketInfo& info)
         {
-            uint32_t seq = data.tcp_header->seq();
-            uint32_t len = data.ipv4_header->length() - (data.ipv4_header->ihl() + data.tcp_header->offset());
+            uint32_t seq = info.tcp->seq();
+            uint32_t len = info.ipv4->length() - (info.ipv4->ihl() + info.tcp->offset());
+            
+            //info.dlen;
 
             if( sequence == 0 ) // this is the first time we have seen this src's sequence number
             {
                 sequence = seq + len;
-                if( data.tcp_header->is(tcp_header::SYN) )
+                if( info.tcp->is(tcp_header::SYN) )
                 {
             //        std::cout << "SYN flag" << '\n';
                     sequence++;
@@ -848,8 +830,7 @@ public:
               
                 if(len > 0)
                 {
-                    Fragment* frag = Fragment::create(data);
-                    stream.push(frag);
+                    stream.push(info);
                 }
 
                 return;
@@ -872,17 +853,17 @@ public:
 
                     uint32_t new_len = sequence - seq;
 
-                    if ( data.tcp_dlen <= new_len )
+                    if ( info.dlen <= new_len )
                     {
-                        data.tcp_data = NULL;
-                        data.tcp_dlen = 0;
+                        info.data = NULL;
+                        info.dlen = 0;
                    //     incomplete_tcp_stream = TRUE;
                     }
                     else
                     {
-                        assert(data.tcp_dlen >= new_len);
-                        data.tcp_data += new_len;
-                        data.tcp_dlen -= new_len;
+                        assert(info.dlen >= new_len);
+                        info.data += new_len;
+                        info.dlen -= new_len;
                     }
                //     sc.dlen = tcp_dlen;
                     seq = sequence;
@@ -895,12 +876,11 @@ public:
             if ( seq == sequence ) // right on time
             {
                 sequence += len;
-                if( data.tcp_header->is(tcp_header::SYN) ) sequence++;
+                if( info.tcp->is(tcp_header::SYN) ) sequence++;
 
-                if( data.tcp_data && data.tcp_dlen > 0)
+                if( info.data && info.dlen > 0)
                 {
-                    Fragment* frag = Fragment::create(data);
-                    stream.push(frag);
+                    stream.push(info);
                 //    write_packet_data( src_index, &sc, data );
                 }
                 // done with the packet, see if it caused a fragment to fit
@@ -909,9 +889,9 @@ public:
             }
             else // out of order packet
             {
-                if(data.tcp_dlen > 0 && (seq > sequence) )
+                if(info.dlen > 0 && (seq > sequence) )
                 {
-                    Fragment* frag = Fragment::create(data);
+                    Fragment* frag = Fragment::create(info);
 
              //       tmp_frag = (tcp_frag *)g_malloc( sizeof( tcp_frag ) );
              //       tmp_frag->data = (gchar *)g_malloc( dlength );
@@ -931,7 +911,7 @@ public:
                 }
                 else
                 {
-                    std::cout << "drop packet seq:" << seq << " sequence: " << sequence << " dlen: " << data.tcp_dlen << '\n';
+                    std::cout << "drop packet seq:" << seq << " sequence: " << sequence << " dlen: " << info.dlen << '\n';
                 }
             }
         }
@@ -959,14 +939,14 @@ public:
         }
     }
 
-    void reassemble_tcp(const Nodes& nodes, Nodes::Direction d, FiltrationData& data)
+    void reassemble_tcp(const Nodes& nodes, Nodes::Direction d, PacketInfo& info)
     {
-        const uint32_t ack = data.tcp_header->ack();
+        const uint32_t ack = info.tcp->ack();
 
         //check whether this frame acks fragments that were already seen.
         while( flows[1-d].check_fragments(ack) );
 
-        flows[d].reassemble(data);
+        flows[d].reassemble(info);
     }
 
     Flow flows[2];
@@ -997,14 +977,13 @@ public:
             std::pair<iterator, bool> res = insert(value_type(key, Session()));
             if(res.second)
             {
-                std::cout << "add session" << std::endl;
                 i = res.first;
                 // TODO:refactor this session initialization
                 i->second.init();
             }
             else
             {
-                std::cout << "session is not created!" << std::endl;
+                //std::cout << "session is not created!" << std::endl;
             }
         }
         return i;
@@ -1021,8 +1000,16 @@ class FiltrationProcessor
 {
 public:
 
-    FiltrationProcessor(std::auto_ptr<Reader>& r, std::auto_ptr<Writer>& w) : reader(r), writer(w)
+    FiltrationProcessor(std::auto_ptr<Reader>& r, std::auto_ptr<Writer>& w, bool v=true) : reader(r), writer(w), verbose(v)
     {
+        // check datalink layer
+        const int datalink = reader->datalink();
+        switch(datalink)
+        {
+        case DLT_EN10MB: break;
+        default:
+            throw Exception(std::string("Unsupported Data Link Layer: ") + Reader::datalink_description(datalink));
+        }
     }
     ~FiltrationProcessor()
     {
@@ -1043,16 +1030,6 @@ public:
         return (u_char*)this;
     }
 
-    inline void discard(const FiltrationData& data)
-    {
-        writer->discard(data);
-    }
-
-    inline void collect(const FiltrationData& data)
-    {
-        writer->collect(data);
-    }
-
     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
     {
         FiltrationProcessor* processor = (FiltrationProcessor*) user;
@@ -1063,66 +1040,26 @@ public:
         //       3) Detect placement of NFS Op data and drop it ASAP
         //       4) Pass filtered NFS Op headers (RPC messages) to Analysis
 
-        FiltrationData data = {0};
-
-        data.header = pkthdr;
-        data.packet = packet;
-
-        const uint32_t len = pkthdr->len;
-
-        // parse Data Link Layer
-        uint32_t payload = data.validate_eth(len, packet);
-        if(!payload)
+        PacketInfo info(pkthdr, packet);
+        
+        if(! info.check_eth())
         {
-            return processor->discard(data);
+            return;
         }
-
-        // parse Internet Layer
-        switch(data.eth_header->type())
-        {
-        case ethernet_header::IP:
-            payload = data.validate_ipv4(payload, packet + (len - payload));
-            break;
-        case ethernet_header::IPV6: // TODO: implement IPv6
-        default:
-            payload = 0;
-        }
-        if(!payload)
-        {
-            return processor->discard(data);
-        }
-
-        // parse Transport Layer
-        switch(data.ipv4_header->protocol())
-        {
-        case ipv4_header::TCP:
-            payload = data.validate_tcp(payload, packet + (len - payload));
-            break;
-        case ipv4_header::UDP: // TODO: implement UDP
-        default:
-            payload = 0;
-        }
-        if(!payload)
-        {
-            return processor->discard(data);
-        }
-
-        processor->collect(data);
-
 
         Nodes key;
 
-        Nodes::Direction direction =key.set(data.ipv4_header->src(),
-                                            data.ipv4_header->dst(),
-                                            data.tcp_header->sport(),
-                                            data.tcp_header->dport());
+        Nodes::Direction direction = key.set(info.ipv4->src(),
+                                             info.ipv4->dst(),
+                                             info.tcp->sport(),
+                                             info.tcp->dport());
 
         TCPSessions::it i = processor->sessions.find_or_create_session(direction, key);
         if(i != processor->sessions.end())
         {
             Session& session = i->second;
 
-            session.reassemble_tcp(i->first, direction, data);
+            session.reassemble_tcp(i->first, direction, info);
 
             for(uint32_t i=0; i<2; i++)
             {
@@ -1143,6 +1080,7 @@ private:
     std::auto_ptr<Reader> reader;
     std::auto_ptr<Writer> writer;
     TCPSessions sessions;
+    const bool verbose;
 };
 
 

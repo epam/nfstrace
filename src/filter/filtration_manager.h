@@ -37,7 +37,6 @@ public:
     }
     ~FiltrationManager()
     {
-        threads.stop();
     }
 
     void dump_to_file(const std::string& file, const std::string& interface, const std::string& bpf, int snaplen, int ms)
