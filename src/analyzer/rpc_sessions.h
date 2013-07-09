@@ -55,21 +55,29 @@ public:
             operation->set_call(call, time);
             std::pair<Iterator, bool> res = operations.insert(Pair(xid, operation.release()));
             if(res.second == true)
-                return res.first;
+            {
+                el = res.first;
+            }
         }
-        return operations.end();
+        return el;
     }
     Iterator confirm_call(std::auto_ptr<RPCReply>& reply, const timeval& time)
     {
         uint32_t xid = reply->get_xid();
+
         Iterator el = operations.find(xid);
-        if(el == operations.end())
+        if(el != operations.end())
         {
-            return operations.end();
+            el->second->set_reply(reply, time);
+
         }
-        el->second->set_reply(reply, time);
         return el;
     }
+    bool check_iterator(Iterator& iterator)
+    {
+        return iterator != operations.end();
+    }
+
     void release_iterator(Iterator& iterator)
     {
         delete iterator->second;

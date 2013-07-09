@@ -84,7 +84,7 @@ private:
             {
                 const FilteredData& data = list.data();
                 parse_rpc(data);
-                //list.free_current();
+                list.free_current();
             }
         }
     }
@@ -132,8 +132,18 @@ private:
                         {
                             RPCSession* session = sessions.get_session(rpc.session, RPCSessions::REVERSE);
                             RPCSession::Iterator i = session->confirm_call(r, rpc.timestamp);
-                            //assert(i->second);
-                            analyzers.call(session->get_session(), *i->second);
+                            
+                            
+                            if(!session->check_iterator(i))
+                            {
+                                std::cout << "unknown reply: " << r->get_xid() << std::endl;
+                            }
+                            else
+                            {
+                                assert(i->second);
+                                analyzers.call(session->get_session(), *(i->second));
+                                session->release_iterator(i);
+                            }
                         }
                     }
                     break;
