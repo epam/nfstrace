@@ -892,7 +892,7 @@ public:
                 }
                 else
                 {
-                    std::cout << "drop packet seq:" << seq << " sequence: " << sequence << " dlen: " << info.dlen << '\n';
+                 //   std::cout << "drop packet seq:" << seq << " sequence: " << sequence << " dlen: " << info.dlen << '\n';
                 }
             }
         }
