@@ -212,6 +212,11 @@ bool PrintAnalyzer::call_commit(const Session& session, const NFSOperation& oper
     return true;
 }
 
+void PrintAnalyzer::print(std::ostream& out)
+{
+    return;
+}
+
 std::string PrintAnalyzer::print_fh(const OpaqueDyn& fh) const
 {
     std::stringstream tmp;
