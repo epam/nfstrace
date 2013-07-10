@@ -6,6 +6,7 @@
 #ifndef PRINT_ANALYZER_H
 #define PRINT_ANALYZER_H
 //------------------------------------------------------------------------------
+#include <iostream>
 #include <string>
 
 #include "base_analyzer.h"
@@ -49,6 +50,7 @@ public:
     virtual bool call_fsinfo     (const Session& session, const NFSOperation& operation);
     virtual bool call_pathconf   (const Session& session, const NFSOperation& operation);
     virtual bool call_commit     (const Session& session, const NFSOperation& operation);
+    virtual void print(std::ostream& out);
 
 private:
     std::string print_fh(const OpaqueDyn& fh) const;
