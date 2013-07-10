@@ -12,6 +12,7 @@
 #include "../auxiliary/thread.h"
 #include "../auxiliary/filtered_data.h"
 #include "../controller/running_status.h"
+#include "../filter/rpc/rpc_header.h"
 #include "../filter/rpc/rpc_struct.h"
 #include "../filter/nfs/nfs_operation.h"
 #include "../filter/nfs/nfs_procedures.h"
@@ -23,6 +24,7 @@
 using namespace NST::filter::NFS3; // enum Ops;
 using namespace NST::filter::XDR;
 using namespace NST::filter::RPC;
+using namespace NST::filter::rpc;
 
 using NST::auxiliary::FilteredData;
 using NST::auxiliary::FilteredDataQueue;
@@ -99,22 +101,14 @@ private:
             {
                 if(rpc.dlen < sizeof(CallHeader)) return;
                 const CallHeader* call = static_cast<const CallHeader*>(msg);
-
-                uint32_t rpcvers = call->rpcvers();
-                uint32_t prog = call->prog();
-                uint32_t vers = call->vers();
-                uint32_t proc = call->proc();
-
-                if(rpcvers != 2)    return;
-                if(prog != 100003)  return;  // portmap NFS v3 TCP 2049
-                if(vers != 3)       return;  // NFS v3
-                if(proc < 0 || proc > 21) return;
-
-                std::auto_ptr<RPCCall> c = parse_rpc_call((Proc::Ops)proc, rpc);
-                if(c.get() != NULL)
+                if(RPCValidator::check(call) && NFSv3Validator::check(call))
                 {
-                    RPCSession* session = sessions.get_session(rpc.session, RPCSessions::DIRECT);
-                    session->register_call(c);
+                    std::auto_ptr<RPCCall> c = parse_rpc_call((Proc::Ops)call->proc(), rpc);
+                    if(c.get() != NULL)
+                    {
+                        RPCSession* session = sessions.get_session(rpc.session, RPCSessions::DIRECT);
+                        session->register_call(c);
+                    }
                 }
             }
             break;
@@ -186,7 +180,7 @@ private:
         }
 
         call->set_time(rpc.timestamp);
-        return call;    
+        return call;
     }
     std::auto_ptr<RPCReply> parse_rpc_reply(const FilteredData& rpc)
     {
