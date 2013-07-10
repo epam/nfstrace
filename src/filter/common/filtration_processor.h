@@ -369,44 +369,6 @@ private:
     uint32_t discard;  // drop following N bytes from stream
 };
 
-template
-<
-    uint32_t Program,   // remote program number
-    uint32_t Version,   // remote program version number
-    uint32_t MinProc,   // min remote procedure number
-    uint32_t MaxProc    // max remote procedure number
->
-class RPCValidator
-{
-public:
-    RPCValidator()
-    {
-    }
-
-private:
-
-    inline bool validate(const CallHeader*const call)
-    {
-        const uint32_t proc = call->proc();
-
-        return          proc >= MinProc &&
-                        proc <= MaxProc &&
-                call->prog() == Program &&
-                call->vers() == Version ;
-
-    }
-
-    inline bool validate(const ReplyHeader*const reply)
-    {
-        const uint32_t stat = reply->stat();
-        
-        return stat == SUNRPC_MSG_ACCEPTED ||
-               stat == SUNRPC_MSG_DENIED;
-    }
-
-    // TODO: add an array of XIDs for matching RPC Calls and RPC Replies
-};
-
 /*
     Stateful reader of Sun RPC messages
     aggregates length of current RPC message
@@ -415,12 +377,7 @@ private:
 class RPCReader
 {
 public:
-    RPCReader() : rpc_program(100003),  // SunRPC/NFS program
-                  rpc_version(3),       // v3
-                  min_proc(0),          // NFSPROC3_NULL
-                  max_proc(21),         // NFSPROC3_COMMIT
-                  max_hdr(1024),
-                  stream(NULL)
+    RPCReader() : max_hdr(1024), stream(NULL)
     {
         reset();
     }
@@ -431,29 +388,6 @@ public:
         hdr_len = 0;
     }
 
-    inline bool validate_rpc_call(const CallHeader*const call)
-    {
-        return call->rpcvers() == 2;
-    }
-
-    inline bool validate_rpc_reply(const ReplyHeader*const reply)
-    {
-        const uint32_t stat = reply->stat();
-
-        if(stat == SUNRPC_MSG_ACCEPTED) return true;
-        if(stat == SUNRPC_MSG_DENIED  ) return true;
-        return false;
-    }
-
-    inline bool validate_nfs_call(const CallHeader*const call)
-    {
-        if(call->prog() != rpc_program) return false;
-        if(call->vers() != rpc_version) return false;
-        if(call->proc() <  min_proc   ) return false;
-        if(call->proc() >  max_proc   ) return false;
-        return true;
-    }
-    
     inline void set_stream(FragmentStream* s)
     {
         assert(s);
@@ -564,15 +498,6 @@ private:
         // the previous RPC message on stream are processed
         assert(msg_len == 0);
         //assert(hdr_len == 0);
-        
-        /*
-        RPCValidator
-        <
-        100003, // SunRPC/NFS program
-        3,      // v3
-        0,      // NFSPROC3_NULL
-        21      // NFSPROC3_COMMIT
-        > nfs3_validator;*/
 
         // required data size for validation next record mark and a RPC message
         static const uint32_t max_header = sizeof(RecordMark) + std::max(sizeof(CallHeader), sizeof(ReplyHeader));
@@ -610,9 +535,9 @@ private:
             case SUNRPC_CALL:
             {
                 const CallHeader*const call = static_cast<const CallHeader*const>(msg);
-                if(validate_rpc_call(call))
+                if(RPCValidator::check(call))
                 {
-                    if(validate_nfs_call(call))
+                    if(NFSv3Validator::check(call))
                     {
                         return true;
                     }
@@ -637,7 +562,7 @@ private:
             case SUNRPC_REPLY:
             {
                 const ReplyHeader*const reply = static_cast<const ReplyHeader*const>(msg);
-                if(validate_rpc_reply(reply))
+                if(RPCValidator::check(reply))
                 {
                     return true;
                 }
@@ -659,12 +584,6 @@ private:
         }
         return false;
     }
-
-    // constants for validation RPC calls
-    const uint32_t  rpc_program;    // ID of RPC program
-    const uint32_t  rpc_version;
-    const uint32_t  min_proc;
-    const uint32_t  max_proc;
 
     const uint32_t  max_hdr;  // max length of RPC header
     uint32_t        msg_len;  // length of current RPC message

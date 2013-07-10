@@ -1,10 +1,10 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Definitions of Sun RPC (Remote Procedure Call) protocol.
+// Description: Definitions of Sun RPC (Remote Procedure Call) protocol headers.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef RPC_MESSAGE_H
-#define RPC_MESSAGE_H
+#ifndef RPC_HEADER_H
+#define RPC_HEADER_H
 //------------------------------------------------------------------------------
 #include <iostream>
 #include <stdint.h>
@@ -20,12 +20,6 @@ namespace rpc
 {
 
 const uint32_t SUNRPC_MSG_VERSION = 2;
-
-/*
- * Bottom up definition of an rpc message.
- * NOTE: call and reply use the same overall struct but
- * different parts of unions within it.
- */
 
 enum MsgType
 {
@@ -80,91 +74,6 @@ enum AuthFlavor
      AUTH_SYS        = 1,
      AUTH_SHORT      = 2,
 };
-
-// Authentication info. Opaque to client.
-struct rpc_opaque_auth
-{
-    uint32_t oa_flavor; // flavor of auth
-    uint32_t oa_len;    // length of opaque body, not to exceed MAX_AUTH_BYTES
-} __attribute__ ((__packed__));
-
-
-// Reply part of an RPC exchange
-
-/*
- * Reply to an rpc request that was accepted by the server.
- * Note: there could be an error even though the request was
- * accepted.
- */
-struct rpc_accepted_reply
-{
-    struct rpc_opaque_auth  ar_verf;
-    uint32_t                ar_stat;    // enum AcceptStat
-    union
-    {
-        struct
-        {
-            uint32_t low;
-            uint32_t high;
-        } mismatch_info;
-        struct
-        {
-        /* procedure-specific results start here */
-        } results;
-        // and many other null cases
-    } reply_data;
-} __attribute__ ((__packed__));
-
-// Reply to an RPC request that was rejected by the server.
-struct rpc_rejected_reply
-{
-    uint32_t rej_stat;   // enum RejectStat
-    union
-    {
-        struct
-        {
-            uint32_t low;
-            uint32_t high;
-        } mismatch_info;
-        uint32_t auth_stat;  // enum AuthStat
-    } reply_data;
-} __attribute__ ((__packed__));
-
-// Body of a reply to an RPC request.
-struct rpc_reply_body
-{
-    uint32_t stat;   // enum ReplyStat
-    union
-    {
-        struct rpc_accepted_reply areply;
-        struct rpc_rejected_reply rreply;
-    } reply_body;
-} __attribute__ ((__packed__));
-
-// Body of an rpc request call.
-struct rpc_call_body
-{
-    uint32_t cb_rpcvers;  /* must be equal to two (2) */
-    uint32_t cb_prog;
-    uint32_t cb_vers;
-    uint32_t cb_proc;
-    struct rpc_opaque_auth cb_cred;
-    struct rpc_opaque_auth cb_verf;
-    /* procedure specific parameters start here */
-} __attribute__ ((__packed__));
-
-// The rpc message.
-struct rpc_msg
-{
-    uint32_t xid;
-    uint32_t mtype; // enum MsgType
-    union
-    {
-        struct rpc_call_body  cbody;
-        struct rpc_reply_body rbody;
-    } body;
-} __attribute__ ((__packed__));
-
 
 
 struct MessageHeader; // forward declaration
@@ -278,39 +187,68 @@ private:
 };
 
 
-class AuthSYS  // RFC1831 appendix A: System Authentication
+class RPCValidator
 {
 public:
-    AuthSYS(const OpaqueAuthHeader* header);
+    static inline bool check(const MessageHeader*const msg)
+    {
+        const uint32_t type = msg->type();
 
-    inline const uint32_t           stamp() const { return m_stamp;       }
-    inline const std::string& machinename() const { return m_machinename; }
-    inline const uint32_t             uid() const { return m_uid; }
-    inline const uint32_t             gid() const { return m_gid; }
-    inline const uint32_t      guid_count() const { return m_guid_count; }
-    inline const uint32_t*          guids() const { return m_guids; }
+        return type == SUNRPC_CALL ||
+               type == SUNRPC_REPLY;
+    }
 
+    static inline bool check(const CallHeader*const call)
+    {
+        return call->rpcvers() == SUNRPC_MSG_VERSION;
+    }
+
+    static inline bool check(const ReplyHeader*const reply)
+    {
+        const uint32_t stat = reply->stat();
+        
+        return stat == SUNRPC_MSG_ACCEPTED ||
+               stat == SUNRPC_MSG_DENIED;
+    }
 private:
-    uint32_t m_stamp;
-    std::string m_machinename;  // TODO: there is performance drop in memory allocation
-    uint32_t m_uid;
-    uint32_t m_gid;
-    uint32_t m_guid_count;
-    uint32_t m_guids[16];
+    RPCValidator();  // undefined
 };
 
 
-uint32_t rpc_roundup(uint32_t a); // round up uint32_t to near multiplicity of 4
+template
+<
+    uint32_t Program,   // remote program number
+    uint32_t Version,   // remote program version number
+    uint32_t MinProc,   // min remote procedure number
+    uint32_t MaxProc    // max remote procedure number
+>
+class RPCProgramValidator
+{
+public:
+    static inline bool check(const CallHeader*const call)
+    {
+        const uint32_t proc = call->proc();
 
-// some functions for print out structures
-std::ostream& operator<<(std::ostream& out, const OpaqueAuthHeader& a);
-std::ostream& operator<<(std::ostream& out, const AuthSYS& a);
-std::ostream& operator<<(std::ostream& out, const CallHeader& a);
+        return          proc <= MaxProc &&
+                        proc >= MinProc &&
+                call->prog() == Program &&
+                call->vers() == Version ;
+    }
+private:
+    RPCProgramValidator();  // undefined
+};
+
+// TODO: move to special NFSv3 header
+typedef RPCProgramValidator<100003,// SunRPC/NFS program
+                                3,      // v3
+                                0,      // NFSPROC3_NULL
+                                21>     // NFSPROC3_COMMIT
+                                NFSv3Validator;
 
 
 } // namespace rpc
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//RPC_MESSAGE_H
+#endif//RPC_HEADER_H
 //------------------------------------------------------------------------------

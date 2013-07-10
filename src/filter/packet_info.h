@@ -14,7 +14,7 @@
 #include "ethernet/ethernet_header.h"
 #include "ip/ipv4_header.h"
 #include "tcp/tcp_header.h"
-#include "rpc/rpc_message.h"
+#include "rpc/rpc_header.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::ethernet;
 using namespace NST::filter::ip;
