@@ -518,11 +518,13 @@ public:
             }
             else
             {
-                assert("fragmented pcap datagram" == 0);
+                // TODO: fragments may be dumped twice
+                dumper.dump(&frag->pcap_header, frag->pcap_packet());
+                stream->skip(size);
+                size = 0;
             }
-
         }
-        
+
         uint32_t to_skip = msg_len - hdr_len;
         if(to_skip)
         {
