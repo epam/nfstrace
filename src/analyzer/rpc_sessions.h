@@ -45,14 +45,13 @@ public:
         }
     }
 
-    Iterator register_call(std::auto_ptr<RPCCall>& call, const timeval& time)
+    Iterator register_call(std::auto_ptr<RPCCall>& call)
     {
         uint32_t xid = call->get_xid();
         Iterator el = operations.find(xid);
         if(el == operations.end())
         {
-            std::auto_ptr<NFSOperation> operation(new NFSOperation());
-            operation->set_call(call, time);
+            std::auto_ptr<NFSOperation> operation(new NFSOperation(call));
             std::pair<Iterator, bool> res = operations.insert(Pair(xid, operation.release()));
             if(res.second == true)
             {
@@ -61,19 +60,18 @@ public:
         }
         return el;
     }
-    Iterator confirm_call(std::auto_ptr<RPCReply>& reply, const timeval& time)
+    Iterator confirm_call(std::auto_ptr<RPCReply>& reply)
     {
         uint32_t xid = reply->get_xid();
 
         Iterator el = operations.find(xid);
         if(el != operations.end())
         {
-            el->second->set_reply(reply, time);
-
+            el->second->set_reply(reply);
         }
         return el;
     }
-    bool check_iterator(Iterator& iterator)
+    bool is_valid(Iterator& iterator)
     {
         return iterator != operations.end();
     }

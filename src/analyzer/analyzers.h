@@ -75,7 +75,7 @@ public:
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            ((*i)->*methods[operation])(session, operation);
+            ((*i)->*methods[operation.get_call()->get_proc()])(session, operation);
         }
         return true;
     }
