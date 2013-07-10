@@ -25,7 +25,7 @@ class NFSOperation
 {
     typedef Proc::Ops ProcedureType;
 public:
-    NFSOperation() : call(NULL), reply(NULL)
+    NFSOperation(std::auto_ptr<RPCCall>& c) : call(c.release()), reply(NULL) 
     {
     }
     ~NFSOperation()
@@ -34,48 +34,27 @@ public:
         delete reply;
     }
 
-    inline void set_call(std::auto_ptr<RPCCall>& c, const timeval& time)
-    {
-        call = c.release();
-        assert(call);
-        call_time = time;
-    }
     inline const RPCCall* get_call() const
     {
         return call;
     }
-    inline const timeval& get_call_time() const
-    {
-        return call_time;
-    }
-    inline bool is_call() const
-    {
-        return call != NULL;
-    }
-    inline void set_reply(std::auto_ptr<RPCReply>& r, const timeval& time)
+    inline void set_reply(std::auto_ptr<RPCReply>& r)
     {
         reply = r.release();
         assert(reply);
-        reply_time = time;
     }
     inline const RPCReply* get_reply() const
     {
         return reply;
     }
-    inline const timeval& get_reply_time() const
+    inline timeval time_diff() const
     {
-        return reply_time;
-    }
-    inline bool is_reply() const
-    {
-        return reply != NULL;
-    }
-
-    inline operator uint32_t() const // Allow us use NFSOperation inside switch-block
-    {
-        if(!is_call())
-            return 0;
-        return call->get_proc();
+        timeval diff = {0, 0};
+        if(reply) {
+            diff.tv_sec = call->get_time().tv_sec - reply->get_time().tv_sec;
+            diff.tv_usec = call->get_time().tv_usec - reply->get_time().tv_usec;
+        }
+        return diff; 
     }
 
 private:
@@ -83,9 +62,7 @@ private:
     void operator=(const NFSOperation&);
 
     RPCCall* call;
-    timeval call_time;
     RPCReply* reply;
-    timeval reply_time;
 };
 
 } // namespace NFS3

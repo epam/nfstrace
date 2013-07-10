@@ -69,6 +69,15 @@ public:
     {
         return type;
     }
+    void set_time(const struct timeval& t)
+    {
+        time.tv_sec = t.tv_sec;
+        time.tv_usec = t.tv_usec;
+    }
+    const timeval& get_time() const
+    {
+        return time;
+    }
 
 private:
     RPCMessage(const RPCMessage&);
@@ -76,6 +85,7 @@ private:
 
     uint32_t  xid;
     uint32_t  type;
+    struct timeval   time;
 };
 
 class RPCCall : public RPCMessage

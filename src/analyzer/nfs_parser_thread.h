@@ -114,7 +114,7 @@ private:
                 if(c.get() != NULL)
                 {
                     RPCSession* session = sessions.get_session(rpc.session, RPCSessions::DIRECT);
-                    session->register_call(c, rpc.timestamp);
+                    session->register_call(c);
                 }
             }
             break;
@@ -131,14 +131,9 @@ private:
                         if(r.get() != NULL)
                         {
                             RPCSession* session = sessions.get_session(rpc.session, RPCSessions::REVERSE);
-                            RPCSession::Iterator i = session->confirm_call(r, rpc.timestamp);
+                            RPCSession::Iterator i = session->confirm_call(r);
                             
-                            
-                            if(!session->check_iterator(i))
-                            {
-                                std::cout << "unknown reply: " << r->get_xid() << std::endl;
-                            }
-                            else
+                            if(session->is_valid(i))
                             {
                                 assert(i->second);
                                 analyzers.call(session->get_session(), *(i->second));
@@ -190,12 +185,14 @@ private:
         default:    break;
         }
 
+        call->set_time(rpc.timestamp);
         return call;    
     }
     std::auto_ptr<RPCReply> parse_rpc_reply(const FilteredData& rpc)
     {
         XDRReader reader((uint8_t*)rpc.data, rpc.dlen);
         std::auto_ptr<RPCReply> reply(new RPCReply(reader));
+        reply->set_time(rpc.timestamp);
         return reply;
     }
 
