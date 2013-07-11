@@ -915,6 +915,7 @@ public:
     }
     ~FiltrationProcessor()
     {
+        reader->print_statistic(std::clog);
     }
 
     void run()
