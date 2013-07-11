@@ -13,7 +13,7 @@
 #include "../rpc/rpc_struct.h"
 #include "nfs_procedures.h"
 //------------------------------------------------------------------------------
-using namespace NST::filter::RPC;
+using namespace NST::filter::rpc;
 
 using NST::auxiliary::FilteredData;
 //------------------------------------------------------------------------------
@@ -27,8 +27,9 @@ namespace NFS3
 class NFSOperation
 {
     typedef Proc::Ops ProcedureType;
-    typedef FilteredData::Session Session;
 public:
+    typedef FilteredData::Session Session;
+
     NFSOperation(const RPCCall* c, const RPCReply* r, const Session* s) : call(c), reply(r), session(s)
     {
     }

@@ -12,9 +12,10 @@
 #include "../controller/running_status.h"
 #include "../filter/nfs/nfs_operation.h"
 #include "../filter/nfs/nfs_struct.h"
-#include "base_analyzer.h"
+#include "analyzers/base_analyzer.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::NFS3;
+using NST::analyzer::analyzers::BaseAnalyzer;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -25,7 +26,7 @@ class Analyzers
 {
     typedef std::list<BaseAnalyzer*> Storage;
 
-    typedef bool (BaseAnalyzer::*Method)(const BaseAnalyzer::Session& session, const NFSOperation& operation);
+    typedef bool (BaseAnalyzer::*Method)(const NFSOperation& operation);
 public:
     Analyzers()
     {
@@ -69,13 +70,13 @@ public:
         analyzers.push_back(analyzer);
     }
 
-    bool call(const BaseAnalyzer::Session& session, const NFSOperation& operation)
+    bool call(const NFSOperation& operation)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            ((*i)->*methods[operation.get_call()->get_proc()])(session, operation);
+            ((*i)->*methods[operation.get_call()->get_proc()])(operation);
         }
         return true;
     }

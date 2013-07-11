@@ -12,7 +12,7 @@
 #include "nfs_procedures.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::XDR;
-using namespace NST::filter::RPC;
+using namespace NST::filter::rpc;
 //------------------------------------------------------------------------------
 namespace NST
 {

@@ -1,5 +1,11 @@
+//------------------------------------------------------------------------------
+//// Author: Dzianis Huznou
+//// Description: Enumeration of the NFS procedures.
+//// Copyright (c) 2013 EPAM Systems. All Rights Reserved.
+////------------------------------------------------------------------------------
 #include "nfs_procedures.h"
-
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace filter 
@@ -19,4 +25,4 @@ const char* Proc::titles[Proc::num] = {
 } // namespace NFS3
 } // namespace filter
 } // namespace NST
-
+//------------------------------------------------------------------------------

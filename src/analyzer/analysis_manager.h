@@ -3,8 +3,8 @@
 // Description: Manager for all instances created inside analyzer module.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef ANALYSE_MANAGER_H
-#define ANALYSE_MANAGER_H
+#ifndef ANALYSIS_MANAGER_H
+#define ANALYSIS_MANAGER_H
 //------------------------------------------------------------------------------
 #include <memory> // std::auto_ptr
 
@@ -13,9 +13,11 @@
 #include "../auxiliary/thread.h"
 #include "../controller/running_status.h"
 #include "analyzers.h"
+#include "analyzers/print_analyzer.h"
 #include "nfs_parser_thread.h"
-#include "print_analyzer.h"
 //------------------------------------------------------------------------------
+using namespace NST::analyzer::analyzers;
+
 using NST::auxiliary::FilteredData;
 using NST::auxiliary::FilteredDataQueue;
 using NST::auxiliary::Exception;
@@ -80,5 +82,5 @@ private:
 } // namespace analyzer
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//ANALYSE_MANAGER_H
+#endif//ANALYSIS_MANAGER_H
 //------------------------------------------------------------------------------
