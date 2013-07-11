@@ -25,7 +25,7 @@ namespace analyzer
 class RPCSession
 {
     typedef FilteredData::Session Session;
-    typedef std::tr1::unordered_map<uint32_t, NFSOperation*> Map;
+    typedef std::tr1::unordered_map<uint32_t, RPCCall*> Map;
     typedef Map::value_type Pair;
 
 public:
@@ -45,14 +45,13 @@ public:
         }
     }
 
-    Iterator register_call(std::auto_ptr<RPCCall>& call)
+    Iterator insert(std::auto_ptr<RPCCall>& call)
     {
         uint32_t xid = call->get_xid();
-        Iterator el = operations.find(xid);
+        Iterator el = find(xid);
         if(el == operations.end())
         {
-            std::auto_ptr<NFSOperation> operation(new NFSOperation(call));
-            std::pair<Iterator, bool> res = operations.insert(Pair(xid, operation.release()));
+            std::pair<Iterator, bool> res = operations.insert(Pair(xid, call.release()));
             if(res.second == true)
             {
                 el = res.first;
@@ -60,30 +59,21 @@ public:
         }
         return el;
     }
-    Iterator confirm_call(std::auto_ptr<RPCReply>& reply)
+    inline Iterator remove(Iterator& el)
     {
-        uint32_t xid = reply->get_xid();
-
-        Iterator el = operations.find(xid);
-        if(el != operations.end())
-        {
-            el->second->set_reply(reply);
-        }
-        return el;
+        return operations.erase(el);
     }
-    bool is_valid(Iterator& iterator)
+    inline Iterator find(uint32_t xid)
+    {
+        return operations.find(xid);
+    }
+    inline bool is_valid(Iterator& iterator)
     {
         return iterator != operations.end();
     }
-
-    void release_iterator(Iterator& iterator)
+    inline const Session* const get_session() const
     {
-        delete iterator->second;
-        operations.erase(iterator);
-    }
-    inline const Session& get_session() const
-    {
-        return session;
+        return &session;
     }
 
 private:
