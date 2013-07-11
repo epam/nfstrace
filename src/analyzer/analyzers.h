@@ -72,11 +72,12 @@ public:
 
     bool call(const NFSOperation& operation)
     {
+        const uint32_t procedure = operation.get_call()->get_proc();
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
         {
-            ((*i)->*methods[operation.get_call()->get_proc()])(operation);
+            ((*i)->*methods[procedure])(operation);
         }
         return true;
     }
