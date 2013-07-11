@@ -7,6 +7,7 @@
 #define FILE_READER_H
 //------------------------------------------------------------------------------
 #include <cstdio>
+#include <ostream>
 #include <string>
 
 #include "base_reader.h"
@@ -26,6 +27,8 @@ public:
     ~FileReader();
 
     inline FILE* get_file() { return pcap_file(handle); }
+    
+    void print_statistic(std::ostream& out) const { /*dummy method*/  }
 };
 
 } // namespace pcap
