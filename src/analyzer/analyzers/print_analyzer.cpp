@@ -6,9 +6,9 @@
 #include <iostream>
 #include <sstream>
 
-#include "../filter/nfs/nfs_operation.h"
-#include "../filter/nfs/nfs_procedures.h"
-#include "../filter/nfs/nfs_struct.h"
+#include "../../filter/nfs/nfs_operation.h"
+#include "../../filter/nfs/nfs_procedures.h"
+#include "../../filter/nfs/nfs_struct.h"
 #include "print_analyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -16,65 +16,67 @@ namespace NST
 {
 namespace analyzer
 {
+namespace analyzers
+{
 
-bool PrintAnalyzer::call_null(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_null(const NFSOperation& operation)
 {
     const NullArgs& data = static_cast<const NullArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] << ". XID: " << data.get_xid() << std::endl;
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] << ". XID: " << data.get_xid() << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_getattr(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_getattr(const NFSOperation& operation)
 {
     const GetAttrArgs& data = static_cast<const GetAttrArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] << ". XID: " << data.get_xid() << " File: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] << ". XID: " << data.get_xid() << " File: ";
     out << print_fh(data.get_file()) << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_setattr(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_setattr(const NFSOperation& operation)
 {
-    out << get_session(session) << " -- Call " << Proc::titles[Proc::SETATTR] << "." << std::endl;
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[Proc::SETATTR] << "." << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_lookup(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_lookup(const NFSOperation& operation)
 {
     const LookUpArgs& data = static_cast<const LookUpArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
     out << print_fh(data.get_dir());
     out << " Name: " << data.get_name() << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_access(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_access(const NFSOperation& operation)
 {
     const AccessArgs& data = static_cast<const AccessArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Object: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Object: ";
     out << print_fh(data.get_object());
     out << " Access: " << data.get_access() << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_readlink(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_readlink(const NFSOperation& operation)
 {
     const ReadLinkArgs& data = static_cast<const ReadLinkArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Symlink: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Symlink: ";
     out << print_fh(data.get_symlink()) << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_read(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_read(const NFSOperation& operation)
 {
     const ReadArgs& data = static_cast<const ReadArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Offset: " << data.get_offset() << " Count: " << data.get_count() << std::endl;
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Offset: " << data.get_offset() << " Count: " << data.get_count() << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_write(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_write(const NFSOperation& operation)
 {
     const WriteArgs& data = static_cast<const WriteArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Offset: " << data.get_offset() << " Count: " << data.get_count() << " Type: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Offset: " << data.get_offset() << " Count: " << data.get_count() << " Type: ";
     switch(data.get_stable())
     {
     case 0:
@@ -97,52 +99,52 @@ bool PrintAnalyzer::call_write(const Session& session, const NFSOperation& opera
     return true;
 }
 
-bool PrintAnalyzer::call_create(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_create(const NFSOperation& operation)
 {
-    out << get_session(session) << " -- Call " << Proc::titles[Proc::CREATE] <<"." << std::endl;
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[Proc::CREATE] <<"." << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_mkdir(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_mkdir(const NFSOperation& operation)
 {
-    out << get_session(session) << " -- Call " << Proc::titles[Proc::MKDIR] <<"." << std::endl;
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[Proc::MKDIR] <<"." << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_symlink(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_symlink(const NFSOperation& operation)
 {
-    out << get_session(session) << " -- Call " << Proc::titles[Proc::SYMLINK] <<"." << std::endl;
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[Proc::SYMLINK] <<"." << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_mknod(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_mknod(const NFSOperation& operation)
 {
-    out << get_session(session) << " -- Call " << Proc::titles[Proc::MKNOD] <<"." << std::endl;
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[Proc::MKNOD] <<"." << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_remove(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_remove(const NFSOperation& operation)
 {
     const RemoveArgs& data = static_cast<const RemoveArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
     out << print_fh(data.get_dir());
     out << " Name: " << data.get_name() << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_rmdir(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_rmdir(const NFSOperation& operation)
 {
     const RmDirArgs& data = static_cast<const RmDirArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
     out << print_fh(data.get_dir());
     out << " Name: " << data.get_name() << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_rename(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_rename(const NFSOperation& operation)
 {
     const RenameArgs& data = static_cast<const RenameArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " From Dir: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " From Dir: ";
     out << print_fh(data.get_from_dir());
     out << " From Name: " << data.get_from_name() << " To Dir: ";
     out << print_fh(data.get_to_dir());
@@ -150,10 +152,10 @@ bool PrintAnalyzer::call_rename(const Session& session, const NFSOperation& oper
     return true;
 }
 
-bool PrintAnalyzer::call_link(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_link(const NFSOperation& operation)
 {
     const LinkArgs& data = static_cast<const LinkArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " File: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " File: ";
     out << print_fh(data.get_file());
     out << " Dir: ";
     out << print_fh(data.get_dir());
@@ -161,52 +163,52 @@ bool PrintAnalyzer::call_link(const Session& session, const NFSOperation& operat
     return true;
 }
 
-bool PrintAnalyzer::call_readdir(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_readdir(const NFSOperation& operation)
 {
     const ReadDirArgs& data = static_cast<const ReadDirArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
     out << print_fh(data.get_dir());
     out << " Cookie: " << data.get_cookie() << " CookieVerf: " << data.get_cookieverf() << " Count: " << data.get_count() << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_readdirplus(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_readdirplus(const NFSOperation& operation)
 {
     const ReadDirPlusArgs& data = static_cast<const ReadDirPlusArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
     out << print_fh(data.get_dir());
     out << " Cookie: " << data.get_cookie() << " CookieVerf: " << data.get_cookieverf() << " Dir Count: " << data.get_dir_count() << " Max Count: " << data.get_max_count() << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_fsstat(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_fsstat(const NFSOperation& operation)
 {
     const FSStatArgs& data = static_cast<const FSStatArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " FS Root:";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " FS Root:";
     out << print_fh(data.get_fs_root()) << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_fsinfo(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_fsinfo(const NFSOperation& operation)
 {
     const FSInfoArgs& data = static_cast<const FSInfoArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " FS Root:";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " FS Root:";
     out << print_fh(data.get_fs_root()) << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_pathconf(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_pathconf(const NFSOperation& operation)
 {
     const PathConfArgs& data = static_cast<const PathConfArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID : " << data.get_xid() << " Object: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID : " << data.get_xid() << " Object: ";
     out << print_fh(data.get_object()) << std::endl;
     return true;
 }
 
-bool PrintAnalyzer::call_commit(const Session& session, const NFSOperation& operation)
+bool PrintAnalyzer::call_commit(const NFSOperation& operation)
 {
     const CommitArgs& data = static_cast<const CommitArgs&>(*operation.get_call());
-    out << get_session(session) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " File: ";
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " File: ";
     out << print_fh(data.get_file());
     out << " Offset: " << data.get_offset() << " Count: " << data.get_count()  << std::endl;
     return true;
@@ -237,31 +239,31 @@ std::string PrintAnalyzer::print_fh(const OpaqueDyn& fh) const
     return tmp.str();
 }
 
-std::string PrintAnalyzer::get_session(const Session& session) const
+std::string PrintAnalyzer::get_session(const NFSOperation::Session& session) const
 {
     std::stringstream s(std::ios_base::out);
-    s << session_addr(Session::Source, session) << " --> " << session_addr(Session::Destination, session);
+    s << session_addr(NFSOperation::Session::Source, session) << " --> " << session_addr(NFSOperation::Session::Destination, session);
     switch(session.type)
     {
-        case Session::TCP:
+        case NFSOperation::Session::TCP:
             s << " (TCP)";
             break;
-        case Session::UDP:
+        case NFSOperation::Session::UDP:
             s << " (UPD)";
             break;
     }
     return s.str();
 }
 
-std::string PrintAnalyzer::session_addr(Session::Direction dir, const Session& session) const
+std::string PrintAnalyzer::session_addr(NFSOperation::Session::Direction dir, const NFSOperation::Session& session) const
 {
     std::stringstream s(std::ios_base::out);
     switch(session.ip_type)
     {
-        case Session::v4:
+        case NFSOperation::Session::v4:
             s << ipv4_string(session.ip.v4.addr[dir]);
             break;
-        case Session::v6:
+        case NFSOperation::Session::v6:
             s << ipv6_string(session.ip.v6.addr[dir]);
             break;
     }
@@ -289,6 +291,7 @@ std::string PrintAnalyzer::ipv4_string(const uint32_t ip) const
     return address.str();
 }
 
+} // namespace analyzers
 } // namespace analyzer
 } // namespace NST
 //------------------------------------------------------------------------------
