@@ -919,7 +919,11 @@ public:
 
     void run()
     {
-        reader->loop(*this);
+        bool done = reader->loop(*this);
+        if(done)
+        {
+            throw Exception("Filtration is done");
+        }
     }
 
     void stop()

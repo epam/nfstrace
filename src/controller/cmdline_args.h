@@ -24,11 +24,16 @@ struct Args
         PORT,
         SNAPLEN,
         MODE,
+        IFILE,
         OFILE,
         VERBOSE,
         HELP,
         num,
     };
+
+    static const char* const profiling_mode;
+    static const char* const filtration_mode;
+    static const char* const analysis_mode;
 
 private:
     static Opt options[num];
