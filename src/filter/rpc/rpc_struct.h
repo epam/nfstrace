@@ -17,7 +17,7 @@ namespace NST
 {
 namespace filter
 {
-namespace RPC
+namespace rpc
 {
 
 class OpaqueAuth
@@ -152,7 +152,7 @@ private:
     void operator=(const RPCReply&);
 };
 
-} // namespace RPC
+} // namespace rpc
 } // namespace filter
 } // namespace NFS
 //------------------------------------------------------------------------------

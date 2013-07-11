@@ -23,7 +23,6 @@
 //------------------------------------------------------------------------------
 using namespace NST::filter::NFS3; // enum Ops;
 using namespace NST::filter::XDR;
-using namespace NST::filter::RPC;
 using namespace NST::filter::rpc;
 
 using NST::auxiliary::FilteredData;
@@ -89,7 +88,7 @@ private:
                 list.free_current();
                 if(op.get())
                 {
-                    analyzers.call(*const_cast<FilteredData::Session*>(op->get_session()), *op);
+                    analyzers.call(*op);
                 }
             }
         }
