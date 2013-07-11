@@ -36,6 +36,11 @@ bool Controller::cmdline_args(int argc, char** argv)
     }
     params.validate();
 
+    if(params[CLI::SNAPLEN].to_int() != 65535)
+    {
+        throw cmdline::CLIError("Statefull filtration RPC messages over TCP requires snaplen = 65535");
+    }
+
     return true;
 }
 
@@ -79,7 +84,13 @@ void Controller::init_runing()
     const std::string filter= "tcp port " + port;
     const unsigned int ms   = 100;
 
-    if(mode == "dump")   // online dump mode
+    if(mode == CLI::profiling_mode)
+    {
+        NST::auxiliary::FilteredDataQueue& queue = analysis.init(verbose);
+
+        filtration.capture_to_queue(queue, iface, filter, snaplen, ms);
+    }
+    else if(mode == CLI::filtration_mode)
     {
         const std::string ofile = params.is_default(CLI::OFILE) ?
                                 iface+"-"+port+"-"+slen+".pcap" :
@@ -87,15 +98,15 @@ void Controller::init_runing()
 
         filtration.dump_to_file(ofile, iface, filter, snaplen, ms);
     }
-    else if(mode == "mon")   // online monitoring mode
+    else if(mode == CLI::analysis_mode)
     {
         NST::auxiliary::FilteredDataQueue& queue = analysis.init(verbose);
 
-        filtration.capture_to_queue(queue, iface, filter, snaplen, ms);
-    }
-    else if(mode == "stat")   // offline analysis mode
-    {
-        throw cmdline::CLIError(std::string("unimplemented mode: ") + mode);
+        const std::string ifile = params.is_default(CLI::IFILE) ?
+                                iface+"-"+port+"-"+slen+".pcap" :
+                                params[CLI::IFILE];
+
+        filtration.read_to_queue(queue, ifile);
     }
     else
     {

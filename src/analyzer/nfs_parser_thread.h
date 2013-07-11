@@ -59,7 +59,11 @@ public:
 
         try
         {
-            process();
+            while(exec)
+            {
+                process_queue();
+            }
+            //process_queue(); // flush data in queue
         }
         catch(std::exception& exception)
         {
@@ -75,21 +79,18 @@ public:
     }
 
 private:
-    inline void process()
+    inline void process_queue()
     {
-        while(exec)
+        // Read all data from the received queue
+        FilteredDataQueue::ElementList list(queue);
+        while(list)
         {
-            // Read all data from the received queue
-            FilteredDataQueue::ElementList list(queue);
-            while(list)
+            const FilteredData& data = list.data();
+            std::auto_ptr<NFSOperation> op(create_nfs_operation(data));
+            list.free_current();
+            if(op.get())
             {
-                const FilteredData& data = list.data();
-                std::auto_ptr<NFSOperation> op(create_nfs_operation(data));
-                list.free_current();
-                if(op.get())
-                {
-                    analyzers.call(*op);
-                }
+                analyzers.call(*op);
             }
         }
     }

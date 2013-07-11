@@ -7,6 +7,7 @@
 #define BASE_READER_H
 //------------------------------------------------------------------------------
 #include <ostream>
+#include <string>
 
 #include <pcap/pcap.h>
 
@@ -20,12 +21,18 @@ namespace filter
 {
 namespace pcap
 {
+
 class BaseReader
 {
-public:
-    BaseReader() {}
-    virtual ~BaseReader() {}
+protected:
+    BaseReader()
+    {
+    }
+    virtual ~BaseReader()
+    {
+    }
 
+public:
     /*
        Processor - class that implements following functions accessible from BaseReader:
        u_char* get_user()
@@ -42,7 +49,10 @@ public:
 
     bool loop(void* user, pcap_handler callback, int count)
     {
-        return -1 != pcap_loop(handle, count, callback, (u_char*)user);
+        const int err = pcap_loop(handle, count, callback, (u_char*)user);
+        if(err == -1) throw PcapError("pcap_loop", pcap_geterr(handle));
+
+        return err == 0; // count is exhausted
     }
 
     inline void          break_loop()       { pcap_breakloop(handle); }

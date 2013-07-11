@@ -67,9 +67,18 @@ public:
         threads.add(thread.release());
     }
 
-    void read_from_file(const std::string& file)
+    void read_to_queue(FilteredDataQueue& queue, const std::string& file)
     {
-        // TODO: implement Offline analyzing mode
+        typedef FiltrationProcessor<FileReader, QueueingTransmission> Processor;
+        typedef ProcessingThread<Processor> OfflineAnalyzing;
+
+        std::auto_ptr<FileReader>           reader (new FileReader(file));
+        std::auto_ptr<QueueingTransmission> writer (new QueueingTransmission(queue));
+
+        std::auto_ptr<Processor>      processor (new Processor(reader, writer));
+        std::auto_ptr<OfflineAnalyzing>  thread (new OfflineAnalyzing(processor, status));
+
+        threads.add(thread.release());
     }
 
     void start()
