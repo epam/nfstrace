@@ -7,17 +7,20 @@
 #include <exception>
 
 #include "controller/controller.h"
+#include "controller/parameters.h"
 //------------------------------------------------------------------------------
 using namespace NST::controller;
 //------------------------------------------------------------------------------
 int main(int argc, char **argv) try
 {
-    Controller controller;
-
-    if(!controller.cmdline_args(argc, argv))
+    Parameters& params = Parameters::instance();
+    // set and validate CLI options
+    if(!params.cmdline_args(argc, argv))
     {
         return 0; // -h was passed
     }
+
+    Controller controller(params);
 
     return controller.run();
 }

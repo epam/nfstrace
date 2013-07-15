@@ -11,6 +11,7 @@
 #include "../auxiliary/filtered_data.h"
 #include "../auxiliary/exception.h"
 #include "../auxiliary/thread.h"
+#include "../controller/parameters.h"
 #include "../controller/running_status.h"
 #include "analyzers.h"
 #include "analyzers/print_analyzer.h"
@@ -22,6 +23,7 @@ using NST::auxiliary::FilteredData;
 using NST::auxiliary::FilteredDataQueue;
 using NST::auxiliary::Exception;
 using NST::auxiliary::Thread;
+using NST::controller::Parameters;
 using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
 namespace NST
@@ -39,15 +41,17 @@ public:
     {
     }
 
-    FilteredDataQueue& init(bool verbose, uint32_t q_size = 256, uint32_t q_limit = 16)
+    FilteredDataQueue& init(const Parameters& params)
     {
+        uint32_t q_size = 256;
+        uint32_t q_limit = 16;
+        
         queue.reset(new FilteredDataQueue(q_size, q_limit));
         parser_thread.reset(new NFSParserThread(*queue, analyzers, status));
 
-        if(verbose) // add special analyzer for trace out RPC calls
+        if(params.is_verbose()) // add special analyzer for trace out RPC calls
         {
-            std::auto_ptr<BaseAnalyzer> a(new PrintAnalyzer(std::clog));
-            analyzers.add(a.release());
+            analyzers.add(new PrintAnalyzer(std::clog));
         }
 
         return *queue;

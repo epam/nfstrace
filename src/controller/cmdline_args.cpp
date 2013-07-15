@@ -27,7 +27,7 @@ Opt Args::options[Args::num] =
     {'p', "port",      Opt::REQ, "2049",                        "port of NFS communications",       "PORT"},
     {'s', "snaplen",   Opt::REQ, "65535",                       "max length of raw captured packet","0..65535"},
     {'m', "mode",      Opt::REQ,  LIVE,                         "set runing mode",                  LIVE"|"DUMP"|"STAT },
-    {'I', "ifile",     Opt::REQ, "INTERFACE-PORT-SNAPLEN.pcap", "input file to " STAT" mode",       "PATH"},
+    {'I', "ifile",     Opt::REQ, "INTERFACE-PORT-SNAPLEN.pcap", "input file to "STAT" mode",        "PATH"},
     {'O', "ofile",     Opt::REQ, "INTERFACE-PORT-SNAPLEN.pcap", "output file to "DUMP" mode",       "PATH"},
     {'v', "verbose",   Opt::NOA, "false",                       "print out additional information"},
     {'h', "help",      Opt::NOA, "false",                       "print this help message and exit"},
