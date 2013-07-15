@@ -120,6 +120,7 @@ private:
             {
                 if(rpc.dlen < sizeof(ReplyHeader)) return NULL;
                 const ReplyHeader* reply = static_cast<const ReplyHeader*>(msg);
+                
                 switch(reply->stat())
                 {
                     case SUNRPC_MSG_ACCEPTED:

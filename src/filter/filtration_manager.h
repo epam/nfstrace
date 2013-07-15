@@ -10,6 +10,7 @@
 
 #include "../auxiliary/filtered_data.h"
 #include "../auxiliary/thread_group.h"
+#include "../controller/parameters.h"
 #include "../controller/running_status.h"
 #include "common/filtration_processor.h"
 #include "common/dumping_transmission.h"
@@ -20,6 +21,7 @@
 //------------------------------------------------------------------------------
 using NST::auxiliary::FilteredDataQueue;
 using NST::auxiliary::ThreadGroup;
+using NST::controller::Parameters;
 using NST::controller::RunningStatus;
 using NST::filter::pcap::CaptureReader;
 using NST::filter::pcap::FileReader;
@@ -39,13 +41,13 @@ public:
     {
     }
 
-    void dump_to_file(const std::string& file, const std::string& interface, const std::string& bpf, int snaplen, int ms)
+    void dump_to_file(const Parameters& params)
     {
         typedef FiltrationProcessor<CaptureReader, DumpingTransmission> Processor;
         typedef ProcessingThread<Processor> OnlineDumping;
 
-        std::auto_ptr<CaptureReader>        reader (new CaptureReader(interface, bpf, snaplen, ms));
-        std::auto_ptr<DumpingTransmission>  writer (new DumpingTransmission(reader->get_handle(), file));
+        std::auto_ptr<CaptureReader>        reader (new CaptureReader(params.interface(), params.filter(), params.snaplen(), 100));
+        std::auto_ptr<DumpingTransmission>  writer (new DumpingTransmission(reader->get_handle(), params.output_file()));
 
         std::auto_ptr<Processor>      processor (new Processor(reader, writer));
         std::auto_ptr<OnlineDumping>  thread    (new OnlineDumping(processor, status));
@@ -53,12 +55,12 @@ public:
         threads.add(thread.release());
     }
 
-    void capture_to_queue(FilteredDataQueue& queue, const std::string& interface, const std::string& bpf, int snaplen, int ms)
+    void capture_to_queue(FilteredDataQueue& queue, const Parameters& params)
     {
         typedef FiltrationProcessor<CaptureReader, QueueingTransmission> Processor;
         typedef ProcessingThread<Processor> OnlineAnalyzing;
 
-        std::auto_ptr<CaptureReader>        reader (new CaptureReader(interface, bpf, snaplen, ms));
+        std::auto_ptr<CaptureReader>        reader (new CaptureReader(params.interface(), params.filter(), params.snaplen(), 100));
         std::auto_ptr<QueueingTransmission> writer (new QueueingTransmission(queue));
 
         std::auto_ptr<Processor>     processor (new Processor(reader, writer));
@@ -67,12 +69,12 @@ public:
         threads.add(thread.release());
     }
 
-    void read_to_queue(FilteredDataQueue& queue, const std::string& file)
+    void read_to_queue(FilteredDataQueue& queue, const Parameters& params)
     {
         typedef FiltrationProcessor<FileReader, QueueingTransmission> Processor;
         typedef ProcessingThread<Processor> OfflineAnalyzing;
 
-        std::auto_ptr<FileReader>           reader (new FileReader(file));
+        std::auto_ptr<FileReader>           reader (new FileReader(params.input_file()));
         std::auto_ptr<QueueingTransmission> writer (new QueueingTransmission(queue));
 
         std::auto_ptr<Processor>      processor (new Processor(reader, writer));

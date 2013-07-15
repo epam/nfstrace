@@ -27,8 +27,8 @@ public:
     ~FileReader();
 
     inline FILE* get_file() { return pcap_file(handle); }
-    
-    void print_statistic(std::ostream& out) const { /*dummy method*/  }
+
+    void print_statistic(std::ostream& out) const { /*dummy method*/ }
 };
 
 } // namespace pcap

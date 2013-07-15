@@ -18,6 +18,7 @@
 
 #include "../../auxiliary/exception.h"
 #include "../../auxiliary/filtered_data.h"
+#include "../../controller/parameters.h"
 #include "../packet_info.h"
 #include "../pcap/packet_dumper.h"
 //------------------------------------------------------------------------------
@@ -613,7 +614,7 @@ public:
             }
         }
 
-        bool check_fragments(uint32_t acknowledged)
+        bool check_fragments(const uint32_t acknowledged)
         {
             Fragment* current = fragments;
             if( current )
@@ -902,7 +903,7 @@ class FiltrationProcessor
 {
 public:
 
-    FiltrationProcessor(std::auto_ptr<Reader>& r, std::auto_ptr<Writer>& w, bool v=true) : reader(r), writer(w), verbose(v)
+    FiltrationProcessor(std::auto_ptr<Reader>& r, std::auto_ptr<Writer>& w) : reader(r), writer(w)
     {
         // check datalink layer
         const int datalink = reader->datalink();
@@ -915,7 +916,10 @@ public:
     }
     ~FiltrationProcessor()
     {
-        reader->print_statistic(std::clog);
+        if(controller::Parameters::instance().is_verbose())
+        {
+            reader->print_statistic(std::clog);
+        }
     }
 
     void run()
@@ -987,7 +991,6 @@ private:
     std::auto_ptr<Reader> reader;
     std::auto_ptr<Writer> writer;
     TCPSessions sessions;
-    const bool verbose;
 };
 
 

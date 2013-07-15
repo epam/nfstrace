@@ -44,6 +44,7 @@ struct Opt
         }
 
         operator std::string() const { return std::string(value);           }
+        const char*  to_cstr() const { return value;                        }
         int           to_int() const { return atoi(value);                  }
         bool         to_bool() const { return std::string(value) == "true"; }
         bool is(const char* s) const { return strcmp(value, s) == 0;        }

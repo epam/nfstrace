@@ -41,8 +41,6 @@ private:
     explicit Args();  // undefined
 };
 
-typedef CmdlineParser<Args> Params;
-
 } // namespace cmdline
 } // namespace controller
 } // namespace NST

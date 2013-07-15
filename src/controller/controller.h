@@ -7,12 +7,11 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 //------------------------------------------------------------------------------
-#include "cmdline_args.h"
-
 #include "../filter/filtration_manager.h"
 #include "../analyzer/analysis_manager.h"
-#include "synchronous_signal_handling.h"
+#include "parameters.h"
 #include "running_status.h"
+#include "synchronous_signal_handling.h"
 //------------------------------------------------------------------------------
 using NST::filter::FiltrationManager;
 using NST::analyzer::AnalysisManager;
@@ -25,19 +24,13 @@ namespace controller
 class Controller
 {
 public:
-    Controller();
+
+    Controller(const Parameters& parameters);
     ~Controller();
 
-    bool cmdline_args(int argc, char** argv);
     int run();
 
 private:
-
-    void init_runing();
-
-    // this object stores command-line parameters of the application
-    cmdline::Params params;
-
     // container for generated exceptions
     RunningStatus status;
 
