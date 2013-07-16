@@ -20,7 +20,7 @@ void Latencies::add(const timeval& t)
     ++count;
     latencies.push_back(t);
     set_range(t);
-}             
+}
 
 double Latencies::get_avg() const
 {
@@ -43,9 +43,8 @@ double Latencies::get_avg() const
 
 double Latencies::get_st_dev() const
 {
-    if(!count)
-        return 0;
-    
+    if(!count) return 0.0;
+
     double avg = get_avg();
     double st_dev = 0.0;
     double diff;
