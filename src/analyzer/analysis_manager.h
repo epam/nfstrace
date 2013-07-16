@@ -44,8 +44,6 @@ public:
 
     FilteredDataQueue& init(const Parameters& params)
     {
-        typedef std::vector<std::string> AString;
-        typedef AString::const_iterator ConstIterator;
         uint32_t q_size = 256;
         uint32_t q_limit = 16;
         
@@ -58,12 +56,10 @@ public:
 
         }
 
-        AString active_analyzers = params.analyzers();
-        ConstIterator i = active_analyzers.begin();
-        ConstIterator end = active_analyzers.end();
-        for(; i != end; ++i)
+        std::vector<std::string> active_analyzers = params.analyzers();
+        for(unsigned int i = 0; i < active_analyzers.size(); ++i)
         {
-            if(*i == std::string("ob"))
+            if(active_analyzers[i] == std::string("ob"))
                 breakdown_analyzer();
         }
 
