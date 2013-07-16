@@ -299,7 +299,7 @@ void CmdlineParser<CLI>::print_usage(std::ostream& out, const char* name)
         }
 
         out << std::setw(6) << s_opt;
-        out << std::setiosflags(std::ios::left) << std::setw(25) << l_opt;
+        out << std::setiosflags(std::ios::left) << std::setw(35) << l_opt;
         /* don't wrap text description
         while(text.size() > 49) // wrap text at 80'th character
         {

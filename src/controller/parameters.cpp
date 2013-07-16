@@ -6,6 +6,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <unistd.h>
+
 #include "cmdline_args.h"
 #include "cmdline_parser.h"
 #include "parameters.h"
@@ -76,6 +78,38 @@ const unsigned short Parameters::snaplen() const
 const std::string Parameters::filter() const
 {
     return std::string("tcp port ") + std::string(parser[CLI::PORT]);
+}
+
+const Parameters::AString Parameters::analyzers() const
+{
+    AString analyzers;
+    std::istringstream raw_analyzers(parser[CLI::ANALYZERS]);
+    while(raw_analyzers)
+    {
+        std::string analyzer;
+        if(!std::getline(raw_analyzers, analyzer, ',')) break;
+        analyzers.push_back(analyzer);
+    }
+    validate_analyzers(analyzers);
+    return analyzers;
+}
+
+void Parameters::validate_analyzers(const AString& analyzers)
+{                 
+    static std::string ob(CLI::ob_analyzer);
+    static std::string ofws(CLI::ofws_analyzer);
+    static std::string ofdws(CLI::ofdws_analyzer);
+
+    ConstIterator i = analyzers.begin();
+    ConstIterator end = analyzers.end();
+    for(; i != end; ++i)
+    {
+        if(*i == ob) continue;
+        if(*i == ofws) continue;
+        if(*i == ofdws) continue;
+        if(access(i->c_str(), F_OK))
+            throw cmdline::CLIError(std::string("Unsupported analyzer: ") + *i);
+    }
 }
 
 const std::string Parameters::input_file() const

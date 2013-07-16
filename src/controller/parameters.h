@@ -7,6 +7,7 @@
 #define PARAMETERS_H
 //------------------------------------------------------------------------------
 #include <string>
+#include <vector>
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -23,7 +24,8 @@ enum RunningMode
 
 class Parameters
 {
-
+    typedef std::vector<std::string> AString;
+    typedef AString::const_iterator ConstIterator;
 public:
     inline static Parameters& instance()
     {
@@ -41,6 +43,7 @@ public:
     const std::string       filter() const;
     const std::string       input_file() const;
     const std::string       output_file() const;
+    const AString           analyzers() const;
 
 private:
     Parameters()
@@ -49,6 +52,7 @@ private:
     ~Parameters()
     {
     }
+    static void validate_analyzers(const AString& analyzers);
 
     Parameters(const Parameters&);            // undefined
     Parameters& operator=(const Parameters&); // undefined

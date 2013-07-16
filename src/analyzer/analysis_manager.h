@@ -44,6 +44,8 @@ public:
 
     FilteredDataQueue& init(const Parameters& params)
     {
+        typedef std::vector<std::string> AString;
+        typedef AString::const_iterator ConstIterator;
         uint32_t q_size = 256;
         uint32_t q_limit = 16;
         
@@ -56,8 +58,14 @@ public:
 
         }
 
-        // TODO: move createion in controller, add appropriate key
-        breakdown_analyzer();
+        AString active_analyzers = params.analyzers();
+        ConstIterator i = active_analyzers.begin();
+        ConstIterator end = active_analyzers.end();
+        for(; i != end; ++i)
+        {
+            if(*i == std::string("ob"))
+                breakdown_analyzer();
+        }
 
         return *queue;
     }
