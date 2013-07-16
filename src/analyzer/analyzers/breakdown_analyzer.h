@@ -43,6 +43,7 @@ public:
         Iterator end = per_op_stat.end();
         for(; i != end;)
         {
+            delete i->second;
             i = per_op_stat.erase(i);
         }
     }

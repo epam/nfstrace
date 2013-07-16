@@ -101,7 +101,7 @@ const std::vector<std::string> Parameters::analyzers() const
         if((analyzer == ob) || (analyzer == ofws) || (analyzer == ofdws))
             continue;
         if(access(analyzer.c_str(), F_OK))
-            throw cmdline::CLIError(std::string("Unsupported analyzer: ") + analyzer);
+            throw cmdline::CLIError(std::string("Can't access to plugable module: ") + analyzer);
     }
     return analyzers;
 }

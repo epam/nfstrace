@@ -25,28 +25,24 @@ class Breakdown
 public:
     Breakdown()
     {
-        for(int i = 0; i < Proc::num; ++i)
-        {
-            latencies.push_back(new Latencies());
-        }
     }
     ~Breakdown()
     {
-        for(int i = 0; i < Proc::num; ++i)
-        {
-            delete latencies[i];
-        }
+    }
+    inline const Latencies& operator[](uint32_t ind) const
+    {
+        return latencies[ind];
     }
     inline Latencies& operator[](uint32_t ind)
     {
-        return *latencies[ind];
+        return latencies[ind];
     }
 
 private:
     Breakdown(const Breakdown& breakdown);  //Protection
     void operator=(const Breakdown&);       //Protection
 
-    std::vector<Latencies*> latencies;
+    Latencies latencies[Proc::num];
 };
 
 } // namespace analyzers

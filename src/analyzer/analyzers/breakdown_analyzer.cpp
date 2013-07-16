@@ -170,7 +170,13 @@ void BreakdownAnalyzer::print(std::ostream& out)
     for(; it != end; ++it)
     {
         out << "Session: " << it->first << std::endl;
-        out << "Total: " << total << ". Per operation:" << std::endl;
+        const Breakdown& current = *it->second;
+        int s_total = 0;
+        for(int i = 0; i < Proc::num; ++i)
+        {
+            s_total += current[i].get_count();
+        }
+        out << "Total: " << s_total << ". Per operation:" << std::endl;
         for(int i = 0; i < Proc::num; ++i)
         {
             out.width(14);
@@ -178,23 +184,23 @@ void BreakdownAnalyzer::print(std::ostream& out)
             out.width(6);
             out << " Count:";
             out.width(5);
-            out << std::right << it->second->operator[](i).get_count();
+            out << std::right << current[i].get_count();
             out << " ";
             out.precision(2);
             out << "(";
             out.width(6);
-            out << std::fixed << (double(it->second->operator[](i).get_count()) / total) * 100;
+            out << std::fixed << (double(current[i].get_count()) / s_total) * 100;
             out << "%)";
             out << " Min: ";
             out.precision(3);
-            out << std::fixed << Latencies::to_sec((*it->second)[i].get_min());
+            out << std::fixed << Latencies::to_sec(current[i].get_min());
             out << " Max: ";
-            out << std::fixed << Latencies::to_sec((*it->second)[i].get_max());
+            out << std::fixed << Latencies::to_sec(current[i].get_max());
             out << " Avg: ";
-            out << std::fixed << (*it->second)[i].get_avg();
+            out << std::fixed << current[i].get_avg();
             out.precision(8);
             out << " StDev: ";
-            out << std::fixed << (*it->second)[i].get_st_dev() << std::endl;
+            out << std::fixed << current[i].get_st_dev() << std::endl;
         }
     }
 }
