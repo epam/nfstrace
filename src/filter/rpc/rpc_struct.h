@@ -71,8 +71,7 @@ public:
     }
     void set_time(const struct timeval& t)
     {
-        time.tv_sec = t.tv_sec;
-        time.tv_usec = t.tv_usec;
+        time = t;
     }
     const timeval& get_time() const
     {

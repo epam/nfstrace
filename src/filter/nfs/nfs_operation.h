@@ -9,12 +9,14 @@
 #include <cassert>
 #include <memory>
 
+#include "../../auxiliary/session.h"
 #include "../../auxiliary/filtered_data.h"
 #include "../rpc/rpc_struct.h"
 #include "nfs_procedures.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::rpc;
 
+using NST::auxiliary::Session;
 using NST::auxiliary::FilteredData;
 //------------------------------------------------------------------------------
 namespace NST
@@ -27,9 +29,9 @@ namespace NFS3
 class NFSOperation
 {
     typedef Proc::Ops ProcedureType;
-public:
-    typedef FilteredData::Session Session;
 
+public:
+    typedef NST::auxiliary::Session Session;
     NFSOperation(const RPCCall* c, const RPCReply* r, const Session* s) : call(c), reply(r), session(s)
     {
     }
@@ -51,12 +53,12 @@ public:
     {
         return session;
     }
-    inline timeval time_diff() const
+    inline timeval latency() const
     {
-        timeval diff = {0, 0};
+        timeval diff;
+        timerclear(&diff);
         if(reply) {
-            diff.tv_sec = call->get_time().tv_sec - reply->get_time().tv_sec;
-            diff.tv_usec = call->get_time().tv_usec - reply->get_time().tv_usec;
+            timersub(&reply->get_time(), &call->get_time(), &diff);
         }
         return diff; 
     }
