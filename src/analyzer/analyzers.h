@@ -81,6 +81,15 @@ public:
         }
         return true;
     }
+    void print(std::ostream& out)
+    {
+        Storage::iterator i = analyzers.begin();
+        Storage::iterator end = analyzers.end();
+        for(; i != end; ++i)
+        {
+            (*i)->print(out);
+        }
+    }
 
 private:
     Storage analyzers;

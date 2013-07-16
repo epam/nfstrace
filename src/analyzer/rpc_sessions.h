@@ -11,10 +11,12 @@
 #include <string>
 
 #include "../auxiliary/filtered_data.h"
+#include "../auxiliary/session.h"
 #include "../filter/nfs/nfs_operation.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::NFS3;
 
+using NST::auxiliary::Session;
 using NST::auxiliary::FilteredData;
 //------------------------------------------------------------------------------
 namespace NST
@@ -24,7 +26,6 @@ namespace analyzer
 
 class RPCSession
 {
-    typedef FilteredData::Session Session;
     typedef std::tr1::unordered_map<uint32_t, RPCCall*> Map;
     typedef Map::value_type Pair;
 
@@ -71,7 +72,7 @@ public:
     {
         return iterator != operations.end();
     }
-    inline const Session* const get_session() const
+    inline const Session* get_session() const
     {
         return &session;
     }
@@ -83,7 +84,6 @@ private:
 
 class RPCSessions
 {
-    typedef FilteredData::Session Session;
     typedef std::tr1::unordered_map<std::string, RPCSession*> Map;
     typedef Map::iterator Iterator;
     typedef Map::const_iterator ConstIterator;

@@ -14,6 +14,7 @@
 #include "../controller/parameters.h"
 #include "../controller/running_status.h"
 #include "analyzers.h"
+#include "analyzers/breakdown_analyzer.h"
 #include "analyzers/print_analyzer.h"
 #include "nfs_parser_thread.h"
 //------------------------------------------------------------------------------
@@ -52,9 +53,19 @@ public:
         if(params.is_verbose()) // add special analyzer for trace out RPC calls
         {
             analyzers.add(new PrintAnalyzer(std::clog));
+
         }
 
+        // TODO: move createion in controller, add appropriate key
+        breakdown_analyzer();
+
         return *queue;
+    }
+
+    void breakdown_analyzer()
+    {
+        std::auto_ptr<BaseAnalyzer> a(new BreakdownAnalyzer());
+        analyzers.add(a.release());
     }
 
     void start()
@@ -67,6 +78,8 @@ public:
 
     void stop()
     {
+        analyzers.print(std::cout);
+
         if(parser_thread.get())
         {
             parser_thread->stop();

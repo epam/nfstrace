@@ -9,6 +9,7 @@
 #include <algorithm> // for std::min()
 #include <string>
 
+#include "../../auxiliary/session.h"
 #include "../../auxiliary/filtered_data.h"
 #include "filtration_processor.h"
 //------------------------------------------------------------------------------
@@ -34,11 +35,11 @@ public:
     {
         FilteredDataQueue::ElementPtr nfs(queue);
 
-        nfs->session.ip_type = FilteredData::Session::v4;
+        nfs->session.ip_type = NST::auxiliary::Session::v4;
         nfs->session.ip.v4.addr[0] = key.src_address(d);
         nfs->session.ip.v4.addr[1] = key.dst_address(d);
 
-        nfs->session.type = FilteredData::Session::TCP;
+        nfs->session.type = NST::auxiliary::Session::TCP;
         nfs->session.port[0] = key.src_port(d);
         nfs->session.port[1] = key.dst_port(d);
 
