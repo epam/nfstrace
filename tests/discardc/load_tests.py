@@ -30,6 +30,7 @@ def main (argv):
         # mnt_dir is argv[1]
         for i in range(0, noop):
             cd_op = "cd " + argv[1]
+            subprc.check_output(cd_op + "&& rm -rf hello", shell=True)
             subprc.check_output(cd_op + "&& ls", shell=True)
             subprc.check_output(cd_op + "&& mkdir hello", shell=True)
             cd_op += "/hello &&"
