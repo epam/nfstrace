@@ -35,6 +35,12 @@ public:
     {
         FilteredDataQueue::ElementPtr nfs(queue);
 
+        if(!nfs)
+        {
+            std::clog << "free elements of the Queue are exhausted" << std::endl;
+            return;
+        }
+
         nfs->session.ip_type = NST::auxiliary::Session::v4;
         nfs->session.ip.v4.addr[0] = key.src_address(d);
         nfs->session.ip.v4.addr[1] = key.dst_address(d);
