@@ -82,12 +82,11 @@ public:
 
     void stop()
     {
-        analyzers.print(std::cout);
-
         if(parser_thread.get())
         {
             parser_thread->stop();
         }
+        analyzers.print(std::cout);
     }
 
 private:

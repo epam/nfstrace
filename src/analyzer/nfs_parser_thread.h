@@ -63,7 +63,7 @@ public:
             {
                 process_queue();
             }
-            //process_queue(); // flush data in queue
+            process_queue(); // flush data in queue
         }
         catch(std::exception& exception)
         {

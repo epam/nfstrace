@@ -2,6 +2,7 @@
 // Author: Pavel Karneliuk
 // Description: Generic processor for filtration raw pcap packets.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
+// TODO: THIS CODE MUST BE TOTALLY REFACTORED!
 //------------------------------------------------------------------------------
 #ifndef FILTRATION_PROCESSOR_H
 #define FILTRATION_PROCESSOR_H
@@ -183,6 +184,20 @@ public:
 
     inline operator bool() const { return first != NULL; }
 
+    inline void lost(const uint32_t n) // we are lost n bytes in sequence
+    {
+        if(discard >= n) // discard whole new fragment
+        {
+            std::clog << "We are lost " << n << " bytes of payload marked for discard\n";
+            discard -= n;
+        }
+        else
+        {
+            std::clog << "We are lost " << n - discard << " bytes of useful data\n";
+            discard = 0;
+        }
+    }
+
     void push(PacketInfo& info)
     {
         assert(info.dlen != 0);
@@ -351,14 +366,16 @@ public:
 
     inline void set_discard_size(const uint32_t n)
     {
-    //    std::clog << "set size of discard payload: " << n << std::endl;
-        int32_t to_discard = n - length;
-        if(to_discard > 0)
+    //    std::clog << "set size of discard payload: " << n << " current len: " << length << std::endl;
+        if(length >= n)
         {
-            discard = to_discard;
+            skip(n);
         }
-        skip(n); // discard existing part of stream
-        assert(length == 0);
+        else // length < n
+        {
+            discard = n - length;
+            skip(length);
+        }
     }
 
 //private:
@@ -417,11 +434,18 @@ public:
         {
             ptr->timestamp = frag->pcap_header.ts; // set timestamp as ts of first fragment
 
+            stream->skip(sizeof(RecordMark));
+       //     std::cout << "msg_len: " << msg_len << " hdr_len: " << hdr_len << std::endl;
+            hdr_len -= sizeof(RecordMark);
+            msg_len -= sizeof(RecordMark);
+
             ptr->dlen = std::min(hdr_len, ptr->dlen);
             stream->readout(ptr->data, ptr->dlen);
 
+      //      std::cout << "msg_len: " << msg_len << " hdr_len: " << hdr_len << std::endl;
             assert(msg_len >= hdr_len);
 
+       //     std::cout << "msg_len: " << msg_len << " hdr_len: " << hdr_len << " dlen: " << ptr->dlen << std::endl;
             uint32_t to_skip = msg_len - ptr->dlen;
             if(to_skip)
             {
@@ -479,7 +503,6 @@ private:
         {
             if(parse_message()) // ok, skip record mark of RPC message
             {
-                stream->skip(sizeof(RecordMark));
                 return;
             }
             else // we are out of sequence of RPC messages in stream
@@ -528,7 +551,7 @@ private:
         const MessageHeader*const msg = rm->fragment();
 
         //if(rm->is_last()); // TODO: handle sequence field of record mark
-        msg_len = rm->fragment_len();    // length of current RPC message
+        msg_len = sizeof(RecordMark) + rm->fragment_len();    // length of current RPC message + RM
         hdr_len = std::min(msg_len, max_hdr);
 
         switch(msg->type())
@@ -548,7 +571,9 @@ private:
                                   << " v: "                            << call->vers()
                                   << " procedure: "                    << call->proc()
                                   << '\n';*/
-                        hdr_len = 0;  // dont collect header
+                /*        stream->skip(msg_len);
+                        msg_len = 0;
+                        hdr_len = 0;  // dont collect header*/
                         return true;
                     }
                 }
@@ -587,7 +612,7 @@ private:
     }
 
     const uint32_t  max_hdr;  // max length of RPC header
-    uint32_t        msg_len;  // length of current RPC message
+    uint32_t        msg_len;  // length of current RPC message + RM
     uint32_t        hdr_len;  // min(max_hdr, msg_len) or 0 in case of unknown msg
 
     FragmentStream* stream;
@@ -704,16 +729,9 @@ public:
                 
                 if( acknowledged > lowest_seq )
                 {
-                    // There are frames missing in the capture file that were seen
-                    // by the receiving host. Add dummy stream chunk with the data
-                    // "[xxx bytes missing in capture file]"
-    /*
-                    gchar* dummy_str = g_strdup_printf("[%d bytes missing in capture file]",
-                                    (int)(lowest_seq - sequences[idx]) );
-                    sc->dlen = (guint32) strlen(dummy_str);
-                    write_packet_data( idx, sc, dummy_str );
-                    g_free(dummy_str);*/
-                    std::cout << "DUMMMMMY LOST bytes: " << (lowest_seq - sequence) << std::endl;
+                    // There are frames missing in the capture stream that were seen
+                    // by the receiving host. Inform Stream about it.
+                    stream.lost(lowest_seq - sequence);
                     sequence = lowest_seq;
                     return true;
                 }
