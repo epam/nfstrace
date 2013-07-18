@@ -7,7 +7,6 @@
 #define SESSION_H
 //------------------------------------------------------------------------------
 #include <ostream>
-#include <sstream>
 
 #include <stdint.h>
 //------------------------------------------------------------------------------
@@ -19,11 +18,6 @@ namespace auxiliary
 
 struct Session
 {
-    struct Hash
-    {
-        std::size_t operator()(Session const &s) const;
-    };
-
     enum Direction
     {
         Source      =0,
@@ -42,7 +36,7 @@ struct Session
         UDP=1,
     } type:16;    //16 bit for alignment following integers
 
-    union
+    union IPAddress
     {
         struct
         {
@@ -56,7 +50,13 @@ struct Session
 
     uint16_t port[2];           // 2 ports in host byte order
 
-    bool operator==(const Session& obj) const;
+    struct Hash
+    {
+        std::size_t operator()(const Session& key) const { return key.hash(); }
+    };
+
+    bool operator==(const Session& key) const;
+    size_t hash() const;
     friend std::ostream& operator<<(std::ostream& out, const Session& session);
     static std::string session_addr(Session::Direction dir, const Session& session);
     static std::string ipv4_string(const uint32_t ip);

@@ -21,6 +21,7 @@
 #include "../../auxiliary/filtered_data.h"
 #include "../../controller/parameters.h"
 #include "../packet_info.h"
+#include "../conversation.h"
 #include "../pcap/packet_dumper.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Exception;
@@ -32,97 +33,6 @@ namespace NST
 {
 namespace filter
 {
-
-
-
-struct Nodes
-{
-    enum Direction
-    {
-        AtoB = 0, // A -> B
-        BtoA = 1, // A <- B
-    };
-
-    inline Direction set(const uint32_t& src_address,
-                         const uint32_t& dst_address,
-                         const uint16_t& src_port,
-                         const uint16_t& dst_port)
-    {
-        Direction src;
-
-        if (src_address < dst_address) src = AtoB;
-        else
-        if (src_address > dst_address) src = BtoA;
-        else // Ok, addresses are equal, compare ports
-        src = (src_port < dst_port) ? AtoB : BtoA;
-
-        Direction dst = (Direction)(1 - src);
-
-        addr[src] = src_address;
-        addr[dst] = dst_address;
-        port[src] = src_port;
-        port[dst] = dst_port;
-
-        return src;
-    }
-
-    size_t hash() const
-    {
-        size_t value = port[0] + port[1];
-
-        const uint8_t* a = (const uint8_t*)&addr[0];
-        const uint8_t* b = (const uint8_t*)&addr[1];
-        for(size_t i=0; i<sizeof(uint32_t); ++i)
-        {   // sum bytes of addresses
-            value += a[i];
-            value += b[i];
-        }
-
-        return value;
-    }
-
-    struct Hash
-    {
-      long operator() (const Nodes& key) const { return key.hash(); }
-    };
-
-    bool operator==(const Nodes& a) const
-    {
-        return memcmp(this, &a, sizeof(Nodes)) == 0; // are equal?
-    }
-
-    inline const uint32_t src_address(const Direction d) const { return addr[ d ]; }
-    inline const uint32_t dst_address(const Direction d) const { return addr[1-d]; }
-
-    inline const uint16_t src_port(const Direction d) const { return port[ d ]; }
-    inline const uint16_t dst_port(const Direction d) const { return port[1-d]; }
-
-    void print(std::ostream& out, Direction d) const
-    {
-        out << ipv4_string(src_address(d)) << ":" << src_port(d);
-        out << " -> ";
-        out << ipv4_string(dst_address(d)) << ":" << dst_port(d);
-    }
-
-    static std::string ipv4_string(uint32_t ip /*host byte order*/ )
-    {
-        std::stringstream address(std::ios_base::out);
-        address << ((ip >> 24) & 0xFF);
-        address << '.';
-        address << ((ip >> 16) & 0xFF);
-        address << '.';
-        address << ((ip >> 8) & 0xFF);
-        address << '.';
-        address << ((ip >> 0) & 0xFF);
-        return address.str();
-    }
-
-private:
-    uint32_t addr[2];
-    uint16_t port[2];
-};
-
-
 
 struct Fragment
 {
@@ -665,7 +575,6 @@ public:
                             // this one has more than we have seen. let's get the
                             // payload that we have not seen. This happens when
                             // part of this frame has been retransmitted
-
                             uint32_t new_pos = sequence - current->seq;
 
                             sequence += (current->len - new_pos);
@@ -705,11 +614,6 @@ public:
                     if( current->seq == sequence )
                     {
                         // this fragment fits the stream
-                     /*   if( current->data )
-                        {
-                            sc->dlen = current->dlen;
-                            write_packet_data( idx, sc, current->data );
-                        }*/
                         sequence += current->len;
                         if( prev )
                         {
@@ -749,22 +653,16 @@ public:
                 sequence = seq + len;
                 if( info.tcp->is(tcp_header::SYN) )
                 {
-                //    std::cout << "SYN flag!!!!!!!!!!!!!!!!!!!" << '\n';
                     sequence++;
                 }
-            //    std::cout << "sequence number: " << sequence << '\n';
 
-                // write out the packet data
-              //  write_packet_data( src_index, &sc, data );
-              
                 if(len > 0)
                 {
-                    stream.push(info);
+                    stream.push(info);  // write out the packet data
                 }
 
                 return;
             }
-
 
             // if we are here, we have already seen this src, let's
             // try and figure out if this packet is in the right place
@@ -779,7 +677,6 @@ public:
 
                     // this one has more than we have seen. let's get the
                     // payload that we have not seen
-
                     uint32_t new_len = sequence - seq;
 
                     if ( info.dlen <= new_len )
@@ -839,9 +736,8 @@ public:
 
         FragmentStream  stream;     // acked data stream
         Fragment*       fragments;  // list of not yet acked fragments
-        uint32_t        base_seq;   // base seq number (used by relative sequence numbers) or 0 if not yet known.
+        uint32_t        base_seq;   // base seq number (used by relative sequence numbers) or 0 if not yet known
         uint32_t        sequence;
-
     };
 
     Session()
@@ -860,7 +756,7 @@ public:
         }
     }
 
-    void reassemble_tcp(const Nodes& nodes, Nodes::Direction d, PacketInfo& info)
+    void reassemble_tcp(const Conversation& conversation, Conversation::Direction d, PacketInfo& info)
     {
         const uint32_t ack = info.tcp->ack();
 
@@ -875,8 +771,7 @@ public:
 };
 
 
-
-class TCPSessions: public std::tr1::unordered_map<Nodes, Session, Nodes::Hash>
+class TCPSessions: public std::tr1::unordered_map<Conversation, Session, Conversation::Hash>
 {
 
 public:
@@ -890,7 +785,7 @@ public:
     {
     }
 
-    iterator find_or_create_session(Nodes::Direction d, const Nodes& key)
+    iterator find_or_create_session(const Conversation& key)
     {
         iterator i = find(key);
         if(i == end())
@@ -976,14 +871,11 @@ public:
             return;
         }
 
-        Nodes key;
+        Conversation::Direction direction = Conversation::AtoB;
+        Conversation key(info, direction);
 
-        Nodes::Direction direction = key.set(info.ipv4->src(),
-                                             info.ipv4->dst(),
-                                             info.tcp->sport(),
-                                             info.tcp->dport());
-
-        TCPSessions::it i = processor->sessions.find_or_create_session(direction, key);
+        // Following code must be refactored!
+        TCPSessions::iterator i = processor->sessions.find_or_create_session(key);
         if(i != processor->sessions.end())
         {
             Session& session = i->second;
@@ -992,13 +884,18 @@ public:
 
             for(uint32_t i=0; i<2; i++)
             {
-                Nodes::Direction d = (Nodes::Direction)i;
-
                 RPCReader& reader = session.readers[i];
 
                 if(reader.detect_message())
                 {
-                    processor->writer->collect(d, key, reader);
+                    if(direction == (Conversation::Direction)i)
+                    {
+                        processor->writer->collect((Conversation::Direction)i, key, reader);
+                    }
+                    else
+                    {
+                        std::cerr << "There is missmatch in data flow direction." << std::endl;
+                    }
                 }
 
             }
