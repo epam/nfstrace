@@ -31,7 +31,7 @@ public:
     {
     }
 
-    void collect(Nodes::Direction d, const Nodes& key, RPCReader& reader)
+    void collect(Conversation::Direction d, const Conversation& key, RPCReader& reader)
     {
         FilteredDataQueue::ElementPtr nfs(queue);
 
@@ -40,14 +40,8 @@ public:
             std::clog << "free elements of the Queue are exhausted" << std::endl;
             return;
         }
-
-        nfs->session.ip_type = NST::auxiliary::Session::v4;
-        nfs->session.ip.v4.addr[0] = key.src_address(d);
-        nfs->session.ip.v4.addr[1] = key.dst_address(d);
-
-        nfs->session.type = NST::auxiliary::Session::TCP;
-        nfs->session.port[0] = key.src_port(d);
-        nfs->session.port[1] = key.dst_port(d);
+        
+        nfs->session = key.get_session();
 
         nfs->dlen = sizeof(nfs->data);
 

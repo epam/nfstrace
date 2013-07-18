@@ -3,6 +3,8 @@
 // Description: Struct represented tcp session.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
+#include <sstream>
+
 #include "session.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -11,23 +13,23 @@ namespace NST
 namespace auxiliary
 {
 
-std::size_t Session::Hash::operator()(Session const &s) const
+std::size_t Session::hash() const
 {
-    std::size_t key(0);
-    key += s.port[0] + s.port[1];
-    if(s.ip_type == Session::v4)
+    std::size_t key = port[0] + port[1];
+
+    if(ip_type == Session::v4)
     {
-        key += s.ip.v4.addr[0] + s.ip.v4.addr[1];
+        key += ip.v4.addr[0] + ip.v4.addr[1];
     }
     else
     {
         for(int i = 0; i < 16; ++i)
         {
-            key += s.ip.v6.addr[0][i] + s.ip.v6.addr[1][i];
+            key += ip.v6.addr[0][i] + ip.v6.addr[1][i];
         }
     }
 
-    if(s.type == Session::UDP)
+    if(type == Session::UDP)
     {
         key = ~key;
     }
@@ -42,7 +44,7 @@ bool Session::operator==(const Session& obj) const
         return false;
     switch(ip_type)
     {
-        case Session::v4: 
+        case Session::v4:
         {
             if((ip.v4.addr[0] != obj.ip.v4.addr[0]) || (ip.v4.addr[1] != obj.ip.v4.addr[1]))
                 return false;

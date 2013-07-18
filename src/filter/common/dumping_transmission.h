@@ -32,7 +32,7 @@ public:
     {
     }
 
-    void collect(Nodes::Direction d, const Nodes& key, RPCReader& reader)
+    void collect(Conversation::Direction d, const Conversation& key, RPCReader& reader)
     {
         reader.readto(*dumper);
     }
