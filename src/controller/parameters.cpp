@@ -13,7 +13,7 @@
 #include "parameters.h"
 //------------------------------------------------------------------------------
 typedef NST::controller::cmdline::Args CLI;
-NST::controller::cmdline::CmdlineParser<CLI> parser;
+static NST::controller::cmdline::CmdlineParser<CLI> parser;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -112,6 +112,17 @@ const std::string Parameters::output_file() const
     }
     // TODO: add file validation
     return ofile;
+}
+
+const unsigned int Parameters::buffer_size() const
+{
+    const int size = parser[CLI::BSIZE].to_int();
+    if(size < 1)
+    {
+        throw cmdline::CLIError(std::string("Invalid value of kernel buffer size: ") + parser[CLI::BSIZE].to_cstr());
+    }
+
+    return size * 1024 * 1024; // MBytes
 }
 
 const unsigned short Parameters::queue_capacity() const

@@ -41,6 +41,7 @@ public:
     const std::string       filter() const;
     const std::string       input_file() const;
     const std::string       output_file() const;
+    const unsigned int      buffer_size() const;
     const unsigned short    queue_capacity() const;
     const std::vector<std::string> analyzers() const;
 

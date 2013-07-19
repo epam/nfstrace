@@ -47,7 +47,7 @@ public:
         uint32_t q_capacity = params.queue_capacity();
         uint32_t q_size = 64;
         uint32_t q_limit= 1;
-        if(q_capacity < q_size)
+        if(q_capacity <= q_size)
         {
             q_size  = q_capacity;
         }
@@ -55,29 +55,13 @@ public:
         {
             q_limit = 1 + q_capacity / q_size;
         }
-        
+
         queue.reset(new FilteredDataQueue(q_size, q_limit));
         parser_thread.reset(new NFSParserThread(*queue, analyzers, status));
 
-        if(params.is_verbose()) // add special analyzer for trace out RPC calls
-        {
-            analyzers.add(new PrintAnalyzer(std::clog));
-
-        }
-
-        std::vector<std::string> active_analyzers = params.analyzers();
-        for(unsigned int i = 0; i < active_analyzers.size(); ++i)
-        {
-            if(active_analyzers[i] == std::string("ob"))
-                breakdown_analyzer();
-        }
+        populate_analyzers(params);
 
         return *queue;
-    }
-
-    void breakdown_analyzer()
-    {
-        analyzers.add(new BreakdownAnalyzer());
     }
 
     void start()
@@ -98,6 +82,27 @@ public:
     }
 
 private:
+
+    void populate_analyzers(const Parameters& params)
+    {
+        std::vector<std::string> active_analyzers = params.analyzers();
+        for(unsigned int i = 0; i < active_analyzers.size(); ++i)
+        {
+            if(active_analyzers[i] == std::string("ob"))
+                breakdown_analyzer();
+        }
+
+        if(params.is_verbose()) // add special analyzer for trace out RPC calls
+        {
+            analyzers.add(new PrintAnalyzer(std::clog));
+        }
+    }
+
+    void breakdown_analyzer()
+    {
+        analyzers.add(new BreakdownAnalyzer());
+    }
+
     AnalysisManager(const AnalysisManager& object);            // Uncopyable object
     AnalysisManager& operator=(const AnalysisManager& object); // Uncopyable object
 
