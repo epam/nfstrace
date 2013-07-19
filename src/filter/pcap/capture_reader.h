@@ -29,10 +29,9 @@ public:
         O  = PCAP_D_OUT,
     };
 
-    CaptureReader(const std::string& interface, const std::string& filter, int snaplen, int to_ms);
+    CaptureReader(const std::string& interface, const std::string& filter, int snaplen, int to_ms, int buffer_size);
     ~CaptureReader();
 
-    inline bool set_buffer_size(int size) { return 0 == pcap_set_buffer_size(handle, size); }
     inline void set_direction(Direction d) { pcap_setdirection(handle,(pcap_direction_t)d); }
     void        print_statistic(std::ostream& out) const;
 };

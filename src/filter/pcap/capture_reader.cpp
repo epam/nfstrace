@@ -15,7 +15,11 @@ namespace filter
 namespace pcap
 {
 
-CaptureReader::CaptureReader(const std::string& interface, const std::string& filter, int snaplen, int to_ms)
+CaptureReader::CaptureReader(const std::string& interface,
+                             const std::string& filter,
+                             int snaplen,
+                             int to_ms,
+                             int buffer_size)
     :BaseReader()
 {
     char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
@@ -37,11 +41,14 @@ CaptureReader::CaptureReader(const std::string& interface, const std::string& fi
     // creating BPF
     BPF bpf(handle, filter.c_str(), netmask);
 
-    //set BPF
+    // set BPF
     if(pcap_setfilter(handle, bpf) < 0)
     {
         throw PcapError("pcap_setfilter", pcap_geterr(handle));
     }
+
+    // set capture buffer size in kernel
+    pcap_set_buffer_size(handle, buffer_size);
 }
 
 CaptureReader::~CaptureReader()
@@ -51,15 +58,15 @@ CaptureReader::~CaptureReader()
 void CaptureReader::print_statistic(std::ostream& out) const
 {
     struct pcap_stat stat;
-    if(pcap_stats(handle, &stat) < 0)
-    {
-        throw PcapError("pcap_stats", pcap_geterr(handle));
-    }
-    else
+    if(pcap_stats(handle, &stat) == 0)
     {
         out << stat.ps_recv   << " packets received by filter"   << std::endl
             << stat.ps_drop   << " packets dropped by kernel"    << std::endl
             << stat.ps_ifdrop << " packets dropped by interface" << std::endl;
+    }
+    else
+    {
+        throw PcapError("pcap_stats", pcap_geterr(handle));
     }
 }
 

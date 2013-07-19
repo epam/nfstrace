@@ -24,11 +24,12 @@ struct Args
         PORT,
         SNAPLEN,
         MODE,
+        ANALYZERS,
         IFILE,
         OFILE,
+        BSIZE,
         QSIZE,
         VERBOSE,
-        ANALYZERS,
         HELP,
         num,
     };

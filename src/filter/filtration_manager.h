@@ -46,7 +46,7 @@ public:
         typedef FiltrationProcessor<CaptureReader, DumpingTransmission> Processor;
         typedef ProcessingThread<Processor> OnlineDumping;
 
-        std::auto_ptr<CaptureReader>        reader (new CaptureReader(params.interface(), params.filter(), params.snaplen(), 100));
+        std::auto_ptr<CaptureReader>        reader = create_capture_reader(params);
         std::auto_ptr<DumpingTransmission>  writer (new DumpingTransmission(reader->get_handle(), params.output_file()));
 
         std::auto_ptr<Processor>      processor (new Processor(reader, writer));
@@ -60,7 +60,7 @@ public:
         typedef FiltrationProcessor<CaptureReader, QueueingTransmission> Processor;
         typedef ProcessingThread<Processor> OnlineAnalyzing;
 
-        std::auto_ptr<CaptureReader>        reader (new CaptureReader(params.interface(), params.filter(), params.snaplen(), 100));
+        std::auto_ptr<CaptureReader>        reader = create_capture_reader(params);
         std::auto_ptr<QueueingTransmission> writer (new QueueingTransmission(queue));
 
         std::auto_ptr<Processor>     processor (new Processor(reader, writer));
@@ -94,6 +94,19 @@ public:
     }
 
 private:
+
+    std::auto_ptr<CaptureReader> create_capture_reader(const Parameters& params)
+    {
+        const int read_timeout = 250; // milliseconds
+        std::auto_ptr<CaptureReader> reader (new CaptureReader(params.interface(),
+                                                               params.filter(),
+                                                               params.snaplen(),
+                                                               read_timeout,
+                                                               params.buffer_size()
+                                                               ));
+        return reader;
+    }
+
     FiltrationManager(const FiltrationManager&);            // undefined
     FiltrationManager& operator=(const FiltrationManager&); // undefined
 
