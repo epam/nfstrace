@@ -74,9 +74,9 @@ public:
 
 private:
     bool account(Proc::Ops op, const NFSOperation& operation);
-    int total;
+    uint64_t total;
     std::vector<int> ops_count;
-    PerOpStat per_op_stat; 
+    PerOpStat per_op_stat;
 };
 
 } // namespace analyzers

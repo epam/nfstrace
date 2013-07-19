@@ -22,39 +22,36 @@ void Latencies::add(const timeval& t)
     set_range(t);
 }
 
-double Latencies::get_avg() const
+long double Latencies::get_avg() const
 {
-    double avg = 0.0;
-    if(count != 0)
-    {
-        ConstIterator i = latencies.begin();
-        ConstIterator end = latencies.end();
+    if(count == 0) return 0.0L;
 
-        timeval res;
-        timerclear(&res);
-        for(; i != end; ++i)
-        {
-            timeradd(&res, &(*i), &res);
-        }
-        avg = to_sec(res) / count;
+    ConstIterator i = latencies.begin();
+    ConstIterator end = latencies.end();
+
+    timeval res;
+    timerclear(&res);
+    for(; i != end; ++i)
+    {
+        timeradd(&res, &(*i), &res);
     }
-    return avg;
+    return to_sec(res) / count;
 }
 
-double Latencies::get_st_dev() const
+long double Latencies::get_st_dev() const
 {
-    if(!count) return 0.0;
+    if(count == 0) return 0.0L;
 
-    double avg = get_avg();
-    double st_dev = 0.0;
-    double diff;
+    const long double avg = get_avg();
+    long double st_dev = 0.0L;
+    long double diff;
 
     ConstIterator i = latencies.begin();
     ConstIterator end = latencies.end();
     for(; i != end; ++i)
     {
         diff = to_sec(*i) - avg;
-        st_dev += pow(diff, 2);
+        st_dev += pow(diff, 2.0L);
     }
     st_dev /= count;
     return sqrt(st_dev);
@@ -70,9 +67,9 @@ void Latencies::set_range(const timeval& t)
         max = t;
 }
 
-double Latencies::to_sec(const timeval& val)
+long double Latencies::to_sec(const timeval& val)
 {
-    return (double(val.tv_sec) + double(val.tv_usec) / 1000000.0);
+    return (((long double)val.tv_sec) + ((long double)val.tv_usec) / 1000000.0L);
 }
 
 } // namespace analyzers

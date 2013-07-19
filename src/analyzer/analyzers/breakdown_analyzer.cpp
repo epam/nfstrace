@@ -171,7 +171,7 @@ void BreakdownAnalyzer::print(std::ostream& out)
     {
         out << "Session: " << it->first << std::endl;
         const Breakdown& current = *it->second;
-        int s_total = 0;
+        uint64_t s_total = 0;
         for(int i = 0; i < Proc::num; ++i)
         {
             s_total += current[i].get_count();
@@ -189,7 +189,7 @@ void BreakdownAnalyzer::print(std::ostream& out)
             out.precision(2);
             out << "(";
             out.width(6);
-            out << std::fixed << (double(current[i].get_count()) / s_total) * 100;
+            out << std::fixed << ((long double)(current[i].get_count()) / s_total) * 100;
             out << "%)";
             out << " Min: ";
             out.precision(3);
