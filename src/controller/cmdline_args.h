@@ -26,6 +26,7 @@ struct Args
         MODE,
         IFILE,
         OFILE,
+        QSIZE,
         VERBOSE,
         ANALYZERS,
         HELP,

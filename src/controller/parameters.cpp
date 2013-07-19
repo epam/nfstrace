@@ -67,7 +67,7 @@ const std::string Parameters::interface() const
 
 const unsigned short Parameters::snaplen() const
 {
-    unsigned short snaplen = parser[CLI::SNAPLEN].to_int();
+    const int snaplen = parser[CLI::SNAPLEN].to_int();
     if(snaplen != 65535)
     {
         throw cmdline::CLIError("Statefull filtration RPC messages over TCP requires snaplen = 65535");
@@ -78,32 +78,6 @@ const unsigned short Parameters::snaplen() const
 const std::string Parameters::filter() const
 {
     return std::string("tcp port ") + std::string(parser[CLI::PORT]);
-}
-
-const std::vector<std::string> Parameters::analyzers() const
-{
-    static std::string ob(CLI::ob_analyzer);
-    static std::string ofws(CLI::ofws_analyzer);
-    static std::string ofdws(CLI::ofdws_analyzer);
-    
-    std::vector<std::string> analyzers;
-    std::istringstream raw_analyzers(parser[CLI::ANALYZERS]);
-    while(raw_analyzers)
-    {
-        std::string analyzer;
-        if(!std::getline(raw_analyzers, analyzer, ',')) break;
-        analyzers.push_back(analyzer);
-    }
-
-    for(unsigned int i = 0; i < analyzers.size(); ++i)
-    {
-        std::string& analyzer = analyzers[i];
-        if((analyzer == ob) || (analyzer == ofws) || (analyzer == ofdws))
-            continue;
-        if(access(analyzer.c_str(), F_OK))
-            throw cmdline::CLIError(std::string("Can't access to plugable module: ") + analyzer);
-    }
-    return analyzers;
 }
 
 const std::string Parameters::input_file() const
@@ -138,6 +112,43 @@ const std::string Parameters::output_file() const
     }
     // TODO: add file validation
     return ofile;
+}
+
+const unsigned short Parameters::queue_capacity() const
+{
+    const int capacity = parser[CLI::QSIZE].to_int();
+    if(capacity < 1 || capacity > 65535)
+    {
+        throw cmdline::CLIError(std::string("Invalid value of queue capacity: ") + parser[CLI::QSIZE].to_cstr());
+    }
+
+    return capacity;
+}
+
+const std::vector<std::string> Parameters::analyzers() const
+{
+    static std::string ob(CLI::ob_analyzer);
+    static std::string ofws(CLI::ofws_analyzer);
+    static std::string ofdws(CLI::ofdws_analyzer);
+    
+    std::vector<std::string> analyzers;
+    std::istringstream raw_analyzers(parser[CLI::ANALYZERS]);
+    while(raw_analyzers)
+    {
+        std::string analyzer;
+        if(!std::getline(raw_analyzers, analyzer, ',')) break;
+        analyzers.push_back(analyzer);
+    }
+
+    for(unsigned int i = 0; i < analyzers.size(); ++i)
+    {
+        std::string& analyzer = analyzers[i];
+        if((analyzer == ob) || (analyzer == ofws) || (analyzer == ofdws))
+            continue;
+        if(access(analyzer.c_str(), F_OK))
+            throw cmdline::CLIError(std::string("Can't access to plugable module: ") + analyzer);
+    }
+    return analyzers;
 }
 
 } // namespace controller
