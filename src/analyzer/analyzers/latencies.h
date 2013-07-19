@@ -29,12 +29,9 @@ public:
         timerclear(&max);
     }
     void add(const timeval& t);
-    inline uint32_t get_count() const
-    {
-        return count;
-    }
-    double get_avg() const;
-    double get_st_dev() const;
+    inline uint64_t get_count() const { return count; }
+    long double get_avg() const;
+    long double get_st_dev() const;
     inline const timeval& get_min() const
     {
         return min;
@@ -43,14 +40,14 @@ public:
     {
         return max;
     }
-    static double to_sec(const timeval& val);
+    static long double to_sec(const timeval& val);
 private:
     Latencies(const Latencies&);       // Protection
     void operator=(const Latencies&);  // Protection
-    
+
     void set_range(const timeval& t);
-    
-    uint32_t count;
+
+    uint64_t count;
     std::list<timeval> latencies;
     timeval min;
     timeval max;
