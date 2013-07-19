@@ -37,6 +37,7 @@ Opt Args::options[Args::num] =
     {'m', "mode",      Opt::REQ,  LIVE,                         "set runing mode",                  LIVE"|"DUMP"|"STAT },
     {'I', "ifile",     Opt::REQ, "INTERFACE-PORT-SNAPLEN.pcap", "input file to "STAT" mode",        "PATH"},
     {'O', "ofile",     Opt::REQ, "INTERFACE-PORT-SNAPLEN.pcap", "output file to "DUMP" mode",       "PATH"},
+    {'q', "qcapacity", Opt::REQ, "256",                         "max queue capacity of RPC messages","1..65535"},
     {'v', "verbose",   Opt::NOA, "false",                       "print out additional information"},
     {'a', "analyzers", Opt::REQ,  OB,                           "use specified analyzer",           OB"|"OFWS"|"OFDWS"|PATH" },
     {'h', "help",      Opt::NOA, "false",                       "print this help message and exit"},

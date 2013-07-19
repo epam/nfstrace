@@ -44,8 +44,17 @@ public:
 
     FilteredDataQueue& init(const Parameters& params)
     {
-        uint32_t q_size = 256;
-        uint32_t q_limit = 16;
+        uint32_t q_capacity = params.queue_capacity();
+        uint32_t q_size = 64;
+        uint32_t q_limit= 1;
+        if(q_capacity < q_size)
+        {
+            q_size  = q_capacity;
+        }
+        else
+        {
+            q_limit = 1 + q_capacity / q_size;
+        }
         
         queue.reset(new FilteredDataQueue(q_size, q_limit));
         parser_thread.reset(new NFSParserThread(*queue, analyzers, status));
@@ -68,8 +77,7 @@ public:
 
     void breakdown_analyzer()
     {
-        std::auto_ptr<BaseAnalyzer> a(new BreakdownAnalyzer());
-        analyzers.add(a.release());
+        analyzers.add(new BreakdownAnalyzer());
     }
 
     void start()
