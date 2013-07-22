@@ -56,7 +56,9 @@ struct Packet: public PacketInfo
     }
 
 private:
-    Packet (); // undefiend
+    Packet();                       // undefiend
+    Packet(const Packet&);          // undefined
+    void operator=(const Packet&);  // undefined
 };
 
 } // namespace filter

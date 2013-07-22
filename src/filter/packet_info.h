@@ -131,6 +131,10 @@ struct PacketInfo
 
     const uint8_t*                  data;   // pointer to payload data
     uint32_t                        dlen;   // length of payload data
+
+private:
+    PacketInfo(const PacketInfo&);      // undefined
+    void operator=(const PacketInfo&);  // undefined
 };
 
 } // namespace filter
