@@ -31,6 +31,13 @@ bool Parameters::cmdline_args(int argc, char** argv)
     parser.validate();
 
     // cashed values
+    const int limit = parser[CLI::MSIZE].to_int();
+    if(limit < 1 || limit > 4000)
+    {
+        throw cmdline::CLIError(std::string("Invalid limit of RPC messages: ") + parser[CLI::MSIZE].to_cstr());
+    }
+
+    rpc_message_limit = limit;
     verbose = parser[CLI::VERBOSE].to_bool();
 
     return true;
@@ -86,7 +93,7 @@ const std::string Parameters::input_file() const
     if(parser.is_default(CLI::IFILE))
     {
         std::stringstream buffer;
-        buffer << parser[CLI::INTERFACE].to_cstr() << '-' << parser[CLI::PORT].to_cstr() << '-' << parser[CLI::SNAPLEN].to_cstr() << ".pcap";
+        buffer << parser[CLI::INTERFACE].to_cstr() << '-' << parser[CLI::PORT].to_cstr() << ".pcap";
         ifile = buffer.str();
     }
     else
@@ -103,7 +110,7 @@ const std::string Parameters::output_file() const
     if(parser.is_default(CLI::OFILE))
     {
         std::stringstream buffer;
-        buffer << parser[CLI::INTERFACE].to_cstr() << '-' << parser[CLI::PORT].to_cstr() << '-' << parser[CLI::SNAPLEN].to_cstr() << ".pcap";
+        buffer << parser[CLI::INTERFACE].to_cstr() << '-' << parser[CLI::PORT].to_cstr() << ".pcap";
         ofile = buffer.str();
     }
     else
@@ -123,6 +130,11 @@ const unsigned int Parameters::buffer_size() const
     }
 
     return size * 1024 * 1024; // MBytes
+}
+
+const unsigned short Parameters::rpcmsg_limit() const
+{
+    return rpc_message_limit;
 }
 
 const unsigned short Parameters::queue_capacity() const

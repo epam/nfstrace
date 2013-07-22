@@ -305,8 +305,9 @@ private:
 class RPCReader
 {
 public:
-    RPCReader() : max_hdr(1024), stream(NULL)
+    RPCReader() : stream(NULL)
     {
+        max_hdr = controller::Parameters::instance().rpcmsg_limit();
         reset();
     }
 
@@ -521,9 +522,9 @@ private:
         return false;
     }
 
-    const uint32_t  max_hdr;  // max length of RPC header
-    uint32_t        msg_len;  // length of current RPC message + RM
-    uint32_t        hdr_len;  // min(max_hdr, msg_len) or 0 in case of unknown msg
+    uint32_t    max_hdr;  // max length of RPC header
+    uint32_t    msg_len;  // length of current RPC message + RM
+    uint32_t    hdr_len;  // min(max_hdr, msg_len) or 0 in case of unknown msg
 
     FragmentStream* stream;
 };
