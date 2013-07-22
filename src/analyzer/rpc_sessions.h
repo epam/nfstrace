@@ -13,6 +13,7 @@
 #include "../auxiliary/filtered_data.h"
 #include "../auxiliary/session.h"
 #include "../filter/nfs/nfs_operation.h"
+#include "transmission.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::NFS3;
 
@@ -84,7 +85,7 @@ private:
 
 class RPCSessions
 {
-    typedef std::tr1::unordered_map<std::string, RPCSession*> Map;
+    typedef std::tr1::unordered_map<Transmission, RPCSession*, Transmission::Hash> Map;
     typedef Map::iterator Iterator;
     typedef Map::const_iterator ConstIterator;
     typedef Map::value_type Pair;
@@ -111,11 +112,8 @@ public:
     }
 
     RPCSession* get_session(const Session& session, Type type)
-    {                        
-        std::string key;
-
-        if(type == DIRECT)  key = make_direct_key(session); 
-        else                key = make_reverse_key(session);
+    {
+        Transmission key(session, (type == DIRECT) ? Session::Source : Session::Destination);
 
         Iterator el = sessions.find(key);
         if(el == sessions.end())
@@ -134,35 +132,6 @@ public:
 private:
     RPCSessions(const RPCSessions&);
     void operator=(const RPCSessions&);
-
-    static std::string make_direct_key(const Session& session)
-    {
-        std::stringstream key(std::ios_base::out);
-        key << session.type;
-        if(session.ip_type == session.v4)
-        {
-            key << session.ip.v4.addr[0] << session.port[0] << session.ip.v4.addr[1] << session.port[1]; 
-        }
-        else
-        {
-            // TODO: Add support of ipv6
-        }
-        return key.str();
-    }
-    static std::string make_reverse_key(const Session& session)
-    {
-        std::stringstream key(std::ios_base::out);
-        key << session.type;
-        if(session.ip_type == session.v4)
-        {
-            key << session.ip.v4.addr[1] << session.port[1] << session.ip.v4.addr[0] << session.port[0]; 
-        }
-        else
-        {
-            // TODO: Add support of ipv6
-        }
-        return key.str();
-    }
 
     Map sessions;
 };

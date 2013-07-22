@@ -883,23 +883,13 @@ public:
 
             session.reassemble_tcp(i->first, direction, info);
 
-            for(uint32_t i=0; i<2; i++)
+            RPCReader& reader = session.readers[direction];
+
+            while(reader.detect_message())
             {
-                RPCReader& reader = session.readers[i];
-
-                if(reader.detect_message())
-                {
-                    if(direction == (Conversation::Direction)i)
-                    {
-                        processor->writer->collect((Conversation::Direction)i, key, reader);
-                    }
-                    else
-                    {
-                        std::cerr << "There is missmatch in data flow direction." << std::endl;
-                    }
-                }
-
+                processor->writer->collect(direction, key, reader);
             }
+
         }
     }
 

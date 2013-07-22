@@ -32,6 +32,11 @@ public:
     {
     }
 
+    void collect(const PacketInfo& info)
+    {
+        dumper->dump(info.header, info.packet);
+    }
+
     void collect(Conversation::Direction d, const Conversation& key, RPCReader& reader)
     {
         reader.readto(*dumper);
