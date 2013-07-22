@@ -21,6 +21,7 @@
 #include "../../auxiliary/filtered_data.h"
 #include "../../controller/parameters.h"
 #include "../packet_info.h"
+#include "../packet.h"
 #include "../conversation.h"
 #include "../pcap/packet_dumper.h"
 //------------------------------------------------------------------------------
@@ -34,48 +35,6 @@ namespace NST
 namespace filter
 {
 
-struct Fragment
-{
-    Fragment* next;     // pointer to next fragment or NULL
-
-    uint32_t seq;       // sequence number in host byte order
-    uint32_t len;
-    pcap_pkthdr pcap_header;
-    uint32_t dlen;
-    uint8_t* data;
-
-
-    inline const uint8_t* pcap_packet() const { return (const uint8_t*)(this+1); }
-    // caplen data of PCAP frame followed by this structure
-
-    static Fragment* create(const PacketInfo& info)
-    {
-        Fragment* frag = (Fragment*) new uint8_t[sizeof(Fragment) + info.header->caplen];
-        void* pcap_data = frag+1;
-        memcpy(pcap_data, info.packet, info.header->caplen);
-        frag->pcap_header   = *info.header;
-
-        frag->seq           = info.tcp->seq();
-
-        frag->len           = info.header->len;
-        frag->data          = ((uint8_t*)pcap_data) + (info.data - info.packet);
-        frag->dlen          = info.dlen;
-
-        return frag;
-    }
-
-    static void destroy(Fragment* frag)
-    {
-        uint8_t* ptr = (uint8_t*)frag;
-        delete[] ptr;
-    }
-
-private:
-    Fragment(); // undefiend
-};
-
-
-
 class FragmentStream
 {
 public:
@@ -86,9 +45,9 @@ public:
     {
         while(first)
         {
-            Fragment* c = first;
+            Packet* c = first;
             first = first->next;
-            Fragment::destroy(c);
+            Packet::destroy(c);
         }
     }
 
@@ -128,7 +87,7 @@ public:
             }
         }
 
-        Fragment* fragment = Fragment::create(info);
+        Packet* fragment = Packet::create(info);
 
         if(last != NULL)
         {
@@ -147,7 +106,7 @@ public:
     }
 
 
-    void push(Fragment* fragment)
+    void push(Packet* fragment)
     {
         assert(fragment->dlen != 0);
 
@@ -157,7 +116,7 @@ public:
             if(discard >= fragment->dlen) // discard whole new fragment
             {
                 discard -= fragment->dlen;
-                Fragment::destroy(fragment);
+                Packet::destroy(fragment);
                 return;
             }
             else  // discard part of new fragment payload
@@ -187,7 +146,7 @@ public:
     uint32_t read(uint8_t*const out, uint32_t size) const
     {
         uint8_t* ptr = out;
-        Fragment* c = first;    // current fragment
+        Packet* c = first;    // current fragment
         while(c)
         {
             if(c->dlen <= size)
@@ -220,14 +179,14 @@ public:
                 ptr += first->dlen;
                 size -= first->dlen;
 
-                Fragment* c = first;
+                Packet* c = first;
                 if(last == first)
                 {
                     last = first->next;
                 }
 
                 first = first->next;
-                Fragment::destroy(c);
+                Packet::destroy(c);
             }
             else
             {
@@ -254,14 +213,14 @@ public:
                 length -= first->dlen;
                 size   -= first->dlen;
 
-                Fragment* c = first;
+                Packet* c = first;
                 if(last == first)
                 {
                     last = first->next;
                 }
                 first = first->next;
 
-                Fragment::destroy(c);
+                Packet::destroy(c);
             }
             else
             {
@@ -289,8 +248,8 @@ public:
     }
 
 //private:
-    Fragment* first;
-    Fragment* last;
+    Packet* first;
+    Packet* last;
     uint32_t length;
 
 private:
@@ -339,24 +298,22 @@ public:
 
     bool readto(FilteredData* ptr)
     {
-        Fragment* frag = stream->first;
+        Packet* frag = stream->first;
         assert(frag);
         if(frag)
         {
-            ptr->timestamp = frag->pcap_header.ts; // set timestamp as ts of first fragment
+            ptr->timestamp = frag->header->ts; // set timestamp as ts of first fragment
 
             stream->skip(sizeof(RecordMark));
-       //     std::cout << "msg_len: " << msg_len << " hdr_len: " << hdr_len << std::endl;
+
             hdr_len -= sizeof(RecordMark);
             msg_len -= sizeof(RecordMark);
 
             ptr->dlen = std::min(hdr_len, ptr->dlen);
             stream->readout(ptr->data, ptr->dlen);
 
-      //      std::cout << "msg_len: " << msg_len << " hdr_len: " << hdr_len << std::endl;
             assert(msg_len >= hdr_len);
 
-       //     std::cout << "msg_len: " << msg_len << " hdr_len: " << hdr_len << " dlen: " << ptr->dlen << std::endl;
             uint32_t to_skip = msg_len - ptr->dlen;
             if(to_skip)
             {
@@ -376,20 +333,20 @@ public:
         uint32_t size = hdr_len;
         while(size > 0)
         {
-            Fragment* frag = stream->first;
+            Packet* frag = stream->first;
             
             uint32_t dlen = frag->dlen;
             
             if(dlen <= size)
             {
-                dumper.dump(&frag->pcap_header, frag->pcap_packet());
+                dumper.dump(frag->header, frag->packet);
                 stream->skip(dlen);
                 size -= dlen;
             }
             else
             {
                 // TODO: fragments may be dumped twice
-                dumper.dump(&frag->pcap_header, frag->pcap_packet());
+                dumper.dump(frag->header, frag->packet);
                 stream->skip(size);
                 size = 0;
             }
@@ -418,7 +375,7 @@ private:
             }
             else // we are out of sequence of RPC messages in stream
             {
-                Fragment* frag = stream->first;
+                Packet* frag = stream->first;
                 if(frag)
                 {
                     stream->skip(frag->dlen);    // skip first fragment
@@ -444,7 +401,7 @@ private:
 
         // Prepare data from stream for parsing and validation
         {
-            Fragment* frag = stream->first;
+            Packet* frag = stream->first;
             assert(frag);
             
             if(frag->dlen >= max_header)
@@ -544,41 +501,43 @@ public:
         {
             while(fragments)
             {
-                Fragment* c = fragments;
+                Packet* c = fragments;
                 fragments = c->next;
-                Fragment::destroy(c);
+                Packet::destroy(c);
             }
         }
 
         bool check_fragments(const uint32_t acknowledged)
         {
-            Fragment* current = fragments;
+            Packet* current = fragments;
             if( current )
             {
-                Fragment* prev = NULL;
-                uint32_t lowest_seq = current->seq;
+                Packet* prev = NULL;
+                uint32_t lowest_seq = current->tcp->seq();
                 while( current )
                 {
-                    if( lowest_seq > current->seq )
+                    const uint32_t current_seq = current->tcp->seq();
+                    const uint32_t current_len = current->header->len;
+                    if( lowest_seq > current_seq )
                     {
-                        lowest_seq = current->seq;
+                        lowest_seq = current_seq;
                     }
 
-                    if( current->seq < sequence )
+                    if( current_seq < sequence )
                     {
                         bool has_data = false;
                         // this sequence number seems dated, but
                         // check the end to make sure it has no more
                         // info than we have already seen
-                        uint32_t newseq = current->seq + current->len;
+                        uint32_t newseq = current_seq + current_len;
                         if( newseq > sequence )
                         {
                             // this one has more than we have seen. let's get the
                             // payload that we have not seen. This happens when
                             // part of this frame has been retransmitted
-                            uint32_t new_pos = sequence - current->seq;
+                            uint32_t new_pos = sequence - current_seq;
 
-                            sequence += (current->len - new_pos);
+                            sequence += (current_len - new_pos);
 
                             if ( current->dlen > new_pos )
                             {
@@ -606,16 +565,16 @@ public:
                         }
                         else
                         {
-                            Fragment::destroy(current);
+                            Packet::destroy(current);
                         }
 
                         return true;
                     }
 
-                    if( current->seq == sequence )
+                    if( current_seq == sequence )
                     {
                         // this fragment fits the stream
-                        sequence += current->len;
+                        sequence += current_len;
                         if( prev )
                         {
                             prev->next = current->next;
@@ -716,7 +675,7 @@ public:
             {
                 if(info.dlen > 0 && (seq > sequence) )
                 {
-                    Fragment* frag = Fragment::create(info);
+                    Packet* frag = Packet::create(info);
 
                     if( fragments )
                     {
@@ -736,7 +695,7 @@ public:
         }
 
         FragmentStream  stream;     // acked data stream
-        Fragment*       fragments;  // list of not yet acked fragments
+        Packet*         fragments;  // list of not yet acked fragments
         uint32_t        base_seq;   // base seq number (used by relative sequence numbers) or 0 if not yet known
         uint32_t        sequence;
     };
