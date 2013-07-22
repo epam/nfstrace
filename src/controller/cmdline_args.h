@@ -28,6 +28,7 @@ struct Args
         IFILE,
         OFILE,
         BSIZE,
+        MSIZE,
         QSIZE,
         VERBOSE,
         HELP,

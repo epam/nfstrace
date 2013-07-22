@@ -42,6 +42,7 @@ public:
     const std::string       input_file() const;
     const std::string       output_file() const;
     const unsigned int      buffer_size() const;
+    const unsigned short    rpcmsg_limit() const;
     const unsigned short    queue_capacity() const;
     const std::vector<std::string> analyzers() const;
 
@@ -57,6 +58,7 @@ private:
     Parameters& operator=(const Parameters&); // undefined
 
     // cashed values
+    unsigned short rpc_message_limit;
     bool verbose;
 };
 
