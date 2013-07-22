@@ -30,6 +30,10 @@ public:
     ~QueueingTransmission()
     {
     }
+    
+    void collect(const PacketInfo& info)
+    {
+    }
 
     void collect(Conversation::Direction d, const Conversation& key, RPCReader& reader)
     {

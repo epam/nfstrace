@@ -83,16 +83,21 @@ private:
     {
         // Read all data from the received queue
         FilteredDataQueue::ElementList list(queue);
-        while(list)
+        if(list)
         {
-            const FilteredData& data = list.data();
-            std::auto_ptr<NFSOperation> op(create_nfs_operation(data));
-            list.free_current();
-            if(op.get())
+            do
             {
-                analyzers.call(*op);
+                const FilteredData& data = list.data();
+                std::auto_ptr<NFSOperation> op(create_nfs_operation(data));
+                list.free_current();
+                if(op.get())
+                {
+                    analyzers.call(*op);
+                }
             }
+            while(list);
         }
+        else pthread_yield();
     }
 
     NFSOperation* create_nfs_operation(const FilteredData& rpc)
