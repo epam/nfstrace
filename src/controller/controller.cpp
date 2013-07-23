@@ -68,13 +68,15 @@ int Controller::run()
             }
         }
     }
-    catch(...)
+    catch(std::exception& e)
     {
         filtration.stop();
         analysis.stop();
         status.print(std::cerr);
         sig_handler.stop();
-        throw;
+
+        std::cerr << e.what() << std::endl;
+        return -1;
     }
 
     return 0;
