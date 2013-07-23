@@ -15,7 +15,7 @@
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace filter
+namespace analyzer 
 {
 namespace XDR
 {
@@ -39,13 +39,28 @@ public:
         }
         return out;
     }
+    std::string to_string() const
+    {
+        std::stringstream ss;
+        
+        Opaque::const_iterator i = data.begin();
+        Opaque::const_iterator end = data.end();
+        for(;i != end; ++i)
+        {
+            ss << static_cast<char>(*i);
+        }
+        return ss.str();
+    }
 };
 
 template<uint32_t size>
 struct OpaqueStat
 {
-    uint8_t data[size];
+    OpaqueStat() : data(size)
+    {
+    }
 
+    std::vector<uint8_t> data;
     friend std::ostream& operator<<(std::ostream& out, const OpaqueStat<size>& opaque)
     {
         for(uint32_t i = 0; i != size; ++i)
@@ -54,10 +69,20 @@ struct OpaqueStat
         }
         return out;
     }
+    std::string to_string() const
+    {
+        std::stringstream ss;
+        
+        for(uint32_t i = 0; i != size; ++i)
+        {
+            ss << static_cast<char>(data[i]);
+        }
+        return ss.str();
+    }
 };
 
 } // namespace XDR
-} // namespace filter
+} // namespace analyzer 
 } // namespace NST
 //------------------------------------------------------------------------------
 #endif//XDR_STRUCT_H

@@ -21,7 +21,7 @@
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace filter
+namespace analyzer 
 {
 namespace XDR
 {
@@ -32,7 +32,7 @@ public:
     XDRReader() : it(NULL), last(NULL)
     {
     }
-    XDRReader(uint8_t* beg, size_t num) : it(beg), last(beg + num)
+    XDRReader(const uint8_t* beg, size_t num) : it(beg), last(beg + num)
     {
     }
     ~XDRReader()
@@ -98,11 +98,11 @@ public:
     {
         arrange_check(size);
 
-        memcpy(&obj, it, size);
+        obj.data.assign(it, it+size);
         it += calc_offset(size);
         return *this;
     }
-    
+
 private:
     inline void arrange_check(size_t size)
     {
@@ -124,7 +124,7 @@ private:
 };
 
 } // namespace XDR
-} // namespace filter
+} // namespace analyzer 
 } // namespace NST
 //------------------------------------------------------------------------------
 #endif//XDR_READER_H

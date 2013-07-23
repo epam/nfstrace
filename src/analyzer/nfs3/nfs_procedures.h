@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace filter
+namespace analyzer 
 {
 namespace NFS3
 {
@@ -48,7 +48,7 @@ struct Proc // counters definition for NFS v3 procedures. See: RFC 1813
 };
 
 } // namespace NFS3
-} // namespace filter
+} // namespace analyzer 
 } // namespace NST
 //------------------------------------------------------------------------------
 #endif//NFS_PROCEDURES_H

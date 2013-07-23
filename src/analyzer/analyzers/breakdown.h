@@ -8,10 +8,10 @@
 //------------------------------------------------------------------------------
 #include <vector>
 
-#include "../../filter/nfs/nfs_procedures.h"
+#include "../nfs3/nfs_procedures.h"
 #include "latencies.h"
 //------------------------------------------------------------------------------
-using NST::filter::NFS3::Proc;
+using NST::analyzer::NFS3::Proc;
 //------------------------------------------------------------------------------
 namespace NST
 {

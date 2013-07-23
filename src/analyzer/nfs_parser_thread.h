@@ -13,16 +13,16 @@
 #include "../auxiliary/filtered_data.h"
 #include "../controller/running_status.h"
 #include "../filter/rpc/rpc_header.h"
-#include "../filter/rpc/rpc_struct.h"
-#include "../filter/nfs/nfs_operation.h"
-#include "../filter/nfs/nfs_procedures.h"
-#include "../filter/nfs/nfs_struct.h"
-#include "../filter/xdr/xdr_reader.h"
 #include "analyzers.h"
+#include "nfs3/nfs_operation.h"
+#include "nfs3/nfs_procedures.h"
+#include "nfs3/nfs_structs.h"
+#include "rpc/rpc_struct.h"
 #include "rpc_sessions.h"
+#include "xdr/xdr_reader.h"
 //------------------------------------------------------------------------------
-using namespace NST::filter::NFS3; // enum Ops;
-using namespace NST::filter::XDR;
+using namespace NST::analyzer::NFS3; // enum Ops;
+using namespace NST::analyzer::XDR;
 using namespace NST::filter::rpc;
 
 using NST::auxiliary::FilteredData;
@@ -102,6 +102,7 @@ private:
 
     NFSOperation* create_nfs_operation(const FilteredData& rpc)
     {
+        NFSOperation* op = NULL;
         if(rpc.dlen < sizeof(MessageHeader)) return NULL;
         const MessageHeader* msg = (MessageHeader*)rpc.data;
         switch(msg->type())
@@ -125,46 +126,29 @@ private:
             {
                 if(rpc.dlen < sizeof(ReplyHeader)) return NULL;
                 const ReplyHeader* reply = static_cast<const ReplyHeader*>(msg);
-                
-                switch(reply->stat())
+
+                RPCSession* session = sessions.get_session(rpc.session, RPCSessions::REVERSE);
+                RPCSession::Iterator i = session->find(reply->xid());
+                if(session->is_valid(i))
                 {
-                    case SUNRPC_MSG_ACCEPTED:
+                    if(reply->stat() == SUNRPC_MSG_ACCEPTED)
                     {
                         // TODO: check msg-length before cast
                         const AcceptedReplyHeader* areply = static_cast<const AcceptedReplyHeader*>(msg);
-                        switch(areply->stat())
+                        if(areply->astat() == SUNRPC_SUCCESS)
                         {
-                            case SUNRPC_SUCCESS:
+                            std::auto_ptr<RPCReply> r = parse_rpc_reply((Proc::Ops)i->second->get_proc(), rpc);
+                            if(r.get() != NULL)
                             {
-                                RPCSession* session = sessions.get_session(rpc.session, RPCSessions::REVERSE);
-                                RPCSession::Iterator i = session->find(areply->xid());
-                                if(session->is_valid(i))
-                                {
-                                    std::auto_ptr<RPCReply> r = parse_rpc_reply(rpc);
-                                    if(r.get() != NULL)
-                                    {
-                                        std::auto_ptr<NFSOperation> op(new NFSOperation(i->second, r.release(), session->get_session()));
-                                        session->remove(i);
-                                        return op.release();
-                                    }
-                                }
+                                op = new NFSOperation(i->second, r.release(), session->get_session());
                             }
-                            break;
-
-                            default:    break;
                         }
                     }
-                    break;
-                    case SUNRPC_MSG_DENIED:
-                    {
-                        // TODO: check rejected reply
-                    }
-                    break;
+                    session->remove(i);
                 }
             }
-            break;
         }
-        return NULL;
+        return op;
     }
 
     std::auto_ptr<RPCCall> parse_nfs_call(Proc::Ops ops, const FilteredData& rpc)
@@ -176,16 +160,16 @@ private:
         {
         case Proc::NFS_NULL:    call.reset(new NullArgs       (reader)); break;
         case Proc::GETATTR:     call.reset(new GetAttrArgs    (reader)); break;
-        case Proc::SETATTR:     call.reset(new RPCCall        (reader)); break;
+        case Proc::SETATTR:     call.reset(new SetAttrArgs    (reader)); break;
         case Proc::LOOKUP:      call.reset(new LookUpArgs     (reader)); break;
         case Proc::ACCESS:      call.reset(new AccessArgs     (reader)); break;
         case Proc::READLINK:    call.reset(new ReadLinkArgs   (reader)); break;
         case Proc::READ:        call.reset(new ReadArgs       (reader)); break;
         case Proc::WRITE:       call.reset(new WriteArgs      (reader)); break;
-        case Proc::CREATE:      call.reset(new RPCCall        (reader)); break;
-        case Proc::MKDIR:       call.reset(new RPCCall        (reader)); break;
-        case Proc::SYMLINK:     call.reset(new RPCCall        (reader)); break;
-        case Proc::MKNOD:       call.reset(new RPCCall        (reader)); break;
+        case Proc::CREATE:      call.reset(new CreateArgs     (reader)); break;
+        case Proc::MKDIR:       call.reset(new MkDirArgs      (reader)); break;
+        case Proc::SYMLINK:     call.reset(new SymLinkArgs    (reader)); break;
+        case Proc::MKNOD:       call.reset(new MkNodArgs      (reader)); break;
         case Proc::REMOVE:      call.reset(new RemoveArgs     (reader)); break;
         case Proc::RMDIR:       call.reset(new RmDirArgs      (reader)); break;
         case Proc::RENAME:      call.reset(new RenameArgs     (reader)); break;
@@ -202,7 +186,7 @@ private:
         call->set_time(rpc.timestamp);
         return call;
     }
-    std::auto_ptr<RPCReply> parse_rpc_reply(const FilteredData& rpc)
+    std::auto_ptr<RPCReply> parse_rpc_reply(Proc::Ops ops, const FilteredData& rpc)
     {
         XDRReader reader((uint8_t*)rpc.data, rpc.dlen);
         std::auto_ptr<RPCReply> reply(new RPCReply(reader));

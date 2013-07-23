@@ -35,6 +35,7 @@ def main (argv):
             subprc.check_output(cd_op + "&& mkdir hello", shell=True)
             cd_op += "/hello &&"
             subprc.check_output(cd_op + "dd if=/dev/zero of=temp.file bs=1M count=1", shell=True)
+            subprc.check_output(cd_op + " chmod +x ./temp.file", shell=True)
             subprc.check_output(cd_op + "cd .. && rm -rf hello", shell=True)
     except ValueError:
         print "data error - load_tests [numb_of_oper] [mnt_dir]"

@@ -10,14 +10,14 @@
 #include <vector>
 
 #include "../../auxiliary/session.h"
-#include "../../filter/nfs/nfs_operation.h"
-#include "../../filter/nfs/nfs_procedures.h"
+#include "../nfs3/nfs_procedures.h"
+#include "../nfs3/nfs_operation.h"
 #include "base_analyzer.h"
 #include "breakdown.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Session;
-using NST::filter::NFS3::NFSOperation;
-using NST::filter::NFS3::Proc;
+using NST::analyzer::NFS3::NFSOperation;
+using NST::analyzer::NFS3::Proc;
 //------------------------------------------------------------------------------
 namespace NST
 {

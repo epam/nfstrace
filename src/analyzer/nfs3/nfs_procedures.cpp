@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace filter 
+namespace analyzer 
 {
 namespace NFS3
 {
@@ -23,6 +23,6 @@ const char* Proc::titles[Proc::num] = {
 };
 
 } // namespace NFS3
-} // namespace filter
+} // namespace analyzer 
 } // namespace NST
 //------------------------------------------------------------------------------

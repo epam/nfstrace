@@ -160,7 +160,7 @@ struct AcceptedReplyHeader: public ReplyHeader
     {
         return (OpaqueAuthHeader*)(this);
     }
-    inline const uint32_t stat() const
+    inline const uint32_t astat() const
     {
         const OpaqueAuthHeader* verf = verifier();
         const uint32_t* stat = (uint32_t*)(verf->opaque_data() + verf->len());
