@@ -16,8 +16,10 @@
 #  include <sys/endian.h>
 #endif
 
+#include "../../auxiliary/exception.h"
 #include "xdr_struct.h"
 //------------------------------------------------------------------------------
+using NST::auxiliary::Exception;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -25,6 +27,16 @@ namespace analyzer
 {
 namespace XDR
 {
+
+class XDRError : public Exception
+{
+public:
+    explicit XDRError(const std::string& msg) : Exception(msg)
+    {
+    }
+    virtual const XDRError* dynamic_clone() const { return new XDRError(*this); }
+    virtual void            dynamic_throw() const { throw *this; }
+};
 
 class XDRReader
 {
@@ -108,7 +120,7 @@ private:
     {
         if(it+size > last)
         {
-            throw std::out_of_range("XDRReader::read action cannot be done");
+            throw XDRError("XDRReader::read action cannot be done");
         }
     }
 

@@ -410,7 +410,7 @@ private:
             }
             else // first TCP fragment isn't enough
             {
-                std::clog << "RPC RM and Message in separate TCP segments. Merge them." << std::endl;
+                //std::clog << "RPC RM and Message in separate TCP segments. Merge them." << std::endl;
                 stream->read(tmp, max_header);
                 rm = reinterpret_cast<const RecordMark*>(tmp);
             }

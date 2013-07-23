@@ -870,6 +870,149 @@ private:
     SAttrGuard guard;
 };
 
+class LookUpArgs : public RPCCall
+{
+public:
+    LookUpArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> dir >> name;
+    }
+    virtual ~LookUpArgs()
+    {
+    }
+    
+    const OpaqueDyn& get_dir() const
+    {
+        return dir;
+    }
+    const std::string& get_name() const
+    {
+        return name;
+    }
+
+private:
+    OpaqueDyn dir;      // File handle
+    std::string name;   // File name
+};
+
+class AccessArgs : public RPCCall
+{
+public:
+    AccessArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> object >> access;
+    }
+    virtual ~AccessArgs()
+    {
+    }
+
+    const OpaqueDyn& get_object() const
+    {
+        return object;
+    }
+    uint32_t get_access() const
+    {
+        return access;
+    }
+
+private:
+    OpaqueDyn object;   // File handle
+    uint32_t access;
+};
+
+class ReadLinkArgs : public RPCCall
+{
+public:
+    ReadLinkArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> symlink;
+    }
+    virtual ~ReadLinkArgs()
+    {
+    }
+
+    const OpaqueDyn& get_symlink() const
+    {
+        return symlink;
+    }
+
+private:
+    OpaqueDyn symlink;  // File handle
+};
+
+class ReadArgs : public RPCCall
+{
+public:
+    ReadArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> file >> offset >> count;
+    }
+    virtual ~ReadArgs()
+    {
+    }
+    
+    const OpaqueDyn& get_file() const
+    {
+        return file;
+    }
+    uint64_t get_offset() const
+    {
+        return offset;
+    }
+    uint32_t get_count() const
+    {
+        return count;
+    }
+
+private:
+    OpaqueDyn file;     // File handle
+    uint64_t  offset;
+    uint32_t  count;
+};
+
+class WriteArgs : public RPCCall
+{
+public:
+    WriteArgs(XDRReader& in) : RPCCall(in)
+    {
+        in >> file >> offset >> count >> stable;
+    }
+    virtual ~WriteArgs()
+    {
+    }
+    enum Stable_How
+    {
+        UNSTABLE    = 0,
+        DATA_SYNC   = 1,
+        FYLE_SYNC   = 2
+    };
+    friend std::ostream& operator<<(std::ostream& in, const WriteArgs& obj);
+
+    const NFS_FH& get_file() const
+    {
+        return file;
+    }
+    const Offset& get_offset() const
+    {
+        return offset;
+    }
+    const Count& get_count() const
+    {
+        return count;
+    }
+    Stable_How get_stable() const
+    {
+        return Stable_How(stable);
+    }
+    
+private:
+    NFS_FH      file;
+    Offset      offset;
+    Count       count;
+    uint32_t    stable;
+    //OpaqueDyn   data;
+};
+
 class CreateHow
 {
 public:
@@ -1092,141 +1235,6 @@ private:
 
     DirOpArgs where;
     MkNodData what;
-};
-
-class LookUpArgs : public RPCCall
-{
-public:
-    LookUpArgs(XDRReader& in) : RPCCall(in)
-    {
-        in >> dir >> name;
-    }
-    virtual ~LookUpArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_dir() const
-    {
-        return dir;
-    }
-    const std::string& get_name() const
-    {
-        return name;
-    }
-
-private:
-    OpaqueDyn dir;      // File handle
-    std::string name;   // File name
-};
-
-class AccessArgs : public RPCCall
-{
-public:
-    AccessArgs(XDRReader& in) : RPCCall(in)
-    {
-        in >> object >> access;
-    }
-    virtual ~AccessArgs()
-    {
-    }
-
-    const OpaqueDyn& get_object() const
-    {
-        return object;
-    }
-    uint32_t get_access() const
-    {
-        return access;
-    }
-
-private:
-    OpaqueDyn object;   // File handle
-    uint32_t access;
-};
-
-class ReadLinkArgs : public RPCCall
-{
-public:
-    ReadLinkArgs(XDRReader& in) : RPCCall(in)
-    {
-        in >> symlink;
-    }
-    virtual ~ReadLinkArgs()
-    {
-    }
-
-    const OpaqueDyn& get_symlink() const
-    {
-        return symlink;
-    }
-
-private:
-    OpaqueDyn symlink;  // File handle
-};
-
-class ReadArgs : public RPCCall
-{
-public:
-    ReadArgs(XDRReader& in) : RPCCall(in)
-    {
-        in >> file >> offset >> count;
-    }
-    virtual ~ReadArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_file() const
-    {
-        return file;
-    }
-    uint64_t get_offset() const
-    {
-        return offset;
-    }
-    uint32_t get_count() const
-    {
-        return count;
-    }
-
-private:
-    OpaqueDyn file;     // File handle
-    uint64_t  offset;
-    uint32_t  count;
-};
-
-class WriteArgs : public RPCCall
-{
-public:
-    WriteArgs(XDRReader& in) : RPCCall(in)
-    {
-        in >> file >> offset >> count >> stable;
-    }
-    virtual ~WriteArgs()
-    {
-    }
-
-    const OpaqueDyn& get_file() const
-    {
-        return file;
-    }
-    uint64_t get_offset() const
-    {
-        return offset;
-    }
-    uint32_t get_count() const
-    {
-        return count;
-    }
-    uint32_t get_stable() const
-    {
-        return stable;
-    }
-    
-private:
-    OpaqueDyn file;     // File handle
-    uint64_t  offset;
-    uint32_t  count;
-    uint32_t  stable;
 };
 
 class RemoveArgs : public RPCCall

@@ -56,7 +56,17 @@ int Controller::run()
     // TODO: add code for recovery processing
     try
     {
-        status.wait_and_rethrow_exception();
+        while(true)
+        {
+            try
+            {
+                status.wait_and_rethrow_exception();
+            }
+            catch(XDRError& exception)
+            {
+                std::cerr << "XDRError: " << exception.what() << std::endl;
+            }
+        }
     }
     catch(...)
     {
