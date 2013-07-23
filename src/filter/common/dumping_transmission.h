@@ -37,11 +37,6 @@ public:
         dumper->dump(info.header, info.packet);
     }
 
-    void collect(Conversation::Direction d, const Conversation& key, RPCReader& reader)
-    {
-        reader.readto(*dumper);
-    }
-
 private:
     DumpingTransmission(const DumpingTransmission&);            // undefined
     DumpingTransmission& operator=(const DumpingTransmission&); // undefined

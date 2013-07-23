@@ -316,9 +316,7 @@ XDRReader& operator>>(XDRReader& in, NFS_FH& obj)
 
 std::ostream& operator<<(std::ostream& out, const NFS_FH& obj)
 {
-    std::stringstream tmp;
-    tmp << "data: " << std::hex << obj.data;
-    return out << tmp.str();
+    return out << "data: " << std::hex << obj.data;
 }
 
 XDRReader& operator>>(XDRReader& in, NFSTime& obj)

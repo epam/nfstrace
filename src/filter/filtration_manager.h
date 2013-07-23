@@ -43,7 +43,7 @@ public:
 
     void dump_to_file(const Parameters& params)
     {
-        typedef FiltrationProcessor<CaptureReader, DumpingTransmission> Processor;
+/*        typedef FiltrationProcessor<CaptureReader, DumpingTransmission> Processor;
         typedef ProcessingThread<Processor> OnlineDumping;
 
         std::auto_ptr<CaptureReader>        reader = create_capture_reader(params);
@@ -52,7 +52,8 @@ public:
         std::auto_ptr<Processor>      processor (new Processor(reader, writer));
         std::auto_ptr<OnlineDumping>  thread    (new OnlineDumping(processor, status));
 
-        threads.add(thread.release());
+        threads.add(thread.release());*/
+        throw Exception("Dumping mode is turned off in this version");
     }
 
     void capture_to_queue(FilteredDataQueue& queue, const Parameters& params)

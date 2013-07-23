@@ -11,489 +11,34 @@
 #include <algorithm>
 #include <memory>
 #include <string>
-#include <sstream>
 
 #include <tr1/unordered_map>
 
 #include <pcap/pcap.h>
 
 #include "../../auxiliary/exception.h"
-#include "../../auxiliary/filtered_data.h"
 #include "../../controller/parameters.h"
 #include "../packet_info.h"
 #include "../packet.h"
 #include "../conversation.h"
-#include "../pcap/packet_dumper.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Exception;
-using NST::auxiliary::FilteredData;
-using NST::auxiliary::FilteredDataQueue;
-using NST::filter::pcap::PacketDumper;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filter
 {
 
-class FragmentStream
-{
-public:
-    FragmentStream(): first(NULL), last(NULL), length(0), discard(0)
-    {
-    }
-    ~FragmentStream()
-    {
-        while(first)
-        {
-            Packet* c = first;
-            first = first->next;
-            Packet::destroy(c);
-        }
-    }
-
-    inline operator bool() const { return first != NULL; }
-
-    inline void lost(const uint32_t n) // we are lost n bytes in sequence
-    {
-        if(discard >= n) // discard whole new fragment
-        {
-            std::clog << "We are lost " << n << " bytes of payload marked for discard\n";
-            discard -= n;
-        }
-        else
-        {
-            std::clog << "We are lost " << n - discard << " bytes of useful data\n";
-            discard = 0;
-        }
-    }
-
-    void push(PacketInfo& info)
-    {
-        assert(info.dlen != 0);
-
-        if(discard)
-        {
-        //    std::clog << "discard new info: " << info.dlen << std::endl;
-            if(discard >= info.dlen) // discard whole new fragment
-            {
-                discard -= info.dlen;
-                return;
-            }
-            else  // discard part of new fragment payload
-            {
-                info.dlen -= discard;
-                info.data += discard;
-                discard = 0;
-            }
-        }
-
-        Packet* fragment = Packet::create(info);
-
-        if(last != NULL)
-        {
-            last->next = fragment;
-            last = fragment;
-            fragment->next = NULL;
-        }
-        else // stream is empty
-        {
-            first = fragment;
-            last = fragment;
-            fragment->next = NULL;
-        }
-
-        length += fragment->dlen;
-    }
-
-
-    void push(Packet* fragment)
-    {
-        assert(fragment->dlen != 0);
-
-        if(discard)
-        {
-        //    std::clog << "discard new fragment: " << fragment->dlen << std::endl;
-            if(discard >= fragment->dlen) // discard whole new fragment
-            {
-                discard -= fragment->dlen;
-                Packet::destroy(fragment);
-                return;
-            }
-            else  // discard part of new fragment payload
-            {
-                fragment->dlen -= discard;
-                fragment->data += discard;
-                discard = 0;
-            }
-        }
-
-        if(last != NULL)
-        {
-            last->next = fragment;
-            last = fragment;
-            fragment->next = NULL;
-        }
-        else // stream is empty
-        {
-            first = fragment;
-            last = fragment;
-            fragment->next = NULL;
-        }
-
-        length += fragment->dlen;
-    }
-    
-    uint32_t read(uint8_t*const out, uint32_t size) const
-    {
-        uint8_t* ptr = out;
-        Packet* c = first;    // current fragment
-        while(c)
-        {
-            if(c->dlen <= size)
-            {
-                memcpy(ptr, c->data, c->dlen);
-                ptr     += c->dlen;
-                size    -= c->dlen;
-
-                c = c->next;
-            }
-            else
-            {
-                memcpy(ptr, c->data, size);
-                ptr += size;
-                break; // break while loop
-            }
-        }
-
-        return ptr-out;
-    }
-
-    uint32_t readout(uint8_t*const out, uint32_t size)
-    {
-        uint8_t* ptr = out;
-        while(first)
-        {
-            if(first->dlen <= size)
-            {
-                memcpy(ptr, first->data, first->dlen);
-                ptr += first->dlen;
-                size -= first->dlen;
-
-                Packet* c = first;
-                if(last == first)
-                {
-                    last = first->next;
-                }
-
-                first = first->next;
-                Packet::destroy(c);
-            }
-            else
-            {
-                memcpy(ptr, first->data, size);
-                ptr += size;
-
-                first->data += size;
-                first->dlen -= size;
-                break; // break while loop
-            }
-        }
-        const uint32_t n = ptr-out;
-        length -= n;
-
-        return n;
-    }
-    
-    void skip(uint32_t size)
-    {
-        while(first)
-        {
-            if(first->dlen <= size)
-            {
-                length -= first->dlen;
-                size   -= first->dlen;
-
-                Packet* c = first;
-                if(last == first)
-                {
-                    last = first->next;
-                }
-                first = first->next;
-
-                Packet::destroy(c);
-            }
-            else
-            {
-                length -= size;
-
-                first->data += size;
-                first->dlen -= size;
-                break; // break while loop
-            }
-        }
-    }
-
-    inline void set_discard_size(const uint32_t n)
-    {
-    //    std::clog << "set size of discard payload: " << n << " current len: " << length << std::endl;
-        if(length >= n)
-        {
-            skip(n);
-        }
-        else // length < n
-        {
-            discard = n - length;
-            skip(length);
-        }
-    }
-
-//private:
-    Packet* first;
-    Packet* last;
-    uint32_t length;
-
-private:
-    uint32_t discard;  // drop following N bytes from stream
-};
-
-/*
-    Stateful reader of Sun RPC messages
-    aggregates length of current RPC message
-    TODO: add matching Calls and replies by XID of message
-*/
-class RPCReader
-{
-public:
-    RPCReader() : stream(NULL)
-    {
-        max_hdr = controller::Parameters::instance().rpcmsg_limit();
-        reset();
-    }
-
-    inline void reset()
-    {
-        msg_len = 0;
-        hdr_len = 0;
-    }
-
-    inline void set_stream(FragmentStream* s)
-    {
-        assert(s);
-        stream = s;
-    }
-
-    inline bool detect_message()
-    {
-        if(stream->length > 0)
-        {
-            if(msg_len == 0)    // no current message
-            {
-                find_message(); // try to find new current message
-            }
-
-            return msg_len != 0 && stream->length >= hdr_len;
-        }
-        return false;
-    }
-
-    bool readto(FilteredData* ptr)
-    {
-        Packet* frag = stream->first;
-        assert(frag);
-        if(frag)
-        {
-            ptr->timestamp = frag->header->ts; // set timestamp as ts of first fragment
-
-            stream->skip(sizeof(RecordMark));
-
-            hdr_len -= sizeof(RecordMark);
-            msg_len -= sizeof(RecordMark);
-
-            ptr->dlen = std::min(hdr_len, ptr->dlen);
-            stream->readout(ptr->data, ptr->dlen);
-
-            assert(msg_len >= hdr_len);
-
-            uint32_t to_skip = msg_len - ptr->dlen;
-            if(to_skip)
-            {
-                stream->set_discard_size(to_skip);
-            }
-
-            msg_len = 0;
-
-            return true;
-        }
-        
-        return false;
-    }
-
-    bool readto(PacketDumper& dumper)
-    {
-        uint32_t size = hdr_len;
-        while(size > 0)
-        {
-            Packet* frag = stream->first;
-            
-            uint32_t dlen = frag->dlen;
-            
-            if(dlen <= size)
-            {
-                dumper.dump(frag->header, frag->packet);
-                stream->skip(dlen);
-                size -= dlen;
-            }
-            else
-            {
-                // TODO: fragments may be dumped twice
-                dumper.dump(frag->header, frag->packet);
-                stream->skip(size);
-                size = 0;
-            }
-        }
-
-        uint32_t to_skip = msg_len - hdr_len;
-        if(to_skip)
-        {
-            stream->set_discard_size(to_skip);
-        }
-
-        msg_len = 0;
-
-        return false;
-    }
-
-private:
-
-    void find_message()
-    {
-        while(*stream)
-        {
-            if(parse_message()) // ok, skip record mark of RPC message
-            {
-                return;
-            }
-            else // we are out of sequence of RPC messages in stream
-            {
-                Packet* frag = stream->first;
-                if(frag)
-                {
-                    stream->skip(frag->dlen);    // skip first fragment
-                }
-                reset();    // reset the reader
-            }
-        }
-    }
-
-    bool parse_message()
-    {
-        // the previous RPC message on stream are processed
-        assert(msg_len == 0);
-        //assert(hdr_len == 0);
-
-        // required data size for validation next record mark and a RPC message
-        static const uint32_t max_header = sizeof(RecordMark) + std::max(sizeof(CallHeader), sizeof(ReplyHeader));
-
-        if(stream->length < max_header) return true;
-
-        uint8_t tmp[max_header];    // temporary array for merged data from separate fragments
-        const RecordMark* rm;
-
-        // Prepare data from stream for parsing and validation
-        {
-            Packet* frag = stream->first;
-            assert(frag);
-            
-            if(frag->dlen >= max_header)
-            {
-                rm = reinterpret_cast<const RecordMark*>(frag->data);
-            }
-            else // first TCP fragment isn't enough
-            {
-                //std::clog << "RPC RM and Message in separate TCP segments. Merge them." << std::endl;
-                stream->read(tmp, max_header);
-                rm = reinterpret_cast<const RecordMark*>(tmp);
-            }
-        }
-
-        const MessageHeader*const msg = rm->fragment();
-
-        //if(rm->is_last()); // TODO: handle sequence field of record mark
-        msg_len = sizeof(RecordMark) + rm->fragment_len();    // length of current RPC message + RM
-        hdr_len = std::min(msg_len, max_hdr);
-
-        switch(msg->type())
-        {
-            case SUNRPC_CALL:
-            {
-                const CallHeader*const call = static_cast<const CallHeader*const>(msg);
-                if(RPCValidator::check(call))
-                {
-                    if(NFSv3Validator::check(call))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-               /*         std::cerr << "unknown RPC call(?) of program:" << call->prog()
-                                  << " v: "                            << call->vers()
-                                  << " procedure: "                    << call->proc()
-                                  << '\n';*/
-                /*        stream->skip(msg_len);
-                        msg_len = 0;
-                        hdr_len = 0;  // dont collect header*/
-                        return true;
-                    }
-                }
-                else
-                {   // ERROR stream is corrupt
-               //     std::cerr << "unknown RPC call(?)\n";
-                    msg_len = 0;
-                    return false;
-                }
-            }
-            break;
-            case SUNRPC_REPLY:
-            {
-                const ReplyHeader*const reply = static_cast<const ReplyHeader*const>(msg);
-                if(RPCValidator::check(reply))
-                {
-                    return true;
-                }
-                else
-                {   // ERROR stream is corrupt
-            //        std::cerr << "unknown RPC reply(?)\n";
-                    msg_len = 0;
-                    return false;
-                }
-            }
-            break;
-            default:
-            {
-            //    std::cerr << "unknown RPC message type(?)\n";
-                msg_len = 0;
-                return false;
-            }
-            break;
-        }
-        return false;
-    }
-
-    uint32_t    max_hdr;  // max length of RPC header
-    uint32_t    msg_len;  // length of current RPC message + RM
-    uint32_t    hdr_len;  // min(max_hdr, msg_len) or 0 in case of unknown msg
-
-    FragmentStream* stream;
-};
-
-
-// Represents conversation between node A and node B
-struct Session
+// Represents TCP conversation between node A and node B
+template <typename StreamReader>
+struct TCPSession
 {
 public:
 
     struct Flow
     {
+        friend class TCPSession<StreamReader>;
+
         Flow() : fragments(NULL), base_seq(0), sequence(0)
         {
         }
@@ -504,6 +49,97 @@ public:
                 Packet* c = fragments;
                 fragments = c->next;
                 Packet::destroy(c);
+            }
+        }
+
+        void reassemble(PacketInfo& info)
+        {
+            uint32_t seq = info.tcp->seq();
+            uint32_t len = info.dlen;
+
+            if( sequence == 0 ) // this is the first time we have seen this src's sequence number
+            {
+                sequence = seq + len;
+                if( info.tcp->is(tcp_header::SYN) )
+                {
+                    sequence++;
+                }
+
+                if(len > 0)
+                {
+                    reader.push(info);  // write out the packet data
+                }
+
+                return;
+            }
+
+            // if we are here, we have already seen this src, let's
+            // try and figure out if this packet is in the right place
+            if( seq < sequence )
+            {
+                // this sequence number seems dated, but
+                // check the end to make sure it has no more
+                // info than we have already seen
+                uint32_t newseq = seq + len;
+                if( newseq > sequence )
+                {
+
+                    // this one has more than we have seen. let's get the
+                    // payload that we have not seen
+                    uint32_t new_len = sequence - seq;
+
+                    if ( info.dlen <= new_len )
+                    {
+                        info.data = NULL;
+                        info.dlen = 0;
+                   //     incomplete_tcp_stream = TRUE;
+                    }
+                    else
+                    {
+                        assert(info.dlen >= new_len);
+                        info.data += new_len;
+                        info.dlen -= new_len;
+                    }
+
+                    seq = sequence;
+                    len = newseq - sequence;
+
+                    // this will now appear to be right on time :)
+                }
+            }
+
+            if ( seq == sequence ) // right on time
+            {
+                sequence += len;
+                if( info.tcp->is(tcp_header::SYN) ) sequence++;
+
+                if( info.data && info.dlen > 0)
+                {
+                    reader.push(info);
+                }
+                // done with the packet, see if it caused a fragment to fit
+                while( check_fragments(0) );
+            }
+            else // out of order packet
+            {
+                if(info.dlen > 0 && (seq > sequence) )
+                {
+                    Packet* frag = Packet::create(info);
+
+                    if( fragments )
+                    {
+                        frag->next = fragments;
+                    }
+                    else
+                    {
+                        frag->next = NULL;
+                    }
+                    fragments = frag;
+                }
+                else
+                {
+                 //   std::cout << "drop packet seq:" << seq << " sequence: " << sequence << " dlen: " << info.dlen << '\n';
+                }
             }
         }
 
@@ -561,12 +197,10 @@ public:
 
                         if(has_data)
                         {
-                            stream.push(current);
+                            reader.push(*current);
                         }
-                        else
-                        {
-                            Packet::destroy(current);
-                        }
+
+                        Packet::destroy(current);
 
                         return true;
                     }
@@ -584,7 +218,9 @@ public:
                             fragments = current->next;
                         }
 
-                        stream.push(current);
+                        reader.push(*current);
+                        Packet::destroy(current);
+
                         return true;
                     }
                     prev = current;
@@ -595,7 +231,7 @@ public:
                 {
                     // There are frames missing in the capture stream that were seen
                     // by the receiving host. Inform Stream about it.
-                    stream.lost(lowest_seq - sequence);
+                    reader.lost(lowest_seq - sequence);
                     sequence = lowest_seq;
                     return true;
                 }
@@ -603,116 +239,26 @@ public:
             return false;
         }
 
-        void reassemble(PacketInfo& info)
-        {
-            uint32_t seq = info.tcp->seq();
-            uint32_t len = info.dlen;
-
-            if( sequence == 0 ) // this is the first time we have seen this src's sequence number
-            {
-                sequence = seq + len;
-                if( info.tcp->is(tcp_header::SYN) )
-                {
-                    sequence++;
-                }
-
-                if(len > 0)
-                {
-                    stream.push(info);  // write out the packet data
-                }
-
-                return;
-            }
-
-            // if we are here, we have already seen this src, let's
-            // try and figure out if this packet is in the right place
-            if( seq < sequence )
-            {
-                // this sequence number seems dated, but
-                // check the end to make sure it has no more
-                // info than we have already seen
-                uint32_t newseq = seq + len;
-                if( newseq > sequence )
-                {
-
-                    // this one has more than we have seen. let's get the
-                    // payload that we have not seen
-                    uint32_t new_len = sequence - seq;
-
-                    if ( info.dlen <= new_len )
-                    {
-                        info.data = NULL;
-                        info.dlen = 0;
-                   //     incomplete_tcp_stream = TRUE;
-                    }
-                    else
-                    {
-                        assert(info.dlen >= new_len);
-                        info.data += new_len;
-                        info.dlen -= new_len;
-                    }
-
-                    seq = sequence;
-                    len = newseq - sequence;
-
-                    // this will now appear to be right on time :)
-                }
-            }
-
-            if ( seq == sequence ) // right on time
-            {
-                sequence += len;
-                if( info.tcp->is(tcp_header::SYN) ) sequence++;
-
-                if( info.data && info.dlen > 0)
-                {
-                    stream.push(info);
-                }
-                // done with the packet, see if it caused a fragment to fit
-                while( check_fragments(0) );
-            }
-            else // out of order packet
-            {
-                if(info.dlen > 0 && (seq > sequence) )
-                {
-                    Packet* frag = Packet::create(info);
-
-                    if( fragments )
-                    {
-                        frag->next = fragments;
-                    }
-                    else
-                    {
-                        frag->next = NULL;
-                    }
-                    fragments = frag;
-                }
-                else
-                {
-                 //   std::cout << "drop packet seq:" << seq << " sequence: " << sequence << " dlen: " << info.dlen << '\n';
-                }
-            }
-        }
-
-        FragmentStream  stream;     // acked data stream
+    private:
+        StreamReader    reader;     // reader of acknowledged data stream
         Packet*         fragments;  // list of not yet acked fragments
         uint32_t        base_seq;   // base seq number (used by relative sequence numbers) or 0 if not yet known
         uint32_t        sequence;
     };
 
-    Session()
+    TCPSession()
     {
     }
-    
-    ~Session()
+    ~TCPSession()
     {
     }
-    
-    void init()
+
+    template <typename Writer>
+    void init(Writer* writer)
     {
         for(uint32_t i=0; i<2; i++)
         {
-            readers[i].set_stream(&flows[i].stream);
+            flows[i].reader.set_writer(writer);
         }
     }
 
@@ -727,15 +273,16 @@ public:
     }
 
     Flow flows[2];
-    RPCReader readers[2];
 };
 
-
-class TCPSessions: public std::tr1::unordered_map<Conversation, Session, Conversation::Hash>
+template<typename Reader>
+class TCPSessions: public std::tr1::unordered_map<Conversation, TCPSession<Reader>, Conversation::Hash>
 {
 
 public:
-    typedef iterator it;
+
+    typedef std::tr1::unordered_map<Conversation, TCPSession<Reader>, Conversation::Hash> Container;
+    typedef typename Container::iterator it;
 
     TCPSessions()
     {
@@ -745,17 +292,17 @@ public:
     {
     }
 
-    iterator find_or_create_session(const Conversation& key)
+    template <typename Writer>
+    it find_or_create_session(const Conversation& key, Writer* writer)
     {
-        iterator i = find(key);
-        if(i == end())
+        it i = Container::find(key);
+        if(i == Container::end())
         {
-            std::pair<iterator, bool> res = insert(value_type(key, Session()));
+            std::pair<it, bool> res = Container::insert(typename Container::value_type(key, TCPSession<Reader>()));
             if(res.second)
             {
                 i = res.first;
-                // TODO:refactor this session initialization
-                i->second.init();
+                i->second.init(writer);
             }
             else
             {
@@ -766,6 +313,255 @@ public:
     }
 };
 
+
+/*
+    Stateful reader of Sun RPC messages 
+    Reads data from PacketInfo passed via push() method
+    aggregates length of current RPC message and length of RPC message useful for analysis
+    TODO: add matching Calls and replies by XID of message
+*/
+template<typename Writer>
+class RPCFiltrator
+{
+public:
+    RPCFiltrator() : writer(NULL)
+    {
+        max_hdr = controller::Parameters::instance().rpcmsg_limit();
+        reset();
+    }
+
+    inline void reset()
+    {
+        msg_len = 0;
+        hdr_len = 0;
+    }
+
+    inline void set_writer(Writer* w)
+    {
+        assert(w);
+        writer = w;
+    }
+
+    inline void lost(const uint32_t n) // we are lost n bytes in sequence
+    {
+        //TODO: this code must be refactored, wrong logic
+        if(hdr_len == 0 && msg_len >= n)
+        {
+            std::clog << "We are lost " << n << " bytes of payload marked for discard" << std::endl;
+            msg_len -= n;
+        }
+        else
+        {
+            std::clog << "We are lost " << n - msg_len << " bytes of useful data" << std::endl;
+            msg_len = 0;
+        }
+    }
+
+    void push(PacketInfo& info)
+    {
+        assert(info.dlen != 0);
+
+        while(info.dlen) // loop over data in packet
+        {
+            if(msg_len != 0)    // we are on-stream and we are looking to some message
+            {
+                if(hdr_len == 0)    // message header is readout, discard the unused tail of message
+                {
+                    if(msg_len >= info.dlen) // discard whole new packet
+                    {
+                        msg_len -= info.dlen;
+                        info.dlen = 0;  // return from while
+                    }
+                    else  // discard only a part of packet payload related to current message
+                    {
+                        info.dlen -= msg_len;
+                        info.data += msg_len;
+                        msg_len = 0;
+                    }
+                }
+                else // hdr_len != 0, readout a part of header of current message
+                {
+                    if(hdr_len > info.dlen) // got new part of header (not the all!)
+                    {
+                        collection.push(info);
+                        hdr_len     -= info.dlen;
+                        msg_len     -= info.dlen;
+                        info.dlen = 0;  // return from while
+                    }
+                    else // hdr_len <= dlen, current message will be complete, also we have some additional data
+                    {
+                        collection.push(info, hdr_len);
+                        info.dlen   -= hdr_len;
+                        info.data   += hdr_len;
+
+                        msg_len -= hdr_len;
+                        hdr_len -= hdr_len; // set 0
+
+                        collection.complete(info);    // push complete message to queue
+                    }
+                }
+            }
+            else // msg_len == 0, no one mesasge is on reading, try to find next message
+            {
+                find_message(info);
+            }
+        }
+    }
+
+    inline void find_message(PacketInfo& info)
+    {
+        static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
+        const RecordMark* rm;
+
+        if(collection) // collection is allocated
+        {
+            const uint32_t tocopy = max_header-collection.data_size();
+
+            if(info.dlen < tocopy)
+            {
+                std::clog << "Warning: Untested code:" __FILE__ << ':' << __LINE__ << std::endl;
+                collection.push(info);
+                //info.data += info.dlen;   optimization
+                info.dlen = 0;
+                return;
+            }
+            else // info.dlen >= tocopy
+            {
+                collection.push(info, tocopy);
+                info.dlen -= tocopy;
+                info.data += tocopy;
+
+                assert(max_header == collection.data_size());
+
+                rm = reinterpret_cast<const RecordMark*>(collection.data());
+            }
+        }
+        else // collection is empty
+        {
+            collection = writer->alloc();   // allocate new collection
+
+            if(info.dlen >= max_header)  // is data enougth to message validation?
+            {
+                rm = reinterpret_cast<const RecordMark*>(info.data);
+            }
+            else // push them into collection to validation after supplement by next data
+            {
+                collection.push(info);
+                //info.data += info.dlen;   optimization
+                info.dlen = 0;
+                return;
+            }
+        }
+
+        assert(collection);     // collection must be initialized
+        assert(rm != NULL);     // RM must be initialized
+        assert(msg_len == 0);   // RPC Message still undetected
+
+        if(validate_header(rm))
+        {
+            assert(msg_len != 0);   // message is found
+
+            const uint32_t written = collection.data_size();
+            if(written != 0) // a message was partially written to collection
+            {
+                collection.skip_first(sizeof(RecordMark)); // TODO:workaround remove RM
+                msg_len -= written - sizeof(RecordMark);
+                if(hdr_len !=0) // we want to collect header of this RPC message
+                {
+                    hdr_len -= written - sizeof(RecordMark);
+                }
+            }
+            else // whole message is in packet
+            {
+                //std::clog << "Warning: Untested code:" __FILE__ << ':' << __LINE__ << std::endl;
+                // TODO:workaround remove RM
+                info.dlen -= sizeof(RecordMark);
+                info.data += sizeof(RecordMark);
+            }
+        }
+        else    // unknown data in packet payload
+        {
+            assert(msg_len == 0);   // message is not found
+            assert(hdr_len == 0);   // header should be skipped
+            collection.reset();     // skip collected data
+            // skip data od current packet at all
+            //info.data = NULL; optimization
+            info.dlen = 0;
+        }
+    }
+
+    inline bool validate_header(const RecordMark*const rm)
+    {
+        const MessageHeader*const msg = rm->fragment();
+        switch(msg->type())
+        {
+            case SUNRPC_CALL:
+            {
+                const CallHeader*const call = static_cast<const CallHeader*const>(msg);
+                if(RPCValidator::check(call))
+                {
+                    //if(rm->is_last()); // TODO: handle sequence field of record mark
+                    msg_len = rm->fragment_len();   // length of current RPC message
+
+                    if(NFSv3Validator::check(call))
+                    {
+                        hdr_len = std::min(msg_len, max_hdr);
+                        //std::clog << "header len: " << hdr_len << std::endl;
+                    }
+                    else
+                    {
+                        hdr_len = 0; // don't collect headers of unknown calls
+                    /*    std::clog << "unknown RPC call of program: "<< call->prog()
+                                  << " version: "                   << call->vers()
+                                  << " procedure: "                 << call->proc()
+                                  << '\n';*/
+                    }
+                    return true;
+                }
+                else
+                {
+                    //std::clog << "unknown RPC call(?)\n";
+                    return false;
+                }
+            }
+            break;
+            case SUNRPC_REPLY:
+            {
+                const ReplyHeader*const reply = static_cast<const ReplyHeader*const>(msg);
+                if(RPCValidator::check(reply))
+                {
+                    msg_len = rm->fragment_len();   // length of current RPC message
+                    hdr_len = std::min(msg_len, max_hdr);
+                    return true;
+                }
+                else
+                {   // ERROR stream is corrupt
+                    //std::clog << "unknown RPC reply(?)\n";
+                    msg_len = 0;
+                    hdr_len = 0;
+                    return false;
+                }
+            }
+            break;
+            default:
+            {
+                //std::clog << "unknown RPC message type(?)\n";
+            }
+            break;
+        }
+
+        return false;
+    }
+
+private:
+    uint32_t    max_hdr;  // max length of RPC message that will be collected
+    uint32_t    msg_len;  // length of current RPC message + RM
+    uint32_t    hdr_len;  // min(max_hdr, msg_len) or 0 in case of unknown msg
+
+    Writer*     writer;
+
+    typename Writer::Collection collection;    // storage for collection packet data
+};
 
 template
 <
@@ -835,27 +631,19 @@ public:
         Conversation key(info, direction);
 
         // Following code must be refactored!
-        TCPSessions::iterator i = processor->sessions.find_or_create_session(key);
+        typename TCPSessions< RPCFiltrator < Writer > >::it i = processor->sessions.find_or_create_session(key, processor->writer.get());
         if(i != processor->sessions.end())
         {
-            Session& session = i->second;
+            TCPSession< RPCFiltrator < Writer > > & session = i->second;
 
             session.reassemble_tcp(i->first, direction, info);
-
-            RPCReader& reader = session.readers[direction];
-
-            while(reader.detect_message())
-            {
-                processor->writer->collect(direction, key, reader);
-            }
-
         }
     }
 
 private:
     std::auto_ptr<Reader> reader;
     std::auto_ptr<Writer> writer;
-    TCPSessions sessions;
+    TCPSessions< RPCFiltrator < Writer > > sessions;
 };
 
 
