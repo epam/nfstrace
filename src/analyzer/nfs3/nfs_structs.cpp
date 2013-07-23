@@ -752,7 +752,9 @@ XDRReader& operator>>(XDRReader& in, CreateHow& obj)
                 in >> *obj.verf;
             }
             break;
-        default:
+        
+        case CreateHow::UNCHECKED :
+        case CreateHow::GUARDED :
             {
                 obj.obj_attributes = new SAttr();
                 in >> *obj.obj_attributes;

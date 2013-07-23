@@ -1019,6 +1019,11 @@ public:
     CreateHow() : obj_attributes(NULL), verf(NULL)
     {
     }
+    ~CreateHow()
+    {
+        delete obj_attributes;
+        delete verf;
+    }
     enum CreateMode
     {
         UNCHECKED = 0,
