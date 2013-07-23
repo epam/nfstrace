@@ -78,7 +78,7 @@ public:
             {
                 List::iterator i = fifo.begin();
                 List::iterator end = fifo.end();
-                out << "list of collected exceptions:" << std::endl;
+                out << "list of unhandled exceptions:" << std::endl;
                 for(; i != end; ++i)
                 {
                     out << '\t' << (*i)->what() << std::endl;
