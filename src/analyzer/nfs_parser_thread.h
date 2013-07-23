@@ -81,23 +81,30 @@ public:
 private:
     inline void process_queue()
     {
-        // Read all data from the received queue
-        FilteredDataQueue::ElementList list(queue);
-        if(list)
+        try
         {
-            do
+            // Read all data from the received queue
+            FilteredDataQueue::ElementList list(queue);
+            if(list)
             {
-                const FilteredData& data = list.data();
-                std::auto_ptr<NFSOperation> op(create_nfs_operation(data));
-                list.free_current();
-                if(op.get())
+                do
                 {
-                    analyzers.call(*op);
+                    const FilteredData& data = list.data();
+                    std::auto_ptr<NFSOperation> op(create_nfs_operation(data));
+                    list.free_current();
+                    if(op.get())
+                    {
+                        analyzers.call(*op);
+                    }
                 }
+                while(list);
             }
-            while(list);
+            else pthread_yield();
         }
-        else pthread_yield();
+        catch(XDRError& exception)
+        {
+            status.push(exception);
+        }
     }
 
     NFSOperation* create_nfs_operation(const FilteredData& rpc)

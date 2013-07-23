@@ -77,6 +77,7 @@ std::ostream& operator<<(std::ostream& out, const NFSOperation& obj)
                 break;
             case Proc::WRITE :
                 {
+                    out << static_cast<const WriteArgs&>(*obj.get_call());
                 }
                 break;
             case Proc::CREATE :

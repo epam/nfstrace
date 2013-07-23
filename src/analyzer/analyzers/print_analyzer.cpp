@@ -76,27 +76,7 @@ bool PrintAnalyzer::call_read(const NFSOperation& operation)
 
 bool PrintAnalyzer::call_write(const NFSOperation& operation)
 {
-    const WriteArgs& data = static_cast<const WriteArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Offset: " << data.get_offset() << " Count: " << data.get_count() << " Type: ";
-    switch(data.get_stable())
-    {
-    case 0:
-        {
-            out << "Unstable";
-        }
-        break;
-    case 1:
-        {
-            out << "Data Sync";
-        }
-        break;
-    case 2:
-        {
-            out << "File Sync";
-        }
-        break;
-    }
-    out << std::endl;
+    out << operation << std::endl;
     return true;
 }
 

@@ -764,6 +764,42 @@ XDRReader& operator>>(XDRReader& in, CreateHow& obj)
     return in;
 } 
 
+std::ostream& operator<<(std::ostream& out, const WriteArgs& obj)
+{
+    out << "file:" << std::endl;
+    {
+        Indent indentation(out, 4);
+        out << obj.file << std::endl;
+    }
+
+    out << "offset:" << std::endl;
+    {
+        Indent indentation(out, 4);
+        out << obj.offset << std::endl;
+    }
+
+    out << "count:" << std::endl;
+    {
+        Indent indentation(out, 4);
+        out << obj.file << std::endl;
+    }
+
+    out << "stable:" << std::endl;
+    {
+        Indent indentation(out, 4);
+        switch(obj.stable)
+        {
+            case WriteArgs::UNSTABLE :
+                out << "UNSTABLE"; break;
+            case WriteArgs::DATA_SYNC :
+                out << "DATA_SYNC"; break;
+            case WriteArgs::FYLE_SYNC :
+                out << "FYLE_SYNC"; break;
+        }
+    }
+    return out;
+}
+
 std::ostream& operator<<(std::ostream& out, const CreateHow& obj)
 {
     out << "mode: ";
