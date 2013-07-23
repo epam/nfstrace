@@ -33,9 +33,9 @@ public:
 
     ~BlockAllocator()
     {
-        for(uint32_t i = 0; i<limit; i++)
+        for(uint32_t i = 0; i<allocated; i++)
         {
-            delete blocks[i];
+            delete[] blocks[i];
         }
         delete[] blocks;
     }
