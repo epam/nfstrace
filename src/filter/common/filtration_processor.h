@@ -419,7 +419,7 @@ public:
 
             if(info.dlen < tocopy)
             {
-                std::clog << "Warning: Untested code:" __FILE__ << ':' << __LINE__ << std::endl;
+                //std::clog << "Warning: Untested code:" __FILE__ << ':' << __LINE__ << std::endl;
                 collection.push(info);
                 //info.data += info.dlen;   optimization
                 info.dlen = 0;
@@ -585,7 +585,7 @@ public:
     }
     ~FiltrationProcessor()
     {
-        if(controller::Parameters::instance().is_verbose())
+        //if(controller::Parameters::instance().is_verbose())
         {
             reader->print_statistic(std::clog);
         }
