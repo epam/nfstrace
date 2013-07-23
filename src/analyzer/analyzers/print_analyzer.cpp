@@ -6,11 +6,12 @@
 #include <iostream>
 #include <sstream>
 
-#include "../../filter/nfs/nfs_operation.h"
-#include "../../filter/nfs/nfs_procedures.h"
-#include "../../filter/nfs/nfs_struct.h"
+#include "../nfs3/nfs_operation.h"
+#include "../nfs3/nfs_procedures.h"
+#include "../nfs3/nfs_structs.h"
 #include "print_analyzer.h"
 //------------------------------------------------------------------------------
+using namespace NST::analyzer::NFS3;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -36,7 +37,7 @@ bool PrintAnalyzer::call_getattr(const NFSOperation& operation)
 
 bool PrintAnalyzer::call_setattr(const NFSOperation& operation)
 {
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[Proc::SETATTR] << "." << std::endl;
+    out << operation << std::endl;
     return true;
 }
 
@@ -101,13 +102,13 @@ bool PrintAnalyzer::call_write(const NFSOperation& operation)
 
 bool PrintAnalyzer::call_create(const NFSOperation& operation)
 {
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[Proc::CREATE] <<"." << std::endl;
+    out << operation << std::endl;
     return true;
 }
 
 bool PrintAnalyzer::call_mkdir(const NFSOperation& operation)
 {
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[Proc::MKDIR] <<"." << std::endl;
+    out << operation << std::endl;
     return true;
 }
 

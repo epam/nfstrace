@@ -8,9 +8,9 @@
 //------------------------------------------------------------------------------
 #include <ostream>
 
-#include "../../filter/nfs/nfs_operation.h"
+#include "../nfs3/nfs_operation.h"
 //------------------------------------------------------------------------------
-using NST::filter::NFS3::NFSOperation;
+using NST::analyzer::NFS3::NFSOperation;
 //------------------------------------------------------------------------------
 namespace NST
 {

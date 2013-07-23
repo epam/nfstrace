@@ -9,13 +9,13 @@
 #include <list>
 #include <vector>
 
-#include "../controller/running_status.h"
-#include "../filter/nfs/nfs_operation.h"
-#include "../filter/nfs/nfs_struct.h"
 #include "analyzers/base_analyzer.h"
+#include "nfs3/nfs_operation.h"
+#include "nfs3/nfs_procedures.h"
 //------------------------------------------------------------------------------
-using namespace NST::filter::NFS3;
 using NST::analyzer::analyzers::BaseAnalyzer;
+using NST::analyzer::NFS3::Proc;
+using NST::analyzer::NFS3::NFSOperation;
 //------------------------------------------------------------------------------
 namespace NST
 {

@@ -9,7 +9,6 @@
 #include <memory> // std::auto_ptr
 
 #include "../auxiliary/filtered_data.h"
-#include "../auxiliary/exception.h"
 #include "../auxiliary/thread.h"
 #include "../controller/parameters.h"
 #include "../controller/running_status.h"
@@ -18,11 +17,9 @@
 #include "analyzers/print_analyzer.h"
 #include "nfs_parser_thread.h"
 //------------------------------------------------------------------------------
-using namespace NST::analyzer::analyzers;
-
-using NST::auxiliary::FilteredData;
+using NST::analyzer::analyzers::PrintAnalyzer;
+using NST::analyzer::analyzers::BreakdownAnalyzer;
 using NST::auxiliary::FilteredDataQueue;
-using NST::auxiliary::Exception;
 using NST::auxiliary::Thread;
 using NST::controller::Parameters;
 using NST::controller::RunningStatus;

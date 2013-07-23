@@ -12,13 +12,12 @@
 
 #include "../auxiliary/filtered_data.h"
 #include "../auxiliary/session.h"
-#include "../filter/nfs/nfs_operation.h"
+#include "nfs3/nfs_operation.h"
 #include "transmission.h"
 //------------------------------------------------------------------------------
-using namespace NST::filter::NFS3;
-
-using NST::auxiliary::Session;
 using NST::auxiliary::FilteredData;
+using NST::auxiliary::Session;
+using NST::analyzer::NFS3::NFSOperation;
 //------------------------------------------------------------------------------
 namespace NST
 {

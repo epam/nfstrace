@@ -14,13 +14,13 @@
 #include "../../auxiliary/session.h"
 #include "../rpc/rpc_struct.h"
 //------------------------------------------------------------------------------
-using namespace NST::filter::rpc;
+using namespace NST::analyzer::RPC;
 
 using NST::auxiliary::Session;
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace filter
+namespace analyzer 
 {
 namespace NFS3
 {
@@ -33,11 +33,8 @@ public:
     NFSOperation(const RPCCall* c, const RPCReply* r, const Session* s) : call(c), reply(r), session(s)
     {
     }
-    ~NFSOperation()
-    {
-        delete call;
-        delete reply;
-    }
+    ~NFSOperation();
+    friend std::ostream& operator<<(std::ostream& out, const NFSOperation& obj);
 
     inline const RPCCall* get_call() const
     {
@@ -51,16 +48,7 @@ public:
     {
         return session;
     }
-    inline timeval latency() const
-    {
-        timeval diff;
-        timerclear(&diff);
-        if(call && reply)
-        {
-            timersub(&reply->get_time(), &call->get_time(), &diff);
-        }
-        return diff;
-    }
+    timeval latency() const;
 
 private:
     NFSOperation(const NFSOperation&);
