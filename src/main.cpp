@@ -27,12 +27,12 @@ int main(int argc, char **argv) try
 catch(const std::exception& e)
 {
     std::cerr << argv[0] << ": " << e.what() << std::endl;
-    exit(-1);
+    return -1;
 }
 catch(...)
 {
     std::cerr << "Unknown error" << std::endl;
-    exit(-1);
+    return -1;
 }
 //------------------------------------------------------------------------------
 
