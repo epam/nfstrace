@@ -16,17 +16,19 @@
 //------------------------------------------------------------------------------
 #ifdef DEBUG
 #define TRACE(format, ...) {\
-    NST::auxiliary::Spinlock::Lock lock(NST::auxiliary::g_Logger->get_spinlock());\
-    NST::auxiliary::g_Logger->print("%s %d. TYPE: TRACE. MSG -- "format, __FILE__, __LINE__, __VA_ARGS__);\
-    NST::auxiliary::g_Logger->flush();\
+    NST::auxiliary::Logger& log = NST::auxiliary::Logger::get_global();\
+    NST::auxiliary::Spinlock::Lock lock(log.get_spinlock());\
+    log.print("%s %d: "format, __FILE__, __LINE__, __VA_ARGS__);\
+    log.flush();\
 }
 #else
 #define TRACE(format, ...)
 #endif
 
 #define LOG(format, ...) {\
-    NST::auxiliary::Spinlock::Lock lock(NST::auxiliary::g_Logger->get_spinlock());\
-    NST::auxiliary::g_Logger->print("%s %d. TYPE: LOG. MSG -- "format, __FILE__, __LINE__, __VA_ARGS__);\
+    NST::auxiliary::Logger& log = NST::auxiliary::Logger::get_global();\
+    NST::auxiliary::Spinlock::Lock lock(log.get_spinlock());\
+    log.print("%s %d: "format, __FILE__, __LINE__, __VA_ARGS__);\
 }
 //------------------------------------------------------------------------------
 namespace NST
@@ -37,8 +39,34 @@ namespace auxiliary
 class Logger 
 {
 public:
-    Logger(const std::string& file_path) : file(NULL)
+    Logger() : owner(false), file(NULL) 
     {
+    }
+    ~Logger()
+    {
+        if(owner)
+        {
+            flock(fileno(file), LOCK_UN);
+            fclose(file);
+        }
+    }
+
+    inline static void set_global(Logger* global)
+    {
+        if(g_log)
+        {
+            throw Exception(std::string("Global Logger have been set"));
+        }
+        g_log = global;
+    }
+    inline static Logger& get_global()
+    {
+        return *g_log;
+    }
+    void set_output_file(const std::string& file_path)
+    {
+        owner = true;
+
         if(!(file = fopen(file_path.c_str(), "w")))
         {
             throw Exception(std::string("Logger cannot open file: " + file_path)); 
@@ -48,12 +76,14 @@ public:
             throw Exception(std::string("File: " + file_path + " opened in another thread"));
         }
     }
-    ~Logger()
+    void set_output_err()
     {
-        flock(fileno(file), LOCK_UN);
-        fclose(file);
+        file = stderr;
     }
-
+    void set_output_out()
+    {
+        file = stdout;
+    }
     void print(const char* format, ...)
     {
         va_list args;
@@ -74,11 +104,11 @@ private:
     Logger(const Logger&);
     void operator=(const Logger&);
 
+    static Logger* g_log;
+    bool     owner; // Is logger is file owner? 
     FILE*    file;
     Spinlock spinlock;
 };
-
-static Logger* g_Logger = NULL;
 
 } // auxiliary
 } // NST

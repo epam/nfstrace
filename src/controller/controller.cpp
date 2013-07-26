@@ -17,9 +17,10 @@ namespace NST
 namespace controller
 {
 
-Controller::Controller(const Parameters& params) : logger("nfstrace.log"), sig_handler(status), filtration(status), analysis(status)
+Controller::Controller(const Parameters& params) : sig_handler(status), filtration(status), analysis(status)
 {
-    NST::auxiliary::g_Logger = &logger;
+    logger.set_output_file("nfstrace.log");
+    NST::auxiliary::Logger::set_global(&logger);
 
     const RunningMode mode = params.running_mode();
 
