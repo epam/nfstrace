@@ -17,7 +17,7 @@
 #include "nfs3/nfs_operation.h"
 #include "nfs3/nfs_procedures.h"
 #include "nfs3/nfs_structs.h"
-#include "rpc/rpc_struct.h"
+#include "rpc/rpc_structs.h"
 #include "rpc_sessions.h"
 #include "xdr/xdr_reader.h"
 //------------------------------------------------------------------------------

@@ -12,7 +12,7 @@
 #include <sys/time.h>
 
 #include "../../auxiliary/session.h"
-#include "../rpc/rpc_struct.h"
+#include "../rpc/rpc_structs.h"
 //------------------------------------------------------------------------------
 using namespace NST::analyzer::RPC;
 
@@ -20,7 +20,7 @@ using NST::auxiliary::Session;
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace analyzer 
+namespace analyzer
 {
 namespace NFS3
 {

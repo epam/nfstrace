@@ -54,7 +54,7 @@ public:
     virtual void print(std::ostream& out);
 
 private:
-    std::string print_fh(const OpaqueDyn& fh) const;
+    std::ostream& print_fh(std::ostream& out, const Opaque& fh) const;
     std::string get_session(const NFSOperation::Session& session) const;
     std::string session_addr(NFSOperation::Session::Direction dir, const NFSOperation::Session& session) const;
     std::string ipv6_string(const uint8_t ip[16]) const;
