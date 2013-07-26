@@ -69,7 +69,7 @@ public:
 
         if(!(file = fopen(file_path.c_str(), "w")))
         {
-            throw Exception(std::string("Logger cannot open file: " + file_path)); 
+            throw Exception(std::string("Logger cannot open file: " + file_path));
         }
         if(flock(fileno(file), LOCK_EX | LOCK_NB))
         {
@@ -105,7 +105,7 @@ private:
     void operator=(const Logger&);
 
     static Logger* global_logger;
-    bool     owner; // Is logger is file owner? 
+    bool     owner; // Is logger file owner?
     FILE*    file;
     Spinlock spinlock;
 };
