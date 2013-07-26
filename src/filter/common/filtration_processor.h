@@ -23,6 +23,7 @@
 #include "../conversation.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Exception;
+using NST::auxiliary::Logger;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -138,7 +139,7 @@ public:
                 }
                 else
                 {
-                 //   std::cout << "drop packet seq:" << seq << " sequence: " << sequence << " dlen: " << info.dlen << '\n';
+                    TRACE("drop packet seq: %d; sequence: %d;  dlen: %d\n", seq, sequence, info.dlen);
                 }
             }
         }
@@ -306,7 +307,7 @@ public:
             }
             else
             {
-                //std::cout << "session is not created!" << std::endl;
+                TRACE("%s", "session is not created!");
             }
         }
         return i;

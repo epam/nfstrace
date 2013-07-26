@@ -7,14 +7,16 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 //------------------------------------------------------------------------------
-#include "../filter/filtration_manager.h"
 #include "../analyzer/analysis_manager.h"
+#include "../auxiliary/logger.h"
+#include "../filter/filtration_manager.h"
 #include "parameters.h"
 #include "running_status.h"
 #include "synchronous_signal_handling.h"
 //------------------------------------------------------------------------------
-using NST::filter::FiltrationManager;
 using NST::analyzer::AnalysisManager;
+using NST::auxiliary::Logger;
+using NST::filter::FiltrationManager;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -31,6 +33,9 @@ public:
     int run();
 
 private:
+    // global used logger
+    Logger logger; 
+
     // container for generated exceptions
     RunningStatus status;
 
