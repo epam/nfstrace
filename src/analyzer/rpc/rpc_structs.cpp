@@ -3,7 +3,7 @@
 // Description: Different rpc structures.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include "rpc_struct.h"
+#include "rpc_structs.h"
 #include "../../auxiliary/print/indent.h"
 #include "../nfs3/nfs_procedures.h"
 //------------------------------------------------------------------------------
@@ -12,14 +12,21 @@ using NST::analyzer::NFS3::Proc;
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace analyzer 
+namespace analyzer
 {
-namespace RPC 
+namespace RPC
 {
 
 XDRReader& operator>>(XDRReader& in, OpaqueAuth& obj)
 {
-    return in >> obj.auth_flavor >> obj.body;
+    in >> obj.flavor;
+    in.read_varialble_len(obj.body);
+    return in;
+}
+
+XDRReader& operator>>(XDRReader& in, MismatchInfo& obj)
+{
+    return in >> obj.low >> obj.high;
 }
 
 std::ostream& operator<<(std::ostream& out, const RPCMessage& obj)
@@ -27,12 +34,9 @@ std::ostream& operator<<(std::ostream& out, const RPCMessage& obj)
     out << "RPC:" << std::endl;
     Indent indentation(out, 4);
 
-    out << "xid: " << obj.xid << std::endl;
+    out << "xid: " << obj.get_xid() << std::endl;
     out << "type: ";
-    if(obj.type == SUNRPC_CALL)
-        out << "CALL";
-    else
-        out << "REPLY";
+    out << ((obj.get_type() == SUNRPC_CALL) ? "CALL" : "REPLY");
     return out << std::endl;
 }
 
@@ -41,10 +45,10 @@ std::ostream& operator<<(std::ostream& out, const RPCCall& obj)
     out << static_cast<const RPCMessage&>(obj);
     Indent indentation(out, 4);
 
-    out << "rpcvers: " << obj.rpcvers << std::endl;
-    out << "prog: " << obj.prog << std::endl;
-    out << "vers: " << obj.vers << std::endl;
-    out << "proc: " << Proc::titles[obj.proc] << "(" << obj.proc << ")";
+    out << "rpcvers: " << obj.get_rpcvers() << std::endl;
+    out << "prog: " << obj.get_prog() << std::endl;
+    out << "vers: " << obj.get_vers() << std::endl;
+    out << "proc: " << Proc::titles[obj.get_proc()] << "(" << obj.get_proc() << ")";
     return out;
 }
 
@@ -52,12 +56,12 @@ std::ostream& operator<<(std::ostream& out, const RPCReply& obj)
 {
     out << static_cast<const RPCMessage&>(obj);
     Indent indentation(out, 4);
-
+/*
     out << "stat: ";
     if(obj.stat == SUNRPC_MSG_ACCEPTED)
         out << "MSG_ACCEPTED";
     else
-        out << "MSG_DENIED";
+        out << "MSG_DENIED";*/
     return out << std::endl;
 }
 

@@ -7,7 +7,7 @@
 #define NFS_STRUCTS_H
 //------------------------------------------------------------------------------
 #include "../../auxiliary/print/indent.h"
-#include "../rpc/rpc_struct.h" // OpaqueAuth, RPCMessage, RPCCall, RPCReply
+#include "../rpc/rpc_structs.h" // OpaqueAuth, RPCMessage, RPCCall, RPCReply
 #include "../xdr/xdr_struct.h" // OpaqueDyn, OpaqueStat
 #include "../xdr/xdr_reader.h"
 #include "nfs_procedures.h" // Proc (enumeration Ops)
@@ -26,294 +26,47 @@ namespace NFS3
 const uint32_t cg_program = 100003;
 const uint32_t cg_version = 3;
 const uint32_t cg_port    = 2049;
-const uint32_t cg_fhsize  = 64;
+const uint32_t NFS3_FHSIZE  = 64;
 
-const uint32_t cg_cookieverfsize = 8;
-const uint32_t cg_createverfsize = 8;
-const uint32_t cg_writeverfszie  = 8;
+const uint32_t NFS3_COOKIEVERFSIZE = 8;
+const uint32_t NFS3_CREATEVERFSIZE = 8;
+const uint32_t NFS3_WRITEVERFSIZE  = 8;
 
-class FileName
+typedef Opaque      filename3;
+typedef Opaque      nfspath3;
+typedef uint64_t    fileid3;
+typedef uint64_t    cookie3;
+typedef Opaque      cookieverf3;
+typedef Opaque      createverf3;
+typedef Opaque      writeverf3;
+
+typedef uint32_t    uid3;
+typedef uint32_t    gid3;
+typedef uint32_t    size3;
+typedef uint64_t    offset3;
+typedef uint32_t    mode3;
+typedef uint32_t    count3;
+
+
+enum Enum_mode3
 {
-public:
-    FileName()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, FileName& obj);
-    friend std::ostream& operator<<(std::ostream& out, const FileName& obj); 
-
-    inline std::string get_filename() const
-    {
-        return filename.to_string();
-    }
-private:
-    FileName(const FileName& obj);
-    void operator=(const FileName& obj); 
-
-    OpaqueDyn filename;
+    USER_ID_EXEC      = 0x00800,
+    GROUP_ID_EXEC     = 0x00400,
+    SAVE_SWAPPED_TEXT = 0x00200, // Not defined in POSIX
+    OWNER_READ        = 0x00100,
+    OWNER_WRITE       = 0x00080,
+    OWNER_EXEC        = 0x00040, // Search in directory
+    GROUP_READ        = 0x00020,
+    GROUP_WRITE       = 0x00010,
+    GROUP_EXEC        = 0x00008, // Search in directory
+    OTHER_READ        = 0x00004,
+    OTHER_WRITE       = 0x00002,
+    OTHER_EXEC        = 0x00001  // Search in directory
 };
 
-class NFSPath
+struct nfsstat3
 {
-public:
-    NFSPath()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, NFSPath& obj);
-    friend std::ostream& operator<<(std::ostream& out, const NFSPath& obj); 
-
-    inline std::string get_nfspath() const
-    {
-        return nfspath.to_string();
-    }
-private:
-    NFSPath(const NFSPath& obj);
-    void operator=(const NFSPath& obj); 
-
-    OpaqueDyn nfspath;
-};
-
-class FileID
-{
-public:
-    FileID()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, FileID& obj);
-    friend std::ostream& operator<<(std::ostream& out, const FileID& obj); 
-
-    inline uint64_t get_fileid() const
-    {
-        return fileid;
-    }
-private:
-    FileID(const FileID& obj);
-    void operator=(const FileID& obj); 
-
-    uint64_t fileid;
-};
-
-class Cookie
-{
-public:
-    Cookie()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, Cookie& obj);
-    friend std::ostream& operator<<(std::ostream& out, const Cookie& obj); 
-
-    inline uint64_t get_cookie() const
-    {
-        return cookie;
-    }
-private:
-    Cookie(const Cookie& obj);
-    void operator=(const Cookie& obj); 
-
-    uint64_t cookie;
-};
-
-class CookieVerf
-{
-public:
-    CookieVerf()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, CookieVerf& obj);
-    friend std::ostream& operator<<(std::ostream& out, const CookieVerf& obj); 
-
-    inline const std::vector<uint8_t>& get_cookieverf() const
-    {
-        return cookieverf.data;
-    }
-private:
-    CookieVerf(const CookieVerf& obj);
-    void operator=(const CookieVerf& obj); 
-
-    OpaqueStat<cg_cookieverfsize> cookieverf;
-};
-
-class CreateVerf
-{
-public:
-    CreateVerf()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, CreateVerf& obj);
-    friend std::ostream& operator<<(std::ostream& out, const CreateVerf& obj); 
-
-    inline const std::vector<uint8_t>& get_createverf() const
-    {
-        return createverf.data;
-    }
-private:
-    CreateVerf(const CreateVerf& obj);
-    void operator=(const CreateVerf& obj); 
-
-    OpaqueStat<cg_createverfsize> createverf;
-};
-
-class WriteVerf
-{
-public:
-    WriteVerf()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, WriteVerf& obj);
-    friend std::ostream& operator<<(std::ostream& in, const WriteVerf& obj);
-
-    inline const std::vector<uint8_t>& get_writeverf() const
-    {
-        return writeverf.data;
-    }
-private:
-    WriteVerf(const WriteVerf& obj);
-    void operator=(const WriteVerf& obj); 
-
-    OpaqueStat<cg_writeverfszie> writeverf;
-};
-
-class UID
-{
-public:
-    UID()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, UID& obj);
-    friend std::ostream& operator<<(std::ostream& in, const UID& obj);
-
-    inline uint32_t get_uid() const
-    {
-        return uid;
-    }
-private:
-    UID(const UID& obj);
-    void operator=(const UID& obj); 
-
-    uint32_t uid;
-};
-
-class GID
-{
-public:
-    GID()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, GID& obj);
-    friend std::ostream& operator<<(std::ostream& in, const GID& obj);
-
-    inline uint32_t get_gid() const
-    {
-        return gid;
-    }
-private:
-    GID(const GID& obj);
-    void operator=(const GID& obj); 
-
-    uint32_t gid;
-};
-
-class Size
-{
-public:
-    Size()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, Size& obj);
-    friend std::ostream& operator<<(std::ostream& in, const Size& obj);
-
-    inline uint32_t get_size() const
-    {
-        return size;
-    }
-private:
-    Size(const Size& obj);
-    void operator=(const Size& obj); 
-
-    uint64_t size;
-};
-
-class Offset
-{
-public:
-    Offset()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, Offset& obj);
-    friend std::ostream& operator<<(std::ostream& in, const Offset& obj);
-
-    inline uint32_t get_offset() const
-    {
-        return offset;
-    }
-private:
-    Offset(const Offset& obj);
-    void operator=(const Offset& obj); 
-
-    uint64_t offset;
-};
-
-class Mode
-{
-public:
-    Mode()
-    {
-    }
-    enum EMode
-    {
-        USER_ID_EXEC      = 0x800,
-        GROUP_ID_EXEC     = 0x400,
-        SAVE_SWAPPED_TEXT = 0x200, // Not defined in POSIX
-        OWNER_READ        = 0x100,
-        OWNER_WRITE       = 0x080,
-        OWNER_EXEC        = 0x040, // Search in directory
-        GROUP_READ        = 0x020,
-        GROUP_WRITE       = 0x010,
-        GROUP_EXEC        = 0x008, // Search in directory
-        OTHER_READ        = 0x004,
-        OTHER_WRITE       = 0x002,
-        OTHER_EXEC        = 0x001  // Search in directory
-    };
-    friend XDRReader& operator>>(XDRReader& in, Mode& obj);
-    friend std::ostream& operator<<(std::ostream& in, const Mode& obj);
-
-    inline EMode get_mode() const
-    {
-        return EMode(mode);
-    }
-private:
-    Mode(const Mode& obj);
-    void operator=(const Mode& obj); 
-
-    uint32_t mode;
-};
-
-class Count
-{
-public:
-    Count()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, Count& obj);
-    friend std::ostream& operator<<(std::ostream& in, const Count& obj);
-
-    inline uint32_t get_count() const
-    {
-        return count;
-    }
-private:
-    Count(const Count& obj);
-    void operator=(const Count& obj); 
-
-    uint32_t count;
-};
-
-class NFSStat
-{
-public:
-    NFSStat()
-    {
-    }
-    enum ENFSStat
+    enum Enum_nfsstat3
     {
         OK              = 0,
         ERR_PERM        = 1,
@@ -345,27 +98,18 @@ public:
         ERR_BADTYPE     = 10007,
         ERR_JUKEBOX     = 10008
     };
-    friend XDRReader& operator>>(XDRReader& in, NFSStat& obj);
-    friend std::ostream& operator<<(std::ostream& in, const NFSStat& obj);
 
-    inline ENFSStat get_nfsstat() const
-    {
-        return ENFSStat(nfsstat);
-    }
+    friend XDRReader& operator>>(XDRReader& in, nfsstat3& obj);
+
+    inline Enum_nfsstat3 get_stat() const { return Enum_nfsstat3(stat); }
+
 private:
-    NFSStat(const NFSStat& obj);
-    void operator=(const NFSStat& obj); 
-
-    uint32_t nfsstat;
+    uint32_t stat;
 };
 
-class FType
+struct ftype3
 {
-public:
-    FType()
-    {
-    }
-    enum EFType
+    enum Enum_ftype3
     {
         REG  = 1,
         DIR  = 2,
@@ -375,425 +119,213 @@ public:
         SOCK = 6,
         FIFO = 7
     };
-    friend XDRReader& operator>>(XDRReader& in, FType& obj);
-    friend std::ostream& operator<<(std::ostream& in, const FType& obj);
 
-    inline EFType get_ftype() const
-    {
-        return EFType(ftype);
-    }
+    friend XDRReader& operator>>(XDRReader& in, ftype3& obj);
+
+    inline Enum_ftype3 get_ftype() const { return Enum_ftype3(ftype); }
+
 private:
-    FType(const FType& obj);
-    void operator=(const FType& obj); 
-
     uint32_t ftype;
 };
 
-class SpecData
+struct specdata3
 {
-public:
-    SpecData()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, SpecData& obj);
-    friend std::ostream& operator<<(std::ostream& in, const SpecData& obj);
+    friend XDRReader& operator>>(XDRReader& in, specdata3& obj);
 
-    inline uint32_t get_specdata1() const
-    {
-        return specdata1;
-    }
-    inline uint32_t get_specdata2() const
-    {
-        return specdata2;
-    }
+    inline uint32_t get_specdata1() const { return specdata1; }
+    inline uint32_t get_specdata2() const { return specdata2; }
+
 private:
-    SpecData(const SpecData& obj);
-    void operator=(const SpecData& obj); 
-
     uint32_t specdata1;
     uint32_t specdata2;
 };
 
-class NFS_FH
+struct nfs_fh3
 {
-public:
-    NFS_FH()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, NFS_FH& obj);
-    friend std::ostream& operator<<(std::ostream& in, const NFS_FH& obj);
+    friend XDRReader& operator>>(XDRReader& in, nfs_fh3& obj);
 
-    inline const OpaqueDyn& get_data() const
-    {
-        return data;
-    }
+    inline const Opaque& get_data() const{ return data; }
+
 private:
-    NFS_FH(const NFS_FH& obj);
-    void operator=(const NFS_FH& obj); 
-
-    OpaqueDyn data; //TODO: Check data (should be less than "cg_fhsize") 
+    XDR::Opaque data;
 };
 
-class NFSTime
+struct nfstime3
 {
-public:
-    NFSTime()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, NFSTime& obj);
-    friend std::ostream& operator<<(std::ostream& in, const NFSTime& obj);
+    friend XDRReader& operator>>(XDRReader& in, nfstime3& obj);
 
-    inline uint32_t get_seconds() const
-    {
-        return seconds;
-    }
-    inline uint32_t get_nseconds() const
-    {
-        return nseconds;
-    }
+    inline uint32_t  get_seconds() const { return seconds;  }
+    inline uint32_t get_nseconds() const { return nseconds; }
+
 private:
-    NFSTime(const NFSTime& obj);
-    void operator=(const NFSTime& obj); 
-
     uint32_t seconds;
     uint32_t nseconds;
 };
 
-class FAttr
+struct fattr3
 {
-public:
-    FAttr()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, FAttr& obj);
-    friend std::ostream& operator<<(std::ostream& in, const FAttr& obj);
+    friend XDRReader& operator>>(XDRReader& in, fattr3& obj);
 
-    inline const FType& get_type() const
-    {
-        return type;
-    }
-    inline const Mode& get_mode() const
-    {
-        return mode;
-    }
-    inline uint32_t get_nlink() const
-    {
-        return nlink;
-    }
-    inline const UID& get_uid() const
-    {
-        return uid;
-    }
-    inline const GID& get_gid() const
-    {
-        return gid;
-    }
-    inline const Size& get_size() const
-    {
-        return size;
-    }
-    inline const Size& get_used() const
-    {
-        return used;
-    }
-    inline const SpecData& get_rdev() const
-    {
-        return rdev;
-    }
-    inline uint64_t get_fsid() const
-    {
-        return fsid;
-    }
-    inline const FileID& get_fileid() const
-    {
-        return fileid;
-    }
-    inline const NFSTime& get_atime() const
-    {
-        return atime;
-    }
-    inline const NFSTime& get_mtime() const
-    {
-        return mtime;
-    }
-    inline const NFSTime& get_ctime() const
-    {
-        return ctime;
-    }
+    inline const ftype3       get_type() const { return type;   }
+    inline const mode3        get_mode() const { return mode;   }
+    inline const uint32_t    get_nlink() const { return nlink;  }
+    inline const uid3          get_uid() const { return uid;    }
+    inline const gid3          get_gid() const { return gid;    }
+    inline const size3        get_size() const { return size;   }
+    inline const size3        get_used() const { return used;   }
+    inline const specdata3&   get_rdev() const { return rdev;   }
+    inline const uint64_t     get_fsid() const { return fsid;   }
+    inline const fileid3    get_fileid() const { return fileid; }
+    inline const nfstime3&   get_atime() const { return atime;  }
+    inline const nfstime3&   get_mtime() const { return mtime;  }
+    inline const nfstime3&   get_ctime() const { return ctime;  }
+
 private:
-    FAttr(const FAttr& obj);
-    void operator=(const FAttr& obj); 
-
-    FType    type;
-    Mode     mode;
-    uint32_t nlink;
-    UID      uid;
-    GID      gid;
-    Size     size;
-    Size     used;
-    SpecData rdev;
-    uint64_t fsid;
-    FileID   fileid;
-    NFSTime  atime;
-    NFSTime  mtime;
-    NFSTime  ctime;
+    ftype3      type;
+    mode3       mode;
+    uint32_t    nlink;
+    uid3        uid;
+    gid3        gid;
+    size3       size;
+    size3       used;
+    specdata3   rdev;
+    uint64_t    fsid;
+    fileid3     fileid;
+    nfstime3    atime;
+    nfstime3    mtime;
+    nfstime3    ctime;
 };
 
-class Post_Op_Attr
+struct post_op_attr
 {
-public:
-    Post_Op_Attr() : attributes(NULL)
-    {
-    }
-    ~Post_Op_Attr()
-    {
-        delete attributes;
-    }
-    friend XDRReader& operator>>(XDRReader& in, Post_Op_Attr& obj);
-    friend std::ostream& operator<<(std::ostream& in, const Post_Op_Attr& obj);
+    friend XDRReader& operator>>(XDRReader& in, post_op_attr& obj);
 
-    inline bool is_attributes() const
-    {
-        return attributes != NULL;
-    }
-    inline const FAttr& get_attributes() const
-    {
-        return *attributes;
-    }
+    inline const uint32_t is_attributes() const { return attributes_follow; }
+    inline const fattr3& get_attributes() const { return attributes;        }
+
 private:
-    Post_Op_Attr(const Post_Op_Attr& obj);
-    void operator=(const Post_Op_Attr& obj); 
-
-    FAttr*  attributes;
+    uint32_t attributes_follow;
+    fattr3   attributes;
 };
 
-class WCC_Attr
+struct wcc_attr
 {
-public:
-    WCC_Attr()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, WCC_Attr& obj);
-    friend std::ostream& operator<<(std::ostream& in, const WCC_Attr& obj);
+    friend XDRReader& operator>>(XDRReader& in, wcc_attr& obj);
 
-    inline const Size& get_size() const
-    {
-        return size;
-    }
-    inline const NFSTime& get_mtime() const
-    {
-        return mtime;
-    }
-    inline const NFSTime& get_ctime() const
-    {
-        return ctime;
-    }
+    inline const size3      get_size() const { return size;  }
+    inline const nfstime3& get_mtime() const { return mtime; }
+    inline const nfstime3& get_ctime() const { return ctime; }
+
 private:
-    WCC_Attr(const WCC_Attr& obj);
-    void operator=(const WCC_Attr& obj); 
-
-    Size    size;
-    NFSTime mtime;
-    NFSTime ctime;
+    size3    size;
+    nfstime3 mtime;
+    nfstime3 ctime;
 };
 
-class Pre_Op_Attr
+struct pre_op_attr
 {
-public:
-    Pre_Op_Attr() : attributes(NULL)
-    {
-    }
-    ~Pre_Op_Attr()
-    {
-        delete attributes;
-    }
-    friend XDRReader& operator>>(XDRReader& in, Pre_Op_Attr& obj);
-    friend std::ostream& operator<<(std::ostream& in, const Pre_Op_Attr& obj);
+    friend XDRReader& operator>>(XDRReader& in, pre_op_attr& obj);
 
-    inline bool is_attributes() const
-    {
-        return attributes != NULL;
-    }
-    inline const WCC_Attr& get_attributes() const
-    {
-        return *attributes;
-    }
+    inline const uint32_t   is_attributes() const { return attributes_follow; }
+    inline const wcc_attr& get_attributes() const { return attributes;        }
+
 private:
-    Pre_Op_Attr(const Pre_Op_Attr& obj);
-    void operator=(const Pre_Op_Attr& obj); 
-
-    WCC_Attr* attributes;
+    uint32_t attributes_follow;
+    wcc_attr attributes;
 };
 
-class WCC_Data
+struct wcc_data
 {
-public:
-    WCC_Data()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, WCC_Data& obj);
-    friend std::ostream& operator<<(std::ostream& in, const WCC_Data& obj);
+    friend XDRReader& operator>>(XDRReader& in, wcc_data& obj);
 
-    inline const Pre_Op_Attr& get_before() const
-    {
-        return before;
-    }
-    inline const Post_Op_Attr& get_after() const
-    {
-        return after;
-    }
+    inline const pre_op_attr& get_before() const { return before; }
+    inline const post_op_attr& get_after() const { return after;  }
+
 private:
-    WCC_Data(const WCC_Data& obj);
-    void operator=(const WCC_Data& obj); 
-
-    Pre_Op_Attr  before;
-    Post_Op_Attr after;
+    pre_op_attr  before;
+    post_op_attr after;
 };
 
-class Post_Op_FH
+struct post_op_fh3
 {
-public:
-    Post_Op_FH() : b_handle(false)
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, Post_Op_FH& obj);
-    friend std::ostream& operator<<(std::ostream& in, const Post_Op_FH& obj);
+    friend XDRReader& operator>>(XDRReader& in, post_op_fh3& obj);
 
-    inline bool is_handle() const
-    {
-        return b_handle;
-    }
-    inline const NFS_FH& get_handle() const
-    {
-        return handle;
-    }
+    inline const uint32_t  is_handle() const { return handle_follows; }
+    inline const nfs_fh3& get_handle() const { return handle;         }
+
 private:
-    Post_Op_FH(const Post_Op_FH& obj);
-    void operator=(const Post_Op_FH& obj); 
-
-    bool    b_handle;
-    NFS_FH  handle;
+    uint32_t    handle_follows;
+    nfs_fh3     handle;
 };
 
-class SAttr
+struct sattr3
 {
-public:
-    SAttr() : b_mode(false), b_uid(false), b_gid(false), b_size(false), b_atime(false), b_mtime(false)
+    enum time_how
     {
-    }
-    enum Time_How
-    {
-        DONT_CHANGE = 0,
+        DONT_CHANGE        = 0,
         SET_TO_SERVER_TIME = 1,
         SET_TO_CLIENT_TIME = 2
     };
 
-    friend XDRReader& operator>>(XDRReader& in, SAttr& obj);
-    friend std::ostream& operator<<(std::ostream& in, const SAttr& obj);
+    friend XDRReader& operator>>(XDRReader& in, sattr3& obj);
 
-    inline bool is_mode() const
-    {
-        return b_mode;
-    }
-    inline const Mode& get_mode() const
-    {
-        return mode;
-    }
-    inline bool is_uid() const
-    {
-        return b_uid;
-    }
-    inline const UID& get_uid() const
-    {
-        return uid;
-    }
-    inline bool is_gid() const
-    {
-        return b_gid;
-    }
-    inline const GID& get_gid() const
-    {
-        return gid;
-    }
-    inline bool is_size() const
-    {
-        return b_size;
-    }
-    inline const Size& get_size() const
-    {
-        return size;
-    }
-    inline bool is_atime() const
-    {
-        return b_atime;
-    }
-    inline const NFSTime& get_atime() const
-    {
-        return atime;
-    }
-    inline bool is_mtime() const
-    {
-        return b_mtime;
-    }
-    inline const NFSTime& get_mtime() const
-    {
-        return mtime;
-    }
+    inline const bool        is_mode() const { return b_mode; }
+    inline const mode3      get_mode() const { return mode;   }
+
+    inline const bool         is_uid() const { return b_uid; }
+    inline const uid3        get_uid() const { return uid;   }
+
+    inline const bool         is_gid() const { return b_gid; }
+    inline const gid3        get_gid() const { return gid;   }
+
+    inline const bool        is_size() const { return b_size; }
+    inline const size3      get_size() const { return size;   }
+
+    inline const time_how   is_atime() const { return time_how(set_it_atime); }
+    inline const nfstime3& get_atime() const { return atime;                  }
+
+    inline const time_how   is_mtime() const { return time_how(set_it_mtime); }
+    inline const nfstime3& get_mtime() const { return mtime;                  }
 
 private:
-    SAttr(const SAttr& obj);
-    void operator=(const SAttr& obj); 
-
     bool b_mode;
     bool b_uid;
     bool b_gid;
     bool b_size;
-    bool b_atime;
-    bool b_mtime;
-    Mode mode;
-    UID  uid;
-    GID  gid;
-    Size size;
-    NFSTime atime;
-    NFSTime mtime;
+    uint32_t set_it_atime;
+    uint32_t set_it_mtime;
+    mode3 mode;
+    uid3  uid;
+    gid3  gid;
+    size3 size;
+    nfstime3 atime;
+    nfstime3 mtime;
 };
 
-class DirOpArgs
+struct diropargs3
 {
-public:
-    DirOpArgs()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, DirOpArgs& obj);
-    friend std::ostream& operator<<(std::ostream& in, const DirOpArgs& obj);
+    friend XDRReader& operator>>(XDRReader& in, diropargs3& obj);
 
-    inline const NFS_FH& get_dir() const
-    {
-        return dir;
-    }
-    inline const FileName& get_name() const
-    {
-        return name;
-    }
+    inline const nfs_fh3&   get_dir () const { return dir;  }
+    inline const filename3& get_name() const { return name; }
+
 private:
-    DirOpArgs(const DirOpArgs& obj);
-    void operator=(const DirOpArgs& obj); 
-
-    NFS_FH   dir;
-    FileName name;
+    nfs_fh3   dir;
+    filename3 name;
 };
 
+// Procedure 0: NULL - Do nothing
+// void NFSPROC3_NULL(void) = 0;
 class NullArgs : public RPCCall
 {
 public:
     NullArgs(XDRReader& in) : RPCCall(in)
     {
     }
-    virtual ~NullArgs()
-    {
-    }
 };
 
+// Procedure 1: GETATTR - Get file attributes
+// GETATTR3res NFSPROC3_GETATTR(GETATTR3args) = 1;
 class GetAttrArgs : public RPCCall
 {
 public:
@@ -801,42 +333,25 @@ public:
     {
         in >> file;
     }
-    virtual ~GetAttrArgs()
-    {
-    }
 
-    const OpaqueDyn& get_file() const
-    {
-        return file;
-    }
+    inline const nfs_fh3& get_file() const { return file; }
 
 private:
-    OpaqueDyn file;     // File handle
+    nfs_fh3 file;
 };
 
-class SAttrGuard
+// Procedure 2: SETATTR - Set file attributes
+// SETATTR3res NFSPROC3_SETATTR(SETATTR3args) = 2;
+struct sattrguard3
 {
-public:
-    SAttrGuard()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, SAttrGuard& obj);
-    friend std::ostream& operator<<(std::ostream& in, const SAttrGuard& obj);
+    friend XDRReader& operator>>(XDRReader& in, sattrguard3& obj);
 
-    inline bool is_obj_ctime() const
-    {
-        return b_obj_ctime;
-    }
-    inline const NFSTime& get_obj_ctime() const
-    {
-        return obj_ctime;
-    }
+    inline const bool       is_obj_ctime() const { return check;     }
+    inline const nfstime3& get_obj_ctime() const { return obj_ctime; }
+
 private:
-    SAttrGuard(const SAttrGuard& obj);
-    void operator=(const SAttrGuard& obj); 
-
-    bool    b_obj_ctime;
-    NFSTime obj_ctime;
+    bool     check;
+    nfstime3 obj_ctime;
 };
 
 class SetAttrArgs : public RPCCall
@@ -846,55 +361,38 @@ public:
     {
         in >> object >> new_attributes >> guard;
     }
-    friend std::ostream& operator<<(std::ostream& in, const SetAttrArgs& obj);
 
-    inline const NFS_FH& get_object() const
-    {
-        return object;
-    }
-    inline const SAttr& get_new_attributes() const
-    {
-        return new_attributes;
-    }
-    inline const SAttrGuard& get_guard() const
-    {
-        return guard;
-    }
+    inline const nfs_fh3&         get_object() const { return object;         }
+    inline const sattr3&  get_new_attributes() const { return new_attributes; }
+    inline const sattrguard3&      get_guard() const { return guard;          }
 
 private:
     SetAttrArgs(const SetAttrArgs& obj);
-    void operator=(const SetAttrArgs& obj); 
+    void operator=(const SetAttrArgs& obj);
 
-    NFS_FH     object;
-    SAttr      new_attributes;
-    SAttrGuard guard;
+    nfs_fh3     object;
+    sattr3      new_attributes;
+    sattrguard3 guard;
 };
 
+// Procedure 3: LOOKUP -  Lookup filename
+// LOOKUP3res NFSPROC3_LOOKUP(LOOKUP3args) = 3;
 class LookUpArgs : public RPCCall
 {
 public:
     LookUpArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> dir >> name;
+        in >> what;
     }
-    virtual ~LookUpArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_dir() const
-    {
-        return dir;
-    }
-    const std::string& get_name() const
-    {
-        return name;
-    }
+
+    inline const diropargs3& get_what() const { return what; }
 
 private:
-    OpaqueDyn dir;      // File handle
-    std::string name;   // File name
+    diropargs3 what;
 };
 
+// Procedure 4: ACCESS - Check Access Permission
+// ACCESS3res NFSPROC3_ACCESS(ACCESS3args) = 4;
 class AccessArgs : public RPCCall
 {
 public:
@@ -902,24 +400,16 @@ public:
     {
         in >> object >> access;
     }
-    virtual ~AccessArgs()
-    {
-    }
 
-    const OpaqueDyn& get_object() const
-    {
-        return object;
-    }
-    uint32_t get_access() const
-    {
-        return access;
-    }
-
+    inline const nfs_fh3& get_object() const { return object; }
+    inline const uint32_t get_access() const { return access; }
 private:
-    OpaqueDyn object;   // File handle
+    nfs_fh3  object;
     uint32_t access;
 };
 
+// Procedure 5: READLINK - Read from symbolic link
+// READLINK3res NFSPROC3_READLINK(READLINK3args) = 5;
 class ReadLinkArgs : public RPCCall
 {
 public:
@@ -927,19 +417,15 @@ public:
     {
         in >> symlink;
     }
-    virtual ~ReadLinkArgs()
-    {
-    }
 
-    const OpaqueDyn& get_symlink() const
-    {
-        return symlink;
-    }
+    inline const nfs_fh3& get_symlink() const { return symlink; }
 
 private:
-    OpaqueDyn symlink;  // File handle
+    nfs_fh3 symlink;
 };
 
+// Procedure 6: READ - Read From file
+// READ3res NFSPROC3_READ(READ3args) = 6;
 class ReadArgs : public RPCCall
 {
 public:
@@ -947,112 +433,71 @@ public:
     {
         in >> file >> offset >> count;
     }
-    virtual ~ReadArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_file() const
-    {
-        return file;
-    }
-    uint64_t get_offset() const
-    {
-        return offset;
-    }
-    uint32_t get_count() const
-    {
-        return count;
-    }
+
+    inline const nfs_fh3&   get_file() const { return file;   }
+    inline const offset3  get_offset() const { return offset; }
+    inline const count3    get_count() const { return count;  }
 
 private:
-    OpaqueDyn file;     // File handle
-    uint64_t  offset;
-    uint32_t  count;
+    nfs_fh3 file;
+    offset3 offset;
+    count3  count;
 };
 
+
+// Procedure 7: WRITE - Write to file
+// WRITE3res NFSPROC3_WRITE(WRITE3args) = 7;
 class WriteArgs : public RPCCall
 {
 public:
-    WriteArgs(XDRReader& in) : RPCCall(in)
-    {
-        in >> file >> offset >> count >> stable;
-    }
-    virtual ~WriteArgs()
-    {
-    }
-    enum Stable_How
+    enum stable_how
     {
         UNSTABLE    = 0,
         DATA_SYNC   = 1,
         FYLE_SYNC   = 2
     };
-    friend std::ostream& operator<<(std::ostream& in, const WriteArgs& obj);
 
-    const NFS_FH& get_file() const
+    WriteArgs(XDRReader& in) : RPCCall(in)
     {
-        return file;
+        in >> file >> offset >> count >> stable;
     }
-    const Offset& get_offset() const
-    {
-        return offset;
-    }
-    const Count& get_count() const
-    {
-        return count;
-    }
-    Stable_How get_stable() const
-    {
-        return Stable_How(stable);
-    }
-    
+
+    inline const nfs_fh3&     get_file() const { return file; }
+    inline const offset3    get_offset() const { return offset; }
+    inline const count3      get_count() const { return count; }
+    inline const stable_how get_stable() const { return stable_how(stable); }
+
 private:
-    NFS_FH      file;
-    Offset      offset;
-    Count       count;
-    uint32_t    stable;
-    //OpaqueDyn   data;
+    nfs_fh3  file;
+    offset3  offset;
+    count3   count;
+    uint32_t stable;
+    //Opaque   data; the payload data of this operation. REMOVED
 };
 
-class CreateHow
+// Procedure 8: CREATE - Create a file
+// CREATE3res NFSPROC3_CREATE(CREATE3args) = 8;
+struct createhow3
 {
-public:
-    CreateHow() : obj_attributes(NULL), verf(NULL)
-    {
-    }
-    ~CreateHow()
-    {
-        delete obj_attributes;
-        delete verf;
-    }
-    enum CreateMode
+    enum createmode3
     {
         UNCHECKED = 0,
         GUARDED   = 1,
         EXCLUSIVE = 2
     };
-    friend XDRReader& operator>>(XDRReader& in, CreateHow& obj);
-    friend std::ostream& operator<<(std::ostream& in, const CreateHow& obj);
+    friend XDRReader& operator>>(XDRReader& in, createhow3& obj);
 
-    inline const CreateVerf& get_verf() const
-    {
-        return *verf;
-    }
-    inline const SAttr& get_obj_attributes() const
-    {
-        return *obj_attributes;
-    }
-    inline CreateMode get_mode() const
-    {
-        return CreateMode(mode);
-    }
+    inline const createverf3&      get_verf() const { return u.verf;           }
+    inline const sattr3& get_obj_attributes() const { return u.obj_attributes; }
+    inline const createmode3       get_mode() const { return createmode3(mode);}
 
 private:
-    CreateHow(const CreateHow& obj);
-    void operator=(const CreateHow& obj); 
-
-    SAttr*      obj_attributes;
-    CreateVerf* verf;
-    uint32_t    mode;
+    uint32_t        mode;
+    union U
+    {
+        sattr3      obj_attributes;
+        createverf3 verf;
+    } u;
 };
 
 class CreateArgs : public RPCCall
@@ -1062,25 +507,17 @@ public:
     {
         in >> where >> how;
     }
-    friend std::ostream& operator<<(std::ostream& in, const CreateArgs& obj);
 
-    inline const DirOpArgs& get_where() const
-    {
-        return where;
-    }
-    inline const CreateHow& get_how() const
-    {
-        return how;
-    }
+    inline const diropargs3&  get_where() const { return where; }
+    inline const createhow3&    get_how() const { return how;   }
 
 private:
-    CreateArgs(const CreateArgs& obj);
-    void operator=(const CreateArgs& obj); 
-
-    DirOpArgs where;
-    CreateHow how;
+    diropargs3 where;
+    createhow3 how;
 };
 
+// Procedure 9: MKDIR - Create a directory
+// MKDIR3res NFSPROC3_MKDIR(MKDIR3args) = 9;
 class MkDirArgs : public RPCCall
 {
 public:
@@ -1088,49 +525,27 @@ public:
     {
         in >> where >> attributes;
     }
-    friend std::ostream& operator<<(std::ostream& in, const MkDirArgs& obj);
 
-    inline const DirOpArgs& get_where() const
-    {
-        return where;
-    }
-    inline const SAttr& get_attributes() const
-    {
-        return attributes;
-    }
+    inline const diropargs3&   get_where() const { return where;      }
+    inline const sattr3&  get_attributes() const { return attributes; }
 
 private:
-    MkDirArgs(const MkDirArgs& obj);
-    void operator=(const MkDirArgs& obj); 
-
-    DirOpArgs where;
-    SAttr attributes;
+    diropargs3 where;
+    sattr3     attributes;
 };
 
-class SymLinkData
+// Procedure 10: SYMLINK - Create a symbolic link
+// SYMLINK3res NFSPROC3_SYMLINK(SYMLINK3args) = 10;
+struct symlinkdata3
 {
-public:
-    SymLinkData()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, SymLinkData& obj);
-    friend std::ostream& operator<<(std::ostream& in, const SymLinkData& obj);
+    friend XDRReader& operator>>(XDRReader& in, symlinkdata3& obj);
 
-    inline const SAttr& get_symlink_attributes() const
-    {
-        return symlink_attributes;
-    }
-    inline const NFSPath& get_symlink_data() const
-    {
-        return symlink_data;
-    }
+    inline const sattr3& get_symlink_attributes() const { return symlink_attributes; }
+    inline const nfspath3&     get_symlink_data() const { return symlink_data;       }
 
 private:
-    SymLinkData(const SymLinkData& obj);
-    void operator=(const SymLinkData& obj); 
-
-    SAttr   symlink_attributes;
-    NFSPath symlink_data;
+    sattr3   symlink_attributes;
+    nfspath3 symlink_data;
 };
 
 class SymLinkArgs : public RPCCall
@@ -1140,80 +555,44 @@ public:
     {
         in >> where >> symlink;
     }
-    friend std::ostream& operator<<(std::ostream& in, const SymLinkArgs& obj);
 
-    inline const DirOpArgs& get_where() const
-    {
-        return where;
-    }
-    inline const SymLinkData& get_symlink() const
-    {
-        return symlink;
-    }
+    inline const diropargs3&     get_where() const { return where;   }
+    inline const symlinkdata3& get_symlink() const { return symlink; }
 
 private:
-    SymLinkArgs(const SymLinkArgs& obj);
-    void operator=(const SymLinkArgs& obj); 
-
-    DirOpArgs where;
-    SymLinkData symlink;
+    diropargs3   where;
+    symlinkdata3 symlink;
 };
 
-class DeviceData
+// Procedure 11: MKNOD - Create a special device
+// MKNOD3res NFSPROC3_MKNOD(MKNOD3args) = 11;
+struct devicedata3
 {
-public:
-    DeviceData()
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, DeviceData& obj);
-    friend std::ostream& operator<<(std::ostream& in, const DeviceData& obj);
+    friend XDRReader& operator>>(XDRReader& in, devicedata3& obj);
 
-    inline const SAttr& get_dev_attributes() const
-    {
-        return dev_attributes;
-    }
-    inline const SpecData& get_spec() const
-    {
-        return spec;
-    }
+    inline const sattr3&   get_dev_attributes() const { return dev_attributes; }
+    inline const specdata3&          get_spec() const { return spec;           }
 
 private:
-    DeviceData(const DeviceData& obj);
-    void operator=(const DeviceData& obj); 
-
-    SAttr    dev_attributes;
-    SpecData spec;
+    sattr3    dev_attributes;
+    specdata3 spec;
 };
 
-class MkNodData
+struct mknoddata3
 {
-public:
-    MkNodData() : device(NULL), pipe_attributes(NULL)
-    {
-    }
-    friend XDRReader& operator>>(XDRReader& in, MkNodData& pipe);
-    friend std::ostream& operator<<(std::ostream& in, const MkNodData& obj);
+    friend XDRReader& operator>>(XDRReader& in, mknoddata3& pipe);
 
-    inline FType::EFType get_type() const
-    {
-        return type.get_ftype();
-    }
-    inline const SAttr& get_pipe_attributes() const
-    {
-        return *pipe_attributes;
-    }
-    inline const DeviceData& get_device() const
-    {
-        return *device;
-    }
+    inline const ftype3::Enum_ftype3 get_type() const { return type.get_ftype();  }
+    inline const sattr3&  get_pipe_attributes() const { return u.pipe_attributes; }
+    inline const devicedata3&      get_device() const { return u.device;          }
 
 private:
-    MkNodData(const MkNodData& pipe);
-    void operator=(const MkNodData& pipe); 
-
-    FType       type;
-    DeviceData* device;
-    SAttr*      pipe_attributes;
+    ftype3          type;
+    union U
+    {
+        devicedata3 device;
+        sattr3      pipe_attributes;
+    } u;
 };
 
 class MkNodArgs : public RPCCall
@@ -1223,256 +602,167 @@ public:
     {
         in >> where >> what;
     }
-    friend std::ostream& operator<<(std::ostream& in, const MkNodArgs& obj);
 
-    inline const DirOpArgs& get_where() const
-    {
-        return where;
-    }
-    inline const MkNodData& get_what() const
-    {
-        return what;
-    }
+    inline const diropargs3& get_where() const { return where; }
+    inline const mknoddata3&  get_what() const { return what; }
 
 private:
-    MkNodArgs(const MkNodArgs& obj);
-    void operator=(const MkNodArgs& obj); 
-
-    DirOpArgs where;
-    MkNodData what;
+    diropargs3 where;
+    mknoddata3 what;
 };
 
+// Procedure 12: REMOVE - Remove a File
+// REMOVE3res NFSPROC3_REMOVE(REMOVE3args) = 12;
 class RemoveArgs : public RPCCall
 {
 public:
     RemoveArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> dir >> name;
+        in >> object;
     }
-    virtual ~RemoveArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_dir() const
-    {
-        return dir;
-    }
-    const std::string& get_name() const
-    {
-        return name;
-    }
+
+    inline const diropargs3& get_object() const { return object; }
 
 private:
-    OpaqueDyn dir;      // File handle
-    std::string name;   // File name
-}; 
+    diropargs3 object;
+};
 
+// Procedure 13: RMDIR - Remove a Directory
+// RMDIR3res NFSPROC3_RMDIR(RMDIR3args) = 13;
 class RmDirArgs : public RPCCall
 {
 public:
     RmDirArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> dir >> name;
+        in >> object;
     }
-    virtual ~RmDirArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_dir() const
-    {
-        return dir;
-    }
-    const std::string& get_name() const
-    {
-        return name;
-    }
+
+    inline const diropargs3& get_object() const { return object; }
 
 private:
-    OpaqueDyn dir;      // File handle
-    std::string name;   // File name
+    diropargs3 object;
 };
 
+// Procedure 14: RENAME - Rename a File or Directory
+// RENAME3res NFSPROC3_RENAME(RENAME3args) = 14;
 class RenameArgs : public RPCCall
 {
 public:
     RenameArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> from_dir >> from_name;
-        in >> to_dir >> to_name;
+        in >> from >> to;
     }
-    virtual ~RenameArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_from_dir() const
-    {
-        return from_dir;
-    }
-    const std::string& get_from_name() const
-    {
-        return from_name;
-    }
-    const OpaqueDyn& get_to_dir() const
-    {
-        return to_dir;
-    }
-    const std::string& get_to_name() const
-    {
-        return to_name;
-    }
+
+    inline const diropargs3& get_from() const { return from; }
+    inline const diropargs3&   get_to() const { return to;   }
 
 private:
-    OpaqueDyn from_dir; // File handle
-    std::string from_name;
-    OpaqueDyn to_dir;   // File handle
-    std::string to_name;
-}; 
+    diropargs3 from;
+    diropargs3 to;
+};
 
+// Procedure 15: LINK - Create Link to an object
+// LINK3res NFSPROC3_LINK(LINK3args) = 15;
 class LinkArgs : public RPCCall
 {
 public:
     LinkArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> file >> dir >> name;
+        in >> file >> link;
     }
-    virtual ~LinkArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_file() const
-    {
-        return file;
-    }
-    const OpaqueDyn& get_dir() const
-    {
-        return dir;
-    }
-    const std::string& get_name() const
-    {
-        return name;
-    }
+
+    inline const nfs_fh3&    get_file() const { return file; }
+    inline const diropargs3& get_link() const { return link; }
 
 private:
-    OpaqueDyn file;     // File handle
-    OpaqueDyn dir;      // File handle
-    std::string name;
+    nfs_fh3    file;
+    diropargs3 link;
 };
 
+// Procedure 16: READDIR - Read From Directory
+// READDIR3res NFSPROC3_READDIR(READDIR3args) = 16;
 class ReadDirArgs : public RPCCall
 {
 public:
     ReadDirArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> dir >> cookie >> cookieverf >> count;
+        in >> dir >> cookie;
+        in.read_fixed_len(cookieverf, NFS3_COOKIEVERFSIZE);
+        in >> count;
     }
-    virtual ~ReadDirArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_dir() const
-    {
-        return dir;
-    }
-    uint64_t get_cookie() const
-    {
-        return cookie;
-    }
-    const OpaqueStat<8>& get_cookieverf() const
-    {
-        return cookieverf;
-    }
-    uint32_t get_count() const
-    {
-        return count;
-    }
+
+    inline const nfs_fh3&            get_dir() const { return dir;        }
+    inline const cookie3          get_cookie() const { return cookie;     }
+    inline const cookieverf3& get_cookieverf() const { return cookieverf; }
+    inline const count3            get_count() const { return count;      }
 
 private:
-    OpaqueDyn dir;      // File handle
-    uint64_t cookie;
-    OpaqueStat<8> cookieverf;
-    uint32_t count;
+    nfs_fh3     dir;
+    cookie3     cookie;
+    cookieverf3 cookieverf;
+    count3      count;
 };
 
+// Procedure 17: READDIRPLUS - Extended read from directory
+// READDIRPLUS3res NFSPROC3_READDIRPLUS(READDIRPLUS3args) = 17;
 class ReadDirPlusArgs : public RPCCall
 {
 public:
     ReadDirPlusArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> dir >> cookie >> cookieverf >> dir_count >> max_count;
+        in >> dir >> cookie;
+        in.read_fixed_len(cookieverf, NFS3_COOKIEVERFSIZE);
+        in >> dircount >> maxcount;
     }
-    virtual ~ReadDirPlusArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_dir() const
-    {
-        return dir;
-    }
-    uint64_t get_cookie() const
-    {
-        return cookie;
-    }
-    const OpaqueStat<8>& get_cookieverf() const
-    {
-        return cookieverf;
-    }
-    uint32_t get_dir_count() const
-    {
-        return dir_count;
-    }
-    uint32_t get_max_count() const
-    {
-        return max_count;
-    }
+
+    inline const nfs_fh3&            get_dir() const { return dir;        }
+    inline const cookie3          get_cookie() const { return cookie;     }
+    inline const cookieverf3& get_cookieverf() const { return cookieverf; }
+    inline const count3         get_dircount() const { return dircount;   }
+    inline const count3         get_maxcount() const { return maxcount;   }
 
 private:
-    OpaqueDyn dir;      // File handle
-    uint64_t cookie;
-    OpaqueStat<8> cookieverf;
-    uint32_t dir_count;
-    uint32_t max_count;
+    nfs_fh3     dir;
+    cookie3     cookie;
+    cookieverf3 cookieverf;
+    count3      dircount;
+    count3      maxcount;
 };
 
+// Procedure 18: FSSTAT - Get dynamic file system information
+// FSSTAT3res NFSPROC3_FSSTAT(FSSTAT3args) = 18;
 class FSStatArgs : public RPCCall
 {
 public:
     FSStatArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> fs_root;
+        in >> fsroot;
     }
-    virtual ~FSStatArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_fs_root() const
-    {
-        return fs_root;
-    }
+
+    inline const nfs_fh3& get_fsroot() const { return fsroot; }
 
 private:
-    OpaqueDyn fs_root;  // File handle
+    nfs_fh3 fsroot;
 };
 
+// Procedure 19: FSINFO - Get static file system Information
+// FSINFO3res NFSPROC3_FSINFO(FSINFO3args) = 19;
 class FSInfoArgs : public RPCCall
 {
 public:
     FSInfoArgs(XDRReader& in) : RPCCall(in)
     {
-        in >> fs_root;
+        in >> fsroot;
     }
-    virtual ~FSInfoArgs()
-    {
-    }
-    
-    const OpaqueDyn& get_fs_root() const
-    {
-        return fs_root;
-    }
+
+    inline const nfs_fh3& get_fsroot() const { return fsroot; }
 
 private:
-    OpaqueDyn fs_root;  // File handle
+    nfs_fh3 fsroot;
 };
 
+// Procedure 20: PATHCONF - Retrieve POSIX information
+// PATHCONF3res NFSPROC3_PATHCONF(PATHCONF3args) = 20;
 class PathConfArgs : public RPCCall
 {
 public:
@@ -1480,19 +770,15 @@ public:
     {
         in >> object;
     }
-    virtual ~PathConfArgs()
-    {
-    }
 
-    const OpaqueDyn& get_object() const
-    {
-        return object;
-    }
+    inline const nfs_fh3& get_object() const { return object; }
 
 private:
-    OpaqueDyn object;   // File handle
+    nfs_fh3 object;
 };
 
+// Procedure 21: COMMIT - Commit cached data on a server to stable storage
+// COMMIT3res NFSPROC3_COMMIT(COMMIT3args) = 21;
 class CommitArgs : public RPCCall
 {
 public:
@@ -1500,28 +786,49 @@ public:
     {
         in >> file >> offset >> count;
     }
-    virtual ~CommitArgs()
-    {
-    }
 
-    const OpaqueDyn& get_file() const
-    {
-        return file;
-    }
-    uint64_t get_offset() const
-    {
-        return offset;
-    }
-    uint32_t get_count() const
-    {
-        return count;
-    }
+    inline const nfs_fh3&   get_file() const { return file;   }
+    inline const uint64_t get_offset() const { return offset; }
+    inline const uint32_t  get_count() const { return count;  }
 
 private:
-    OpaqueDyn file;     // File handle
-    uint64_t offset;
-    uint32_t count;
+    nfs_fh3 file;
+    offset3 offset;
+    count3  count;
 };
+
+std::ostream& operator<<(std::ostream& out, const Enum_mode3 obj);
+std::ostream& operator<<(std::ostream& out, const nfsstat3& obj);
+std::ostream& operator<<(std::ostream& out, const ftype3& obj);
+std::ostream& operator<<(std::ostream& out, const specdata3& obj);
+std::ostream& operator<<(std::ostream& out, const nfs_fh3& obj);
+std::ostream& operator<<(std::ostream& out, const nfstime3& obj);
+std::ostream& operator<<(std::ostream& out, const fattr3& obj);
+std::ostream& operator<<(std::ostream& out, const post_op_attr& obj);
+std::ostream& operator<<(std::ostream& out, const wcc_attr& obj);
+std::ostream& operator<<(std::ostream& out, const pre_op_attr& obj);
+std::ostream& operator<<(std::ostream& out, const wcc_data& obj);
+std::ostream& operator<<(std::ostream& out, const post_op_fh3& obj);
+std::ostream& operator<<(std::ostream& out, const sattr3& obj);
+std::ostream& operator<<(std::ostream& out, const diropargs3& obj);
+
+std::ostream& operator<<(std::ostream& out, const sattrguard3& obj);
+std::ostream& operator<<(std::ostream& out, const SetAttrArgs& obj);
+
+std::ostream& operator<<(std::ostream& out, const WriteArgs& obj);
+
+std::ostream& operator<<(std::ostream& out, const createhow3& obj);
+std::ostream& operator<<(std::ostream& out, const CreateArgs& obj);
+
+std::ostream& operator<<(std::ostream& out, const MkDirArgs& obj);
+
+std::ostream& operator<<(std::ostream& out, const symlinkdata3& obj);
+std::ostream& operator<<(std::ostream& out, const SymLinkArgs& obj);
+
+std::ostream& operator<<(std::ostream& out, const devicedata3& obj);
+std::ostream& operator<<(std::ostream& out, const mknoddata3& obj);
+std::ostream& operator<<(std::ostream& out, const MkNodArgs& obj);
+
 
 } // namespace NFS3
 } // namespace filter

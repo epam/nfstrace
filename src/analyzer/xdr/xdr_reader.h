@@ -6,6 +6,7 @@
 #ifndef XDR_READER_H
 #define XDR_READER_H
 //------------------------------------------------------------------------------
+#include <cassert>
 #include <stdexcept>
 #include <string>
 
@@ -23,7 +24,7 @@ using NST::auxiliary::Exception;
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace analyzer 
+namespace analyzer
 {
 namespace XDR
 {
@@ -41,14 +42,17 @@ public:
 class XDRReader
 {
 public:
-    XDRReader() : it(NULL), last(NULL)
+    XDRReader(const uint8_t* ptr, size_t len) : it(ptr), last(ptr + len)
     {
     }
-    XDRReader(const uint8_t* beg, size_t num) : it(beg), last(beg + num)
+
+    inline size_t    data_size() const { return last-it; }
+    inline const uint8_t* data() const { return it;      }
+    
+    inline void reset(const uint8_t* ptr, size_t len)
     {
-    }
-    ~XDRReader()
-    {
+        it = ptr;
+        last = ptr+len;
     }
 
     XDRReader& operator>>(uint16_t& obj)
@@ -94,29 +98,67 @@ public:
         return *this;
     }
 
-    XDRReader& operator>>(OpaqueDyn& obj)
+    void read_fixed_len(Opaque& obj, const uint32_t len)
+    {
+        arrange_check(len);
+
+        obj.set(it, len);
+
+        it += calc_offset(len);
+    }
+
+    void read_varialble_len(Opaque& obj)
+    {
+        uint32_t len = 0;
+        operator>>(len);
+        arrange_check(len);
+
+        obj.set(it, len);
+
+        it += calc_offset(len);
+    }
+/*
+    XDRReader& operator>>(Opaque& obj)
     {
         uint32_t size = 0;
         operator>>(size);
         arrange_check(size);
 
-        obj.data.assign(it, it+size);
+        obj.set(it, size);
+
         it += calc_offset(size);
         return *this;
-    }
+    }*/
 
+/*
+    // read Fixed-length Opaque Data
     template<uint32_t size>
-    XDRReader& operator>>(OpaqueStat<size>& obj)
+    XDRReader& operator>>(Opaque<size>& obj)
     {
         arrange_check(size);
 
-        obj.data.assign(it, it+size);
+        obj.set(it);
         it += calc_offset(size);
         return *this;
     }
 
-private:
-    inline void arrange_check(size_t size)
+    // read Variable-length Opaque Data
+    template<>
+    XDRReader& operator>>(Opaque <0>& obj)
+    {
+        uint32_t len = 0;
+        operator>>(len);
+        arrange_check(len);
+
+        obj.set(it, len);
+
+        it += calc_offset(len);
+        return *this;
+    }*/
+
+
+protected:
+    inline void arrange_check(uint32_t size)
     {
         if(it+size > last)
         {
@@ -130,13 +172,13 @@ private:
         return (mod) ? size - mod + align : size;
     }
 
-private:
+
     const uint8_t* it;
     const uint8_t* last;
 };
 
 } // namespace XDR
-} // namespace analyzer 
+} // namespace analyzer
 } // namespace NST
 //------------------------------------------------------------------------------
 #endif//XDR_READER_H

@@ -31,7 +31,8 @@ bool PrintAnalyzer::call_getattr(const NFSOperation& operation)
 {
     const GetAttrArgs& data = static_cast<const GetAttrArgs&>(*operation.get_call());
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] << ". XID: " << data.get_xid() << " File: ";
-    out << print_fh(data.get_file()) << std::endl;
+    print_fh(out, data.get_file().get_data());
+    out << std::endl;
     return true;
 }
 
@@ -45,8 +46,8 @@ bool PrintAnalyzer::call_lookup(const NFSOperation& operation)
 {
     const LookUpArgs& data = static_cast<const LookUpArgs&>(*operation.get_call());
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
-    out << print_fh(data.get_dir());
-    out << " Name: " << data.get_name() << std::endl;
+    print_fh(out, data.get_what().get_dir().get_data());
+    out << " Name: " << data.get_what().get_name() << std::endl;
     return true;
 }
 
@@ -54,7 +55,7 @@ bool PrintAnalyzer::call_access(const NFSOperation& operation)
 {
     const AccessArgs& data = static_cast<const AccessArgs&>(*operation.get_call());
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Object: ";
-    out << print_fh(data.get_object());
+    print_fh(out, data.get_object().get_data());
     out << " Access: " << data.get_access() << std::endl;
     return true;
 }
@@ -63,7 +64,7 @@ bool PrintAnalyzer::call_readlink(const NFSOperation& operation)
 {
     const ReadLinkArgs& data = static_cast<const ReadLinkArgs&>(*operation.get_call());
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Symlink: ";
-    out << print_fh(data.get_symlink()) << std::endl;
+    print_fh(out, data.get_symlink().get_data()) << std::endl;
     return true;
 }
 
@@ -108,8 +109,8 @@ bool PrintAnalyzer::call_remove(const NFSOperation& operation)
 {
     const RemoveArgs& data = static_cast<const RemoveArgs&>(*operation.get_call());
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
-    out << print_fh(data.get_dir());
-    out << " Name: " << data.get_name() << std::endl;
+    print_fh(out, data.get_object().get_dir().get_data());
+    out << " Name: " << data.get_object().get_name().get_string() << std::endl;
     return true;
 }
 
@@ -117,30 +118,30 @@ bool PrintAnalyzer::call_rmdir(const NFSOperation& operation)
 {
     const RmDirArgs& data = static_cast<const RmDirArgs&>(*operation.get_call());
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
-    out << print_fh(data.get_dir());
-    out << " Name: " << data.get_name() << std::endl;
+    print_fh(out, data.get_object().get_dir().get_data());
+    out << " Name: " << data.get_object().get_name().get_string() << std::endl;
     return true;
 }
 
 bool PrintAnalyzer::call_rename(const NFSOperation& operation)
 {
     const RenameArgs& data = static_cast<const RenameArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " From Dir: ";
-    out << print_fh(data.get_from_dir());
-    out << " From Name: " << data.get_from_name() << " To Dir: ";
-    out << print_fh(data.get_to_dir());
-    out << " To Name: " << data.get_to_name() << std::endl;
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid();
+    out << " from dir: "; print_fh(out, data.get_from().get_dir().get_data());
+    out << " name: " << data.get_from().get_name().get_string();
+    out << " to dir: "; print_fh(out, data.get_to().get_dir().get_data());
+    out << " name: " << data.get_to().get_name().get_string();
+    out << std::endl;
     return true;
 }
 
 bool PrintAnalyzer::call_link(const NFSOperation& operation)
 {
     const LinkArgs& data = static_cast<const LinkArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " File: ";
-    out << print_fh(data.get_file());
-    out << " Dir: ";
-    out << print_fh(data.get_dir());
-    out << " Name: " << data.get_name() << std::endl;
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid();
+    out << " File: "; print_fh(out, data.get_file().get_data());
+    out << " Dir: "; print_fh(out, data.get_link().get_dir().get_data());
+    out << " Name: " << data.get_link().get_name().get_string() << std::endl;
     return true;
 }
 
@@ -148,7 +149,7 @@ bool PrintAnalyzer::call_readdir(const NFSOperation& operation)
 {
     const ReadDirArgs& data = static_cast<const ReadDirArgs&>(*operation.get_call());
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
-    out << print_fh(data.get_dir());
+    print_fh(out, data.get_dir().get_data());
     out << " Cookie: " << data.get_cookie() << " CookieVerf: " << data.get_cookieverf() << " Count: " << data.get_count() << std::endl;
     return true;
 }
@@ -157,8 +158,8 @@ bool PrintAnalyzer::call_readdirplus(const NFSOperation& operation)
 {
     const ReadDirPlusArgs& data = static_cast<const ReadDirPlusArgs&>(*operation.get_call());
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
-    out << print_fh(data.get_dir());
-    out << " Cookie: " << data.get_cookie() << " CookieVerf: " << data.get_cookieverf() << " Dir Count: " << data.get_dir_count() << " Max Count: " << data.get_max_count() << std::endl;
+    print_fh(out, data.get_dir().get_data());
+    out << " Cookie: " << data.get_cookie() << " CookieVerf: " << data.get_cookieverf() << " Dir Count: " << data.get_dircount() << " Max Count: " << data.get_maxcount() << std::endl;
     return true;
 }
 
@@ -166,7 +167,7 @@ bool PrintAnalyzer::call_fsstat(const NFSOperation& operation)
 {
     const FSStatArgs& data = static_cast<const FSStatArgs&>(*operation.get_call());
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " FS Root:";
-    out << print_fh(data.get_fs_root()) << std::endl;
+    print_fh(out, data.get_fsroot().get_data()) << std::endl;
     return true;
 }
 
@@ -174,7 +175,7 @@ bool PrintAnalyzer::call_fsinfo(const NFSOperation& operation)
 {
     const FSInfoArgs& data = static_cast<const FSInfoArgs&>(*operation.get_call());
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " FS Root:";
-    out << print_fh(data.get_fs_root()) << std::endl;
+    print_fh(out, data.get_fsroot().get_data()) << std::endl;
     return true;
 }
 
@@ -182,16 +183,18 @@ bool PrintAnalyzer::call_pathconf(const NFSOperation& operation)
 {
     const PathConfArgs& data = static_cast<const PathConfArgs&>(*operation.get_call());
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID : " << data.get_xid() << " Object: ";
-    out << print_fh(data.get_object()) << std::endl;
+    print_fh(out, data.get_object().get_data()) << std::endl;
     return true;
 }
 
 bool PrintAnalyzer::call_commit(const NFSOperation& operation)
 {
     const CommitArgs& data = static_cast<const CommitArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " File: ";
-    out << print_fh(data.get_file());
-    out << " Offset: " << data.get_offset() << " Count: " << data.get_count()  << std::endl;
+    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid();
+    out << " File: ";
+    print_fh(out, data.get_file().get_data());
+    out << " Offset: " << data.get_offset();
+    out << " Count: " << data.get_count()  << std::endl;
     return true;
 }
 
@@ -200,24 +203,41 @@ void PrintAnalyzer::print(std::ostream& out)
     return;
 }
 
-std::string PrintAnalyzer::print_fh(const OpaqueDyn& fh) const
+std::ostream& PrintAnalyzer::print_fh(std::ostream& out, const Opaque& fh) const
 {
-    std::stringstream tmp;
-    tmp << fh;
-    std::string opaque = tmp.str();
+    const uint8_t* data = fh.data();
+    const uint32_t size = fh.size();
 
-    tmp.str("");
-    for(int i = 0; i < 4; ++i)
+    static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    if(size <= 8)
     {
-        tmp << opaque[i];
+        for(uint32_t j = 0; j < size; j++)
+        {
+            uint8_t value = data[j];
+            out << hex[value & 0xF];
+            value >>= 4;
+            out << hex[value & 0xF];
+        }
     }
-    tmp << "...";
-    int len = fh.data.size();
-    for(int i = len - 4; i < len; ++i)
+    else // truncate binary data to: 00112233...CCDDEEFF
     {
-        tmp << opaque[i];
+        for(uint32_t j = 0; j < 4; j++)
+        {
+            uint8_t value = data[j];
+            out << hex[value & 0xF];
+            value >>= 4;
+            out << hex[value & 0xF];
+        }
+        out << "...";
+        for(uint32_t j = size-4; j < size; j++)
+        {
+            uint8_t value = data[j];
+            out << hex[value & 0xF];
+            value >>= 4;
+            out << hex[value & 0xF];
+        }
     }
-    return tmp.str();
+    return out;
 }
 
 std::string PrintAnalyzer::get_session(const NFSOperation::Session& session) const

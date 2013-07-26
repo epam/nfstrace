@@ -15,74 +15,47 @@
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace analyzer 
+namespace analyzer
 {
 namespace XDR
 {
 
 const size_t align = 4;
 
-struct OpaqueDyn
+struct Opaque
 {
+    friend std::ostream& operator<<(std::ostream& out, const Opaque& opaque)
+    {
+        static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+        for(uint32_t j = 0; j < opaque.len; j++)
+        {
+            uint8_t value = opaque.ptr[j];
+            out << hex[value & 0xF];
+            value >>= 4;
+            out << hex[value & 0xF];
+        }
+        return out;
+    }
+
+    inline void set(const uint8_t* p, uint32_t n)
+    {
+        ptr = p;
+        len = n;
+    }
+
+    inline std::string get_string() const { return std::string((char*)data(), size()); }
+
+    inline uint8_t operator[](size_t i) const { return ptr[i]; }
+    inline const uint8_t* data() const { return ptr; }
+    inline const uint32_t size() const { return len; }
+
 private:
-    typedef std::vector<uint8_t> Opaque;
-public:
-    std::vector<uint8_t> data;    // XDR specific size
-
-    friend std::ostream& operator<<(std::ostream& out, const OpaqueDyn& opaque)
-    {
-        Opaque::const_iterator i = opaque.data.begin();
-        Opaque::const_iterator end = opaque.data.end();
-        for(;i != end; ++i)
-        {
-            out << static_cast<uint32_t>(*i);
-        }
-        return out;
-    }
-    std::string to_string() const
-    {
-        std::stringstream ss;
-        
-        Opaque::const_iterator i = data.begin();
-        Opaque::const_iterator end = data.end();
-        for(;i != end; ++i)
-        {
-            ss << static_cast<char>(*i);
-        }
-        return ss.str();
-    }
-};
-
-template<uint32_t size>
-struct OpaqueStat
-{
-    OpaqueStat() : data(size)
-    {
-    }
-
-    std::vector<uint8_t> data;
-    friend std::ostream& operator<<(std::ostream& out, const OpaqueStat<size>& opaque)
-    {
-        for(uint32_t i = 0; i != size; ++i)
-        {
-            out << static_cast<uint32_t>(opaque.data[i]);
-        }
-        return out;
-    }
-    std::string to_string() const
-    {
-        std::stringstream ss;
-        
-        for(uint32_t i = 0; i != size; ++i)
-        {
-            ss << static_cast<char>(data[i]);
-        }
-        return ss.str();
-    }
+    const uint8_t* ptr;
+    uint32_t       len;
 };
 
 } // namespace XDR
-} // namespace analyzer 
+} // namespace analyzer
 } // namespace NST
 //------------------------------------------------------------------------------
 #endif//XDR_STRUCT_H
