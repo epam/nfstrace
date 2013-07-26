@@ -11,7 +11,7 @@ namespace NST
 namespace auxiliary
 {
 
-Logger* Logger::g_Logger = NULL;
+Logger* Logger::global_logger = NULL;
 
 }
 }

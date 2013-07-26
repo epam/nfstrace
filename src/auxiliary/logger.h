@@ -53,15 +53,15 @@ public:
 
     inline static void set_global(Logger* global)
     {
-        if(g_log)
+        if(global_logger)
         {
             throw Exception(std::string("Global Logger have been set"));
         }
-        g_log = global;
+        global_logger = global;
     }
     inline static Logger& get_global()
     {
-        return *g_log;
+        return *global_logger;
     }
     void set_output_file(const std::string& file_path)
     {
@@ -104,7 +104,7 @@ private:
     Logger(const Logger&);
     void operator=(const Logger&);
 
-    static Logger* g_log;
+    static Logger* global_logger;
     bool     owner; // Is logger is file owner? 
     FILE*    file;
     Spinlock spinlock;
