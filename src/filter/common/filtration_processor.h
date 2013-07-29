@@ -17,6 +17,7 @@
 #include <pcap/pcap.h>
 
 #include "../../auxiliary/exception.h"
+#include "../../auxiliary/logger.h"
 #include "../../controller/parameters.h"
 #include "../packet_info.h"
 #include "../packet.h"
@@ -227,7 +228,7 @@ public:
                     prev = current;
                     current = current->next;
                 }// end while
-                
+
                 if( acknowledged > lowest_seq )
                 {
                     // There are frames missing in the capture stream that were seen
@@ -586,10 +587,8 @@ public:
     }
     ~FiltrationProcessor()
     {
-        //if(controller::Parameters::instance().is_verbose())
-        {
-            reader->print_statistic(std::clog);
-        }
+        Logger::Buffer log_buf;
+        reader->print_statistic(log_buf);
     }
 
     void run()
