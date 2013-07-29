@@ -9,6 +9,8 @@
 #include <cstdarg>
 #include <cstdio>
 #include <fstream>
+#include <sstream>
+
 #include <sys/file.h>
 
 #include "exception.h"
@@ -25,11 +27,25 @@
 #define TRACE(format, ...)
 #endif
 
-#define LOG(format, ...) {\
+/*
+ * Non-blocking logging.
+ * Should be used inside LOCK_LOG and UNLOCK_LOG section.
+ */
+#define NBLK_LOG(format, ...) {\
     NST::auxiliary::Logger& log = NST::auxiliary::Logger::get_global();\
-    NST::auxiliary::Spinlock::Lock lock(log.get_spinlock());\
-    log.print("%s %d: "format, __FILE__, __LINE__, __VA_ARGS__);\
+    log.print(format, __VA_ARGS__);\
 }
+// Allow lock GLOBAL logger
+#define LOCK_LOG {\
+    NST::auxiliary::Logger& log = NST::auxiliary::Logger::get_global();\
+    NST::auxiliary::Spinlock::Lock lock(log.get_spinlock());
+// Unlock locked logger
+#define UNLOCK_LOG }
+// Atomic write data in the global log
+#define LOG(format, ...)\
+    LOCK_LOG\
+    NBLK_LOG(format, __VA_ARGS__)\
+    UNLOCK_LOG
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -50,6 +66,24 @@ public:
             fclose(file);
         }
     }
+
+    class Buffer : public std::ostream
+    {
+    public:
+        Buffer(Logger& logger = Logger::get_global()) : std::ostream(NULL), log(logger), buf(ios_base::out)
+        {
+            init(&buf);
+        }
+        ~Buffer()
+        {
+            Spinlock::Lock lock(log.get_spinlock());
+            log.print("%s", buf.str().c_str());
+        }
+
+    private:
+        Logger& log;
+        std::stringbuf buf;
+    };
 
     inline static void set_global(Logger* global)
     {
