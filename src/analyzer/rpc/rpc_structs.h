@@ -110,8 +110,6 @@ struct AcceptedReply
             case SUNRPC_GARBAGE_ARGS:
             case SUNRPC_SYSTEM_ERR:
                 break;
-            default:
-                throw Exception("Invalid RPC's AcceptStat");
         }
         return in;
     }
@@ -130,25 +128,18 @@ struct RejectedReply
         in >> obj.stat;
         switch(obj.stat)
         {
-            case SUNRPC_RPC_MISMATCH:
-                in >> obj.u.mismatch_info;
-                break;
-            case SUNRPC_AUTH_ERROR:
-                in >> obj.u.auth_stat;
-                break;
-            default:
-                throw Exception("Invalid RPC's RejectStat");
+            case SUNRPC_RPC_MISMATCH:   in >> obj.mismatch_info; break;
+            case SUNRPC_AUTH_ERROR:     in >> obj.auth_stat;     break;
         }
         return in;
     }
 
-private:
     uint32_t         stat;
-    union U
+    union
     {
         MismatchInfo mismatch_info;
         OpaqueAuth   auth_stat;
-    } u;
+    };
 };
 
 struct RPCReply : public RPCMessage
@@ -159,20 +150,18 @@ struct RPCReply : public RPCMessage
         in >> o.stat;
         switch(o.stat)
         {
-            case SUNRPC_MSG_ACCEPTED:  in >> o.u.accepted; break;
-            case SUNRPC_MSG_DENIED:    in >> o.u.rejected; break;
-            default: throw Exception("Invalid RPC's ReplyStat");
+            case SUNRPC_MSG_ACCEPTED:  in >> o.accepted; break;
+            case SUNRPC_MSG_DENIED:    in >> o.rejected; break;
         }
         return in;
     }
 
-private:
     uint32_t          stat;
-    union U
+    union
     {
         AcceptedReply accepted;
         RejectedReply rejected;
-    } u;
+    };
 };
 /*
 std::ostream& operator<<(std::ostream& out, const RPCMessage& obj);
