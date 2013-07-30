@@ -60,12 +60,15 @@ inline std::ostream& operator<<(std::ostream& out, const Proc::Enum proc);
 
 template
 <
-    typename Arg,   // structure of RPC procedure parameters
-    typename Res    // structure of RPC procedure results
+    typename ArgType,   // structure of RPC procedure parameters
+    typename ResType    // structure of RPC procedure results
 >
 class NFSOperation: public RPC::RPCOperation
 {
 public:
+    typedef ArgType Arg;
+    typedef ResType Res;
+
     NFSOperation(FilteredDataQueue::Ptr& c,
                  FilteredDataQueue::Ptr& r,
                  RPCSession* s)

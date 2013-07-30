@@ -19,8 +19,49 @@ namespace analyzer
 namespace analyzers
 {
 
+// Spesial helper for printout short representation of NFS FH
+std::ostream& operator += (std::ostream& out, const nfs_fh3& fh)
+{
+    static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+    const Opaque& opaque = fh.get_data();
+    const uint8_t* data = opaque.data();
+    const uint32_t size = opaque.size();
+
+    if(size <= 8)
+    {
+        for(uint32_t j = 0; j < size; j++)
+        {
+            uint8_t value = data[j];
+            out << hex[value & 0xF];
+            value >>= 4;
+            out << hex[value & 0xF];
+        }
+    }
+    else // truncate binary data to: 00112233...CCDDEEFF
+    {
+        for(uint32_t j = 0; j < 4; j++)
+        {
+            uint8_t value = data[j];
+            out << hex[value & 0xF];
+            value >>= 4;
+            out << hex[value & 0xF];
+        }
+        out << "...";
+        for(uint32_t j = size-4; j < size; j++)
+        {
+            uint8_t value = data[j];
+            out << hex[value & 0xF];
+            value >>= 4;
+            out << hex[value & 0xF];
+        }
+    }
+    return out;
+}
+
 bool PrintAnalyzer::call_null(const RPCOperation& operation)
 {
+//    const NFSPROC3_NULL& op = static_cast<const NFSPROC3_NULL&>(operation);
 /*    const NFSPROC3_NULL& data = static_cast<const NFSPROC3_NULL&>(operation);
     out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] << ". XID: " << data.get_xid() << std::endl;*/
     return true;
@@ -43,10 +84,19 @@ bool PrintAnalyzer::call_setattr(const RPCOperation& operation)
 
 bool PrintAnalyzer::call_lookup(const RPCOperation& operation)
 {
-/*    const LookUpArgs& data = static_cast<const LookUpArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
-    print_fh(out, data.get_what().get_dir().get_data());
-    out << " Name: " << data.get_what().get_name() << std::endl;*/
+    const NFSPROC3_LOOKUP& op = static_cast<const NFSPROC3_LOOKUP&>(operation);
+    const NFSPROC3_LOOKUP::Arg& arg = op.get_arg();
+// unused   const NFSPROC3_LOOKUP::Res& res = op.get_res();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << "CALL [";
+    out << " dir: "  += arg.get_what().get_dir();
+    out << " name: " << arg.get_what().get_name().get_string();
+    out << "] REPLY [";
+// unused   out << res;
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
@@ -201,95 +251,6 @@ void PrintAnalyzer::print(std::ostream& out)
 {
     return;
 }
-
-std::ostream& PrintAnalyzer::print_fh(std::ostream& out, const Opaque& fh) const
-{
-    const uint8_t* data = fh.data();
-    const uint32_t size = fh.size();
-
-    static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    if(size <= 8)
-    {
-        for(uint32_t j = 0; j < size; j++)
-        {
-            uint8_t value = data[j];
-            out << hex[value & 0xF];
-            value >>= 4;
-            out << hex[value & 0xF];
-        }
-    }
-    else // truncate binary data to: 00112233...CCDDEEFF
-    {
-        for(uint32_t j = 0; j < 4; j++)
-        {
-            uint8_t value = data[j];
-            out << hex[value & 0xF];
-            value >>= 4;
-            out << hex[value & 0xF];
-        }
-        out << "...";
-        for(uint32_t j = size-4; j < size; j++)
-        {
-            uint8_t value = data[j];
-            out << hex[value & 0xF];
-            value >>= 4;
-            out << hex[value & 0xF];
-        }
-    }
-    return out;
-}
-/*
-std::string PrintAnalyzer::get_session(const RPCOperation::Session& session) const
-{
-    std::stringstream s(std::ios_base::out);
-    s << session_addr(RPCOperation::Session::Source, session) << " --> " << session_addr(RPCOperation::Session::Destination, session);
-    switch(session.type)
-    {
-        case RPCOperation::Session::TCP:
-            s << " (TCP)";
-            break;
-        case RPCOperation::Session::UDP:
-            s << " (UPD)";
-            break;
-    }
-    return s.str();
-}
-
-std::string PrintAnalyzer::session_addr(RPCOperation::Session::Direction dir, const RPCOperation::Session& session) const
-{
-    std::stringstream s(std::ios_base::out);
-    switch(session.ip_type)
-    {
-        case RPCOperation::Session::v4:
-            s << ipv4_string(session.ip.v4.addr[dir]);
-            break;
-        case RPCOperation::Session::v6:
-            s << ipv6_string(session.ip.v6.addr[dir]);
-            break;
-    }
-    s << ":" << session.port[dir];
-    return s.str();
-}
-
-std::string PrintAnalyzer::ipv6_string(const uint8_t ip[16]) const
-{
-    std::stringstream address(std::ios_base::out);
-    address << "IPV6";
-    return address.str();
-}
-
-std::string PrintAnalyzer::ipv4_string(const uint32_t ip) const
-{
-    std::stringstream address(std::ios_base::out);
-    address << ((ip >> 24) & 0xFF);
-    address << '.';
-    address << ((ip >> 16) & 0xFF);
-    address << '.';
-    address << ((ip >> 8) & 0xFF);
-    address << '.';
-    address << ((ip >> 0) & 0xFF);
-    return address.str();
-}*/
 
 } // namespace analyzers
 } // namespace analyzer

@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 #include <tr1/unordered_map>
 #include <memory>
+#include <sstream>
 #include <string>
 
 #include "../auxiliary/filtered_data.h"
@@ -69,7 +70,55 @@ public:
         return &session;
     }
 
+    const std::string& str() const
+    {
+        if(session_str.empty())
+        {
+            switch(session.ip_type)
+            {
+                case Session::v4:
+                    session_str += ipv4_string(session.ip.v4.addr[Session::Source]);
+                    session_str += " --> ";
+                    session_str += ipv4_string(session.ip.v4.addr[Session::Destination]);
+                    break;
+                case Session::v6:
+                default:
+                    session_str = "IPv6 is not supported yet.";
+                //    s << ipv6_string(session.ip.v6.addr[dir]);
+                    break;
+            }
+            switch(session.type)
+            {
+                case Session::TCP:
+                    session_str += " (TCP)";
+                    break;
+                case Session::UDP:
+                    session_str += " (UPD)";
+                    break;
+            }
+        }
+        return session_str;
+    }
+
 private:
+    RPCSession(const RPCSession&);              // undefined
+    RPCSession& operator=(const RPCSession&);   // undefined
+
+    static std::string ipv4_string(const uint32_t ip)
+    {
+        std::stringstream address(std::ios_base::out);
+        address << ((ip >> 24) & 0xFF);
+        address << '.';
+        address << ((ip >> 16) & 0xFF);
+        address << '.';
+        address << ((ip >> 8) & 0xFF);
+        address << '.';
+        address << ((ip >> 0) & 0xFF);
+        return address.str();
+    }
+
+    mutable std::string session_str;    // cached string representation of session
+
     Session session;
     Map operations;
 };
@@ -107,7 +156,7 @@ public:
         Transmission key(session, (type == DIRECT) ? Session::Source : Session::Destination);
 
         Iterator el = sessions.find(key);
-        if(el == sessions.end())
+        if(el == sessions.end() && type == DIRECT) // add new session only for Call (type == DIRECT)
         {
             std::auto_ptr<RPCSession> s(new RPCSession(session));
             std::pair<Iterator, bool> in_res = sessions.insert(Pair(key, s.release()));
@@ -119,7 +168,7 @@ public:
         }
         return el->second;
     }
-    
+
 private:
     RPCSessions(const RPCSessions&);
     void operator=(const RPCSessions&);
