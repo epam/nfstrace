@@ -95,6 +95,7 @@ struct nfsstat3
 
     friend XDRReader& operator>>(XDRReader& in, nfsstat3& obj);
 
+    inline const bool operator==(const Enum_nfsstat3 e) const { return get_stat() == e; }
     inline Enum_nfsstat3 get_stat() const { return Enum_nfsstat3(stat); }
 
 private:
@@ -385,6 +386,44 @@ struct LOOKUP3args
 
 private:
     diropargs3 what;
+};
+
+struct LOOKUP3res
+{
+    friend XDRReader& operator>>(XDRReader& in, LOOKUP3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.ok.object;
+            in >> o.ok.obj_attributes;
+            in >> o.ok.dir_attributes;
+        }
+        else
+        {
+            in >> o.fail.dir_attributes;
+        }
+        return in;
+    }
+
+    struct LOOKUP3resok
+    {
+       nfs_fh3      object;
+       post_op_attr obj_attributes;
+       post_op_attr dir_attributes;
+    };
+
+    struct LOOKUP3resfail
+    {
+       post_op_attr dir_attributes;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        LOOKUP3resok   ok;
+        LOOKUP3resfail fail;
+    };
 };
 
 // Procedure 4: ACCESS - Check Access Permission
