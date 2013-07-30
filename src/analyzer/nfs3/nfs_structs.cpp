@@ -283,7 +283,7 @@ std::ostream& operator<<(std::ostream& out, const nfs_fh3& obj)
 
 std::ostream& operator<<(std::ostream& out, const nfstime3& obj)
 {
-    return out << "seconds: " << obj.get_seconds() << "nseconds: " << obj.get_nseconds();
+    return out << "seconds: " << obj.get_seconds() << " nseconds: " << obj.get_nseconds();
 }
 
 std::ostream& operator<<(std::ostream& out, const fattr3& obj)

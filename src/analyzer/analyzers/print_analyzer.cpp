@@ -86,14 +86,25 @@ bool PrintAnalyzer::call_lookup(const RPCOperation& operation)
 {
     const NFSPROC3_LOOKUP& op = static_cast<const NFSPROC3_LOOKUP&>(operation);
     const NFSPROC3_LOOKUP::Arg& arg = op.get_arg();
-// unused   const NFSPROC3_LOOKUP::Res& res = op.get_res();
+    const NFSPROC3_LOOKUP::Res& res = op.get_res();
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
-    out << "CALL [";
+    out << " CALL [";
     out << " dir: "  += arg.get_what().get_dir();
     out << " name: " << arg.get_what().get_name().get_string();
     out << "] REPLY [";
-// unused   out << res;
+
+    out << " status: " << res.status;
+/*    if(res.status == nfsstat3::OK)
+    {
+        out << " object: "  += res.ok.object;
+        out << " obj_attributes: "  << res.ok.obj_attributes;
+        out << " dir_attributes: "  << res.ok.dir_attributes;
+    }
+    else
+    {
+        out << " dir_attributes: "  << res.fail.dir_attributes;
+    }*/
     out << " ]";
     out << std::endl;
 
