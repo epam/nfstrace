@@ -1,52 +1,44 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Operation breakdown - Latencies storage.
+// Author: Pavel Karneliuk
+// Description: Composite of XDRReader + related memory with RPC message
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef BREAKDOWN_H
-#define BREAKDOWN_H
+#ifndef RPC_READER_H
+#define RPC_READER_H
 //------------------------------------------------------------------------------
-#include <vector>
-
-#include "../nfs3/nfs_operation.h"
-#include "latencies.h"
+#include "../../auxiliary/filtered_data.h"
+#include "../xdr/xdr_reader.h"
 //------------------------------------------------------------------------------
+using NST::auxiliary::FilteredData;
+using NST::auxiliary::FilteredDataQueue;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analyzer
 {
-namespace analyzers
+namespace RPC
 {
 
-class Breakdown
+class RPCReader: public XDR::XDRReader
 {
 public:
-    Breakdown()
+
+    RPCReader(FilteredDataQueue::Ptr& p) : XDRReader(p->data, p->dlen), ptr(p)
     {
     }
-    ~Breakdown()
+    ~RPCReader()
     {
     }
-    inline const Latencies& operator[](uint32_t index) const
-    {
-        return latencies[index];
-    }
-    inline Latencies& operator[](uint32_t index)
-    {
-        return latencies[index];
-    }
+
+    inline const FilteredData& data() const { return ptr; }
 
 private:
-    Breakdown(const Breakdown& breakdown);  //Protection
-    void operator=(const Breakdown&);       //Protection
-
-    Latencies latencies[NFS3::Proc::num];
+    FilteredDataQueue::Ptr ptr;
 };
 
-} // namespace analyzers
-} // namespace analyzer
+} // namespace RPC
+} // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//BREAKDOWN_H
+#endif//RPC_READER_H
 //------------------------------------------------------------------------------

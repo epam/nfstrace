@@ -10,7 +10,7 @@
 
 #include "../nfs3/nfs_operation.h"
 //------------------------------------------------------------------------------
-using NST::analyzer::NFS3::NFSOperation;
+using NST::analyzer::RPC::RPCOperation;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -29,28 +29,28 @@ public:
     {
     }
 
-    virtual bool call_null          (const NFSOperation& operation) = 0;
-    virtual bool call_getattr       (const NFSOperation& operation) = 0;
-    virtual bool call_setattr       (const NFSOperation& operation) = 0;
-    virtual bool call_lookup        (const NFSOperation& operation) = 0;
-    virtual bool call_access        (const NFSOperation& operation) = 0;
-    virtual bool call_readlink      (const NFSOperation& operation) = 0;
-    virtual bool call_read          (const NFSOperation& operation) = 0;
-    virtual bool call_write         (const NFSOperation& operation) = 0;
-    virtual bool call_create        (const NFSOperation& operation) = 0;
-    virtual bool call_mkdir         (const NFSOperation& operation) = 0;
-    virtual bool call_symlink       (const NFSOperation& operation) = 0;
-    virtual bool call_mknod         (const NFSOperation& operation) = 0;
-    virtual bool call_remove        (const NFSOperation& operation) = 0;
-    virtual bool call_rmdir         (const NFSOperation& operation) = 0;
-    virtual bool call_rename        (const NFSOperation& operation) = 0;
-    virtual bool call_link          (const NFSOperation& operation) = 0;
-    virtual bool call_readdir       (const NFSOperation& operation) = 0;
-    virtual bool call_readdirplus   (const NFSOperation& operation) = 0;
-    virtual bool call_fsstat        (const NFSOperation& operation) = 0;
-    virtual bool call_fsinfo        (const NFSOperation& operation) = 0;
-    virtual bool call_pathconf      (const NFSOperation& operation) = 0;
-    virtual bool call_commit        (const NFSOperation& operation) = 0;
+    virtual bool call_null          (const RPCOperation& operation) = 0;
+    virtual bool call_getattr       (const RPCOperation& operation) = 0;
+    virtual bool call_setattr       (const RPCOperation& operation) = 0;
+    virtual bool call_lookup        (const RPCOperation& operation) = 0;
+    virtual bool call_access        (const RPCOperation& operation) = 0;
+    virtual bool call_readlink      (const RPCOperation& operation) = 0;
+    virtual bool call_read          (const RPCOperation& operation) = 0;
+    virtual bool call_write         (const RPCOperation& operation) = 0;
+    virtual bool call_create        (const RPCOperation& operation) = 0;
+    virtual bool call_mkdir         (const RPCOperation& operation) = 0;
+    virtual bool call_symlink       (const RPCOperation& operation) = 0;
+    virtual bool call_mknod         (const RPCOperation& operation) = 0;
+    virtual bool call_remove        (const RPCOperation& operation) = 0;
+    virtual bool call_rmdir         (const RPCOperation& operation) = 0;
+    virtual bool call_rename        (const RPCOperation& operation) = 0;
+    virtual bool call_link          (const RPCOperation& operation) = 0;
+    virtual bool call_readdir       (const RPCOperation& operation) = 0;
+    virtual bool call_readdirplus   (const RPCOperation& operation) = 0;
+    virtual bool call_fsstat        (const RPCOperation& operation) = 0;
+    virtual bool call_fsinfo        (const RPCOperation& operation) = 0;
+    virtual bool call_pathconf      (const RPCOperation& operation) = 0;
+    virtual bool call_commit        (const RPCOperation& operation) = 0;
     virtual void print(std::ostream& out) = 0;
 };
 

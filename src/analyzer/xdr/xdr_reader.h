@@ -6,10 +6,6 @@
 #ifndef XDR_READER_H
 #define XDR_READER_H
 //------------------------------------------------------------------------------
-#include <cassert>
-#include <stdexcept>
-#include <string>
-
 #include <arpa/inet.h> // ntohl()
 #if defined(__linux__)
 #  include <endian.h> // be64toh()
@@ -46,7 +42,7 @@ public:
     {
     }
 
-    inline size_t    data_size() const { return last-it; }
+    inline const size_t   size() const { return last-it; }
     inline const uint8_t* data() const { return it;      }
     
     inline void reset(const uint8_t* ptr, size_t len)
@@ -85,19 +81,6 @@ public:
         return *this;
     }
 
-    XDRReader& operator>>(std::string& obj)
-    {
-        uint32_t len = 0;
-        operator>>(len);
-        arrange_check(len);
-
-        obj.reserve(len);
-        obj.assign((std::string::value_type*)it, len);
-        it += calc_offset(len);
-
-        return *this;
-    }
-
     void read_fixed_len(Opaque& obj, const uint32_t len)
     {
         arrange_check(len);
@@ -117,48 +100,9 @@ public:
 
         it += calc_offset(len);
     }
-/*
-    XDRReader& operator>>(Opaque& obj)
-    {
-        uint32_t size = 0;
-        operator>>(size);
-        arrange_check(size);
-
-        obj.set(it, size);
-
-        it += calc_offset(size);
-        return *this;
-    }*/
-
-/*
-    // read Fixed-length Opaque Data
-    template<uint32_t size>
-    XDRReader& operator>>(Opaque<size>& obj)
-    {
-        arrange_check(size);
-
-        obj.set(it);
-        it += calc_offset(size);
-        return *this;
-    }
-
-    // read Variable-length Opaque Data
-    template<>
-    XDRReader& operator>>(Opaque <0>& obj)
-    {
-        uint32_t len = 0;
-        operator>>(len);
-        arrange_check(len);
-
-        obj.set(it, len);
-
-        it += calc_offset(len);
-        return *this;
-    }*/
-
 
 protected:
-    inline void arrange_check(uint32_t size)
+    inline void arrange_check(uint32_t size) const
     {
         if(it+size > last)
         {
@@ -166,7 +110,7 @@ protected:
         }
     }
 
-    inline uint32_t calc_offset(uint32_t size)
+    inline static uint32_t calc_offset(uint32_t size)
     {
         uint32_t mod = size % align;
         return (mod) ? size - mod + align : size;

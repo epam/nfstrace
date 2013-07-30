@@ -12,12 +12,9 @@
 
 #include "../auxiliary/filtered_data.h"
 #include "../auxiliary/session.h"
-#include "nfs3/nfs_operation.h"
 #include "transmission.h"
 //------------------------------------------------------------------------------
-using NST::auxiliary::FilteredData;
-using NST::auxiliary::Session;
-using NST::analyzer::NFS3::NFSOperation;
+using NST::auxiliary::FilteredDataQueue;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -26,10 +23,12 @@ namespace analyzer
 
 class RPCSession
 {
-    typedef std::tr1::unordered_map<uint32_t, RPCCall*> Map;
+    // TODO: Dangerous code the FilteredDataQueue::Ptr works like std::auto_ptr (move copy semantic)!
+    typedef std::tr1::unordered_map<uint32_t, FilteredDataQueue::Ptr> Map;
     typedef Map::value_type Pair;
 
 public:
+    typedef NST::auxiliary::Session Session;
     typedef Map::iterator Iterator;
 
     RPCSession(const Session& s) : session(s)
@@ -37,41 +36,34 @@ public:
     }
     ~RPCSession()
     {
-        Iterator i = operations.begin();
-        Iterator end = operations.end();
-
-        for(; i != end; ++i)
+    }
+    
+    void save_nfs_call_data(uint32_t xid, FilteredDataQueue::Ptr& data)
+    {
+        std::pair<Iterator, bool> res = operations.insert( Pair(xid, data) );
+        if(res.second == false) // we have some Call data with same XID
         {
-            delete i->second;
+            // TODO: add warning to log
+            // remove existing data
+            operations.erase(res.first);
+            // insert new data
+            res = operations.insert( Pair(xid, data) );
         }
     }
+    inline FilteredDataQueue::Ptr get_nfs_call_data(uint32_t xid)
+    {
+        FilteredDataQueue::Ptr ptr;
 
-    Iterator insert(std::auto_ptr<RPCCall>& call)
-    {
-        uint32_t xid = call->get_xid();
-        Iterator el = find(xid);
-        if(el == operations.end())
+        Iterator i = operations.find(xid);
+        if(i != operations.end())
         {
-            std::pair<Iterator, bool> res = operations.insert(Pair(xid, call.release()));
-            if(res.second == true)
-            {
-                el = res.first;
-            }
+
+            ptr = i->second;
+            operations.erase(i);
         }
-        return el;
+        return ptr;
     }
-    inline Iterator remove(Iterator& el)
-    {
-        return operations.erase(el);
-    }
-    inline Iterator find(uint32_t xid)
-    {
-        return operations.find(xid);
-    }
-    inline bool is_valid(Iterator& iterator)
-    {
-        return iterator != operations.end();
-    }
+
     inline const Session* get_session() const
     {
         return &session;

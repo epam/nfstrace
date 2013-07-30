@@ -9,14 +9,13 @@
 #include <tr1/unordered_map>
 #include <vector>
 
-#include "../../auxiliary/session.h"
-#include "../nfs3/nfs_procedures.h"
+#include "../rpc_sessions.h"
 #include "../nfs3/nfs_operation.h"
 #include "base_analyzer.h"
 #include "breakdown.h"
 //------------------------------------------------------------------------------
-using NST::auxiliary::Session;
-using NST::analyzer::NFS3::NFSOperation;
+using NST::analyzer::RPC::RPCOperation;
+//using NST::analyzer::RPCSession;
 using NST::analyzer::NFS3::Proc;
 //------------------------------------------------------------------------------
 namespace NST
@@ -28,7 +27,7 @@ namespace analyzers
 
 class BreakdownAnalyzer : public BaseAnalyzer
 {
-    typedef std::tr1::unordered_map<Session, Breakdown*, Session::Hash> PerOpStat;
+    typedef std::tr1::unordered_map<RPCSession::Session, Breakdown*, Session::Hash> PerOpStat;
     typedef PerOpStat::value_type Pair;
     typedef PerOpStat::iterator Iterator;
     typedef PerOpStat::const_iterator ConstIterator;
@@ -48,32 +47,32 @@ public:
         }
     }
 
-    virtual bool call_null       (const NFSOperation& operation);
-    virtual bool call_getattr    (const NFSOperation& operation);
-    virtual bool call_setattr    (const NFSOperation& operation);
-    virtual bool call_lookup     (const NFSOperation& operation);
-    virtual bool call_access     (const NFSOperation& operation);
-    virtual bool call_readlink   (const NFSOperation& operation);
-    virtual bool call_read       (const NFSOperation& operation);
-    virtual bool call_write      (const NFSOperation& operation);
-    virtual bool call_create     (const NFSOperation& operation);
-    virtual bool call_mkdir      (const NFSOperation& operation);
-    virtual bool call_symlink    (const NFSOperation& operation);
-    virtual bool call_mknod      (const NFSOperation& operation);
-    virtual bool call_remove     (const NFSOperation& operation);
-    virtual bool call_rmdir      (const NFSOperation& operation);
-    virtual bool call_rename     (const NFSOperation& operation);
-    virtual bool call_link       (const NFSOperation& operation);
-    virtual bool call_readdir    (const NFSOperation& operation);
-    virtual bool call_readdirplus(const NFSOperation& operation);
-    virtual bool call_fsstat     (const NFSOperation& operation);
-    virtual bool call_fsinfo     (const NFSOperation& operation);
-    virtual bool call_pathconf   (const NFSOperation& operation);
-    virtual bool call_commit     (const NFSOperation& operation);
+    virtual bool call_null       (const RPCOperation& operation);
+    virtual bool call_getattr    (const RPCOperation& operation);
+    virtual bool call_setattr    (const RPCOperation& operation);
+    virtual bool call_lookup     (const RPCOperation& operation);
+    virtual bool call_access     (const RPCOperation& operation);
+    virtual bool call_readlink   (const RPCOperation& operation);
+    virtual bool call_read       (const RPCOperation& operation);
+    virtual bool call_write      (const RPCOperation& operation);
+    virtual bool call_create     (const RPCOperation& operation);
+    virtual bool call_mkdir      (const RPCOperation& operation);
+    virtual bool call_symlink    (const RPCOperation& operation);
+    virtual bool call_mknod      (const RPCOperation& operation);
+    virtual bool call_remove     (const RPCOperation& operation);
+    virtual bool call_rmdir      (const RPCOperation& operation);
+    virtual bool call_rename     (const RPCOperation& operation);
+    virtual bool call_link       (const RPCOperation& operation);
+    virtual bool call_readdir    (const RPCOperation& operation);
+    virtual bool call_readdirplus(const RPCOperation& operation);
+    virtual bool call_fsstat     (const RPCOperation& operation);
+    virtual bool call_fsinfo     (const RPCOperation& operation);
+    virtual bool call_pathconf   (const RPCOperation& operation);
+    virtual bool call_commit     (const RPCOperation& operation);
     virtual void print(std::ostream& out);
 
 private:
-    bool account(Proc::Ops op, const NFSOperation& operation);
+    bool account(NFS3::Proc::Enum op, const RPCOperation& operation);
     uint64_t total;
     std::vector<int> ops_count;
     PerOpStat per_op_stat;

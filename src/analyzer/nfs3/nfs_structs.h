@@ -6,15 +6,9 @@
 #ifndef NFS_STRUCTS_H
 #define NFS_STRUCTS_H
 //------------------------------------------------------------------------------
-#include "../../auxiliary/print/indent.h"
-#include "../rpc/rpc_structs.h" // OpaqueAuth, RPCMessage, RPCCall, RPCReply
-#include "../xdr/xdr_struct.h" // OpaqueDyn, OpaqueStat
 #include "../xdr/xdr_reader.h"
-#include "nfs_procedures.h" // Proc (enumeration Ops)
 //------------------------------------------------------------------------------
-using namespace NST::auxiliary::print;
 using namespace NST::analyzer::XDR;
-using namespace NST::analyzer::RPC;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -316,22 +310,29 @@ private:
 
 // Procedure 0: NULL - Do nothing
 // void NFSPROC3_NULL(void) = 0;
-class NullArgs : public RPCCall
+struct NULLargs
 {
-public:
-    NullArgs(XDRReader& in) : RPCCall(in)
+    inline friend XDRReader& operator>>(XDRReader& in, NULLargs& o)
     {
+        return in;
+    }
+};
+
+struct NULLres
+{
+    inline friend XDRReader& operator>>(XDRReader& in, NULLres& o)
+    {
+        return in;
     }
 };
 
 // Procedure 1: GETATTR - Get file attributes
 // GETATTR3res NFSPROC3_GETATTR(GETATTR3args) = 1;
-class GetAttrArgs : public RPCCall
+struct GETATTR3args
 {
-public:
-    GetAttrArgs(XDRReader& in) : RPCCall(in)
+    inline friend XDRReader& operator>>(XDRReader& in, GETATTR3args& o)
     {
-        in >> file;
+        return in >> o.file;
     }
 
     inline const nfs_fh3& get_file() const { return file; }
@@ -354,12 +355,11 @@ private:
     nfstime3 obj_ctime;
 };
 
-class SetAttrArgs : public RPCCall
+struct SETATTR3args
 {
-public:
-    SetAttrArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, SETATTR3args& o)
     {
-        in >> object >> new_attributes >> guard;
+        return in >> o.object >> o.new_attributes >> o.guard;
     }
 
     inline const nfs_fh3&         get_object() const { return object;         }
@@ -367,9 +367,6 @@ public:
     inline const sattrguard3&      get_guard() const { return guard;          }
 
 private:
-    SetAttrArgs(const SetAttrArgs& obj);
-    void operator=(const SetAttrArgs& obj);
-
     nfs_fh3     object;
     sattr3      new_attributes;
     sattrguard3 guard;
@@ -377,12 +374,11 @@ private:
 
 // Procedure 3: LOOKUP -  Lookup filename
 // LOOKUP3res NFSPROC3_LOOKUP(LOOKUP3args) = 3;
-class LookUpArgs : public RPCCall
+struct LOOKUP3args
 {
-public:
-    LookUpArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, LOOKUP3args& o)
     {
-        in >> what;
+        return in >> o.what;
     }
 
     inline const diropargs3& get_what() const { return what; }
@@ -393,16 +389,16 @@ private:
 
 // Procedure 4: ACCESS - Check Access Permission
 // ACCESS3res NFSPROC3_ACCESS(ACCESS3args) = 4;
-class AccessArgs : public RPCCall
+struct ACCESS3args
 {
-public:
-    AccessArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, ACCESS3args& o)
     {
-        in >> object >> access;
+        return in >> o.object >> o.access;
     }
 
     inline const nfs_fh3& get_object() const { return object; }
     inline const uint32_t get_access() const { return access; }
+
 private:
     nfs_fh3  object;
     uint32_t access;
@@ -410,12 +406,11 @@ private:
 
 // Procedure 5: READLINK - Read from symbolic link
 // READLINK3res NFSPROC3_READLINK(READLINK3args) = 5;
-class ReadLinkArgs : public RPCCall
+struct READLINK3args
 {
-public:
-    ReadLinkArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, READLINK3args& o)
     {
-        in >> symlink;
+        return in >> o.symlink;
     }
 
     inline const nfs_fh3& get_symlink() const { return symlink; }
@@ -426,12 +421,11 @@ private:
 
 // Procedure 6: READ - Read From file
 // READ3res NFSPROC3_READ(READ3args) = 6;
-class ReadArgs : public RPCCall
+struct READ3args
 {
-public:
-    ReadArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, READ3args& o)
     {
-        in >> file >> offset >> count;
+        return in >> o.file >> o.offset >> o.count;
     }
 
     inline const nfs_fh3&   get_file() const { return file;   }
@@ -447,9 +441,8 @@ private:
 
 // Procedure 7: WRITE - Write to file
 // WRITE3res NFSPROC3_WRITE(WRITE3args) = 7;
-class WriteArgs : public RPCCall
+struct WRITE3args
 {
-public:
     enum stable_how
     {
         UNSTABLE    = 0,
@@ -457,9 +450,9 @@ public:
         FYLE_SYNC   = 2
     };
 
-    WriteArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, WRITE3args& o)
     {
-        in >> file >> offset >> count >> stable;
+        return in >> o.file >> o.offset >> o.count >> o.stable;
     }
 
     inline const nfs_fh3&     get_file() const { return file; }
@@ -500,12 +493,11 @@ private:
     } u;
 };
 
-class CreateArgs : public RPCCall
+struct CREATE3args
 {
-public:
-    CreateArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, CREATE3args& o)
     {
-        in >> where >> how;
+        return in >> o.where >> o.how;
     }
 
     inline const diropargs3&  get_where() const { return where; }
@@ -518,12 +510,11 @@ private:
 
 // Procedure 9: MKDIR - Create a directory
 // MKDIR3res NFSPROC3_MKDIR(MKDIR3args) = 9;
-class MkDirArgs : public RPCCall
+struct MKDIR3args
 {
-public:
-    MkDirArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, MKDIR3args& o)
     {
-        in >> where >> attributes;
+        return in >> o.where >> o.attributes;
     }
 
     inline const diropargs3&   get_where() const { return where;      }
@@ -548,12 +539,11 @@ private:
     nfspath3 symlink_data;
 };
 
-class SymLinkArgs : public RPCCall
+struct SYMLINK3args
 {
-public:
-    SymLinkArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, SYMLINK3args& o)
     {
-        in >> where >> symlink;
+        return in >> o.where >> o.symlink;
     }
 
     inline const diropargs3&     get_where() const { return where;   }
@@ -595,16 +585,15 @@ private:
     } u;
 };
 
-class MkNodArgs : public RPCCall
+struct MKNOD3args
 {
-public:
-    MkNodArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, MKNOD3args& o)
     {
-        in >> where >> what;
+        return in >> o.where >> o.what;
     }
 
     inline const diropargs3& get_where() const { return where; }
-    inline const mknoddata3&  get_what() const { return what; }
+    inline const mknoddata3&  get_what() const { return what;  }
 
 private:
     diropargs3 where;
@@ -613,12 +602,11 @@ private:
 
 // Procedure 12: REMOVE - Remove a File
 // REMOVE3res NFSPROC3_REMOVE(REMOVE3args) = 12;
-class RemoveArgs : public RPCCall
+struct REMOVE3args
 {
-public:
-    RemoveArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, REMOVE3args& o)
     {
-        in >> object;
+        return in >> o.object;
     }
 
     inline const diropargs3& get_object() const { return object; }
@@ -629,12 +617,11 @@ private:
 
 // Procedure 13: RMDIR - Remove a Directory
 // RMDIR3res NFSPROC3_RMDIR(RMDIR3args) = 13;
-class RmDirArgs : public RPCCall
+struct RMDIR3args
 {
-public:
-    RmDirArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, RMDIR3args& o)
     {
-        in >> object;
+        return in >> o.object;
     }
 
     inline const diropargs3& get_object() const { return object; }
@@ -645,12 +632,11 @@ private:
 
 // Procedure 14: RENAME - Rename a File or Directory
 // RENAME3res NFSPROC3_RENAME(RENAME3args) = 14;
-class RenameArgs : public RPCCall
+struct RENAME3args
 {
-public:
-    RenameArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, RENAME3args& o)
     {
-        in >> from >> to;
+        return in >> o.from >> o.to;
     }
 
     inline const diropargs3& get_from() const { return from; }
@@ -663,12 +649,11 @@ private:
 
 // Procedure 15: LINK - Create Link to an object
 // LINK3res NFSPROC3_LINK(LINK3args) = 15;
-class LinkArgs : public RPCCall
+struct LINK3args
 {
-public:
-    LinkArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, LINK3args& o)
     {
-        in >> file >> link;
+        return in >> o.file >> o.link;
     }
 
     inline const nfs_fh3&    get_file() const { return file; }
@@ -681,14 +666,13 @@ private:
 
 // Procedure 16: READDIR - Read From Directory
 // READDIR3res NFSPROC3_READDIR(READDIR3args) = 16;
-class ReadDirArgs : public RPCCall
+struct READDIR3args
 {
-public:
-    ReadDirArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, READDIR3args& o)
     {
-        in >> dir >> cookie;
-        in.read_fixed_len(cookieverf, NFS3_COOKIEVERFSIZE);
-        in >> count;
+        in >> o.dir >> o.cookie;
+        in.read_fixed_len(o.cookieverf, NFS3_COOKIEVERFSIZE);
+        return in >> o.count;
     }
 
     inline const nfs_fh3&            get_dir() const { return dir;        }
@@ -705,14 +689,13 @@ private:
 
 // Procedure 17: READDIRPLUS - Extended read from directory
 // READDIRPLUS3res NFSPROC3_READDIRPLUS(READDIRPLUS3args) = 17;
-class ReadDirPlusArgs : public RPCCall
+struct READDIRPLUS3args
 {
-public:
-    ReadDirPlusArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, READDIRPLUS3args& o)
     {
-        in >> dir >> cookie;
-        in.read_fixed_len(cookieverf, NFS3_COOKIEVERFSIZE);
-        in >> dircount >> maxcount;
+        in >> o.dir >> o.cookie;
+        in.read_fixed_len(o.cookieverf, NFS3_COOKIEVERFSIZE);
+        return in >> o.dircount >> o.maxcount;
     }
 
     inline const nfs_fh3&            get_dir() const { return dir;        }
@@ -731,12 +714,11 @@ private:
 
 // Procedure 18: FSSTAT - Get dynamic file system information
 // FSSTAT3res NFSPROC3_FSSTAT(FSSTAT3args) = 18;
-class FSStatArgs : public RPCCall
+struct FSSTAT3args
 {
-public:
-    FSStatArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, FSSTAT3args& o)
     {
-        in >> fsroot;
+        return in >> o.fsroot;
     }
 
     inline const nfs_fh3& get_fsroot() const { return fsroot; }
@@ -747,12 +729,11 @@ private:
 
 // Procedure 19: FSINFO - Get static file system Information
 // FSINFO3res NFSPROC3_FSINFO(FSINFO3args) = 19;
-class FSInfoArgs : public RPCCall
+struct FSINFO3args
 {
-public:
-    FSInfoArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, FSINFO3args& o)
     {
-        in >> fsroot;
+        return in >> o.fsroot;
     }
 
     inline const nfs_fh3& get_fsroot() const { return fsroot; }
@@ -763,12 +744,11 @@ private:
 
 // Procedure 20: PATHCONF - Retrieve POSIX information
 // PATHCONF3res NFSPROC3_PATHCONF(PATHCONF3args) = 20;
-class PathConfArgs : public RPCCall
+struct PATHCONF3args
 {
-public:
-    PathConfArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, PATHCONF3args& o)
     {
-        in >> object;
+        return in >> o.object;
     }
 
     inline const nfs_fh3& get_object() const { return object; }
@@ -779,12 +759,11 @@ private:
 
 // Procedure 21: COMMIT - Commit cached data on a server to stable storage
 // COMMIT3res NFSPROC3_COMMIT(COMMIT3args) = 21;
-class CommitArgs : public RPCCall
+struct COMMIT3args
 {
-public:
-    CommitArgs(XDRReader& in) : RPCCall(in)
+    friend XDRReader& operator>>(XDRReader& in, COMMIT3args& o)
     {
-        in >> file >> offset >> count;
+        return in >> o.file >> o.offset >> o.count;
     }
 
     inline const nfs_fh3&   get_file() const { return file;   }
@@ -813,21 +792,21 @@ std::ostream& operator<<(std::ostream& out, const sattr3& obj);
 std::ostream& operator<<(std::ostream& out, const diropargs3& obj);
 
 std::ostream& operator<<(std::ostream& out, const sattrguard3& obj);
-std::ostream& operator<<(std::ostream& out, const SetAttrArgs& obj);
+std::ostream& operator<<(std::ostream& out, const SETATTR3args& obj);
 
-std::ostream& operator<<(std::ostream& out, const WriteArgs& obj);
+std::ostream& operator<<(std::ostream& out, const WRITE3args& obj);
 
 std::ostream& operator<<(std::ostream& out, const createhow3& obj);
-std::ostream& operator<<(std::ostream& out, const CreateArgs& obj);
+std::ostream& operator<<(std::ostream& out, const CREATE3args& obj);
 
-std::ostream& operator<<(std::ostream& out, const MkDirArgs& obj);
+std::ostream& operator<<(std::ostream& out, const MKDIR3args& obj);
 
 std::ostream& operator<<(std::ostream& out, const symlinkdata3& obj);
-std::ostream& operator<<(std::ostream& out, const SymLinkArgs& obj);
+std::ostream& operator<<(std::ostream& out, const SYMLINK3args& obj);
 
 std::ostream& operator<<(std::ostream& out, const devicedata3& obj);
 std::ostream& operator<<(std::ostream& out, const mknoddata3& obj);
-std::ostream& operator<<(std::ostream& out, const MkNodArgs& obj);
+std::ostream& operator<<(std::ostream& out, const MKNOD3args& obj);
 
 
 } // namespace NFS3

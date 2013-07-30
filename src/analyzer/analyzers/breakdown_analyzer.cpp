@@ -13,135 +13,135 @@ namespace analyzer
 namespace analyzers
 {
 
-bool BreakdownAnalyzer::call_null(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_null(const RPCOperation& operation)
 {
-    account(Proc::NFS_NULL, operation);
+    account(NFS3::Proc::NFS_NULL, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_getattr(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_getattr(const RPCOperation& operation)
 {
-    account(Proc::GETATTR, operation);
+    account(NFS3::Proc::GETATTR, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_setattr(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_setattr(const RPCOperation& operation)
 {
-    account(Proc::SETATTR, operation);
+    account(NFS3::Proc::SETATTR, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_lookup(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_lookup(const RPCOperation& operation)
 {
-    account(Proc::LOOKUP, operation);
+    account(NFS3::Proc::LOOKUP, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_access(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_access(const RPCOperation& operation)
 {
-    account(Proc::ACCESS, operation);
+    account(NFS3::Proc::ACCESS, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_readlink(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_readlink(const RPCOperation& operation)
 {
-    account(Proc::READLINK, operation);
+    account(NFS3::Proc::READLINK, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_read(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_read(const RPCOperation& operation)
 {
-    account(Proc::READ, operation);
+    account(NFS3::Proc::READ, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_write(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_write(const RPCOperation& operation)
 {
-    account(Proc::WRITE, operation);
+    account(NFS3::Proc::WRITE, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_create(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_create(const RPCOperation& operation)
 {
-    account(Proc::CREATE, operation);
+    account(NFS3::Proc::CREATE, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_mkdir(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_mkdir(const RPCOperation& operation)
 {
-    account(Proc::MKDIR, operation);
+    account(NFS3::Proc::MKDIR, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_symlink(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_symlink(const RPCOperation& operation)
 {
-    account(Proc::SYMLINK, operation);
+    account(NFS3::Proc::SYMLINK, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_mknod(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_mknod(const RPCOperation& operation)
 {
-    account(Proc::MKNOD, operation);
+    account(NFS3::Proc::MKNOD, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_remove(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_remove(const RPCOperation& operation)
 {
-    account(Proc::REMOVE, operation);
+    account(NFS3::Proc::REMOVE, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_rmdir(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_rmdir(const RPCOperation& operation)
 {
-    account(Proc::RMDIR, operation);
+    account(NFS3::Proc::RMDIR, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_rename(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_rename(const RPCOperation& operation)
 {
-    account(Proc::RENAME, operation);
+    account(NFS3::Proc::RENAME, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_link(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_link(const RPCOperation& operation)
 {
-    account(Proc::LINK, operation);
+    account(NFS3::Proc::LINK, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_readdir(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_readdir(const RPCOperation& operation)
 {
-    account(Proc::READDIR, operation);
+    account(NFS3::Proc::READDIR, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_readdirplus(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_readdirplus(const RPCOperation& operation)
 {
-    account(Proc::READDIRPLUS, operation);
+    account(NFS3::Proc::READDIRPLUS, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_fsstat(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_fsstat(const RPCOperation& operation)
 {
-    account(Proc::FSSTAT, operation);
+    account(NFS3::Proc::FSSTAT, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_fsinfo(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_fsinfo(const RPCOperation& operation)
 {
-    account(Proc::FSINFO, operation);
+    account(NFS3::Proc::FSINFO, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_pathconf(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_pathconf(const RPCOperation& operation)
 {
-    account(Proc::PATHCONF, operation);
+    account(NFS3::Proc::PATHCONF, operation);
     return true;
 }
 
-bool BreakdownAnalyzer::call_commit(const NFSOperation& operation)
+bool BreakdownAnalyzer::call_commit(const RPCOperation& operation)
 {
-    account(Proc::COMMIT, operation);
+    account(NFS3::Proc::COMMIT, operation);
     return true;
 }
 
@@ -149,10 +149,10 @@ void BreakdownAnalyzer::print(std::ostream& out)
 {
     out << "###  Breakdown analyzer  ###" << std::endl;
     out << "Total calls: " << total << ". Per operation:" << std::endl;
-    for(int i = 0; i < Proc::num; ++i)
+    for(int i = 0; i < NFS3::Proc::num; ++i)
     {          
         out.width(12);
-        out << std::left << Proc::titles[i];
+        out << std::left << NFS3::Proc::Titles[i];
         out.width(5);
         out << std::right << ops_count[i];
         out.width(7);
@@ -180,7 +180,7 @@ void BreakdownAnalyzer::print(std::ostream& out)
         for(int i = 0; i < Proc::num; ++i)
         {
             out.width(14);
-            out << std::left << Proc::titles[i];
+            out << std::left << NFS3::Proc::Titles[i];
             out.width(6);
             out << " Count:";
             out.width(5);
@@ -205,16 +205,17 @@ void BreakdownAnalyzer::print(std::ostream& out)
     }
 }
 
-bool BreakdownAnalyzer::account(Proc::Ops op, const NFSOperation& operation)
+bool BreakdownAnalyzer::account(NFS3::Proc::Enum op, const RPCOperation& operation)
 {
     ++total;
     ++ops_count[op];
 
-    const NFSOperation::Session* session = operation.get_session();
+    const RPCSession* rpc_session = operation.get_session();
+    const RPCSession::Session* session = rpc_session->get_session();
     Iterator el = per_op_stat.find(*session);
     if(el == per_op_stat.end())
     {
-        Inserted res = per_op_stat.insert(Pair(*session, new Breakdown())); 
+        Inserted res = per_op_stat.insert(Pair(*session, new Breakdown()));
         if(res.second == false)
             return false;
         el = res.first;
