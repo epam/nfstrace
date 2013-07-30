@@ -9,13 +9,12 @@
 #include <list>
 #include <vector>
 
-#include "analyzers/base_analyzer.h"
 #include "nfs3/nfs_operation.h"
-#include "nfs3/nfs_procedures.h"
+#include "analyzers/base_analyzer.h"
 //------------------------------------------------------------------------------
 using NST::analyzer::analyzers::BaseAnalyzer;
 using NST::analyzer::NFS3::Proc;
-using NST::analyzer::NFS3::NFSOperation;
+using NST::analyzer::RPC::RPCOperation;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -26,7 +25,7 @@ class Analyzers
 {
     typedef std::list<BaseAnalyzer*> Storage;
 
-    typedef bool (BaseAnalyzer::*Method)(const NFSOperation& operation);
+    typedef bool (BaseAnalyzer::*Method)(const RPCOperation& operation);
 public:
     Analyzers()
     {
@@ -70,9 +69,9 @@ public:
         analyzers.push_back(analyzer);
     }
 
-    bool call(const NFSOperation& operation)
+    bool call(const RPCOperation& operation)
     {
-        const uint32_t procedure = operation.get_call()->get_proc();
+        const uint32_t procedure = operation.procedure();
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)

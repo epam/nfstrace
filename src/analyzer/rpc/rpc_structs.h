@@ -6,9 +6,6 @@
 #ifndef RPC_STRUCTS_H
 #define RPC_STRUCTS_H
 //------------------------------------------------------------------------------
-#include <sstream>
-#include <string>
-
 #include "../../auxiliary/exception.h"
 #include "../../filter/rpc/rpc_header.h"
 #include "../xdr/xdr_reader.h"
@@ -26,7 +23,12 @@ namespace RPC
 
 struct OpaqueAuth
 {
-    friend XDRReader& operator>>(XDRReader& in, OpaqueAuth& obj);
+    inline friend XDRReader& operator>>(XDRReader& in, OpaqueAuth& o)
+    {
+        in >> o.flavor;
+        in.read_varialble_len(o.body);
+        return in;
+    }
 
     inline uint32_t    get_flavor() const { return flavor; }
     inline const Opaque& get_body() const { return body;   }
@@ -38,7 +40,10 @@ private:
 
 struct MismatchInfo
 {
-    friend XDRReader& operator>>(XDRReader& in, MismatchInfo& obj);
+    inline friend XDRReader& operator>>(XDRReader& in, MismatchInfo& o)
+    {
+        return in >> o.low >> o.high;
+    }
 
     inline uint32_t  get_low() const { return low; }
     inline uint32_t get_high() const { return high;}
@@ -48,72 +53,37 @@ private:
     uint32_t high;
 };
 
-class RPCMessage
+struct RPCMessage
 {
-public:
-    RPCMessage(XDRReader& in)
+    inline friend XDRReader& operator>>(XDRReader& in, RPCMessage& o)
     {
-        // copy data to own storage
-        dlen = in.data_size();
-      //  std::cout << "len: " << dlen << std::endl;
-        data = new uint8_t[dlen];
-        memcpy(data, in.data(), dlen);
-        // reset reader to read from own storage
-        in.reset(data, dlen);
-
-        in >> xid >> type;
-    }
-    virtual ~RPCMessage()
-    {
-        delete[] data;
+        return in >> o.xid >> o.type;
     }
 
-    inline uint32_t get_xid () const { return xid;  }
-    inline uint32_t get_type() const { return type; }
+    inline const uint32_t get_xid () const { return xid;  }
+    inline const uint32_t get_type() const { return type; }
 
-    inline void set_time(const struct timeval& t)
-    {
-        time = t;
-    }
-    inline const timeval& get_time() const
-    {
-        return time;
-    }
-
-private:
-    RPCMessage(const RPCMessage&);
-    RPCMessage& operator=(const RPCMessage&);
-
-    uint32_t         xid;
-    uint32_t        type;
-    struct timeval  time;
-
-    uint8_t*        data;
-    uint32_t        dlen;
+protected:
+    uint32_t  xid;
+    uint32_t type;
 };
 
-class RPCCall : public RPCMessage
+struct RPCCall : public RPCMessage
 {
-public:
-    RPCCall(XDRReader& in) : RPCMessage(in)
+    inline friend XDRReader& operator>>(XDRReader& in, RPCCall& o)
     {
-        in >> rpcvers >> prog >> vers >> proc >> cred >> verf;
-    }
-    virtual ~RPCCall()
-    {
+        in >> o.xid >> o.type; // direct fill RPCMessage fileds
+        return in >> o.rpcvers >> o.prog >> o.vers >> o.proc >> o.cred >> o.verf;
     }
 
-    inline uint32_t get_rpcvers() const{ return rpcvers; }
-    inline uint32_t get_prog() const { return prog; }
-    inline uint32_t get_vers() const { return vers; }
-    inline uint32_t get_proc() const { return proc; }
+    inline const uint32_t get_rpcvers() const { return rpcvers; }
+    inline const uint32_t    get_prog() const { return prog; }
+    inline const uint32_t    get_vers() const { return vers; }
+    inline const uint32_t    get_proc() const { return proc; }
     inline const OpaqueAuth& get_cred() const { return cred; }
     inline const OpaqueAuth& get_verf() const { return verf; }
 
 private:
-    RPCCall(const RPCCall&);            // undefined
-    RPCCall& operator=(const RPCCall&); // undefined
-
     uint32_t rpcvers;
     uint32_t prog;
     uint32_t vers;
@@ -183,40 +153,33 @@ private:
 
 struct RPCReply : public RPCMessage
 {
-    RPCReply(XDRReader& in) : RPCMessage(in)
+    inline friend XDRReader& operator>>(XDRReader& in, RPCReply& o)
     {
-        in >> stat;
-        switch(stat)
+        in >> o.xid >> o.type; // direct fill RPCMessage fileds
+        in >> o.stat;
+        switch(o.stat)
         {
-            case SUNRPC_MSG_ACCEPTED:
-                in >> u.accepted;
-                break;
-            case SUNRPC_MSG_DENIED:
-                in >> u.rejected;
-                break;
-            default:
-                throw Exception("Invalid RPC's ReplyStat");
+            case SUNRPC_MSG_ACCEPTED:  in >> o.u.accepted; break;
+            case SUNRPC_MSG_DENIED:    in >> o.u.rejected; break;
+            default: throw Exception("Invalid RPC's ReplyStat");
         }
+        return in;
     }
 
 private:
-    RPCReply(const RPCReply&);
-    RPCReply& operator=(const RPCReply&);
-
     uint32_t          stat;
     union U
     {
         AcceptedReply accepted;
         RejectedReply rejected;
     } u;
-
 };
-
+/*
 std::ostream& operator<<(std::ostream& out, const RPCMessage& obj);
 std::ostream& operator<<(std::ostream& out, const RPCReply& obj);
-
+*/
 } // namespace rpc
-} // namespace analyzer 
+} // namespace analyzer
 } // namespace NFS
 //------------------------------------------------------------------------------
 #endif//RPC_STRUCTS_H

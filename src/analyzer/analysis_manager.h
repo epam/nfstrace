@@ -13,12 +13,7 @@
 #include "../controller/parameters.h"
 #include "../controller/running_status.h"
 #include "analyzers.h"
-#include "analyzers/breakdown_analyzer.h"
-#include "analyzers/print_analyzer.h"
-#include "nfs_parser_thread.h"
 //------------------------------------------------------------------------------
-using NST::analyzer::analyzers::PrintAnalyzer;
-using NST::analyzer::analyzers::BreakdownAnalyzer;
 using NST::auxiliary::FilteredDataQueue;
 using NST::auxiliary::Thread;
 using NST::controller::Parameters;
@@ -32,76 +27,20 @@ namespace analyzer
 class AnalysisManager
 {
 public:
-    AnalysisManager(RunningStatus& running_status) : parser_thread(NULL), queue(NULL), status(running_status)
-    {
-    }
-    ~AnalysisManager()
-    {
-    }
+    AnalysisManager(RunningStatus& running_status);
+    ~AnalysisManager();
 
-    FilteredDataQueue& init(const Parameters& params)
-    {
-        uint32_t q_capacity = params.queue_capacity();
-        uint32_t q_size = 64;
-        uint32_t q_limit= 1;
-        if(q_capacity <= q_size)
-        {
-            q_size  = q_capacity;
-        }
-        else
-        {
-            q_limit = 1 + q_capacity / q_size;
-        }
+    FilteredDataQueue& init(const Parameters& params);
 
-        queue.reset(new FilteredDataQueue(q_size, q_limit));
-        parser_thread.reset(new NFSParserThread(*queue, analyzers, status));
-
-        populate_analyzers(params);
-
-        return *queue;
-    }
-
-    void start()
-    {
-        if(parser_thread.get())
-        {
-            parser_thread->create();
-        }
-    }
-
-    void stop()
-    {
-        if(parser_thread.get())
-        {
-            parser_thread->stop();
-        }
-        analyzers.print(std::cout);
-    }
+    void start();
+    void stop();
 
 private:
 
-    void populate_analyzers(const Parameters& params)
-    {
-        std::vector<std::string> active_analyzers = params.analyzers();
-        for(unsigned int i = 0; i < active_analyzers.size(); ++i)
-        {
-            if(active_analyzers[i] == std::string("ob"))
-                breakdown_analyzer();
-        }
+    void populate_analyzers(const Parameters& params);
 
-        if(params.is_verbose()) // add special analyzer for trace out RPC calls
-        {
-            analyzers.add(new PrintAnalyzer(std::clog));
-        }
-    }
-
-    void breakdown_analyzer()
-    {
-        analyzers.add(new BreakdownAnalyzer());
-    }
-
-    AnalysisManager(const AnalysisManager& object);            // Uncopyable object
-    AnalysisManager& operator=(const AnalysisManager& object); // Uncopyable object
+    AnalysisManager(const AnalysisManager&);            // undefiend
+    AnalysisManager& operator=(const AnalysisManager&); // undefiend
 
     std::auto_ptr<Thread> parser_thread;
     std::auto_ptr<FilteredDataQueue> queue;

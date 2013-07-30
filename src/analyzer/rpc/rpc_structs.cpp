@@ -5,10 +5,7 @@
 //------------------------------------------------------------------------------
 #include "rpc_structs.h"
 #include "../../auxiliary/print/indent.h"
-#include "../nfs3/nfs_procedures.h"
 //------------------------------------------------------------------------------
-using NST::auxiliary::print::Indent;
-using NST::analyzer::NFS3::Proc;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -17,18 +14,7 @@ namespace analyzer
 namespace RPC
 {
 
-XDRReader& operator>>(XDRReader& in, OpaqueAuth& obj)
-{
-    in >> obj.flavor;
-    in.read_varialble_len(obj.body);
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, MismatchInfo& obj)
-{
-    return in >> obj.low >> obj.high;
-}
-
+/*
 std::ostream& operator<<(std::ostream& out, const RPCMessage& obj)
 {
     out << "RPC:" << std::endl;
@@ -56,16 +42,16 @@ std::ostream& operator<<(std::ostream& out, const RPCReply& obj)
 {
     out << static_cast<const RPCMessage&>(obj);
     Indent indentation(out, 4);
-/*
+
     out << "stat: ";
     if(obj.stat == SUNRPC_MSG_ACCEPTED)
         out << "MSG_ACCEPTED";
     else
-        out << "MSG_DENIED";*/
+        out << "MSG_DENIED";
     return out << std::endl;
-}
+}*/
 
-} // namespace NFS3
+} // namespace RPC
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------

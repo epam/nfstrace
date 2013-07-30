@@ -3,6 +3,8 @@
 // Description: All RFC1813 declared structures.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
+#include <cassert>
+
 #include "nfs_structs.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -414,7 +416,7 @@ std::ostream& operator<<(std::ostream& out, const sattrguard3& obj)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const SetAttrArgs& obj)
+std::ostream& operator<<(std::ostream& out, const SETATTR3args& obj)
 {
     out << "object: " << obj.get_object();
     out << "new_attributes: " << obj.get_new_attributes();
@@ -423,16 +425,16 @@ std::ostream& operator<<(std::ostream& out, const SetAttrArgs& obj)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const WriteArgs& obj)
+std::ostream& operator<<(std::ostream& out, const WRITE3args& obj)
 {
     out << "file: " << obj.get_file();
     out << " offset: " << obj.get_offset();
     out << " count: " << obj.get_count();
     switch(obj.get_stable())
     {
-        case WriteArgs::UNSTABLE:  out << " stable: UNSTABLE";  break;
-        case WriteArgs::DATA_SYNC: out << " stable: DATA_SYNC"; break;
-        case WriteArgs::FYLE_SYNC: out << " stable: FYLE_SYNC"; break;
+        case WRITE3args::UNSTABLE:  out << " stable: UNSTABLE";  break;
+        case WRITE3args::DATA_SYNC: out << " stable: DATA_SYNC"; break;
+        case WRITE3args::FYLE_SYNC: out << " stable: FYLE_SYNC"; break;
     }
     return out;
 }
@@ -461,14 +463,14 @@ std::ostream& operator<<(std::ostream& out, const createhow3& obj)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const CreateArgs& obj)
+std::ostream& operator<<(std::ostream& out, const CREATE3args& obj)
 {
     out << "where: " << obj.get_where();
     out << " howcreate: " << obj.get_how();
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const MkDirArgs& obj)
+std::ostream& operator<<(std::ostream& out, const MKDIR3args& obj)
 {
     out << "where: " << obj.get_where();
     out << " attributes: " << obj.get_attributes();
@@ -482,7 +484,7 @@ std::ostream& operator<<(std::ostream& out, const symlinkdata3& obj)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const SymLinkArgs& obj)
+std::ostream& operator<<(std::ostream& out, const SYMLINK3args& obj)
 {
     out << "where: " << obj.get_where();
     out << " symlink: " << obj.get_symlink();
@@ -521,7 +523,7 @@ std::ostream& operator<<(std::ostream& out, const mknoddata3& obj)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const MkNodArgs& obj)
+std::ostream& operator<<(std::ostream& out, const MKNOD3args& obj)
 {
     out << "where: " << obj.get_where();
     out << " what: " << obj.get_what();
