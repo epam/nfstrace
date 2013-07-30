@@ -150,6 +150,8 @@ RPCOperation* NFSParserThread::parse_data(FilteredDataQueue::Ptr& ptr)
 
             RPCSession* session = sessions.get_session(ptr->session, RPCSessions::REVERSE);
 
+            if(session == NULL) return NULL;
+
             FilteredDataQueue::Ptr call_data = session->get_nfs_call_data(reply->xid());
             if(call_data)
             {

@@ -210,8 +210,8 @@ bool BreakdownAnalyzer::account(NFS3::Proc::Enum op, const RPCOperation& operati
     ++total;
     ++ops_count[op];
 
-    const RPCSession* rpc_session = operation.get_session();
-    const RPCSession::Session* session = rpc_session->get_session();
+    const RPCSession& rpc_session = operation.get_session();
+    const RPCSession::Session* session = rpc_session.get_session();
     Iterator el = per_op_stat.find(*session);
     if(el == per_op_stat.end())
     {

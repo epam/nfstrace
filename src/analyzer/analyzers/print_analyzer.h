@@ -6,7 +6,7 @@
 #ifndef PRINT_ANALYZER_H
 #define PRINT_ANALYZER_H
 //------------------------------------------------------------------------------
-#include <iostream>
+#include <ostream>
 #include <string>
 
 #include "base_analyzer.h"
@@ -54,11 +54,8 @@ public:
     virtual void print(std::ostream& out);
 
 private:
-    std::ostream& print_fh(std::ostream& out, const Opaque& fh) const;
-//    std::string get_session(const RPCSession& session) const;
-//    std::string session_addr(RPCOperation::Session::Direction dir, const RPCOperation::Session& session) const;
-//    std::string ipv6_string(const uint8_t ip[16]) const;
-//    std::string ipv4_string(const uint32_t ip) const;
+    PrintAnalyzer(const PrintAnalyzer&);            // undefined
+    PrintAnalyzer& operator=(const PrintAnalyzer&); // undefined
 
     std::ostream& out;
 };

@@ -44,9 +44,9 @@ public:
     inline const uint32_t            xid() const { return call.get_xid();  }
     inline const uint32_t      procedure() const { return call.get_proc(); }
 
-    inline const RPCCall&      get_call () const { return call;    }
-    inline const RPCReply&     get_reply() const { return reply;   }
-    inline const RPCSession* get_session() const { return session; }
+    inline const RPCCall&      get_call () const { return call;     }
+    inline const RPCReply&     get_reply() const { return reply;    }
+    inline const RPCSession& get_session() const { return *session; }
 
     inline timeval latency() const
     {
