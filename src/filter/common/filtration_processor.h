@@ -140,7 +140,7 @@ public:
                 }
                 else
                 {
-                    TRACE("drop packet seq: %d; sequence: %d;  dlen: %d\n", seq, sequence, info.dlen);
+                    TRACE("drop packet seq: %u; sequence: %u;  dlen: %u\n", seq, sequence, info.dlen);
                 }
             }
         }
@@ -442,6 +442,13 @@ public:
         {
             collection = writer->alloc();   // allocate new collection
 
+            if(!collection)
+            {
+                // collection isn't allocated!
+                info.dlen = 0;  // skip whole packet
+                return;
+            }
+
             if(info.dlen >= max_header)  // is data enougth to message validation?
             {
                 rm = reinterpret_cast<const RecordMark*>(info.data);
@@ -455,7 +462,7 @@ public:
             }
         }
 
-        assert(collection);     // collection must be initialized
+//        assert(collection);     // collection must be initialized
         assert(rm != NULL);     // RM must be initialized
         assert(msg_len == 0);   // RPC Message still undetected
 
