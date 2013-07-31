@@ -371,11 +371,13 @@ public:
                 {
                     if(msg_len >= info.dlen) // discard whole new packet
                     {
+                        TRACE("%s\n", "discard whole new packet");
                         msg_len -= info.dlen;
                         info.dlen = 0;  // return from while
                     }
                     else  // discard only a part of packet payload related to current message
                     {
+                        TRACE("%s\n", "discard only a part of packet payload related to current message");
                         info.dlen -= msg_len;
                         info.data += msg_len;
                         msg_len = 0;
@@ -385,6 +387,7 @@ public:
                 {
                     if(hdr_len > info.dlen) // got new part of header (not the all!)
                     {
+                        TRACE("%s\n", "got new part of header (not the all!)");
                         collection.push(info);
                         hdr_len     -= info.dlen;
                         msg_len     -= info.dlen;
@@ -392,6 +395,7 @@ public:
                     }
                     else // hdr_len <= dlen, current message will be complete, also we have some additional data
                     {
+                        TRACE("%s\n", "current message will be complete, also we have some additional data");
                         collection.push(info, hdr_len);
                         info.dlen   -= hdr_len;
                         info.data   += hdr_len;

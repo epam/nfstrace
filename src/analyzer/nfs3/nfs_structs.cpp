@@ -203,7 +203,7 @@ XDRReader& operator>>(XDRReader& in, mknoddata3& obj)
 
 std::ostream& operator<<(std::ostream& out, const Enum_mode3 m)
 {
-    out << "mode: ";
+    out << " mode: ";
     if(m & USER_ID_EXEC)      out << "USER_ID_EXEC";
     if(m & GROUP_ID_EXEC)     out << "GROUP_ID_EXEC";
     if(m & SAVE_SWAPPED_TEXT) out << "SAVE_SWAPPED_TEXT";
@@ -273,7 +273,7 @@ std::ostream& operator<<(std::ostream& out, const ftype3& obj)
 
 std::ostream& operator<<(std::ostream& out, const specdata3& obj)
 {
-    return out << "specdata1: " << obj.get_specdata1() << " specdata2: " << obj.get_specdata2();
+    return out << " specdata1: " << obj.get_specdata1() << " specdata2: " << obj.get_specdata2();
 }
 
 std::ostream& operator<<(std::ostream& out, const nfs_fh3& obj)
@@ -283,24 +283,24 @@ std::ostream& operator<<(std::ostream& out, const nfs_fh3& obj)
 
 std::ostream& operator<<(std::ostream& out, const nfstime3& obj)
 {
-    return out << "seconds: " << obj.get_seconds() << " nseconds: " << obj.get_nseconds();
+    return out << " seconds: " << obj.get_seconds() << " nseconds: " << obj.get_nseconds();
 }
 
 std::ostream& operator<<(std::ostream& out, const fattr3& obj)
 {
-    out << "type: " << obj.get_type() << std::endl;
-    out << "mode: " << obj.get_mode() << std::endl;
-    out << "nlink: " << obj.get_nlink() << std::endl;
-    out << "uid: " << obj.get_uid() << std::endl;
-    out << "gid: " << obj.get_gid() << std::endl;
-    out << "size: " << obj.get_size() << std::endl;
-    out << "used: " << obj.get_used() << std::endl;
-    out << "rdev: " << obj.get_rdev() << std::endl;
-    out << "fsid: " << obj.get_fsid() << std::endl;
-    out << "fileid: " << obj.get_fileid() << std::endl;
-    out << "atime: " << obj.get_atime() << std::endl;
-    out << "mtime: " << obj.get_mtime() << std::endl;
-    out << "ctime: " << obj.get_ctime() << std::endl;
+    out << " type: " << obj.get_type();
+    out << " mode: " << obj.get_mode();
+    out << " nlink: " << obj.get_nlink();
+    out << " uid: " << obj.get_uid();
+    out << " gid: " << obj.get_gid();
+    out << " size: " << obj.get_size();
+    out << " used: " << obj.get_used();
+    out << " rdev: " << obj.get_rdev();
+    out << " fsid: " << obj.get_fsid();
+    out << " fileid: " << obj.get_fileid();
+    out << " atime: " << obj.get_atime();
+    out << " mtime: " << obj.get_mtime();
+    out << " ctime: " << obj.get_ctime();
 
     return out;
 }
@@ -309,11 +309,11 @@ std::ostream& operator<<(std::ostream& out, const post_op_attr& obj)
 {
     if(obj.is_attributes())
     {
-        out << "attributes: " << obj.get_attributes();
+        out << " attributes: " << obj.get_attributes();
     }
     else
     {
-        out << "void";
+        out << " void ";
     }
 
     return out;
@@ -321,9 +321,9 @@ std::ostream& operator<<(std::ostream& out, const post_op_attr& obj)
 
 std::ostream& operator<<(std::ostream& out, const wcc_attr& obj)
 {
-    out << "size:" << obj.get_size() << std::endl;
-    out << "mtime:" << obj.get_mtime() << std::endl;
-    out << "ctime:" << obj.get_ctime() << std::endl;
+    out << " size: " << obj.get_size();
+    out << " mtime: " << obj.get_mtime();
+    out << " ctime: " << obj.get_ctime();
 
     return out;
 }
@@ -332,11 +332,11 @@ std::ostream& operator<<(std::ostream& out, const pre_op_attr& obj)
 {
     if(obj.is_attributes())
     {
-        out << "attributes: " << obj.get_attributes();
+        out << " attributes: " << obj.get_attributes();
     }
     else
     {
-        out << "void";
+        out << " void ";
     }
 
     return out;
@@ -344,8 +344,8 @@ std::ostream& operator<<(std::ostream& out, const pre_op_attr& obj)
 
 std::ostream& operator<<(std::ostream& out, const wcc_data& obj)
 {
-    out << "before:" << obj.get_before() << std::endl;
-    out << "after:"  << obj.get_after()  << std::endl;
+    out << " before: " << obj.get_before();
+    out << " after: "  << obj.get_after() ;
     return out;
 }
 
@@ -353,11 +353,11 @@ std::ostream& operator<<(std::ostream& out, const post_op_fh3& obj)
 {
     if(obj.is_handle())
     {
-        out << "handle:" << obj.get_handle();
+        out << " handle: " << obj.get_handle();
     }
     else
     {
-        out << "void";
+        out << " void ";
     }
     return out;
 }
@@ -366,40 +366,40 @@ std::ostream& operator<<(std::ostream& out, const sattr3& obj)
 {
     if(obj.is_mode())
     {
-        out << "mode:" << obj.get_mode() << std::endl;
+        out << " mode: " << obj.get_mode();
     }
 
     if(obj.is_uid())
     {
-        out << "uid:" << obj.get_uid() << std::endl;
+        out << " uid: " << obj.get_uid();
     }
 
     if(obj.is_gid())
     {
-        out << "gid:" << obj.get_gid() << std::endl;
+        out << " gid: " << obj.get_gid();
     }
 
     if(obj.is_size())
     {
-        out << "size:" << obj.get_size() << std::endl;
+        out << " size: " << obj.get_size();
     }
 
     if(obj.is_atime())
     {
-        out << "atime:" << obj.get_atime() << std::endl;
+        out << " atime: " << obj.get_atime();
     }
 
     if(obj.is_mtime())
     {
-        out << "mtime:" << obj.get_mtime() << std::endl;
+        out << " mtime: " << obj.get_mtime();
     }
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const diropargs3& obj)
 {
-    out << "dir:"  << obj.get_dir()  << std::endl;
-    out << "name:" << obj.get_name().get_string() << std::endl;
+    out << " dir: "  << obj.get_dir() ;
+    out << " name: " << obj.get_name().get_string();
     return out;
 }
 
@@ -407,34 +407,11 @@ std::ostream& operator<<(std::ostream& out, const sattrguard3& obj)
 {
     if(obj.is_obj_ctime())
     {
-        out << "obj_ctime:" << obj.get_obj_ctime();
+        out << " obj_ctime: " << obj.get_obj_ctime();
     }
     else
     {
-        out << "void";
-    }
-    return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const SETATTR3args& obj)
-{
-    out << "object: " << obj.get_object();
-    out << "new_attributes: " << obj.get_new_attributes();
-    out << "guard: " << obj.get_guard();
-
-    return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const WRITE3args& obj)
-{
-    out << "file: " << obj.get_file();
-    out << " offset: " << obj.get_offset();
-    out << " count: " << obj.get_count();
-    switch(obj.get_stable())
-    {
-        case WRITE3args::UNSTABLE:  out << " stable: UNSTABLE";  break;
-        case WRITE3args::DATA_SYNC: out << " stable: DATA_SYNC"; break;
-        case WRITE3args::FYLE_SYNC: out << " stable: FYLE_SYNC"; break;
+        out << " void ";
     }
     return out;
 }
@@ -445,17 +422,17 @@ std::ostream& operator<<(std::ostream& out, const createhow3& obj)
     {
         case createhow3::UNCHECKED:
         {
-            out << "mode: UNCHECKED obj_attributes: " << obj.get_obj_attributes();
+            out << " mode: UNCHECKED obj_attributes: " << obj.get_obj_attributes();
         }
         break;
         case createhow3::GUARDED:
         {
-            out << "mode: GUARDED obj_attributes: " << obj.get_obj_attributes();
+            out << " mode: GUARDED obj_attributes: " << obj.get_obj_attributes();
         }
         break;
         case createhow3::EXCLUSIVE:
         {
-            out << "mode: EXCLUSIVE verf: " << obj.get_verf();
+            out << " mode: EXCLUSIVE verf: " << obj.get_verf();
         }
         break;
     }
@@ -463,70 +440,42 @@ std::ostream& operator<<(std::ostream& out, const createhow3& obj)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const CREATE3args& obj)
-{
-    out << "where: " << obj.get_where();
-    out << " howcreate: " << obj.get_how();
-    return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const MKDIR3args& obj)
-{
-    out << "where: " << obj.get_where();
-    out << " attributes: " << obj.get_attributes();
-    return out;
-}
-
 std::ostream& operator<<(std::ostream& out, const symlinkdata3& obj)
 {
-    out << "symlink_attributes: " << obj.get_symlink_attributes();
+    out << " symlink_attributes: " << obj.get_symlink_attributes();
     out << " symlink_data: " << obj.get_symlink_data();
-    return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const SYMLINK3args& obj)
-{
-    out << "where: " << obj.get_where();
-    out << " symlink: " << obj.get_symlink();
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const devicedata3& obj)
 {
-    out << "dev_attributes: " << obj.get_dev_attributes();
-    out << "spec: " << obj.get_spec();
+    out << " dev_attributes: " << obj.get_dev_attributes();
+    out << " spec: " << obj.get_spec();
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const mknoddata3& obj)
 {
-    out << "type: " << obj.get_type();
+    out << " type: " << obj.get_type();
     
     switch(obj.get_type())
     {
         case ftype3::CHR:
         case ftype3::BLK:
             {
-                out << "device: " << obj.get_device();
+                out << " device: " << obj.get_device();
             }
             break;
         case ftype3::SOCK:
         case ftype3::FIFO:
             {
-                out << "pipe_attributes:" << obj.get_pipe_attributes();
+                out << " pipe_attributes: " << obj.get_pipe_attributes();
             }
             break;
         default:
-            out << "void";
+            out << " void ";
             break;
     }
-    return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const MKNOD3args& obj)
-{
-    out << "where: " << obj.get_where();
-    out << " what: " << obj.get_what();
     return out;
 }
 

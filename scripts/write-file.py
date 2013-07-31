@@ -26,6 +26,7 @@ def main (argv):
             system(cd_op + "&& rm -rf hello", shell=True)
             system(cd_op + "&& ls", shell=True)
             system(cd_op + "&& mkdir hello", shell=True)
+            system(cd_op + "&& chmod 777 hello", shell=True)
             cd_op += "/hello &&"
             system(cd_op + "dd if=/dev/zero of=temp.file bs=1M count=" + argv[2], shell=True)
             system(cd_op + "cd .. && rm -rf hello", shell=True)
