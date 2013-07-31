@@ -61,24 +61,46 @@ std::ostream& operator += (std::ostream& out, const nfs_fh3& fh)
 
 bool PrintAnalyzer::call_null(const RPCOperation& operation)
 {
-//    const NFSPROC3_NULL& op = static_cast<const NFSPROC3_NULL&>(operation);
-/*    const NFSPROC3_NULL& data = static_cast<const NFSPROC3_NULL&>(operation);
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] << ". XID: " << data.get_xid() << std::endl;*/
+    const NFSPROC3_NULL& op = static_cast<const NFSPROC3_NULL&>(operation);
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_getattr(const RPCOperation& operation)
 {
-/*    const GetAttrArgs& data = static_cast<const GetAttrArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] << ". XID: " << data.get_xid() << " File: ";
-    print_fh(out, data.get_file().get_data());
-    out << std::endl;*/
+    const NFSPROC3_GETATTR& op = static_cast<const NFSPROC3_GETATTR&>(operation);
+    const NFSPROC3_GETATTR::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " file: " += arg.get_file();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_setattr(const RPCOperation& operation)
 {
-//    out << operation << std::endl;
+    const NFSPROC3_SETATTR& op = static_cast<const NFSPROC3_SETATTR&>(operation);
+    const NFSPROC3_SETATTR::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " object: " += arg.get_object();
+    out << " new_attributes: " << arg.get_new_attributes();
+    out << " guard: " << arg.get_guard();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
@@ -93,7 +115,6 @@ bool PrintAnalyzer::call_lookup(const RPCOperation& operation)
     out << " dir: "  += arg.get_what().get_dir();
     out << " name: " << arg.get_what().get_name().get_string();
     out << "] REPLY [";
-
     out << " status: " << res.status;
 /*    if(res.status == nfsstat3::OK)
     {
@@ -113,148 +134,297 @@ bool PrintAnalyzer::call_lookup(const RPCOperation& operation)
 
 bool PrintAnalyzer::call_access(const RPCOperation& operation)
 {
-/*    const AccessArgs& data = static_cast<const AccessArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Object: ";
-    print_fh(out, data.get_object().get_data());
-    out << " Access: " << data.get_access() << std::endl;*/
+    const NFSPROC3_ACCESS& op = static_cast<const NFSPROC3_ACCESS&>(operation);
+    const NFSPROC3_ACCESS::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " object: "  += arg.get_object();
+    out << " access: " << arg.get_access();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_readlink(const RPCOperation& operation)
 {
-/*    const ReadLinkArgs& data = static_cast<const ReadLinkArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Symlink: ";
-    print_fh(out, data.get_symlink().get_data()) << std::endl;*/
+    const NFSPROC3_READLINK& op = static_cast<const NFSPROC3_READLINK&>(operation);
+    const NFSPROC3_READLINK::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " symlink: "  += arg.get_symlink();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_read(const RPCOperation& operation)
 {
-/*    const ReadArgs& data = static_cast<const ReadArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Offset: " << data.get_offset() << " Count: " << data.get_count() << std::endl;*/
+    const NFSPROC3_READ& op = static_cast<const NFSPROC3_READ&>(operation);
+    const NFSPROC3_READ::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " file: "  += arg.get_file();
+    out << " offset: "  << arg.get_offset();
+    out << " count: " << arg.get_count();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_write(const RPCOperation& operation)
 {
-//    out << operation << std::endl;
+    const NFSPROC3_WRITE& op = static_cast<const NFSPROC3_WRITE&>(operation);
+    const NFSPROC3_WRITE::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " file: " += arg.get_file();
+    out << " offset: " << arg.get_offset();
+    out << " count: " << arg.get_count();
+    switch(arg.get_stable())
+    {
+        case WRITE3args::UNSTABLE:  out << " stable: UNSTABLE";  break;
+        case WRITE3args::DATA_SYNC: out << " stable: DATA_SYNC"; break;
+        case WRITE3args::FYLE_SYNC: out << " stable: FYLE_SYNC"; break;
+    }
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_create(const RPCOperation& operation)
 {
-//    out << operation << std::endl;
+    const NFSPROC3_CREATE& op = static_cast<const NFSPROC3_CREATE&>(operation);
+    const NFSPROC3_CREATE::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " where: " << arg.get_where();
+    out << " how: " << arg.get_how();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_mkdir(const RPCOperation& operation)
 {
-//    out << operation << std::endl;
+    const NFSPROC3_MKDIR& op = static_cast<const NFSPROC3_MKDIR&>(operation);
+    const NFSPROC3_MKDIR::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " where: " << arg.get_where();
+    out << " attributes: " << arg.get_attributes();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_symlink(const RPCOperation& operation)
 {
-//    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[Proc::SYMLINK] <<"." << std::endl;
+    const NFSPROC3_SYMLINK& op = static_cast<const NFSPROC3_SYMLINK&>(operation);
+    const NFSPROC3_SYMLINK::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " where: " << arg.get_where();
+    out << " symlinkdata: " << arg.get_symlink();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_mknod(const RPCOperation& operation)
 {
-//    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[Proc::MKNOD] <<"." << std::endl;
+    const NFSPROC3_MKNOD& op = static_cast<const NFSPROC3_MKNOD&>(operation);
+    const NFSPROC3_MKNOD::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " where: " << arg.get_where();
+    out << " what: " << arg.get_what();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_remove(const RPCOperation& operation)
 {
-/*    const RemoveArgs& data = static_cast<const RemoveArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
-    print_fh(out, data.get_object().get_dir().get_data());
-    out << " Name: " << data.get_object().get_name().get_string() << std::endl;*/
+    const NFSPROC3_REMOVE& op = static_cast<const NFSPROC3_REMOVE&>(operation);
+    const NFSPROC3_REMOVE::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " object: " << arg.get_object();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_rmdir(const RPCOperation& operation)
 {
-/*    const RmDirArgs& data = static_cast<const RmDirArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
-    print_fh(out, data.get_object().get_dir().get_data());
-    out << " Name: " << data.get_object().get_name().get_string() << std::endl;*/
+    const NFSPROC3_RMDIR& op = static_cast<const NFSPROC3_RMDIR&>(operation);
+    const NFSPROC3_RMDIR::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " object: " << arg.get_object();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_rename(const RPCOperation& operation)
 {
-/*    const RenameArgs& data = static_cast<const RenameArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid();
-    out << " from dir: "; print_fh(out, data.get_from().get_dir().get_data());
-    out << " name: " << data.get_from().get_name().get_string();
-    out << " to dir: "; print_fh(out, data.get_to().get_dir().get_data());
-    out << " name: " << data.get_to().get_name().get_string();
-    out << std::endl;*/
+    const NFSPROC3_RENAME& op = static_cast<const NFSPROC3_RENAME&>(operation);
+    const NFSPROC3_RENAME::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " from: " << arg.get_from();
+    out << " to: " << arg.get_to();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_link(const RPCOperation& operation)
 {
-/*    const LinkArgs& data = static_cast<const LinkArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid();
-    out << " File: "; print_fh(out, data.get_file().get_data());
-    out << " Dir: "; print_fh(out, data.get_link().get_dir().get_data());
-    out << " Name: " << data.get_link().get_name().get_string() << std::endl;*/
+    const NFSPROC3_LINK& op = static_cast<const NFSPROC3_LINK&>(operation);
+    const NFSPROC3_LINK::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " file: " += arg.get_file();
+    out << " link: " << arg.get_link();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_readdir(const RPCOperation& operation)
 {
-/*    const ReadDirArgs& data = static_cast<const ReadDirArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
-    print_fh(out, data.get_dir().get_data());
-    out << " Cookie: " << data.get_cookie() << " CookieVerf: " << data.get_cookieverf() << " Count: " << data.get_count() << std::endl;*/
+    const NFSPROC3_READDIR& op = static_cast<const NFSPROC3_READDIR&>(operation);
+    const NFSPROC3_READDIR::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " dir: " += arg.get_dir();
+    out << " cookie: " << arg.get_cookie();
+    out << " cookieverf: " << arg.get_cookieverf();
+    out << " count: " << arg.get_count();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_readdirplus(const RPCOperation& operation)
 {
-/*    const ReadDirPlusArgs& data = static_cast<const ReadDirPlusArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " Dir: ";
-    print_fh(out, data.get_dir().get_data());
-    out << " Cookie: " << data.get_cookie() << " CookieVerf: " << data.get_cookieverf() << " Dir Count: " << data.get_dircount() << " Max Count: " << data.get_maxcount() << std::endl;*/
+    const NFSPROC3_READDIRPLUS& op = static_cast<const NFSPROC3_READDIRPLUS&>(operation);
+    const NFSPROC3_READDIRPLUS::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " dir: " += arg.get_dir();
+    out << " cookie: " << arg.get_cookie();
+    out << " cookieverf: " << arg.get_cookieverf();
+    out << " dircount: " << arg.get_dircount();
+    out << " maxcount: " << arg.get_maxcount();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_fsstat(const RPCOperation& operation)
 {
-/*    const FSStatArgs& data = static_cast<const FSStatArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " FS Root:";
-    print_fh(out, data.get_fsroot().get_data()) << std::endl;*/
+    const NFSPROC3_FSSTAT& op = static_cast<const NFSPROC3_FSSTAT&>(operation);
+    const NFSPROC3_FSSTAT::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " fsroot: " += arg.get_fsroot();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_fsinfo(const RPCOperation& operation)
 {
-/*    const FSInfoArgs& data = static_cast<const FSInfoArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid() << " FS Root:";
-    print_fh(out, data.get_fsroot().get_data()) << std::endl;*/
+    const NFSPROC3_FSINFO& op = static_cast<const NFSPROC3_FSINFO&>(operation);
+    const NFSPROC3_FSINFO::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " fsroot: " += arg.get_fsroot();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_pathconf(const RPCOperation& operation)
 {
-/*    const PathConfArgs& data = static_cast<const PathConfArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID : " << data.get_xid() << " Object: ";
-    print_fh(out, data.get_object().get_data()) << std::endl;*/
+    const NFSPROC3_PATHCONF& op = static_cast<const NFSPROC3_PATHCONF&>(operation);
+    const NFSPROC3_PATHCONF::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " object: " += arg.get_object();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
 bool PrintAnalyzer::call_commit(const RPCOperation& operation)
 {
-/*    const CommitArgs& data = static_cast<const CommitArgs&>(*operation.get_call());
-    out << get_session(*operation.get_session()) << " -- Call " << Proc::titles[data.get_proc()] <<". XID: " << data.get_xid();
-    out << " File: ";
-    print_fh(out, data.get_file().get_data());
-    out << " Offset: " << data.get_offset();
-    out << " Count: " << data.get_count()  << std::endl;*/
+    const NFSPROC3_COMMIT& op = static_cast<const NFSPROC3_COMMIT&>(operation);
+    const NFSPROC3_COMMIT::Arg& arg = op.get_arg();
+
+    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << " CALL [";
+    out << " file: " += arg.get_file();
+    out << " offset: " << arg.get_offset();
+    out << " count: " << arg.get_count();
+    out << "] REPLY [";
+    out << " ]";
+    out << std::endl;
+
     return true;
 }
 
