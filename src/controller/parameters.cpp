@@ -31,6 +31,10 @@ bool Parameters::cmdline_args(int argc, char** argv)
     parser.validate();
 
     // cashed values
+    const std::string program_path(argv[0]);
+    size_t found = program_path.find_last_of("/\\");
+    program = program_path.substr(found+1);
+
     const int limit = parser[CLI::MSIZE].to_int();
     if(limit < 1 || limit > 4000)
     {
@@ -41,6 +45,11 @@ bool Parameters::cmdline_args(int argc, char** argv)
     verbose = parser[CLI::VERBOSE].to_bool();
 
     return true;
+}
+
+const std::string& Parameters::program_name() const
+{
+    return program;
 }
 
 const RunningMode Parameters::running_mode() const
