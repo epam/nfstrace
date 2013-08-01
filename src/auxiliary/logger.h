@@ -25,7 +25,8 @@
 #ifdef DEBUG
 #define STRINGIZE(x) DO_STRINGIZE(x)
 #define DO_STRINGIZE(x) #x
-// TODO: DANGEROUS MACRO !!! Passing custom client string as format to printf() may SIGSEGV
+// TODO: DANGEROUS MACRO !!! Passing custom client string as format to printf().
+// May SIGSEGV
 #define TRACE(...) {\
     NST::auxiliary::Logger& log = NST::auxiliary::Logger::get_global();\
     log.print("\n" __FILE__ ":" STRINGIZE(__LINE__) ": " __VA_ARGS__);\
