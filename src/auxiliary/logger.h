@@ -8,54 +8,46 @@
 //------------------------------------------------------------------------------
 #include <cstdarg>
 #include <cstdio>
-#include <fstream>
 #include <sstream>
 
 #include <sys/file.h>
 
 #include "exception.h"
-#include "spinlock.h"
 //------------------------------------------------------------------------------
+/*  http://www.unix.org/whitepapers/reentrant.html
+    The POSIX.1 and C-language functions that operate on character streams 
+    (represented by pointers to objects of type FILE) are required by POSIX.1c 
+    to be implemented in such a way that reentrancy is achieved 
+    (see ISO/IEC 9945:1-1996, §8.2). This requirement has a drawback; it imposes
+    substantial performance penalties because of the synchronization that must
+    be built into the implementations of the functions for the sake of reentrancy.
+*/
 #ifdef DEBUG
-#define TRACE(format, ...) {\
+#define STRINGIZE(x) DO_STRINGIZE(x)
+#define DO_STRINGIZE(x) #x
+#define TRACE(...) {\
     NST::auxiliary::Logger& log = NST::auxiliary::Logger::get_global();\
-    NST::auxiliary::Spinlock::Lock lock(log.get_spinlock());\
-    log.print("%s %d: "format, __FILE__, __LINE__, __VA_ARGS__);\
+    log.print("\n" __FILE__ ":" STRINGIZE(__LINE__) ": " __VA_ARGS__);\
     log.flush();\
 }
 #else
 #define TRACE(format, ...)
 #endif
 
-/*
- * Non-blocking logging.
- * Should be used inside LOCK_LOG and UNLOCK_LOG section.
- */
-#define NBLK_LOG(format, ...) {\
+#define LOG(...) {\
     NST::auxiliary::Logger& log = NST::auxiliary::Logger::get_global();\
-    log.print(format, __VA_ARGS__);\
+    log.print("\n" __VA_ARGS__);\
 }
-// Allow lock GLOBAL logger
-#define LOCK_LOG {\
-    NST::auxiliary::Logger& log = NST::auxiliary::Logger::get_global();\
-    NST::auxiliary::Spinlock::Lock lock(log.get_spinlock());
-// Unlock locked logger
-#define UNLOCK_LOG }
-// Atomic write data in the global log
-#define LOG(format, ...)\
-    LOCK_LOG\
-    NBLK_LOG(format, __VA_ARGS__)\
-    UNLOCK_LOG
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace auxiliary
 {
 
-class Logger 
+class Logger
 {
 public:
-    Logger() : owner(false), file(NULL) 
+    Logger(FILE* out=NULL) : owner(false), file(out)
     {
     }
     ~Logger()
@@ -70,14 +62,13 @@ public:
     class Buffer : public std::ostream
     {
     public:
-        Buffer(Logger& logger = Logger::get_global()) : std::ostream(NULL), log(logger), buf(ios_base::out)
+        inline Buffer(Logger& logger = Logger::get_global()) : std::ostream(NULL), log(logger), buf(ios_base::out)
         {
-            init(&buf);
+            std::ostream::init(&buf);
         }
-        ~Buffer()
+        inline ~Buffer()
         {
-            Spinlock::Lock lock(log.get_spinlock());
-            log.print("%s", buf.str().c_str());
+            log.print("\n%s", buf.str().c_str());
         }
 
     private:
@@ -129,10 +120,6 @@ public:
     {
         fflush(file);
     }
-    Spinlock& get_spinlock()
-    {
-        return spinlock;
-    }
 
 private:
     Logger(const Logger&);
@@ -141,7 +128,6 @@ private:
     static Logger* global_logger;
     bool     owner; // Is logger file owner?
     FILE*    file;
-    Spinlock spinlock;
 };
 
 } // auxiliary

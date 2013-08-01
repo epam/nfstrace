@@ -17,9 +17,9 @@ namespace NST
 namespace controller
 {
 
-Controller::Controller(const Parameters& params) : sig_handler(status), filtration(status), analysis(status)
+Controller::Controller(const Parameters& params) : logger(::stderr), sig_handler(status), filtration(status), analysis(status)
 {
-    logger.set_output_file("nfstrace.log");
+    logger.set_output_file(params.program_name() + ".log");
     NST::auxiliary::Logger::set_global(&logger);
 
     const RunningMode mode = params.running_mode();
@@ -75,7 +75,10 @@ int Controller::run()
     {
         filtration.stop();
         analysis.stop();
-        status.print(std::cerr);
+        {
+            Logger::Buffer buffer;
+            status.print(buffer);
+        }
         sig_handler.stop();
         throw;
     }

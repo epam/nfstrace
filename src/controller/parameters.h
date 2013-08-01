@@ -34,6 +34,7 @@ public:
     bool cmdline_args(int argc, char** argv);
 
     // access helpers
+    const std::string&      program_name() const;
     const RunningMode       running_mode() const;
     const bool              is_verbose() const;
     const std::string       interface() const;
@@ -60,6 +61,7 @@ private:
     // cashed values
     unsigned short rpc_message_limit;
     bool verbose;
+    std::string program;  // name of program in command line
 };
 
 } // namespace controller

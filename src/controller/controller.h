@@ -34,7 +34,7 @@ public:
 
 private:
     // global used logger
-    Logger logger; 
+    Logger logger;
 
     // container for generated exceptions
     RunningStatus status;
