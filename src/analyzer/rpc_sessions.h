@@ -156,7 +156,7 @@ public:
         Transmission key(session, (type == DIRECT) ? Session::Source : Session::Destination);
 
         Iterator el = sessions.find(key);
-        if(el == sessions.end() && type == DIRECT) // add new session only for Call (type == DIRECT)
+        if(el == sessions.end()) // TODO: add new session only for Call (type == DIRECT)
         {
             std::auto_ptr<RPCSession> s(new RPCSession(session));
             std::pair<Iterator, bool> in_res = sessions.insert(Pair(key, s.release()));
