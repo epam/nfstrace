@@ -86,28 +86,28 @@ private:
     Res res;
 };
 
-typedef NFSOperation <NULLargs,         NULLres>    NFSPROC3_NULL;
-typedef NFSOperation <GETATTR3args,     NULLres>    NFSPROC3_GETATTR;
-typedef NFSOperation <SETATTR3args,     NULLres>    NFSPROC3_SETATTR;
-typedef NFSOperation <LOOKUP3args,      LOOKUP3res>    NFSPROC3_LOOKUP;
-typedef NFSOperation <ACCESS3args,      NULLres>    NFSPROC3_ACCESS;
-typedef NFSOperation <READLINK3args,    NULLres>    NFSPROC3_READLINK;
-typedef NFSOperation <READ3args,        NULLres>    NFSPROC3_READ;
-typedef NFSOperation <WRITE3args,       NULLres>    NFSPROC3_WRITE;
-typedef NFSOperation <CREATE3args,      NULLres>    NFSPROC3_CREATE;
-typedef NFSOperation <MKDIR3args,       NULLres>    NFSPROC3_MKDIR;
-typedef NFSOperation <SYMLINK3args,     NULLres>    NFSPROC3_SYMLINK;
-typedef NFSOperation <MKNOD3args,       NULLres>    NFSPROC3_MKNOD;
-typedef NFSOperation <REMOVE3args,      NULLres>    NFSPROC3_REMOVE;
-typedef NFSOperation <RMDIR3args,       NULLres>    NFSPROC3_RMDIR;
-typedef NFSOperation <RENAME3args,      NULLres>    NFSPROC3_RENAME;
-typedef NFSOperation <LINK3args,        NULLres>    NFSPROC3_LINK;
-typedef NFSOperation <READDIR3args,     NULLres>    NFSPROC3_READDIR;
-typedef NFSOperation <READDIRPLUS3args, NULLres>    NFSPROC3_READDIRPLUS;
-typedef NFSOperation <FSSTAT3args,      NULLres>    NFSPROC3_FSSTAT;
-typedef NFSOperation <FSINFO3args,      NULLres>    NFSPROC3_FSINFO;
-typedef NFSOperation <PATHCONF3args,    NULLres>    NFSPROC3_PATHCONF;
-typedef NFSOperation <COMMIT3args,      NULLres>    NFSPROC3_COMMIT;
+typedef NFSOperation <NULLargs,         NULLres>            NFSPROC3_NULL;
+typedef NFSOperation <GETATTR3args,     GETATTR3res>        NFSPROC3_GETATTR;
+typedef NFSOperation <SETATTR3args,     SETATTR3res>        NFSPROC3_SETATTR;
+typedef NFSOperation <LOOKUP3args,      LOOKUP3res>         NFSPROC3_LOOKUP;
+typedef NFSOperation <ACCESS3args,      ACCESS3res>         NFSPROC3_ACCESS;
+typedef NFSOperation <READLINK3args,    READLINK3res>       NFSPROC3_READLINK;
+typedef NFSOperation <READ3args,        READ3res>           NFSPROC3_READ;
+typedef NFSOperation <WRITE3args,       WRITE3res>          NFSPROC3_WRITE;
+typedef NFSOperation <CREATE3args,      CREATE3res>         NFSPROC3_CREATE;
+typedef NFSOperation <MKDIR3args,       MKDIR3res>          NFSPROC3_MKDIR;
+typedef NFSOperation <SYMLINK3args,     SYMLINK3res>        NFSPROC3_SYMLINK;
+typedef NFSOperation <MKNOD3args,       MKNOD3res>          NFSPROC3_MKNOD;
+typedef NFSOperation <REMOVE3args,      REMOVE3res>         NFSPROC3_REMOVE;
+typedef NFSOperation <RMDIR3args,       RMDIR3res>          NFSPROC3_RMDIR;
+typedef NFSOperation <RENAME3args,      RENAME3res>         NFSPROC3_RENAME;
+typedef NFSOperation <LINK3args,        LINK3res>           NFSPROC3_LINK;
+typedef NFSOperation <READDIR3args,     READDIR3res>        NFSPROC3_READDIR;
+typedef NFSOperation <READDIRPLUS3args, READDIRPLUS3res>    NFSPROC3_READDIRPLUS;
+typedef NFSOperation <FSSTAT3args,      FSSTAT3res>         NFSPROC3_FSSTAT;
+typedef NFSOperation <FSINFO3args,      FSINFO3res>         NFSPROC3_FSINFO;
+typedef NFSOperation <PATHCONF3args,    PATHCONF3res>       NFSPROC3_PATHCONF;
+typedef NFSOperation <COMMIT3args,      COMMIT3res>         NFSPROC3_COMMIT;
 
 } // namespace NFS3
 } // namespace filter

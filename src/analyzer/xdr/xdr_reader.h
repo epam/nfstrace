@@ -38,15 +38,21 @@ public:
 class XDRReader
 {
 public:
-    XDRReader(const uint8_t* ptr, size_t len) : it(ptr), last(ptr + len)
+    XDRReader(const uint8_t* ptr, size_t len) : beg(ptr), it(ptr), last(ptr + len)
     {
     }
 
     inline const size_t   size() const { return last-it; }
     inline const uint8_t* data() const { return it;      }
+
+    inline uint32_t get_offset() const
+    {
+        return it - beg;
+    }
     
     inline void reset(const uint8_t* ptr, size_t len)
     {
+        beg = ptr;
         it = ptr;
         last = ptr+len;
     }
@@ -90,7 +96,7 @@ public:
         it += calc_offset(len);
     }
 
-    void read_varialble_len(Opaque& obj)
+    void read_variable_len(Opaque& obj)
     {
         uint32_t len = 0;
         operator>>(len);
@@ -117,6 +123,7 @@ protected:
     }
 
 
+    const uint8_t* beg;
     const uint8_t* it;
     const uint8_t* last;
 };

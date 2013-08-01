@@ -32,7 +32,7 @@ XDRReader& operator>>(XDRReader& in, specdata3& obj)
 
 XDRReader& operator>>(XDRReader& in, nfs_fh3& obj)
 {
-    in.read_varialble_len(obj.data); // opaque data size should be less than NFS3_FHSIZE
+    in.read_variable_len(obj.data); // opaque data size should be less than NFS3_FHSIZE
     assert(obj.data.size() < NFS3_FHSIZE);
     return in;
 }
@@ -129,7 +129,7 @@ XDRReader& operator>>(XDRReader& in, sattr3& obj)
 XDRReader& operator>>(XDRReader& in, diropargs3& obj)
 {
     in >> obj.dir;
-    in.read_varialble_len(obj.name);
+    in.read_variable_len(obj.name);
     return in;
 }
 
@@ -167,7 +167,7 @@ XDRReader& operator>>(XDRReader& in, createhow3& obj)
 XDRReader& operator>>(XDRReader& in, symlinkdata3& obj)
 {
     in >> obj.symlink_attributes;
-    in.read_varialble_len(obj.symlink_data);
+    in.read_variable_len(obj.symlink_data);
     return in;
 }
 

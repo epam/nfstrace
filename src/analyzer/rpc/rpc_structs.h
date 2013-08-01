@@ -26,7 +26,7 @@ struct OpaqueAuth
     inline friend XDRReader& operator>>(XDRReader& in, OpaqueAuth& o)
     {
         in >> o.flavor;
-        in.read_varialble_len(o.body);
+        in.read_variable_len(o.body);
         return in;
     }
 
@@ -100,7 +100,7 @@ struct AcceptedReply
         switch(obj.stat)
         {
             case SUNRPC_SUCCESS:
-                in.read_varialble_len(obj.proc_spec_data);
+                // Data will be parsed in the specific reader.
                 break;
             case SUNRPC_PROG_MISMATCH:
                 in >> obj.mismatch_info;
@@ -114,10 +114,8 @@ struct AcceptedReply
         return in;
     }
 
-private:
     OpaqueAuth      verf;
     uint32_t        stat;
-    Opaque          proc_spec_data;      // TODO: COPY TO THE LOCAL ARRAY
     MismatchInfo    mismatch_info;
 };
 

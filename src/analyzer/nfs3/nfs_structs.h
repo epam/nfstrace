@@ -7,6 +7,7 @@
 #define NFS_STRUCTS_H
 //------------------------------------------------------------------------------
 #include "../xdr/xdr_reader.h"
+#include "../../auxiliary/logger.h"
 //------------------------------------------------------------------------------
 using namespace NST::analyzer::XDR;
 //------------------------------------------------------------------------------
@@ -36,7 +37,7 @@ typedef Opaque      writeverf3;
 
 typedef uint32_t    uid3;
 typedef uint32_t    gid3;
-typedef uint32_t    size3;
+typedef uint64_t    size3;
 typedef uint64_t    offset3;
 typedef uint32_t    mode3;
 typedef uint32_t    count3;
@@ -98,7 +99,6 @@ struct nfsstat3
     inline const bool operator==(const Enum_nfsstat3 e) const { return get_stat() == e; }
     inline Enum_nfsstat3 get_stat() const { return Enum_nfsstat3(stat); }
 
-private:
     uint32_t stat;
 };
 
@@ -119,7 +119,6 @@ struct ftype3
 
     inline Enum_ftype3 get_ftype() const { return Enum_ftype3(ftype); }
 
-private:
     uint32_t ftype;
 };
 
@@ -130,7 +129,6 @@ struct specdata3
     inline uint32_t get_specdata1() const { return specdata1; }
     inline uint32_t get_specdata2() const { return specdata2; }
 
-private:
     uint32_t specdata1;
     uint32_t specdata2;
 };
@@ -141,7 +139,6 @@ struct nfs_fh3
 
     inline const Opaque& get_data() const{ return data; }
 
-private:
     XDR::Opaque data;
 };
 
@@ -152,7 +149,6 @@ struct nfstime3
     inline uint32_t  get_seconds() const { return seconds;  }
     inline uint32_t get_nseconds() const { return nseconds; }
 
-private:
     uint32_t seconds;
     uint32_t nseconds;
 };
@@ -175,7 +171,6 @@ struct fattr3
     inline const nfstime3&   get_mtime() const { return mtime;  }
     inline const nfstime3&   get_ctime() const { return ctime;  }
 
-private:
     ftype3      type;
     mode3       mode;
     uint32_t    nlink;
@@ -198,7 +193,6 @@ struct post_op_attr
     inline const uint32_t is_attributes() const { return attributes_follow; }
     inline const fattr3& get_attributes() const { return attributes;        }
 
-private:
     uint32_t attributes_follow;
     fattr3   attributes;
 };
@@ -211,7 +205,6 @@ struct wcc_attr
     inline const nfstime3& get_mtime() const { return mtime; }
     inline const nfstime3& get_ctime() const { return ctime; }
 
-private:
     size3    size;
     nfstime3 mtime;
     nfstime3 ctime;
@@ -224,7 +217,6 @@ struct pre_op_attr
     inline const uint32_t   is_attributes() const { return attributes_follow; }
     inline const wcc_attr& get_attributes() const { return attributes;        }
 
-private:
     uint32_t attributes_follow;
     wcc_attr attributes;
 };
@@ -236,7 +228,6 @@ struct wcc_data
     inline const pre_op_attr& get_before() const { return before; }
     inline const post_op_attr& get_after() const { return after;  }
 
-private:
     pre_op_attr  before;
     post_op_attr after;
 };
@@ -248,7 +239,6 @@ struct post_op_fh3
     inline const uint32_t  is_handle() const { return handle_follows; }
     inline const nfs_fh3& get_handle() const { return handle;         }
 
-private:
     uint32_t    handle_follows;
     nfs_fh3     handle;
 };
@@ -282,7 +272,6 @@ struct sattr3
     inline const time_how   is_mtime() const { return time_how(set_it_mtime); }
     inline const nfstime3& get_mtime() const { return mtime;                  }
 
-private:
     bool b_mode;
     bool b_uid;
     bool b_gid;
@@ -304,7 +293,6 @@ struct diropargs3
     inline const nfs_fh3&   get_dir () const { return dir;  }
     inline const filename3& get_name() const { return name; }
 
-private:
     nfs_fh3   dir;
     filename3 name;
 };
@@ -338,8 +326,28 @@ struct GETATTR3args
 
     inline const nfs_fh3& get_file() const { return file; }
 
-private:
     nfs_fh3 file;
+};
+
+struct GETATTR3res
+{
+    friend XDRReader& operator>>(XDRReader& in, GETATTR3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.obj_attributes;
+        }
+        return in;
+    }
+
+    struct GETATTR3resok
+    {
+        fattr3 obj_attributes;
+    };
+
+    nfsstat3 status;
+    GETATTR3resok resok;
 };
 
 // Procedure 2: SETATTR - Set file attributes
@@ -351,7 +359,6 @@ struct sattrguard3
     inline const bool       is_obj_ctime() const { return check;     }
     inline const nfstime3& get_obj_ctime() const { return obj_ctime; }
 
-private:
     bool     check;
     nfstime3 obj_ctime;
 };
@@ -367,10 +374,43 @@ struct SETATTR3args
     inline const sattr3&  get_new_attributes() const { return new_attributes; }
     inline const sattrguard3&      get_guard() const { return guard;          }
 
-private:
     nfs_fh3     object;
     sattr3      new_attributes;
     sattrguard3 guard;
+};
+
+struct SETATTR3res
+{
+    friend XDRReader& operator>>(XDRReader& in, SETATTR3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.obj_wcc;
+        }
+        else
+        {
+            in >> o.resfail.obj_wcc;
+        }
+        return in;
+    }
+
+    struct SETATTR3resok
+    {
+        wcc_data obj_wcc;
+    };
+
+    struct SETATTR3resfail
+    {
+        wcc_data obj_wcc;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        SETATTR3resok   resok;
+        SETATTR3resfail resfail;
+    };
 };
 
 // Procedure 3: LOOKUP -  Lookup filename
@@ -384,7 +424,6 @@ struct LOOKUP3args
 
     inline const diropargs3& get_what() const { return what; }
 
-private:
     diropargs3 what;
 };
 
@@ -395,13 +434,13 @@ struct LOOKUP3res
         in >> o.status;
         if(o.status == nfsstat3::OK)
         {
-            in >> o.ok.object;
-            in >> o.ok.obj_attributes;
-            in >> o.ok.dir_attributes;
+            in >> o.resok.object;
+            in >> o.resok.obj_attributes;
+            in >> o.resok.dir_attributes;
         }
         else
         {
-            in >> o.fail.dir_attributes;
+            in >> o.resfail.dir_attributes;
         }
         return in;
     }
@@ -421,15 +460,24 @@ struct LOOKUP3res
     nfsstat3 status;
     union
     {
-        LOOKUP3resok   ok;
-        LOOKUP3resfail fail;
+        LOOKUP3resok   resok;
+        LOOKUP3resfail resfail;
     };
 };
 
 // Procedure 4: ACCESS - Check Access Permission
 // ACCESS3res NFSPROC3_ACCESS(ACCESS3args) = 4;
+
+const uint32_t ACCESS3_READ    = 0x001;
+const uint32_t ACCESS3_LOOKUP  = 0x002;
+const uint32_t ACCESS3_MODIFY  = 0x004;
+const uint32_t ACCESS3_EXTEND  = 0x008;
+const uint32_t ACCESS3_DELETE  = 0x010;
+const uint32_t ACCESS3_EXECUTE = 0x020;
+
 struct ACCESS3args
 {
+
     friend XDRReader& operator>>(XDRReader& in, ACCESS3args& o)
     {
         return in >> o.object >> o.access;
@@ -438,9 +486,43 @@ struct ACCESS3args
     inline const nfs_fh3& get_object() const { return object; }
     inline const uint32_t get_access() const { return access; }
 
-private:
     nfs_fh3  object;
     uint32_t access;
+};
+struct ACCESS3res
+{
+    friend XDRReader& operator>>(XDRReader& in, ACCESS3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.obj_attributes;
+            in >> o.resok.access;
+        }
+        else
+        {
+            in >> o.resfail.obj_attributes;
+        }
+        return in;
+    }
+
+    struct ACCESS3resok
+    {
+       post_op_attr obj_attributes;
+       uint32_t access;
+    };
+
+    struct ACCESS3resfail
+    {
+       post_op_attr obj_attributes;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        ACCESS3resok   resok;
+        ACCESS3resfail resfail;
+    };
 };
 
 // Procedure 5: READLINK - Read from symbolic link
@@ -454,8 +536,43 @@ struct READLINK3args
 
     inline const nfs_fh3& get_symlink() const { return symlink; }
 
-private:
     nfs_fh3 symlink;
+};
+
+struct READLINK3res
+{
+    friend XDRReader& operator>>(XDRReader& in, READLINK3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.symlink_attributes;
+            in.read_variable_len(o.resok.data);
+        }
+        else
+        {
+            in >> o.resfail.symlink_attributes;
+        }
+        return in;
+    }
+
+    struct READLINK3resok
+    {
+       post_op_attr symlink_attributes;
+       nfspath3 data;
+    };
+
+    struct READLINK3resfail
+    {
+       post_op_attr symlink_attributes;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        READLINK3resok   resok;
+        READLINK3resfail resfail;
+    };
 };
 
 // Procedure 6: READ - Read From file
@@ -471,12 +588,50 @@ struct READ3args
     inline const offset3  get_offset() const { return offset; }
     inline const count3    get_count() const { return count;  }
 
-private:
     nfs_fh3 file;
     offset3 offset;
     count3  count;
 };
 
+struct READ3res
+{
+    friend XDRReader& operator>>(XDRReader& in, READ3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.file_attributes;
+            in >> o.resok.count;
+            in >> o.resok.eof;
+            //in.read_variable_len(o.resok.data);
+        }
+        else
+        {
+            in >> o.resfail.file_attributes;
+        }
+        return in;
+    }
+
+    struct READ3resok
+    {
+        post_op_attr file_attributes;
+        count3 count;
+        uint32_t eof; // bool
+        Opaque data;
+    };
+
+    struct READ3resfail
+    {
+        post_op_attr file_attributes;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        READ3resok   resok;
+        READ3resfail resfail;
+    };
+};
 
 // Procedure 7: WRITE - Write to file
 // WRITE3res NFSPROC3_WRITE(WRITE3args) = 7;
@@ -499,12 +654,58 @@ struct WRITE3args
     inline const count3      get_count() const { return count; }
     inline const stable_how get_stable() const { return stable_how(stable); }
 
-private:
     nfs_fh3  file;
     offset3  offset;
     count3   count;
     uint32_t stable;
-    //Opaque   data; the payload data of this operation. REMOVED
+    Opaque   data;
+};
+
+struct WRITE3res
+{
+    enum stable_how
+    {
+        UNSTABLE    = 0,
+        DATA_SYNC   = 1,
+        FYLE_SYNC   = 2
+    };
+
+    friend XDRReader& operator>>(XDRReader& in, WRITE3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.file_wcc;
+            in >> o.resok.count;
+            in >> o.resok.committed;
+            in.read_fixed_len(o.resok.verf, NFS3_WRITEVERFSIZE);
+        }
+        else
+        {
+            in >> o.resfail.file_wcc;
+        }
+        return in;
+    }
+
+    struct WRITE3resok
+    {
+        wcc_data file_wcc;
+        count3 count;
+        uint32_t committed; // stable_how
+        writeverf3 verf;
+    };
+
+    struct WRITE3resfail
+    {
+        wcc_data file_wcc;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        WRITE3resok   resok;
+        WRITE3resfail resfail;
+    };
 };
 
 // Procedure 8: CREATE - Create a file
@@ -523,7 +724,6 @@ struct createhow3
     inline const sattr3& get_obj_attributes() const { return u.obj_attributes; }
     inline const createmode3       get_mode() const { return createmode3(mode);}
 
-private:
     uint32_t        mode;
     union U
     {
@@ -542,9 +742,46 @@ struct CREATE3args
     inline const diropargs3&  get_where() const { return where; }
     inline const createhow3&    get_how() const { return how;   }
 
-private:
     diropargs3 where;
     createhow3 how;
+};
+
+struct CREATE3res
+{
+    friend XDRReader& operator>>(XDRReader& in, CREATE3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.obj;
+            in >> o.resok.obj_attributes;
+            in >> o.resok.dir_wcc;
+        }
+        else
+        {
+            in >> o.resfail.dir_wcc;
+        }
+        return in;
+    }
+
+    struct CREATE3resok
+    {
+        post_op_fh3 obj;
+        post_op_attr obj_attributes;
+        wcc_data dir_wcc;
+    };
+
+    struct CREATE3resfail
+    {
+        wcc_data dir_wcc;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        CREATE3resok   resok;
+        CREATE3resfail resfail;
+    };
 };
 
 // Procedure 9: MKDIR - Create a directory
@@ -559,9 +796,46 @@ struct MKDIR3args
     inline const diropargs3&   get_where() const { return where;      }
     inline const sattr3&  get_attributes() const { return attributes; }
 
-private:
     diropargs3 where;
     sattr3     attributes;
+};
+
+struct MKDIR3res
+{
+    friend XDRReader& operator>>(XDRReader& in, MKDIR3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.obj;
+            in >> o.resok.obj_attributes;
+            in >> o.resok.dir_wcc;
+        }
+        else
+        {
+            in >> o.resfail.dir_wcc;
+        }
+        return in;
+    }
+
+    struct MKDIR3resok
+    {
+        post_op_fh3 obj;
+        post_op_attr obj_attributes;
+        wcc_data dir_wcc;
+    };
+
+    struct MKDIR3resfail
+    {
+        wcc_data dir_wcc;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        MKDIR3resok   resok;
+        MKDIR3resfail resfail;
+    };
 };
 
 // Procedure 10: SYMLINK - Create a symbolic link
@@ -573,7 +847,6 @@ struct symlinkdata3
     inline const sattr3& get_symlink_attributes() const { return symlink_attributes; }
     inline const nfspath3&     get_symlink_data() const { return symlink_data;       }
 
-private:
     sattr3   symlink_attributes;
     nfspath3 symlink_data;
 };
@@ -588,9 +861,46 @@ struct SYMLINK3args
     inline const diropargs3&     get_where() const { return where;   }
     inline const symlinkdata3& get_symlink() const { return symlink; }
 
-private:
     diropargs3   where;
     symlinkdata3 symlink;
+};
+
+struct SYMLINK3res
+{
+    friend XDRReader& operator>>(XDRReader& in, SYMLINK3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.obj;
+            in >> o.resok.obj_attributes;
+            in >> o.resok.dir_wcc;
+        }
+        else
+        {
+            in >> o.resfail.dir_wcc;
+        }
+        return in;
+    }
+
+    struct SYMLINK3resok
+    {
+        post_op_fh3 obj;
+        post_op_attr obj_attributes;
+        wcc_data dir_wcc;
+    };
+
+    struct SYMLINK3resfail
+    {
+        wcc_data dir_wcc;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        SYMLINK3resok   resok;
+        SYMLINK3resfail resfail;
+    };
 };
 
 // Procedure 11: MKNOD - Create a special device
@@ -602,7 +912,6 @@ struct devicedata3
     inline const sattr3&   get_dev_attributes() const { return dev_attributes; }
     inline const specdata3&          get_spec() const { return spec;           }
 
-private:
     sattr3    dev_attributes;
     specdata3 spec;
 };
@@ -615,7 +924,6 @@ struct mknoddata3
     inline const sattr3&  get_pipe_attributes() const { return u.pipe_attributes; }
     inline const devicedata3&      get_device() const { return u.device;          }
 
-private:
     ftype3          type;
     union U
     {
@@ -634,9 +942,46 @@ struct MKNOD3args
     inline const diropargs3& get_where() const { return where; }
     inline const mknoddata3&  get_what() const { return what;  }
 
-private:
     diropargs3 where;
     mknoddata3 what;
+};
+
+struct MKNOD3res
+{
+    friend XDRReader& operator>>(XDRReader& in, MKNOD3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.obj;
+            in >> o.resok.obj_attributes;
+            in >> o.resok.dir_wcc;
+        }
+        else
+        {
+            in >> o.resfail.dir_wcc;
+        }
+        return in;
+    }
+
+    struct MKNOD3resok
+    {
+        post_op_fh3 obj;
+        post_op_attr obj_attributes;
+        wcc_data dir_wcc;
+    };
+
+    struct MKNOD3resfail
+    {
+        wcc_data dir_wcc;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        MKNOD3resok   resok;
+        MKNOD3resfail resfail;
+    };
 };
 
 // Procedure 12: REMOVE - Remove a File
@@ -650,8 +995,41 @@ struct REMOVE3args
 
     inline const diropargs3& get_object() const { return object; }
 
-private:
     diropargs3 object;
+};
+
+struct REMOVE3res
+{
+    friend XDRReader& operator>>(XDRReader& in, REMOVE3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.dir_wcc;
+        }
+        else
+        {
+            in >> o.resfail.dir_wcc;
+        }
+        return in;
+    }
+
+    struct REMOVE3resok
+    {
+        wcc_data dir_wcc;
+    };
+
+    struct REMOVE3resfail
+    {
+        wcc_data dir_wcc;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        REMOVE3resok   resok;
+        REMOVE3resfail resfail;
+    };
 };
 
 // Procedure 13: RMDIR - Remove a Directory
@@ -665,8 +1043,41 @@ struct RMDIR3args
 
     inline const diropargs3& get_object() const { return object; }
 
-private:
     diropargs3 object;
+};
+
+struct RMDIR3res
+{
+    friend XDRReader& operator>>(XDRReader& in, RMDIR3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.dir_wcc;
+        }
+        else
+        {
+            in >> o.resfail.dir_wcc;
+        }
+        return in;
+    }
+
+    struct RMDIR3resok
+    {
+        wcc_data dir_wcc;
+    };
+
+    struct RMDIR3resfail
+    {
+        wcc_data dir_wcc;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        RMDIR3resok   resok;
+        RMDIR3resfail resfail;
+    };
 };
 
 // Procedure 14: RENAME - Rename a File or Directory
@@ -681,9 +1092,46 @@ struct RENAME3args
     inline const diropargs3& get_from() const { return from; }
     inline const diropargs3&   get_to() const { return to;   }
 
-private:
     diropargs3 from;
     diropargs3 to;
+};
+
+struct RENAME3res
+{
+    friend XDRReader& operator>>(XDRReader& in, RENAME3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.fromdir_wcc;
+            in >> o.resok.todir_wcc;
+        }
+        else
+        {
+            in >> o.resfail.fromdir_wcc;
+            in >> o.resfail.todir_wcc;
+        }
+        return in;
+    }
+
+    struct RENAME3resok
+    {
+        wcc_data fromdir_wcc;
+        wcc_data todir_wcc;
+    };
+
+    struct RENAME3resfail
+    {
+        wcc_data fromdir_wcc;
+        wcc_data todir_wcc;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        RENAME3resok   resok;
+        RENAME3resfail resfail;
+    };
 };
 
 // Procedure 15: LINK - Create Link to an object
@@ -698,9 +1146,46 @@ struct LINK3args
     inline const nfs_fh3&    get_file() const { return file; }
     inline const diropargs3& get_link() const { return link; }
 
-private:
     nfs_fh3    file;
     diropargs3 link;
+};
+
+struct LINK3res
+{
+    friend XDRReader& operator>>(XDRReader& in, LINK3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.file_attributes;
+            in >> o.resok.linkdir_wcc;
+        }
+        else
+        {
+            in >> o.resfail.file_attributes;
+            in >> o.resfail.linkdir_wcc;
+        }
+        return in;
+    }
+
+    struct LINK3resok
+    {
+        post_op_attr file_attributes;
+        wcc_data linkdir_wcc;
+    };
+
+    struct LINK3resfail
+    {
+        post_op_attr file_attributes;
+        wcc_data linkdir_wcc;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        LINK3resok   resok;
+        LINK3resfail resfail;
+    };
 };
 
 // Procedure 16: READDIR - Read From Directory
@@ -719,11 +1204,66 @@ struct READDIR3args
     inline const cookieverf3& get_cookieverf() const { return cookieverf; }
     inline const count3            get_count() const { return count;      }
 
-private:
     nfs_fh3     dir;
     cookie3     cookie;
     cookieverf3 cookieverf;
     count3      count;
+};
+
+struct READDIR3res
+{
+    friend XDRReader& operator>>(XDRReader& in, READDIR3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.dir_attributes;
+            in.read_fixed_len(o.resok.cookieverf, NFS3_COOKIEVERFSIZE);
+            o.resok.reply.entries = NULL;
+            o.resok.reply.eof = true;
+        }
+        else
+        {
+            in >> o.resfail.dir_attributes;
+        }
+        return in;
+    }
+
+    struct entry3
+    {
+        fileid3 fileid;
+        filename3 name;
+        cookie3 cookie;
+        entry3* nextentry;  //It is not implemented now.
+    };
+
+    /*
+     * dirlist3 is payload
+     */
+    struct dirlist3
+    {
+        entry3* entries;    //It is not implemented now.
+        uint32_t eof;
+    };
+
+    struct READDIR3resok
+    {
+        post_op_attr dir_attributes;
+        cookieverf3 cookieverf;
+        dirlist3 reply;
+    };
+
+    struct READDIR3resfail
+    {
+        post_op_attr dir_attributes;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        READDIR3resok   resok;
+        READDIR3resfail resfail;
+    };
 };
 
 // Procedure 17: READDIRPLUS - Extended read from directory
@@ -743,12 +1283,69 @@ struct READDIRPLUS3args
     inline const count3         get_dircount() const { return dircount;   }
     inline const count3         get_maxcount() const { return maxcount;   }
 
-private:
     nfs_fh3     dir;
     cookie3     cookie;
     cookieverf3 cookieverf;
     count3      dircount;
     count3      maxcount;
+};
+
+struct READDIRPLUS3res
+{
+    friend XDRReader& operator>>(XDRReader& in, READDIRPLUS3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.dir_attributes;
+            in.read_fixed_len(o.resok.cookieverf, NFS3_COOKIEVERFSIZE);
+            o.resok.reply.entries = NULL;
+            o.resok.reply.eof = true;
+        }
+        else
+        {
+            in >> o.resfail.dir_attributes;
+        }
+        return in;
+    }
+
+    struct entryplus3
+    {
+        fileid3 fileid;
+        filename3 name;
+        cookie3 cookie;
+        post_op_attr name_attributes;
+        post_op_fh3 name_handle;
+        entryplus3* nextentry;  //It is not implemented now.
+    };
+
+    /*
+     * dirlistplus3 is payload
+     */
+    struct dirlistplus3
+    {
+        entryplus3* entries;    //It is not implemented now.
+        uint32_t eof;
+    };
+
+    struct READDIRPLUS3resok
+    {
+        post_op_attr dir_attributes;
+        cookieverf3 cookieverf;
+        dirlistplus3 reply;
+    };
+
+    struct READDIRPLUS3resfail
+    {
+        post_op_attr dir_attributes;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        READDIRPLUS3resok   resok;
+        READDIRPLUS3resfail resfail;
+    };
 };
 
 // Procedure 18: FSSTAT - Get dynamic file system information
@@ -762,12 +1359,64 @@ struct FSSTAT3args
 
     inline const nfs_fh3& get_fsroot() const { return fsroot; }
 
-private:
     nfs_fh3 fsroot;
+};
+
+struct FSSTAT3res
+{
+    friend XDRReader& operator>>(XDRReader& in, FSSTAT3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.obj_attributes;
+            in >> o.resok.tbytes;
+            in >> o.resok.fbytes;
+            in >> o.resok.abytes;
+            in >> o.resok.tfiles;
+            in >> o.resok.ffiles;
+            in >> o.resok.afiles;
+            in >> o.resok.invarsec;
+        }
+        else
+        {
+            in >> o.resfail.obj_attributes;
+        }
+        return in;
+    }
+
+    struct FSSTAT3resok
+    {
+        post_op_attr obj_attributes;
+        size3 tbytes;
+        size3 fbytes;
+        size3 abytes;
+        size3 tfiles;
+        size3 ffiles;
+        size3 afiles;
+        uint32_t invarsec;
+    };
+
+    struct FSSTAT3resfail
+    {
+        post_op_attr obj_attributes;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        FSSTAT3resok   resok;
+        FSSTAT3resfail resfail;
+    };
 };
 
 // Procedure 19: FSINFO - Get static file system Information
 // FSINFO3res NFSPROC3_FSINFO(FSINFO3args) = 19;
+const uint32_t FSF3_LINK        = 0x0001;
+const uint32_t FSF3_SYMLINK     = 0x0002;
+const uint32_t FSF3_HOMOGENEOUS = 0x0008;
+const uint32_t FSF3_CANSETTIME  = 0x0010;
+
 struct FSINFO3args
 {
     friend XDRReader& operator>>(XDRReader& in, FSINFO3args& o)
@@ -777,8 +1426,61 @@ struct FSINFO3args
 
     inline const nfs_fh3& get_fsroot() const { return fsroot; }
 
-private:
     nfs_fh3 fsroot;
+};
+
+struct FSINFO3res
+{
+    friend XDRReader& operator>>(XDRReader& in, FSINFO3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.obj_attributes;
+            in >> o.resok.rtmax;
+            in >> o.resok.rtpref;
+            in >> o.resok.rtmult;
+            in >> o.resok.wtmax;
+            in >> o.resok.wtpref;
+            in >> o.resok.wtmult;
+            in >> o.resok.dtpref;
+            in >> o.resok.maxfilesize;
+            in >> o.resok.time_delta;
+            in >> o.resok.properties;
+        }
+        else
+        {
+            in >> o.resfail.obj_attributes;
+        }
+        return in;
+    }
+
+    struct FSINFO3resok
+    {
+        post_op_attr obj_attributes;
+        uint32_t rtmax;
+        uint32_t rtpref;
+        uint32_t rtmult;
+        uint32_t wtmax;
+        uint32_t wtpref;
+        uint32_t wtmult;
+        uint32_t dtpref;
+        size3 maxfilesize;
+        nfstime3 time_delta;
+        uint32_t properties;
+    };
+
+    struct FSINFO3resfail
+    {
+        post_op_attr obj_attributes;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        FSINFO3resok   resok;
+        FSINFO3resfail resfail;
+    };
 };
 
 // Procedure 20: PATHCONF - Retrieve POSIX information
@@ -792,8 +1494,53 @@ struct PATHCONF3args
 
     inline const nfs_fh3& get_object() const { return object; }
 
-private:
     nfs_fh3 object;
+};
+
+struct PATHCONF3res
+{
+    friend XDRReader& operator>>(XDRReader& in, PATHCONF3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.obj_attributes;
+            in >> o.resok.linkmax;
+            in >> o.resok.name_max;
+            in >> o.resok.no_trunc;
+            in >> o.resok.shown_restricted;
+            in >> o.resok.case_insensitive;
+            in >> o.resok.case_preserving;
+        }
+        else
+        {
+            in >> o.resfail.obj_attributes;
+        }
+        return in;
+    }
+
+    struct PATHCONF3resok
+    {
+        post_op_attr obj_attributes;
+        uint32_t linkmax;
+        uint32_t name_max;
+        uint32_t no_trunc;
+        uint32_t shown_restricted;
+        uint32_t case_insensitive;
+        uint32_t case_preserving;
+    };
+
+    struct PATHCONF3resfail
+    {
+        post_op_attr obj_attributes;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        PATHCONF3resok   resok;
+        PATHCONF3resfail resfail;
+    };
 };
 
 // Procedure 21: COMMIT - Commit cached data on a server to stable storage
@@ -809,10 +1556,45 @@ struct COMMIT3args
     inline const uint64_t get_offset() const { return offset; }
     inline const uint32_t  get_count() const { return count;  }
 
-private:
     nfs_fh3 file;
     offset3 offset;
     count3  count;
+};
+
+struct COMMIT3res
+{
+    friend XDRReader& operator>>(XDRReader& in, COMMIT3res& o)
+    {
+        in >> o.status;
+        if(o.status == nfsstat3::OK)
+        {
+            in >> o.resok.file_wcc;
+            in.read_fixed_len(o.resok.verf, NFS3_WRITEVERFSIZE);
+        }
+        else
+        {
+            in >> o.resfail.file_wcc;
+        }
+        return in;
+    }
+
+    struct COMMIT3resok
+    {
+        wcc_data file_wcc;
+        writeverf3 verf;
+    };
+
+    struct COMMIT3resfail
+    {
+        wcc_data file_wcc;
+    };
+
+    nfsstat3 status;
+    union
+    {
+        COMMIT3resok   resok;
+        COMMIT3resfail resfail;
+    };
 };
 
 std::ostream& operator<<(std::ostream& out, const Enum_mode3 obj);
