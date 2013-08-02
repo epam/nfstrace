@@ -126,6 +126,7 @@ public:
             {
                 if(info.dlen > 0 && (seq > sequence) )
                 {
+                    TRACE("ADD FRAGMENT seq: %u dlen: %u sequence: %u", seq, info.dlen, sequence);
                     Packet* frag = Packet::create(info);
 
                     if( fragments )
@@ -140,7 +141,7 @@ public:
                 }
                 else
                 {
-                    TRACE("drop packet seq: %u; sequence: %u;  dlen: %u", seq, sequence, info.dlen);
+                    TRACE("DROP FRAGMENT seq: %u dlen: %u sequence: %u", seq, info.dlen, sequence);
                 }
             }
         }
@@ -156,6 +157,7 @@ public:
                 {
                     const uint32_t current_seq = current->tcp->seq();
                     const uint32_t current_len = current->header->len;
+                    TRACE("current FRAGMENT len:%u ipv4 len:%u", current->header->len, current->ipv4->length());
                     if( lowest_seq > current_seq )
                     {
                         lowest_seq = current_seq;
@@ -199,7 +201,12 @@ public:
 
                         if(has_data)
                         {
+                            TRACE("accepted payload new seq:%u len:%u", sequence, current->dlen);
                             reader.push(*current);
+                        }
+                        else
+                        {
+                            TRACE("drop part of stream seq:%u len:%u", current_seq, current_len);
                         }
 
                         Packet::destroy(current);
@@ -231,6 +238,7 @@ public:
 
                 if( acknowledged > lowest_seq )
                 {
+                    TRACE("acknowledged(%u) > lowest_seq(%u) seq:%u", acknowledged, lowest_seq, sequence);
                     // There are frames missing in the capture stream that were seen
                     // by the receiving host. Inform Stream about it.
                     reader.lost(lowest_seq - sequence);
@@ -267,6 +275,16 @@ public:
     void reassemble_tcp(const Conversation& conversation, Conversation::Direction d, PacketInfo& info)
     {
         const uint32_t ack = info.tcp->ack();
+/*        const uint32_t seq = info.tcp->seq();
+
+        const uint8_t flags = info.tcp->flags();
+        if(flags & (tcp::tcp_header::SYN | tcp::tcp_header::ACK))
+        {
+            TRACE("seq:%u ack:%u dlen:%u flags: %s %s", seq, ack, info.dlen,
+            (flags & tcp::tcp_header::SYN ? "SYN" : ""),
+            (flags & tcp::tcp_header::ACK ? "ACK" : "")
+            );
+        }*/
 
         //check whether this frame acks fragments that were already seen.
         while( flows[1-d].check_fragments(ack) );
@@ -308,7 +326,7 @@ public:
             }
             else
             {
-                TRACE("session is not created!");
+                TRACE("TCP Session is not created!");
             }
         }
         return i;
@@ -346,16 +364,22 @@ public:
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
-        //TODO: this code must be refactored, wrong logic
-        if(hdr_len == 0 && msg_len >= n)
+        if(msg_len != 0)
         {
-            std::clog << "We are lost " << n << " bytes of payload marked for discard" << std::endl;
-            msg_len -= n;
+            if(hdr_len == 0 && msg_len >= n)
+            {
+                TRACE("We are lost %u bytes of payload marked for discard", n);
+                msg_len -= n;
+            }
+            else
+            {
+                TRACE("We are lost %u bytes of useful data lost:%u msg_len:%u", n - msg_len, n, msg_len);
+                msg_len = 0;
+            }
         }
         else
         {
-            std::clog << "We are lost " << n - msg_len << " bytes of useful data" << std::endl;
-            msg_len = 0;
+            TRACE("We are lost %u bytes of unknown payload", n);
         }
     }
 
@@ -371,12 +395,13 @@ public:
                 {
                     if(msg_len >= info.dlen) // discard whole new packet
                     {
+                        //TRACE("discard whole new packet");
                         msg_len -= info.dlen;
                         info.dlen = 0;  // return from while
                     }
                     else  // discard only a part of packet payload related to current message
                     {
-                        TRACE("discard only a part of packet payload related to current message");
+                        //TRACE("discard only a part of packet payload related to current message");
                         info.dlen -= msg_len;
                         info.data += msg_len;
                         msg_len = 0;
@@ -386,7 +411,7 @@ public:
                 {
                     if(hdr_len > info.dlen) // got new part of header (not the all!)
                     {
-                        TRACE("got new part of header (not the all!)");
+                        //TRACE("got new part of header (not the all!)");
                         collection.push(info);
                         hdr_len     -= info.dlen;
                         msg_len     -= info.dlen;
@@ -394,7 +419,7 @@ public:
                     }
                     else // hdr_len <= dlen, current message will be complete, also we have some additional data
                     {
-                        TRACE("current message will be complete, also we have some additional data");
+                        //TRACE("current message will be complete, also we have some additional data");
                         collection.push(info, hdr_len);
                         info.dlen   -= hdr_len;
                         info.data   += hdr_len;
@@ -424,7 +449,6 @@ public:
 
             if(info.dlen < tocopy)
             {
-                //std::clog << "Warning: Untested code:" __FILE__ << ':' << __LINE__ << std::endl;
                 collection.push(info);
                 //info.data += info.dlen;   optimization
                 info.dlen = 0;
@@ -465,7 +489,7 @@ public:
             }
         }
 
-//        assert(collection);     // collection must be initialized
+        assert(collection);     // collection must be initialized
         assert(rm != NULL);     // RM must be initialized
         assert(msg_len == 0);   // RPC Message still undetected
 
@@ -485,7 +509,6 @@ public:
             }
             else // whole message is in packet
             {
-                //std::clog << "Warning: Untested code:" __FILE__ << ':' << __LINE__ << std::endl;
                 // TODO:workaround remove RM
                 info.dlen -= sizeof(RecordMark);
                 info.data += sizeof(RecordMark);
@@ -518,22 +541,18 @@ public:
                     if(NFSv3Validator::check(call))
                     {
                         hdr_len = std::min(msg_len, max_hdr);
-                        //std::clog << "header len: " << hdr_len << std::endl;
+           //             TRACE("MATCH RPC Call xid:%u len: %u procedure: %u", call->xid(), msg_len, call->proc());
                     }
                     else
                     {
                         hdr_len = 0; // don't collect headers of unknown calls
-                    /*    std::clog << "unknown RPC call of program: "<< call->prog()
-                                  << " version: "                   << call->vers()
-                                  << " procedure: "                 << call->proc()
-                                  << '\n';*/
+                        //TRACE("Unknown RPC call of program: %u version: %u procedure: %u", call->prog(), call->vers(), call->proc());
                     }
                     return true;
                 }
                 else
                 {
-                    //std::clog << "unknown RPC call(?)\n";
-                    return false;
+                    return false;   // isn't RPC Call, stream is corrupt
                 }
             }
             break;
@@ -544,11 +563,11 @@ public:
                 {
                     msg_len = rm->fragment_len();   // length of current RPC message
                     hdr_len = std::min(msg_len, max_hdr);
+            //        TRACE("MATCH RPC Reply xid:%u len: %u", reply->xid(), msg_len);
                     return true;
                 }
-                else
-                {   // ERROR stream is corrupt
-                    //std::clog << "unknown RPC reply(?)\n";
+                else // isn't RPC reply, stream is corrupt
+                {
                     msg_len = 0;
                     hdr_len = 0;
                     return false;
@@ -557,7 +576,7 @@ public:
             break;
             default:
             {
-                //std::clog << "unknown RPC message type(?)\n";
+                //isn't RPC message
             }
             break;
         }

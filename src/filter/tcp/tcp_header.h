@@ -50,6 +50,7 @@ struct TCPHeader : private tcp_header
     inline uint32_t   seq() const { return ntohl(tcp_seq); }
     inline uint32_t   ack() const { return ntohl(tcp_ack); }
     inline uint8_t offset() const { return (tcp_rsrvd_off & 0xf0) >> 2; }
+    inline uint8_t  flags() const { return tcp_flags; }
     inline bool is(tcp_header::Flag flag) const { return tcp_flags & flag; }
     inline uint16_t window()   const { return ntohs(tcp_win); }
     inline uint16_t checksum() const { return ntohs(tcp_sum); }
