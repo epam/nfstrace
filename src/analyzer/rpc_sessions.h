@@ -167,7 +167,6 @@ public:
                 {
                     return NULL;
                 }
-                TRACE("MESSAGE!");
                 el = in_res.first;
             }
             else
@@ -175,8 +174,8 @@ public:
                 return NULL;
             }
         }
-        return el->second;
 
+        return el->second;
     }
 
 private:
