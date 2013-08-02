@@ -36,10 +36,10 @@ struct Packet: public PacketInfo
         fragment->packet   = packet;
 
         // fix pointers from PacketInfo to point to owned copy of packet data
-        fragment->eth   = info.eth  ? (const ethernet::EthernetHeader*) packet + ((const uint8_t*)info.eth - info.packet) : NULL;
-        fragment->ipv4  = info.ipv4 ? (const ip::IPv4Header*)           packet + ((const uint8_t*)info.ipv4- info.packet) : NULL;
-        fragment->tcp   = info.tcp  ? (const tcp::TCPHeader*)           packet + ((const uint8_t*)info.tcp - info.packet) : NULL;
-        fragment->rpc   = info.rpc  ? (const rpc::MessageHeader*)       packet + ((const uint8_t*)info.rpc - info.packet) : NULL;
+        fragment->eth   = info.eth  ? (const ethernet::EthernetHeader*) (packet + ( ((const uint8_t*)info.eth ) - info.packet)) : NULL;
+        fragment->ipv4  = info.ipv4 ? (const ip::IPv4Header*)           (packet + ( ((const uint8_t*)info.ipv4) - info.packet)) : NULL;
+        fragment->tcp   = info.tcp  ? (const tcp::TCPHeader*)           (packet + ( ((const uint8_t*)info.tcp ) - info.packet)) : NULL;
+        fragment->rpc   = info.rpc  ? (const rpc::MessageHeader*)       (packet + ( ((const uint8_t*)info.rpc ) - info.packet)) : NULL;
 
         fragment->data  = packet + (info.data - info.packet);
         fragment->dlen  = info.dlen;
