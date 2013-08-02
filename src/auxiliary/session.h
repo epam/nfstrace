@@ -57,10 +57,9 @@ struct Session
 
     bool operator==(const Session& key) const;
     size_t hash() const;
-    friend std::ostream& operator<<(std::ostream& out, const Session& session);
-    static std::string session_addr(Session::Direction dir, const Session& session);
-    static std::string ipv4_string(const uint32_t ip);
 };
+
+std::ostream& operator<<(std::ostream& out, const Session& session);
 
 } // namespace auxiliary
 } // namespace NST

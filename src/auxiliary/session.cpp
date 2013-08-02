@@ -65,46 +65,45 @@ bool Session::operator==(const Session& obj) const
 
 std::ostream& operator<<(std::ostream& out, const Session& session)
 {
-    out << Session::session_addr(Session::Source, session) << " --> " << Session::session_addr(Session::Destination, session);
-    switch(session.type)
-    {
-        case Session::TCP:
-            out << " (TCP)";
-            break;
-        case Session::UDP:
-            out << " (UPD)";
-            break;
-    }
-    return out;
-}
-
-std::string Session::session_addr(Session::Direction dir, const Session& session)
-{
-    std::stringstream s(std::ios_base::out);
     switch(session.ip_type)
     {
         case Session::v4:
-            s << ipv4_string(session.ip.v4.addr[dir]);
-            break;
+        {
+            uint32_t ip = session.ip.v4.addr[Session::Source];
+            out << ((ip >> 24) & 0xFF);
+            out << '.';
+            out << ((ip >> 16) & 0xFF);
+            out << '.';
+            out << ((ip >> 8) & 0xFF);
+            out << '.';
+            out << ((ip >> 0) & 0xFF);
+        }
+            out << " --> ";
+        {
+            uint32_t ip = session.ip.v4.addr[Session::Destination];
+            out << ((ip >> 24) & 0xFF);
+            out << '.';
+            out << ((ip >> 16) & 0xFF);
+            out << '.';
+            out << ((ip >> 8) & 0xFF);
+            out << '.';
+            out << ((ip >> 0) & 0xFF);
+        }
+        break;
         case Session::v6:
-            s << "(IPv6 currently not supported)";
+            out << "IPv6 is not supported yet.";
+        break;
+    }
+    switch(session.type)
+    {
+        case Session::TCP:
+            out << "[TCP]";
+            break;
+        case Session::UDP:
+            out << "[UDP]";
             break;
     }
-    s << ":" << session.port[dir];
-    return s.str();
-}
-
-std::string Session::ipv4_string(const uint32_t ip)
-{
-    std::stringstream address(std::ios_base::out);
-    address << ((ip >> 24) & 0xFF);
-    address << '.';
-    address << ((ip >> 16) & 0xFF);
-    address << '.';
-    address << ((ip >> 8) & 0xFF);
-    address << '.';
-    address << ((ip >> 0) & 0xFF);
-    return address.str();
+    return out;
 }
 
 } // namespace auxiliary
