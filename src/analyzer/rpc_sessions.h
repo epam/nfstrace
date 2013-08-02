@@ -12,6 +12,7 @@
 #include <string>
 
 #include "../auxiliary/filtered_data.h"
+#include "../auxiliary/logger.h"
 #include "../auxiliary/session.h"
 #include "transmission.h"
 //------------------------------------------------------------------------------
@@ -156,18 +157,26 @@ public:
         Transmission key(session, (type == DIRECT) ? Session::Source : Session::Destination);
 
         Iterator el = sessions.find(key);
-        if(el == sessions.end() && type == DIRECT) // add new session only for Call (type == DIRECT)
+        if(el == sessions.end())
         {
-            std::auto_ptr<RPCSession> s(new RPCSession(session));
-            std::pair<Iterator, bool> in_res = sessions.insert(Pair(key, s.release()));
-            if(in_res.second == false)
+            if(type == DIRECT) // add new session only for Call (type == DIRECT)
+            {
+                std::auto_ptr<RPCSession> s(new RPCSession(session));
+                std::pair<Iterator, bool> in_res = sessions.insert(Pair(key, s.release()));
+                if(in_res.second == false)
+                {
+                    return NULL;
+                }
+                TRACE("MESSAGE!");
+                el = in_res.first;
+            }
+            else
             {
                 return NULL;
             }
-            el = in_res.first;
-            return el->second;
         }
-        return NULL;
+        return el->second;
+
     }
 
 private:
