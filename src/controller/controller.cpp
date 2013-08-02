@@ -61,14 +61,7 @@ int Controller::run()
     {
         while(true)
         {
-            try
-            {
-                status.wait_and_rethrow_exception();
-            }
-            catch(XDRError& exception)
-            {
-                std::cerr << "XDRError: " << exception.what() << std::endl;
-            }
+            status.wait_and_rethrow_exception();
         }
     }
     catch(...)
