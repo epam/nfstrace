@@ -42,8 +42,8 @@ private:
     AnalysisManager(const AnalysisManager&);            // undefiend
     AnalysisManager& operator=(const AnalysisManager&); // undefiend
 
-    std::auto_ptr<Thread> parser_thread;
     std::auto_ptr<FilteredDataQueue> queue;
+    std::auto_ptr<Thread> parser_thread;
     RunningStatus& status;
     Analyzers analyzers;
 };

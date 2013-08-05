@@ -17,8 +17,8 @@ namespace analyzer
 {
 
 AnalysisManager::AnalysisManager(RunningStatus& running_status)
-                                 : parser_thread(NULL)
-                                 , queue(NULL)
+                                 : queue(NULL)
+                                 , parser_thread(NULL)
                                  , status(running_status)
 {
 }
