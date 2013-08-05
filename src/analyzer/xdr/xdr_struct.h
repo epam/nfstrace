@@ -26,15 +26,10 @@ struct Opaque
 {
     friend std::ostream& operator<<(std::ostream& out, const Opaque& opaque)
     {
-//        static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
         out << std::hex;
-        for(uint32_t j = 0; j < opaque.len; j++)
+        for(uint32_t i = 0; i < opaque.len; i++)
         {
-            out << (uint32_t) opaque.ptr[j];
-//            uint8_t value = opaque.ptr[j];
-//            out << hex[value & 0xF];
-//            value >>= 4;
-//            out << hex[value & 0xF];
+            out << (uint32_t) opaque.ptr[i];
         }
         return out << std::dec;
     }
@@ -51,7 +46,6 @@ struct Opaque
     inline const uint8_t* data() const { return ptr; }
     inline const uint32_t size() const { return len; }
 
-private:
     const uint8_t* ptr;
     uint32_t       len;
 };

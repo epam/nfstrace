@@ -321,12 +321,12 @@ struct GETATTR3args
 {
     inline friend XDRReader& operator>>(XDRReader& in, GETATTR3args& o)
     {
-        return in >> o.file;
+        return in >> o.object;
     }
 
-    inline const nfs_fh3& get_file() const { return file; }
+    inline const nfs_fh3& get_object() const { return object; }
 
-    nfs_fh3 file;
+    nfs_fh3 object;
 };
 
 struct GETATTR3res
