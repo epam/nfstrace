@@ -8,13 +8,11 @@
 //------------------------------------------------------------------------------
 #include <cstring>  //memset
 #include <tr1/unordered_map>
-#include <sstream>
 
 #include "../xdr/xdr_struct.h"
 #include "../nfs3/nfs_operation.h"
 #include "../rpc_sessions.h"
 #include "base_analyzer.h"
-#include "breakdown.h"
 //------------------------------------------------------------------------------
 using namespace NST::analyzer::NFS3;
 
@@ -53,6 +51,7 @@ private:
 
 class OFWSAnalyzer : public BaseAnalyzer
 {
+public:
     struct FH 
     {
         inline FH(const nfs_fh3& obj)
@@ -66,48 +65,20 @@ class OFWSAnalyzer : public BaseAnalyzer
             memcpy(data, obj.data, len);
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const FH& obj)
-        {
-            for(uint32_t i = 0; i < obj.len; ++i)
-            {
-                out << (uint32_t) obj.data[i];
-            }
-            return out;
-        }
+        friend std::ostream& operator<<(std::ostream& out, const FH& obj);
 
         uint32_t len;
         uint8_t data[64];
     };
+
+private:
     struct FH_Eq
     {
-        bool operator()(const FH& a, const FH& b) const
-        {
-            if(a.len != b.len)
-            {
-                return false;
-            }
-
-            for(uint32_t i = 0; i < a.len; ++i)
-            {
-                if(a.data[i] != b.data[i])
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+        bool operator()(const FH& a, const FH& b) const;
     };
     struct FH_Hash
     {
-        int operator()(const FH& fh) const
-        {
-            int hash = 0;
-            for(uint32_t i = 0; i < fh.len; ++i)
-            {
-                hash += fh.data[i];
-            }
-            return hash;
-        }
+        int operator()(const FH& fh) const;
     };
 
     typedef std::tr1::unordered_map<FH, OpCounter*, FH_Hash, FH_Eq> OFWS;
@@ -118,7 +89,7 @@ class OFWSAnalyzer : public BaseAnalyzer
 
     struct Iterator_Comp
     {
-        bool operator()(const Iterator& a, const Iterator& b) const
+        inline bool operator()(const Iterator& a, const Iterator& b) const
         {
             return (a->second->get_total() < b->second->get_total());
         }
