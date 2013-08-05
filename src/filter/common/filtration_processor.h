@@ -46,12 +46,21 @@ public:
         }
         ~Flow()
         {
+            reset();
+        }
+        
+        void reset()
+        {
+            reader.reset(); // reset state of Reader
             while(fragments)
             {
                 Packet* c = fragments;
                 fragments = c->next;
                 Packet::destroy(c);
             }
+
+            base_seq = 0;
+            sequence = 0;
         }
 
         void reassemble(PacketInfo& info)
@@ -132,10 +141,6 @@ public:
                     frag->next = fragments;
                     fragments = frag;
                 }
-                else
-                {
-                    TRACE("DROP FRAGMENT seq: %u dlen: %u sequence: %u", seq, info.dlen, sequence);
-                }
             }
         }
 
@@ -150,7 +155,6 @@ public:
                 {
                     const uint32_t current_seq = current->tcp->seq();
                     const uint32_t current_len = current->dlen;
-                    TRACE("current FRAGMENT len:%u ipv4 len:%u", current->dlen, current->ipv4->length());
                     if( lowest_seq > current_seq )
                     {
                         lowest_seq = current_seq;
@@ -268,16 +272,6 @@ public:
     void reassemble_tcp(const Conversation& conversation, Conversation::Direction d, PacketInfo& info)
     {
         const uint32_t ack = info.tcp->ack();
-/*        const uint32_t seq = info.tcp->seq();
-
-        const uint8_t flags = info.tcp->flags();
-        if(flags & (tcp::tcp_header::SYN | tcp::tcp_header::ACK))
-        {
-            TRACE("seq:%u ack:%u dlen:%u flags: %s %s", seq, ack, info.dlen,
-            (flags & tcp::tcp_header::SYN ? "SYN" : ""),
-            (flags & tcp::tcp_header::ACK ? "ACK" : "")
-            );
-        }*/
 
         //check whether this frame acks fragments that were already seen.
         while( flows[1-d].check_fragments(ack) );
@@ -347,6 +341,7 @@ public:
     {
         msg_len = 0;
         hdr_len = 0;
+        collection.reset();     // skip collected data
     }
 
     inline void set_writer(Writer* w)
@@ -366,8 +361,8 @@ public:
             }
             else
             {
-                TRACE("We are lost %u bytes of useful data lost:%u msg_len:%u", n - msg_len, n, msg_len);
-                msg_len = 0;
+                LOG("We are lost %u bytes of useful data lost:%u msg_len:%u", n - msg_len, n, msg_len);
+                reset();
             }
         }
         else
