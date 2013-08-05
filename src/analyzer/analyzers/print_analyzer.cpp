@@ -80,7 +80,7 @@ bool PrintAnalyzer::call_getattr(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " file: " += arg.get_file();
+    out << " object: " += arg.get_object();
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
