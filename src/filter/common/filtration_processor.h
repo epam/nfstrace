@@ -129,14 +129,7 @@ public:
                     TRACE("ADD FRAGMENT seq: %u dlen: %u sequence: %u", seq, info.dlen, sequence);
                     Packet* frag = Packet::create(info);
 
-                    if( fragments )
-                    {
-                        frag->next = fragments;
-                    }
-                    else
-                    {
-                        frag->next = NULL;
-                    }
+                    frag->next = fragments;
                     fragments = frag;
                 }
                 else
@@ -156,8 +149,8 @@ public:
                 while( current )
                 {
                     const uint32_t current_seq = current->tcp->seq();
-                    const uint32_t current_len = current->header->len;
-                    TRACE("current FRAGMENT len:%u ipv4 len:%u", current->header->len, current->ipv4->length());
+                    const uint32_t current_len = current->dlen;
+                    TRACE("current FRAGMENT len:%u ipv4 len:%u", current->dlen, current->ipv4->length());
                     if( lowest_seq > current_seq )
                     {
                         lowest_seq = current_seq;
@@ -201,7 +194,7 @@ public:
 
                         if(has_data)
                         {
-                            TRACE("accepted payload new seq:%u len:%u", sequence, current->dlen);
+                            TRACE("accepted payload new seq:%u len:%u", sequence, current_len);
                             reader.push(*current);
                         }
                         else
