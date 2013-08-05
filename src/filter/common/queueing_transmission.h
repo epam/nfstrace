@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 
+#include "../../auxiliary/logger.h"
 #include "../../auxiliary/session.h"
 #include "../../auxiliary/filtered_data.h"
 //------------------------------------------------------------------------------
@@ -37,7 +38,7 @@ public:
             ptr = queue->allocate();
             if(ptr == NULL)
             {
-                std::clog << "free elements of the Queue are exhausted" << std::endl;
+                LOG("free elements of the Queue are exhausted");
             }
         }
         inline Collection(const Collection& p):size(0) // move
@@ -67,16 +68,12 @@ public:
 
         void push(const PacketInfo& info)
         {
-            assert((sizeof(ptr->data)-size) >= info.dlen);
-            memcpy(ptr->data+size, info.data, info.dlen);
-            size += info.dlen;
+            copy_data_to_collection(info.data, info.dlen);
         }
 
         void push(const PacketInfo& info, const uint32_t len)
         {
-            assert((sizeof(ptr->data)-size) >= len);
-            memcpy(ptr->data+size, info.data, len);
-            size += len;
+            copy_data_to_collection(info.data, len);
         }
         
         // TODO: workaround
@@ -125,6 +122,18 @@ public:
         inline    operator Data*const() const { return ptr; }
         inline Data*const operator ->() const { return ptr; }
 
+    private:
+        inline void copy_data_to_collection(const uint8_t* p, const uint32_t len)
+        {
+            if(len > (sizeof(ptr->data)-size))
+            {
+                LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", size, sizeof(ptr->data), len);
+                assert((sizeof(ptr->data)-size) >= len);
+            }
+            memcpy(ptr->data+size, p, len);
+            size += len;
+        }
+
         mutable Queue*      queue;
         mutable Data*       ptr;
         mutable uint32_t    size;
@@ -136,7 +145,7 @@ public:
     ~QueueingTransmission()
     {
     }
-    
+
     void collect(const PacketInfo& info)
     {
     }
