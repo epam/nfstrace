@@ -37,6 +37,14 @@ struct TCPSession
 {
 public:
 
+    // Helpers for comparison sequence numbers
+    // Idea for gt: either x > y, or y is much bigger (assume wrap)
+    inline static bool GT_SEQ(uint32_t x, uint32_t y){ return (int32_t)((y) - (x)) <  0; }
+    inline static bool LT_SEQ(uint32_t x, uint32_t y){ return (int32_t)((x) - (y)) <  0; }
+    inline static bool GE_SEQ(uint32_t x, uint32_t y){ return (int32_t)((y) - (x)) <= 0; }
+    inline static bool LE_SEQ(uint32_t x, uint32_t y){ return (int32_t)((x) - (y)) <= 0; }
+    inline static bool EQ_SEQ(uint32_t x, uint32_t y){ return           (x) == (y);      }
+
     struct Flow
     {
         friend class TCPSession<StreamReader>;
@@ -155,7 +163,8 @@ public:
                 {
                     const uint32_t current_seq = current->tcp->seq();
                     const uint32_t current_len = current->dlen;
-                    if( lowest_seq > current_seq )
+
+                    if( (int32_t)(lowest_seq - current_seq) > 0 )
                     {
                         lowest_seq = current_seq;
                     }
@@ -233,7 +242,7 @@ public:
                     current = current->next;
                 }// end while
 
-                if( acknowledged > lowest_seq )
+                if( (int32_t)(acknowledged - lowest_seq) > 0 )
                 {
                     TRACE("acknowledged(%u) > lowest_seq(%u) seq:%u", acknowledged, lowest_seq, sequence);
                     // There are frames missing in the capture stream that were seen
@@ -638,22 +647,29 @@ public:
         //       4) Pass filtered NFS Op headers (RPC messages) to Analysis
 
         PacketInfo info(pkthdr, packet);
-        
+
         if(! info.check_eth())
         {
             return;
         }
 
-        Conversation::Direction direction = Conversation::AtoB;
-        Conversation key(info, direction);
-
-        // Following code must be refactored!
-        typename TCPSessions< RPCFiltrator < Writer > >::it i = processor->sessions.find_or_create_session(key, processor->writer.get());
-        if(i != processor->sessions.end())
+        if(info.eth && info.ipv4 && info.tcp)    // Ethernet:IPv4:TCP supported only
         {
-            TCPSession< RPCFiltrator < Writer > > & session = i->second;
+            Conversation::Direction direction = Conversation::AtoB;
+            Conversation key(info, direction);
 
-            session.reassemble_tcp(i->first, direction, info);
+            // Following code must be refactored!
+            typename TCPSessions< RPCFiltrator < Writer > >::it i = processor->sessions.find_or_create_session(key, processor->writer.get());
+            if(i != processor->sessions.end())
+            {
+                TCPSession< RPCFiltrator < Writer > > & session = i->second;
+
+                session.reassemble_tcp(i->first, direction, info);
+            }
+        }
+        else
+        {
+            LOG("only following stack of protocol is supported: Ethernet IPv4 TCP");
         }
     }
 

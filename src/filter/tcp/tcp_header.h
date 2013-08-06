@@ -25,7 +25,7 @@ struct tcp_header
         FIN = 0x01,     // finished send data
         SYN = 0x02,     // synchronize sequence numbers
         RST = 0x04,     // reset the connection
-        PSH = 0x08,      // push data to the app layer
+        PSH = 0x08,     // push data to the app layer
         ACK = 0x10,     // acknowledge
         URG = 0x20,     // urgent
         ECE = 0x40,     // ECN-echo
