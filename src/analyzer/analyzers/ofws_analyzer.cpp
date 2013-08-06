@@ -377,10 +377,10 @@ void OFWSAnalyzer::print(std::ostream& out)
 
     out << "###  Overall File Working Set (OFWS) analyzer  ###" << std::endl;
     out << "Total number of files accessed: " << size << std::endl;
-    out << "FileHandle," << "NFS Ops,";
+    out << "FileHandle" << ",NFS Ops";
     for(uint32_t j = 0; j < Proc::num; ++j)
     {
-        out << Proc::Titles[j] << ',';
+        out << ',' << Proc::Titles[j];
     }
     out << '\n';
 
@@ -392,7 +392,7 @@ void OFWSAnalyzer::print(std::ostream& out)
         out << iterator->first << ',' << opcounter->get_total();
         for(uint32_t j = 0; j < Proc::num; ++j)
         {
-            out << (*opcounter)[j] << ',';
+            out << ',' << (*opcounter)[j];
         }
         out << '\n';
     }
