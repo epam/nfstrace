@@ -19,7 +19,7 @@ namespace controller
 
 Controller::Controller(const Parameters& params) : logger(::stderr), sig_handler(status), filtration(status), analysis(status)
 {
-    logger.set_output_file(params.program_name() + ".log");
+//    logger.set_output_file(params.program_name() + ".log");
     NST::auxiliary::Logger::set_global(&logger);
 
     const RunningMode mode = params.running_mode();
