@@ -400,8 +400,6 @@ void OFWSAnalyzer::print(std::ostream& out)
 
 OFWSAnalyzer::Iterator OFWSAnalyzer::find_or_create_op_counter(const nfs_fh3& key)
 {
-    std::stringstream s;
-    s << key;
     //TRACE("FIND_OR_CREATE KEY = %s", s.str().c_str());
     Iterator i = ofws_stat.find(key);
     if(i == ofws_stat.end())
