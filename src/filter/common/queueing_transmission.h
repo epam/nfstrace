@@ -127,8 +127,7 @@ public:
 
         inline const uint32_t    size() const { return ptr->dlen; }
         inline uint8_t*          data() const { return ptr->data; }
-        inline    operator Data*const() const { return ptr; }
-        inline Data*const operator ->() const { return ptr; }
+        inline    operator bool const() const { return ptr != NULL; }
 
     private:
         inline void copy_data_to_collection(const uint8_t* p, const uint32_t len)

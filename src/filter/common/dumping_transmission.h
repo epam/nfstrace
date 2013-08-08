@@ -24,17 +24,68 @@ namespace filter
 class DumpingTransmission
 {
 public:
+
+    class Collection
+    {
+    public:
+        inline Collection()
+        {
+        }
+
+        inline void operator=(const DumpingTransmission& t) // initialization
+        {
+        }
+        inline ~Collection()
+        {
+        }
+
+//        Collection(const Collection&);            // undefiend
+//        Collection& operator=(const Collection&); // undefiend
+        inline Collection(const Collection& p) // move
+        {
+
+        }
+        inline Collection& operator=(const Collection& p) // move
+        {
+            return *this;
+        }
+
+        inline void reset()
+        {
+        }
+
+        inline void push(const PacketInfo& info)
+        {
+
+        }
+
+        inline void push(const PacketInfo& info, const uint32_t len)
+        {
+
+        }
+
+        inline void skip_first(const uint32_t len)
+        {
+        }
+
+        void complete(const PacketInfo& info)
+        {
+
+        }
+
+        inline const uint32_t    size() const { return 0; }
+        inline uint8_t*          data() const { return NULL; }
+        inline    operator bool const() const { return false; }
+
+    private:
+    };
+
     DumpingTransmission(const Handle& handle, const std::string& path)
     {
         dumper.reset(new PacketDumper(handle, path.c_str()));
     }
     ~DumpingTransmission()
     {
-    }
-
-    void collect(const PacketInfo& info)
-    {
-        dumper->dump(info.header, info.packet);
     }
 
 private:
