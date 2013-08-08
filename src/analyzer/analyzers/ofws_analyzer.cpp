@@ -4,7 +4,6 @@
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #include <algorithm>
-#include <iomanip>
 #include <vector>
 
 #include "ofws_analyzer.h"
@@ -389,7 +388,7 @@ void OFWSAnalyzer::print(std::ostream& out)
         Iterator& iterator = v[i];
         const OpCounter* opcounter = iterator->second;
 
-        out << std::hex << iterator->first << std::dec << ',' << opcounter->get_total();
+        out << iterator->first << ',' << opcounter->get_total();
         for(uint32_t j = 0; j < Proc::num; ++j)
         {
             out << ',' << (*opcounter)[j];
