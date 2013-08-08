@@ -27,11 +27,13 @@ public:
 
     struct Session __attribute__ ((__packed__)) session;
 
-    uint32_t dlen;       // length of filtered payload
-    uint8_t  data[4000]; // raw filtered data in network byte order
-private:
-    FilteredData(const FilteredData&);
-    void operator=(const FilteredData&);
+    uint32_t dlen;  // length of filtered payload
+    uint8_t* data;  // pointer to data in memory
+
+    uint8_t  memory[4000]; // raw filtered data in network byte order
+
+    FilteredData(const FilteredData&);              // undefined
+    FilteredData& operator=(const FilteredData&);   // undefined
 } __attribute__ ((__packed__));
 
 typedef Queue<FilteredData> FilteredDataQueue;
