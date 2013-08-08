@@ -56,7 +56,10 @@ public:
         {
             reset();
         }
-        
+
+//        Flow(const Flow&);            // undefiend
+//        Flow& operator=(const Flow&); // undefiend
+
         void reset()
         {
             reader.reset(); // reset state of Reader
@@ -269,6 +272,9 @@ public:
     {
     }
 
+//    TCPSession(const TCPSession&);            // undefiend
+//    TCPSession& operator=(const TCPSession&); // undefiend
+
     template <typename Writer>
     void init(Writer* writer)
     {
@@ -345,6 +351,9 @@ public:
         max_hdr = controller::Parameters::instance().rpcmsg_limit();
         reset();
     }
+
+//    RPCFiltrator(const RPCFiltrator&);            // undefiend
+//    RPCFiltrator& operator=(const RPCFiltrator&); // undefiend
 
     inline void reset()
     {
@@ -424,6 +433,9 @@ public:
                         msg_len -= hdr_len;
                         hdr_len -= hdr_len; // set 0
 
+                        // we should remove RM(uin32_t) from collected data
+                        collection.skip_first(sizeof(RecordMark));
+
                         collection.complete(info);    // push complete message to queue
                     }
                 }
@@ -442,7 +454,7 @@ public:
 
         if(collection) // collection is allocated
         {
-            const uint32_t tocopy = max_header-collection.data_size();
+            const uint32_t tocopy = max_header-collection.size();
 
             if(info.dlen < tocopy)
             {
@@ -457,14 +469,14 @@ public:
                 info.dlen -= tocopy;
                 info.data += tocopy;
 
-                assert(max_header == collection.data_size());
+                assert(max_header == collection.size());
 
                 rm = reinterpret_cast<const RecordMark*>(collection.data());
             }
         }
         else // collection is empty
         {
-            collection = writer->alloc();   // allocate new collection
+            collection = *writer;   // allocate new collection from writer
 
             if(!collection)
             {
@@ -490,25 +502,19 @@ public:
         assert(rm != NULL);     // RM must be initialized
         assert(msg_len == 0);   // RPC Message still undetected
 
-        if(validate_header(rm))
+        //if(rm->is_last()); // TODO: handle sequence field of record mark
+        if(validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
         {
             assert(msg_len != 0);   // message is found
 
-            const uint32_t written = collection.data_size();
+            const uint32_t written = collection.size();
             if(written != 0) // a message was partially written to collection
             {
-                collection.skip_first(sizeof(RecordMark)); // TODO:workaround remove RM
-                msg_len -= written - sizeof(RecordMark);
+                msg_len -= written;
                 if(hdr_len !=0) // we want to collect header of this RPC message
                 {
-                    hdr_len -= written - sizeof(RecordMark);
+                    hdr_len -= written;
                 }
-            }
-            else // whole message is in packet
-            {
-                // TODO:workaround remove RM
-                info.dlen -= sizeof(RecordMark);
-                info.data += sizeof(RecordMark);
             }
         }
         else    // unknown data in packet payload
@@ -522,9 +528,8 @@ public:
         }
     }
 
-    inline bool validate_header(const RecordMark*const rm)
+    inline bool validate_header(const MessageHeader*const msg, const uint32_t len)
     {
-        const MessageHeader*const msg = rm->fragment();
         switch(msg->type())
         {
             case SUNRPC_CALL:
@@ -532,8 +537,7 @@ public:
                 const CallHeader*const call = static_cast<const CallHeader*const>(msg);
                 if(RPCValidator::check(call))
                 {
-                    //if(rm->is_last()); // TODO: handle sequence field of record mark
-                    msg_len = rm->fragment_len();   // length of current RPC message
+                    msg_len = len;   // length of current RPC message
 
                     if(NFSv3Validator::check(call))
                     {
@@ -558,7 +562,7 @@ public:
                 const ReplyHeader*const reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
                 {
-                    msg_len = rm->fragment_len();   // length of current RPC message
+                    msg_len = len;   // length of current RPC message
                     hdr_len = std::min(msg_len, max_hdr);
             //        TRACE("MATCH RPC Reply xid:%u len: %u", reply->xid(), msg_len);
                     return true;

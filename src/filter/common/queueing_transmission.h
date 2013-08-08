@@ -30,18 +30,34 @@ public:
     class Collection
     {
     public:
-        inline Collection(): queue(NULL), ptr(NULL), size(0)
+        inline Collection(): queue(NULL), ptr(NULL)
         {
         }
-        inline Collection(Queue& q):queue(&q), size(0)
+
+        inline void operator=(const QueueingTransmission& t) // initialization
         {
+            queue = &t.queue;
             ptr = queue->allocate();
-            if(ptr == NULL)
+            if(ptr)
+            {
+                reset();
+            }
+            else
             {
                 LOG("free elements of the Queue are exhausted");
             }
         }
-        inline Collection(const Collection& p):size(0) // move
+        inline ~Collection()
+        {
+            if(ptr)
+            {
+                queue->deallocate(ptr);
+            }
+        }
+
+//        Collection(const Collection&);            // undefiend
+//        Collection& operator=(const Collection&); // undefiend
+        inline Collection(const Collection& p) // move
         {
             queue = p.queue;
             ptr   = p.ptr;
@@ -52,72 +68,64 @@ public:
         {
             queue = p.queue;
             ptr   = p.ptr;
-            size  = 0;
             p.queue = NULL;
             p.ptr   = NULL;
-
             return *this;
         }
-        inline ~Collection()
+
+        inline void reset()
         {
             if(ptr)
             {
-                queue->deallocate(ptr);
+                ptr->dlen = 0;
+                ptr->data = ptr->memory;
             }
         }
 
-        void push(const PacketInfo& info)
+        inline void push(const PacketInfo& info)
         {
             copy_data_to_collection(info.data, info.dlen);
         }
 
-        void push(const PacketInfo& info, const uint32_t len)
+        inline void push(const PacketInfo& info, const uint32_t len)
         {
             copy_data_to_collection(info.data, len);
         }
-        
+
         // TODO: workaround
         // we should remove RM(uin32_t) from collected data
         inline void skip_first(const uint32_t len)
         {
-            size = size-len;
-            // TODO: performance drop! unnecessary memmove!!!!
-            memmove(ptr->data, ptr->data+len, size);
+            ptr->dlen -= len;
+            ptr->data += len;
         }
 
         void complete(const PacketInfo& info)
         {
-            assert(size > 0);
-            if(ptr)
+            assert(ptr);
+            assert(ptr->dlen > 0);
+
+            // TODO: replace this code with correct reading of current Conversation (Session)
+            ptr->timestamp = info.header->ts;
+            if(info.ipv4)
             {
-                //std::cout << "collection complete len: " << sizeof(ptr->data) << " size: " << size << std::endl;
-
-                ptr->dlen = size;
-
-                // TODO: replace this code with correct reading of current Conversation (Session)
-                ptr->timestamp = info.header->ts;
-                if(info.ipv4)
-                {
-                    ptr->session.ip_type = auxiliary::Session::v4;
-                    ptr->session.ip.v4.addr[0] = info.ipv4->src();
-                    ptr->session.ip.v4.addr[1] = info.ipv4->dst();
-                }
-
-                if(info.tcp)
-                {
-                    ptr->session.type = auxiliary::Session::TCP;
-                    ptr->session.port[0] = info.tcp->sport();
-                    ptr->session.port[1] = info.tcp->dport();
-                }
-
-                queue->push(ptr);
-                ptr = NULL;
+                ptr->session.ip_type = auxiliary::Session::v4;
+                ptr->session.ip.v4.addr[0] = info.ipv4->src();
+                ptr->session.ip.v4.addr[1] = info.ipv4->dst();
             }
-            size = 0;
+
+            if(info.tcp)
+            {
+                ptr->session.type = auxiliary::Session::TCP;
+                ptr->session.port[0] = info.tcp->sport();
+                ptr->session.port[1] = info.tcp->dport();
+            }
+
+            queue->push(ptr);
+            ptr = NULL;
         }
 
-        inline void             reset() { size = 0; }
-        inline const uint32_t data_size() const { return size; }
+        inline const uint32_t    size() const { return ptr->dlen; }
         inline uint8_t*          data() const { return ptr->data; }
         inline    operator Data*const() const { return ptr; }
         inline Data*const operator ->() const { return ptr; }
@@ -125,18 +133,18 @@ public:
     private:
         inline void copy_data_to_collection(const uint8_t* p, const uint32_t len)
         {
-            if(len > (sizeof(ptr->data)-size))
+            const uint32_t capacity = sizeof(ptr->memory) - ((ptr->data - ptr->memory) + ptr->dlen);
+            if(len > capacity)
             {
-                LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", size, sizeof(ptr->data), len);
-                assert((sizeof(ptr->data)-size) >= len);
+                LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, capacity, len);
+                assert(capacity >= len);
             }
-            memcpy(ptr->data+size, p, len);
-            size += len;
+            memcpy(ptr->data + ptr->dlen, p, len);
+            ptr->dlen += len;
         }
 
         mutable Queue*      queue;
         mutable Data*       ptr;
-        mutable uint32_t    size;
     };
 
     QueueingTransmission(FilteredDataQueue& q) : queue(q)
@@ -144,15 +152,6 @@ public:
     }
     ~QueueingTransmission()
     {
-    }
-
-    void collect(const PacketInfo& info)
-    {
-    }
-
-    inline Collection alloc()
-    {
-        return Collection(queue);
     }
 
 private:
