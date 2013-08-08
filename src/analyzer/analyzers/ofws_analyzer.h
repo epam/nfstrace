@@ -6,13 +6,13 @@
 #ifndef OFWS_ANALYZER_H
 #define OFWS_ANALYZER_H
 //------------------------------------------------------------------------------
-#include <cstring>  //memset
 #include <tr1/unordered_map>
 
 #include "../xdr/xdr_struct.h"
 #include "../nfs3/nfs_operation.h"
 #include "../rpc_sessions.h"
 #include "base_analyzer.h"
+#include "fh.h"                     //hash-table's key
 //------------------------------------------------------------------------------
 using namespace NST::analyzer::NFS3;
 
@@ -26,62 +26,32 @@ namespace analyzer
 namespace analyzers
 {
 
-class OpCounter
-{
-public:
-    inline OpCounter() : total(0)
-    {
-        std::memset(counters, 0, sizeof(counters));
-    }
-    inline ~OpCounter() {}
-    inline void inc(Proc::Enum op, uint32_t size = 1)
-    {
-        total += size;
-        counters[op] += size;
-    }
-    inline uint64_t get_total() const { return total; }
-    inline uint32_t operator[](uint32_t op) const { return counters[op]; }
-private:
-    OpCounter(const OpCounter&);
-    void operator=(const OpCounter&);
-
-    uint32_t counters[Proc::num];
-    uint64_t total;
-};
-
 class OFWSAnalyzer : public BaseAnalyzer
 {
-public:
-    struct FH 
+    class OpCounter
     {
-        inline FH(const nfs_fh3& obj)
+    public:
+        inline OpCounter() : total(0)
         {
-            len = obj.data.len;
-            memcpy(data, obj.data.ptr, len);
+            std::memset(counters, 0, sizeof(counters));
         }
-        inline FH(const FH& obj)
+        inline ~OpCounter() {}
+        inline void inc(Proc::Enum op, uint32_t size = 1)
         {
-            len = obj.len;
-            memcpy(data, obj.data, len);
+            total += size;
+            counters[op] += size;
         }
+        inline uint64_t get_total() const { return total; }
+        inline uint32_t operator[](uint32_t op) const { return counters[op]; }
+    private:
+        OpCounter(const OpCounter&);
+        void operator=(const OpCounter&);
 
-        friend std::ostream& operator<<(std::ostream& out, const FH& obj);
-
-        uint32_t len;
-        uint8_t data[64];
+        uint32_t counters[Proc::num];
+        uint64_t total;
     };
 
-private:
-    struct FH_Eq
-    {
-        bool operator()(const FH& a, const FH& b) const;
-    };
-    struct FH_Hash
-    {
-        int operator()(const FH& fh) const;
-    };
-
-    typedef std::tr1::unordered_map<FH, OpCounter*, FH_Hash, FH_Eq> OFWS;
+    typedef std::tr1::unordered_map<FH, OpCounter*, FH::FH_Hash, FH::FH_Eq> OFWS;
     typedef OFWS::value_type Pair;
     typedef OFWS::iterator Iterator;
     typedef OFWS::const_iterator ConstIterator;

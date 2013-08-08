@@ -413,41 +413,6 @@ OFWSAnalyzer::Iterator OFWSAnalyzer::find_or_create_op_counter(const nfs_fh3& ke
     return i;
 }
 
-bool OFWSAnalyzer::FH_Eq::operator()(const OFWSAnalyzer::FH& a, const OFWSAnalyzer::FH& b) const
-{
-    if(a.len != b.len)
-    {
-        return false;
-    }
-
-    for(uint32_t i = 0; i < a.len; ++i)
-    {
-        if(a.data[i] != b.data[i])
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-std::ostream& operator<<(std::ostream& out, const OFWSAnalyzer::FH& obj)
-{
-    for(uint32_t i = 0; i < obj.len; ++i)
-    {
-        out << (uint32_t) obj.data[i];
-    }
-    return out;
-}
-
-int OFWSAnalyzer::FH_Hash::operator()(const FH& fh) const
-{
-    int hash = 0;
-    for(uint32_t i = 0; i < fh.len; ++i)
-    {
-        hash += fh.data[i];
-    }
-    return hash;
-}
 } // namespace analyzers
 } // namespace analyzer
 } // namespace NST
