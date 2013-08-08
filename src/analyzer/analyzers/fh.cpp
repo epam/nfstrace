@@ -3,6 +3,8 @@
 // Description: FH is a representation nfs_fh3, which is prepared for use in tables and trees. 
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
+#include <iomanip>
+
 #include "fh.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -38,10 +40,19 @@ bool FH::FH_Eq::operator()(const FH& a, const FH& b) const
 
 std::ostream& operator<<(std::ostream& out, const FH& obj)
 {
+
+    const std::ios::fmtflags   f = out.flags(std::ios::hex);
+    const char                 c = out.fill('0');
+
     for(uint32_t i = 0; i < obj.len; ++i)
     {
+        out.width(2);
         out << (uint32_t) obj.data[i];
     }
+
+    out.flags(f);
+    out.fill(c);
+
     return out;
 }
 
