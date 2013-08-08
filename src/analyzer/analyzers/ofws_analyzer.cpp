@@ -389,7 +389,7 @@ void OFWSAnalyzer::print(std::ostream& out)
         Iterator& iterator = v[i];
         const OpCounter* opcounter = iterator->second;
 
-        out << iterator->first << ',' << opcounter->get_total();
+        out << std::hex << iterator->first << std::dec << ',' << opcounter->get_total();
         for(uint32_t j = 0; j < Proc::num; ++j)
         {
             out << ',' << (*opcounter)[j];
