@@ -105,7 +105,7 @@ private:
 
         Chunk** new_blocks = new Chunk*[limit];               // allocate new array of blocks pointers
         memcpy(new_blocks, blocks, sizeof(Chunk*)*allocated); // copy pointers of existing blocks
-        memset(&new_blocks[allocated+1], 0, sizeof(Chunk*)*(limit-allocated)); // fill pointers for new blocks by NULL
+        memset(&new_blocks[allocated], 0, sizeof(Chunk*)*(limit-allocated)); // fill pointers for new blocks by NULL
 
         delete[] blocks;        // delete old array of blocks pointers
         blocks = new_blocks;    // set new array
