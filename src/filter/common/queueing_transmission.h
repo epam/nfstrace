@@ -132,13 +132,14 @@ public:
     private:
         inline void copy_data_to_collection(const uint8_t* p, const uint32_t len)
         {
-            const uint32_t capacity = sizeof(ptr->memory) - ((ptr->data - ptr->memory) + ptr->dlen);
+            uint8_t* const offset_ptr = ptr->data + ptr->dlen;
+            const uint32_t capacity = sizeof(ptr->memory) - (offset_ptr - ptr->memory);
             if(len > capacity)
             {
                 LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, capacity, len);
                 assert(capacity >= len);
             }
-            memcpy(ptr->data + ptr->dlen, p, len);
+            memcpy(offset_ptr, p, len);
             ptr->dlen += len;
         }
 
