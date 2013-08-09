@@ -608,10 +608,8 @@ public:
     {
         // check datalink layer
         const int datalink = reader->datalink();
-        switch(datalink)
+        if(datalink != DLT_EN10MB)
         {
-        case DLT_EN10MB: break;
-        default:
             throw Exception(std::string("Unsupported Data Link Layer: ") + Reader::datalink_description(datalink));
         }
     }
