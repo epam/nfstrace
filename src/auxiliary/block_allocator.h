@@ -17,7 +17,6 @@ namespace NST
 namespace auxiliary
 {
 
-// Return NULL when limit is reached
 // May throw std::bad_alloc() when memory is not enough
 class BlockAllocator
 {
@@ -35,7 +34,7 @@ public:
     {
         for(uint32_t i = 0; i<allocated; i++)
         {
-            delete[] blocks[i];
+            delete[] ((char*)blocks[i]);
         }
         delete[] blocks;
     }
@@ -56,11 +55,12 @@ public:
         Spinlock::Lock lock(spinlock);
             if(list == NULL)
             {
-                if(allocated < limit)
+                if(allocated == limit) // all blocks are allocated!
                 {
-                    list = blocks[allocated] = new_block();
+                    increase_blocks_limit();
                 }
-                else return NULL; // all blocks are allocated!
+
+                list = blocks[allocated] = new_block();
             }
 
             Chunk* c = list;
@@ -99,9 +99,21 @@ private:
         return (Chunk*) ptr;
     }
 
+    void increase_blocks_limit()
+    {
+        limit *= 2; // increase soft limit by twice
+
+        Chunk** new_blocks = new Chunk*[limit];               // allocate new array of blocks pointers
+        memcpy(new_blocks, blocks, sizeof(Chunk*)*allocated); // copy pointers of existing blocks
+        memset(&new_blocks[allocated+1], 0, sizeof(Chunk*)*(limit-allocated)); // fill pointers for new blocks by NULL
+
+        delete[] blocks;        // delete old array of blocks pointers
+        blocks = new_blocks;    // set new array
+    }
+
     uint32_t chunk;       // chunk size
     uint32_t block;       // num chunks in block
-    uint32_t limit;       // max blocks
+    uint32_t limit;       // max blocks, soft limit
     uint32_t nfree;       // num of avaliable chunks
     uint32_t allocated;   // num of allocated blocks, up to limit
     Chunk** blocks;       // array of blocks
