@@ -82,14 +82,17 @@ public:
             }
         }
 
-        inline void push(const PacketInfo& info)
-        {
-            copy_data_to_collection(info.data, info.dlen);
-        }
-
         inline void push(const PacketInfo& info, const uint32_t len)
         {
-            copy_data_to_collection(info.data, len);
+            uint8_t* const offset_ptr = ptr->data + ptr->dlen;
+            const uint32_t capacity = sizeof(ptr->memory) - (offset_ptr - ptr->memory);
+            if(len > capacity)
+            {
+                LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, capacity, len);
+                assert(capacity >= len);
+            }
+            memcpy(offset_ptr, info.data, len);
+            ptr->dlen += len;
         }
 
         // TODO: workaround
@@ -130,19 +133,6 @@ public:
         inline    operator bool const() const { return ptr != NULL; }
 
     private:
-        inline void copy_data_to_collection(const uint8_t* p, const uint32_t len)
-        {
-            uint8_t* const offset_ptr = ptr->data + ptr->dlen;
-            const uint32_t capacity = sizeof(ptr->memory) - (offset_ptr - ptr->memory);
-            if(len > capacity)
-            {
-                LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, capacity, len);
-                assert(capacity >= len);
-            }
-            memcpy(offset_ptr, p, len);
-            ptr->dlen += len;
-        }
-
         mutable Queue*      queue;
         mutable Data*       ptr;
     };

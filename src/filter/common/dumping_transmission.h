@@ -64,14 +64,29 @@ public:
             packets_len = 0;
         }
 
-        inline void push(const PacketInfo& info)
-        {
-            push_packet(info, info.dlen);
-        }
-
         inline void push(const PacketInfo& info, const uint32_t len)
         {
-            push_packet(info, len);
+            if(timercmp(&last, &info.header->ts, !=))  // timestamps aren't equal
+            {
+                last = info.header->ts;
+
+                // copy packet for dumping to file because it hasn't been seen before
+                //TRACE("payload_len: %u packets_len: %u len: %u", payload_len, packets_len, len);
+                assert(sizeof(packets) >= (packets_len + sizeof(pcap_pkthdr) + info.header->caplen));
+
+                memcpy(packets+packets_len, info.header, sizeof(pcap_pkthdr));
+                packets_len += sizeof(pcap_pkthdr);
+                memcpy(packets+packets_len, info.packet, info.header->caplen);
+                packets_len += info.header->caplen;
+            }
+            else
+            {
+                TRACE("The packet was collected before");
+            }
+
+            // copy payload
+            memcpy(payload+payload_len, info.data, len);
+            payload_len += len;
         }
 
         inline void skip_first(const uint32_t len)
@@ -101,38 +116,7 @@ public:
         inline    operator bool const() const { return dumper != NULL; }
 
     private:
-        inline void push_packet(const PacketInfo& info, const uint32_t len)
-        {
-            if(timercmp(&last, &info.header->ts, !=))  // timestamps aren't equal
-            {
-                // copy packet for dumping to file because it hasn't been seen before
-                copy_packet(info);
-                last = info.header->ts;
-            }
-            else
-            {
-                TRACE("The packet was collected before");
-            }
-
-            // copy payload
-            memcpy(payload+payload_len, info.data, len);
-            payload_len += len;
-        }
-        
-        inline void copy_packet(const PacketInfo& info)
-        {
-            const uint32_t len = sizeof(pcap_pkthdr) + info.header->caplen;
-            //TRACE("payload_len: %u packets_len: %u len: %u", payload_len, packets_len, len);
-            assert(sizeof(packets) >= packets_len + len);
-
-            memcpy(packets+packets_len, info.header, sizeof(pcap_pkthdr));
-            packets_len += sizeof(pcap_pkthdr);
-            memcpy(packets+packets_len, info.packet, info.header->caplen);
-            packets_len += info.header->caplen;
-        }
-
         PacketDumper* dumper;
-
         uint8_t payload[4096];
         uint32_t payload_len;
         uint8_t packets[128 * 1024]; // 128k
