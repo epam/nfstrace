@@ -21,15 +21,13 @@ namespace pcap
 class PacketDumper
 {
 public:
-    PacketDumper(pcap_t* handle, const char* path):dumper(NULL), stream(NULL)
+    PacketDumper(pcap_t* handle, const char* path):dumper(NULL)
     {
         dumper = pcap_dump_open(handle, path);
         if(NULL == dumper)
         {
             throw PcapError("pcap_dump_open", pcap_geterr(handle));
         }
-
-        stream = pcap_dump_file(dumper);
     }
 
     ~PacketDumper()
@@ -43,20 +41,16 @@ public:
         pcap_dump((u_char*)dumper, h, sp);
     }
 
-    inline void dump(const void* ptr, size_t size)
+    inline FILE* get_stream()
     {
-        if(fwrite(ptr, size, 1, stream) != 1)
-        {
-            throw PcapError("fwrite", "Error writing to dumping file");
-        }
+        return pcap_dump_file(dumper);
     }
 
 private:
-    PacketDumper(const PacketDumper&);                  // undefined
-    const PacketDumper& operator=(const PacketDumper&); // undefined
+    PacketDumper(const PacketDumper&);            // undefined
+    PacketDumper& operator=(const PacketDumper&); // undefined
 
     pcap_dumper_t* dumper;
-    FILE* stream;
 };
 
 } // namespace pcap

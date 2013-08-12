@@ -9,10 +9,14 @@
 #include <memory> // for std::auto_ptr
 #include <string>
 
+#include <sys/time.h>
+
+#include "../../auxiliary/exception.h"
+#include "../../auxiliary/logger.h"
 #include "../pcap/handle.h"
 #include "../pcap/packet_dumper.h"
-#include "filtration_processor.h"
 //------------------------------------------------------------------------------
+using NST::auxiliary::Exception;
 using NST::filter::pcap::Handle;
 using NST::filter::pcap::PacketDumper;
 //------------------------------------------------------------------------------
@@ -28,12 +32,16 @@ public:
     class Collection
     {
     public:
-        inline Collection()
+        inline Collection():dumper(NULL)
         {
+            reset();
+            timerclear(&last);
         }
 
         inline void operator=(const DumpingTransmission& t) // initialization
         {
+            dumper = t.dumper.get();
+            reset();
         }
         inline ~Collection()
         {
@@ -52,16 +60,18 @@ public:
 
         inline void reset()
         {
+            payload_len = 0;
+            packets_len = 0;
         }
 
         inline void push(const PacketInfo& info)
         {
-
+            push_packet(info, info.dlen);
         }
 
         inline void push(const PacketInfo& info, const uint32_t len)
         {
-
+            push_packet(info, len);
         }
 
         inline void skip_first(const uint32_t len)
@@ -70,14 +80,64 @@ public:
 
         void complete(const PacketInfo& info)
         {
+            assert(dumper);
 
+            // dump packets to file stream
+            uint32_t i = 0;
+            while(i < packets_len)
+            {
+                const pcap_pkthdr* h = reinterpret_cast<pcap_pkthdr*>(packets + i);
+                const uint8_t*     p = reinterpret_cast<uint8_t*>    (packets + i + sizeof(pcap_pkthdr));
+                dumper->dump(h, p);
+                i += sizeof(pcap_pkthdr) + h->caplen;
+            }
+
+            reset();
+            dumper = NULL;
         }
 
-        inline const uint32_t    size() const { return 0; }
-        inline uint8_t*          data() const { return NULL; }
-        inline    operator bool const() const { return false; }
+        inline const uint32_t    size() const { return payload_len;    }
+        inline const uint8_t*    data() const { return payload;        }
+        inline    operator bool const() const { return dumper != NULL; }
 
     private:
+        inline void push_packet(const PacketInfo& info, const uint32_t len)
+        {
+            if(timercmp(&last, &info.header->ts, !=))  // timestamps aren't equal
+            {
+                // copy packet for dumping to file because it hasn't been seen before
+                copy_packet(info);
+                last = info.header->ts;
+            }
+            else
+            {
+                TRACE("The packet was collected before");
+            }
+
+            // copy payload
+            memcpy(payload+payload_len, info.data, len);
+            payload_len += len;
+        }
+        
+        inline void copy_packet(const PacketInfo& info)
+        {
+            const uint32_t len = sizeof(pcap_pkthdr) + info.header->caplen;
+            //TRACE("payload_len: %u packets_len: %u len: %u", payload_len, packets_len, len);
+            assert(sizeof(packets) >= packets_len + len);
+
+            memcpy(packets+packets_len, info.header, sizeof(pcap_pkthdr));
+            packets_len += sizeof(pcap_pkthdr);
+            memcpy(packets+packets_len, info.packet, info.header->caplen);
+            packets_len += info.header->caplen;
+        }
+
+        PacketDumper* dumper;
+
+        uint8_t payload[4096];
+        uint32_t payload_len;
+        uint8_t packets[128 * 1024]; // 128k
+        uint32_t packets_len;
+        struct  timeval last;   // use timestamp as unique ID of packet
     };
 
     DumpingTransmission(const Handle& handle, const std::string& path)
