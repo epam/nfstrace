@@ -146,7 +146,7 @@ public:
             {
                 if(info.dlen > 0 && (seq > sequence) )
                 {
-                    TRACE("ADD FRAGMENT seq: %u dlen: %u sequence: %u", seq, info.dlen, sequence);
+                    //TRACE("ADD FRAGMENT seq: %u dlen: %u sequence: %u", seq, info.dlen, sequence);
                     Packet* frag = Packet::create(info);
 
                     frag->next = fragments;
@@ -247,7 +247,7 @@ public:
 
                 if( (int32_t)(acknowledged - lowest_seq) > 0 )
                 {
-                    TRACE("acknowledged(%u) > lowest_seq(%u) seq:%u", acknowledged, lowest_seq, sequence);
+                    //TRACE("acknowledged(%u) > lowest_seq(%u) seq:%u", acknowledged, lowest_seq, sequence);
                     // There are frames missing in the capture stream that were seen
                     // by the receiving host. Inform Stream about it.
                     reader.lost(lowest_seq - sequence);
@@ -374,7 +374,7 @@ public:
         {
             if(hdr_len == 0 && msg_len >= n)
             {
-                TRACE("We are lost %u bytes of payload marked for discard", n);
+                //TRACE("We are lost %u bytes of payload marked for discard", n);
                 msg_len -= n;
             }
             else
@@ -418,7 +418,7 @@ public:
                     if(hdr_len > info.dlen) // got new part of header (not the all!)
                     {
                         //TRACE("got new part of header (not the all!)");
-                        collection.push(info);
+                        collection.push(info, info.dlen);
                         hdr_len     -= info.dlen;
                         msg_len     -= info.dlen;
                         info.dlen = 0;  // return from while
@@ -458,7 +458,7 @@ public:
 
             if(info.dlen < tocopy)
             {
-                collection.push(info);
+                collection.push(info, info.dlen);
                 //info.data += info.dlen;   optimization
                 info.dlen = 0;
                 return;
@@ -491,7 +491,7 @@ public:
             }
             else // push them into collection to validation after supplement by next data
             {
-                collection.push(info);
+                collection.push(info, info.dlen);
                 //info.data += info.dlen;   optimization
                 info.dlen = 0;
                 return;
