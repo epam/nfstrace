@@ -29,7 +29,6 @@ struct Conversation : private NST::auxiliary::Session
     Conversation(const PacketInfo& info, Direction& direction /*out value*/)
     {
         memset(this, 0, sizeof(Conversation));
-
         if(info.ipv4)
         {
             ip_type = v4;

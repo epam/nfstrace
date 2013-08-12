@@ -21,6 +21,7 @@ struct Transmission : private NST::auxiliary::Session
 {
     Transmission(const NST::auxiliary::Session& session, const Session::Direction as_source)
     {
+        memset(this, 0, sizeof(Transmission));
         ip_type = session.ip_type;
         type    = session.type;
 
