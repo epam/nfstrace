@@ -478,13 +478,6 @@ public:
         {
             collection = *writer;   // allocate new collection from writer
 
-            if(!collection)
-            {
-                // collection isn't allocated!
-                info.dlen = 0;  // skip whole packet
-                return;
-            }
-
             if(info.dlen >= max_header)  // is data enougth to message validation?
             {
                 rm = reinterpret_cast<const RecordMark*>(info.data);
