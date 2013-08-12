@@ -52,7 +52,6 @@ void FiltrationManager::dump_to_file(const Parameters& params)
     std::auto_ptr<OnlineDumping>  thread    (new OnlineDumping(processor, status));
 
     threads.add(thread.release());
-    throw Exception("Dumping mode is turned off in this version");
 }
 
 void FiltrationManager::capture_to_queue(FilteredDataQueue& queue, const Parameters& params)

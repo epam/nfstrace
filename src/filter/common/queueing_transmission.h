@@ -9,9 +9,9 @@
 #include <iostream>
 #include <string>
 
+#include "../../auxiliary/filtered_data.h"
 #include "../../auxiliary/logger.h"
 #include "../../auxiliary/session.h"
-#include "../../auxiliary/filtered_data.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::FilteredData;
 using NST::auxiliary::FilteredDataQueue;
@@ -126,7 +126,7 @@ public:
         }
 
         inline const uint32_t    size() const { return ptr->dlen; }
-        inline uint8_t*          data() const { return ptr->data; }
+        inline const uint8_t*    data() const { return ptr->data; }
         inline    operator bool const() const { return ptr != NULL; }
 
     private:
