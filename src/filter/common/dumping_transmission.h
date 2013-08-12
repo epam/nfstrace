@@ -69,7 +69,9 @@ public:
             if(timercmp(&last, &info.header->ts, !=))  // timestamps aren't equal
             {
                 last = info.header->ts;
-
+                // direct dumping without waiting  completeness of analysis and complete() call
+                dumper->dump(info.header, info.packet);
+/*
                 // copy packet for dumping to file because it hasn't been seen before
                 //TRACE("payload_len: %u packets_len: %u len: %u", payload_len, packets_len, len);
                 assert(sizeof(packets) >= (packets_len + sizeof(pcap_pkthdr) + info.header->caplen));
@@ -78,6 +80,7 @@ public:
                 packets_len += sizeof(pcap_pkthdr);
                 memcpy(packets+packets_len, info.packet, info.header->caplen);
                 packets_len += info.header->caplen;
+*/
             }
             else
             {
@@ -96,7 +99,7 @@ public:
         void complete(const PacketInfo& info)
         {
             assert(dumper);
-
+/*
             // dump packets to file stream
             uint32_t i = 0;
             while(i < packets_len)
@@ -106,7 +109,7 @@ public:
                 dumper->dump(h, p);
                 i += sizeof(pcap_pkthdr) + h->caplen;
             }
-
+*/
             reset();
             dumper = NULL;
         }
