@@ -56,7 +56,26 @@ struct Session
     };
 
     bool operator==(const Session& key) const;
-    size_t hash() const;
+    inline size_t hash() const
+    {
+        std::size_t key = port[0] + port[1];
+
+        if(ip_type == Session::v4)
+        {
+            key += ip.v4.addr[0] + ip.v4.addr[1];
+        }
+        else
+        {
+            for(int i = 0; i < 16; ++i)
+            {
+                key += ip.v6.addr[0][i] + ip.v6.addr[1][i];
+            }
+        }
+
+        key <<= type;
+
+        return key;
+    }
 };
 
 std::ostream& operator<<(std::ostream& out, const Session& session);

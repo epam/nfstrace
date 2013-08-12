@@ -11,29 +11,6 @@ namespace NST
 namespace auxiliary
 {
 
-std::size_t Session::hash() const
-{
-    std::size_t key = port[0] + port[1];
-
-    if(ip_type == Session::v4)
-    {
-        key += ip.v4.addr[0] + ip.v4.addr[1];
-    }
-    else
-    {
-        for(int i = 0; i < 16; ++i)
-        {
-            key += ip.v6.addr[0][i] + ip.v6.addr[1][i];
-        }
-    }
-
-    if(type == Session::UDP)
-    {
-        key = ~key;
-    }
-    return key;
-}
-
 bool Session::operator==(const Session& obj) const
 {
     if((ip_type != obj.ip_type) || (type != obj.type))
