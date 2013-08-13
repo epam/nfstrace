@@ -7,6 +7,7 @@
 
 #include "analysis_manager.h"
 #include "analyzers/breakdown_analyzer.h"
+#include "analyzers/ofdws_analyzer.h"
 #include "analyzers/ofws_analyzer.h"
 #include "analyzers/print_analyzer.h"
 #include "nfs_parser_thread.h"
@@ -80,6 +81,11 @@ void AnalysisManager::populate_analyzers(const Parameters& params)
         if(active_analyzers[i] == std::string("ofws"))
         {
             analyzers.add(new analyzers::OFWSAnalyzer());
+            continue;
+        }
+        if(active_analyzers[i] == std::string("ofdws"))
+        {
+            analyzers.add(new analyzers::OFDWSAnalyzer(params.block_size(), params.bucket_size()));
             continue;
         }
     }

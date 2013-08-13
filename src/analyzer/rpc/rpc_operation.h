@@ -48,6 +48,8 @@ public:
     inline const RPCReply&     get_reply() const { return reply;    }
     inline const RPCSession& get_session() const { return *session; }
 
+    inline timeval get_call_time()  const { return cdata.data().timestamp; }
+    inline timeval get_reply_time() const { return rdata.data().timestamp; }
     inline timeval latency() const
     {
         timeval diff;

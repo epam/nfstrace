@@ -41,11 +41,21 @@ struct FH
         len = obj.len;
         memcpy(data, obj.data, len);
     }
+    std::string to_string() const;
 
     friend std::ostream& operator<<(std::ostream& out, const FH& obj);
 
     uint32_t len;
     uint8_t data[64];
+
+private:
+    static inline char to_char(uint8_t hex)
+    {
+        if(hex < 0xA)
+            return hex + '0';
+        else
+            return hex + 'a' - 0xA;
+    }
 };
 
 } // namespace analyzers
