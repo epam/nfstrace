@@ -30,6 +30,8 @@ struct Args
         BSIZE,
         MSIZE,
         QSIZE,
+        BLSIZE,
+        BUSIZE,
         VERBOSE,
         HELP,
         num,

@@ -183,6 +183,22 @@ const std::vector<std::string> Parameters::analyzers() const
     return analyzers;
 }
 
+const unsigned int Parameters::block_size() const
+{
+    const int bl_s = parser[CLI::BLSIZE].to_int();
+    if(bl_s < 1)
+        throw cmdline::CLIError(std::string("Invalid value of block size: ") + parser[CLI::BLSIZE].to_cstr());
+    return bl_s * 1024;
+}
+
+const unsigned int Parameters::bucket_size() const
+{
+    const int b_s = parser[CLI::BUSIZE].to_int();
+    if(b_s < 1)
+        throw cmdline::CLIError(std::string("Invalid value of bucket size: ") + parser[CLI::BUSIZE].to_cstr());
+    return b_s;
+}
+
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------

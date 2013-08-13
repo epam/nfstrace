@@ -46,6 +46,8 @@ public:
     const unsigned short    rpcmsg_limit() const;
     const unsigned short    queue_capacity() const;
     const std::vector<std::string> analyzers() const;
+    const unsigned int      block_size() const;
+    const unsigned int      bucket_size() const;
 
 private:
     Parameters()
