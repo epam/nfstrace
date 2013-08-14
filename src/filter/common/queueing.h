@@ -3,8 +3,8 @@
 // Description: Push FilteredData to queue for further analysis.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef QUEUEING_TRANSMISSION_H
-#define QUEUEING_TRANSMISSION_H
+#ifndef QUEUEING_H
+#define QUEUEING_H
 //------------------------------------------------------------------------------
 #include <iostream>
 #include <string>
@@ -21,7 +21,7 @@ namespace NST
 namespace filter
 {
 
-class QueueingTransmission
+class Queueing
 {
     typedef FilteredDataQueue Queue;
     typedef FilteredData      Data;
@@ -34,7 +34,7 @@ public:
         {
         }
 
-        inline void operator=(const QueueingTransmission& t) // initialization
+        inline void operator=(const Queueing& t) // initialization
         {
             queue = &t.queue;
             ptr = queue->allocate();
@@ -137,16 +137,16 @@ public:
         mutable Data*       ptr;
     };
 
-    QueueingTransmission(FilteredDataQueue& q) : queue(q)
+    Queueing(FilteredDataQueue& q) : queue(q)
     {
     }
-    ~QueueingTransmission()
+    ~Queueing()
     {
     }
 
 private:
-    QueueingTransmission(const QueueingTransmission&);            // undefined
-    QueueingTransmission& operator=(const QueueingTransmission&); // undefined
+    Queueing(const Queueing&);            // undefined
+    Queueing& operator=(const Queueing&); // undefined
 
     Queue& queue;
 };
@@ -154,5 +154,5 @@ private:
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//QUEUEING_TRANSMISSION_H
+#endif//QUEUEING_H
 //------------------------------------------------------------------------------

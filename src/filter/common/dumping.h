@@ -3,8 +3,8 @@
 // Description: Dump filtered packets to .pcap file
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef DUMPING_PROCESSOR_H
-#define DUMPING_PROCESSOR_H
+#ifndef DUMPING_H
+#define DUMPING_H
 //------------------------------------------------------------------------------
 #include <memory> // for std::auto_ptr
 #include <string>
@@ -25,7 +25,7 @@ namespace NST
 namespace filter
 {
 
-class DumpingTransmission
+class Dumping
 {
 public:
 
@@ -38,7 +38,7 @@ public:
             timerclear(&last);
         }
 
-        inline void operator=(const DumpingTransmission& t) // initialization
+        inline void operator=(const Dumping& t) // initialization
         {
             dumper = t.dumper.get();
             reset();
@@ -61,7 +61,7 @@ public:
         inline void reset()
         {
             payload_len = 0;
-            packets_len = 0;
+        //    packets_len = 0;
         }
 
         inline void push(const PacketInfo& info, const uint32_t len)
@@ -122,22 +122,22 @@ public:
         PacketDumper* dumper;
         uint8_t payload[4096];
         uint32_t payload_len;
-        uint8_t packets[128 * 1024]; // 128k
-        uint32_t packets_len;
+    //    uint8_t packets[128 * 1024]; // 128k
+    //    uint32_t packets_len;
         struct  timeval last;   // use timestamp as unique ID of packet
     };
 
-    DumpingTransmission(const Handle& handle, const std::string& path)
+    Dumping(const Handle& handle, const std::string& path)
     {
         dumper.reset(new PacketDumper(handle, path.c_str()));
     }
-    ~DumpingTransmission()
+    ~Dumping()
     {
     }
 
 private:
-    DumpingTransmission(const DumpingTransmission&);            // undefined
-    DumpingTransmission& operator=(const DumpingTransmission&); // undefined
+    Dumping(const Dumping&);            // undefined
+    Dumping& operator=(const Dumping&); // undefined
 
     std::auto_ptr<PacketDumper> dumper;
 };
@@ -145,5 +145,5 @@ private:
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//DUMPING_PROCESSOR_H
+#endif//DUMPING_H
 //------------------------------------------------------------------------------
