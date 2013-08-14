@@ -6,8 +6,8 @@
 #include <memory> // std::auto_ptr
 
 #include "common/filtration_processor.h"
-#include "common/dumping_transmission.h"
-#include "common/queueing_transmission.h"
+#include "common/dumping.h"
+#include "common/queueing.h"
 #include "filtration_manager.h"
 #include "pcap/capture_reader.h"
 #include "pcap/file_reader.h"
@@ -42,42 +42,42 @@ FiltrationManager::~FiltrationManager()
 
 void FiltrationManager::dump_to_file(const Parameters& params)
 {
-    typedef FiltrationProcessor<CaptureReader, DumpingTransmission> Processor;
+    typedef FiltrationProcessor<CaptureReader, Dumping> Processor;
     typedef ProcessingThread<Processor> OnlineDumping;
 
-    std::auto_ptr<CaptureReader>        reader = create_capture_reader(params);
-    std::auto_ptr<DumpingTransmission>  writer (new DumpingTransmission(reader->get_handle(), params.output_file()));
+    std::auto_ptr<CaptureReader> reader = create_capture_reader(params);
+    std::auto_ptr<Dumping>       writer (new Dumping(reader->get_handle(), params.output_file()));
 
-    std::auto_ptr<Processor>      processor (new Processor(reader, writer));
-    std::auto_ptr<OnlineDumping>  thread    (new OnlineDumping(processor, status));
+    std::auto_ptr<Processor>     processor (new Processor(reader, writer));
+    std::auto_ptr<OnlineDumping> thread    (new OnlineDumping(processor, status));
 
     threads.add(thread.release());
 }
 
 void FiltrationManager::capture_to_queue(FilteredDataQueue& queue, const Parameters& params)
 {
-    typedef FiltrationProcessor<CaptureReader, QueueingTransmission> Processor;
+    typedef FiltrationProcessor<CaptureReader, Queueing> Processor;
     typedef ProcessingThread<Processor> OnlineAnalyzing;
 
-    std::auto_ptr<CaptureReader>        reader = create_capture_reader(params);
-    std::auto_ptr<QueueingTransmission> writer (new QueueingTransmission(queue));
+    std::auto_ptr<CaptureReader> reader = create_capture_reader(params);
+    std::auto_ptr<Queueing>      writer (new Queueing(queue));
 
-    std::auto_ptr<Processor>     processor (new Processor(reader, writer));
-    std::auto_ptr<OnlineAnalyzing>  thread (new OnlineAnalyzing(processor, status));
+    std::auto_ptr<Processor>       processor (new Processor(reader, writer));
+    std::auto_ptr<OnlineAnalyzing> thread    (new OnlineAnalyzing(processor, status));
 
     threads.add(thread.release());
 }
 
 void FiltrationManager::read_to_queue(FilteredDataQueue& queue, const Parameters& params)
 {
-    typedef FiltrationProcessor<FileReader, QueueingTransmission> Processor;
+    typedef FiltrationProcessor<FileReader, Queueing> Processor;
     typedef ProcessingThread<Processor> OfflineAnalyzing;
 
-    std::auto_ptr<FileReader>           reader (new FileReader(params.input_file()));
-    std::auto_ptr<QueueingTransmission> writer (new QueueingTransmission(queue));
+    std::auto_ptr<FileReader> reader (new FileReader(params.input_file()));
+    std::auto_ptr<Queueing>   writer (new Queueing(queue));
 
-    std::auto_ptr<Processor>      processor (new Processor(reader, writer));
-    std::auto_ptr<OfflineAnalyzing>  thread (new OfflineAnalyzing(processor, status));
+    std::auto_ptr<Processor>        processor (new Processor(reader, writer));
+    std::auto_ptr<OfflineAnalyzing> thread    (new OfflineAnalyzing(processor, status));
 
     threads.add(thread.release());
 }
