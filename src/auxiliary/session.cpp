@@ -52,6 +52,7 @@ std::ostream& operator<<(std::ostream& out, const Session& session)
             out << ((ip >> 8) & 0xFF);
             out << '.';
             out << ((ip >> 0) & 0xFF);
+            out << ':' << session.port[Session::Source];
         }
             out << " --> ";
         {
@@ -63,6 +64,7 @@ std::ostream& operator<<(std::ostream& out, const Session& session)
             out << ((ip >> 8) & 0xFF);
             out << '.';
             out << ((ip >> 0) & 0xFF);
+            out << ':' << session.port[Session::Destination];
         }
         break;
         case Session::v6:
