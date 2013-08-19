@@ -27,7 +27,12 @@ XDRReader& operator>>(XDRReader& in, ftype3& obj)
 
 XDRReader& operator>>(XDRReader& in, specdata3& obj)
 {
-    return in >> obj.specdata1 >> obj.specdata2;
+    const size_t size = sizeof(obj.specdata1) +
+                        sizeof(obj.specdata2);
+    in.arrange_check(size);
+    in.read_unchecked(obj.specdata1);
+    in.read_unchecked(obj.specdata2);
+    return in;
 }
 
 XDRReader& operator>>(XDRReader& in, nfs_fh3& obj)
@@ -39,12 +44,39 @@ XDRReader& operator>>(XDRReader& in, nfs_fh3& obj)
 
 XDRReader& operator>>(XDRReader& in, nfstime3& obj)
 {
-    return in >> obj.seconds >> obj.nseconds;
+    const size_t size = sizeof(obj.seconds) +
+                        sizeof(obj.nseconds);
+    in.arrange_check(size);
+    in.read_unchecked(obj.seconds);
+    in.read_unchecked(obj.nseconds);
+    return in;
 }
 
 XDRReader& operator>>(XDRReader& in, fattr3& obj)
 {
-    in >> obj.type >> obj.mode >> obj.nlink >> obj.uid >> obj.gid >> obj.size >> obj.used >> obj.rdev >> obj.fsid >> obj.fileid >> obj.atime >> obj.mtime >> obj.ctime;
+    const size_t size = sizeof(obj.type) +
+                        sizeof(obj.mode) +
+                        sizeof(obj.nlink) +
+                        sizeof(obj.uid) +
+                        sizeof(obj.gid) +
+                        sizeof(obj.size) +
+                        sizeof(obj.used) +
+                        sizeof(obj.rdev) +
+                        sizeof(obj.fsid) +
+                        sizeof(obj.fileid);
+    in.arrange_check(size);
+    in >> obj.type;
+    in.read_unchecked(obj.mode);
+    in.read_unchecked(obj.nlink);
+    in.read_unchecked(obj.uid);
+    in.read_unchecked(obj.gid);
+    in.read_unchecked(obj.size);
+    in.read_unchecked(obj.used);
+    in >> obj.rdev;
+    in.read_unchecked(obj.fsid);
+    in.read_unchecked(obj.fileid);
+
+    in >> obj.atime >> obj.mtime >> obj.ctime;
     return in;
 }
 
@@ -283,7 +315,7 @@ std::ostream& operator<<(std::ostream& out, const nfs_fh3& obj)
 
 std::ostream& operator<<(std::ostream& out, const nfstime3& obj)
 {
-    return out << " seconds: " << obj.get_seconds() << " nseconds: " << obj.get_nseconds();
+    return out << "seconds: " << obj.get_seconds() << " nseconds: " << obj.get_nseconds();
 }
 
 std::ostream& operator<<(std::ostream& out, const fattr3& obj)
