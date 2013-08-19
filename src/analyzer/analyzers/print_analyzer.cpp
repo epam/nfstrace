@@ -404,8 +404,8 @@ bool PrintAnalyzer::call_readdirplus(const RPCOperation& operation)
     out << " status: " << res.status;
     if(res.status == nfsstat3::OK)
     {
-        out << res.resok.dir_attributes;
-        out << res.resok.cookieverf;
+        out << " dir_attributes: " << res.resok.dir_attributes;
+        out << " cookieverf: "    << res.resok.cookieverf;
     }
     out << " ]";
     out << std::endl;

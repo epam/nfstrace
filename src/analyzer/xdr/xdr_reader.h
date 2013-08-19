@@ -49,7 +49,7 @@ public:
     {
         return it - beg;
     }
-    
+
     inline void reset(const uint8_t* ptr, size_t len)
     {
         beg = ptr;
@@ -57,14 +57,28 @@ public:
         last = ptr+len;
     }
 
-    XDRReader& operator>>(uint16_t& obj)
+    inline void read_unchecked(uint32_t& v)
     {
-        const size_t size = sizeof(obj);
-        arrange_check(size);
+        v = ntohl(*(uint32_t*)it);
+        it += sizeof(v);
+    }
 
-        obj = ntohl(*(uint16_t*)it);
-        it += size;
-        return *this;
+    inline void read(uint32_t& v)
+    {
+        arrange_check(sizeof(v));
+        read_unchecked(v);
+    }
+
+    inline void read_unchecked(uint64_t& v)
+    {
+        v = be64toh(*(uint64_t*)it);
+        it += sizeof(v);
+    }
+
+    inline void read(uint64_t& v)
+    {
+        arrange_check(sizeof(v));
+        read_unchecked(v);
     }
 
     XDRReader& operator>>(uint32_t& obj)
@@ -107,7 +121,6 @@ public:
         it += calc_offset(len);
     }
 
-protected:
     inline void arrange_check(uint32_t size) const
     {
         if(it+size > last)
@@ -116,6 +129,7 @@ protected:
         }
     }
 
+protected:
     inline static uint32_t calc_offset(uint32_t size)
     {
         uint32_t mod = size % align;

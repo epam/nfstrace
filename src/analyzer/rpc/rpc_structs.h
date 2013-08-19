@@ -72,8 +72,20 @@ struct RPCCall : public RPCMessage
 {
     inline friend XDRReader& operator>>(XDRReader& in, RPCCall& o)
     {
-        in >> o.xid >> o.type; // direct fill RPCMessage fileds
-        return in >> o.rpcvers >> o.prog >> o.vers >> o.proc >> o.cred >> o.verf;
+        const size_t size = sizeof(o.xid) +
+                            sizeof(o.type) +
+                            sizeof(o.rpcvers) +
+                            sizeof(o.prog) +
+                            sizeof(o.vers) +
+                            sizeof(o.proc);
+        in.arrange_check(size);
+        in.read_unchecked(o.xid);   // direct fill RPCMessage fileds
+        in.read_unchecked(o.type);  // direct fill RPCMessage fileds
+        in.read_unchecked(o.rpcvers);
+        in.read_unchecked(o.prog);
+        in.read_unchecked(o.vers);
+        in.read_unchecked(o.proc);
+        return in >> o.cred >> o.verf;
     }
 
     inline const uint32_t get_rpcvers() const { return rpcvers; }
@@ -144,8 +156,13 @@ struct RPCReply : public RPCMessage
 {
     inline friend XDRReader& operator>>(XDRReader& in, RPCReply& o)
     {
-        in >> o.xid >> o.type; // direct fill RPCMessage fileds
-        in >> o.stat;
+        const size_t size = sizeof(o.xid) +
+                            sizeof(o.type) +
+                            sizeof(o.stat);
+        in.arrange_check(size);
+        in.read_unchecked(o.xid);   // direct fill RPCMessage fileds
+        in.read_unchecked(o.type);  // direct fill RPCMessage fileds
+        in.read_unchecked(o.stat);
         switch(o.stat)
         {
             case SUNRPC_MSG_ACCEPTED:  in >> o.accepted; break;
