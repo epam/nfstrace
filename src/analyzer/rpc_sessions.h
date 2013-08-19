@@ -14,9 +14,9 @@
 #include "../auxiliary/filtered_data.h"
 #include "../auxiliary/logger.h"
 #include "../auxiliary/session.h"
-#include "transmission.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::FilteredDataQueue;
+using NST::auxiliary::Session;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -59,7 +59,6 @@ public:
         Iterator i = operations.find(xid);
         if(i != operations.end())
         {
-
             ptr = i->second;
             operations.erase(i);
         }
@@ -94,7 +93,88 @@ private:
 
 class RPCSessions
 {
-    typedef std::tr1::unordered_map<Transmission, RPCSession*, Transmission::Hash> Map;
+
+    struct Hash
+    {
+        std::size_t operator()(const Session& s) const
+        {
+            std::size_t key = s.port[0] + s.port[1];
+
+            if(s.ip_type == Session::v4)
+            {
+                key += s.ip.v4.addr[0] + s.ip.v4.addr[1];
+            }
+            else
+            {
+                for(int i = 0; i < 16; ++i)
+                {
+                    key += s.ip.v6.addr[0][i] + s.ip.v6.addr[1][i];
+                }
+            }
+            key <<= s.type;
+            return key;
+        }
+    };
+
+    struct Pred
+    {
+        bool operator() (const Session& a, const Session& b) const
+        {
+            if((a.ip_type != b.ip_type) || (a.type != b.type)) return false;
+
+            switch(a.ip_type)
+            {
+                case Session::v4:
+                {
+                    if((a.port[0] == b.port[0]) &&
+                       (a.port[1] == b.port[1]) &&
+                       (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
+                       (a.ip.v4.addr[1] == b.ip.v4.addr[1]))
+                        return true;
+
+                    if((a.port[1] == b.port[0]) &&
+                       (a.port[0] == b.port[1]) &&
+                       (a.ip.v4.addr[1] == b.ip.v4.addr[0]) &&
+                       (a.ip.v4.addr[0] == b.ip.v4.addr[1]))
+                        return true;
+                }
+                break;
+                case Session::v6:
+                {
+                    if((a.port[0] == b.port[0]) &&
+                       (a.port[1] == b.port[1]) )
+                    {
+                        int i = 0;
+                        for(; i < 16; ++i)
+                        {
+                            if((a.ip.v6.addr[0][i] != b.ip.v6.addr[0][i]) ||
+                               (a.ip.v6.addr[1][i] != b.ip.v6.addr[1][i]))
+                                break;
+                        }
+                        if(i == 16) return true;
+                    }
+
+                    if((a.port[1] == b.port[0]) &&
+                       (a.port[0] == b.port[1]) )
+                    {
+                        int i = 0;
+                        for(; i < 16; ++i)
+                        {
+                            if((a.ip.v6.addr[1][i] != b.ip.v6.addr[0][i]) ||
+                               (a.ip.v6.addr[0][i] != b.ip.v6.addr[1][i]))
+                                break;
+                        }
+                        if(i == 16) return true;
+                    }
+                }
+                break;
+            }
+            return false;
+        }
+    };
+
+
+    typedef std::tr1::unordered_map<Session, RPCSession*, Hash, Pred> Map;
     typedef Map::iterator Iterator;
     typedef Map::const_iterator ConstIterator;
     typedef Map::value_type Pair;
@@ -120,16 +200,14 @@ public:
         }
     }
 
-    RPCSession* get_session(const Session& session, Type type)
+    RPCSession* get_session(const Session& key, Type type)
     {
-        Transmission key(session, (type == DIRECT) ? Session::Source : Session::Destination);
-
         Iterator el = sessions.find(key);
         if(el == sessions.end())
         {
             if(type == DIRECT) // add new session only for Call (type == DIRECT)
             {
-                std::auto_ptr<RPCSession> s(new RPCSession(session));
+                std::auto_ptr<RPCSession> s(new RPCSession(key));
                 std::pair<Iterator, bool> in_res = sessions.insert(Pair(key, s.release()));
                 if(in_res.second == false)
                 {
