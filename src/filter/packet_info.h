@@ -33,7 +33,6 @@ struct PacketInfo
         eth  = NULL;
         ipv4 = NULL;
         tcp  = NULL;
-        rpc  = NULL;
         data = packet;
         dlen = header->caplen;
     }
@@ -124,10 +123,6 @@ struct PacketInfo
     const tcp::TCPHeader*           tcp;
     // UDP
     // TODO: add UDP support
-
-    // Application Layer
-    // Sun RPC
-    const rpc::MessageHeader*       rpc;
 
     const uint8_t*                  data;   // pointer to payload data
     uint32_t                        dlen;   // length of payload data
