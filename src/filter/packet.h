@@ -34,8 +34,8 @@ struct Packet: public PacketInfo
         *header = *info.header;                           // copy packet header
         memcpy(packet, info.packet, info.header->caplen); // copy packet data
 
-        fragment->header   = header;
-        fragment->packet   = packet;
+        fragment->header = header;
+        fragment->packet = packet;
 
         // fix pointers from PacketInfo to point to owned copy of packet data
         fragment->eth   = info.eth  ? (const ethernet::EthernetHeader*) (packet + ( ((const uint8_t*)info.eth ) - info.packet)) : NULL;

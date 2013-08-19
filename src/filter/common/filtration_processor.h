@@ -284,7 +284,7 @@ public:
         }
     }
 
-    void reassemble_tcp(const Conversation& conversation, Conversation::Direction d, PacketInfo& info)
+    void reassemble_tcp(Conversation::Direction d, PacketInfo& info)
     {
         const uint32_t ack = info.tcp->ack();
 
@@ -659,7 +659,7 @@ public:
             {
                 TCPSession< RPCFiltrator < Writer > > & session = i->second;
 
-                session.reassemble_tcp(i->first, direction, info);
+                session.reassemble_tcp(direction, info);
             }
         }
         else
