@@ -18,13 +18,17 @@
 
 #include "../../auxiliary/exception.h"
 #include "../../auxiliary/logger.h"
+#include "../../auxiliary/session.h"
 #include "../../controller/parameters.h"
 #include "../packet_info.h"
 #include "../packet.h"
-#include "../conversation.h"
+#include "../rpc/rpc_header.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Exception;
 using NST::auxiliary::Logger;
+using NST::auxiliary::Session;
+
+using namespace NST::filter::rpc;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -36,7 +40,6 @@ template <typename StreamReader>
 struct TCPSession
 {
 public:
-
     // Helpers for comparison sequence numbers
     // Idea for gt: either x > y, or y is much bigger (assume wrap)
     inline static bool GT_SEQ(uint32_t x, uint32_t y){ return (int32_t)((y) - (x)) <  0; }
@@ -49,7 +52,7 @@ public:
     {
         friend class TCPSession<StreamReader>;
 
-        Flow() : fragments(NULL), base_seq(0), sequence(0)
+        Flow() : fragments(NULL), sequence(0)
         {
         }
         ~Flow()
@@ -70,7 +73,6 @@ public:
                 Packet::destroy(c);
             }
 
-            base_seq = 0;
             sequence = 0;
         }
 
@@ -114,7 +116,6 @@ public:
                     {
                         info.data = NULL;
                         info.dlen = 0;
-                   //     incomplete_tcp_stream = TRUE;
                     }
                     else
                     {
@@ -261,7 +262,6 @@ public:
     private:
         StreamReader    reader;     // reader of acknowledged data stream
         Packet*         fragments;  // list of not yet acked fragments
-        uint32_t        base_seq;   // base seq number (used by relative sequence numbers) or 0 if not yet known
         uint32_t        sequence;
     };
 
@@ -284,7 +284,7 @@ public:
         }
     }
 
-    void reassemble_tcp(Conversation::Direction d, PacketInfo& info)
+    void collect(PacketInfo& info, Session::Direction d)
     {
         const uint32_t ack = info.tcp->ack();
 
@@ -297,30 +297,84 @@ public:
     Flow flows[2];
 };
 
-template<typename Reader>
-class TCPSessions: public std::tr1::unordered_map<Conversation, TCPSession<Reader>, Conversation::Hash>
+template<typename SessionCollector>
+struct IPv4TCPMapper
+{
+    typedef SessionCollector Collector;
+
+    static inline Session::Direction fill_session(const PacketInfo& info, Session& s)
+    {
+        s.ip_type = Session::v4;
+        s.ip.v4.addr[0] = info.ipv4->src();
+        s.ip.v4.addr[1] = info.ipv4->dst();
+
+        s.type = Session::TCP;
+        s.port[0] = info.tcp->sport();
+        s.port[1] = info.tcp->dport();
+
+        if(s.ip.v4.addr[0] < s.ip.v4.addr[1]) return Session::Source;
+        else
+        if(s.ip.v4.addr[0] > s.ip.v4.addr[1]) return Session::Destination;
+        else // Ok, addresses are equal, compare ports
+        return (s.port[0] < s.port[1]) ? Session::Source : Session::Destination;
+    }
+
+    struct Hash
+    {
+        std::size_t operator() (const Session& s) const
+        {
+            return s.port[0] + s.port[1] + s.ip.v4.addr[0] + s.ip.v4.addr[1];
+        }
+    };
+
+    struct Pred
+    {
+        bool operator() (const Session& a, const Session& b) const
+        {
+            if((a.port[0] == b.port[0]) &&
+               (a.port[1] == b.port[1]) &&
+               (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
+               (a.ip.v4.addr[1] == b.ip.v4.addr[1]))
+                return true;
+
+            if((a.port[1] == b.port[0]) &&
+               (a.port[0] == b.port[1]) &&
+               (a.ip.v4.addr[1] == b.ip.v4.addr[0]) &&
+               (a.ip.v4.addr[0] == b.ip.v4.addr[1]))
+                return true;
+            return false;
+        }
+    };
+};
+
+
+
+template<typename Mapper>
+class SessionCollectors
 {
 
 public:
 
-    typedef std::tr1::unordered_map<Conversation, TCPSession<Reader>, Conversation::Hash> Container;
+    typedef std::tr1::unordered_map<Session, typename Mapper::Collector, typename Mapper::Hash, typename Mapper::Pred> Container;
     typedef typename Container::iterator it;
 
-    TCPSessions()
+    SessionCollectors()
     {
     }
-
-    ~TCPSessions()
+    ~SessionCollectors()
     {
     }
 
     template <typename Writer>
-    it find_or_create_session(const Conversation& key, Writer* writer)
+    void collect_packet(PacketInfo& info, Writer* writer)
     {
-        it i = Container::find(key);
-        if(i == Container::end())
+        Session key;
+        const Session::Direction direction = Mapper::fill_session(info, key);
+
+        it i = container.find(key);
+        if(i == container.end())
         {
-            std::pair<it, bool> res = Container::insert(typename Container::value_type(key, TCPSession<Reader>()));
+            std::pair<it, bool> res = container.insert(typename Container::value_type(key, typename Mapper::Collector()));
             if(res.second)
             {
                 i = res.first;
@@ -328,11 +382,16 @@ public:
             }
             else
             {
-                TRACE("TCP Session is not created!");
+                TRACE("Session is not created!");
+                return;
             }
         }
-        return i;
+
+        i->second.collect(info, direction);
     }
+
+private:
+    Container container;
 };
 
 
@@ -504,7 +563,7 @@ public:
             if(written != 0) // a message was partially written to collection
             {
                 msg_len -= written;
-                if(hdr_len !=0) // we want to collect header of this RPC message
+                if(hdr_len != 0) // we want to collect header of this RPC message
                 {
                     hdr_len -= written;
                 }
@@ -600,7 +659,7 @@ public:
     FiltrationProcessor(std::auto_ptr<Reader>& r, std::auto_ptr<Writer>& w) : reader(r), writer(w)
     {
         // check datalink layer
-        const int datalink = reader->datalink();
+        datalink = reader->datalink();
         if(datalink != DLT_EN10MB)
         {
             throw Exception(std::string("Unsupported Data Link Layer: ") + Reader::datalink_description(datalink));
@@ -635,32 +694,11 @@ public:
     {
         FiltrationProcessor* processor = (FiltrationProcessor*) user;
 
-        // TODO: THIS CODE MUST BE TOTALLY REFACTORED!
-        // TODO: 1) Design and implement the Readers for each layer
-        //       2) Manage separate reades for each session
-        //       3) Detect placement of NFS Op data and drop it ASAP
-        //       4) Pass filtered NFS Op headers (RPC messages) to Analysis
-
-        PacketInfo info(pkthdr, packet);
-
-        if(! info.check_eth())
-        {
-            return;
-        }
+        PacketInfo info(pkthdr, packet, processor->datalink);
 
         if(info.eth && info.ipv4 && info.tcp)    // Ethernet:IPv4:TCP supported only
         {
-            Conversation::Direction direction = Conversation::AtoB;
-            Conversation key(info, direction);
-
-            // Following code must be refactored!
-            typename TCPSessions< RPCFiltrator < Writer > >::it i = processor->sessions.find_or_create_session(key, processor->writer.get());
-            if(i != processor->sessions.end())
-            {
-                TCPSession< RPCFiltrator < Writer > > & session = i->second;
-
-                session.reassemble_tcp(direction, info);
-            }
+            processor->sessions.collect_packet(info, processor->writer.get());
         }
         else
         {
@@ -671,7 +709,8 @@ public:
 private:
     std::auto_ptr<Reader> reader;
     std::auto_ptr<Writer> writer;
-    TCPSessions< RPCFiltrator < Writer > > sessions;
+    int datalink;
+    SessionCollectors< IPv4TCPMapper < TCPSession < RPCFiltrator < Writer > > > > sessions;
 };
 
 
