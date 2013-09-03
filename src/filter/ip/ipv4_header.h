@@ -52,7 +52,7 @@ struct ipv4_header
         COMP    = 108, // Compression Header Protocol
         SCTP    = 132, // Stream Control Transmission Protocol
         UDPLITE = 136, // UDP-Lite protocol
-        RAW     = 255, // Raw IP packets
+        RAW     = 255  // Raw IP packets
     };
 
     enum TOS
@@ -60,7 +60,7 @@ struct ipv4_header
         LOWDELAY    = 0x10,
         THROUGHPUT  = 0x08,
         RELIABILITY = 0x04,
-        LOWCOST     = 0x02,
+        LOWCOST     = 0x02
     };
 
     enum Fragmentation
@@ -68,7 +68,7 @@ struct ipv4_header
         RF      = 0x8000, // reserved fragment flag
         DF      = 0x4000, // dont fragment flag
         MF      = 0x2000, // more fragments flag
-        OFFMASK = 0x1fff, // mask for fragmenting bits
+        OFFMASK = 0x1fff  // mask for fragmenting bits
     };
 
     uint8_t ipv4_vhl;           // header length and version

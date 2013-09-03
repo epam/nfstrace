@@ -26,7 +26,7 @@ public:
     {
         IO = PCAP_D_INOUT,
         I  = PCAP_D_IN,
-        O  = PCAP_D_OUT,
+        O  = PCAP_D_OUT
     };
 
     CaptureReader(const std::string& interface, const std::string& filter, int snaplen, int to_ms, int buffer_size);

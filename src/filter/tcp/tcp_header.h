@@ -29,7 +29,7 @@ struct tcp_header
         ACK = 0x10,     // acknowledge
         URG = 0x20,     // urgent
         ECE = 0x40,     // ECN-echo
-        CWR = 0x80,     // congestion window reduced
+        CWR = 0x80      // congestion window reduced
     };
 
     uint16_t tcp_sport;     // source port
