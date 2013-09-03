@@ -460,7 +460,7 @@ int main(int argc, char **argv) try
               << " filtration by BPF: \"" << filter << '\"'
               << " snaplen: " << snaplen << std::endl;
 
-    CaptureReader capture(iface, filter, snaplen, 32);
+    CaptureReader capture(iface, filter, snaplen, 32, 2);
     g_capture = &capture;
 
     // setting SIGINT and SIGTERM handlers
@@ -475,7 +475,7 @@ int main(int argc, char **argv) try
         exit(-1);
     }
 
-    capture.print_datalink(std::cout);
+    std::cout << CaptureReader::datalink_name(capture.datalink());
 
     if(params.is_passed(CLI::DUMP))
     {
