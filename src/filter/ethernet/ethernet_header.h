@@ -34,7 +34,7 @@ struct ethernet_header
         VLAN    = 0x8100,   // IEEE 802.1Q VLAN tagging
         IPX     = 0x8137,   // IPX
         IPV6    = 0x86dd,   // IP protocol version 6
-        LOOPBACK= 0x9000,   // used to test interfaces
+        LOOPBACK= 0x9000    // used to test interfaces
     };
 
     uint8_t  eth_dhost[ADDR_LEN];   // destination host address

@@ -57,7 +57,7 @@ struct Opt
     {
         NOA = no_argument,
         REQ = required_argument,
-        OPT = optional_argument, // not yet supported
+        OPT = optional_argument  // not yet supported
     };
 
     const char short_opt;   // a character for short option, can be 0

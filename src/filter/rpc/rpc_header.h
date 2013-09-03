@@ -72,7 +72,7 @@ enum AuthFlavor
 {
      AUTH_NONE       = 0,
      AUTH_SYS        = 1,
-     AUTH_SHORT      = 2,
+     AUTH_SHORT      = 2
 };
 
 

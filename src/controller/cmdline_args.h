@@ -34,7 +34,7 @@ struct Args
         BUSIZE,
         VERBOSE,
         HELP,
-        num,
+        num
     };
 
     static const char* const profiling_mode;

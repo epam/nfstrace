@@ -27,13 +27,13 @@ struct Session
     enum IPType
     {
         v4=0,
-        v6=1,
+        v6=1
     } ip_type:16;    //16 bit for alignment following integers
 
     enum Type
     {
         TCP=0,
-        UDP=1,
+        UDP=1
     } type:16;    //16 bit for alignment following integers
 
     union IPAddress
