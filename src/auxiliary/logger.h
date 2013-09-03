@@ -92,8 +92,6 @@ public:
     }
     void set_output_file(const std::string& file_path)
     {
-        owner = true;
-
         if(!(file = fopen(file_path.c_str(), "w")))
         {
             throw Exception(std::string("Logger cannot open file: " + file_path));
@@ -102,6 +100,8 @@ public:
         {
             throw Exception(std::string("File: " + file_path + " opened in another thread"));
         }
+
+        owner = true;
     }
     void set_output_err()
     {
