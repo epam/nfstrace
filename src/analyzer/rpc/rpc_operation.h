@@ -41,8 +41,8 @@ public:
     }
 
 public:
-    inline const uint32_t            xid() const { return call.xid;  }
-    inline const uint32_t      procedure() const { return call.proc; }
+    inline uint32_t            xid() const { return call.xid;  }
+    inline uint32_t      procedure() const { return call.proc; }
 
     inline const RPCCall&      get_call () const { return call;     }
     inline const RPCReply&     get_reply() const { return reply;    }

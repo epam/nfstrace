@@ -10,6 +10,7 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
+#include <vector>
 #include <string>
 
 #include <getopt.h>
@@ -36,6 +37,12 @@ public:
 
 struct Opt
 {
+    class Value;
+
+    typedef std::vector<Value> ValObjs;
+    typedef ValObjs::iterator ValObjsIter;
+    typedef ValObjs::const_iterator ValObjsCIter;
+
     class Value
     {
     public:
@@ -50,7 +57,7 @@ struct Opt
         bool is(const char* s) const { return strcmp(value, s) == 0;        }
 
     private:
-        const char* const value;
+        const char* value;
     };
 
     enum Type
@@ -66,7 +73,7 @@ struct Opt
     const char* deflt;      // default value
     const char* description;
     const char* value_pattern;
-    const char* value;
+    ValObjs values;
     bool passed;            // is option parsed
 };
 
@@ -75,15 +82,19 @@ template <typename CLI>
 class CmdlineParser
 {
 public:
+    typedef Opt::ValObjs ParamVals;
+    typedef Opt::ValObjsCIter ParamValsCIter;
+    typedef Opt::ValObjsIter ParamValsIter;
+
     CmdlineParser() {}
     ~CmdlineParser() {}
 
     void parse(int argc, char** argv) throw (CLIError);
     void validate();
 
-    const Opt::Value operator[](typename CLI::Names name) const
+    const Opt::ValObjs& operator[](typename CLI::Names name) const
     {
-        return Opt::Value(CLI::options[name].value);
+        return CLI::options[name].values;
     }
 
     bool is_passed(typename CLI::Names name) const
@@ -94,7 +105,7 @@ public:
     bool is_default(typename CLI::Names name) const
     {
         const Opt& a = CLI::options[name];
-        return a.value == a.deflt;
+        return a.values.begin()->to_cstr() == a.deflt;
     }
 
     static void print_usage(std::ostream& out, const char* executable);
@@ -105,7 +116,7 @@ private:
         Opt& a = CLI::options[index];
         // if option argument specified (by global optarg) - set it
         // otherwise set valid default OR "true" for no-args options
-        a.value = optarg ? optarg : (a.deflt && a.type != Opt::NOA ? a.deflt : "true");
+        a.values.push_back(Opt::Value(optarg ? optarg : (a.deflt && a.type != Opt::NOA ? a.deflt : "true")));
         a.passed = true;
     }
 
@@ -229,11 +240,11 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
     for(int i = 0; i < CLI::num; ++i)
     {
         Opt& a = CLI::options[i];
-        if(a.value == NULL) // is value still uninitialized?
+        if(a.values.empty()) // is value still uninitialized?
         {
             if(a.deflt) // try to substitute by default value
             {
-                a.value = a.deflt;
+                a.values.push_back(Opt::Value(a.deflt));
                 a.passed = false;
             }
         }
@@ -247,7 +258,7 @@ void CmdlineParser<CLI>::validate()
     for(int i = 0; i < CLI::num; ++i)
     {
         Opt& a = CLI::options[i];
-        if(a.value == NULL) // is value still uninitialized?
+        if(a.values.empty()) // is value still uninitialized?
         {
             std::string long_opt = a.long_opt ? std::string("--") + a.long_opt : "";
             std::string name = build_name(a.short_opt, long_opt);

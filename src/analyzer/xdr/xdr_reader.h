@@ -42,7 +42,7 @@ public:
     {
     }
 
-    inline const size_t   size() const { return last-it; }
+    inline size_t   size() const { return last-it; }
     inline const uint8_t* data() const { return it;      }
 
     inline uint32_t get_offset() const
