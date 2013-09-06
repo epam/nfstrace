@@ -70,10 +70,10 @@ bool OFDWSAnalyzer::call_read(const RPCOperation& operation)
 
     if(res.status == nfsstat3::OK)
     {
-        read_total += res.resok.count;
+        read_total += res.u.resok.count;
 
         Iterator i = get_file_rw_op(arg.file);
-        i->second->calculate(Proc::READ, arg.offset, res.resok.count);
+        i->second->calculate(Proc::READ, arg.offset, res.u.resok.count);
     }
     return true;
 }
@@ -86,10 +86,10 @@ bool OFDWSAnalyzer::call_write(const RPCOperation& operation)
 
     if(res.status == nfsstat3::OK)
     {
-        write_total += res.resok.count;
+        write_total += res.u.resok.count;
 
         Iterator i = get_file_rw_op(arg.file);
-        i->second->calculate(Proc::WRITE, arg.offset, res.resok.count);
+        i->second->calculate(Proc::WRITE, arg.offset, res.u.resok.count);
     }
     return true;
 }

@@ -14,7 +14,7 @@
 #endif
 
 #include "../../auxiliary/exception.h"
-#include "xdr_struct.h"
+#include "xdr_structs.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Exception;
 //------------------------------------------------------------------------------
@@ -132,8 +132,8 @@ public:
 protected:
     inline static uint32_t calc_offset(uint32_t size)
     {
-        uint32_t mod = size % align;
-        return (mod) ? size - mod + align : size;
+        uint32_t mod = size % XDR_ALIGN;
+        return (mod) ? size - mod + XDR_ALIGN : size;
     }
 
 
