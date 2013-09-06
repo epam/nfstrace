@@ -12,6 +12,7 @@
 #include "analyzers/print_analyzer.h"
 #include "nfs_parser_thread.h"
 //------------------------------------------------------------------------------
+using NST::controller::AParams;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -70,24 +71,25 @@ void AnalysisManager::stop()
 
 void AnalysisManager::populate_analyzers(const Parameters& params)
 {
-    std::vector<std::string> active_analyzers = params.analyzers();
+    std::vector<AParams> active_analyzers = params.analyzers();
     for(unsigned int i = 0; i < active_analyzers.size(); ++i)
     {
-        if(active_analyzers[i] == std::string("ob"))
+        if(active_analyzers[i].path == std::string("ob"))
         {
             analyzers.add(new analyzers::BreakdownAnalyzer());
             continue;
         }
-        if(active_analyzers[i] == std::string("ofws"))
+        if(active_analyzers[i].path == std::string("ofws"))
         {
             analyzers.add(new analyzers::OFWSAnalyzer());
             continue;
         }
-        if(active_analyzers[i] == std::string("ofdws"))
+        if(active_analyzers[i].path == std::string("ofdws"))
         {
             analyzers.add(new analyzers::OFDWSAnalyzer(params.block_size(), params.bucket_size()));
             continue;
         }
+        // TODO: load from shared object by path and provide arguments
     }
 
     if(params.is_verbose()) // add special analyzer for trace out RPC calls

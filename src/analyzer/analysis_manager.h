@@ -26,6 +26,7 @@ namespace analyzer
 
 class AnalysisManager
 {
+//    typedef std::list<Plugin> Plugins;
 public:
     AnalysisManager(RunningStatus& running_status);
     ~AnalysisManager();
@@ -46,6 +47,7 @@ private:
     std::auto_ptr<Thread> parser_thread;
     RunningStatus& status;
     Analyzers analyzers;
+//    Plugins plugins;
 };
 
 } // namespace analyzer

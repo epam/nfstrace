@@ -22,6 +22,15 @@ enum RunningMode
     Analysis
 };
 
+struct AParams
+{
+    AParams(const std::string& p) : path(p) {}
+    AParams(const std::string& p, const std::string& a) : path(p), arguments(a) {}
+    ~AParams() {}
+    std::string path;
+    std::string arguments;
+};
+
 class Parameters
 {
 public:
@@ -34,20 +43,20 @@ public:
     bool cmdline_args(int argc, char** argv);
 
     // access helpers
-    const std::string&      program_name() const;
-    const RunningMode       running_mode() const;
-    const bool              is_verbose() const;
-    const std::string       interface() const;
-    const unsigned short    snaplen() const;
-    const std::string       filter() const;
-    const std::string       input_file() const;
-    const std::string       output_file() const;
-    const unsigned int      buffer_size() const;
-    const unsigned short    rpcmsg_limit() const;
-    const unsigned short    queue_capacity() const;
-    const std::vector<std::string> analyzers() const;
-    const unsigned int      block_size() const;
-    const unsigned int      bucket_size() const;
+    const std::string&  program_name() const;
+    RunningMode         running_mode() const;
+    bool                is_verbose() const;
+    const std::string   interface() const;
+    unsigned short      snaplen() const;
+    const std::string   filter() const;
+    const std::string   input_file() const;
+    const std::string   output_file() const;
+    unsigned int        buffer_size() const;
+    unsigned short      rpcmsg_limit() const;
+    unsigned short      queue_capacity() const;
+    const std::vector<AParams> analyzers() const;
+    unsigned int        block_size() const;
+    unsigned int        bucket_size() const;
 
 private:
     Parameters()

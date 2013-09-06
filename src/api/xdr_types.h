@@ -20,7 +20,7 @@ struct Opaque
 
     inline uint8_t operator[](size_t i) const { return ptr[i]; }
     inline const uint8_t* data() const { return ptr; }
-    inline const uint32_t size() const { return len; }
+    inline uint32_t size() const { return len; }
 
     const uint8_t* ptr;
     uint32_t       len;
