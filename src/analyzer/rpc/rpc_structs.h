@@ -21,167 +21,92 @@ namespace analyzer
 namespace RPC
 {
 
-struct OpaqueAuth
+#include "../../api/rpc_types.h"
+
+inline XDRReader& operator>>(XDRReader& in, OpaqueAuth& o)
 {
-    inline friend XDRReader& operator>>(XDRReader& in, OpaqueAuth& o)
-    {
-        in >> o.flavor;
-        in.read_variable_len(o.body);
-        return in;
-    }
+    in >> o.flavor;
+    in.read_variable_len(o.body);
+    return in;
+}
 
-    inline uint32_t    get_flavor() const { return flavor; }
-    inline const Opaque& get_body() const { return body;   }
-
-private:
-    uint32_t flavor;
-    Opaque   body;
-};
-
-struct MismatchInfo
+inline XDRReader& operator>>(XDRReader& in, MismatchInfo& o)
 {
-    inline friend XDRReader& operator>>(XDRReader& in, MismatchInfo& o)
-    {
-        return in >> o.low >> o.high;
-    }
+    return in >> o.low >> o.high;
+}
 
-    inline uint32_t  get_low() const { return low; }
-    inline uint32_t get_high() const { return high;}
-
-private:
-    uint32_t low;
-    uint32_t high;
-};
-
-struct RPCMessage
+inline XDRReader& operator>>(XDRReader& in, RPCMessage& o)
 {
-    inline friend XDRReader& operator>>(XDRReader& in, RPCMessage& o)
-    {
-        return in >> o.xid >> o.type;
-    }
+    return in >> o.xid >> o.type;
+}
 
-    inline const uint32_t get_xid () const { return xid;  }
-    inline const uint32_t get_type() const { return type; }
-
-protected:
-    uint32_t  xid;
-    uint32_t type;
-};
-
-struct RPCCall : public RPCMessage
+inline XDRReader& operator>>(XDRReader& in, RPCCall& o)
 {
-    inline friend XDRReader& operator>>(XDRReader& in, RPCCall& o)
-    {
-        const size_t size = sizeof(o.xid) +
-                            sizeof(o.type) +
-                            sizeof(o.rpcvers) +
-                            sizeof(o.prog) +
-                            sizeof(o.vers) +
-                            sizeof(o.proc);
-        in.arrange_check(size);
-        in.read_unchecked(o.xid);   // direct fill RPCMessage fileds
-        in.read_unchecked(o.type);  // direct fill RPCMessage fileds
-        in.read_unchecked(o.rpcvers);
-        in.read_unchecked(o.prog);
-        in.read_unchecked(o.vers);
-        in.read_unchecked(o.proc);
-        return in >> o.cred >> o.verf;
-    }
+    const size_t size = sizeof(o.xid) +
+                        sizeof(o.type) +
+                        sizeof(o.rpcvers) +
+                        sizeof(o.prog) +
+                        sizeof(o.vers) +
+                        sizeof(o.proc);
+    in.arrange_check(size);
+    in.read_unchecked(o.xid);   // direct fill RPCMessage fileds
+    in.read_unchecked(o.type);  // direct fill RPCMessage fileds
+    in.read_unchecked(o.rpcvers);
+    in.read_unchecked(o.prog);
+    in.read_unchecked(o.vers);
+    in.read_unchecked(o.proc);
+    return in >> o.cred >> o.verf;
+}
 
-    inline const uint32_t get_rpcvers() const { return rpcvers; }
-    inline const uint32_t    get_prog() const { return prog; }
-    inline const uint32_t    get_vers() const { return vers; }
-    inline const uint32_t    get_proc() const { return proc; }
-    inline const OpaqueAuth& get_cred() const { return cred; }
-    inline const OpaqueAuth& get_verf() const { return verf; }
 
-private:
-    uint32_t rpcvers;
-    uint32_t prog;
-    uint32_t vers;
-    uint32_t proc;
-    OpaqueAuth cred;
-    OpaqueAuth verf;
-};
-
-struct AcceptedReply
+inline XDRReader& operator>>(XDRReader& in, AcceptedReply& o)
 {
-    inline friend XDRReader& operator>>(XDRReader& in, AcceptedReply& obj)
+    in >> o.verf >> o.stat;
+    switch(o.stat)
     {
-        in >> obj.verf >> obj.stat;
-        switch(obj.stat)
-        {
-            case SUNRPC_SUCCESS:
-                // Data will be parsed in the specific reader.
-                break;
-            case SUNRPC_PROG_MISMATCH:
-                in >> obj.mismatch_info;
-                break;
-            case SUNRPC_PROG_UNAVAIL:
-            case SUNRPC_PROC_UNAVAIL:
-            case SUNRPC_GARBAGE_ARGS:
-            case SUNRPC_SYSTEM_ERR:
-                break;
-        }
-        return in;
+        case SUNRPC_SUCCESS:
+            // Data will be parsed in the specific reader.
+            break;
+        case SUNRPC_PROG_MISMATCH:
+            in >> o.mismatch_info;
+            break;
+        case SUNRPC_PROG_UNAVAIL:
+        case SUNRPC_PROC_UNAVAIL:
+        case SUNRPC_GARBAGE_ARGS:
+        case SUNRPC_SYSTEM_ERR:
+            break;
     }
+    return in;
+}
 
-    OpaqueAuth      verf;
-    uint32_t        stat;
-    MismatchInfo    mismatch_info;
-};
-
-struct RejectedReply
+inline XDRReader& operator>>(XDRReader& in, RejectedReply& o)
 {
-    inline friend XDRReader& operator>>(XDRReader& in, RejectedReply& obj)
+    in >> o.stat;
+    switch(o.stat)
     {
-        in >> obj.stat;
-        switch(obj.stat)
-        {
-            case SUNRPC_RPC_MISMATCH:   in >> obj.mismatch_info; break;
-            case SUNRPC_AUTH_ERROR:     in >> obj.auth_stat;     break;
-        }
-        return in;
+        case SUNRPC_RPC_MISMATCH:   in >> o.u.mismatch_info; break;
+        case SUNRPC_AUTH_ERROR:     in >> o.u.auth_stat;     break;
     }
+    return in;
+}
 
-    uint32_t         stat;
-    union
-    {
-        MismatchInfo mismatch_info;
-        OpaqueAuth   auth_stat;
-    };
-};
-
-struct RPCReply : public RPCMessage
+inline XDRReader& operator>>(XDRReader& in, RPCReply& o)
 {
-    inline friend XDRReader& operator>>(XDRReader& in, RPCReply& o)
+    const size_t size = sizeof(o.xid) +
+                        sizeof(o.type) +
+                        sizeof(o.stat);
+    in.arrange_check(size);
+    in.read_unchecked(o.xid);   // direct fill RPCMessage fileds
+    in.read_unchecked(o.type);  // direct fill RPCMessage fileds
+    in.read_unchecked(o.stat);
+    switch(o.stat)
     {
-        const size_t size = sizeof(o.xid) +
-                            sizeof(o.type) +
-                            sizeof(o.stat);
-        in.arrange_check(size);
-        in.read_unchecked(o.xid);   // direct fill RPCMessage fileds
-        in.read_unchecked(o.type);  // direct fill RPCMessage fileds
-        in.read_unchecked(o.stat);
-        switch(o.stat)
-        {
-            case SUNRPC_MSG_ACCEPTED:  in >> o.accepted; break;
-            case SUNRPC_MSG_DENIED:    in >> o.rejected; break;
-        }
-        return in;
+        case SUNRPC_MSG_ACCEPTED:  in >> o.u.accepted; break;
+        case SUNRPC_MSG_DENIED:    in >> o.u.rejected; break;
     }
+    return in;
+}
 
-    uint32_t          stat;
-    union
-    {
-        AcceptedReply accepted;
-        RejectedReply rejected;
-    };
-};
-/*
-std::ostream& operator<<(std::ostream& out, const RPCMessage& obj);
-std::ostream& operator<<(std::ostream& out, const RPCReply& obj);
-*/
 } // namespace rpc
 } // namespace analyzer
 } // namespace NFS
