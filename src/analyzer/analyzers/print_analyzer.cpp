@@ -24,7 +24,7 @@ std::ostream& operator += (std::ostream& out, const nfs_fh3& fh)
 {
     static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-    const Opaque& opaque = fh.get_data();
+    const Opaque& opaque = fh.data;
     const uint8_t* data = opaque.data();
     const uint32_t size = opaque.size();
 
@@ -64,9 +64,7 @@ bool PrintAnalyzer::call_null(const RPCOperation& operation)
     const NFSPROC3_NULL& op = static_cast<const NFSPROC3_NULL&>(operation);
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
-    out << " CALL [";
-    out << "] REPLY [";
-    out << " ]";
+    out << " CALL [] REPLY []";
     out << std::endl;
 
     return true;
@@ -80,7 +78,7 @@ bool PrintAnalyzer::call_getattr(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " object: " += arg.get_object();
+    out << " object: " += arg.object;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -97,9 +95,9 @@ bool PrintAnalyzer::call_setattr(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " object: " += arg.get_object();
-    out << " new_attributes: " << arg.get_new_attributes();
-    out << " guard: " << arg.get_guard();
+    out << " object: " += arg.object;
+    out << " new_attributes: " << arg.new_attributes;
+    out << " guard: " << arg.guard;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -116,8 +114,7 @@ bool PrintAnalyzer::call_lookup(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " dir: "  += arg.get_what().get_dir();
-    out << " name: " << arg.get_what().get_name().get_string();
+    out << " what: " << arg.what;
     out << "] REPLY [";
     out << " status: " << res.status;
     if(res.status == nfsstat3::OK)
@@ -142,16 +139,35 @@ bool PrintAnalyzer::call_access(const RPCOperation& operation)
     const NFSPROC3_ACCESS::Arg& arg = op.get_arg();
     const NFSPROC3_ACCESS::Res& res = op.get_res();
 
-    const RPC::RPCReply& rep = op.get_reply();
-
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " object: "  += arg.get_object();
-    out << " access: " << arg.get_access();
+    out << " object: " += arg.object;
+    out << " access: ";
+    if(arg.access & ACCESS3args::ACCESS3_READ)   out << "READ ";
+    if(arg.access & ACCESS3args::ACCESS3_LOOKUP) out << "LOOKUP ";
+    if(arg.access & ACCESS3args::ACCESS3_MODIFY) out << "MODIFY ";
+    if(arg.access & ACCESS3args::ACCESS3_EXTEND) out << "EXTEND ";
+    if(arg.access & ACCESS3args::ACCESS3_DELETE) out << "DELETE ";
+    if(arg.access & ACCESS3args::ACCESS3_EXECUTE)out << "EXECUTE ";
+
     out << "] REPLY [";
-    out << " Reply Status: " << rep.stat;
-    out << " Accepted Status: " << rep.accepted.stat;
-    out << " Result Status: " << res.status;
+    out << " status: " << res.status;
+    if(res.status == nfsstat3::OK)
+    {
+        out << " obj_attributes: " << res.u.resok.obj_attributes;
+        out << " access: ";
+        uint32_t access = res.u.resok.access;
+        if(access & ACCESS3args::ACCESS3_READ)   out << "READ ";
+        if(access & ACCESS3args::ACCESS3_LOOKUP) out << "LOOKUP ";
+        if(access & ACCESS3args::ACCESS3_MODIFY) out << "MODIFY ";
+        if(access & ACCESS3args::ACCESS3_EXTEND) out << "EXTEND ";
+        if(access & ACCESS3args::ACCESS3_DELETE) out << "DELETE ";
+        if(access & ACCESS3args::ACCESS3_EXECUTE)out << "EXECUTE ";
+    }
+    else
+    {
+        out << " obj_attributes: " << res.u.resfail.obj_attributes;
+    }
     out << " ]";
     out << std::endl;
 
@@ -166,7 +182,7 @@ bool PrintAnalyzer::call_readlink(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " symlink: "  += arg.get_symlink();
+    out << " symlink: "  += arg.symlink;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -183,9 +199,9 @@ bool PrintAnalyzer::call_read(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " file: "  += arg.get_file();
-    out << " offset: "  << arg.get_offset();
-    out << " count: " << arg.get_count();
+    out << " file: "   += arg.file;
+    out << " offset: " << arg.offset;
+    out << " count: "  << arg.count;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -202,15 +218,10 @@ bool PrintAnalyzer::call_write(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " file: " += arg.get_file();
-    out << " offset: " << arg.get_offset();
-    out << " count: " << arg.get_count();
-    switch(arg.get_stable())
-    {
-        case WRITE3args::UNSTABLE:  out << " stable: UNSTABLE";  break;
-        case WRITE3args::DATA_SYNC: out << " stable: DATA_SYNC"; break;
-        case WRITE3args::FYLE_SYNC: out << " stable: FYLE_SYNC"; break;
-    }
+    out << " file: "   += arg.file;
+    out << " offset: " << arg.offset;
+    out << " count: "  << arg.count;
+    out << " stable: "  << arg.stable;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -227,15 +238,15 @@ bool PrintAnalyzer::call_create(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " where: " << arg.get_where();
-    out << " how: " << arg.get_how();
+    out << " where: " << arg.where;
+    out << " how: " << arg.how;
     out << "] REPLY [";
     out << " status: " << res.status;
     if(res.status == nfsstat3::OK)
     {
-        out << " obj: " << res.resok.obj;
-        out << " obj_attributes: " << res.resok.obj_attributes;
-        out << " dir_wcc: " << res.resok.dir_wcc;
+        out << " obj: " << res.u.resok.obj;
+        out << " obj_attributes: " << res.u.resok.obj_attributes;
+        out << " dir_wcc: " << res.u.resok.dir_wcc;
     }
     out << " ]";
     out << std::endl;
@@ -251,8 +262,8 @@ bool PrintAnalyzer::call_mkdir(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " where: " << arg.get_where();
-    out << " attributes: " << arg.get_attributes();
+    out << " where: " << arg.where;
+    out << " attributes: " << arg.attributes;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -269,8 +280,8 @@ bool PrintAnalyzer::call_symlink(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " where: " << arg.get_where();
-    out << " symlinkdata: " << arg.get_symlink();
+    out << " where: " << arg.where;
+    out << " symlinkdata: " << arg.symlink;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -287,8 +298,8 @@ bool PrintAnalyzer::call_mknod(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " where: " << arg.get_where();
-    out << " what: " << arg.get_what();
+    out << " where: " << arg.where;
+    out << " what: " << arg.what;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -305,7 +316,7 @@ bool PrintAnalyzer::call_remove(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " object: " << arg.get_object();
+    out << " object: " << arg.object;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -322,7 +333,7 @@ bool PrintAnalyzer::call_rmdir(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " object: " << arg.get_object();
+    out << " object: " << arg.object;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -339,8 +350,8 @@ bool PrintAnalyzer::call_rename(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " from: " << arg.get_from();
-    out << " to: " << arg.get_to();
+    out << " from: " << arg.from;
+    out << " to: " << arg.to;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -357,8 +368,8 @@ bool PrintAnalyzer::call_link(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " file: " += arg.get_file();
-    out << " link: " << arg.get_link();
+    out << " file: " += arg.file;
+    out << " link: " << arg.link;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -375,12 +386,12 @@ bool PrintAnalyzer::call_readdir(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " dir: " += arg.get_dir();
-    out << " cookie: " << arg.get_cookie();
-    out << " cookieverf: " << arg.get_cookieverf();
-    out << " count: " << arg.get_count();
+    out << " dir: "         += arg.dir;
+    out << " cookie: "      << arg.cookie;
+    out << " cookieverf: "  << arg.cookieverf;
+    out << " count: "       << arg.count;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: "      << res.status;
     out << " ]";
     out << std::endl;
 
@@ -395,17 +406,17 @@ bool PrintAnalyzer::call_readdirplus(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " dir: " += arg.get_dir();
-    out << " cookie: " << arg.get_cookie();
-    out << " cookieverf: " << arg.get_cookieverf();
-    out << " dircount: " << arg.get_dircount();
-    out << " maxcount: " << arg.get_maxcount();
+    out << " dir: "         += arg.dir;
+    out << " cookie: "      << arg.cookie;
+    out << " cookieverf: "  << arg.cookieverf;
+    out << " dircount: "    << arg.dircount;
+    out << " maxcount: "    << arg.maxcount;
     out << "] REPLY [";
     out << " status: " << res.status;
     if(res.status == nfsstat3::OK)
     {
-        out << " dir_attributes: " << res.resok.dir_attributes;
-        out << " cookieverf: "    << res.resok.cookieverf;
+        out << " dir_attributes: " << res.u.resok.dir_attributes;
+        out << " cookieverf: "     << res.u.resok.cookieverf;
     }
     out << " ]";
     out << std::endl;
@@ -421,7 +432,7 @@ bool PrintAnalyzer::call_fsstat(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " fsroot: " += arg.get_fsroot();
+    out << " fsroot: " += arg.fsroot;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -438,7 +449,7 @@ bool PrintAnalyzer::call_fsinfo(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " fsroot: " += arg.get_fsroot();
+    out << " fsroot: " += arg.fsroot;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -455,7 +466,7 @@ bool PrintAnalyzer::call_pathconf(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " object: " += arg.get_object();
+    out << " object: " += arg.object;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";
@@ -472,9 +483,9 @@ bool PrintAnalyzer::call_commit(const RPCOperation& operation)
 
     out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
     out << " CALL [";
-    out << " file: " += arg.get_file();
-    out << " offset: " << arg.get_offset();
-    out << " count: " << arg.get_count();
+    out << " file: "    += arg.file;
+    out << " offset: "  << arg.offset;
+    out << " count: "   << arg.count;
     out << "] REPLY [";
     out << " status: " << res.status;
     out << " ]";

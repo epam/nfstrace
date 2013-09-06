@@ -15,245 +15,30 @@ namespace analyzer
 namespace NFS3
 {
 
-XDRReader& operator>>(XDRReader& in, nfsstat3& obj)
-{
-    return in >> obj.stat;
-}
-
-XDRReader& operator>>(XDRReader& in, ftype3& obj)
-{
-    return in >> obj.ftype;
-}
-
-XDRReader& operator>>(XDRReader& in, specdata3& obj)
-{
-    const size_t size = sizeof(obj.specdata1) +
-                        sizeof(obj.specdata2);
-    in.arrange_check(size);
-    in.read_unchecked(obj.specdata1);
-    in.read_unchecked(obj.specdata2);
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, nfs_fh3& obj)
-{
-    in.read_variable_len(obj.data); // opaque data size should be less than NFS3_FHSIZE
-    assert(obj.data.size() < NFS3_FHSIZE);
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, nfstime3& obj)
-{
-    const size_t size = sizeof(obj.seconds) +
-                        sizeof(obj.nseconds);
-    in.arrange_check(size);
-    in.read_unchecked(obj.seconds);
-    in.read_unchecked(obj.nseconds);
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, fattr3& obj)
-{
-    const size_t size = sizeof(obj.type) +
-                        sizeof(obj.mode) +
-                        sizeof(obj.nlink) +
-                        sizeof(obj.uid) +
-                        sizeof(obj.gid) +
-                        sizeof(obj.size) +
-                        sizeof(obj.used) +
-                        sizeof(obj.rdev) +
-                        sizeof(obj.fsid) +
-                        sizeof(obj.fileid);
-    in.arrange_check(size);
-    in >> obj.type;
-    in.read_unchecked(obj.mode);
-    in.read_unchecked(obj.nlink);
-    in.read_unchecked(obj.uid);
-    in.read_unchecked(obj.gid);
-    in.read_unchecked(obj.size);
-    in.read_unchecked(obj.used);
-    in >> obj.rdev;
-    in.read_unchecked(obj.fsid);
-    in.read_unchecked(obj.fileid);
-
-    in >> obj.atime >> obj.mtime >> obj.ctime;
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, post_op_attr& obj)
-{
-    in >> obj.attributes_follow;
-    if(obj.attributes_follow)
-    {
-        in >> obj.attributes;
-    }
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, wcc_attr& obj)
-{
-    return in >> obj.size >> obj.mtime >> obj.ctime;
-}
-
-XDRReader& operator>>(XDRReader& in, pre_op_attr& obj)
-{
-    in >> obj.attributes_follow;
-    if(obj.attributes_follow)
-    {
-        in >> obj.attributes;
-    }
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, wcc_data& obj)
-{
-    return in >> obj.before >> obj.after;
-}
-
-XDRReader& operator>>(XDRReader& in, post_op_fh3& obj)
-{
-    in >> obj.handle_follows;
-    if(obj.handle_follows)
-    {
-        in >> obj.handle;
-    }
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, sattr3& obj)
-{
-    uint32_t temp;
-
-    in >> temp;
-    obj.b_mode = temp;
-    if(obj.b_mode)
-        in >> obj.mode;
-
-    in >> temp;
-    obj.b_uid = temp;
-    if(obj.b_uid)
-        in >> obj.uid;
-
-    in >> temp;
-    obj.b_gid = temp;
-    if(obj.b_gid)
-        in >> obj.gid;
-
-    in >> temp;
-    obj.b_size = temp;
-    if(obj.b_size)
-        in >> obj.size;
-
-    in >> obj.set_it_atime;
-    if(obj.set_it_atime == sattr3::SET_TO_CLIENT_TIME)
-    {
-        in >> obj.atime;
-    }
-
-    in >> obj.set_it_mtime;
-    if(obj.set_it_mtime == sattr3::SET_TO_CLIENT_TIME)
-    {
-        in >> obj.mtime;
-    }
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, diropargs3& obj)
-{
-    in >> obj.dir;
-    in.read_variable_len(obj.name);
-    return in;
-}
 
 
 
-
-
-
-XDRReader& operator>>(XDRReader& in, sattrguard3& obj)
-{
-    uint32_t temp;
-
-    in >> temp;
-    obj.check = temp;
-    if(obj.check)
-        in >> obj.obj_ctime;
-
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, createhow3& obj)
-{
-    in >> obj.mode;
-    switch(obj.mode)
-    {
-        case createhow3::UNCHECKED:  in >> obj.u.obj_attributes; break;
-        case createhow3::GUARDED:    in >> obj.u.obj_attributes; break;
-        case createhow3::EXCLUSIVE:
-            in.read_fixed_len(obj.u.verf, NFS3_CREATEVERFSIZE);
-        break;
-    }
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, symlinkdata3& obj)
-{
-    in >> obj.symlink_attributes;
-    in.read_variable_len(obj.symlink_data);
-    return in;
-}
-
-XDRReader& operator>>(XDRReader& in, devicedata3& obj)
-{
-    return in >> obj.dev_attributes >> obj.spec;
-}
-
-XDRReader& operator>>(XDRReader& in, mknoddata3& obj)
-{
-    in >> obj.type;
-    switch(obj.type.get_ftype())
-    {
-        case ftype3::CHR:
-        case ftype3::BLK:
-            {
-                in >> obj.u.device;
-            }
-            break;
-        case ftype3::SOCK:
-        case ftype3::FIFO:
-            {
-                in >> obj.u.pipe_attributes;
-            }
-            break;
-        default:
-            break;
-    }
-    return in;
-}
-
-
-
-std::ostream& operator<<(std::ostream& out, const Enum_mode3 m)
+std::ostream& operator<<(std::ostream& out, const mode3 m)
 {
     out << " mode: ";
-    if(m & USER_ID_EXEC)      out << "USER_ID_EXEC";
-    if(m & GROUP_ID_EXEC)     out << "GROUP_ID_EXEC";
-    if(m & SAVE_SWAPPED_TEXT) out << "SAVE_SWAPPED_TEXT";
-    if(m & OWNER_READ)        out << "OWNER_READ";
-    if(m & OWNER_WRITE)       out << "OWNER_WRITE";
-    if(m & OWNER_EXEC)        out << "OWNER_EXEC";
-    if(m & GROUP_READ)        out << "GROUP_READ";
-    if(m & GROUP_WRITE)       out << "GROUP_WRITE";
-    if(m & GROUP_EXEC)        out << "GROUP_EXEC";
-    if(m & OTHER_READ)        out << "OTHER_READ";
-    if(m & OTHER_WRITE)       out << "OTHER_WRITE";
-    if(m & OTHER_EXEC)        out << "OTHER_EXEC";
+    if(m & mode3::USER_ID_EXEC)      out << "USER_ID_EXEC";
+    if(m & mode3::GROUP_ID_EXEC)     out << "GROUP_ID_EXEC";
+    if(m & mode3::SAVE_SWAPPED_TEXT) out << "SAVE_SWAPPED_TEXT";
+    if(m & mode3::OWNER_READ)        out << "OWNER_READ";
+    if(m & mode3::OWNER_WRITE)       out << "OWNER_WRITE";
+    if(m & mode3::OWNER_EXEC)        out << "OWNER_EXEC";
+    if(m & mode3::GROUP_READ)        out << "GROUP_READ";
+    if(m & mode3::GROUP_WRITE)       out << "GROUP_WRITE";
+    if(m & mode3::GROUP_EXEC)        out << "GROUP_EXEC";
+    if(m & mode3::OTHER_READ)        out << "OTHER_READ";
+    if(m & mode3::OTHER_WRITE)       out << "OTHER_WRITE";
+    if(m & mode3::OTHER_EXEC)        out << "OTHER_EXEC";
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const nfsstat3& obj)
 {
-    switch(obj.get_stat())
+    switch(obj)
     {
         case nfsstat3::OK:               out << "OK";                break;
         case nfsstat3::ERR_PERM:         out << "ERR_PERM";          break;
@@ -290,7 +75,7 @@ std::ostream& operator<<(std::ostream& out, const nfsstat3& obj)
 
 std::ostream& operator<<(std::ostream& out, const ftype3& obj)
 {
-    switch(obj.get_ftype())
+    switch(obj)
     {
         case ftype3::REG: out << "REG"; break;
         case ftype3::DIR: out << "DIR"; break;
@@ -305,43 +90,43 @@ std::ostream& operator<<(std::ostream& out, const ftype3& obj)
 
 std::ostream& operator<<(std::ostream& out, const specdata3& obj)
 {
-    return out << " specdata1: " << obj.get_specdata1() << " specdata2: " << obj.get_specdata2();
+    return out << " specdata1: " << obj.specdata1 << " specdata2: " << obj.specdata2;
 }
 
 std::ostream& operator<<(std::ostream& out, const nfs_fh3& obj)
 {
-    return out << obj.get_data();
+    return out << obj.data;
 }
 
 std::ostream& operator<<(std::ostream& out, const nfstime3& obj)
 {
-    return out << "seconds: " << obj.get_seconds() << " nseconds: " << obj.get_nseconds();
+    return out << "seconds: " << obj.seconds << " nseconds: " << obj.nseconds;
 }
 
 std::ostream& operator<<(std::ostream& out, const fattr3& obj)
 {
-    out << " type: " << obj.get_type();
-    out << " mode: " << obj.get_mode();
-    out << " nlink: " << obj.get_nlink();
-    out << " uid: " << obj.get_uid();
-    out << " gid: " << obj.get_gid();
-    out << " size: " << obj.get_size();
-    out << " used: " << obj.get_used();
-    out << " rdev: " << obj.get_rdev();
-    out << " fsid: " << obj.get_fsid();
-    out << " fileid: " << obj.get_fileid();
-    out << " atime: " << obj.get_atime();
-    out << " mtime: " << obj.get_mtime();
-    out << " ctime: " << obj.get_ctime();
+    out << " type: " << obj.type;
+    out << " mode: " << obj.mode;
+    out << " nlink: " << obj.nlink;
+    out << " uid: " << obj.uid;
+    out << " gid: " << obj.gid;
+    out << " size: " << obj.size;
+    out << " used: " << obj.used;
+    out << " rdev: " << obj.rdev;
+    out << " fsid: " << obj.fsid;
+    out << " fileid: " << obj.fileid;
+    out << " atime: " << obj.atime;
+    out << " mtime: " << obj.mtime;
+    out << " ctime: " << obj.ctime;
 
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const post_op_attr& obj)
 {
-    if(obj.is_attributes())
+    if(obj.attributes_follow)
     {
-        out << " attributes: " << obj.get_attributes();
+        out << " attributes: " << obj.attributes;
     }
     else
     {
@@ -353,18 +138,18 @@ std::ostream& operator<<(std::ostream& out, const post_op_attr& obj)
 
 std::ostream& operator<<(std::ostream& out, const wcc_attr& obj)
 {
-    out << " size: " << obj.get_size();
-    out << " mtime: " << obj.get_mtime();
-    out << " ctime: " << obj.get_ctime();
+    out << " size: " << obj.size;
+    out << " mtime: " << obj.mtime;
+    out << " ctime: " << obj.ctime;
 
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const pre_op_attr& obj)
 {
-    if(obj.is_attributes())
+    if(obj.attributes_follow)
     {
-        out << " attributes: " << obj.get_attributes();
+        out << " attributes: " << obj.attributes;
     }
     else
     {
@@ -376,16 +161,16 @@ std::ostream& operator<<(std::ostream& out, const pre_op_attr& obj)
 
 std::ostream& operator<<(std::ostream& out, const wcc_data& obj)
 {
-    out << " before: " << obj.get_before();
-    out << " after: "  << obj.get_after() ;
+    out << " before: " << obj.before;
+    out << " after: "  << obj.after;
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const post_op_fh3& obj)
 {
-    if(obj.is_handle())
+    if(obj.handle_follows)
     {
-        out << " handle: " << obj.get_handle();
+        out << " handle: " << obj.handle;
     }
     else
     {
@@ -396,50 +181,50 @@ std::ostream& operator<<(std::ostream& out, const post_op_fh3& obj)
 
 std::ostream& operator<<(std::ostream& out, const sattr3& obj)
 {
-    if(obj.is_mode())
+    if(obj.set_it_mode)
     {
-        out << " mode: " << obj.get_mode();
+        out << " mode: " << obj.mode;
     }
 
-    if(obj.is_uid())
+    if(obj.set_it_uid)
     {
-        out << " uid: " << obj.get_uid();
+        out << " uid: " << obj.uid;
     }
 
-    if(obj.is_gid())
+    if(obj.set_it_gid)
     {
-        out << " gid: " << obj.get_gid();
+        out << " gid: " << obj.gid;
     }
 
-    if(obj.is_size())
+    if(obj.set_it_size)
     {
-        out << " size: " << obj.get_size();
+        out << " size: " << obj.size;
     }
 
-    if(obj.is_atime())
+    if(obj.set_it_atime == sattr3::SET_TO_CLIENT_TIME)
     {
-        out << " atime: " << obj.get_atime();
+        out << " atime: " << obj.atime;
     }
 
-    if(obj.is_mtime())
+    if(obj.set_it_mtime == sattr3::SET_TO_CLIENT_TIME)
     {
-        out << " mtime: " << obj.get_mtime();
+        out << " mtime: " << obj.mtime;
     }
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const diropargs3& obj)
 {
-    out << " dir: "  << obj.get_dir() ;
-    out << " name: " << obj.get_name().get_string();
+    out << " dir: "  << obj.dir;
+    out << " name: " << to_string(obj.name);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const sattrguard3& obj)
 {
-    if(obj.is_obj_ctime())
+    if(obj.check)
     {
-        out << " obj_ctime: " << obj.get_obj_ctime();
+        out << " obj_ctime: " << obj.obj_ctime;
     }
     else
     {
@@ -450,21 +235,21 @@ std::ostream& operator<<(std::ostream& out, const sattrguard3& obj)
 
 std::ostream& operator<<(std::ostream& out, const createhow3& obj)
 {
-    switch(obj.get_mode())
+    switch(obj.mode)
     {
         case createhow3::UNCHECKED:
         {
-            out << " mode: UNCHECKED obj_attributes: " << obj.get_obj_attributes();
+            out << " mode: UNCHECKED obj_attributes: " << obj.u.obj_attributes;
         }
         break;
         case createhow3::GUARDED:
         {
-            out << " mode: GUARDED obj_attributes: " << obj.get_obj_attributes();
+            out << " mode: GUARDED obj_attributes: " << obj.u.obj_attributes;
         }
         break;
         case createhow3::EXCLUSIVE:
         {
-            out << " mode: EXCLUSIVE verf: " << obj.get_verf();
+            out << " mode: EXCLUSIVE verf: " << obj.u.verf;
         }
         break;
     }
@@ -474,34 +259,34 @@ std::ostream& operator<<(std::ostream& out, const createhow3& obj)
 
 std::ostream& operator<<(std::ostream& out, const symlinkdata3& obj)
 {
-    out << " symlink_attributes: " << obj.get_symlink_attributes();
-    out << " symlink_data: " << obj.get_symlink_data();
+    out << " symlink_attributes: " << obj.symlink_attributes;
+    out << " symlink_data: " << obj.symlink_data;
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const devicedata3& obj)
 {
-    out << " dev_attributes: " << obj.get_dev_attributes();
-    out << " spec: " << obj.get_spec();
+    out << " dev_attributes: " << obj.dev_attributes;
+    out << " spec: " << obj.spec;
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const mknoddata3& obj)
 {
-    out << " type: " << obj.get_type();
+    out << " type: " << obj.type;
     
-    switch(obj.get_type())
+    switch(obj.type)
     {
         case ftype3::CHR:
         case ftype3::BLK:
             {
-                out << " device: " << obj.get_device();
+                out << " device: " << obj.u.device;
             }
             break;
         case ftype3::SOCK:
         case ftype3::FIFO:
             {
-                out << " pipe_attributes: " << obj.get_pipe_attributes();
+                out << " pipe_attributes: " << obj.u.pipe_attributes;
             }
             break;
         default:

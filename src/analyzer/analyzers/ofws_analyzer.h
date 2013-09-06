@@ -8,7 +8,6 @@
 //------------------------------------------------------------------------------
 #include <tr1/unordered_map>
 
-#include "../xdr/xdr_struct.h"
 #include "../nfs3/nfs_operation.h"
 #include "../rpc_sessions.h"
 #include "base_analyzer.h"

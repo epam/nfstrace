@@ -3,44 +3,20 @@
 // Description: Definition of XDR structures.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef XDR_STRUCT_H
-#define XDR_STRUCT_H
+#ifndef XDR_TYPES_H
+#define XDR_TYPES_H
 //------------------------------------------------------------------------------
 #include <cstring> // size_t
-#include <iostream>
-#include <vector>
-
 #include <stdint.h> // uintxx_t
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace XDR
-{
-
-const size_t align = 4;
-
 struct Opaque
 {
-    friend std::ostream& operator<<(std::ostream& out, const Opaque& opaque)
-    {
-        out << std::hex;
-        for(uint32_t i = 0; i < opaque.len; i++)
-        {
-            out << (uint32_t) opaque.ptr[i];
-        }
-        return out << std::dec;
-    }
-
     inline void set(const uint8_t* p, uint32_t n)
     {
         ptr = p;
         len = n;
     }
-
-    inline std::string get_string() const { return std::string((char*)data(), size()); }
 
     inline uint8_t operator[](size_t i) const { return ptr[i]; }
     inline const uint8_t* data() const { return ptr; }
@@ -49,10 +25,6 @@ struct Opaque
     const uint8_t* ptr;
     uint32_t       len;
 };
-
-} // namespace XDR
-} // namespace analyzer
-} // namespace NST
 //------------------------------------------------------------------------------
-#endif//XDR_STRUCT_H
+#endif//XDR_TYPES_H
 //------------------------------------------------------------------------------

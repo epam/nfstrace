@@ -148,9 +148,9 @@ bool OFWSAnalyzer::call_create(const RPCOperation& operation)
 
     if(res.status == nfsstat3::OK)
     {
-        if(res.resok.obj.handle_follows)
+        if(res.u.resok.obj.handle_follows)
         {
-            Iterator i = find_or_create_op_counter(res.resok.obj.handle);
+            Iterator i = find_or_create_op_counter(res.u.resok.obj.handle);
             (*i->second).inc(Proc::CREATE);
         }
     }
@@ -166,9 +166,9 @@ bool OFWSAnalyzer::call_mkdir(const RPCOperation& operation)
 
     if(res.status == nfsstat3::OK)
     {
-        if(res.resok.obj.handle_follows)
+        if(res.u.resok.obj.handle_follows)
         {
-            Iterator i = find_or_create_op_counter(res.resok.obj.handle);
+            Iterator i = find_or_create_op_counter(res.u.resok.obj.handle);
             (*i->second).inc(Proc::MKDIR);
         }
     }
@@ -184,9 +184,9 @@ bool OFWSAnalyzer::call_symlink(const RPCOperation& operation)
 
     if(res.status == nfsstat3::OK)
     {
-        if(res.resok.obj.handle_follows)
+        if(res.u.resok.obj.handle_follows)
         {
-            Iterator i = find_or_create_op_counter(res.resok.obj.handle);
+            Iterator i = find_or_create_op_counter(res.u.resok.obj.handle);
             (*i->second).inc(Proc::SYMLINK);
         }
     }
@@ -202,9 +202,9 @@ bool OFWSAnalyzer::call_mknod(const RPCOperation& operation)
 
     if(res.status == nfsstat3::OK)
     {
-        if(res.resok.obj.handle_follows)
+        if(res.u.resok.obj.handle_follows)
         {
-            Iterator i = find_or_create_op_counter(res.resok.obj.handle);
+            Iterator i = find_or_create_op_counter(res.u.resok.obj.handle);
             (*i->second).inc(Proc::MKNOD);
         }
     }
