@@ -33,7 +33,7 @@
     log.flush();\
 }
 #else
-#define TRACE(format, ...)
+#define TRACE(...)
 #endif
 
 #define LOG(...) {\
