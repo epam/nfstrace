@@ -13,6 +13,7 @@
 #include "../controller/parameters.h"
 #include "../controller/running_status.h"
 #include "analyzers.h"
+#include "plugins.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::FilteredDataQueue;
 using NST::auxiliary::Thread;
@@ -26,7 +27,6 @@ namespace analyzer
 
 class AnalysisManager
 {
-//    typedef std::list<Plugin> Plugins;
 public:
     AnalysisManager(RunningStatus& running_status);
     ~AnalysisManager();
@@ -47,7 +47,7 @@ private:
     std::auto_ptr<Thread> parser_thread;
     RunningStatus& status;
     Analyzers analyzers;
-//    Plugins plugins;
+    Plugins plugins;
 };
 
 } // namespace analyzer

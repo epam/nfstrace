@@ -89,7 +89,7 @@ void AnalysisManager::populate_analyzers(const Parameters& params)
             analyzers.add(new analyzers::OFDWSAnalyzer(params.block_size(), params.bucket_size()));
             continue;
         }
-        // TODO: load from shared object by path and provide arguments
+        plugins.add(active_analyzers[i].path, active_analyzers[i].arguments);
     }
 
     if(params.is_verbose()) // add special analyzer for trace out RPC calls

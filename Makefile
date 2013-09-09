@@ -30,6 +30,7 @@ debug: $(TARGET)
 $(TARGET):$(OBJS)
 	@mkdir -p $(OUT_DIR)
 	$(CC) $(CFLAGS) -o $(OUT_DIR)/$@ $^ $(LIBS)
+	@cd ./tests/test_plugin ; make ; cd -
 
 .SECONDEXPANSION:
 $(OBJS): $$(patsubst $(OBJ_DIR)/%.o, $(SRC_DIR)/%.cpp, $$@)
