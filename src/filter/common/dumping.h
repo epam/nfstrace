@@ -61,7 +61,6 @@ public:
         inline void reset()
         {
             payload_len = 0;
-        //    packets_len = 0;
         }
 
         inline void push(const PacketInfo& info, const uint32_t len)
@@ -69,18 +68,8 @@ public:
             if(timercmp(&last, &info.header->ts, !=))  // timestamps aren't equal
             {
                 last = info.header->ts;
-                // direct dumping without waiting  completeness of analysis and complete() call
+                // direct dumping without waiting completeness of analysis and complete() call
                 dumper->dump(info.header, info.packet);
-/*
-                // copy packet for dumping to file because it hasn't been seen before
-                //TRACE("payload_len: %u packets_len: %u len: %u", payload_len, packets_len, len);
-                assert(sizeof(packets) >= (packets_len + sizeof(pcap_pkthdr) + info.header->caplen));
-
-                memcpy(packets+packets_len, info.header, sizeof(pcap_pkthdr));
-                packets_len += sizeof(pcap_pkthdr);
-                memcpy(packets+packets_len, info.packet, info.header->caplen);
-                packets_len += info.header->caplen;
-*/
             }
             else
             {
@@ -99,17 +88,6 @@ public:
         void complete(const PacketInfo& info)
         {
             assert(dumper);
-/*
-            // dump packets to file stream
-            uint32_t i = 0;
-            while(i < packets_len)
-            {
-                const pcap_pkthdr* h = reinterpret_cast<pcap_pkthdr*>(packets + i);
-                const uint8_t*     p = reinterpret_cast<uint8_t*>    (packets + i + sizeof(pcap_pkthdr));
-                dumper->dump(h, p);
-                i += sizeof(pcap_pkthdr) + h->caplen;
-            }
-*/
             reset();
             dumper = NULL;
         }
@@ -122,12 +100,10 @@ public:
         PacketDumper* dumper;
         uint8_t payload[4096];
         uint32_t payload_len;
-    //    uint8_t packets[128 * 1024]; // 128k
-    //    uint32_t packets_len;
         struct  timeval last;   // use timestamp as unique ID of packet
     };
 
-    Dumping(const Handle& handle, const std::string& path)
+    Dumping(const Handle& handle, const std::string& path, bool compression, uint32_t limit)
     {
         dumper.reset(new PacketDumper(handle, path.c_str()));
     }

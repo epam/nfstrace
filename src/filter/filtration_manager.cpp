@@ -46,7 +46,10 @@ void FiltrationManager::dump_to_file(const Parameters& params)
     typedef ProcessingThread<Processor> OnlineDumping;
 
     std::auto_ptr<CaptureReader> reader = create_capture_reader(params);
-    std::auto_ptr<Dumping>       writer (new Dumping(reader->get_handle(), params.output_file()));
+    std::auto_ptr<Dumping>       writer (new Dumping(reader->get_handle(),
+                                                     params.output_file(),
+                                                     params.compression(),
+                                                     params.dumping_size()));
 
     std::auto_ptr<Processor>     processor (new Processor(reader, writer));
     std::auto_ptr<OnlineDumping> thread    (new OnlineDumping(processor, status));
