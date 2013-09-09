@@ -51,6 +51,8 @@ public:
     const std::string   filter() const;
     const std::string   input_file() const;
     const std::string   output_file() const;
+    bool                compression() const;
+    unsigned int        dumping_size() const;
     unsigned int        buffer_size() const;
     unsigned short      rpcmsg_limit() const;
     unsigned short      queue_capacity() const;

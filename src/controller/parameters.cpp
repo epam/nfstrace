@@ -131,6 +131,16 @@ const std::string Parameters::output_file() const
     return ofile;
 }
 
+bool Parameters::compression() const
+{
+    return parser[CLI::COMPRESSION].begin()->to_bool();
+}
+
+unsigned int Parameters::dumping_size() const
+{
+    return parser[CLI::DSIZE].begin()->to_int();
+}
+
 unsigned int Parameters::buffer_size() const
 {
     const int size = parser[CLI::BSIZE].begin()->to_int();

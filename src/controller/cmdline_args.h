@@ -27,6 +27,8 @@ struct Args
         ANALYZERS,
         IFILE,
         OFILE,
+        COMPRESSION,
+        DSIZE,
         BSIZE,
         MSIZE,
         QSIZE,
