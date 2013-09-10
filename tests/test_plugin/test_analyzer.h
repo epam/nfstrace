@@ -6,46 +6,30 @@
 #ifndef TEST_ANALYZER_H
 #define TEST_ANALYZER_H
 //------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-#include "plugin_api.h"
-
 #include <iostream>
 //------------------------------------------------------------------------------
+extern "C"
+{
+#include "../../src/api/plugin_api.h"
 
-class TestAnalyzer : public BaseAnalyzer
+//------------------------------------------------------------------------------
+
+class TestAnalyzer : public BaseAnalyzer2
 {
 public:
-    TestAnalyzer() : BaseAnalyzer()
+    TestAnalyzer(const char* opts)
     {
-        std::cout << "TestAnalyzer::TestAnalyzer()" << std::endl;
+        std::cout << "TestAnalyzer::TestAnalyzer(const char*)" << std::endl;
     }
 
-    virtual ~TestAnalyzer()
+    ~TestAnalyzer()
     {
         std::cout << "TestAnalyzer::~TestAnalyzer()" << std::endl;
     }
-
-    virtual const char* name() const
-    {
-        return "TestAnalyzer";
-    }
-
-    virtual void analyse(int data)
-    {
-        std::cout << "TestAnalyzer::analyse(int)" << std::endl;
-        std::cout << "data = " << data << std::endl;
-    }
-
-    virtual void stage()
-    {
-        std::cout << "TestAnalyzer::stage()" << std::endl;
-    }
-
-    virtual void terminate(int)
-    {
-        std::cout << "TestAnalyzer::terminate()" << std::endl;
-    }
+    
+    virtual const char* usage() { return "Relax!"; }
 };
+}
 //------------------------------------------------------------------------------
 #endif//TEST_ANALYZER_H
 //------------------------------------------------------------------------------

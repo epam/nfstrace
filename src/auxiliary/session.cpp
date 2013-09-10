@@ -11,33 +11,6 @@ namespace NST
 namespace auxiliary
 {
 
-bool Session::operator==(const Session& obj) const
-{
-    if((ip_type != obj.ip_type) || (type != obj.type))
-        return false;
-    if((port[0] != obj.port[0]) || (port[1] != obj.port[1]))
-        return false;
-    switch(ip_type)
-    {
-        case Session::v4:
-        {
-            if((ip.v4.addr[0] != obj.ip.v4.addr[0]) || (ip.v4.addr[1] != obj.ip.v4.addr[1]))
-                return false;
-        }
-        break;
-        case Session::v6:
-        {
-            for(int i = 0; i < 16; ++i)
-            {
-                if((ip.v6.addr[0][i] != obj.ip.v6.addr[0][i]) || (ip.v6.addr[1][i] != obj.ip.v6.addr[1][i]))
-                    return false;
-            }
-        }
-        break;
-    }
-    return true;
-}
-
 std::ostream& operator<<(std::ostream& out, const Session& session)
 {
     switch(session.ip_type)

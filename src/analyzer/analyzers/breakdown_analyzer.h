@@ -27,7 +27,26 @@ namespace analyzers
 
 class BreakdownAnalyzer : public BaseAnalyzer
 {
-    typedef std::tr1::unordered_map<RPCSession::Session, Breakdown*, Session::Hash> PerOpStat;
+    struct Hash
+    {
+        std::size_t operator() (const Session& s) const
+        {
+            return s.port[0] + s.port[1] + s.ip.v4.addr[0] + s.ip.v4.addr[1];
+        }
+    };
+
+    struct Pred
+    {
+        bool operator() (const Session& a, const Session& b) const
+        {
+            return (a.port[0] == b.port[0]) &&
+                    (a.port[1] == b.port[1]) &&
+                    (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
+                    (a.ip.v4.addr[1] == b.ip.v4.addr[1]);
+        }
+    };
+
+    typedef std::tr1::unordered_map<RPCSession::Session, Breakdown*, Hash, Pred> PerOpStat;
     typedef PerOpStat::value_type Pair;
     typedef PerOpStat::iterator Iterator;
     typedef PerOpStat::const_iterator ConstIterator;

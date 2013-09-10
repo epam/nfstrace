@@ -3,26 +3,52 @@
 // Description: Struct represented tcp session.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef SESSION_H
-#define SESSION_H
+#ifndef SESSION_TYPE_H
+#define SESSION_TYPE_H
 //------------------------------------------------------------------------------
-#include <ostream>
-
 #include <stddef.h> // size_t
 #include <stdint.h>
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace auxiliary
+extern "C"
 {
 
-#include "../api/session_type.h"
+struct Session
+{
+    enum Direction
+    {
+        Source      =0,
+        Destination =1
+    };
 
-std::ostream& operator<<(std::ostream& out, const Session& session);
+    enum IPType
+    {
+        v4=0,
+        v6=1
+    } ip_type:16;    //16 bit for alignment following integers
 
-} // namespace auxiliary
-} // namespace NST
+    enum Type
+    {
+        TCP=0,
+        UDP=1
+    } type:16;    //16 bit for alignment following integers
+
+    union IPAddress
+    {
+        struct
+        {
+            uint32_t addr[2];   // 2 IPv4 addresses in host byte order
+        } v4;
+        struct
+        {
+            uint8_t addr[2][16];// 2 IPv6 addresses in host byte order
+        } v6;
+    } ip;
+
+    uint16_t port[2];           // 2 ports in host byte order
+};
+
+}
 //------------------------------------------------------------------------------
-#endif //SESSION_H
+#endif //SESSION_TYPE_H
 //------------------------------------------------------------------------------
