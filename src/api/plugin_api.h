@@ -1,36 +1,25 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Definition of XDR structures.
+// Description: Plugin-API describe interface expected by nfstrace.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef XDR_TYPES_H
-#define XDR_TYPES_H
+#ifndef PLUGIN_API_H
+#define PLUGIN_API_H
 //------------------------------------------------------------------------------
-#include <cstring> // size_t
-#include <stdint.h> // uintxx_t
+#include "rpc_types.h"
+#include "nfs3_types.h"
+#include "session_type.h"
+#include "base_analyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-
 extern "C"
 {
 
-struct Opaque
-{
-    inline void set(const uint8_t* p, uint32_t n)
-    {
-        ptr = p;
-        len = n;
-    }
-
-    inline uint8_t operator[](size_t i) const { return ptr[i]; }
-    inline const uint8_t* data() const { return ptr; }
-    inline uint32_t size() const { return len; }
-
-    const uint8_t* ptr;
-    uint32_t       len;
-};
+BaseAnalyzer2* create(const char* opts);// create analyzer and return filled NST_API structure 
+void destroy(BaseAnalyzer2* context);   // destroy analyzer 
 
 }
+
 //------------------------------------------------------------------------------
-#endif//XDR_TYPES_H
+#endif //PLUGIN_API_H
 //------------------------------------------------------------------------------

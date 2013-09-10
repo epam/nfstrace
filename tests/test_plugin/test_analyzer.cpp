@@ -6,12 +6,12 @@
 #include "test_analyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-BaseAnalyzer* create(const char*)
+BaseAnalyzer2* create(const char* opts)
 {
-    return new TestAnalyzer;
+    return new TestAnalyzer(opts);
 }
 
-void destroy(BaseAnalyzer* handle)
+void destroy(BaseAnalyzer2* handle)
 {
     delete handle;
 }

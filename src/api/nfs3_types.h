@@ -8,6 +8,9 @@
 //------------------------------------------------------------------------------
 #include "xdr_types.h"
 //------------------------------------------------------------------------------
+extern "C"
+{
+
 const uint32_t NFS3_FHSIZE = 64;
 const uint32_t NFS3_COOKIEVERFSIZE = 8;
 const uint32_t NFS3_CREATEVERFSIZE = 8;
@@ -26,6 +29,35 @@ typedef uint32_t    gid3;
 typedef uint64_t    size3;
 typedef uint64_t    offset3;
 typedef uint32_t    count3;
+
+struct ProcNum
+{
+    enum NFSProcedure
+    {
+        NFS_NULL    = 0,
+        GETATTR     = 1,
+        SETATTR     = 2,
+        LOOKUP      = 3,
+        ACCESS      = 4,
+        READLINK    = 5,
+        READ        = 6,
+        WRITE       = 7,
+        CREATE      = 8,
+        MKDIR       = 9,
+        SYMLINK     = 10,
+        MKNOD       = 11,
+        REMOVE      = 12,
+        RMDIR       = 13,
+        RENAME      = 14,
+        LINK        = 15,
+        READDIR     = 16,
+        READDIRPLUS = 17,
+        FSSTAT      = 18,
+        FSINFO      = 19,
+        PATHCONF    = 20,
+        COMMIT      = 21
+    };
+};
 
 struct mode3
 {
@@ -956,6 +988,8 @@ struct COMMIT3res
         COMMIT3resfail resfail;
     } u;
 };
+
+} // extern "C"
 //------------------------------------------------------------------------------
 #endif//NFS3_TYPES_H
 //------------------------------------------------------------------------------
