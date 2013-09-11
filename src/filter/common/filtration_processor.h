@@ -382,7 +382,8 @@ public:
             }
             else
             {
-                TRACE("Session is not created!");
+                Logger::Buffer buffer;
+                buffer << "Session " << key << " is not created";
                 return;
             }
         }
