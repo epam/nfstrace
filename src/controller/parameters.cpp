@@ -131,14 +131,20 @@ const std::string Parameters::output_file() const
     return ofile;
 }
 
-bool Parameters::compression() const
+const std::string Parameters::dumping_cmd() const
 {
-    return parser[CLI::COMPRESSION].begin()->to_bool();
+    return parser[CLI::COMMAND].begin()->to_cstr();
 }
 
 unsigned int Parameters::dumping_size() const
 {
-    return parser[CLI::DSIZE].begin()->to_int();
+    unsigned int dsize = parser[CLI::DSIZE].begin()->to_int();
+    if(dsize != 0 && output_file() == "-") // '-' is alias for stdout in libpcap dumps
+    {
+        throw cmdline::CLIError(std::string("Output file \"-\" means stdout, the dump-size must be 0"));
+    }
+
+    return dsize * 1024 * 1024; // MBytes
 }
 
 unsigned int Parameters::buffer_size() const

@@ -11,6 +11,9 @@
 #include <signal.h>
 #include <string.h> // for strsignal()
 
+#include <sys/wait.h>
+
+#include "../auxiliary/logger.h"
 #include "../auxiliary/exception.h"
 #include "../auxiliary/thread.h"
 #include "running_status.h"
@@ -50,6 +53,7 @@ public:
         sigemptyset(&mask);
         sigaddset(&mask, SIGINT);
         sigaddset(&mask, SIGQUIT);
+        sigaddset(&mask, SIGCHLD);
         sigaddset(&mask, SIGUSR2);
 
         int signo = 0;
@@ -59,8 +63,15 @@ public:
             // Synchronously wait of the signals
             sigwait(&mask, &signo);
 
+            if (signo == SIGCHLD)
+            {
+                wait(NULL);
+                continue;
+            }
+
             if (signo == SIGUSR2)
             {
+                wait(NULL);
                 return NULL;
             }
             status.push(Signal(signo));
