@@ -48,7 +48,7 @@ void FiltrationManager::dump_to_file(const Parameters& params)
     std::auto_ptr<CaptureReader> reader = create_capture_reader(params);
     std::auto_ptr<Dumping>       writer (new Dumping(reader->get_handle(),
                                                      params.output_file(),
-                                                     params.compression(),
+                                                     params.dumping_cmd(),
                                                      params.dumping_size()));
 
     std::auto_ptr<Processor>     processor (new Processor(reader, writer));

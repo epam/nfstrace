@@ -4,8 +4,6 @@
 // of the application.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include <string>
-
 #include "controller.h"
 #include "parameters.h"
 #include "../auxiliary/filtered_data.h"
