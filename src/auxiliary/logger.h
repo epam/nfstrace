@@ -82,7 +82,7 @@ public:
     {
         if(global_logger)
         {
-            throw Exception(std::string("Global Logger have been set"));
+            throw Exception(std::string("Global Logger hasn't been set"));
         }
         global_logger = global;
     }
