@@ -41,6 +41,7 @@ struct Packet: public PacketInfo
         fragment->eth   = info.eth  ? (const ethernet::EthernetHeader*) (packet + ( ((const uint8_t*)info.eth ) - info.packet)) : NULL;
         fragment->ipv4  = info.ipv4 ? (const ip::IPv4Header*)           (packet + ( ((const uint8_t*)info.ipv4) - info.packet)) : NULL;
         fragment->tcp   = info.tcp  ? (const tcp::TCPHeader*)           (packet + ( ((const uint8_t*)info.tcp ) - info.packet)) : NULL;
+        fragment->udp   = info.udp  ? (const udp::UDPHeader*)           (packet + ( ((const uint8_t*)info.udp ) - info.packet)) : NULL;
 
         fragment->data  = packet + (info.data - info.packet);
         fragment->dlen  = info.dlen;
@@ -57,9 +58,9 @@ struct Packet: public PacketInfo
     }
 
 private:
-    Packet();                       // undefiend
-    Packet(const Packet&);          // undefined
-    void operator=(const Packet&);  // undefined
+    Packet();                           // undefiend
+    Packet(const Packet&);              // undefined
+    Packet& operator=(const Packet&);   // undefined
 };
 
 } // namespace filter
