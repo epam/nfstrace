@@ -21,7 +21,7 @@ struct Args
 
     enum Names {
         INTERFACE,
-        PORT,
+        FILTER,
         SNAPLEN,
         MODE,
         ANALYZERS,

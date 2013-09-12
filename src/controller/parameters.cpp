@@ -94,7 +94,7 @@ unsigned short Parameters::snaplen() const
 
 const std::string Parameters::filter() const
 {
-    return std::string("tcp port ") + std::string(*parser[CLI::PORT].begin());
+    return std::string(*parser[CLI::FILTER].begin());
 }
 
 const std::string Parameters::input_file() const
@@ -103,7 +103,7 @@ const std::string Parameters::input_file() const
     if(parser.is_default(CLI::IFILE))
     {
         std::stringstream buffer;
-        buffer << parser[CLI::INTERFACE].begin()->to_cstr() << '-' << parser[CLI::PORT].begin()->to_cstr() << ".pcap";
+        buffer << parser[CLI::INTERFACE].begin()->to_cstr() << '-' << parser[CLI::FILTER].begin()->to_cstr() << ".pcap";
         ifile = buffer.str();
     }
     else
@@ -120,7 +120,7 @@ const std::string Parameters::output_file() const
     if(parser.is_default(CLI::OFILE))
     {
         std::stringstream buffer;
-        buffer << parser[CLI::INTERFACE].begin()->to_cstr() << '-' << parser[CLI::PORT].begin()->to_cstr() << ".pcap";
+        buffer << parser[CLI::INTERFACE].begin()->to_cstr() << '-' << parser[CLI::FILTER].begin()->to_cstr() << ".pcap";
         ofile = buffer.str();
     }
     else
