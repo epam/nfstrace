@@ -697,9 +697,16 @@ public:
 
         PacketInfo info(pkthdr, packet, processor->datalink);
 
-        if(info.eth && info.ipv4 && info.tcp)    // Ethernet:IPv4:TCP supported only
+        if(info.eth && info.ipv4)
         {
-            processor->sessions.collect_packet(info, processor->writer.get());
+            if(info.tcp)     // Ethernet:IPv4:TCP supported only
+            {
+                return processor->sessions.collect_packet(info, processor->writer.get());
+            }
+            else if(info.udp)
+            {
+                LOG("the UDP protocol isn't yet implemented");
+            }
         }
         else
         {

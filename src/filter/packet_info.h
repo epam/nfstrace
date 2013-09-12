@@ -14,10 +14,12 @@
 #include "ethernet/ethernet_header.h"
 #include "ip/ipv4_header.h"
 #include "tcp/tcp_header.h"
+#include "udp/udp_header.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::ethernet;
 using namespace NST::filter::ip;
 using namespace NST::filter::tcp;
+using namespace NST::filter::udp;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -31,6 +33,7 @@ struct PacketInfo
         eth  = NULL;
         ipv4 = NULL;
         tcp  = NULL;
+        udp  = NULL;
         data = packet;
         dlen = header->caplen;
 
@@ -83,7 +86,7 @@ struct PacketInfo
         switch(header->protocol())
         {
         case ipv4_header::TCP: check_tcp(); break;
-        case ipv4_header::UDP: // TODO: implement UDP
+        case ipv4_header::UDP: check_udp(); break;
         default:
             return;
         }
@@ -94,8 +97,8 @@ struct PacketInfo
     inline void check_tcp()
     {
         if(dlen < sizeof(TCPHeader)) return;   // fragmented TCP header
+        const TCPHeader* header = reinterpret_cast<const TCPHeader*>(data);
 
-        TCPHeader* header = (TCPHeader*)data;
         uint8_t offset = header->offset();
         if(offset < 20 || offset > 60) return; // invalid length of TCP header
 
@@ -105,6 +108,17 @@ struct PacketInfo
         dlen -= offset;
 
         tcp = header;
+    }
+
+    inline void check_udp()
+    {
+        if(dlen < sizeof(UDPHeader)) return;   // fragmented UDP header
+        const UDPHeader* header = reinterpret_cast<const UDPHeader*>(data);
+
+        data += sizeof(UDPHeader);
+        dlen -= sizeof(UDPHeader);
+
+        udp = header;
     }
 
     // libpcap structures
@@ -127,7 +141,7 @@ struct PacketInfo
     // TCP
     const tcp::TCPHeader*           tcp;
     // UDP
-    // TODO: add UDP support
+    const udp::UDPHeader*           udp;
 
     const uint8_t*                  data;   // pointer to payload data
     uint32_t                        dlen;   // length of payload data
