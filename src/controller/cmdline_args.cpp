@@ -32,12 +32,12 @@ const char* const Args::ofdws_analyzer  = OFDWS;
 Opt Args::options[Args::num] =
 {
     {'i', "interface",  Opt::REQ,  NULL,                 "listen interface",                                    "INTERFACE"},
-    {'p', "port",       Opt::REQ, "2049",                "port of NFS communications",                          "PORT"},
+    {'f', "filter",     Opt::REQ, "tcp port 2049",       "a packet filter in libpcap BPF syntax",               "BPF"},
     {'s', "snaplen",    Opt::REQ, "65535",               "max length of raw captured packet",                   "0..65535"},
     {'m', "mode",       Opt::REQ,  LIVE,                 "set runing mode",                                     LIVE"|"DUMP"|"STAT },
     {'a', "analyzers",  Opt::REQ,  OB,                   "use specified analyzer",                              OB"|"OFWS"|"OFDWS"|PATH" },
-    {'I', "ifile",      Opt::REQ, "INTERFACE-PORT.pcap", "input file to "STAT" mode, the '-' means stdin",      "PATH"},
-    {'O', "ofile",      Opt::REQ, "INTERFACE-PORT.pcap", "output file to "DUMP" mode, the '-' means stdout",    "PATH"},
+    {'I', "ifile",      Opt::REQ, "INTERFACE-BPF.pcap",  "input file to "STAT" mode, the '-' means stdin",      "PATH"},
+    {'O', "ofile",      Opt::REQ, "INTERFACE-BPF.pcap",  "output file to "DUMP" mode, the '-' means stdout",    "PATH"},
     {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file"},
     {'D', "dump-size",  Opt::REQ, "0",                   "size of dumping file portion in MBytes, 0 = no limit","0.."},
     {'B', "bsize",      Opt::REQ, "2",                   "size of capturing kernel buffer in MBytes",           "1.."},
