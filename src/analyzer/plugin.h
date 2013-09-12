@@ -9,9 +9,8 @@
 #include <string>
 
 #include "../api/plugin_api.h"
-#include "../auxiliary/exception.h"
+#include "../auxiliary/dynamic_load.h"
 //------------------------------------------------------------------------------
-using NST::auxiliary::Exception;
 //------------------------------------------------------------------------------
 
 namespace NST
@@ -19,19 +18,12 @@ namespace NST
 namespace analyzer
 {
 
-class PluginException : public Exception
+class Plugin : private NST::auxiliary::DynamicLoad
 {
 public:
-    explicit PluginException(const std::string& msg) : Exception(msg) { }
 
-    virtual const PluginException* dynamic_clone() const { return new PluginException(*this); }
-    virtual void                   dynamic_throw() const { throw *this; }
-};
-
-class Plugin
-{
-    typedef void* (*create_t)    (const char* opts);// create analyzer and return context 
-    typedef void  (*destroy_t)   (void* context);   // destroy analyzer 
+    typedef void* (*create_t)    (const char* opts);// create analyzer and return context
+    typedef void  (*destroy_t)   (void* context);   // destroy analyzer
 
 public:
     Plugin(const std::string& path, const std::string& args);
@@ -42,7 +34,7 @@ private:
     Plugin& operator=(const Plugin&); // undefiend
 
     BaseAnalyzer2* analyzer;
-    void*          handle;
+//    void*          handle;
     destroy_t      destroy;
 };
 
