@@ -47,10 +47,10 @@ std::ostream& operator<<(std::ostream& out, const Session& session)
     switch(session.type)
     {
         case Session::TCP:
-            out << "[TCP]";
+            out << " [TCP]";
             break;
         case Session::UDP:
-            out << "[UDP]";
+            out << " [UDP]";
             break;
     }
     return out;
