@@ -40,16 +40,17 @@ template <typename StreamReader>
 struct TCPSession
 {
 public:
-    // Helpers for comparison sequence numbers
-    // Idea for gt: either x > y, or y is much bigger (assume wrap)
-    inline static bool GT_SEQ(uint32_t x, uint32_t y){ return (int32_t)((y) - (x)) <  0; }
-    inline static bool LT_SEQ(uint32_t x, uint32_t y){ return (int32_t)((x) - (y)) <  0; }
-    inline static bool GE_SEQ(uint32_t x, uint32_t y){ return (int32_t)((y) - (x)) <= 0; }
-    inline static bool LE_SEQ(uint32_t x, uint32_t y){ return (int32_t)((x) - (y)) <= 0; }
-    inline static bool EQ_SEQ(uint32_t x, uint32_t y){ return           (x) == (y);      }
 
     struct Flow
     {
+        // Helpers for comparison sequence numbers
+        // Idea for gt: either x > y, or y is much bigger (assume wrap)
+        inline static bool GT_SEQ(uint32_t x, uint32_t y){ return (int32_t)((y) - (x)) <  0; }
+        inline static bool LT_SEQ(uint32_t x, uint32_t y){ return (int32_t)((x) - (y)) <  0; }
+        inline static bool GE_SEQ(uint32_t x, uint32_t y){ return (int32_t)((y) - (x)) <= 0; }
+        inline static bool LE_SEQ(uint32_t x, uint32_t y){ return (int32_t)((x) - (y)) <= 0; }
+        inline static bool EQ_SEQ(uint32_t x, uint32_t y){ return           (x) ==(y);       }
+
         friend class TCPSession<StreamReader>;
 
         Flow() : fragments(NULL), sequence(0)
@@ -168,7 +169,7 @@ public:
                     const uint32_t current_seq = current->tcp->seq();
                     const uint32_t current_len = current->dlen;
 
-                    if( (int32_t)(lowest_seq - current_seq) > 0 )
+                    if( GT_SEQ(lowest_seq, current_seq) ) // lowest_seq > current_seq
                     {
                         lowest_seq = current_seq;
                     }
@@ -246,11 +247,11 @@ public:
                     current = current->next;
                 }// end while
 
-                if( (int32_t)(acknowledged - lowest_seq) > 0 )
+                if( GT_SEQ(acknowledged, lowest_seq) )  // acknowledged > lowest_seq
                 {
                     //TRACE("acknowledged(%u) > lowest_seq(%u) seq:%u", acknowledged, lowest_seq, sequence);
                     // There are frames missing in the capture stream that were seen
-                    // by the receiving host. Inform Stream about it.
+                    // by the receiving host. Inform stream about it.
                     reader.lost(lowest_seq - sequence);
                     sequence = lowest_seq;
                     return true;
