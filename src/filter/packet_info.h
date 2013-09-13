@@ -11,11 +11,14 @@
 
 #include <pcap/pcap.h>
 
+#include "../auxiliary/session.h"
 #include "ethernet/ethernet_header.h"
 #include "ip/ipv4_header.h"
 #include "tcp/tcp_header.h"
 #include "udp/udp_header.h"
 //------------------------------------------------------------------------------
+using NST::auxiliary::Session;
+
 using namespace NST::filter::ethernet;
 using namespace NST::filter::ip;
 using namespace NST::filter::tcp;
@@ -119,6 +122,29 @@ struct PacketInfo
         dlen -= sizeof(UDPHeader);
 
         udp = header;
+    }
+
+    inline void fill(Session& session) const
+    {
+        if(ipv4)
+        {
+            session.ip_type = Session::v4;
+            session.ip.v4.addr[0] = ipv4->src();
+            session.ip.v4.addr[1] = ipv4->dst();
+        }
+
+        if(tcp)
+        {
+            session.type = Session::TCP;
+            session.port[0] = tcp->sport();
+            session.port[1] = tcp->dport();
+        }
+        else if(udp)
+        {
+            session.type = Session::UDP;
+            session.port[0] = udp->sport();
+            session.port[1] = udp->dport();
+        }
     }
 
     // libpcap structures

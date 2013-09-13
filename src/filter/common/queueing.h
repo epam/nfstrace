@@ -15,6 +15,7 @@
 //------------------------------------------------------------------------------
 using NST::auxiliary::FilteredData;
 using NST::auxiliary::FilteredDataQueue;
+using NST::auxiliary::Session;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -108,21 +109,10 @@ public:
             assert(ptr);
             assert(ptr->dlen > 0);
 
-            // TODO: replace this code with correct reading of current Conversation (Session)
             ptr->timestamp = info.header->ts;
-            if(info.ipv4)
-            {
-                ptr->session.ip_type = auxiliary::Session::v4;
-                ptr->session.ip.v4.addr[0] = info.ipv4->src();
-                ptr->session.ip.v4.addr[1] = info.ipv4->dst();
-            }
 
-            if(info.tcp)
-            {
-                ptr->session.type = auxiliary::Session::TCP;
-                ptr->session.port[0] = info.tcp->sport();
-                ptr->session.port[1] = info.tcp->dport();
-            }
+            // TODO: replace this code with correct reading of current Conversation (Session)
+            info.fill(ptr->session);
 
             queue->push(ptr);
             ptr = NULL;

@@ -25,7 +25,7 @@ struct FilteredData
 public:
     struct timeval timestamp;
 
-    struct Session __attribute__ ((__packed__)) session;
+    struct Session session;
 
     uint32_t dlen;  // length of filtered payload
     uint8_t* data;  // pointer to data in memory
@@ -34,7 +34,7 @@ public:
 
     FilteredData(const FilteredData&);              // undefined
     FilteredData& operator=(const FilteredData&);   // undefined
-} __attribute__ ((__packed__));
+};
 
 typedef Queue<FilteredData> FilteredDataQueue;
 
