@@ -348,6 +348,126 @@ struct IPv4TCPMapper
 };
 
 
+template<typename SessionCollector>
+struct IPv4UDPMapper
+{
+    typedef SessionCollector Collector;
+
+    static inline Session::Direction fill_session(const PacketInfo& info, Session& s)
+    {
+        s.ip_type = Session::v4;
+        s.ip.v4.addr[0] = info.ipv4->src();
+        s.ip.v4.addr[1] = info.ipv4->dst();
+
+        s.type = Session::UDP;
+        s.port[0] = info.udp->sport();
+        s.port[1] = info.udp->dport();
+
+        if(s.ip.v4.addr[0] < s.ip.v4.addr[1]) return Session::Source;
+        else
+        if(s.ip.v4.addr[0] > s.ip.v4.addr[1]) return Session::Destination;
+        else // Ok, addresses are equal, compare ports
+        return (s.port[0] < s.port[1]) ? Session::Source : Session::Destination;
+    }
+
+    struct Hash
+    {
+        std::size_t operator() (const Session& s) const
+        {
+            return s.port[0] + s.port[1] + s.ip.v4.addr[0] + s.ip.v4.addr[1];
+        }
+    };
+
+    struct Pred
+    {
+        bool operator() (const Session& a, const Session& b) const
+        {
+            if((a.port[0] == b.port[0]) &&
+               (a.port[1] == b.port[1]) &&
+               (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
+               (a.ip.v4.addr[1] == b.ip.v4.addr[1]))
+                return true;
+
+            if((a.port[1] == b.port[0]) &&
+               (a.port[0] == b.port[1]) &&
+               (a.ip.v4.addr[1] == b.ip.v4.addr[0]) &&
+               (a.ip.v4.addr[0] == b.ip.v4.addr[1]))
+                return true;
+            return false;
+        }
+    };
+};
+
+// Represents UDP datagrams interchange between node A and node B
+template <typename Writer>
+struct UDPSession
+{
+public:
+    UDPSession()
+    {
+        max_hdr = controller::Parameters::instance().rpcmsg_limit();
+    }
+    ~UDPSession()
+    {
+    }
+
+//    UDPSession(const UDPSession&);            // undefiend
+//    UDPSession& operator=(const UDPSession&); // undefiend
+
+    void init(Writer* w)
+    {
+        writer = w;
+    }
+
+    void collect(PacketInfo& info, Session::Direction d)
+    {
+        // TODO: this code must be generalized with RPCFiltrator class
+    
+        uint32_t hdr_len = 0;
+        const MessageHeader*const msg = reinterpret_cast<const MessageHeader*>(info.data);
+        switch(msg->type())
+        {
+            case SUNRPC_CALL:
+            {
+                const CallHeader*const call = static_cast<const CallHeader*const>(msg);
+                if(RPCValidator::check(call) && NFSv3Validator::check(call))
+                {
+                    hdr_len = std::min(info.dlen, max_hdr);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            break;
+            case SUNRPC_REPLY:
+            {
+                const ReplyHeader*const reply = static_cast<const ReplyHeader*const>(msg);
+                if(RPCValidator::check(reply))
+                {
+                    hdr_len = std::min(info.dlen, max_hdr);
+                }
+                else // isn't RPC reply, stream is corrupt
+                {
+                    return;
+                }
+            }
+            break;
+            default:
+                return;
+        }
+
+        typename Writer::Collection collection;
+        collection = *writer;
+
+        collection.push(info, hdr_len);
+
+        collection.complete(info);
+    }
+
+    Writer* writer;
+    uint32_t max_hdr;
+};
 
 template<typename Mapper>
 class SessionCollectors
@@ -379,11 +499,13 @@ public:
             {
                 i = res.first;
                 i->second.init(writer);
+                Logger::Buffer buffer;
+                buffer << "create new session " << key;
             }
             else
             {
                 Logger::Buffer buffer;
-                buffer << "Session " << key << " is not created";
+                buffer << "session " << key << " is not created";
                 return;
             }
         }
@@ -705,7 +827,7 @@ public:
             }
             else if(info.udp)
             {
-                LOG("the UDP protocol isn't yet implemented");
+                return processor->udp_sessions.collect_packet(info, processor->writer.get());
             }
         }
         else
@@ -715,10 +837,12 @@ public:
     }
 
 private:
+
     std::auto_ptr<Reader> reader;
     std::auto_ptr<Writer> writer;
     int datalink;
     SessionCollectors< IPv4TCPMapper < TCPSession < RPCFiltrator < Writer > > > > sessions;
+    SessionCollectors< IPv4UDPMapper < UDPSession < Writer > > > udp_sessions;
 };
 
 

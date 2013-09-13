@@ -23,15 +23,15 @@ struct udp_header
     uint16_t udp_sport;     // source port, optional, may be 0
     uint16_t udp_dport;     // destination port
     uint16_t udp_len;       // length of the datagram, minimum value is 8
-    uint32_t udp_sum;       // checksum of IP pseudo header, the UDP header, and the data
+    uint16_t udp_sum;       // checksum of IP pseudo header, the UDP header, and the data
 } __attribute__ ((__packed__));
 
 struct UDPHeader : private udp_header
 {
     inline uint16_t sport()    const { return ntohs(udp_sport); }
     inline uint16_t dport()    const { return ntohs(udp_dport); }
-    inline uint32_t length()   const { return ntohs(udp_len);   }
-    inline uint32_t checksum() const { return ntohs(udp_sum);   }
+    inline uint16_t length()   const { return ntohs(udp_len);   }
+    inline uint16_t checksum() const { return ntohs(udp_sum);   }
 } __attribute__ ((__packed__));
 
 } //namespace tcp
