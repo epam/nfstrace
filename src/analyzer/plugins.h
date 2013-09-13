@@ -22,6 +22,8 @@ class Plugins
     typedef std::vector<Plugin*> Storage;
 
 public:
+    typedef Storage::iterator Iterator;
+
     Plugins()
     {
     }
@@ -32,6 +34,10 @@ public:
         for(; i != end; ++i)
             delete *i;
     }
+
+    inline Iterator begin() { return plugins.begin(); }
+    inline Iterator end() { return plugins.end(); }
+    inline size_t size() const { return plugins.size(); }
 
     void add(const std::string& path, const std::string& args)
     {

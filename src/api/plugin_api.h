@@ -6,17 +6,25 @@
 #ifndef PLUGIN_API_H
 #define PLUGIN_API_H
 //------------------------------------------------------------------------------
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
+
+#include <sys/time.h>
+
+#include "xdr_types.h"
 #include "rpc_types.h"
+#include "rpc_procedure_type.h"
 #include "nfs3_types.h"
 #include "session_type.h"
-#include "base_analyzer.h"
+#include "base_analyzer_type.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 extern "C"
 {
 
-BaseAnalyzer2* create(const char* opts);// create analyzer and return filled NST_API structure 
-void destroy(BaseAnalyzer2* context);   // destroy analyzer 
+BaseAnalyzer* create(const char* opts);// create analyzer 
+void destroy(BaseAnalyzer* context);   // destroy analyzer 
 
 }
 

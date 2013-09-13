@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 #include <cassert>
 
+//#include "../xdr/xdr_structs.h"
 #include "../xdr/xdr_reader.h"
 //------------------------------------------------------------------------------
 using namespace NST::analyzer::XDR;
@@ -172,12 +173,12 @@ inline XDRReader& operator>>(XDRReader& in, diropargs3& obj)
 
 // Procedure 0: NULL - Do nothing
 // void NFSPROC3_NULL(void) = 0;
-inline XDRReader& operator>>(XDRReader& in, NULLargs& o)
+inline XDRReader& operator>>(XDRReader& in, NULLargs&)
 {
     return in;
 }
 
-inline XDRReader& operator>>(XDRReader& in, NULLres& o)
+inline XDRReader& operator>>(XDRReader& in, NULLres&)
 {
     return in;
 }

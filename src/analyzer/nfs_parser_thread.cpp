@@ -73,7 +73,7 @@ inline void NFSParserThread::process_queue()
 
             if(operation.get())
             {
-                analyzers.call(*operation);
+                //analyzers.call(*operation);
             }
         }
         while(list);
@@ -91,6 +91,7 @@ RPCOperation* create_nfs_operation( FilteredDataQueue::Ptr& call,
     {
         switch(proc)
         {
+            /*
         case Proc::NFS_NULL:    return new NFSPROC3_NULL       (call, reply, session);
         case Proc::GETATTR:     return new NFSPROC3_GETATTR    (call, reply, session);
         case Proc::SETATTR:     return new NFSPROC3_SETATTR    (call, reply, session);
@@ -114,6 +115,7 @@ RPCOperation* create_nfs_operation( FilteredDataQueue::Ptr& call,
         case Proc::PATHCONF:    return new NFSPROC3_PATHCONF   (call, reply, session);
         case Proc::COMMIT:      return new NFSPROC3_COMMIT     (call, reply, session);
         case Proc::num:;
+            */
         }
     }
     catch(XDRError& exception)

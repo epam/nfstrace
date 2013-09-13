@@ -6,15 +6,20 @@
 #ifndef ANALYZERS_H
 #define ANALYZERS_H
 //------------------------------------------------------------------------------
-#include <list>
 #include <vector>
 
-#include "nfs3/nfs_operation.h"
-#include "analyzers/base_analyzer.h"
+#include "../controller/parameters.h"
+#include "analyzers/base_analyzer_struct.h"
+//#include "analyzers/breakdown_analyzer.h"
+//#include "analyzers/ofdws_analyzer.h"
+//#include "analyzers/ofws_analyzer.h"
+#include "analyzers/print_analyzer.h"
+#include "plugins.h"
 //------------------------------------------------------------------------------
 using NST::analyzer::analyzers::BaseAnalyzer;
-using NST::analyzer::NFS3::Proc;
-using NST::analyzer::RPC::RPCOperation;
+using NST::analyzer::RPC::RPCProcedure;
+using NST::controller::AParams;
+using NST::controller::Parameters;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -23,76 +28,48 @@ namespace analyzer
 
 class Analyzers
 {
-    typedef std::list<BaseAnalyzer*> Storage;
-
-    typedef bool (BaseAnalyzer::*Method)(const RPCOperation& operation);
+    typedef std::vector<BaseAnalyzer*> Storage;
 public:
-    Analyzers()
+    Analyzers(const Parameters& params)
     {
-        methods.resize(Proc::num);
+        if(params.is_verbose()) // add special analyzer for trace out RPC calls
+            analyzers.push_back(new analyzers::PrintAnalyzer(std::clog));
 
-        methods[Proc::NFS_NULL]     = &BaseAnalyzer::call_null;
-        methods[Proc::GETATTR]      = &BaseAnalyzer::call_getattr;
-        methods[Proc::SETATTR]      = &BaseAnalyzer::call_setattr;
-        methods[Proc::LOOKUP]       = &BaseAnalyzer::call_lookup;
-        methods[Proc::ACCESS]       = &BaseAnalyzer::call_access;
-        methods[Proc::READLINK]     = &BaseAnalyzer::call_readlink;
-        methods[Proc::READ]         = &BaseAnalyzer::call_read;
-        methods[Proc::WRITE]        = &BaseAnalyzer::call_write;
-        methods[Proc::CREATE]       = &BaseAnalyzer::call_create;
-        methods[Proc::MKDIR]        = &BaseAnalyzer::call_mkdir;
-        methods[Proc::SYMLINK]      = &BaseAnalyzer::call_symlink;
-        methods[Proc::MKNOD]        = &BaseAnalyzer::call_mknod;
-        methods[Proc::REMOVE]       = &BaseAnalyzer::call_remove;
-        methods[Proc::RMDIR]        = &BaseAnalyzer::call_rmdir;
-        methods[Proc::RENAME]       = &BaseAnalyzer::call_rename;
-        methods[Proc::LINK]         = &BaseAnalyzer::call_link;
-        methods[Proc::READDIR]      = &BaseAnalyzer::call_readdir;
-        methods[Proc::READDIRPLUS]  = &BaseAnalyzer::call_readdirplus;
-        methods[Proc::FSSTAT]       = &BaseAnalyzer::call_fsstat;
-        methods[Proc::FSINFO]       = &BaseAnalyzer::call_fsinfo;
-        methods[Proc::PATHCONF]     = &BaseAnalyzer::call_pathconf;
-        methods[Proc::COMMIT]       = &BaseAnalyzer::call_commit;
+    /*
+        std::vector<AParams> active_analyzers = params.analyzers();
+        for(uint32_t i = 0; i < active_analyzers.size(); ++i)
+            plugins.add(active_analyzers[i].path, active_analyzers[i].arguments);
+
+        Plugins::Iterator i = plugins.begin();
+        Plugins::Iterator end = plugins.end();
+        for(; i != end; ++i)
+            analyzers.push_back((*i)->get_analyzer());
+    */
     }
+ 
     ~Analyzers()
     {
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            delete *i;
-        }
+        if(plugins.size() != analyzers.size())
+            delete *analyzers.begin();
     }
 
-    void add(BaseAnalyzer* analyzer)
-    {
-        analyzers.push_back(analyzer);
-    }
-
-    bool call(const RPCOperation& operation)
-    {
-        const uint32_t procedure = operation.procedure();
-        Storage::iterator i = analyzers.begin();
-        Storage::iterator end = analyzers.end();
-        for(; i != end; ++i)
-        {
-            ((*i)->*methods[procedure])(operation);
-        }
-        return true;
-    }
-    void print(std::ostream& out)
+    template
+    <
+        typename Handle,
+        typename Args,
+        typename Res
+    >
+    void process(Handle* handle, const RPCProcedure* proc, const Args* args, const Res* res)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
-        {
-            (*i)->print(out);
-        }
+            ((*i)->*handle)(proc, args, res);
     }
 
 private:
     Storage analyzers;
-    std::vector<Method> methods;
+    Plugins plugins;
 };
 
 } // namespace analyzer

@@ -6,10 +6,10 @@
 #ifndef XDR_STRUCTS_H
 #define XDR_STRUCTS_H
 //------------------------------------------------------------------------------
-#include <cstring> // size_t
 #include <iostream>
 
-#include <stdint.h> // uintxx_t
+#include <stddef.h>
+#include <stdint.h>
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
