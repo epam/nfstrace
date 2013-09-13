@@ -1,33 +1,30 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Definition of XDR structures.
+// Description: Base analyzer, which implement restoring rpc/nfs structures from plain rpc header.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef XDR_TYPES_H
-#define XDR_TYPES_H
+#ifndef BASE_ANALYZER_STRUCT_H
+#define BASE_ANALYZER_STRUCT_H
 //------------------------------------------------------------------------------
+#include "../nfs3/nfs_structs.h"        // api/nfs3_types.h
+#include "../rpc/rpc_procedure_struct.h"// api/rpc_procedure_type.h
 //------------------------------------------------------------------------------
+using namespace NST::analyzer::NFS3;
+
+using NST::analyzer::RPC::RPCProcedure;
 //------------------------------------------------------------------------------
-extern "C"
+namespace NST
+{
+namespace analyzer
+{
+namespace analyzers
 {
 
-struct Opaque
-{
-    inline void set(const uint8_t* p, uint32_t n)
-    {
-        ptr = p;
-        len = n;
-    }
+#include "../../api/base_analyzer_type.h"
 
-    inline uint8_t operator[](size_t i) const { return ptr[i]; }
-    inline const uint8_t* data() const { return ptr; }
-    inline uint32_t size() const { return len; }
-
-    const uint8_t* ptr;
-    uint32_t       len;
-};
-
-}
+} // namespace analyzers
+} // namespace analyzer
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif//XDR_TYPES_H
+#endif//BASE_ANALYZER_STRUCT_H
 //------------------------------------------------------------------------------

@@ -8,9 +8,10 @@
 //------------------------------------------------------------------------------
 #include <string>
 
-#include "../api/plugin_api.h"
 #include "../auxiliary/dynamic_load.h"
+#include "analyzers/base_analyzer_struct.h"
 //------------------------------------------------------------------------------
+using NST::analyzer::analyzers::BaseAnalyzer;
 //------------------------------------------------------------------------------
 
 namespace NST
@@ -29,12 +30,13 @@ public:
     Plugin(const std::string& path, const std::string& args);
     ~Plugin();
 
+    inline BaseAnalyzer* get_analyzer() { return analyzer; }
+
 private:
     Plugin(const Plugin&);            // undefiend
     Plugin& operator=(const Plugin&); // undefiend
 
-    BaseAnalyzer2* analyzer;
-//    void*          handle;
+    BaseAnalyzer* analyzer;
     destroy_t      destroy;
 };
 

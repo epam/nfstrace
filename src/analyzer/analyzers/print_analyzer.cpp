@@ -19,7 +19,7 @@ namespace analyzer
 namespace analyzers
 {
 
-// Spesial helper for printout short representation of NFS FH
+// Spesial helper for printout short repres->ntation of NFS FH
 std::ostream& operator += (std::ostream& out, const nfs_fh3& fh)
 {
     static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -59,104 +59,88 @@ std::ostream& operator += (std::ostream& out, const nfs_fh3& fh)
     return out;
 }
 
-bool PrintAnalyzer::call_null(const RPCOperation& operation)
+void PrintAnalyzer::null(const struct RPCProcedure* proc,
+        const struct NULLargs* args,
+        const struct NULLres* res)
 {
-    const NFSPROC3_NULL& op = static_cast<const NFSPROC3_NULL&>(operation);
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [] REPLY []";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_getattr(const RPCOperation& operation)
+void PrintAnalyzer::getattr3(const RPCProcedure* proc,
+        const struct GETATTR3args* args,
+        const struct GETATTR3res* res)
 {
-    const NFSPROC3_GETATTR& op = static_cast<const NFSPROC3_GETATTR&>(operation);
-    const NFSPROC3_GETATTR::Arg& arg = op.get_arg();
-    const NFSPROC3_GETATTR::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " object: " += arg.object;
+    out << " object: " += args->object;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_setattr(const RPCOperation& operation)
+void PrintAnalyzer::setattr3(const RPCProcedure* proc,
+        const struct SETATTR3args* args,
+        const struct SETATTR3res* res)
 {
-    const NFSPROC3_SETATTR& op = static_cast<const NFSPROC3_SETATTR&>(operation);
-    const NFSPROC3_SETATTR::Arg& arg = op.get_arg();
-    const NFSPROC3_SETATTR::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " object: " += arg.object;
-    out << " new_attributes: " << arg.new_attributes;
-    out << " guard: " << arg.guard;
+    out << " object: " += args->object;
+    out << " new_attributes: " << args->new_attributes;
+    out << " guard: " << args->guard;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_lookup(const RPCOperation& operation)
+void PrintAnalyzer::lookup3(const RPCProcedure* proc,
+        const struct LOOKUP3args* args,
+        const struct LOOKUP3res* res)
 {
-    const NFSPROC3_LOOKUP& op = static_cast<const NFSPROC3_LOOKUP&>(operation);
-    const NFSPROC3_LOOKUP::Arg& arg = op.get_arg();
-    const NFSPROC3_LOOKUP::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " what: " << arg.what;
+    out << " what: " << args->what;
     out << "] REPLY [";
-    out << " status: " << res.status;
-    if(res.status == nfsstat3::OK)
+    out << " status: " << res->status;
+    if(res->status == nfsstat3::OK)
     {
-        out << " object: "  += res.resok.object;
-        out << " obj_attributes: "  << res.resok.obj_attributes;
-        out << " dir_attributes: "  << res.resok.dir_attributes;
+        out << " object: "  += res->resok.object;
+        out << " obj_attributes: "  << res->resok.obj_attributes;
+        out << " dir_attributes: "  << res->resok.dir_attributes;
     }
     else
     {
-        out << " dir_attributes: "  << res.resfail.dir_attributes;
+        out << " dir_attributes: "  << res->resfail.dir_attributes;
     }
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_access(const RPCOperation& operation)
+void PrintAnalyzer::access3(const struct RPCProcedure* proc,
+            const struct ACCESS3args* args,
+            const struct ACCESS3res* res)
 {
-    const NFSPROC3_ACCESS& op = static_cast<const NFSPROC3_ACCESS&>(operation);
-    const NFSPROC3_ACCESS::Arg& arg = op.get_arg();
-    const NFSPROC3_ACCESS::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " object: " += arg.object;
+    out << " object: " += args->object;
     out << " access: ";
-    if(arg.access & ACCESS3args::ACCESS3_READ)   out << "READ ";
-    if(arg.access & ACCESS3args::ACCESS3_LOOKUP) out << "LOOKUP ";
-    if(arg.access & ACCESS3args::ACCESS3_MODIFY) out << "MODIFY ";
-    if(arg.access & ACCESS3args::ACCESS3_EXTEND) out << "EXTEND ";
-    if(arg.access & ACCESS3args::ACCESS3_DELETE) out << "DELETE ";
-    if(arg.access & ACCESS3args::ACCESS3_EXECUTE)out << "EXECUTE ";
+    if(args->access & ACCESS3args::ACCESS3_READ)   out << "READ ";
+    if(args->access & ACCESS3args::ACCESS3_LOOKUP) out << "LOOKUP ";
+    if(args->access & ACCESS3args::ACCESS3_MODIFY) out << "MODIFY ";
+    if(args->access & ACCESS3args::ACCESS3_EXTEND) out << "EXTEND ";
+    if(args->access & ACCESS3args::ACCESS3_DELETE) out << "DELETE ";
+    if(args->access & ACCESS3args::ACCESS3_EXECUTE)out << "EXECUTE ";
 
     out << "] REPLY [";
-    out << " status: " << res.status;
-    if(res.status == nfsstat3::OK)
+    out << " status: " << res->status;
+    if(res->status == nfsstat3::OK)
     {
-        out << " obj_attributes: " << res.u.resok.obj_attributes;
+        out << " obj_attributes: " << res->u.resok.obj_attributes;
         out << " access: ";
-        uint32_t access = res.u.resok.access;
+        uint32_t access = res->u.resok.access;
         if(access & ACCESS3args::ACCESS3_READ)   out << "READ ";
         if(access & ACCESS3args::ACCESS3_LOOKUP) out << "LOOKUP ";
         if(access & ACCESS3args::ACCESS3_MODIFY) out << "MODIFY ";
@@ -166,337 +150,267 @@ bool PrintAnalyzer::call_access(const RPCOperation& operation)
     }
     else
     {
-        out << " obj_attributes: " << res.u.resfail.obj_attributes;
+        out << " obj_attributes: " << res->u.resfail.obj_attributes;
     }
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_readlink(const RPCOperation& operation)
+void PrintAnalyzer::readlink3(const struct RPCProcedure* proc,
+        const struct READLINK3args* args,
+        const struct READLINK3res* res)
 {
-    const NFSPROC3_READLINK& op = static_cast<const NFSPROC3_READLINK&>(operation);
-    const NFSPROC3_READLINK::Arg& arg = op.get_arg();
-    const NFSPROC3_READLINK::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " symlink: "  += arg.symlink;
+    out << " symlink: "  += args->symlink;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_read(const RPCOperation& operation)
+void PrintAnalyzer::read3(const struct RPCProcedure* proc,
+        const struct READ3args* args,
+        const struct READ3res* res)
 {
-    const NFSPROC3_READ& op = static_cast<const NFSPROC3_READ&>(operation);
-    const NFSPROC3_READ::Arg& arg = op.get_arg();
-    const NFSPROC3_READ::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " file: "   += arg.file;
-    out << " offset: " << arg.offset;
-    out << " count: "  << arg.count;
+    out << " file: "   += args->file;
+    out << " offset: " << args->offset;
+    out << " count: "  << args->count;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_write(const RPCOperation& operation)
+void PrintAnalyzer::write3(const struct RPCProcedure* proc,
+        const struct WRITE3args* args,
+        const struct WRITE3res* res)
 {
-    const NFSPROC3_WRITE& op = static_cast<const NFSPROC3_WRITE&>(operation);
-    const NFSPROC3_WRITE::Arg& arg = op.get_arg();
-    const NFSPROC3_WRITE::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " file: "   += arg.file;
-    out << " offset: " << arg.offset;
-    out << " count: "  << arg.count;
-    out << " stable: "  << arg.stable;
+    out << " file: "   += args->file;
+    out << " offset: " << args->offset;
+    out << " count: "  << args->count;
+    out << " stable: "  << args->stable;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_create(const RPCOperation& operation)
+void PrintAnalyzer::create3(const struct RPCProcedure* proc,
+        const struct CREATE3args* args,
+        const struct CREATE3res* res)
 {
-    const NFSPROC3_CREATE& op = static_cast<const NFSPROC3_CREATE&>(operation);
-    const NFSPROC3_CREATE::Arg& arg = op.get_arg();
-    const NFSPROC3_CREATE::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " where: " << arg.where;
-    out << " how: " << arg.how;
+    out << " where: " << args->where;
+    out << " how: " << args->how;
     out << "] REPLY [";
-    out << " status: " << res.status;
-    if(res.status == nfsstat3::OK)
+    out << " status: " << res->status;
+    if(res->status == nfsstat3::OK)
     {
-        out << " obj: " << res.u.resok.obj;
-        out << " obj_attributes: " << res.u.resok.obj_attributes;
-        out << " dir_wcc: " << res.u.resok.dir_wcc;
+        out << " obj: " << res->u.resok.obj;
+        out << " obj_attributes: " << res->u.resok.obj_attributes;
+        out << " dir_wcc: " << res->u.resok.dir_wcc;
     }
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_mkdir(const RPCOperation& operation)
+void PrintAnalyzer::mkdir3(const struct RPCProcedure* proc,
+        const struct MKDIR3args* args,
+        const struct MKDIR3res* res)
 {
-    const NFSPROC3_MKDIR& op = static_cast<const NFSPROC3_MKDIR&>(operation);
-    const NFSPROC3_MKDIR::Arg& arg = op.get_arg();
-    const NFSPROC3_MKDIR::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " where: " << arg.where;
-    out << " attributes: " << arg.attributes;
+    out << " where: " << args->where;
+    out << " attributes: " << args->attributes;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_symlink(const RPCOperation& operation)
+void PrintAnalyzer::symlink3(const struct RPCProcedure* proc,
+        const struct SYMLINK3args* args,
+        const struct SYMLINK3res* res)
 {
-    const NFSPROC3_SYMLINK& op = static_cast<const NFSPROC3_SYMLINK&>(operation);
-    const NFSPROC3_SYMLINK::Arg& arg = op.get_arg();
-    const NFSPROC3_SYMLINK::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " where: " << arg.where;
-    out << " symlinkdata: " << arg.symlink;
+    out << " where: " << args->where;
+    out << " symlinkdata: " << args->symlink;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_mknod(const RPCOperation& operation)
+void PrintAnalyzer::mknod3(const struct RPCProcedure* proc,
+        const struct MKNOD3args* args,
+        const struct MKNOD3res* res)
 {
-    const NFSPROC3_MKNOD& op = static_cast<const NFSPROC3_MKNOD&>(operation);
-    const NFSPROC3_MKNOD::Arg& arg = op.get_arg();
-    const NFSPROC3_MKNOD::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " where: " << arg.where;
-    out << " what: " << arg.what;
+    out << " where: " << args->where;
+    out << " what: " << args->what;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_remove(const RPCOperation& operation)
+void PrintAnalyzer::remove3(const struct RPCProcedure* proc,
+        const struct REMOVE3args* args,
+        const struct REMOVE3res* res)
 {
-    const NFSPROC3_REMOVE& op = static_cast<const NFSPROC3_REMOVE&>(operation);
-    const NFSPROC3_REMOVE::Arg& arg = op.get_arg();
-    const NFSPROC3_REMOVE::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " object: " << arg.object;
+    out << " object: " << args->object;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_rmdir(const RPCOperation& operation)
+void PrintAnalyzer::rmdir3(const struct RPCProcedure* proc,
+        const struct RMDIR3args* args,
+        const struct RMDIR3res* res)
 {
-    const NFSPROC3_RMDIR& op = static_cast<const NFSPROC3_RMDIR&>(operation);
-    const NFSPROC3_RMDIR::Arg& arg = op.get_arg();
-    const NFSPROC3_RMDIR::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " object: " << arg.object;
+    out << " object: " << args->object;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_rename(const RPCOperation& operation)
+void PrintAnalyzer::rename3(const struct RPCProcedure* proc,
+        const struct RENAME3args* args,
+        const struct RENAME3res* res)
 {
-    const NFSPROC3_RENAME& op = static_cast<const NFSPROC3_RENAME&>(operation);
-    const NFSPROC3_RENAME::Arg& arg = op.get_arg();
-    const NFSPROC3_RENAME::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " from: " << arg.from;
-    out << " to: " << arg.to;
+    out << " from: " << args->from;
+    out << " to: " << args->to;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_link(const RPCOperation& operation)
+void PrintAnalyzer::link3(const struct RPCProcedure* proc,
+        const struct LINK3args* args,
+        const struct LINK3res* res)
 {
-    const NFSPROC3_LINK& op = static_cast<const NFSPROC3_LINK&>(operation);
-    const NFSPROC3_LINK::Arg& arg = op.get_arg();
-    const NFSPROC3_LINK::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " file: " += arg.file;
-    out << " link: " << arg.link;
+    out << " file: " += args->file;
+    out << " link: " << args->link;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_readdir(const RPCOperation& operation)
+void PrintAnalyzer::readdir3(const struct RPCProcedure* proc,
+        const struct READDIR3args* args,
+        const struct READDIR3res* res)
 {
-    const NFSPROC3_READDIR& op = static_cast<const NFSPROC3_READDIR&>(operation);
-    const NFSPROC3_READDIR::Arg& arg = op.get_arg();
-    const NFSPROC3_READDIR::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " dir: "         += arg.dir;
-    out << " cookie: "      << arg.cookie;
-    out << " cookieverf: "  << arg.cookieverf;
-    out << " count: "       << arg.count;
+    out << " dir: "         += args->dir;
+    out << " cookie: "      << args->cookie;
+    out << " cookieverf: "  << args->cookieverf;
+    out << " count: "       << args->count;
     out << "] REPLY [";
-    out << " status: "      << res.status;
+    out << " status: "      << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_readdirplus(const RPCOperation& operation)
+void PrintAnalyzer::readdirplus3(const struct RPCProcedure* proc,
+        const struct READDIRPLUS3args* args,
+        const struct READDIRPLUS3res* res)
 {
-    const NFSPROC3_READDIRPLUS& op = static_cast<const NFSPROC3_READDIRPLUS&>(operation);
-    const NFSPROC3_READDIRPLUS::Arg& arg = op.get_arg();
-    const NFSPROC3_READDIRPLUS::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " dir: "         += arg.dir;
-    out << " cookie: "      << arg.cookie;
-    out << " cookieverf: "  << arg.cookieverf;
-    out << " dircount: "    << arg.dircount;
-    out << " maxcount: "    << arg.maxcount;
+    out << " dir: "         += args->dir;
+    out << " cookie: "      << args->cookie;
+    out << " cookieverf: "  << args->cookieverf;
+    out << " dircount: "    << args->dircount;
+    out << " maxcount: "    << args->maxcount;
     out << "] REPLY [";
-    out << " status: " << res.status;
-    if(res.status == nfsstat3::OK)
+    out << " status: " << res->status;
+    if(res->status == nfsstat3::OK)
     {
-        out << " dir_attributes: " << res.u.resok.dir_attributes;
-        out << " cookieverf: "     << res.u.resok.cookieverf;
+        out << " dir_attributes: " << res->u.resok.dir_attributes;
+        out << " cookieverf: "     << res->u.resok.cookieverf;
     }
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_fsstat(const RPCOperation& operation)
+void PrintAnalyzer::fsstat3(const struct RPCProcedure* proc,
+        const struct FSSTAT3args* args,
+        const struct FSSTAT3res* res)
 {
-    const NFSPROC3_FSSTAT& op = static_cast<const NFSPROC3_FSSTAT&>(operation);
-    const NFSPROC3_FSSTAT::Arg& arg = op.get_arg();
-    const NFSPROC3_FSSTAT::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " fsroot: " += arg.fsroot;
+    out << " fsroot: " += args->fsroot;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_fsinfo(const RPCOperation& operation)
+void PrintAnalyzer::fsinfo3(const struct RPCProcedure* proc,
+        const struct FSINFO3args* args,
+        const struct FSINFO3res* res)
 {
-    const NFSPROC3_FSINFO& op = static_cast<const NFSPROC3_FSINFO&>(operation);
-    const NFSPROC3_FSINFO::Arg& arg = op.get_arg();
-    const NFSPROC3_FSINFO::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " fsroot: " += arg.fsroot;
+    out << " fsroot: " += args->fsroot;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_pathconf(const RPCOperation& operation)
+void PrintAnalyzer::pathconf3(const struct RPCProcedure* proc,
+        const struct PATHCONF3args* args,
+        const struct PATHCONF3res* res)
 {
-    const NFSPROC3_PATHCONF& op = static_cast<const NFSPROC3_PATHCONF&>(operation);
-    const NFSPROC3_PATHCONF::Arg& arg = op.get_arg();
-    const NFSPROC3_PATHCONF::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " object: " += arg.object;
+    out << " object: " += args->object;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-bool PrintAnalyzer::call_commit(const RPCOperation& operation)
+void PrintAnalyzer::commit3(const struct RPCProcedure* proc,
+        const struct COMMIT3args* args,
+        const struct COMMIT3res* res)
 {
-    const NFSPROC3_COMMIT& op = static_cast<const NFSPROC3_COMMIT&>(operation);
-    const NFSPROC3_COMMIT::Arg& arg = op.get_arg();
-    const NFSPROC3_COMMIT::Res& res = op.get_res();
-
-    out << op.get_session().str() << ' ' << Proc::Titles[op.procedure()] << " XID: " << op.xid();
+    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
     out << " CALL [";
-    out << " file: "    += arg.file;
-    out << " offset: "  << arg.offset;
-    out << " count: "   << arg.count;
+    out << " file: "    += args->file;
+    out << " offset: "  << args->offset;
+    out << " count: "   << args->count;
     out << "] REPLY [";
-    out << " status: " << res.status;
+    out << " status: " << res->status;
     out << " ]";
     out << std::endl;
-
-    return true;
 }
 
-void PrintAnalyzer::print(std::ostream& out)
+const char* PrintAnalyzer::usage()
 {
-    return;
+    return "Provide '-h' to enable PrintAnalyzer";
 }
 
 } // namespace analyzers

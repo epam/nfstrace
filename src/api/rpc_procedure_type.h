@@ -1,33 +1,26 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Definition of XDR structures.
+// Description: Presentation info about ISO/OSI layers up to RPC protocol.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef XDR_TYPES_H
-#define XDR_TYPES_H
+#ifndef RPC_PROCEDURE_TYPE_H
+#define RPC_PROCEDURE_TYPE_H
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 extern "C"
 {
 
-struct Opaque
+struct RPCProcedure
 {
-    inline void set(const uint8_t* p, uint32_t n)
-    {
-        ptr = p;
-        len = n;
-    }
-
-    inline uint8_t operator[](size_t i) const { return ptr[i]; }
-    inline const uint8_t* data() const { return ptr; }
-    inline uint32_t size() const { return len; }
-
-    const uint8_t* ptr;
-    uint32_t       len;
+    struct Session*  session;
+    struct RPCCall*  call;
+    struct RPCReply* reply;
+    struct timeval*  call_time;
+    struct timeval*  reply_time;
 };
 
 }
 //------------------------------------------------------------------------------
-#endif//XDR_TYPES_H
+#endif//RPC_PROCEDURE_TYPE_H
 //------------------------------------------------------------------------------

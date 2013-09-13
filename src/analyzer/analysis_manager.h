@@ -37,16 +37,13 @@ public:
     void stop();
 
 private:
-
-    void populate_analyzers(const Parameters& params);
-
     AnalysisManager(const AnalysisManager&);            // undefiend
     AnalysisManager& operator=(const AnalysisManager&); // undefiend
 
     std::auto_ptr<FilteredDataQueue> queue;
     std::auto_ptr<Thread> parser_thread;
     RunningStatus& status;
-    Analyzers analyzers;
+    Analyzers* analyzers;
     Plugins plugins;
 };
 

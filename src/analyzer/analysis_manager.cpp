@@ -6,10 +6,6 @@
 #include <string>
 
 #include "analysis_manager.h"
-#include "analyzers/breakdown_analyzer.h"
-#include "analyzers/ofdws_analyzer.h"
-#include "analyzers/ofws_analyzer.h"
-#include "analyzers/print_analyzer.h"
 #include "nfs_parser_thread.h"
 //------------------------------------------------------------------------------
 using NST::controller::AParams;
@@ -23,6 +19,7 @@ AnalysisManager::AnalysisManager(RunningStatus& running_status)
                                  : queue(NULL)
                                  , parser_thread(NULL)
                                  , status(running_status)
+                                 , analyzers(NULL)
 {
 }
 
@@ -45,9 +42,9 @@ FilteredDataQueue& AnalysisManager::init(const Parameters& params)
     }
 
     queue.reset(new FilteredDataQueue(q_size, q_limit));
-    parser_thread.reset(new NFSParserThread(*queue, analyzers, status));
 
-    populate_analyzers(params);
+    analyzers = new Analyzers(params);
+    parser_thread.reset(new NFSParserThread(*queue, *analyzers, status));
 
     return *queue;
 }
@@ -66,36 +63,7 @@ void AnalysisManager::stop()
     {
         parser_thread->stop();
     }
-    analyzers.print(std::cout);
-}
-
-void AnalysisManager::populate_analyzers(const Parameters& params)
-{
-    std::vector<AParams> active_analyzers = params.analyzers();
-    for(unsigned int i = 0; i < active_analyzers.size(); ++i)
-    {
-        if(active_analyzers[i].path == std::string("ob"))
-        {
-            analyzers.add(new analyzers::BreakdownAnalyzer());
-            continue;
-        }
-        if(active_analyzers[i].path == std::string("ofws"))
-        {
-            analyzers.add(new analyzers::OFWSAnalyzer());
-            continue;
-        }
-        if(active_analyzers[i].path == std::string("ofdws"))
-        {
-            analyzers.add(new analyzers::OFDWSAnalyzer(params.block_size(), params.bucket_size()));
-            continue;
-        }
-        plugins.add(active_analyzers[i].path, active_analyzers[i].arguments);
-    }
-
-    if(params.is_verbose()) // add special analyzer for trace out RPC calls
-    {
-        analyzers.add(new analyzers::PrintAnalyzer(std::clog));
-    }
+//    analyzers.print(std::cout);
 }
 
 } // namespace analyzer

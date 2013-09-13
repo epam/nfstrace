@@ -1,30 +1,31 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Plugin which encapsulate all requests to shared object library.
+// Description: Presentation info about ISO/OSI layers up to RPC protocol.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include "plugin.h"
+#ifndef RPC_PROCEDURE_STRUCT_H
+#define RPC_PROCEDURE_STRUCT_H
 //------------------------------------------------------------------------------
+#include <sys/time.h>
+
+#include "../../auxiliary/session.h"
+#include "../rpc/rpc_structs.h"
+//------------------------------------------------------------------------------
+using NST::auxiliary::Session;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analyzer
 {
-
-Plugin::Plugin(const std::string& path, const std::string& args) : DynamicLoad(path.c_str())
+namespace RPC 
 {
-    create_t create = NULL;
-    load_address_of("create" , create );
-    load_address_of("destroy", destroy);
 
-    analyzer = (BaseAnalyzer*)(*create)(args.c_str());
-}
+#include "../../api/rpc_procedure_type.h"
 
-Plugin::~Plugin()
-{
-    (*destroy)(analyzer);
-}
-
+} // namespace RPC 
 } // namespace analyzer
 } // namespace NST
 //------------------------------------------------------------------------------
+#endif//RPC_PROCEDURE_STRUCT_H
+//------------------------------------------------------------------------------
+
