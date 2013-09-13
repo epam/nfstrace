@@ -21,17 +21,17 @@ namespace NFS3
 std::ostream& operator<<(std::ostream& out, const mode3 m)
 {
     out << " mode: ";
-    if(m & mode3::USER_ID_EXEC)      out << "USER_ID_EXEC";
-    if(m & mode3::GROUP_ID_EXEC)     out << "GROUP_ID_EXEC";
-    if(m & mode3::SAVE_SWAPPED_TEXT) out << "SAVE_SWAPPED_TEXT";
-    if(m & mode3::OWNER_READ)        out << "OWNER_READ";
-    if(m & mode3::OWNER_WRITE)       out << "OWNER_WRITE";
-    if(m & mode3::OWNER_EXEC)        out << "OWNER_EXEC";
-    if(m & mode3::GROUP_READ)        out << "GROUP_READ";
-    if(m & mode3::GROUP_WRITE)       out << "GROUP_WRITE";
-    if(m & mode3::GROUP_EXEC)        out << "GROUP_EXEC";
-    if(m & mode3::OTHER_READ)        out << "OTHER_READ";
-    if(m & mode3::OTHER_WRITE)       out << "OTHER_WRITE";
+    if(m & mode3::USER_ID_EXEC)      out << "USER_ID_EXEC ";
+    if(m & mode3::GROUP_ID_EXEC)     out << "GROUP_ID_EXEC ";
+    if(m & mode3::SAVE_SWAPPED_TEXT) out << "SAVE_SWAPPED_TEXT ";
+    if(m & mode3::OWNER_READ)        out << "OWNER_READ ";
+    if(m & mode3::OWNER_WRITE)       out << "OWNER_WRITE ";
+    if(m & mode3::OWNER_EXEC)        out << "OWNER_EXEC ";
+    if(m & mode3::GROUP_READ)        out << "GROUP_READ ";
+    if(m & mode3::GROUP_WRITE)       out << "GROUP_WRITE ";
+    if(m & mode3::GROUP_EXEC)        out << "GROUP_EXEC ";
+    if(m & mode3::OTHER_READ)        out << "OTHER_READ ";
+    if(m & mode3::OTHER_WRITE)       out << "OTHER_WRITE ";
     if(m & mode3::OTHER_EXEC)        out << "OTHER_EXEC";
     return out;
 }
