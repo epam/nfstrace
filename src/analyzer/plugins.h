@@ -19,7 +19,7 @@ namespace analyzer
 
 class Plugins
 {
-    typedef std::vector<Plugin*> Storage;
+    typedef std::vector<PluginInstance*> Storage;
 
 public:
     typedef Storage::iterator Iterator;
@@ -41,7 +41,7 @@ public:
 
     void add(const std::string& path, const std::string& args)
     {
-        plugins.push_back(new Plugin(path, args));
+        plugins.push_back(new PluginInstance(path, args));
     }
 
 private:

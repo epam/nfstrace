@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
+// Author: Pavel Karneliuk
 // Description: Plugin which encapsulate all requests to shared object library.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
@@ -21,19 +21,43 @@ namespace analyzer
 
 class Plugin : private NST::auxiliary::DynamicLoad
 {
-public:
-    Plugin(const std::string& path, const std::string& args);
+protected:
+    Plugin(const std::string& path);
     ~Plugin();
-
-    BaseAnalyzer* get_analyzer();
 
 private:
     Plugin(const Plugin&);            // undefiend
     Plugin& operator=(const Plugin&); // undefiend
 
+protected:
     analyzers::plugin_usage_func   usage;
     analyzers::plugin_create_func  create;
     analyzers::plugin_destroy_func destroy;
+};
+
+class PluginUsage : private Plugin
+{
+public:
+    PluginUsage(const std::string& path) : Plugin(path) {}
+
+    inline const std::string get() const { return usage(); }
+
+private:
+    PluginUsage(const PluginUsage&);            // undefiend
+    PluginUsage& operator=(const PluginUsage&); // undefiend
+};
+
+class PluginInstance : private Plugin
+{
+public:
+    PluginInstance(const std::string& path, const std::string& args);
+    ~PluginInstance();
+
+    inline operator BaseAnalyzer*() const { return analyzer; }
+
+private:
+    PluginInstance(const PluginInstance&);            // undefiend
+    PluginInstance& operator=(const PluginInstance&); // undefiend
 
     BaseAnalyzer* analyzer;
 };

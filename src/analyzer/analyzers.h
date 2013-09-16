@@ -30,6 +30,8 @@ namespace analyzer
 
 class Analyzers
 {
+//    typedef std::vector<PluginInstance*> Plugins;
+    typedef std::vector<BaseAnalyzer*> BuiltIns;
     typedef std::vector<BaseAnalyzer*> Storage;
 public:
     Analyzers(const Parameters& params)
