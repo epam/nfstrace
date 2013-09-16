@@ -22,6 +22,10 @@ namespace analyzers
 
 #include "../../api/base_analyzer_type.h"
 
+typedef const char* (*plugin_usage_func)   (); // return description of expected opts for plugin_create_func()
+typedef void*       (*plugin_create_func)  (const char* opts); // create and return an instance of analyzer
+typedef void        (*plugin_destroy_func) (void*   instance); // destroy an instance of analyzer
+
 } // namespace analyzers
 } // namespace analyzer
 } // namespace NST

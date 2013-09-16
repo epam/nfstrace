@@ -40,11 +40,10 @@ private:
     AnalysisManager(const AnalysisManager&);            // undefiend
     AnalysisManager& operator=(const AnalysisManager&); // undefiend
 
+    RunningStatus& status;
+    std::auto_ptr<Analyzers> analyzers;
     std::auto_ptr<FilteredDataQueue> queue;
     std::auto_ptr<Thread> parser_thread;
-    RunningStatus& status;
-    Analyzers* analyzers;
-    Plugins plugins;
 };
 
 } // namespace analyzer

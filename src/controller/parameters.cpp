@@ -190,8 +190,6 @@ const std::vector<AParams> Parameters::analyzers() const
         size_t ind = arg.find('#');
         if(ind == std::string::npos)
         {
-            if(!((arg == ob) || (arg == ofws) || (arg == ofdws)))
-                throw cmdline::CLIError(std::string("Request to the unsupported internal analyzer: ") + arg);
             analyzers.push_back(AParams(arg));
         }
         else
