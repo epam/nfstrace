@@ -8,12 +8,18 @@
 #include "../auxiliary/exception.h"
 #include "../auxiliary/logger.h"
 #include "../filter/rpc/rpc_header.h"
-#include "nfs3/nfs_operation.h"
+//#include "nfs3/nfs_operation.h"
+#include "nfs3/nfs_structs.h"
 #include "nfs_parser_thread.h"
+#include "rpc/rpc_procedure_struct.h"
+#include "rpc/rpc_reader.h"
 //------------------------------------------------------------------------------
 using namespace NST::analyzer::NFS3;
+using namespace NST::analyzer::RPC;
 using namespace NST::analyzer::XDR;
 using namespace NST::filter::rpc;
+
+using NST::analyzer::RPC::RPCReader;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -68,20 +74,15 @@ inline void NFSParserThread::process_queue()
         do
         {
             FilteredDataQueue::Ptr data = list.get_current();
-
-            std::auto_ptr<RPCOperation> operation(parse_data(data));
-
-            if(operation.get())
-            {
-                //analyzers.call(*operation);
-            }
+            parse_data(data);
         }
         while(list);
     }
     else pthread_yield();
 }
 
-RPCOperation* create_nfs_operation( FilteredDataQueue::Ptr& call,
+//RPCOperation* create_nfs_operation( FilteredDataQueue::Ptr& call,
+void NFSParserThread::create_nfs_operation( FilteredDataQueue::Ptr& call,
                                     FilteredDataQueue::Ptr& reply,
                                     RPCSession* session)
 {
@@ -89,8 +90,33 @@ RPCOperation* create_nfs_operation( FilteredDataQueue::Ptr& call,
     const uint32_t proc = c->proc();
     try
     {
+        RPCReader c_reader(call);
+        RPCCall c; 
+        c_reader >> c;
+
+        RPCReader r_reader(reply);
+        RPCReply r; 
+        r_reader >> r;
+
+        RPCProcedure procedure;
+        procedure.session = session->get_session();
+        procedure.call  = &c;
+        procedure.reply = &r;
+        procedure.reply_time = &c_reader.data().timestamp;
+        procedure.reply_time = &r_reader.data().timestamp;
+
         switch(proc)
         {
+        case ProcNum::WRITE:
+            {
+                WRITE3args args;
+                c_reader >> args;
+
+                WRITE3res res;
+                c_reader >> res;
+
+                analyzers.process(&BaseAnalyzer::write3, &procedure, &args, &res);
+            }
             /*
         case Proc::NFS_NULL:    return new NFSPROC3_NULL       (call, reply, session);
         case Proc::GETATTR:     return new NFSPROC3_GETATTR    (call, reply, session);
@@ -120,20 +146,21 @@ RPCOperation* create_nfs_operation( FilteredDataQueue::Ptr& call,
     }
     catch(XDRError& exception)
     {
-        LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), Proc::Titles[proc], proc);
+        //LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), Proc::Titles[proc], proc);
+        LOG("The data of NFS operation %s (%u) is too short for parsing", session->str().c_str(), proc);
     }
-    return NULL;
 }
 
-RPCOperation* NFSParserThread::parse_data(FilteredDataQueue::Ptr& ptr)
+//RPCOperation* NFSParserThread::parse_data(FilteredDataQueue::Ptr& ptr)
+void NFSParserThread::parse_data(FilteredDataQueue::Ptr& ptr)
 {
-    if(ptr->dlen < sizeof(MessageHeader)) return NULL;
+    if(ptr->dlen < sizeof(MessageHeader)) return;
     const MessageHeader* msg = (MessageHeader*)ptr->data;
     switch(msg->type())
     {
     case SUNRPC_CALL:
         {
-            if(ptr->dlen < sizeof(CallHeader)) return NULL;
+            if(ptr->dlen < sizeof(CallHeader)) return;
 
             const CallHeader* call = static_cast<const CallHeader*>(msg);
             if(RPCValidator::check(call) && NFSv3Validator::check(call))
@@ -148,12 +175,12 @@ RPCOperation* NFSParserThread::parse_data(FilteredDataQueue::Ptr& ptr)
         break;
     case SUNRPC_REPLY:
         {
-            if(ptr->dlen < sizeof(ReplyHeader)) return NULL;
+            if(ptr->dlen < sizeof(ReplyHeader)) return;
             const ReplyHeader* reply = static_cast<const ReplyHeader*>(msg);
 
             RPCSession* session = sessions.get_session(ptr->session, RPCSessions::REVERSE);
 
-            if(session == NULL) return NULL;
+            if(session == NULL) return;
 
             FilteredDataQueue::Ptr call_data = session->get_nfs_call_data(reply->xid());
             if(call_data)
@@ -164,13 +191,12 @@ RPCOperation* NFSParserThread::parse_data(FilteredDataQueue::Ptr& ptr)
                     const AcceptedReplyHeader* areply = static_cast<const AcceptedReplyHeader*>(msg);
                     if(areply->astat() == SUNRPC_SUCCESS)
                     {
-                        return create_nfs_operation(call_data, ptr, session);
+                        create_nfs_operation(call_data, ptr, session);
                     }
                 }
             }
         }
     }
-    return NULL;
 }
 
 } // namespace analyzer

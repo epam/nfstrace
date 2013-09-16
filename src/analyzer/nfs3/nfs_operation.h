@@ -3,8 +3,8 @@
 // Description: Base structure for nfs-info.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef NFS_OPERATION_H
-#define NFS_OPERATION_H
+#ifndef NFS_PROCEDURE_H
+#define NFS_PROCEDURE_H
 //------------------------------------------------------------------------------
 #include "../../auxiliary/filtered_data.h"
 #include "../rpc/rpc_operation.h"
@@ -113,5 +113,5 @@ typedef NFSOperation <COMMIT3args,      COMMIT3res>         NFSPROC3_COMMIT;
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS_OPERATION_H
+#endif//NFS_PROCEDURE_H
 //------------------------------------------------------------------------------

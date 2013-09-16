@@ -59,7 +59,7 @@ public:
         typename Args,
         typename Res
     >
-    void process(Handle* handle, const RPCProcedure* proc, const Args* args, const Res* res)
+    void process(Handle handle, const RPCProcedure* proc, const Args* args, const Res* res)
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
