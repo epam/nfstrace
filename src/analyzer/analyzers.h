@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 #include <vector>
 
+#include "../auxiliary/logger.h"
 #include "../controller/parameters.h"
 #include "analyzers/base_analyzer_struct.h"
 //#include "analyzers/breakdown_analyzer.h"
@@ -16,6 +17,7 @@
 #include "analyzers/print_analyzer.h"
 #include "plugins.h"
 //------------------------------------------------------------------------------
+using NST::auxiliary::Logger;
 using NST::analyzer::analyzers::BaseAnalyzer;
 using NST::analyzer::RPC::RPCProcedure;
 using NST::controller::AParams;
@@ -32,6 +34,26 @@ class Analyzers
 public:
     Analyzers(const Parameters& params)
     {
+        std::vector<AParams> requested_analyzers = params.analyzers();
+
+        for(unsigned int i = 0; i < requested_analyzers.size(); ++i)
+        {
+            const AParams& r = requested_analyzers[i];
+            std::cout << "path:" << r.path << " args: " << r.arguments << std::endl;
+            
+            
+            Logger::Buffer message;
+            try // try to load plugin
+            {
+                message << "Loading module: '" << r.path << "' with args: [" << r.arguments << "]";
+                plugins.add(r.path, r.arguments);
+            }
+            catch(Exception& e)
+            {
+                message << " failed with: " << e.what();
+            }
+        }
+
         if(params.is_verbose()) // add special analyzer for trace out RPC calls
             analyzers.push_back(new analyzers::PrintAnalyzer(std::clog));
 
@@ -70,6 +92,7 @@ public:
 private:
     Storage analyzers;
     Plugins plugins;
+    Storage builtin;
 };
 
 } // namespace analyzer

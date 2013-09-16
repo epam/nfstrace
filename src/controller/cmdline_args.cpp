@@ -42,7 +42,7 @@ Opt Args::options[Args::num] =
     {'D', "dump-size",  Opt::REQ, "0",                   "size of dumping file portion in MBytes, 0 = no limit","0.."},
     {'B', "bsize",      Opt::REQ, "2",                   "size of capturing kernel buffer in MBytes",           "1.."},
     {'M', "msg-header", Opt::REQ, "512",                 "RPC message will be truncated to this limit in bytes before passing to Analysis", "1..4000"},
-    {'Q', "qcapacity",  Opt::REQ, "256",                 "max queue capacity of RPC messages",                  "1..65535"},
+    {'Q', "qcapacity",  Opt::REQ, "256",                 "initial queue capacity of RPC messages",              "1..65535"},
     {'L', "blsize",     Opt::REQ, "16",                  "block data size [KB]",                                "4..1024" },
     {'U', "busize",     Opt::REQ, "8",                   "size of bucket used by ofdws analyzer",               "1..32768"},
     {'v', "verbose",    Opt::NOA, "false",               "print out additional information"},

@@ -23,8 +23,8 @@
 extern "C"
 {
 
-BaseAnalyzer* create(const char* opts);// create analyzer 
-void destroy(BaseAnalyzer* context);   // destroy analyzer 
+BaseAnalyzer* create(const char* opts);// create analyzer
+void destroy(BaseAnalyzer* context);   // destroy analyzer
 
 }
 

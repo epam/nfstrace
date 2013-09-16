@@ -22,22 +22,20 @@ namespace analyzer
 class Plugin : private NST::auxiliary::DynamicLoad
 {
 public:
-
-    typedef void* (*create_t)    (const char* opts);// create analyzer and return context
-    typedef void  (*destroy_t)   (void* context);   // destroy analyzer
-
-public:
     Plugin(const std::string& path, const std::string& args);
     ~Plugin();
 
-    inline BaseAnalyzer* get_analyzer() { return analyzer; }
+    BaseAnalyzer* get_analyzer();
 
 private:
     Plugin(const Plugin&);            // undefiend
     Plugin& operator=(const Plugin&); // undefiend
 
+    analyzers::plugin_usage_func   usage;
+    analyzers::plugin_create_func  create;
+    analyzers::plugin_destroy_func destroy;
+
     BaseAnalyzer* analyzer;
-    destroy_t      destroy;
 };
 
 } // namespace analyzer

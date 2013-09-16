@@ -16,10 +16,10 @@ namespace analyzer
 {
 
 AnalysisManager::AnalysisManager(RunningStatus& running_status)
-                                 : queue(NULL)
-                                 , parser_thread(NULL)
-                                 , status(running_status)
+                                 : status(running_status)
                                  , analyzers(NULL)
+                                 , queue(NULL)
+                                 , parser_thread(NULL)
 {
 }
 
@@ -29,17 +29,10 @@ AnalysisManager::~AnalysisManager()
 
 FilteredDataQueue& AnalysisManager::init(const Parameters& params)
 {
-    uint32_t q_capacity = params.queue_capacity();
-    uint32_t q_size = 64;
-    uint32_t q_limit= 1;
-    if(q_capacity <= q_size)
-        q_size  = q_capacity;
-    else
-        q_limit = 1 + q_capacity / q_size;
+    analyzers.reset(new Analyzers(params));
 
-    queue.reset(new FilteredDataQueue(q_size, q_limit));
+    queue.reset(new FilteredDataQueue(params.queue_capacity(), 1));
 
-    analyzers = new Analyzers(params);
     parser_thread.reset(new NFSParserThread(*queue, *analyzers, status));
 
     return *queue;
