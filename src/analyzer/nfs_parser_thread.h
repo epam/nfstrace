@@ -33,7 +33,11 @@ public:
 private:
     inline void process_queue();
 
-    class RPCOperation* parse_data(FilteredDataQueue::Ptr& data);
+//    class RPCOperation* parse_data(FilteredDataQueue::Ptr& data);
+    void parse_data(FilteredDataQueue::Ptr& data);
+    void create_nfs_operation( FilteredDataQueue::Ptr& call,
+            FilteredDataQueue::Ptr& reply,
+            RPCSession* session);
 
     RunningStatus& status;
     Analyzers& analyzers;

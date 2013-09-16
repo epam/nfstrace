@@ -33,13 +33,9 @@ FilteredDataQueue& AnalysisManager::init(const Parameters& params)
     uint32_t q_size = 64;
     uint32_t q_limit= 1;
     if(q_capacity <= q_size)
-    {
         q_size  = q_capacity;
-    }
     else
-    {
         q_limit = 1 + q_capacity / q_size;
-    }
 
     queue.reset(new FilteredDataQueue(q_size, q_limit));
 
@@ -52,17 +48,13 @@ FilteredDataQueue& AnalysisManager::init(const Parameters& params)
 void AnalysisManager::start()
 {
     if(parser_thread.get())
-    {
         parser_thread->create();
-    }
 }
 
 void AnalysisManager::stop()
 {
     if(parser_thread.get())
-    {
         parser_thread->stop();
-    }
 //    analyzers.print(std::cout);
 }
 

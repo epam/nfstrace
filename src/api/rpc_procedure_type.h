@@ -13,11 +13,11 @@ extern "C"
 
 struct RPCProcedure
 {
-    struct Session*  session;
-    struct RPCCall*  call;
-    struct RPCReply* reply;
-    struct timeval*  call_time;
-    struct timeval*  reply_time;
+    const struct Session*  session;
+    const struct RPCCall*  call;
+    const struct RPCReply* reply;
+    const struct timeval*  call_time;
+    const struct timeval*  reply_time;
 };
 
 }
