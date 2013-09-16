@@ -12,17 +12,24 @@ namespace NST
 namespace analyzer
 {
 
-Plugin::Plugin(const std::string& path, const std::string& args)
+Plugin::Plugin(const std::string& path)
     : DynamicLoad(path.c_str())
     , usage(NULL)
     , create(NULL)
     , destroy(NULL)
-    , analyzer(NULL)
 {
     load_address_of("usage" ,  usage  );
     load_address_of("create" , create );
     load_address_of("destroy", destroy);
+}
 
+Plugin::~Plugin()
+{
+}
+
+
+PluginInstance::PluginInstance(const std::string& path, const std::string& args) : Plugin(path)
+{
     analyzer = (BaseAnalyzer*)(*create)(args.c_str());
     if(!analyzer)
     {
@@ -30,17 +37,9 @@ Plugin::Plugin(const std::string& path, const std::string& args)
     }
 }
 
-BaseAnalyzer* Plugin::get_analyzer()
+PluginInstance::~PluginInstance()
 {
-    return analyzer;
-}
-
-Plugin::~Plugin()
-{
-    if(analyzer)
-    {
-        (*destroy)(analyzer);
-    }
+    (*destroy)(analyzer);
 }
 
 } // namespace analyzer

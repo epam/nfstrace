@@ -46,7 +46,7 @@ Opt Args::options[Args::num] =
     {'L', "blsize",     Opt::REQ, "16",                  "block data size [KB]",                                "4..1024" },
     {'U', "busize",     Opt::REQ, "8",                   "size of bucket used by ofdws analyzer",               "1..32768"},
     {'v', "verbose",    Opt::NOA, "false",               "print out additional information"},
-    {'h', "help",       Opt::NOA, "false",               "print this help message and exit"}
+    {'h', "help",       Opt::NOA, "false",               "print this help message and usage for analyzers passed via -a options, then exit"}
 };
 
 } // namespace cmdline

@@ -11,6 +11,7 @@
 #include "cmdline_args.h"
 #include "cmdline_parser.h"
 #include "parameters.h"
+#include "../analyzer/plugin.h"
 //------------------------------------------------------------------------------
 typedef NST::controller::cmdline::Args CLI;
 typedef NST::controller::cmdline::CmdlineParser<CLI> Parser;
@@ -21,12 +22,31 @@ namespace NST
 namespace controller
 {
 
+void print_anlyzers_usage(std::ostream& out, Parameters& params)
+{
+    const std::vector<AParams> v = params.analyzers();
+
+    for(unsigned int i=0; i < v.size(); ++i)
+    {
+        try
+        {
+            NST::analyzer::PluginUsage usage(v[i].path);
+            out << "Usage of " << v[i].path << ":\n" << usage.get() << std::endl;
+        }
+        catch(Exception& e)
+        {
+            out << e.what() << std::endl;
+        }
+    }
+}
+
 bool Parameters::cmdline_args(int argc, char** argv)
 {
     parser.parse(argc, argv);
     if(parser[CLI::HELP].begin()->to_bool())
     {
         parser.print_usage(std::cout, argv[0]);
+        print_anlyzers_usage(std::cout, *this);
         return false;
     }
     parser.validate();
@@ -196,8 +216,6 @@ const std::vector<AParams> Parameters::analyzers() const
         {
             std::string path(arg, 0, ind);
             std::string args(arg, ind + 1);
-            if(access(path.c_str(), F_OK))
-                throw cmdline::CLIError(std::string("Can't access to plugable module: ") + path);
             analyzers.push_back(AParams(path, args));
         }
     }
