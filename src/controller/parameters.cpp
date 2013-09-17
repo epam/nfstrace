@@ -104,12 +104,7 @@ const std::string Parameters::interface() const
 
 unsigned short Parameters::snaplen() const
 {
-    const int snaplen = parser[CLI::SNAPLEN].begin()->to_int();
-    if(snaplen != 65535)
-    {
-        throw cmdline::CLIError("Statefull filtration RPC messages over TCP requires snaplen = 65535");
-    }
-    return snaplen;
+    return parser[CLI::SNAPLEN].begin()->to_int();
 }
 
 const std::string Parameters::filter() const

@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Overall File Data Working Set (OFDWS) analyzer. Provide information about unique data accessed. 
+// Description: Overall File Data Working Set (OFDWS) analyzer. Provide information about unique data accessed.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef OFDWS_ANALYZER_H
