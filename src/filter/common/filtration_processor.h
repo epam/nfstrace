@@ -718,7 +718,7 @@ public:
                     if(NFSv3Validator::check(call))
                     {
                         hdr_len = std::min(msg_len, max_hdr);
-           //             TRACE("MATCH RPC Call xid:%u len: %u procedure: %u", call->xid(), msg_len, call->proc());
+                        //TRACE("MATCH RPC Call xid:%u len: %u procedure: %u", call->xid(), msg_len, call->proc());
                     }
                     else
                     {
@@ -740,7 +740,7 @@ public:
                 {
                     msg_len = len;   // length of current RPC message
                     hdr_len = std::min(msg_len, max_hdr);
-            //        TRACE("MATCH RPC Reply xid:%u len: %u", reply->xid(), msg_len);
+                    //TRACE("MATCH RPC Reply xid:%u len: %u", reply->xid(), msg_len);
                     return true;
                 }
                 else // isn't RPC reply, stream is corrupt
@@ -833,7 +833,7 @@ public:
         }
         else
         {
-            LOG("only following stack of protocol is supported: Ethernet IPv4 TCP");
+            LOG("only following stack of protocol is supported: Ethernet IPv4 TCP | UDP");
         }
     }
 

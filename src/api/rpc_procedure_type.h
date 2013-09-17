@@ -6,6 +6,7 @@
 #ifndef RPC_PROCEDURE_TYPE_H
 #define RPC_PROCEDURE_TYPE_H
 //------------------------------------------------------------------------------
+#include "rpc_types.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 extern "C"
@@ -13,11 +14,11 @@ extern "C"
 
 struct RPCProcedure
 {
-    const struct Session*  session;
-    const struct RPCCall*  call;
-    const struct RPCReply* reply;
-    const struct timeval*  call_time;
-    const struct timeval*  reply_time;
+    struct RPCCall  call;
+    struct RPCReply reply;
+    const struct Session* session;
+    const struct timeval* ctimestamp;
+    const struct timeval* rtimestamp;
 };
 
 }

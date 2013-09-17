@@ -10,12 +10,12 @@
 
 #include "../auxiliary/logger.h"
 #include "../controller/parameters.h"
-#include "analyzers/base_analyzer_struct.h"
-//#include "analyzers/breakdown_analyzer.h"
-//#include "analyzers/ofdws_analyzer.h"
-//#include "analyzers/ofws_analyzer.h"
+#include "analyzers/base_analyzer.h"
+#include "analyzers/breakdown_analyzer.h"
+#include "analyzers/ofdws_analyzer.h"
+#include "analyzers/ofws_analyzer.h"
 #include "analyzers/print_analyzer.h"
-#include "plugins.h"
+#include "plugin.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Logger;
 using NST::analyzer::analyzers::BaseAnalyzer;
@@ -30,7 +30,7 @@ namespace analyzer
 
 class Analyzers
 {
-//    typedef std::vector<PluginInstance*> Plugins;
+    typedef std::vector<PluginInstance*> Plugins;
     typedef std::vector<BaseAnalyzer*> BuiltIns;
     typedef std::vector<BaseAnalyzer*> Storage;
 public:
@@ -44,11 +44,31 @@ public:
             std::cout << "path:" << r.path << " args: " << r.arguments << std::endl;
             
             
+            if(r.path == "ob")
+            {
+                builtin.push_back(new analyzers::BreakdownAnalyzer(std::cout /*r.arguments*/));
+                analyzers.push_back(builtin.back());
+                continue;
+            }
+            if(r.path == "ofws")
+            {
+                builtin.push_back(new analyzers::OFWSAnalyzer(std::cout /*r.arguments*/));
+                analyzers.push_back(builtin.back());
+                continue;
+            }
+            if(r.path == "ofdws")
+            {
+                builtin.push_back(new analyzers::OFDWSAnalyzer(std::cout, params.block_size(), params.bucket_size() /*r.arguments*/));
+                analyzers.push_back(builtin.back());
+                continue;
+            }
+
             Logger::Buffer message;
             try // try to load plugin
             {
                 message << "Loading module: '" << r.path << "' with args: [" << r.arguments << "]";
-                plugins.add(r.path, r.arguments);
+                plugins.push_back(new PluginInstance(r.path, r.arguments));
+                analyzers.push_back(*plugins.back());
             }
             catch(Exception& e)
             {
@@ -57,44 +77,61 @@ public:
         }
 
         if(params.is_verbose()) // add special analyzer for trace out RPC calls
-            analyzers.push_back(new analyzers::PrintAnalyzer(std::clog));
-
-    /*
-        std::vector<AParams> active_analyzers = params.analyzers();
-        for(uint32_t i = 0; i < active_analyzers.size(); ++i)
-            plugins.add(active_analyzers[i].path, active_analyzers[i].arguments);
-
-        Plugins::Iterator i = plugins.begin();
-        Plugins::Iterator end = plugins.end();
-        for(; i != end; ++i)
-            analyzers.push_back((*i)->get_analyzer());
-    */
+        {
+            builtin.push_back(new analyzers::PrintAnalyzer(std::clog));
+            analyzers.push_back(builtin.back());
+        }
     }
- 
+
     ~Analyzers()
     {
-        if(plugins.size() != analyzers.size())
-            delete *analyzers.begin();
+        {   // delete built-in analyzers
+            BuiltIns::iterator i = builtin.begin();
+            BuiltIns::iterator end = builtin.end();
+            for(; i != end; ++i)
+                delete *i;
+        }
+
+        {   // delete plugin analyzers
+            Plugins::iterator i = plugins.begin();
+            Plugins::iterator end = plugins.end();
+            for(; i != end; ++i)
+                delete *i;
+        }
     }
 
     template
     <
         typename Handle,
-        typename Args,
-        typename Res
+        typename Procedure
     >
-    void process(Handle handle, const RPCProcedure* proc, const Args* args, const Res* res)
+    void operator()(Handle handle, const Procedure& proc)
+    {
+        const typename Procedure::Arg*const arg = &(proc.arg);
+        const typename Procedure::Res*const res = &(proc.res);
+
+        Storage::iterator i = analyzers.begin();
+        Storage::iterator end = analyzers.end();
+        for(; i != end; ++i)
+        {
+            ((*i)->*handle)(&proc, arg, res);
+        }
+    }
+
+    void flush_statistics()
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();
         for(; i != end; ++i)
-            ((*i)->*handle)(proc, args, res);
+        {
+            (*i)->flush_statistics();
+        }
     }
 
 private:
-    Storage analyzers;
-    Plugins plugins;
-    Storage builtin;
+    Storage  analyzers;
+    Plugins  plugins;
+    BuiltIns builtin;
 };
 
 } // namespace analyzer

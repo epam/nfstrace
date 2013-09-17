@@ -9,7 +9,7 @@
 #include <string>
 
 #include "../auxiliary/dynamic_load.h"
-#include "analyzers/base_analyzer_struct.h"
+#include "analyzers/base_analyzer.h"
 //------------------------------------------------------------------------------
 using NST::analyzer::analyzers::BaseAnalyzer;
 //------------------------------------------------------------------------------
@@ -23,7 +23,6 @@ class Plugin : private NST::auxiliary::DynamicLoad
 {
 protected:
     Plugin(const std::string& path);
-    ~Plugin();
 
 private:
     Plugin(const Plugin&);            // undefiend
@@ -41,10 +40,6 @@ public:
     PluginUsage(const std::string& path) : Plugin(path) {}
 
     inline const std::string get() const { return usage(); }
-
-private:
-    PluginUsage(const PluginUsage&);            // undefiend
-    PluginUsage& operator=(const PluginUsage&); // undefiend
 };
 
 class PluginInstance : private Plugin
@@ -56,9 +51,6 @@ public:
     inline operator BaseAnalyzer*() const { return analyzer; }
 
 private:
-    PluginInstance(const PluginInstance&);            // undefiend
-    PluginInstance& operator=(const PluginInstance&); // undefiend
-
     BaseAnalyzer* analyzer;
 };
 

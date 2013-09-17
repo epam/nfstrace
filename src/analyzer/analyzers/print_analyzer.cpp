@@ -3,14 +3,8 @@
 // Description: Created for demonstration purpose only.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include <iostream>
-#include <sstream>
-
-#include "../nfs3/nfs_operation.h"
-#include "../nfs3/nfs_structs.h"
 #include "print_analyzer.h"
 //------------------------------------------------------------------------------
-using namespace NST::analyzer::NFS3;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -19,7 +13,7 @@ namespace analyzer
 namespace analyzers
 {
 
-// Spesial helper for printout short repres->ntation of NFS FH
+// Special helper for print-out short representation of NFS FH
 std::ostream& operator += (std::ostream& out, const nfs_fh3& fh)
 {
     static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -59,20 +53,25 @@ std::ostream& operator += (std::ostream& out, const nfs_fh3& fh)
     return out;
 }
 
-void PrintAnalyzer::null(const struct RPCProcedure* proc,
-        const struct NULLargs* args,
-        const struct NULLres* res)
+inline std::ostream& operator << (std::ostream& out, const struct RPCProcedure* proc)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    return out << *(proc->session) << ' ' << Proc::Titles[proc->call.proc] << " XID: " << proc->call.xid;
+}
+
+void PrintAnalyzer::null(const struct RPCProcedure* proc,
+                         const struct NULLargs* args,
+                         const struct NULLres* res)
+{
+    out << proc;
     out << " CALL [] REPLY []";
     out << std::endl;
 }
 
 void PrintAnalyzer::getattr3(const RPCProcedure* proc,
-        const struct GETATTR3args* args,
-        const struct GETATTR3res* res)
+                             const struct GETATTR3args* args,
+                             const struct GETATTR3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " object: " += args->object;
     out << "] REPLY [";
@@ -82,14 +81,14 @@ void PrintAnalyzer::getattr3(const RPCProcedure* proc,
 }
 
 void PrintAnalyzer::setattr3(const RPCProcedure* proc,
-        const struct SETATTR3args* args,
-        const struct SETATTR3res* res)
+                             const struct SETATTR3args* args,
+                             const struct SETATTR3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
-    out << " object: " += args->object;
+    out << " object: "         += args->object;
     out << " new_attributes: " << args->new_attributes;
-    out << " guard: " << args->guard;
+    out << " guard: "          << args->guard;
     out << "] REPLY [";
     out << " status: " << res->status;
     out << " ]";
@@ -97,17 +96,17 @@ void PrintAnalyzer::setattr3(const RPCProcedure* proc,
 }
 
 void PrintAnalyzer::lookup3(const RPCProcedure* proc,
-        const struct LOOKUP3args* args,
-        const struct LOOKUP3res* res)
+                            const struct LOOKUP3args* args,
+                            const struct LOOKUP3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " what: " << args->what;
     out << "] REPLY [";
     out << " status: " << res->status;
     if(res->status == nfsstat3::OK)
     {
-        out << " object: "  += res->resok.object;
+        out << " object: "          += res->resok.object;
         out << " obj_attributes: "  << res->resok.obj_attributes;
         out << " dir_attributes: "  << res->resok.dir_attributes;
     }
@@ -120,10 +119,10 @@ void PrintAnalyzer::lookup3(const RPCProcedure* proc,
 }
 
 void PrintAnalyzer::access3(const struct RPCProcedure* proc,
-            const struct ACCESS3args* args,
-            const struct ACCESS3res* res)
+                            const struct ACCESS3args* args,
+                            const struct ACCESS3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " object: " += args->object;
     out << " access: ";
@@ -157,23 +156,23 @@ void PrintAnalyzer::access3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::readlink3(const struct RPCProcedure* proc,
-        const struct READLINK3args* args,
-        const struct READLINK3res* res)
+                              const struct READLINK3args* args,
+                              const struct READLINK3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
-    out << " symlink: "  += args->symlink;
+    out << " symlink: " += args->symlink;
     out << "] REPLY [";
-    out << " status: " << res->status;
+    out << " status: "  << res->status;
     out << " ]";
     out << std::endl;
 }
 
 void PrintAnalyzer::read3(const struct RPCProcedure* proc,
-        const struct READ3args* args,
-        const struct READ3res* res)
+                          const struct READ3args* args,
+                          const struct READ3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " file: "   += args->file;
     out << " offset: " << args->offset;
@@ -185,15 +184,15 @@ void PrintAnalyzer::read3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::write3(const struct RPCProcedure* proc,
-        const struct WRITE3args* args,
-        const struct WRITE3res* res)
+                           const struct WRITE3args* args,
+                           const struct WRITE3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " file: "   += args->file;
     out << " offset: " << args->offset;
     out << " count: "  << args->count;
-    out << " stable: "  << args->stable;
+    out << " stable: " << args->stable;
     out << "] REPLY [";
     out << " status: " << res->status;
     out << " ]";
@@ -201,32 +200,32 @@ void PrintAnalyzer::write3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::create3(const struct RPCProcedure* proc,
-        const struct CREATE3args* args,
-        const struct CREATE3res* res)
+                            const struct CREATE3args* args,
+                            const struct CREATE3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " where: " << args->where;
-    out << " how: " << args->how;
+    out << " how: "   << args->how;
     out << "] REPLY [";
     out << " status: " << res->status;
     if(res->status == nfsstat3::OK)
     {
-        out << " obj: " << res->u.resok.obj;
+        out << " obj: "            << res->u.resok.obj;
         out << " obj_attributes: " << res->u.resok.obj_attributes;
-        out << " dir_wcc: " << res->u.resok.dir_wcc;
+        out << " dir_wcc: "        << res->u.resok.dir_wcc;
     }
     out << " ]";
     out << std::endl;
 }
 
 void PrintAnalyzer::mkdir3(const struct RPCProcedure* proc,
-        const struct MKDIR3args* args,
-        const struct MKDIR3res* res)
+                           const struct MKDIR3args* args,
+                           const struct MKDIR3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
-    out << " where: " << args->where;
+    out << " where: "      << args->where;
     out << " attributes: " << args->attributes;
     out << "] REPLY [";
     out << " status: " << res->status;
@@ -235,12 +234,12 @@ void PrintAnalyzer::mkdir3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::symlink3(const struct RPCProcedure* proc,
-        const struct SYMLINK3args* args,
-        const struct SYMLINK3res* res)
+                             const struct SYMLINK3args* args,
+                             const struct SYMLINK3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
-    out << " where: " << args->where;
+    out << " where: "       << args->where;
     out << " symlinkdata: " << args->symlink;
     out << "] REPLY [";
     out << " status: " << res->status;
@@ -249,13 +248,13 @@ void PrintAnalyzer::symlink3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::mknod3(const struct RPCProcedure* proc,
-        const struct MKNOD3args* args,
-        const struct MKNOD3res* res)
+                           const struct MKNOD3args* args,
+                           const struct MKNOD3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " where: " << args->where;
-    out << " what: " << args->what;
+    out << " what: "  << args->what;
     out << "] REPLY [";
     out << " status: " << res->status;
     out << " ]";
@@ -263,10 +262,10 @@ void PrintAnalyzer::mknod3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::remove3(const struct RPCProcedure* proc,
-        const struct REMOVE3args* args,
-        const struct REMOVE3res* res)
+                            const struct REMOVE3args* args,
+                            const struct REMOVE3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " object: " << args->object;
     out << "] REPLY [";
@@ -276,10 +275,10 @@ void PrintAnalyzer::remove3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::rmdir3(const struct RPCProcedure* proc,
-        const struct RMDIR3args* args,
-        const struct RMDIR3res* res)
+                           const struct RMDIR3args* args,
+                           const struct RMDIR3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " object: " << args->object;
     out << "] REPLY [";
@@ -289,13 +288,13 @@ void PrintAnalyzer::rmdir3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::rename3(const struct RPCProcedure* proc,
-        const struct RENAME3args* args,
-        const struct RENAME3res* res)
+                            const struct RENAME3args* args,
+                            const struct RENAME3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " from: " << args->from;
-    out << " to: " << args->to;
+    out << " to: "   << args->to;
     out << "] REPLY [";
     out << " status: " << res->status;
     out << " ]";
@@ -303,10 +302,10 @@ void PrintAnalyzer::rename3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::link3(const struct RPCProcedure* proc,
-        const struct LINK3args* args,
-        const struct LINK3res* res)
+                          const struct LINK3args* args,
+                          const struct LINK3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " file: " += args->file;
     out << " link: " << args->link;
@@ -317,10 +316,10 @@ void PrintAnalyzer::link3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::readdir3(const struct RPCProcedure* proc,
-        const struct READDIR3args* args,
-        const struct READDIR3res* res)
+                             const struct READDIR3args* args,
+                             const struct READDIR3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " dir: "         += args->dir;
     out << " cookie: "      << args->cookie;
@@ -333,10 +332,10 @@ void PrintAnalyzer::readdir3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::readdirplus3(const struct RPCProcedure* proc,
-        const struct READDIRPLUS3args* args,
-        const struct READDIRPLUS3res* res)
+                                 const struct READDIRPLUS3args* args,
+                                 const struct READDIRPLUS3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " dir: "         += args->dir;
     out << " cookie: "      << args->cookie;
@@ -355,10 +354,10 @@ void PrintAnalyzer::readdirplus3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::fsstat3(const struct RPCProcedure* proc,
-        const struct FSSTAT3args* args,
-        const struct FSSTAT3res* res)
+                            const struct FSSTAT3args* args,
+                            const struct FSSTAT3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " fsroot: " += args->fsroot;
     out << "] REPLY [";
@@ -368,10 +367,10 @@ void PrintAnalyzer::fsstat3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::fsinfo3(const struct RPCProcedure* proc,
-        const struct FSINFO3args* args,
-        const struct FSINFO3res* res)
+                            const struct FSINFO3args* args,
+                            const struct FSINFO3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " fsroot: " += args->fsroot;
     out << "] REPLY [";
@@ -381,10 +380,10 @@ void PrintAnalyzer::fsinfo3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::pathconf3(const struct RPCProcedure* proc,
-        const struct PATHCONF3args* args,
-        const struct PATHCONF3res* res)
+                              const struct PATHCONF3args* args,
+                              const struct PATHCONF3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " object: " += args->object;
     out << "] REPLY [";
@@ -394,23 +393,23 @@ void PrintAnalyzer::pathconf3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::commit3(const struct RPCProcedure* proc,
-        const struct COMMIT3args* args,
-        const struct COMMIT3res* res)
+                            const struct COMMIT3args* args,
+                            const struct COMMIT3res* res)
 {
-    out << *(proc->session) << ' ' << Proc::Titles[proc->call->proc] << " XID: " << proc->call->xid;
+    out << proc;
     out << " CALL [";
     out << " file: "    += args->file;
     out << " offset: "  << args->offset;
     out << " count: "   << args->count;
     out << "] REPLY [";
-    out << " status: " << res->status;
+    out << " status: "  << res->status;
     out << " ]";
     out << std::endl;
 }
 
-const char* PrintAnalyzer::usage()
+void PrintAnalyzer::flush_statistics()
 {
-    return "Provide '-h' to enable PrintAnalyzer";
+    // flush is in each hendler
 }
 
 } // namespace analyzers

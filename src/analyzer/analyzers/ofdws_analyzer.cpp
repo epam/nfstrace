@@ -18,7 +18,7 @@ namespace analyzer
 namespace analyzers
 {
 
-OFDWSAnalyzer::OFDWSAnalyzer(uint32_t block_size, uint32_t bucket_size) : read_total(0), write_total(0)
+OFDWSAnalyzer::OFDWSAnalyzer(std::ostream& o, uint32_t block_size, uint32_t bucket_size) : read_total(0), write_total(0), out(o)
 {
     FileRWOp::set_block_size(block_size);
     FileRWOp::set_bucket_size(bucket_size);
@@ -32,139 +32,33 @@ OFDWSAnalyzer::~OFDWSAnalyzer()
         delete i->second;
 }
 
-bool OFDWSAnalyzer::call_null(const RPCOperation& operation)
+void OFDWSAnalyzer::read3(const struct RPCProcedure* proc,
+                          const struct READ3args* args,
+                          const struct READ3res*  res)
 {
-    return true;
-}
-
-bool OFDWSAnalyzer::call_getattr(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_setattr(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_lookup(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_access(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_readlink(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_read(const RPCOperation& operation)
-{
-    const NFSPROC3_READ& op = static_cast<const NFSPROC3_READ&>(operation);
-    const NFSPROC3_READ::Arg& arg = op.get_arg();
-    const NFSPROC3_READ::Res& res = op.get_res();
-
-    if(res.status == nfsstat3::OK)
+    if(res->status == nfsstat3::OK)
     {
-        read_total += res.u.resok.count;
+        read_total += res->u.resok.count;
 
-        Iterator i = get_file_rw_op(arg.file);
-        i->second->calculate(Proc::READ, arg.offset, res.u.resok.count);
+        Iterator i = get_file_rw_op(args->file);
+        i->second->calculate(Proc::READ, args->offset, res->u.resok.count);
     }
-    return true;
 }
 
-bool OFDWSAnalyzer::call_write(const RPCOperation& operation)
+void OFDWSAnalyzer::write3(const struct RPCProcedure* proc,
+                           const struct WRITE3args* args,
+                           const struct WRITE3res*  res)
 {
-    const NFSPROC3_WRITE& op = static_cast<const NFSPROC3_WRITE&>(operation);
-    const NFSPROC3_WRITE::Arg& arg = op.get_arg();
-    const NFSPROC3_WRITE::Res& res = op.get_res();
-
-    if(res.status == nfsstat3::OK)
+    if(res->status == nfsstat3::OK)
     {
-        write_total += res.u.resok.count;
+        write_total += res->u.resok.count;
 
-        Iterator i = get_file_rw_op(arg.file);
-        i->second->calculate(Proc::WRITE, arg.offset, res.u.resok.count);
+        Iterator i = get_file_rw_op(args->file);
+        i->second->calculate(Proc::WRITE, args->offset, res->u.resok.count);
     }
-    return true;
 }
 
-bool OFDWSAnalyzer::call_create(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_mkdir(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_symlink(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_mknod(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_remove(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_rmdir(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_rename(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_link(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_readdir(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_readdirplus(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_fsstat(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_fsinfo(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_pathconf(const RPCOperation& operation)
-{
-    return true;
-}
-
-bool OFDWSAnalyzer::call_commit(const RPCOperation& operation)
-{
-    return true;
-}
-
-void OFDWSAnalyzer::print(std::ostream& out)
+void OFDWSAnalyzer::flush_statistics()
 {
     out << "### OFDWS Analyzer ###" << std::endl;
     out << "Read total: " << read_total << " Write total: " << write_total << std::endl;

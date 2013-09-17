@@ -13,7 +13,6 @@
 #include "../controller/parameters.h"
 #include "../controller/running_status.h"
 #include "analyzers.h"
-#include "plugins.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::FilteredDataQueue;
 using NST::auxiliary::Thread;

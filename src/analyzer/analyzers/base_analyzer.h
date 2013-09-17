@@ -6,11 +6,15 @@
 #ifndef BASE_ANALYZER_H
 #define BASE_ANALYZER_H
 //------------------------------------------------------------------------------
-#include <ostream>
+#include "../../auxiliary/session.h"
+using NST::auxiliary::Session;  // F*****G namespaces!
 
-#include "../nfs3/nfs_operation.h"
+#include "../nfs3/nfs_structs.h"        // api/nfs3_types.h
+#include "../rpc/rpc_procedure_struct.h"// api/rpc_procedure_type.h
 //------------------------------------------------------------------------------
-using NST::analyzer::RPC::RPCOperation;
+using namespace NST::analyzer::NFS3;
+
+using NST::analyzer::RPC::RPCProcedure;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -19,40 +23,11 @@ namespace analyzer
 namespace analyzers
 {
 
-class BaseAnalyzer
-{
-public:
-    BaseAnalyzer()
-    {
-    }
-    virtual ~BaseAnalyzer()
-    {
-    }
+#include "../../api/base_analyzer_type.h"
 
-    virtual bool call_null          (const RPCOperation& operation) = 0;
-    virtual bool call_getattr       (const RPCOperation& operation) = 0;
-    virtual bool call_setattr       (const RPCOperation& operation) = 0;
-    virtual bool call_lookup        (const RPCOperation& operation) = 0;
-    virtual bool call_access        (const RPCOperation& operation) = 0;
-    virtual bool call_readlink      (const RPCOperation& operation) = 0;
-    virtual bool call_read          (const RPCOperation& operation) = 0;
-    virtual bool call_write         (const RPCOperation& operation) = 0;
-    virtual bool call_create        (const RPCOperation& operation) = 0;
-    virtual bool call_mkdir         (const RPCOperation& operation) = 0;
-    virtual bool call_symlink       (const RPCOperation& operation) = 0;
-    virtual bool call_mknod         (const RPCOperation& operation) = 0;
-    virtual bool call_remove        (const RPCOperation& operation) = 0;
-    virtual bool call_rmdir         (const RPCOperation& operation) = 0;
-    virtual bool call_rename        (const RPCOperation& operation) = 0;
-    virtual bool call_link          (const RPCOperation& operation) = 0;
-    virtual bool call_readdir       (const RPCOperation& operation) = 0;
-    virtual bool call_readdirplus   (const RPCOperation& operation) = 0;
-    virtual bool call_fsstat        (const RPCOperation& operation) = 0;
-    virtual bool call_fsinfo        (const RPCOperation& operation) = 0;
-    virtual bool call_pathconf      (const RPCOperation& operation) = 0;
-    virtual bool call_commit        (const RPCOperation& operation) = 0;
-    virtual void print(std::ostream& out) = 0;
-};
+typedef const char* (*plugin_usage_func)   (); // return description of expected opts for plugin_create_func()
+typedef void*       (*plugin_create_func)  (const char* opts); // create and return an instance of analyzer
+typedef void        (*plugin_destroy_func) (void*   instance); // destroy an instance of analyzer
 
 } // namespace analyzers
 } // namespace analyzer

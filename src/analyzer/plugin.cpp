@@ -23,11 +23,6 @@ Plugin::Plugin(const std::string& path)
     load_address_of("destroy", destroy);
 }
 
-Plugin::~Plugin()
-{
-}
-
-
 PluginInstance::PluginInstance(const std::string& path, const std::string& args) : Plugin(path)
 {
     analyzer = (BaseAnalyzer*)(*create)(args.c_str());

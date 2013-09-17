@@ -9,12 +9,10 @@
 #include <tr1/unordered_map>
 #include <vector>
 
-#include "../nfs3/nfs_operation.h"
+#include "../nfs3/nfs_structs.h"
 #include "fh.h"                     //hash-table's key
 //------------------------------------------------------------------------------
 using namespace NST::analyzer::NFS3;
-
-using NST::analyzer::RPC::RPCOperation;
 //------------------------------------------------------------------------------
 namespace NST
 {

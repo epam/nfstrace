@@ -8,10 +8,8 @@
 #include "../auxiliary/exception.h"
 #include "../auxiliary/logger.h"
 #include "../filter/rpc/rpc_header.h"
-//#include "nfs3/nfs_operation.h"
-#include "nfs3/nfs_structs.h"
+#include "nfs3/nfs_procedure.h"
 #include "nfs_parser_thread.h"
-#include "rpc/rpc_procedure_struct.h"
 #include "rpc/rpc_reader.h"
 //------------------------------------------------------------------------------
 using namespace NST::analyzer::NFS3;
@@ -81,73 +79,48 @@ inline void NFSParserThread::process_queue()
     else pthread_yield();
 }
 
-//RPCOperation* create_nfs_operation( FilteredDataQueue::Ptr& call,
 void NFSParserThread::create_nfs_operation( FilteredDataQueue::Ptr& call,
-                                    FilteredDataQueue::Ptr& reply,
-                                    RPCSession* session)
+                                            FilteredDataQueue::Ptr& reply,
+                                            RPCSession* session)
 {
-    const CallHeader* c = reinterpret_cast<const CallHeader*>(call->data);
-    const uint32_t proc = c->proc();
+    const CallHeader* header = reinterpret_cast<const CallHeader*>(call->data);
+    const uint32_t procedure = header->proc();
     try
     {
-        RPCReader c_reader(call);
-        RPCCall c; 
-        c_reader >> c;
+        RPCReader c(call);
+        RPCReader r(reply);
+        const Session* s = session->get_session();
 
-        RPCReader r_reader(reply);
-        RPCReply r; 
-        r_reader >> r;
-
-        RPCProcedure procedure;
-        procedure.session = session->get_session();
-        procedure.call  = &c;
-        procedure.reply = &r;
-        procedure.reply_time = &c_reader.data().timestamp;
-        procedure.reply_time = &r_reader.data().timestamp;
-
-        switch(proc)
+        switch(procedure)
         {
-        case ProcNum::WRITE:
-            {
-                WRITE3args args;
-                c_reader >> args;
-
-                WRITE3res res;
-                c_reader >> res;
-
-                analyzers.process(&BaseAnalyzer::write3, &procedure, &args, &res);
-            }
-            /*
-        case Proc::NFS_NULL:    return new NFSPROC3_NULL       (call, reply, session);
-        case Proc::GETATTR:     return new NFSPROC3_GETATTR    (call, reply, session);
-        case Proc::SETATTR:     return new NFSPROC3_SETATTR    (call, reply, session);
-        case Proc::LOOKUP:      return new NFSPROC3_LOOKUP     (call, reply, session);
-        case Proc::ACCESS:      return new NFSPROC3_ACCESS     (call, reply, session);
-        case Proc::READLINK:    return new NFSPROC3_READLINK   (call, reply, session);
-        case Proc::READ:        return new NFSPROC3_READ       (call, reply, session);
-        case Proc::WRITE:       return new NFSPROC3_WRITE      (call, reply, session);
-        case Proc::CREATE:      return new NFSPROC3_CREATE     (call, reply, session);
-        case Proc::MKDIR:       return new NFSPROC3_MKDIR      (call, reply, session);
-        case Proc::SYMLINK:     return new NFSPROC3_SYMLINK    (call, reply, session);
-        case Proc::MKNOD:       return new NFSPROC3_MKNOD      (call, reply, session);
-        case Proc::REMOVE:      return new NFSPROC3_REMOVE     (call, reply, session);
-        case Proc::RMDIR:       return new NFSPROC3_RMDIR      (call, reply, session);
-        case Proc::RENAME:      return new NFSPROC3_RENAME     (call, reply, session);
-        case Proc::LINK:        return new NFSPROC3_LINK       (call, reply, session);
-        case Proc::READDIR:     return new NFSPROC3_READDIR    (call, reply, session);
-        case Proc::READDIRPLUS: return new NFSPROC3_READDIRPLUS(call, reply, session);
-        case Proc::FSSTAT:      return new NFSPROC3_FSSTAT     (call, reply, session);
-        case Proc::FSINFO:      return new NFSPROC3_FSINFO     (call, reply, session);
-        case Proc::PATHCONF:    return new NFSPROC3_PATHCONF   (call, reply, session);
-        case Proc::COMMIT:      return new NFSPROC3_COMMIT     (call, reply, session);
+        case Proc::NFS_NULL:    return analyzers(&BaseAnalyzer::null,       NFSPROC3_NULL       (c, r, s));
+        case Proc::GETATTR:     return analyzers(&BaseAnalyzer::getattr3,   NFSPROC3_GETATTR    (c, r, s));
+        case Proc::SETATTR:     return analyzers(&BaseAnalyzer::setattr3,   NFSPROC3_SETATTR    (c, r, s));
+        case Proc::LOOKUP:      return analyzers(&BaseAnalyzer::lookup3,    NFSPROC3_LOOKUP     (c, r, s));
+        case Proc::ACCESS:      return analyzers(&BaseAnalyzer::access3,    NFSPROC3_ACCESS     (c, r, s));
+        case Proc::READLINK:    return analyzers(&BaseAnalyzer::readlink3,  NFSPROC3_READLINK   (c, r, s));
+        case Proc::READ:        return analyzers(&BaseAnalyzer::read3,      NFSPROC3_READ       (c, r, s));
+        case Proc::WRITE:       return analyzers(&BaseAnalyzer::write3,     NFSPROC3_WRITE      (c, r, s));
+        case Proc::CREATE:      return analyzers(&BaseAnalyzer::create3,    NFSPROC3_CREATE     (c, r, s));
+        case Proc::MKDIR:       return analyzers(&BaseAnalyzer::mkdir3,     NFSPROC3_MKDIR      (c, r, s));
+        case Proc::SYMLINK:     return analyzers(&BaseAnalyzer::symlink3,   NFSPROC3_SYMLINK    (c, r, s));
+        case Proc::MKNOD:       return analyzers(&BaseAnalyzer::mknod3,     NFSPROC3_MKNOD      (c, r, s));
+        case Proc::REMOVE:      return analyzers(&BaseAnalyzer::remove3,    NFSPROC3_REMOVE     (c, r, s));
+        case Proc::RMDIR:       return analyzers(&BaseAnalyzer::rmdir3,     NFSPROC3_RMDIR      (c, r, s));
+        case Proc::RENAME:      return analyzers(&BaseAnalyzer::rename3,    NFSPROC3_RENAME     (c, r, s));
+        case Proc::LINK:        return analyzers(&BaseAnalyzer::link3,      NFSPROC3_LINK       (c, r, s));
+        case Proc::READDIR:     return analyzers(&BaseAnalyzer::readdir3,   NFSPROC3_READDIR    (c, r, s));
+        case Proc::READDIRPLUS: return analyzers(&BaseAnalyzer::readdirplus3, NFSPROC3_READDIRPLUS(c, r, s));
+        case Proc::FSSTAT:      return analyzers(&BaseAnalyzer::fsstat3,    NFSPROC3_FSSTAT     (c, r, s));
+        case Proc::FSINFO:      return analyzers(&BaseAnalyzer::fsinfo3,    NFSPROC3_FSINFO     (c, r, s));
+        case Proc::PATHCONF:    return analyzers(&BaseAnalyzer::pathconf3,  NFSPROC3_PATHCONF   (c, r, s));
+        case Proc::COMMIT:      return analyzers(&BaseAnalyzer::commit3,    NFSPROC3_COMMIT     (c, r, s));
         case Proc::num:;
-            */
         }
     }
     catch(XDRError& exception)
     {
-        //LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), Proc::Titles[proc], proc);
-        LOG("The data of NFS operation %s (%u) is too short for parsing", session->str().c_str(), proc);
+        LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), Proc::Titles[procedure], procedure);
     }
 }
 
