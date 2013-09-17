@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Analyzers storage. 
+// Author: Pavel Karneliuk
+// Description: Storage.for populating Analyzers
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef ANALYZERS_H
@@ -19,7 +19,6 @@
 //------------------------------------------------------------------------------
 using NST::auxiliary::Logger;
 using NST::analyzer::analyzers::BaseAnalyzer;
-using NST::analyzer::RPC::RPCProcedure;
 using NST::controller::AParams;
 using NST::controller::Parameters;
 //------------------------------------------------------------------------------
@@ -41,9 +40,7 @@ public:
         for(unsigned int i = 0; i < requested_analyzers.size(); ++i)
         {
             const AParams& r = requested_analyzers[i];
-            std::cout << "path:" << r.path << " args: " << r.arguments << std::endl;
-            
-            
+
             if(r.path == "ob")
             {
                 builtin.push_back(new analyzers::BreakdownAnalyzer(std::cout /*r.arguments*/));
@@ -78,7 +75,7 @@ public:
 
         if(params.is_verbose()) // add special analyzer for trace out RPC calls
         {
-            builtin.push_back(new analyzers::PrintAnalyzer(std::clog));
+            builtin.push_back(new analyzers::PrintAnalyzer(std::cout));
             analyzers.push_back(builtin.back());
         }
     }
