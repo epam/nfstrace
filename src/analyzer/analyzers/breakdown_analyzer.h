@@ -9,13 +9,9 @@
 #include <tr1/unordered_map>
 #include <vector>
 
-#include "../nfs3/nfs_operation.h"
-#include "../rpc_sessions.h"
 #include "base_analyzer.h"
 #include "breakdown.h"
 //------------------------------------------------------------------------------
-using NST::analyzer::RPC::RPCOperation;
-//using NST::analyzer::RPCSession;
 using NST::analyzer::NFS3::Proc;
 //------------------------------------------------------------------------------
 namespace NST
@@ -46,19 +42,17 @@ class BreakdownAnalyzer : public BaseAnalyzer
         }
     };
 
-    typedef std::tr1::unordered_map<RPCSession::Session, Breakdown*, Hash, Pred> PerOpStat;
+    typedef std::tr1::unordered_map<Session, Breakdown*, Hash, Pred> PerOpStat;
     typedef PerOpStat::value_type Pair;
-    typedef PerOpStat::iterator Iterator;
-    typedef PerOpStat::const_iterator ConstIterator;
-    typedef std::pair<Iterator, bool> Inserted;
+//    typedef std::pair<Iterator, bool> Inserted;
 public:
-    BreakdownAnalyzer() : total(0), ops_count(22, 0)
+    BreakdownAnalyzer(std::ostream& o) : total(0), ops_count(22, 0), out(o)
     {
     }
     virtual ~BreakdownAnalyzer()
     {
-        Iterator i = per_op_stat.begin();
-        Iterator end = per_op_stat.end();
+        PerOpStat::iterator i = per_op_stat.begin();
+        PerOpStat::iterator end = per_op_stat.end();
         for(; i != end;)
         {
             delete i->second;
@@ -66,35 +60,81 @@ public:
         }
     }
 
-    virtual bool call_null       (const RPCOperation& operation);
-    virtual bool call_getattr    (const RPCOperation& operation);
-    virtual bool call_setattr    (const RPCOperation& operation);
-    virtual bool call_lookup     (const RPCOperation& operation);
-    virtual bool call_access     (const RPCOperation& operation);
-    virtual bool call_readlink   (const RPCOperation& operation);
-    virtual bool call_read       (const RPCOperation& operation);
-    virtual bool call_write      (const RPCOperation& operation);
-    virtual bool call_create     (const RPCOperation& operation);
-    virtual bool call_mkdir      (const RPCOperation& operation);
-    virtual bool call_symlink    (const RPCOperation& operation);
-    virtual bool call_mknod      (const RPCOperation& operation);
-    virtual bool call_remove     (const RPCOperation& operation);
-    virtual bool call_rmdir      (const RPCOperation& operation);
-    virtual bool call_rename     (const RPCOperation& operation);
-    virtual bool call_link       (const RPCOperation& operation);
-    virtual bool call_readdir    (const RPCOperation& operation);
-    virtual bool call_readdirplus(const RPCOperation& operation);
-    virtual bool call_fsstat     (const RPCOperation& operation);
-    virtual bool call_fsinfo     (const RPCOperation& operation);
-    virtual bool call_pathconf   (const RPCOperation& operation);
-    virtual bool call_commit     (const RPCOperation& operation);
-    virtual void print(std::ostream& out);
+    virtual void null(const struct RPCProcedure* proc,
+            const struct NULLargs* args,
+            const struct NULLres* res);
+    virtual void getattr3(const struct RPCProcedure* proc,
+            const struct GETATTR3args* args,
+            const struct GETATTR3res* res);
+    virtual void setattr3(const struct RPCProcedure* proc,
+            const struct SETATTR3args* args,
+            const struct SETATTR3res* res);
+    virtual void lookup3(const struct RPCProcedure* proc,
+            const struct LOOKUP3args* args,
+            const struct LOOKUP3res* res);
+    virtual void access3(const struct RPCProcedure* proc,
+            const struct ACCESS3args* args,
+            const struct ACCESS3res* res);
+    virtual void readlink3(const struct RPCProcedure* proc,
+            const struct READLINK3args* args,
+            const struct READLINK3res* res);
+    virtual void read3(const struct RPCProcedure* proc,
+            const struct READ3args* args,
+            const struct READ3res* res);
+    virtual void write3(const struct RPCProcedure* proc,
+            const struct WRITE3args* args,
+            const struct WRITE3res* res);
+    virtual void create3(const struct RPCProcedure* proc,
+            const struct CREATE3args* args,
+            const struct CREATE3res* res);
+    virtual void mkdir3(const struct RPCProcedure* proc,
+            const struct MKDIR3args* args,
+            const struct MKDIR3res* res);
+    virtual void symlink3(const struct RPCProcedure* proc,
+            const struct SYMLINK3args* args,
+            const struct SYMLINK3res* res);
+    virtual void mknod3(const struct RPCProcedure* proc,
+            const struct MKNOD3args* args,
+            const struct MKNOD3res* res);
+    virtual void remove3(const struct RPCProcedure* proc,
+            const struct REMOVE3args* args,
+            const struct REMOVE3res* res);
+    virtual void rmdir3(const struct RPCProcedure* proc,
+            const struct RMDIR3args* args,
+            const struct RMDIR3res* res);
+    virtual void rename3(const struct RPCProcedure* proc,
+            const struct RENAME3args* args,
+            const struct RENAME3res* res);
+    virtual void link3(const struct RPCProcedure* proc,
+            const struct LINK3args* args,
+            const struct LINK3res* res);
+    virtual void readdir3(const struct RPCProcedure* proc,
+            const struct READDIR3args* args,
+            const struct READDIR3res* res);
+    virtual void readdirplus3(const struct RPCProcedure* proc,
+            const struct READDIRPLUS3args* args,
+            const struct READDIRPLUS3res* res);
+    virtual void fsstat3(const struct RPCProcedure* proc,
+            const struct FSSTAT3args* args,
+            const struct FSSTAT3res* res);
+    virtual void fsinfo3(const struct RPCProcedure* proc,
+            const struct FSINFO3args* args,
+            const struct FSINFO3res* res);
+    virtual void pathconf3(const struct RPCProcedure* proc,
+            const struct PATHCONF3args* args,
+            const struct PATHCONF3res* res);
+    virtual void commit3(const struct RPCProcedure* proc,
+            const struct COMMIT3args* args,
+            const struct COMMIT3res* res);
+
+    virtual void flush_statistics();
 
 private:
-    bool account(NFS3::Proc::Enum op, const RPCOperation& operation);
+    void account(const struct RPCProcedure* proc);
     uint64_t total;
     std::vector<int> ops_count;
     PerOpStat per_op_stat;
+    std::ostream& out;
 };
 
 } // namespace analyzers

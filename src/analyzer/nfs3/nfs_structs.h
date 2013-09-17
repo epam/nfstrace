@@ -7,8 +7,8 @@
 #define NFS_STRUCTS_H
 //------------------------------------------------------------------------------
 #include <cassert>
+#include <ostream>
 
-//#include "../xdr/xdr_structs.h"
 #include "../xdr/xdr_reader.h"
 //------------------------------------------------------------------------------
 using namespace NST::analyzer::XDR;
@@ -21,6 +21,45 @@ namespace NFS3
 {
 
 #include "../../api/nfs3_types.h"
+
+// Artificial structure for enumeration of the NFS procedures
+struct Proc
+{
+    enum Enum
+    {
+        NFS_NULL    = 0,
+        GETATTR     = 1,
+        SETATTR     = 2,
+        LOOKUP      = 3,
+        ACCESS      = 4,
+        READLINK    = 5,
+        READ        = 6,
+        WRITE       = 7,
+        CREATE      = 8,
+        MKDIR       = 9,
+        SYMLINK     = 10,
+        MKNOD       = 11,
+        REMOVE      = 12,
+        RMDIR       = 13,
+        RENAME      = 14,
+        LINK        = 15,
+        READDIR     = 16,
+        READDIRPLUS = 17,
+        FSSTAT      = 18,
+        FSINFO      = 19,
+        PATHCONF    = 20,
+        COMMIT      = 21,
+        num         = 22
+    };
+
+    static const char* Titles[Proc::num];
+
+private:
+    Proc(const Proc&);            // undefiend
+    Proc& operator=(const Proc&); // undefiend
+};
+
+inline std::ostream& operator<<(std::ostream& out, const Proc::Enum proc);
 
 inline XDRReader& operator>>(XDRReader& in, mode3& obj)
 {

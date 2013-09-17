@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 #include <ostream>
 
-#include "base_analyzer_struct.h"
+#include "base_analyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -95,7 +95,7 @@ public:
             const struct COMMIT3args* args,
             const struct COMMIT3res* res);
 
-    virtual const char* usage();
+    virtual void flush_statistics();
 
 private:
     PrintAnalyzer(const PrintAnalyzer&);            // undefined

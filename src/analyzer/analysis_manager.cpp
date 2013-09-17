@@ -48,7 +48,8 @@ void AnalysisManager::stop()
 {
     if(parser_thread.get())
         parser_thread->stop();
-//    analyzers.print(std::cout);
+
+    analyzers->flush_statistics();
 }
 
 } // namespace analyzer

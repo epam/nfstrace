@@ -16,7 +16,7 @@ class BaseAnalyzer
 public:
     BaseAnalyzer() {};
     virtual ~BaseAnalyzer() {};
-    
+
     virtual void null(const struct RPCProcedure*,
             const struct NULLargs*,
             const struct NULLres*) {}
@@ -84,7 +84,7 @@ public:
             const struct COMMIT3args*,
             const struct COMMIT3res*) {}
 
-    virtual const char* usage() = 0;
+    virtual void flush_statistics() = 0;
 };
 
 }

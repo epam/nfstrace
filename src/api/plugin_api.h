@@ -27,7 +27,6 @@ BaseAnalyzer* create(const char* opts);// create analyzer
 void destroy(BaseAnalyzer* context);   // destroy analyzer
 
 }
-
 //------------------------------------------------------------------------------
 #endif //PLUGIN_API_H
 //------------------------------------------------------------------------------

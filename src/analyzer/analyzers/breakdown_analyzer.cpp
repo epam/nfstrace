@@ -13,139 +13,162 @@ namespace analyzer
 namespace analyzers
 {
 
-bool BreakdownAnalyzer::call_null(const RPCOperation& operation)
+
+void BreakdownAnalyzer::null(const struct RPCProcedure* proc,
+                             const struct NULLargs* args,
+                             const struct NULLres* res)
 {
-    account(NFS3::Proc::NFS_NULL, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_getattr(const RPCOperation& operation)
+void BreakdownAnalyzer::getattr3(const RPCProcedure* proc,
+                                 const struct GETATTR3args* args,
+                                 const struct GETATTR3res* res)
 {
-    account(NFS3::Proc::GETATTR, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_setattr(const RPCOperation& operation)
+void BreakdownAnalyzer::setattr3(const RPCProcedure* proc,
+                                 const struct SETATTR3args* args,
+                                 const struct SETATTR3res* res)
 {
-    account(NFS3::Proc::SETATTR, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_lookup(const RPCOperation& operation)
+void BreakdownAnalyzer::lookup3(const RPCProcedure* proc,
+                                const struct LOOKUP3args* args,
+                                const struct LOOKUP3res* res)
 {
-    account(NFS3::Proc::LOOKUP, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_access(const RPCOperation& operation)
+void BreakdownAnalyzer::access3(const struct RPCProcedure* proc,
+                                const struct ACCESS3args* args,
+                                const struct ACCESS3res* res)
 {
-    account(NFS3::Proc::ACCESS, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_readlink(const RPCOperation& operation)
+void BreakdownAnalyzer::readlink3(const struct RPCProcedure* proc,
+                                  const struct READLINK3args* args,
+                                  const struct READLINK3res* res)
 {
-    account(NFS3::Proc::READLINK, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_read(const RPCOperation& operation)
+void BreakdownAnalyzer::read3(const struct RPCProcedure* proc,
+                              const struct READ3args* args,
+                              const struct READ3res* res)
 {
-    account(NFS3::Proc::READ, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_write(const RPCOperation& operation)
+void BreakdownAnalyzer::write3(const struct RPCProcedure* proc,
+                               const struct WRITE3args* args,
+                               const struct WRITE3res* res)
 {
-    account(NFS3::Proc::WRITE, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_create(const RPCOperation& operation)
+void BreakdownAnalyzer::create3(const struct RPCProcedure* proc,
+                                const struct CREATE3args* args,
+                                const struct CREATE3res* res)
 {
-    account(NFS3::Proc::CREATE, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_mkdir(const RPCOperation& operation)
+void BreakdownAnalyzer::mkdir3(const struct RPCProcedure* proc,
+                               const struct MKDIR3args* args,
+                               const struct MKDIR3res* res)
 {
-    account(NFS3::Proc::MKDIR, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_symlink(const RPCOperation& operation)
+void BreakdownAnalyzer::symlink3(const struct RPCProcedure* proc,
+                                 const struct SYMLINK3args* args,
+                                 const struct SYMLINK3res* res)
 {
-    account(NFS3::Proc::SYMLINK, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_mknod(const RPCOperation& operation)
+void BreakdownAnalyzer::mknod3(const struct RPCProcedure* proc,
+                               const struct MKNOD3args* args,
+                               const struct MKNOD3res* res)
 {
-    account(NFS3::Proc::MKNOD, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_remove(const RPCOperation& operation)
+void BreakdownAnalyzer::remove3(const struct RPCProcedure* proc,
+                                const struct REMOVE3args* args,
+                                const struct REMOVE3res* res)
 {
-    account(NFS3::Proc::REMOVE, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_rmdir(const RPCOperation& operation)
+void BreakdownAnalyzer::rmdir3(const struct RPCProcedure* proc,
+                               const struct RMDIR3args* args,
+                               const struct RMDIR3res* res)
 {
-    account(NFS3::Proc::RMDIR, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_rename(const RPCOperation& operation)
+void BreakdownAnalyzer::rename3(const struct RPCProcedure* proc,
+                                const struct RENAME3args* args,
+                                const struct RENAME3res* res)
 {
-    account(NFS3::Proc::RENAME, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_link(const RPCOperation& operation)
+void BreakdownAnalyzer::link3(const struct RPCProcedure* proc,
+                              const struct LINK3args* args,
+                              const struct LINK3res* res)
 {
-    account(NFS3::Proc::LINK, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_readdir(const RPCOperation& operation)
+void BreakdownAnalyzer::readdir3(const struct RPCProcedure* proc,
+                                 const struct READDIR3args* args,
+                                 const struct READDIR3res* res)
 {
-    account(NFS3::Proc::READDIR, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_readdirplus(const RPCOperation& operation)
+void BreakdownAnalyzer::readdirplus3(const struct RPCProcedure* proc,
+                                     const struct READDIRPLUS3args* args,
+                                     const struct READDIRPLUS3res* res)
 {
-    account(NFS3::Proc::READDIRPLUS, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_fsstat(const RPCOperation& operation)
+void BreakdownAnalyzer::fsstat3(const struct RPCProcedure* proc,
+                                const struct FSSTAT3args* args,
+                                const struct FSSTAT3res* res)
 {
-    account(NFS3::Proc::FSSTAT, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_fsinfo(const RPCOperation& operation)
+void BreakdownAnalyzer::fsinfo3(const struct RPCProcedure* proc,
+                                const struct FSINFO3args* args,
+                                const struct FSINFO3res* res)
 {
-    account(NFS3::Proc::FSINFO, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_pathconf(const RPCOperation& operation)
+void BreakdownAnalyzer::pathconf3(const struct RPCProcedure* proc,
+                                  const struct PATHCONF3args* args,
+                                  const struct PATHCONF3res* res)
 {
-    account(NFS3::Proc::PATHCONF, operation);
-    return true;
+    account(proc);
 }
 
-bool BreakdownAnalyzer::call_commit(const RPCOperation& operation)
+void BreakdownAnalyzer::commit3(const struct RPCProcedure* proc,
+                                const struct COMMIT3args* args,
+                                const struct COMMIT3res* res)
 {
-    account(NFS3::Proc::COMMIT, operation);
-    return true;
+    account(proc);
 }
 
-void BreakdownAnalyzer::print(std::ostream& out)
+void BreakdownAnalyzer::flush_statistics()
 {
     out << "###  Breakdown analyzer  ###" << std::endl;
     out << "Total calls: " << total << ". Per operation:" << std::endl;
@@ -165,8 +188,8 @@ void BreakdownAnalyzer::print(std::ostream& out)
     }
 
     out << "Per connection info: " << std::endl;
-    Iterator it = per_op_stat.begin();
-    Iterator end = per_op_stat.end();
+    PerOpStat::iterator it = per_op_stat.begin();
+    PerOpStat::iterator end = per_op_stat.end();
     for(; it != end; ++it)
     {
         out << "Session: " << it->first << std::endl;
@@ -205,25 +228,28 @@ void BreakdownAnalyzer::print(std::ostream& out)
     }
 }
 
-bool BreakdownAnalyzer::account(NFS3::Proc::Enum op, const RPCOperation& operation)
+void BreakdownAnalyzer::account(const struct RPCProcedure* proc)
 {
+    const int op = proc->call.proc;
     ++total;
     ++ops_count[op];
 
-    const RPCSession& rpc_session = operation.get_session();
-    const RPCSession::Session* session = rpc_session.get_session();
-    Iterator el = per_op_stat.find(*session);
-    if(el == per_op_stat.end())
+    PerOpStat::const_iterator i = per_op_stat.find(*(proc->session));
+    if(i == per_op_stat.end())
     {
-        Inserted res = per_op_stat.insert(Pair(*session, new Breakdown()));
+        std::pair<PerOpStat::iterator, bool> res = per_op_stat.insert(Pair(*(proc->session), new Breakdown()));
         if(res.second == false)
-            return false;
-        el = res.first;
+        {
+            return;
+        }
+        i = res.first;
     }
-    Latencies& lat = (*el->second)[op];
-    lat.add(operation.latency());
-    
-    return true;
+
+    timeval latency;
+    timersub(proc->rtimestamp, proc->ctimestamp, &latency); // reply - call timestamps
+
+    Latencies& lat = (*i->second)[op];
+    lat.add(latency);
 }
 
 } // namespace analyzers

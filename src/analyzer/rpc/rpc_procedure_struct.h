@@ -8,21 +8,19 @@
 //------------------------------------------------------------------------------
 #include <sys/time.h>
 
-#include "../../auxiliary/session.h"
 #include "../rpc/rpc_structs.h"
 //------------------------------------------------------------------------------
-using NST::auxiliary::Session;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analyzer
 {
-namespace RPC 
+namespace RPC
 {
 
 #include "../../api/rpc_procedure_type.h"
 
-} // namespace RPC 
+} // namespace RPC
 } // namespace analyzer
 } // namespace NST
 //------------------------------------------------------------------------------

@@ -9,7 +9,6 @@
 #include "../../auxiliary/exception.h"
 #include "../../filter/rpc/rpc_header.h"
 #include "../xdr/xdr_reader.h"
-//#include "../xdr/xdr_structs.h"
 //------------------------------------------------------------------------------
 using namespace NST::filter::rpc;
 using namespace NST::analyzer::XDR;

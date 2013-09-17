@@ -8,16 +8,11 @@
 //------------------------------------------------------------------------------
 #include <tr1/unordered_map>
 
-#include "../nfs3/nfs_operation.h"
-#include "../rpc_sessions.h"
 #include "base_analyzer.h"
 #include "fh.h"                     //hash-table's key
 #include "file_rw_op.h"
 //------------------------------------------------------------------------------
 using namespace NST::analyzer::NFS3;
-
-using NST::analyzer::RPC::RPCOperation;
-using NST::analyzer::XDR::Opaque;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -43,32 +38,17 @@ class OFDWSAnalyzer : public BaseAnalyzer
     } const_iterator_comp;
 
 public:
-    OFDWSAnalyzer(uint32_t block_size, uint32_t bucket_size);
+    OFDWSAnalyzer(std::ostream& o, uint32_t block_size, uint32_t bucket_size);
     virtual ~OFDWSAnalyzer();
 
-    virtual bool call_null       (const RPCOperation& operation);
-    virtual bool call_getattr    (const RPCOperation& operation);
-    virtual bool call_setattr    (const RPCOperation& operation);
-    virtual bool call_lookup     (const RPCOperation& operation);
-    virtual bool call_access     (const RPCOperation& operation);
-    virtual bool call_readlink   (const RPCOperation& operation);
-    virtual bool call_read       (const RPCOperation& operation);
-    virtual bool call_write      (const RPCOperation& operation);
-    virtual bool call_create     (const RPCOperation& operation);
-    virtual bool call_mkdir      (const RPCOperation& operation);
-    virtual bool call_symlink    (const RPCOperation& operation);
-    virtual bool call_mknod      (const RPCOperation& operation);
-    virtual bool call_remove     (const RPCOperation& operation);
-    virtual bool call_rmdir      (const RPCOperation& operation);
-    virtual bool call_rename     (const RPCOperation& operation);
-    virtual bool call_link       (const RPCOperation& operation);
-    virtual bool call_readdir    (const RPCOperation& operation);
-    virtual bool call_readdirplus(const RPCOperation& operation);
-    virtual bool call_fsstat     (const RPCOperation& operation);
-    virtual bool call_fsinfo     (const RPCOperation& operation);
-    virtual bool call_pathconf   (const RPCOperation& operation);
-    virtual bool call_commit     (const RPCOperation& operation);
-    virtual void print(std::ostream& out);
+    virtual void read3(const struct RPCProcedure* proc,
+            const struct READ3args* args,
+            const struct READ3res* res);
+    virtual void write3(const struct RPCProcedure* proc,
+            const struct WRITE3args* args,
+            const struct WRITE3res* res);
+
+    virtual void flush_statistics();
 
 private:
     Iterator get_file_rw_op(const nfs_fh3& key);
@@ -77,9 +57,10 @@ private:
     void print_rw_records(std::ostream& out, const FileRWOp& file_rw_op) const;
     void store_files_rw_records() const;
 
-    OFDWS ofdws_stat; 
+    OFDWS ofdws_stat;
     uint64_t read_total;
     uint64_t write_total;
+    std::ostream& out;
 };
 
 } // namespace analyzers
