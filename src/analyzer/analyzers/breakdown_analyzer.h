@@ -44,7 +44,6 @@ class BreakdownAnalyzer : public BaseAnalyzer
 
     typedef std::tr1::unordered_map<Session, Breakdown*, Hash, Pred> PerOpStat;
     typedef PerOpStat::value_type Pair;
-//    typedef std::pair<Iterator, bool> Inserted;
 public:
     BreakdownAnalyzer(std::ostream& o) : total(0), ops_count(22, 0), out(o)
     {
