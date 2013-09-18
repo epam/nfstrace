@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "../auxiliary/logger.h"
+#include "../controller/cmdline_args.h"
 #include "../controller/parameters.h"
 #include "analyzers/base_analyzer.h"
 #include "analyzers/breakdown_analyzer.h"
@@ -41,19 +42,19 @@ public:
         {
             const AParams& r = requested_analyzers[i];
 
-            if(r.path == "ob")
+            if(r.path == NST::controller::cmdline::Args::ob_analyzer)
             {
                 builtin.push_back(new analyzers::BreakdownAnalyzer(std::cout /*r.arguments*/));
                 analyzers.push_back(builtin.back());
                 continue;
             }
-            if(r.path == "ofws")
+            if(r.path == NST::controller::cmdline::Args::ofws_analyzer)
             {
                 builtin.push_back(new analyzers::OFWSAnalyzer(std::cout /*r.arguments*/));
                 analyzers.push_back(builtin.back());
                 continue;
             }
-            if(r.path == "ofdws")
+            if(r.path == NST::controller::cmdline::Args::ofdws_analyzer)
             {
                 builtin.push_back(new analyzers::OFDWSAnalyzer(std::cout, params.block_size(), params.bucket_size() /*r.arguments*/));
                 analyzers.push_back(builtin.back());
@@ -102,7 +103,7 @@ public:
         typename Handle,
         typename Procedure
     >
-    void operator()(Handle handle, const Procedure& proc)
+    inline void operator()(Handle handle, const Procedure& proc)
     {
         const typename Procedure::Arg*const arg = &(proc.arg);
         const typename Procedure::Res*const res = &(proc.res);
@@ -115,7 +116,7 @@ public:
         }
     }
 
-    void flush_statistics()
+    inline void flush_statistics()
     {
         Storage::iterator i = analyzers.begin();
         Storage::iterator end = analyzers.end();

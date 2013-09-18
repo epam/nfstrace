@@ -28,6 +28,13 @@ void print_anlyzers_usage(std::ostream& out, Parameters& params)
 
     for(unsigned int i=0; i < v.size(); ++i)
     {
+        if(v[i].path == cmdline::Args::ob_analyzer
+        || v[i].path == cmdline::Args::ofws_analyzer
+        || v[i].path == cmdline::Args::ofdws_analyzer)
+        {
+            continue;   // skip built-in analyzers
+        }
+
         try
         {
             NST::analyzer::PluginUsage usage(v[i].path);
