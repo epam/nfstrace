@@ -7,7 +7,7 @@
 #define BASE_ANALYZER_H
 //------------------------------------------------------------------------------
 #include "../../auxiliary/session.h"
-using NST::auxiliary::Session;  // F*****G namespaces!
+using NST::auxiliary::Session;
 
 #include "../nfs3/nfs_structs.h"        // api/nfs3_types.h
 #include "../rpc/rpc_procedure_struct.h"// api/rpc_procedure_type.h
