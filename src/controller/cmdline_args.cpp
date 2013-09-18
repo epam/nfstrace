@@ -35,7 +35,7 @@ Opt Args::options[Args::num] =
     {'f', "filter",     Opt::REQ, "tcp port 2049",       "a packet filter in libpcap BPF syntax",               "BPF"},
     {'s', "snaplen",    Opt::REQ, "65535",               "max length of raw captured packet. May be used ONLY FOR UDP", "0..65535"},
     {'m', "mode",       Opt::REQ,  LIVE,                 "set runing mode",                                     LIVE"|"DUMP"|"STAT },
-    {'a', "analyzers",  Opt::REQ,  OB,                   "use specified analyzer",                              OB"|"OFWS"|"OFDWS"|PATH" },
+    {'a', "analyzers",  Opt::REQ,  OB,                   "specify built-in analyzers or path to analysis module", OB"|"OFWS"|"OFDWS"|PATH" },
     {'I', "ifile",      Opt::REQ, "INTERFACE-BPF.pcap",  "input file to "STAT" mode, the '-' means stdin",      "PATH"},
     {'O', "ofile",      Opt::REQ, "INTERFACE-BPF.pcap",  "output file to "DUMP" mode, the '-' means stdout",    "PATH"},
     {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file"},
