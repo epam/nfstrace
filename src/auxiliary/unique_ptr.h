@@ -61,7 +61,6 @@ public:
     }
 
     inline  operator bool() const { return  pointer; } // is empty?
-    inline operator const T&() const { return *pointer;    }
     inline T&  operator *() const { return *pointer; }
     inline T* operator ->() const { return  pointer; }
     inline T*         get() const { return  pointer; }
