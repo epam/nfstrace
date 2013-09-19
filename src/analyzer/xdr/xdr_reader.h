@@ -92,9 +92,7 @@ public:
     void read_fixed_len(Opaque& obj, const uint32_t len)
     {
         arrange_check(len);
-
         obj.set(it, len);
-
         it += calc_offset(len);
     }
 
@@ -102,11 +100,8 @@ public:
     {
         uint32_t len = 0;
         operator>>(len);
-        arrange_check(len);
 
-        obj.set(it, len);
-
-        it += calc_offset(len);
+        read_fixed_len(obj, len);
     }
 
     inline void arrange_check(uint32_t size) const
