@@ -1,7 +1,7 @@
 
 
 
-Golden Rule: Imitate the code from template.cpp and template.h. And what you see around.
+Golden Rule: Imitate the code from template.cpp and template.h, and what you see around.
 
 
 
@@ -9,8 +9,8 @@ Indentations: use ONLY white spaces. 1 indentation == 4 white spaces.
 
 Comments: use multiline comments for multiline text and single line comments for single lines of text.
 
-Names: short names for simple things, long names for complex.
+Names: use short names for simple things, long names for complex.
 
-File Names: use lower case characters and underscores (a-z and _) for names of .h and .cpp files.
+File Names: use lowercase characters and underscores (a-z and _) for names of .h and .cpp files.
 
 

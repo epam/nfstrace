@@ -23,9 +23,9 @@ public:
     SayHello& operator=(const SayHello&);   // undefined
 
     // small functions may be implemented in-place
-    inline const std::string& say()const { return text; }
+    inline const std::string& say() const { return text; }
 
-    unsigned int get()const;
+    unsigned int get() const;
     void set(unsigned int v);
 
 private:
