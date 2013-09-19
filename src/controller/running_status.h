@@ -7,14 +7,16 @@
 #define RUNNING_STATUS_H
 //------------------------------------------------------------------------------
 #include <list>
-#include <ostream>
 
 #include "../auxiliary/conditional_variable.h"
 #include "../auxiliary/exception.h"
+#include "../auxiliary/mutex.h"
+#include "../auxiliary/unique_ptr.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::ConditionalVariable;
 using NST::auxiliary::Exception;
 using NST::auxiliary::Mutex;
+using NST::auxiliary::UniquePtr;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -67,7 +69,7 @@ public:
 
     void wait_and_rethrow_exception()
     {
-        std::auto_ptr<const Exception> e(wait_exception());
+        UniquePtr<const Exception> e(wait_exception());
         e->dynamic_throw();
     }
 
