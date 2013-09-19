@@ -63,25 +63,13 @@ public:
         it += sizeof(v);
     }
 
-    inline void read(uint32_t& v)
-    {
-        arrange_check(sizeof(v));
-        read_unchecked(v);
-    }
-
     inline void read_unchecked(uint64_t& v)
     {
         v = be64toh(*(uint64_t*)it);
         it += sizeof(v);
     }
 
-    inline void read(uint64_t& v)
-    {
-        arrange_check(sizeof(v));
-        read_unchecked(v);
-    }
-
-    XDRReader& operator>>(uint32_t& obj)
+    inline XDRReader& operator>>(uint32_t& obj)
     {
         const size_t size = sizeof(obj);
         arrange_check(size);
@@ -91,7 +79,7 @@ public:
         return *this;
     }
 
-    XDRReader& operator>>(uint64_t& obj)
+    inline XDRReader& operator>>(uint64_t& obj)
     {
         const size_t size = sizeof(obj);
         arrange_check(size);
