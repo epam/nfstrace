@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 #include "block_allocator.h"
 #include "spinlock.h"
+#include "unique_ptr.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -24,48 +25,25 @@ class Queue
         T data;
     };
 
-public:
-
-    class Ptr
+    struct ElementDeleter
     {
-    public:
-        inline Ptr():queue(NULL),ptr(NULL)
+        inline explicit ElementDeleter() : queue(NULL) {}
+        inline explicit ElementDeleter(Queue* q) : queue(q) { }
+
+        inline void operator()(T* const pointer) const
         {
-        }
-        inline Ptr(Queue*const q, const Element*const p):queue(q),ptr(p)
-        {
-        }
-        inline Ptr(const Ptr& p) // move
-        {
-            queue = p.queue;
-            ptr   = p.ptr;
-            p.queue = NULL;
-            p.ptr   = NULL;
-        }
-        inline Ptr& operator=(const Ptr& p) // move
-        {
-            queue = p.queue;
-            ptr   = p.ptr;
-            p.queue = NULL;
-            p.ptr   = NULL;
-            return *this;
-        }
-        inline ~Ptr()
-        {
-            if(ptr)
+            if(pointer /*&& queue dont check - optimization*/)
             {
-                queue->deallocate(ptr);
+                queue->deallocate(pointer);
             }
         }
 
-        inline             operator bool() const { return ptr;          } // is empty?
-        inline         operator const T&() const { return ptr->data;    }
-        inline const T*const operator ->() const { return &(ptr->data); }
-
-    private:
-        mutable Queue*         queue;
-        mutable const Element* ptr;
+        Queue* queue;
     };
+
+public:
+
+    typedef UniquePtr<T, ElementDeleter> Ptr;
 
     class List  // List of elements for client code
     {
@@ -88,7 +66,7 @@ public:
         {
             Element* tmp = ptr;
             ptr = ptr->prev;
-            return Ptr(queue, tmp);
+            return Ptr(&tmp->data, ElementDeleter(queue));
         }
         inline void free_current() // deallocate element and switch to next
         {
@@ -115,8 +93,8 @@ public:
 
     inline T* const allocate()
     {
-        Element* e = (Element*)allocator.allocate();
-        return (e) ? &(e->data) : NULL;
+        Element* e = (Element*)allocator.allocate(); // may throw std::bad_alloc
+        return &(e->data);
     }
 
     inline void deallocate(T* ptr)
@@ -166,8 +144,9 @@ private:
     BlockAllocator allocator;
     Spinlock q_spinlock; // for queue push/pop
 
-    // queue empty:  last->NULL<-first
-    // queue filled: last->e<-e<-e<-e<-first
+    // queue empty:   last->NULL<-first
+    // queue filled:  last->e<-e<-e<-e<-first
+    // queue push(i): last->i<-e<-e<-e<-e<-first
     Element* last;
     Element* first;
 };

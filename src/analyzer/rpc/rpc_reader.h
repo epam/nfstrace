@@ -30,7 +30,7 @@ public:
     {
     }
 
-    inline const FilteredData& data() const { return ptr; }
+    inline const FilteredData& data() const { return *ptr; }
 
 private:
     FilteredDataQueue::Ptr ptr;
