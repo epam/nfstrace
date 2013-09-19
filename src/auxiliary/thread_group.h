@@ -6,10 +6,10 @@
 #ifndef TREAD_GROUP_H
 #define TREAD_GROUP_H
 //------------------------------------------------------------------------------
-#include <iostream>
 #include <list>
 
 #include "thread.h"
+#include "unique_ptr.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -19,7 +19,7 @@ namespace auxiliary
 
 class ThreadGroup
 {
-    typedef std::list<Thread*> list;
+    typedef std::list< UniquePtr<Thread> > list;
 
 public:
     ThreadGroup()
@@ -28,12 +28,6 @@ public:
     ~ThreadGroup()
     {
         stop(); // Additional checking before cleaning table
-        list::iterator i_beg = threads.begin();
-        list::iterator i_end = threads.end();
-        for(;i_beg != i_end; ++i_beg)
-        {
-            delete *i_beg;
-        }
     }
 
     void start()
@@ -56,7 +50,7 @@ public:
         }
     }
 
-    void add(Thread *thread)
+    void add(UniquePtr<Thread>& thread)
     {
         threads.push_back(thread);
     }

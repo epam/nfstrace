@@ -8,10 +8,12 @@
 //------------------------------------------------------------------------------
 #include "../auxiliary/exception.h"
 #include "../auxiliary/thread.h"
+#include "../auxiliary/unique_ptr.h"
 #include "../controller/running_status.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Exception;
 using NST::auxiliary::Thread;
+using NST::auxiliary::UniquePtr;
 using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
 namespace NST
@@ -23,7 +25,7 @@ template<typename Processor>
 class ProcessingThread : public Thread
 {
 public:
-    ProcessingThread(std::auto_ptr<Processor>& p, RunningStatus &s) : processor(p), status(s)
+    ProcessingThread(UniquePtr<Processor>& p, RunningStatus &s) : processor(p), status(s)
     {
     }
     ~ProcessingThread()
@@ -56,7 +58,7 @@ private:
     ProcessingThread(const ProcessingThread&);           // undefined
     ProcessingThread& operator=(const ProcessingThread&);// undefined
 
-    std::auto_ptr<Processor> processor;
+    UniquePtr<Processor> processor;
     RunningStatus& status;
 };
 

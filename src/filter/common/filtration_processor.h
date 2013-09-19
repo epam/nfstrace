@@ -9,7 +9,6 @@
 //------------------------------------------------------------------------------
 #include <cassert>
 #include <algorithm>
-#include <memory>
 #include <string>
 
 #include <tr1/unordered_map>
@@ -19,6 +18,7 @@
 #include "../../auxiliary/exception.h"
 #include "../../auxiliary/logger.h"
 #include "../../auxiliary/session.h"
+#include "../../auxiliary/unique_ptr.h"
 #include "../../controller/parameters.h"
 #include "../packet_info.h"
 #include "../packet.h"
@@ -27,6 +27,7 @@
 using NST::auxiliary::Exception;
 using NST::auxiliary::Logger;
 using NST::auxiliary::Session;
+using NST::auxiliary::UniquePtr;
 
 using namespace NST::filter::rpc;
 //------------------------------------------------------------------------------
@@ -780,7 +781,7 @@ class FiltrationProcessor
 {
 public:
 
-    FiltrationProcessor(std::auto_ptr<Reader>& r, std::auto_ptr<Writer>& w) : reader(r), writer(w)
+    FiltrationProcessor(UniquePtr<Reader>& r, UniquePtr<Writer>& w) : reader(r), writer(w)
     {
         // check datalink layer
         datalink = reader->datalink();
@@ -839,8 +840,8 @@ public:
 
 private:
 
-    std::auto_ptr<Reader> reader;
-    std::auto_ptr<Writer> writer;
+    UniquePtr<Reader> reader;
+    UniquePtr<Writer> writer;
     int datalink;
     SessionCollectors< IPv4TCPMapper < TCPSession < RPCFiltrator < Writer > > > > sessions;
     SessionCollectors< IPv4UDPMapper < UDPSession < Writer > > > udp_sessions;
