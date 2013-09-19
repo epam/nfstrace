@@ -8,19 +8,13 @@
 //------------------------------------------------------------------------------
 #include <vector>
 
-#include "../auxiliary/logger.h"
-#include "../controller/cmdline_args.h"
+#include "../auxiliary/unique_ptr.h"
 #include "../controller/parameters.h"
 #include "analyzers/base_analyzer.h"
-#include "analyzers/breakdown_analyzer.h"
-#include "analyzers/ofdws_analyzer.h"
-#include "analyzers/ofws_analyzer.h"
-#include "analyzers/print_analyzer.h"
 #include "plugin.h"
 //------------------------------------------------------------------------------
-using NST::auxiliary::Logger;
+using NST::auxiliary::UniquePtr;
 using NST::analyzer::analyzers::BaseAnalyzer;
-using NST::controller::AParams;
 using NST::controller::Parameters;
 //------------------------------------------------------------------------------
 namespace NST
@@ -30,73 +24,12 @@ namespace analyzer
 
 class Analyzers
 {
-    typedef std::vector<PluginInstance*> Plugins;
-    typedef std::vector<BaseAnalyzer*> BuiltIns;
-    typedef std::vector<BaseAnalyzer*> Storage;
+    typedef std::vector<BaseAnalyzer*>               Storage;
+    typedef std::vector< UniquePtr<PluginInstance> > Plugins;
+    typedef std::vector< UniquePtr<BaseAnalyzer> >   BuiltIns;
+
 public:
-    Analyzers(const Parameters& params)
-    {
-        std::vector<AParams> requested_analyzers = params.analyzers();
-
-        for(unsigned int i = 0; i < requested_analyzers.size(); ++i)
-        {
-            const AParams& r = requested_analyzers[i];
-
-            if(r.path == NST::controller::cmdline::Args::ob_analyzer)
-            {
-                builtin.push_back(new analyzers::BreakdownAnalyzer(std::cout /*r.arguments*/));
-                analyzers.push_back(builtin.back());
-                continue;
-            }
-            if(r.path == NST::controller::cmdline::Args::ofws_analyzer)
-            {
-                builtin.push_back(new analyzers::OFWSAnalyzer(std::cout /*r.arguments*/));
-                analyzers.push_back(builtin.back());
-                continue;
-            }
-            if(r.path == NST::controller::cmdline::Args::ofdws_analyzer)
-            {
-                builtin.push_back(new analyzers::OFDWSAnalyzer(std::cout, params.block_size(), params.bucket_size() /*r.arguments*/));
-                analyzers.push_back(builtin.back());
-                continue;
-            }
-
-            Logger::Buffer message;
-            try // try to load plugin
-            {
-                message << "Loading module: '" << r.path << "' with args: [" << r.arguments << "]";
-                plugins.push_back(new PluginInstance(r.path, r.arguments));
-                analyzers.push_back(*plugins.back());
-            }
-            catch(Exception& e)
-            {
-                message << " failed with: " << e.what();
-            }
-        }
-
-        if(params.is_verbose()) // add special analyzer for trace out RPC calls
-        {
-            builtin.push_back(new analyzers::PrintAnalyzer(std::cout));
-            analyzers.push_back(builtin.back());
-        }
-    }
-
-    ~Analyzers()
-    {
-        {   // delete built-in analyzers
-            BuiltIns::iterator i = builtin.begin();
-            BuiltIns::iterator end = builtin.end();
-            for(; i != end; ++i)
-                delete *i;
-        }
-
-        {   // delete plugin analyzers
-            Plugins::iterator i = plugins.begin();
-            Plugins::iterator end = plugins.end();
-            for(; i != end; ++i)
-                delete *i;
-        }
-    }
+    Analyzers(const Parameters& params);
 
     template
     <
@@ -127,6 +60,9 @@ public:
     }
 
 private:
+    Analyzers(const Analyzers&);            // undefiend
+    Analyzers& operator=(const Analyzers&); // undefiend
+
     Storage  analyzers;
     Plugins  plugins;
     BuiltIns builtin;

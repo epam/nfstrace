@@ -48,7 +48,7 @@ public:
     PluginInstance(const std::string& path, const std::string& args);
     ~PluginInstance();
 
-    inline operator BaseAnalyzer*() const { return analyzer; }
+    inline BaseAnalyzer* instance() const { return analyzer; }
 
 private:
     BaseAnalyzer* analyzer;
