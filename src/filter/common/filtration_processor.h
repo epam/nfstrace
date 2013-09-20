@@ -563,7 +563,7 @@ public:
             }
             else
             {
-                LOG("We are lost %u bytes of useful data lost:%u msg_len:%u", n - msg_len, n, msg_len);
+                LOG("We are lost %u bytes of useful data. lost:%u msg_len:%u", n - msg_len, n, msg_len);
                 reset();
             }
         }
@@ -823,11 +823,20 @@ public:
 
         if(info.eth && info.ipv4)
         {
-            if(info.tcp)     // Ethernet:IPv4:TCP supported only
+            if(info.tcp)     // Ethernet:IPv4:TCP
             {
-                return processor->sessions.collect_packet(info, processor->writer.get());
+                if(pkthdr->caplen == pkthdr->len)
+                {
+                    return processor->tcp_sessions.collect_packet(info, processor->writer.get());
+                }
+                else
+                {
+                    // the pcap packet was truncated by snaplen option
+                    // this packed won't correclty reassembled to TCP stream
+                    return;
+                }
             }
-            else if(info.udp)
+            else if(info.udp)// Ethernet:IPv4:UDP
             {
                 return processor->udp_sessions.collect_packet(info, processor->writer.get());
             }
@@ -843,8 +852,8 @@ private:
     UniquePtr<Reader> reader;
     UniquePtr<Writer> writer;
     int datalink;
-    SessionCollectors< IPv4TCPMapper < TCPSession < RPCFiltrator < Writer > > > > sessions;
-    SessionCollectors< IPv4UDPMapper < UDPSession < Writer > > > udp_sessions;
+    SessionCollectors< IPv4TCPMapper < TCPSession < RPCFiltrator < Writer > > > > tcp_sessions;
+    SessionCollectors< IPv4UDPMapper < UDPSession < Writer > > >                  udp_sessions;
 };
 
 
