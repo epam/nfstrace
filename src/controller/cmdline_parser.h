@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Author: Yauheni Azaranka
+// Author: Pavel Karneliuk
 // Description: Command-line arguments parser.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------

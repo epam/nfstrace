@@ -106,7 +106,15 @@ bool Parameters::is_verbose() const
 
 const std::string Parameters::interface() const
 {
-    return std::string(*parser[CLI::INTERFACE].begin());
+    const std::string itf(*parser[CLI::INTERFACE].begin());
+
+    if(itf.empty())
+    {
+        const char* mode = parser[CLI::MODE].begin()->to_cstr();
+        throw cmdline::CLIError(std::string("interface is required for ") + mode + " mode");
+    }
+
+    return itf;
 }
 
 unsigned short Parameters::snaplen() const
