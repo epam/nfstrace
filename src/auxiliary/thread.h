@@ -57,6 +57,9 @@ public:
     virtual void* run() = 0;
     virtual void stop() = 0;
 
+protected:
+    inline static void yield() { pthread_yield(); }
+
 private:
     pthread_t thread;
     bool is_detached;
