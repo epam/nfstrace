@@ -10,6 +10,7 @@ The '*' means an estimated complexity on a feature implementation.
 *** Add support IPv6 protocol
 *** Replace hardcoded limit(4k) of RPC messages with elastic limit
 *** Move assembling RPC Procedures (Call + Reply) from Analysis to Filtration module
+****** Add support NFSv4 protocol
 ****  Add batching to Analyzers API. Passing a sequence of RPC Procedures to an analyser
 ** Finish PrintAnalyzer for correct print-out NFS replies to console
 ** Fix security issues with superuser privileges required for packet capturing from an interface
