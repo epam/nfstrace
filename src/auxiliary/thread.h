@@ -61,6 +61,9 @@ protected:
     inline static void yield() { pthread_yield(); }
 
 private:
+    Thread(const Thread&);           // undefined
+    Thread& operator=(const Thread&);// undefined
+
     pthread_t thread;
     bool is_detached;
 };
