@@ -33,6 +33,9 @@ public:
     int run();
 
 private:
+    Controller(const Controller&);            // undefined
+    Controller& operator=(const Controller&); // undefined
+
     // global used logger
     Logger logger;
 

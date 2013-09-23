@@ -86,6 +86,9 @@ public:
     }
 
 private:
+    SynchronousSignalHandling(const SynchronousSignalHandling&);            // undefined
+    SynchronousSignalHandling& operator=(const SynchronousSignalHandling&); // undefined
+
     sigset_t mask;
     RunningStatus& status;
 };

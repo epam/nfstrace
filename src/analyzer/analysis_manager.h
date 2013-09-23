@@ -6,16 +6,16 @@
 #ifndef ANALYSIS_MANAGER_H
 #define ANALYSIS_MANAGER_H
 //------------------------------------------------------------------------------
-#include <memory> // std::auto_ptr
-
 #include "../auxiliary/filtered_data.h"
 #include "../auxiliary/thread.h"
+#include "../auxiliary/unique_ptr.h"
 #include "../controller/parameters.h"
 #include "../controller/running_status.h"
 #include "analyzers.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::FilteredDataQueue;
 using NST::auxiliary::Thread;
+using NST::auxiliary::UniquePtr;
 using NST::controller::Parameters;
 using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
@@ -40,9 +40,9 @@ private:
     AnalysisManager& operator=(const AnalysisManager&); // undefiend
 
     RunningStatus& status;
-    std::auto_ptr<Analyzers> analyzers;
-    std::auto_ptr<FilteredDataQueue> queue;
-    std::auto_ptr<Thread> parser_thread;
+    UniquePtr<Analyzers> analyzers;
+    UniquePtr<FilteredDataQueue> queue;
+    UniquePtr<Thread> parser_thread;
 };
 
 } // namespace analyzer
