@@ -40,16 +40,23 @@ FilteredDataQueue& AnalysisManager::init(const Parameters& params)
 
 void AnalysisManager::start()
 {
-    if(parser_thread.get())
+    if(parser_thread)
+    {
         parser_thread->create();
+    }
 }
 
 void AnalysisManager::stop()
 {
-    if(parser_thread.get())
+    if(parser_thread)
+    {
         parser_thread->stop();
+    }
 
-    analyzers->flush_statistics();
+    if(analyzers)
+    {
+        analyzers->flush_statistics();
+    }
 }
 
 } // namespace analyzer
