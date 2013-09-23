@@ -78,13 +78,13 @@ struct PacketInfo
         const IPv4Header* header = reinterpret_cast<const IPv4Header*>(data);
 
         if(header->version()  != 4) return;
-        if(header->length() > dlen) return; // fragmented payload
+//        if(header->length() > dlen) return; // fragmented payload
 
         const uint32_t ihl = header->ihl();
         if(ihl < 20 || ihl > 60) return;    // invalid IPv4  header length
 
         data += ihl;
-        dlen = header->length() - ihl;  // trunk data to length of IP packet
+        dlen = std::min(dlen, header->length() - ihl);  // trunk data to length of IP packet
 
         switch(header->protocol())
         {

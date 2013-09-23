@@ -76,7 +76,7 @@ inline void NFSParserThread::process_queue()
         }
         while(list);
     }
-    else pthread_yield();
+    else Thread::yield();
 }
 
 void NFSParserThread::create_nfs_operation( FilteredDataQueue::Ptr& call,
@@ -124,7 +124,6 @@ void NFSParserThread::create_nfs_operation( FilteredDataQueue::Ptr& call,
     }
 }
 
-//RPCOperation* NFSParserThread::parse_data(FilteredDataQueue::Ptr& ptr)
 void NFSParserThread::parse_data(FilteredDataQueue::Ptr& ptr)
 {
     if(ptr->dlen < sizeof(MessageHeader)) return;

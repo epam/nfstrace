@@ -13,7 +13,6 @@
 #include "rpc_sessions.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::FilteredDataQueue;
-using NST::auxiliary::Thread;
 using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
 namespace NST
@@ -21,7 +20,7 @@ namespace NST
 namespace analyzer
 {
 
-class NFSParserThread : public Thread
+class NFSParserThread : public NST::auxiliary::Thread
 {
 public:
     NFSParserThread(FilteredDataQueue& q, Analyzers& a, RunningStatus &rs);
@@ -33,11 +32,10 @@ public:
 private:
     inline void process_queue();
 
-//    class RPCOperation* parse_data(FilteredDataQueue::Ptr& data);
     void parse_data(FilteredDataQueue::Ptr& data);
-    void create_nfs_operation( FilteredDataQueue::Ptr& call,
-            FilteredDataQueue::Ptr& reply,
-            RPCSession* session);
+    void create_nfs_operation(FilteredDataQueue::Ptr& call,
+                              FilteredDataQueue::Ptr& reply,
+                              RPCSession* session);
 
     RunningStatus& status;
     Analyzers& analyzers;
