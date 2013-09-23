@@ -8,13 +8,6 @@
 #include "fh.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace analyzers
-{
-
 int FH::FH_Hash::operator()(const FH& fh) const
 {
     int hash = 0;
@@ -62,8 +55,4 @@ std::ostream& operator<<(std::ostream& out, const FH& obj)
 
     return out;
 }
-
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
 //------------------------------------------------------------------------------

@@ -8,18 +8,11 @@
 //------------------------------------------------------------------------------
 #include <cstring>  //memcpy()
 #include <ostream>  //std::ostream
+#include <stdint.h>
 
-#include "../nfs3/nfs_structs.h"
+#include "plugin_api_struct.h"
 //------------------------------------------------------------------------------
-using namespace NST::analyzer::NFS3;
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace analyzers
-{
-
 struct FH 
 {
     struct FH_Eq
@@ -57,10 +50,6 @@ private:
             return hex + 'a' - 0xA;
     }
 };
-
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
 //------------------------------------------------------------------------------
 #endif//FH_H
 //------------------------------------------------------------------------------

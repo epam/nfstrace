@@ -1,31 +1,55 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Created for demonstration purpose only.
+// Description: Operation breakdown analyzer. Identify clients that are busier than others.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef PRINT_ANALYZER_H
-#define PRINT_ANALYZER_H
+#ifndef BREAKDOWN_ANALYZER_H
+#define BREAKDOWN_ANALYZER_H
 //------------------------------------------------------------------------------
-#include <ostream>
+#include <tr1/unordered_map>
+#include <vector>
 
-#include "base_analyzer.h"
+#include <utils/plugin_api_struct.h>
+#include "breakdown.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace analyzers
-{
 
-class PrintAnalyzer : public BaseAnalyzer
+class BreakdownAnalyzer : public BaseAnalyzer
 {
+    struct Hash
+    {
+        std::size_t operator() (const Session& s) const
+        {
+            return s.port[0] + s.port[1] + s.ip.v4.addr[0] + s.ip.v4.addr[1];
+        }
+    };
+
+    struct Pred
+    {
+        bool operator() (const Session& a, const Session& b) const
+        {
+            return (a.port[0] == b.port[0]) &&
+                    (a.port[1] == b.port[1]) &&
+                    (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
+                    (a.ip.v4.addr[1] == b.ip.v4.addr[1]);
+        }
+    };
+
+    typedef std::tr1::unordered_map<Session, Breakdown*, Hash, Pred> PerOpStat;
+    typedef PerOpStat::value_type Pair;
 public:
-    PrintAnalyzer(std::ostream& o) : out(o)
+    BreakdownAnalyzer(std::ostream& o = std::cout) : total(0), ops_count(22, 0), out(o)
     {
     }
-    virtual ~PrintAnalyzer()
+    virtual ~BreakdownAnalyzer()
     {
+        PerOpStat::iterator i = per_op_stat.begin();
+        PerOpStat::iterator end = per_op_stat.end();
+        for(; i != end;)
+        {
+            delete i->second;
+            i = per_op_stat.erase(i);
+        }
     }
 
     virtual void null(const struct RPCProcedure* proc,
@@ -98,15 +122,13 @@ public:
     virtual void flush_statistics();
 
 private:
-    PrintAnalyzer(const PrintAnalyzer&);            // undefined
-    PrintAnalyzer& operator=(const PrintAnalyzer&); // undefined
-
+    void account(const struct RPCProcedure* proc);
+    uint64_t total;
+    std::vector<int> ops_count;
+    PerOpStat per_op_stat;
     std::ostream& out;
 };
 
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
 //------------------------------------------------------------------------------
-#endif//PRINT_ANALYZER_H
+#endif//BREAKDOWN_ANALYZER_H
 //------------------------------------------------------------------------------

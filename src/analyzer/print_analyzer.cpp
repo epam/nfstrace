@@ -3,14 +3,14 @@
 // Description: Created for demonstration purpose only.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
+#include <iostream>
+
 #include "print_analyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analyzer
-{
-namespace analyzers
 {
 
 // Special helper for print-out short representation of NFS FH
@@ -59,8 +59,8 @@ inline std::ostream& operator << (std::ostream& out, const struct RPCProcedure* 
 }
 
 void PrintAnalyzer::null(const struct RPCProcedure* proc,
-                         const struct NULLargs* args,
-                         const struct NULLres* res)
+                         const struct NULLargs*,
+                         const struct NULLres*)
 {
     out << proc;
     out << " CALL [] REPLY []";
@@ -412,7 +412,6 @@ void PrintAnalyzer::flush_statistics()
     // flush is in each hendler
 }
 
-} // namespace analyzers
 } // namespace analyzer
 } // namespace NST
 //------------------------------------------------------------------------------

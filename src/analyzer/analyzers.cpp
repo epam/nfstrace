@@ -6,14 +6,10 @@
 #include "../auxiliary/logger.h"
 #include "../controller/cmdline_args.h"
 #include "analyzers.h"
-#include "analyzers/breakdown_analyzer.h"
-#include "analyzers/ofdws_analyzer.h"
-#include "analyzers/ofws_analyzer.h"
-#include "analyzers/print_analyzer.h"
+#include "print_analyzer.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::Logger;
 using NST::auxiliary::UniquePtr;
-using NST::analyzer::analyzers::BaseAnalyzer;
 using NST::controller::AParams;
 using NST::controller::Parameters;
 //------------------------------------------------------------------------------
@@ -29,28 +25,6 @@ Analyzers::Analyzers(const Parameters& params)
     for(unsigned int i = 0; i < requested_analyzers.size(); ++i)
     {
         const AParams& r = requested_analyzers[i];
-
-        if(r.path == NST::controller::cmdline::Args::ob_analyzer)
-        {
-            UniquePtr<BaseAnalyzer> ob(new analyzers::BreakdownAnalyzer(std::cout /*r.arguments*/));
-            analyzers.push_back(ob.get());
-            builtin.push_back(ob);
-            continue;
-        }
-        if(r.path == NST::controller::cmdline::Args::ofws_analyzer)
-        {
-            UniquePtr<BaseAnalyzer> ofws(new analyzers::OFWSAnalyzer(std::cout /*r.arguments*/));
-            analyzers.push_back(ofws.get());
-            builtin.push_back(ofws);
-            continue;
-        }
-        if(r.path == NST::controller::cmdline::Args::ofdws_analyzer)
-        {
-            UniquePtr<BaseAnalyzer> ofdws(new analyzers::OFDWSAnalyzer(std::cout, params.block_size(), params.bucket_size() /*r.arguments*/));
-            analyzers.push_back(ofdws.get());
-            builtin.push_back(ofdws);
-            continue;
-        }
 
         Logger::Buffer message;
         try // try to load plugin
@@ -69,7 +43,7 @@ Analyzers::Analyzers(const Parameters& params)
 
     if(params.is_verbose()) // add special analyzer for trace out RPC calls
     {
-        UniquePtr<BaseAnalyzer> print(new analyzers::PrintAnalyzer(std::cout));
+        UniquePtr<BaseAnalyzer> print(new PrintAnalyzer(std::cout));
         analyzers.push_back(print.get());
         builtin.push_back(print);
     }

@@ -8,16 +8,10 @@
 //------------------------------------------------------------------------------
 #include <vector>
 
-#include "../nfs3/nfs_structs.h"
+#include "api/plugin_api.h"
 #include "latencies.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace analyzers
-{
 
 class Breakdown
 {
@@ -41,12 +35,9 @@ private:
     Breakdown(const Breakdown& breakdown);  //Protection
     void operator=(const Breakdown&);       //Protection
 
-    Latencies latencies[NFS3::Proc::num];
+    Latencies latencies[ProcEnum::count];
 };
 
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
 //------------------------------------------------------------------------------
 #endif//BREAKDOWN_H
 //------------------------------------------------------------------------------

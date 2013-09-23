@@ -9,18 +9,9 @@
 #include <tr1/unordered_map>
 #include <vector>
 
-#include "../nfs3/nfs_structs.h"
-#include "fh.h"                     //hash-table's key
+#include <utils/fh.h>                     //hash-table's key
 //------------------------------------------------------------------------------
-using namespace NST::analyzer::NFS3;
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace analyzers
-{
-
 class FileRWOp
 {
 public:
@@ -52,7 +43,7 @@ public:
     inline FileRWOp() : read_total(0), write_total(0) {}
     ~FileRWOp();
 
-    void calculate(Proc::Enum op, uint64_t offset, uint32_t count, uint32_t time = 0);
+    void calculate(ProcEnum::NFSProcedure op, uint64_t offset, uint32_t count, uint32_t time = 0);
 
     inline uint64_t get_read_total()   { return read_total;  }
     inline uint64_t get_write_total()  { return write_total; }
@@ -79,10 +70,6 @@ private:
     static uint32_t block_size;
     static uint32_t bucket_size;
 };
-
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
 //------------------------------------------------------------------------------
 #endif//FILE_RW_OP_H
 //------------------------------------------------------------------------------

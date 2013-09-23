@@ -8,12 +8,6 @@
 #include "latencies.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace analyzers
-{
 
 void Latencies::add(const timeval& t)
 {
@@ -72,8 +66,4 @@ long double Latencies::to_sec(const timeval& val)
     return (((long double)val.tv_sec) + ((long double)val.tv_usec) / 1000000.0L);
 }
 
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
 //------------------------------------------------------------------------------
-
