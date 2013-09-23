@@ -3,17 +3,9 @@
 // Description: Hash-table hold info about read/write operations.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include "../../auxiliary/logger.h"
 #include "file_rw_op.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace analyzers
-{
-
 uint32_t FileRWOp::block_size = 0;
 uint32_t FileRWOp::bucket_size = 0;
 
@@ -25,9 +17,9 @@ FileRWOp::~FileRWOp()
         delete [] i->second;
 }
 
-void FileRWOp::calculate(Proc::Enum op, uint64_t o, uint32_t c, uint32_t time)
+void FileRWOp::calculate(ProcEnum::NFSProcedure op, uint64_t o, uint32_t c, uint32_t)
 {
-    if(op == Proc::READ)
+    if(op == ProcEnum::READ)
         read_total += c;
     else 
         write_total += c;
@@ -62,7 +54,7 @@ void FileRWOp::calculate(Proc::Enum op, uint64_t o, uint32_t c, uint32_t time)
             if(!end)
                 end = bucket_size;
         }
-        if(op == Proc::READ)
+        if(op == ProcEnum::READ)
             for(uint64_t i = start; i < end; ++i)
                 bucket[i].inc_read_freq();
         else
@@ -71,8 +63,4 @@ void FileRWOp::calculate(Proc::Enum op, uint64_t o, uint32_t c, uint32_t time)
         bl_cur += end - start;
     }
 }
-
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
 //------------------------------------------------------------------------------

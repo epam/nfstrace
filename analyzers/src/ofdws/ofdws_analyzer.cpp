@@ -7,21 +7,13 @@
 #include <fstream>              //std::ofstream
 #include <vector>
 
-#include "../../auxiliary/logger.h"
 #include "ofdws_analyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-namespace NST
+OFDWSAnalyzer::OFDWSAnalyzer(const char*) : read_total(0), write_total(0), out(std::cout)
 {
-namespace analyzer
-{
-namespace analyzers
-{
-
-OFDWSAnalyzer::OFDWSAnalyzer(std::ostream& o, uint32_t block_size, uint32_t bucket_size) : read_total(0), write_total(0), out(o)
-{
-    FileRWOp::set_block_size(block_size);
-    FileRWOp::set_bucket_size(bucket_size);
+    FileRWOp::set_block_size(16*1024);
+    FileRWOp::set_bucket_size(8);
 }
 
 OFDWSAnalyzer::~OFDWSAnalyzer()
@@ -32,7 +24,7 @@ OFDWSAnalyzer::~OFDWSAnalyzer()
         delete i->second;
 }
 
-void OFDWSAnalyzer::read3(const struct RPCProcedure* proc,
+void OFDWSAnalyzer::read3(const struct RPCProcedure*,
                           const struct READ3args* args,
                           const struct READ3res*  res)
 {
@@ -41,11 +33,11 @@ void OFDWSAnalyzer::read3(const struct RPCProcedure* proc,
         read_total += res->u.resok.count;
 
         Iterator i = get_file_rw_op(args->file);
-        i->second->calculate(Proc::READ, args->offset, res->u.resok.count);
+        i->second->calculate(ProcEnum::READ, args->offset, res->u.resok.count);
     }
 }
 
-void OFDWSAnalyzer::write3(const struct RPCProcedure* proc,
+void OFDWSAnalyzer::write3(const struct RPCProcedure*,
                            const struct WRITE3args* args,
                            const struct WRITE3res*  res)
 {
@@ -54,7 +46,7 @@ void OFDWSAnalyzer::write3(const struct RPCProcedure* proc,
         write_total += res->u.resok.count;
 
         Iterator i = get_file_rw_op(args->file);
-        i->second->calculate(Proc::WRITE, args->offset, res->u.resok.count);
+        i->second->calculate(ProcEnum::WRITE, args->offset, res->u.resok.count);
     }
 }
 
@@ -137,7 +129,7 @@ void OFDWSAnalyzer::print_file_ranked(std::ostream& out) const
         v[j] = i;
     std::sort(v.begin(), v.end(), const_iterator_comp);
     for(uint32_t j = size; j > 0; --j)
-        std::cout << v[j-1]->first << ' ' << v[j-1]->second->get_read_total() << ' ' << v[j-1]->second->get_write_total() << '\n';
+        out << v[j-1]->first << ' ' << v[j-1]->second->get_read_total() << ' ' << v[j-1]->second->get_write_total() << '\n';
 }
 
 OFDWSAnalyzer::Iterator OFDWSAnalyzer::get_file_rw_op(const nfs_fh3& key)
@@ -153,7 +145,23 @@ OFDWSAnalyzer::Iterator OFDWSAnalyzer::get_file_rw_op(const nfs_fh3& key)
     return i;
 }
 
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
+extern "C"
+{
+
+BaseAnalyzer* create(const char* opts)
+{
+    return new OFDWSAnalyzer(opts);
+}
+
+void destroy(BaseAnalyzer* context)
+{
+    delete context;
+}
+
+const char* usage()
+{
+    return "Do what you want!";
+}
+
+}
 //------------------------------------------------------------------------------

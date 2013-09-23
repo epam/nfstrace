@@ -10,11 +10,10 @@
 
 #include "../auxiliary/unique_ptr.h"
 #include "../controller/parameters.h"
-#include "analyzers/base_analyzer.h"
+#include "base_analyzer.h"
 #include "plugin.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::UniquePtr;
-using NST::analyzer::analyzers::BaseAnalyzer;
 using NST::controller::Parameters;
 //------------------------------------------------------------------------------
 namespace NST

@@ -9,13 +9,6 @@
 #include "ofws_analyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace analyzers
-{
-
 OFWSAnalyzer::~OFWSAnalyzer()
 {
     Iterator i = ofws_stat.begin();
@@ -27,91 +20,91 @@ OFWSAnalyzer::~OFWSAnalyzer()
     }
 }
 
-void OFWSAnalyzer::null(const struct RPCProcedure* proc,
-                        const struct NULLargs* args,
-                        const struct NULLres* res)
+void OFWSAnalyzer::null(const struct RPCProcedure*,
+                        const struct NULLargs*,
+                        const struct NULLres*)
 {
 }
 
-void OFWSAnalyzer::getattr3(const RPCProcedure* proc,
+void OFWSAnalyzer::getattr3(const RPCProcedure*,
                             const struct GETATTR3args* args,
                             const struct GETATTR3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->object);
-        (*i->second).inc(Proc::GETATTR);
+        (*i->second).inc(ProcEnum::GETATTR);
     }
 }
 
-void OFWSAnalyzer::setattr3(const RPCProcedure* proc,
+void OFWSAnalyzer::setattr3(const RPCProcedure*,
                             const struct SETATTR3args* args,
                             const struct SETATTR3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->object);
-        (*i->second).inc(Proc::SETATTR);
+        (*i->second).inc(ProcEnum::SETATTR);
     }
 }
 
-void OFWSAnalyzer::lookup3(const RPCProcedure* proc,
-                           const struct LOOKUP3args* args,
+void OFWSAnalyzer::lookup3(const RPCProcedure*,
+                           const struct LOOKUP3args*,
                            const struct LOOKUP3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(res->resok.object);
-        (*i->second).inc(Proc::LOOKUP);
+        (*i->second).inc(ProcEnum::LOOKUP);
     }
 }
 
-void OFWSAnalyzer::access3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::access3(const struct RPCProcedure*,
                            const struct ACCESS3args* args,
                            const struct ACCESS3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->object);
-        (*i->second).inc(Proc::ACCESS);
+        (*i->second).inc(ProcEnum::ACCESS);
     }
 }
 
-void OFWSAnalyzer::readlink3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::readlink3(const struct RPCProcedure*,
                              const struct READLINK3args* args,
                              const struct READLINK3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->symlink);
-        (*i->second).inc(Proc::READLINK);
+        (*i->second).inc(ProcEnum::READLINK);
     }
 }
 
-void OFWSAnalyzer::read3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::read3(const struct RPCProcedure*,
                          const struct READ3args* args,
                          const struct READ3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->file);
-        (*i->second).inc(Proc::READ);
+        (*i->second).inc(ProcEnum::READ);
     }
 }
 
-void OFWSAnalyzer::write3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::write3(const struct RPCProcedure*,
                           const struct WRITE3args* args,
                           const struct WRITE3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->file);
-        (*i->second).inc(Proc::WRITE);
+        (*i->second).inc(ProcEnum::WRITE);
     }
 }
 
-void OFWSAnalyzer::create3(const struct RPCProcedure* proc,
-                           const struct CREATE3args* args,
+void OFWSAnalyzer::create3(const struct RPCProcedure*,
+                           const struct CREATE3args*,
                            const struct CREATE3res* res)
 {
     if(res->status == nfsstat3::OK)
@@ -119,13 +112,13 @@ void OFWSAnalyzer::create3(const struct RPCProcedure* proc,
         if(res->u.resok.obj.handle_follows)
         {
             Iterator i = find_or_create_op_counter(res->u.resok.obj.handle);
-            (*i->second).inc(Proc::CREATE);
+            (*i->second).inc(ProcEnum::CREATE);
         }
     }
 }
 
-void OFWSAnalyzer::mkdir3(const struct RPCProcedure* proc,
-                          const struct MKDIR3args* args,
+void OFWSAnalyzer::mkdir3(const struct RPCProcedure*,
+                          const struct MKDIR3args*,
                           const struct MKDIR3res* res)
 {
     if(res->status == nfsstat3::OK)
@@ -133,13 +126,13 @@ void OFWSAnalyzer::mkdir3(const struct RPCProcedure* proc,
         if(res->u.resok.obj.handle_follows)
         {
             Iterator i = find_or_create_op_counter(res->u.resok.obj.handle);
-            (*i->second).inc(Proc::MKDIR);
+            (*i->second).inc(ProcEnum::MKDIR);
         }
     }
 }
 
-void OFWSAnalyzer::symlink3(const struct RPCProcedure* proc,
-                            const struct SYMLINK3args* args,
+void OFWSAnalyzer::symlink3(const struct RPCProcedure*,
+                            const struct SYMLINK3args*,
                             const struct SYMLINK3res* res)
 {
     if(res->status == nfsstat3::OK)
@@ -147,13 +140,13 @@ void OFWSAnalyzer::symlink3(const struct RPCProcedure* proc,
         if(res->u.resok.obj.handle_follows)
         {
             Iterator i = find_or_create_op_counter(res->u.resok.obj.handle);
-            (*i->second).inc(Proc::SYMLINK);
+            (*i->second).inc(ProcEnum::SYMLINK);
         }
     }
 }
 
-void OFWSAnalyzer::mknod3(const struct RPCProcedure* proc,
-                          const struct MKNOD3args* args,
+void OFWSAnalyzer::mknod3(const struct RPCProcedure*,
+                          const struct MKNOD3args*,
                           const struct MKNOD3res* res)
 {
     if(res->status == nfsstat3::OK)
@@ -161,118 +154,118 @@ void OFWSAnalyzer::mknod3(const struct RPCProcedure* proc,
         if(res->u.resok.obj.handle_follows)
         {
             Iterator i = find_or_create_op_counter(res->u.resok.obj.handle);
-            (*i->second).inc(Proc::MKNOD);
+            (*i->second).inc(ProcEnum::MKNOD);
         }
     }
 }
 
-void OFWSAnalyzer::remove3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::remove3(const struct RPCProcedure*,
                            const struct REMOVE3args* args,
                            const struct REMOVE3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->object.dir);
-        (*i->second).inc(Proc::REMOVE);
+        (*i->second).inc(ProcEnum::REMOVE);
     }
 }
 
-void OFWSAnalyzer::rmdir3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::rmdir3(const struct RPCProcedure*,
                           const struct RMDIR3args* args,
                           const struct RMDIR3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->object.dir);
-        (*i->second).inc(Proc::RMDIR);
+        (*i->second).inc(ProcEnum::RMDIR);
     }
 }
 
-void OFWSAnalyzer::rename3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::rename3(const struct RPCProcedure*,
                            const struct RENAME3args* args,
                            const struct RENAME3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->from.dir);
-        (*i->second).inc(Proc::RENAME);
+        (*i->second).inc(ProcEnum::RENAME);
     }
 }
 
-void OFWSAnalyzer::link3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::link3(const struct RPCProcedure*,
                          const struct LINK3args* args,
                          const struct LINK3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->file);
-        (*i->second).inc(Proc::LINK);
+        (*i->second).inc(ProcEnum::LINK);
     }
 }
 
-void OFWSAnalyzer::readdir3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::readdir3(const struct RPCProcedure*,
                             const struct READDIR3args* args,
                             const struct READDIR3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->dir);
-        (*i->second).inc(Proc::READDIR);
+        (*i->second).inc(ProcEnum::READDIR);
     }
 }
 
-void OFWSAnalyzer::readdirplus3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::readdirplus3(const struct RPCProcedure*,
                                 const struct READDIRPLUS3args* args,
                                 const struct READDIRPLUS3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->dir);
-        (*i->second).inc(Proc::READDIRPLUS);
+        (*i->second).inc(ProcEnum::READDIRPLUS);
     }
 }
 
-void OFWSAnalyzer::fsstat3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::fsstat3(const struct RPCProcedure*,
                            const struct FSSTAT3args* args,
                            const struct FSSTAT3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->fsroot);
-        (*i->second).inc(Proc::FSSTAT);
+        (*i->second).inc(ProcEnum::FSSTAT);
     }
 }
 
-void OFWSAnalyzer::fsinfo3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::fsinfo3(const struct RPCProcedure*,
                            const struct FSINFO3args* args,
                            const struct FSINFO3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->fsroot);
-        (*i->second).inc(Proc::FSINFO);
+        (*i->second).inc(ProcEnum::FSINFO);
     }
 }
 
-void OFWSAnalyzer::pathconf3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::pathconf3(const struct RPCProcedure*,
                              const struct PATHCONF3args* args,
                              const struct PATHCONF3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->object);
-        (*i->second).inc(Proc::PATHCONF);
+        (*i->second).inc(ProcEnum::PATHCONF);
     }
 }
 
-void OFWSAnalyzer::commit3(const struct RPCProcedure* proc,
+void OFWSAnalyzer::commit3(const struct RPCProcedure*,
                            const struct COMMIT3args* args,
                            const struct COMMIT3res* res)
 {
     if(res->status == nfsstat3::OK)
     {
         Iterator i = find_or_create_op_counter(args->file);
-        (*i->second).inc(Proc::COMMIT);
+        (*i->second).inc(ProcEnum::COMMIT);
     }
 }
 
@@ -291,9 +284,9 @@ void OFWSAnalyzer::flush_statistics()
     out << "###  Overall File Working Set (OFWS) analyzer  ###" << std::endl;
     out << "Total number of files accessed: " << size << std::endl;
     out << "FileHandle" << ",NFS Ops";
-    for(uint32_t j = 0; j < Proc::num; ++j)
+    for(int32_t j = 0; j < ProcEnum::count; ++j)
     {
-        out << ',' << Proc::Titles[j];
+        out << ',' << static_cast<ProcEnum::NFSProcedure>(j);
     }
     out << '\n';
 
@@ -303,7 +296,7 @@ void OFWSAnalyzer::flush_statistics()
         const OpCounter* opcounter = iterator->second;
 
         out << iterator->first << ',' << opcounter->get_total();
-        for(uint32_t j = 0; j < Proc::num; ++j)
+        for(int32_t j = 0; j < ProcEnum::count; ++j)
         {
             out << ',' << (*opcounter)[j];
         }
@@ -324,7 +317,23 @@ OFWSAnalyzer::Iterator OFWSAnalyzer::find_or_create_op_counter(const nfs_fh3& ke
     return i;
 }
 
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
+extern "C"
+{
+
+BaseAnalyzer* create(const char* opts)
+{
+    return new OFWSAnalyzer(opts);
+}
+
+void destroy(BaseAnalyzer* context)
+{
+    delete context;
+}
+
+const char* usage()
+{
+    return "Do what you want!";
+}
+
+}
 //------------------------------------------------------------------------------

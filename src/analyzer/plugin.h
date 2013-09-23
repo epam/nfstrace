@@ -9,9 +9,8 @@
 #include <string>
 
 #include "../auxiliary/dynamic_load.h"
-#include "analyzers/base_analyzer.h"
+#include "base_analyzer.h"
 //------------------------------------------------------------------------------
-using NST::analyzer::analyzers::BaseAnalyzer;
 //------------------------------------------------------------------------------
 
 namespace NST
@@ -29,9 +28,9 @@ private:
     Plugin& operator=(const Plugin&); // undefiend
 
 protected:
-    analyzers::plugin_usage_func   usage;
-    analyzers::plugin_create_func  create;
-    analyzers::plugin_destroy_func destroy;
+    plugin_usage_func   usage;
+    plugin_create_func  create;
+    plugin_destroy_func destroy;
 };
 
 class PluginUsage : private Plugin

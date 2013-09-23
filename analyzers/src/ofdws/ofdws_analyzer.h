@@ -8,19 +8,10 @@
 //------------------------------------------------------------------------------
 #include <tr1/unordered_map>
 
-#include "base_analyzer.h"
-#include "fh.h"                     //hash-table's key
+#include <utils/fh.h>                     //hash-table's key
 #include "file_rw_op.h"
 //------------------------------------------------------------------------------
-using namespace NST::analyzer::NFS3;
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace analyzers
-{
-
 class OFDWSAnalyzer : public BaseAnalyzer
 {
     typedef std::tr1::unordered_map<FH, FileRWOp*, FH::FH_Hash, FH::FH_Eq> OFDWS;
@@ -38,7 +29,7 @@ class OFDWSAnalyzer : public BaseAnalyzer
     } const_iterator_comp;
 
 public:
-    OFDWSAnalyzer(std::ostream& o, uint32_t block_size, uint32_t bucket_size);
+    OFDWSAnalyzer(const char* opts);
     virtual ~OFDWSAnalyzer();
 
     virtual void read3(const struct RPCProcedure* proc,
@@ -62,10 +53,6 @@ private:
     uint64_t write_total;
     std::ostream& out;
 };
-
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
 //------------------------------------------------------------------------------
 #endif//OFDWS_ANALYZER_H
 //------------------------------------------------------------------------------

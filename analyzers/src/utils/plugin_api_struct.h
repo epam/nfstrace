@@ -1,33 +1,19 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Plugin-API describe interface expected by nfstrace.
+// Author: Dzianis Huznou 
+// Description: Entry for all operations under plugin_api.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef PLUGIN_API_H
-#define PLUGIN_API_H
+#ifndef PLUGIN_API_STRUCT_H
+#define PLUGIN_API_STRUCT_H
 //------------------------------------------------------------------------------
-#include <stdint.h>
-#include <stddef.h>
-#include <string.h>
+#include <api/plugin_api.h>
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-#include <sys/time.h>
+std::ostream& operator<<(std::ostream& out, const Session& session);
+std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc);
 
-#include "xdr_types.h"
-#include "rpc_types.h"
-#include "rpc_procedure_type.h"
-#include "nfs3_types.h"
-#include "session_type.h"
-#include "base_analyzer_type.h"
 //------------------------------------------------------------------------------
+#endif //PLUGIN_API_STRUCT_H
 //------------------------------------------------------------------------------
-extern "C"
-{
 
-BaseAnalyzer* create(const char* opts);// create analyzer
-void destroy(BaseAnalyzer* context);   // destroy analyzer
-const char* usage();    // print info about analyzer usage
-
-}
-//------------------------------------------------------------------------------
-#endif //PLUGIN_API_H
-//------------------------------------------------------------------------------

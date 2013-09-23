@@ -8,18 +8,10 @@
 //------------------------------------------------------------------------------
 #include <tr1/unordered_map>
 
-#include "base_analyzer.h"
-#include "fh.h"                     //hash-table's key
+#include <utils/plugin_api_struct.h>
+#include <utils/fh.h>                     //hash-table's key
 //------------------------------------------------------------------------------
-using namespace NST::analyzer::NFS3;
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace analyzers
-{
-
 class OFWSAnalyzer : public BaseAnalyzer
 {
     class OpCounter
@@ -30,7 +22,7 @@ class OFWSAnalyzer : public BaseAnalyzer
             std::memset(counters, 0, sizeof(counters));
         }
         inline ~OpCounter() {}
-        inline void inc(Proc::Enum op, uint32_t size = 1)
+        inline void inc(ProcEnum::NFSProcedure op, uint32_t size = 1)
         {
             total += size;
             counters[op] += size;
@@ -41,7 +33,7 @@ class OFWSAnalyzer : public BaseAnalyzer
         OpCounter(const OpCounter&);
         void operator=(const OpCounter&);
 
-        uint32_t counters[Proc::num];
+        uint32_t counters[ProcEnum::count];
         uint64_t total;
     };
 
@@ -60,7 +52,7 @@ class OFWSAnalyzer : public BaseAnalyzer
     } iterator_comp;
 
 public:
-    inline OFWSAnalyzer(std::ostream& o):out(o) {}
+    inline OFWSAnalyzer(const char*):out(std::cout) {}
     virtual ~OFWSAnalyzer();
 
     virtual void null(const struct RPCProcedure* proc,
@@ -138,10 +130,6 @@ private:
     OFWS ofws_stat;
     std::ostream& out;
 };
-
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
 //------------------------------------------------------------------------------
 #endif//OFWS_ANALYZER_H
 //------------------------------------------------------------------------------

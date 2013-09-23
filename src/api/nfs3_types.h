@@ -29,7 +29,7 @@ typedef uint64_t    size3;
 typedef uint64_t    offset3;
 typedef uint32_t    count3;
 
-struct ProcNum
+struct ProcEnum
 {
     enum NFSProcedure
     {
@@ -56,6 +56,7 @@ struct ProcNum
         PATHCONF    = 20,
         COMMIT      = 21
     };
+    static const int32_t count = 22;
 };
 
 struct mode3

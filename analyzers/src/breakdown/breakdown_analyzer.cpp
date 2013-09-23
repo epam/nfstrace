@@ -6,13 +6,6 @@
 #include "breakdown_analyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analyzer
-{
-namespace analyzers
-{
-
 
 void BreakdownAnalyzer::null(const struct RPCProcedure* proc,
                              const struct NULLargs* args,
@@ -172,10 +165,10 @@ void BreakdownAnalyzer::flush_statistics()
 {
     out << "###  Breakdown analyzer  ###" << std::endl;
     out << "Total calls: " << total << ". Per operation:" << std::endl;
-    for(int i = 0; i < NFS3::Proc::num; ++i)
+    for(int i = 0; i < ProcEnum::count; ++i)
     {          
         out.width(12);
-        out << std::left << NFS3::Proc::Titles[i];
+        out << std::left << static_cast<ProcEnum::NFSProcedure>(i);
         out.width(5);
         out << std::right << ops_count[i];
         out.width(7);
@@ -195,15 +188,15 @@ void BreakdownAnalyzer::flush_statistics()
         out << "Session: " << it->first << std::endl;
         const Breakdown& current = *it->second;
         uint64_t s_total = 0;
-        for(int i = 0; i < Proc::num; ++i)
+        for(int i = 0; i < ProcEnum::count; ++i)
         {
             s_total += current[i].get_count();
         }
         out << "Total: " << s_total << ". Per operation:" << std::endl;
-        for(int i = 0; i < Proc::num; ++i)
+        for(int i = 0; i < ProcEnum::count; ++i)
         {
             out.width(14);
-            out << std::left << NFS3::Proc::Titles[i];
+            out << std::left << static_cast<ProcEnum::NFSProcedure>(i);
             out.width(6);
             out << " Count:";
             out.width(5);
@@ -252,7 +245,24 @@ void BreakdownAnalyzer::account(const struct RPCProcedure* proc)
     lat.add(latency);
 }
 
-} // namespace analyzers
-} // namespace analyzer
-} // namespace NST
+extern "C"
+{
+
+BaseAnalyzer* create(const char* opts)
+{
+    return new BreakdownAnalyzer();
+}
+
+void destroy(BaseAnalyzer* context)
+{
+    delete context;
+}
+
+const char* usage()
+{
+    return "Do what you want!";
+}
+
+}
+
 //------------------------------------------------------------------------------
