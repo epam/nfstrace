@@ -14,7 +14,6 @@ extern "C"
 class BaseAnalyzer
 {
 public:
-    BaseAnalyzer() {};
     virtual ~BaseAnalyzer() {};
 
     virtual void null(const struct RPCProcedure*,
