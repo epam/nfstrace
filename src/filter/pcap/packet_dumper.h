@@ -45,6 +45,14 @@ public:
     {
         return pcap_dump_file(dumper);
     }
+    
+    void truncate_all_pcap_data_and_header()
+    {
+        pcap_dump_flush(dumper);
+        FILE* stream = pcap_dump_file(dumper);
+        fseek(stream, SEEK_SET, 0); // truncate a file to zero
+        pcap_dump_flush(dumper);
+    }
 
 private:
     PacketDumper(const PacketDumper&);            // undefined

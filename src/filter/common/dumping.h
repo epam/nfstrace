@@ -135,6 +135,8 @@ public:
                 name = base + suffix;
                 size = 0;
                 open_dumping_file(name);
+
+                dumper->truncate_all_pcap_data_and_header();
             }
             size += sizeof(pcap_pkthdr) + header->caplen;
         }
