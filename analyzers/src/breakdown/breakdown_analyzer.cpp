@@ -40,7 +40,7 @@ public:
 
     T get_avg() const
     {
-        if(count == 0) return 0.0;
+        if(count == 0) return T();
 
         ConstIterator i = latencies.begin();
         ConstIterator end = latencies.end();
@@ -60,11 +60,10 @@ public:
 
         const T avg = get_avg();
         T st_dev = 0.0;
-        T delta;
 
         ConstIterator i = latencies.begin();
         ConstIterator end = latencies.end();
-        for(; i != end; ++i)
+        for(T delta; i != end; ++i)
         {
             delta = to_sec<T>(*i) - avg;
             st_dev += pow(delta, 2.0);
@@ -98,10 +97,7 @@ public:
 
     uint32_t get_count() const { return count; }
 
-    T get_avg() const
-    {
-        return avg;
-    }
+    T get_avg() const { return avg; }
 
     T get_st_dev() const
     {
@@ -110,7 +106,7 @@ public:
     }
 
 private:
-    OnlineVariance(const OnlineVariance&);    //Protection
+    OnlineVariance(const OnlineVariance&);    //Protection replace!
     void operator=(const OnlineVariance&);    //Protection
 
     uint32_t count;
@@ -119,7 +115,11 @@ private:
     T m2;
 };
 
-template <typename T, template <typename> class Algorithm>
+template
+<
+typename T, // description
+template <typename> class Algorithm // description
+>
 class Latencies
 {
 public:
@@ -188,7 +188,7 @@ public:
         typename PerOpStat::iterator end = per_op_stat.end();
         for(; i != end;)
         {
-            delete[] i->second;
+            delete i->second;
             i = per_op_stat.erase(i);
         }
     }
@@ -258,14 +258,16 @@ public:
             const struct PATHCONF3res*) { account(proc); }
     virtual void commit3(const struct RPCProcedure* proc,
             const struct COMMIT3args*,
-            const struct COMMIT3res*) { account(proc); }
+            const struct COMMIT3res*) { account(proc); }\
+            
+            friend const char* usage();
 
     virtual void flush_statistics()
     {
         out << "###  Breakdown analyzer  ###" << std::endl;
         out << "Total calls: " << total << ". Per operation:" << std::endl;
         for(int i = 0; i < ProcEnum::count; ++i)
-        {          
+        {
             out.width(12);
             out << std::left << static_cast<ProcEnum::NFSProcedure>(i);
             out.width(5);
@@ -304,7 +306,7 @@ public:
                 out.precision(2);
                 out << "(";
                 out.width(6);
-                out << std::fixed << ((long double)(current[i].get_count()) / s_total) * 100;
+                out << std::fixed << ((T)(current[i].get_count()) / s_total) * 100;
                 out << "%)";
                 out << " Min: ";
                 out.precision(3);
@@ -330,7 +332,7 @@ private:
         typename PerOpStat::const_iterator i = per_op_stat.find(*(proc->session));
         if(i == per_op_stat.end())
         {
-            std::pair<typename PerOpStat::iterator, bool> res = per_op_stat.insert(Pair(*(proc->session), new Breakdown[1]));
+            std::pair<typename PerOpStat::iterator, bool> res = per_op_stat.insert(Pair(*(proc->session), reinterpret_cast<Breakdown*>(new Breakdown)));
             if(res.second == false)
             {
                 return;
@@ -360,17 +362,17 @@ BaseAnalyzer* create(const char* optarg)
         ACC = 0,
         MEM
     };
-    char* token[] = {
-        [ACC] = const_cast<char*>("ACC"),
-        [MEM] = const_cast<char*>("MEME"),
+    const char* token[] = {
+        "ACC",
+        "MEME",
         NULL
     };
-    char* subopts = const_cast<char*>(optarg);
+
     char* value = NULL;
 
-    while (*subopts != '\0')
+    while (*optarg != '\0')
     {
-        switch(getsubopt(&subopts, token, &value))
+        switch(getsubopt((char**)&optarg, (char**)token, &value))
         {
             case ACC:
                 return new BreakdownAnalyzer<long double, TwoPassVariance>();
@@ -394,6 +396,7 @@ void destroy(BaseAnalyzer* context)
 
 const char* usage()
 {
+            std::cout <<"test run: " << sizeof (BreakdownAnalyzer<long double, TwoPassVariance>::Breakdown) / sizeof(Latencies<long double, TwoPassVariance>) << std::endl;
     return "ACC - for accurate evaluation, MEM - for memory undemanding evaluation. Options cannot be combined";
 }
 
