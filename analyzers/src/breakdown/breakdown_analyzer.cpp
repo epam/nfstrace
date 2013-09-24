@@ -56,10 +56,10 @@ public:
 
     T get_st_dev() const
     {
-        if(count < 2) return 0.0;
+        if(count < 2) return T();
 
         const T avg = get_avg();
-        T st_dev = 0.0;
+        T st_dev = T();
 
         ConstIterator i = latencies.begin();
         ConstIterator end = latencies.end();
@@ -73,8 +73,8 @@ public:
     }
 
 private:
-    TwoPassVariance(const TwoPassVariance&);    //Protection
-    void operator=(const TwoPassVariance&);     //Protection
+    TwoPassVariance(const TwoPassVariance&);    //Undefined
+    void operator=(const TwoPassVariance&);     //Undefined
 
     uint32_t count;
     std::list<timeval> latencies;
@@ -84,7 +84,7 @@ template <typename T>
 class OnlineVariance
 {
 public:
-    OnlineVariance() : count(0), st_dev(0.0), avg(0.0), m2(0.0) {}
+    OnlineVariance() : count(0), st_dev(), avg(), m2() {}
     ~OnlineVariance() {}
 
     void add(const timeval& t)
@@ -101,13 +101,13 @@ public:
 
     T get_st_dev() const
     {
-        if(count < 2) return 0.0;
+        if(count < 2) return T();
         return sqrt(m2 / (count - 1));
     }
 
 private:
-    OnlineVariance(const OnlineVariance&);    //Protection replace!
-    void operator=(const OnlineVariance&);    //Protection
+    OnlineVariance(const OnlineVariance&);    //Undefined
+    void operator=(const OnlineVariance&);    //Undefined
 
     uint32_t count;
     T st_dev;
@@ -117,8 +117,8 @@ private:
 
 template
 <
-typename T, // description
-template <typename> class Algorithm // description
+typename T, // Type of precision 
+template <typename> class Algorithm // Evaluation algorithm
 >
 class Latencies
 {
@@ -137,8 +137,8 @@ public:
     const timeval& get_max()    const { return max; }
 
 private:
-    Latencies(const Latencies&);       // Protection
-    void operator=(const Latencies&);  // Protection
+    Latencies(const Latencies&);       // Undefined
+    void operator=(const Latencies&);  // Undefined
 
     void set_range(const timeval& t)
     {
@@ -153,6 +153,28 @@ private:
     Algorithm<T> algorithm;
     timeval min;
     timeval max;
+};
+
+template<typename T, template <class> class Algorithm>
+class BreakdownCounter
+{
+public:
+    BreakdownCounter() {}
+    ~BreakdownCounter() {}
+    const Latencies<T, Algorithm>& operator[](uint32_t index) const
+    {
+        return latencies[index];
+    }
+    Latencies<T, Algorithm>& operator[](uint32_t index)
+    {
+        return latencies[index];
+    }
+
+private:
+    BreakdownCounter(const BreakdownCounter& breakdown);  //Undefined
+    void operator=(const BreakdownCounter&);       //Undefined
+
+    Latencies<T, Algorithm> latencies[ProcEnum::count];
 };
 
 template<typename T, template <class> class Algorithm>
@@ -177,7 +199,7 @@ class BreakdownAnalyzer : public BaseAnalyzer
         }
     };
 
-    typedef Latencies<T, Algorithm> Breakdown[ProcEnum::count];
+    typedef BreakdownCounter<T, Algorithm> Breakdown;
     typedef std::tr1::unordered_map<Session, Breakdown*, Hash, Pred> PerOpStat;
     typedef typename PerOpStat::value_type Pair;
 public:
@@ -258,9 +280,7 @@ public:
             const struct PATHCONF3res*) { account(proc); }
     virtual void commit3(const struct RPCProcedure* proc,
             const struct COMMIT3args*,
-            const struct COMMIT3res*) { account(proc); }\
-            
-            friend const char* usage();
+            const struct COMMIT3res*) { account(proc); }
 
     virtual void flush_statistics()
     {
@@ -369,23 +389,25 @@ BaseAnalyzer* create(const char* optarg)
     };
 
     char* value = NULL;
-
-    while (*optarg != '\0')
-    {
-        switch(getsubopt((char**)&optarg, (char**)token, &value))
+    if(*optarg == '\0')
+        return new BreakdownAnalyzer<long double, TwoPassVariance>();
+    else
+        do
         {
-            case ACC:
-                return new BreakdownAnalyzer<long double, TwoPassVariance>();
-                break;
+            switch(getsubopt((char**)&optarg, (char**)token, &value))
+            {
+                case ACC:
+                    return new BreakdownAnalyzer<long double, TwoPassVariance>();
+                    break;
 
-            case MEM:
-                return new BreakdownAnalyzer<long double, OnlineVariance>();
-                break;
+                case MEM:
+                    return new BreakdownAnalyzer<long double, OnlineVariance>();
+                    break;
 
-            default:
-                return NULL;
-        }
-    }
+                default:
+                    return NULL;
+            }
+        } while (*optarg != '\0');
     return NULL;
 }
 
@@ -396,7 +418,6 @@ void destroy(BaseAnalyzer* context)
 
 const char* usage()
 {
-            std::cout <<"test run: " << sizeof (BreakdownAnalyzer<long double, TwoPassVariance>::Breakdown) / sizeof(Latencies<long double, TwoPassVariance>) << std::endl;
     return "ACC - for accurate evaluation, MEM - for memory undemanding evaluation. Options cannot be combined";
 }
 

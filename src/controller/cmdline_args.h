@@ -32,8 +32,6 @@ struct Args
         BSIZE,
         MSIZE,
         QSIZE,
-        BLSIZE,
-        BUSIZE,
         VERBOSE,
         HELP,
         num
@@ -42,10 +40,6 @@ struct Args
     static const char* const profiling_mode;
     static const char* const filtration_mode;
     static const char* const analysis_mode;
-
-    static const char* const ob_analyzer;
-    static const char* const ofws_analyzer;
-    static const char* const ofdws_analyzer;
 
 private:
     static Opt options[num];
