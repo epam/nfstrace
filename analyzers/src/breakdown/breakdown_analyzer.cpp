@@ -384,7 +384,7 @@ BaseAnalyzer* create(const char* optarg)
     };
     const char* token[] = {
         "ACC",
-        "MEME",
+        "MEM",
         NULL
     };
 
