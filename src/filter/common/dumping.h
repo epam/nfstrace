@@ -149,7 +149,7 @@ private:
     inline void open_dumping_file(const std::string& file_path)
     {
         const char* path = file_path.c_str();
-        LOG("Dunping packets to file:%s", path);
+        LOG("Dumping packets to file:%s", path);
         dumper.reset(new PacketDumper(handle, path));
     }
 
