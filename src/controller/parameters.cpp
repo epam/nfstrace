@@ -28,13 +28,6 @@ void print_anlyzers_usage(std::ostream& out, Parameters& params)
 
     for(unsigned int i=0; i < v.size(); ++i)
     {
-        if(v[i].path == cmdline::Args::ob_analyzer
-        || v[i].path == cmdline::Args::ofws_analyzer
-        || v[i].path == cmdline::Args::ofdws_analyzer)
-        {
-            continue;   // skip built-in analyzers
-        }
-
         try
         {
             NST::analyzer::PluginUsage usage(v[i].path);
@@ -208,14 +201,12 @@ const std::vector<AParams> Parameters::analyzers() const
 {
     std::vector<AParams> analyzers;
 
-    static std::string ob(CLI::ob_analyzer);
-    static std::string ofws(CLI::ofws_analyzer);
-    static std::string ofdws(CLI::ofdws_analyzer);
-
     Parser::ParamValsCIter it = parser[CLI::ANALYZERS].begin();
     Parser::ParamValsCIter end = parser[CLI::ANALYZERS].end();
     for(;it != end; ++it)
     {
+        if(*it->to_cstr() == '\0')
+            continue;
         std::string arg(it->to_cstr());
         size_t ind = arg.find('#');
         if(ind == std::string::npos)
@@ -230,22 +221,6 @@ const std::vector<AParams> Parameters::analyzers() const
         }
     }
     return analyzers;
-}
-
-unsigned int Parameters::block_size() const
-{
-    const int bl_s = parser[CLI::BLSIZE].begin()->to_int();
-    if(bl_s < 1)
-        throw cmdline::CLIError(std::string("Invalid value of block size: ") + parser[CLI::BLSIZE].begin()->to_cstr());
-    return bl_s * 1024;
-}
-
-unsigned int Parameters::bucket_size() const
-{
-    const int b_s = parser[CLI::BUSIZE].begin()->to_int();
-    if(b_s < 1)
-        throw cmdline::CLIError(std::string("Invalid value of bucket size: ") + parser[CLI::BUSIZE].begin()->to_cstr());
-    return b_s;
 }
 
 } // namespace controller
