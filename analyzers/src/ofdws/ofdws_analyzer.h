@@ -12,6 +12,9 @@
 #include "file_rw_op.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+static const int32_t g_def_bl_size = 8; // [KB]
+static const int32_t g_def_bu_size = 16;
+
 class OFDWSAnalyzer : public BaseAnalyzer
 {
     typedef std::tr1::unordered_map<FH, FileRWOp*, FH::FH_Hash, FH::FH_Eq> OFDWS;
@@ -29,7 +32,7 @@ class OFDWSAnalyzer : public BaseAnalyzer
     } const_iterator_comp;
 
 public:
-    OFDWSAnalyzer(const char* opts);
+    OFDWSAnalyzer(int32_t bl_size, int32_t bu_size);
     virtual ~OFDWSAnalyzer();
 
     virtual void read3(const struct RPCProcedure* proc,

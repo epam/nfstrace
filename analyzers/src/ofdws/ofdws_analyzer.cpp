@@ -4,16 +4,17 @@
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #include <algorithm>            //std::sort
+#include <cstdlib>
 #include <fstream>              //std::ofstream
 #include <vector>
 
 #include "ofdws_analyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-OFDWSAnalyzer::OFDWSAnalyzer(const char*) : read_total(0), write_total(0), out(std::cout)
+OFDWSAnalyzer::OFDWSAnalyzer(int32_t bl_size, int32_t bu_size) : read_total(0), write_total(0), out(std::cout)
 {
-    FileRWOp::set_block_size(16*1024);
-    FileRWOp::set_bucket_size(8);
+    FileRWOp::set_block_size(bl_size * 1024);
+    FileRWOp::set_bucket_size(bu_size);
 }
 
 OFDWSAnalyzer::~OFDWSAnalyzer()
@@ -54,11 +55,14 @@ void OFDWSAnalyzer::flush_statistics()
 {
     out << "### OFDWS Analyzer ###" << std::endl;
     out << "Read total: " << read_total << " Write total: " << write_total << std::endl;
-    out << "File ranked:\n"; 
-    print_file_ranked(out);
-    out << "Once accessed: ";
-    print_data_usage(out);
-    store_files_rw_records();
+    if(read_total != 0 || write_total != 0)
+    {
+        out << "File ranked:\n"; 
+        print_file_ranked(out);
+        out << "Once accessed: ";
+        print_data_usage(out);
+        store_files_rw_records();
+    }
 }
 
 void OFDWSAnalyzer::store_files_rw_records() const
@@ -148,9 +152,48 @@ OFDWSAnalyzer::Iterator OFDWSAnalyzer::get_file_rw_op(const nfs_fh3& key)
 extern "C"
 {
 
-BaseAnalyzer* create(const char* opts)
+BaseAnalyzer* create(const char* optarg)
 {
-    return new OFDWSAnalyzer(opts);
+    enum
+    {
+        bu_size = 0,
+        bl_size 
+    };
+    const char* token[] = {
+        "bu_size",
+        "bl_size",
+        NULL
+    };
+
+    char* value = NULL;
+    int32_t bucket_size = g_def_bu_size;
+    int32_t block_size = g_def_bl_size;
+    while (*optarg != '\0')
+    {
+        int supopt = getsubopt((char**)&optarg, (char**)token, &value);
+        if(value == NULL)
+            return NULL;
+
+        switch(supopt)
+        {
+            case bu_size:
+                bucket_size = atoi(value);
+                if(bucket_size < 1 || block_size > 32767)
+                    return NULL;
+                break;
+
+            case bl_size:
+                block_size = atoi(value);
+                if(block_size < 1 || block_size > 31)
+                    return NULL;
+                break;
+
+            default:
+                return NULL;
+        }
+        value = NULL;
+    }
+    return new OFDWSAnalyzer(bucket_size, block_size);
 }
 
 void destroy(BaseAnalyzer* context)
@@ -160,7 +203,8 @@ void destroy(BaseAnalyzer* context)
 
 const char* usage()
 {
-    return "Do what you want!";
+    return "bu_size - for specifying amount of buckets. Range: 1..32767 [16 by default]"\
+        "\nbl_size - for specifying block size [KB]. Range: 1..31 [8 by default]";
 }
 
 }
