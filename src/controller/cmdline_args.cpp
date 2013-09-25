@@ -27,7 +27,7 @@ Opt Args::options[Args::num] =
     {'f', "filter",     Opt::REQ, "tcp port 2049",       "a packet filter in libpcap BPF syntax",               "BPF"},
     {'s', "snaplen",    Opt::REQ, "65535",               "max length of raw captured packet. May be used ONLY FOR UDP", "0..65535"},
     {'m', "mode",       Opt::REQ, LIVE,                  "set runing mode",                                     LIVE"|"DUMP"|"STAT },
-    {'a', "analyzers",  Opt::REQ, "",                    "specify path to analysis module and pass desired options", "PATH#opt1,opt2=val,...,optN" },
+    {'a', "analyzer",   Opt::REQ, "",                    "specify path to analysis module and pass desired options", "PATH#opt1,opt2=val,..." },
     {'I', "ifile",      Opt::REQ, "INTERFACE-BPF.pcap",  "input file for "STAT" mode, the '-' means stdin",     "PATH"},
     {'O', "ofile",      Opt::REQ, "INTERFACE-BPF.pcap",  "output file for "DUMP" mode, the '-' means stdout",   "PATH"},
     {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file"},
@@ -35,7 +35,7 @@ Opt Args::options[Args::num] =
     {'B', "bsize",      Opt::REQ, "2",                   "size of capturing kernel buffer in MBytes",           "1.."},
     {'M', "msg-header", Opt::REQ, "512",                 "RPC message will be truncated to this limit in bytes before passing to Analysis", "1..4000"},
     {'Q', "qcapacity",  Opt::REQ, "256",                 "initial queue capacity of RPC messages",              "1..65535"},
-    {'v', "verbose",    Opt::NOA, "false",               "print out additional information"},
+    {'v', "verbose",    Opt::NOA, "false",               "print out additional information and trace to console collected NFSv3 procedures"},
     {'h', "help",       Opt::NOA, "false",               "print this help message and usage for analyzers passed via -a options, then exit"}
 };
 
