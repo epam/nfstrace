@@ -3,7 +3,7 @@ CC:=g++
 INCLUDES+=-Isrc
 INCLUDES+=-I../src/
 LIBS    +=-lstdc++ -lpthread
-CFLAGS  +=-static-libgcc -Wall -pedantic -Wno-variadic-macros -Wno-long-long -shared -fPIC
+CFLAGS  +=-Wall -pedantic -Wno-variadic-macros -Wno-long-long -shared -fPIC
 
 DEBUG_FLAGS   += -O0 -g -DDEBUG
 RELEASE_FLAGS += -O3 -DNDEBUG

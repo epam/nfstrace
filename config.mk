@@ -3,7 +3,7 @@ CC:=g++
 OS:=$(shell uname -s)
 
 LIBS   += -lstdc++ -lpthread -lpcap
-CFLAGS += -static-libgcc -Wall -pedantic -Wno-variadic-macros -Wno-long-long
+CFLAGS += -Wall -pedantic -Wno-variadic-macros -Wno-long-long
 
 ifeq ($(OS),Linux)
     LIBS += -ldl # dynamic linking loader on GNU/Linux
