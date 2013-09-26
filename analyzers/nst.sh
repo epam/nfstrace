@@ -3,18 +3,20 @@
 usage()
 {
 cat << EOF
-usage: $0 options
-
-This script run i_files visualization.
+Graph images by data provided by analyzers.
+usage: analyzers/nst.sh -a analyzers/breakdown.plt -d . -p "breakdown*.dat"
 
 OPTIONS:
    -h      Show this message.
-   -a      Set analyzer.
+   -a      Set path to the analyzer.
    -d      Directory contained i_files-files. Pattern: <analyzer>(.)*.dat
    -f      Use specific file as i_files-file.
    -p      Pattern used for file search.
    -r      Recursive search.
    -v      Verbose.
+
+Known issues:
+    Supported just one analyzer ('-a' option) at a time.
 EOF
 }
 
