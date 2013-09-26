@@ -5,6 +5,8 @@
 //------------------------------------------------------------------------------
 #include <cmath>
 #include <list>
+#include <fstream>
+#include <sstream>
 #include <stdint.h>
 #include <stdlib.h>
 #include <tr1/unordered_map>
@@ -300,45 +302,72 @@ public:
                 out << 0;
             out << "%" << std::endl;
         }
-
         out << "Per connection info: " << std::endl;
+
+        std::stringstream session;
         typename PerOpStat::iterator it = per_op_stat.begin();
         typename PerOpStat::iterator end = per_op_stat.end();
         for(; it != end; ++it)
         {
-            out << "Session: " << it->first << std::endl;
             const Breakdown& current = *it->second;
             uint64_t s_total = 0;
             for(int i = 0; i < ProcEnum::count; ++i)
             {
                 s_total += current[i].get_count();
             }
-            out << "Total: " << s_total << ". Per operation:" << std::endl;
-            for(int i = 0; i < ProcEnum::count; ++i)
-            {
-                out.width(14);
-                out << std::left << static_cast<ProcEnum::NFSProcedure>(i);
-                out.width(6);
-                out << " Count:";
-                out.width(5);
-                out << std::right << current[i].get_count();
-                out << " ";
-                out.precision(2);
-                out << "(";
-                out.width(6);
-                out << std::fixed << ((T)(current[i].get_count()) / s_total) * 100;
-                out << "%)";
-                out << " Min: ";
-                out.precision(3);
-                out << std::fixed << to_sec<T>(current[i].get_min());
-                out << " Max: ";
-                out << std::fixed << to_sec<T>(current[i].get_max());
-                out << " Avg: ";
-                out << std::fixed << current[i].get_avg();
-                out.precision(8);
-                out << " StDev: ";
-                out << std::fixed << current[i].get_st_dev() << std::endl;
-            }
+            session.str("");
+            session << it->first;
+            print_per_session(current, session.str(), s_total);
+            std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
+            store_per_session(file, current, session.str(), s_total);
+        }
+    }
+
+    void store_per_session(std::ostream& file, const Breakdown& breakdown, const std::string& session, uint64_t s_total) const
+    {
+        file << "Session: " << session << std::endl;
+
+        for(int i = 0; i < ProcEnum::count; ++i)
+        {
+            file << static_cast<ProcEnum::NFSProcedure>(i) << ' ';
+            file << breakdown[i].get_count() << ' ';
+            file << ((T)(breakdown[i].get_count()) / s_total) * 100 << ' ';
+            file << to_sec<T>(breakdown[i].get_min()) << ' ';
+            file << to_sec<T>(breakdown[i].get_max()) << ' ';
+            file << breakdown[i].get_avg() << ' ';
+            file << breakdown[i].get_st_dev() << std::endl;
+        }
+    }
+
+    void print_per_session(const Breakdown& breakdown, const std::string& session, uint64_t s_total) const
+    {
+        out << "Session: " << session << std::endl;
+
+        out << "Total: " << s_total << ". Per operation:" << std::endl;
+        for(int i = 0; i < ProcEnum::count; ++i)
+        {
+            out.width(14);
+            out << std::left << static_cast<ProcEnum::NFSProcedure>(i);
+            out.width(6);
+            out << " Count:";
+            out.width(5);
+            out << std::right << breakdown[i].get_count();
+            out << " ";
+            out.precision(2);
+            out << "(";
+            out.width(6);
+            out << std::fixed << ((T)(breakdown[i].get_count()) / s_total) * 100;
+            out << "%)";
+            out << " Min: ";
+            out.precision(3);
+            out << std::fixed << to_sec<T>(breakdown[i].get_min());
+            out << " Max: ";
+            out << std::fixed << to_sec<T>(breakdown[i].get_max());
+            out << " Avg: ";
+            out << std::fixed << breakdown[i].get_avg();
+            out.precision(8);
+            out << " StDev: ";
+            out << std::fixed << breakdown[i].get_st_dev() << std::endl;
         }
     }
 
