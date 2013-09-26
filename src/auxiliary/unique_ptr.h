@@ -54,8 +54,9 @@ public:
         D::operator()(pointer);
     }
 
-    inline void reset(T*const p, const D& deleter=D())
+    inline void reset(T*const p=NULL, const D& deleter=D())
     {
+        D::operator()(pointer);           // delete current managed object
         static_cast<D&>(*this) = deleter; // use slicing for copying deleter
         pointer = p;
     }
