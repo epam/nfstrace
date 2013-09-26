@@ -9,13 +9,14 @@
 #include <cerrno>
 #include <cstring> // memcpy()
 #include <exception> // std::terminate()
-#include <memory>  // for std::auto_ptr
 #include <string>
+#include <sstream>
 
 #include <unistd.h>
 #include <sys/time.h>
 
 #include "../../auxiliary/logger.h"
+#include "../../auxiliary/unique_ptr.h"
 #include "../pcap/handle.h"
 #include "../pcap/packet_dumper.h"
 //------------------------------------------------------------------------------
@@ -165,14 +166,31 @@ private:
 
         NST::auxiliary::Logger::get_global().flush();   // force flush buffer
 
-        if(fork()) return;  // spawn child process
-
-        const char* cmd = command.c_str();
-        const char* arg = name.c_str();
-
-        if(execlp(cmd, cmd, arg, NULL) == -1)
+        if(pid_t pid = fork()) // spawn child process
         {
-            LOG("execlp(%s,%s,%s,NULL) return: %s", cmd, cmd, arg, strerror(errno));
+            // parrent process
+            LOG("Try to execute(%s %s) in %u child process", command.c_str(), name.c_str(), pid);
+            NST::auxiliary::Logger::get_global().flush();   // force flush buffer
+            return;
+        }
+
+        // child process
+        std::istringstream ss(command);
+        std::vector<std::string> tokens;
+        std::vector<char*> args;
+
+        // TODO: this parser isn't works with dual quotes, like rm "a file.cpp"
+        for(std::string arg; ss >> arg;)
+        {
+           tokens.push_back(arg);
+           args  .push_back(const_cast<char*>(tokens.back().c_str()));
+        }
+        args.push_back(const_cast<char*>(name.c_str()));
+        args.push_back(NULL);  // need terminating null pointer
+
+        if(execvp(args[0], &args[0]) == -1)
+        {
+            LOG("execvp(%s,%s %s) return: %s", args[0], command.c_str(), name.c_str(), strerror(errno));
         }
 
         LOG("child process %u will be terminated.", getpid());
@@ -182,7 +200,7 @@ private:
     Dumping(const Dumping&);            // undefined
     Dumping& operator=(const Dumping&); // undefined
 
-    std::auto_ptr<PacketDumper> dumper;
+    NST::auxiliary::UniquePtr<PacketDumper> dumper;
     const Handle& handle;
     std::string base;
     std::string name;
