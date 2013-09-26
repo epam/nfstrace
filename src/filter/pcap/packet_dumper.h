@@ -45,7 +45,7 @@ public:
     {
         return pcap_dump_file(dumper);
     }
-    
+
     void truncate_all_pcap_data_and_header()
     {
         pcap_dump_flush(dumper);
