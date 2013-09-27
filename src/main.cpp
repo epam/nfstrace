@@ -13,9 +13,9 @@ using namespace NST::controller;
 //------------------------------------------------------------------------------
 int main(int argc, char **argv) try
 {
-    Parameters& params = Parameters::instance();
-    // set and validate CLI options
-    if(!params.cmdline_args(argc, argv))
+    Parameters params(argc, argv); // set and validate CLI options
+
+    if(!Parameters::instance())
     {
         return 0; // -h was passed
     }
