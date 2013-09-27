@@ -1,8 +1,8 @@
 #/bin/sh
 
-APP=../../release/nfstrace
-MODULES=../../analyzers/release
-
+ROOT=$(dirname $0)/../..
+APP=$ROOT/release/nfstrace
+MOD=$ROOT/analyzers/release
 
 echo '
 -Information:-------------------------------------------------------------------
@@ -29,4 +29,4 @@ $APP --mode=dump                                           \
 # Analyse dump.pcap file by libbreakdown.so module
 $APP --mode=stat                                           \
      -I dump.pcap                                          \
-     --analyzer=$MODULES/libbreakdown.so
+     --analyzer=$MOD/libbreakdown.so
