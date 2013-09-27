@@ -15,27 +15,21 @@ namespace NST
 namespace analyzer
 {
 
-AnalysisManager::AnalysisManager(RunningStatus& running_status)
+AnalysisManager::AnalysisManager(RunningStatus& running_status, const Parameters& params)
                                  : status(running_status)
                                  , analyzers(NULL)
                                  , queue(NULL)
                                  , parser_thread(NULL)
-{
-}
-
-AnalysisManager::~AnalysisManager()
-{
-}
-
-FilteredDataQueue& AnalysisManager::init(const Parameters& params)
 {
     analyzers.reset(new Analyzers(params));
 
     queue.reset(new FilteredDataQueue(params.queue_capacity(), 1));
 
     parser_thread.reset(new NFSParserThread(*queue, *analyzers, status));
+}
 
-    return *queue;
+AnalysisManager::~AnalysisManager()
+{
 }
 
 void AnalysisManager::start()

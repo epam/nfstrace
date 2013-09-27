@@ -33,14 +33,7 @@ static UniquePtr<CaptureReader> create_capture_reader(const Parameters& params)
     return reader;
 }
 
-FiltrationManager::FiltrationManager(RunningStatus& s) : status(s)
-{
-}
-FiltrationManager::~FiltrationManager()
-{
-}
-
-void FiltrationManager::dump_to_file(const Parameters& params)
+FiltrationManager::FiltrationManager(RunningStatus& s, const Parameters& params) : status(s)
 {
     typedef FiltrationProcessor<CaptureReader, Dumping> Processor;
     typedef ProcessingThread<Processor> OnlineDumping;
@@ -56,8 +49,7 @@ void FiltrationManager::dump_to_file(const Parameters& params)
 
     threads.add(thread);
 }
-
-void FiltrationManager::capture_to_queue(FilteredDataQueue& queue, const Parameters& params)
+FiltrationManager::FiltrationManager(RunningStatus& s, FilteredDataQueue& queue, const Parameters& params) : status(s)
 {
     typedef FiltrationProcessor<CaptureReader, Queueing> Processor;
     typedef ProcessingThread<Processor> OnlineAnalyzing;
@@ -70,19 +62,21 @@ void FiltrationManager::capture_to_queue(FilteredDataQueue& queue, const Paramet
 
     threads.add(thread);
 }
-
-void FiltrationManager::read_to_queue(FilteredDataQueue& queue, const Parameters& params)
+FiltrationManager::FiltrationManager(RunningStatus& s, FilteredDataQueue& queue, const std::string& ifile) : status(s)
 {
     typedef FiltrationProcessor<FileReader, Queueing> Processor;
     typedef ProcessingThread<Processor> OfflineAnalyzing;
 
-    UniquePtr<FileReader> reader (new FileReader(params.input_file()));
+    UniquePtr<FileReader> reader (new FileReader(ifile));
     UniquePtr<Queueing>   writer (new Queueing(queue));
 
     UniquePtr<Processor>        processor (new Processor(reader, writer));
     UniquePtr<Thread> thread    (new OfflineAnalyzing(processor, status));
 
     threads.add(thread);
+}
+FiltrationManager::~FiltrationManager()
+{
 }
 
 void FiltrationManager::start()

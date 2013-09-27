@@ -18,8 +18,8 @@ namespace controller
 Controller::Controller(const Parameters& params)
     : logger(::stderr)
     , sig_handler(status)
-    , filtration (status)
-    , analysis   (status)
+    , analysis   (NULL)
+    , filtration (NULL)
 {
     logger.set_output_file(params.program_name() + ".log");
     NST::auxiliary::Logger::set_global(&logger);
@@ -28,19 +28,23 @@ Controller::Controller(const Parameters& params)
 
     if(mode == Profiling)
     {
-        FilteredDataQueue& queue = analysis.init(params);
+        analysis.reset(new AnalysisManager(status, params));
 
-        filtration.capture_to_queue(queue, params);
+        FilteredDataQueue& queue = analysis->get_queue();
+
+        filtration.reset(new FiltrationManager(status, queue, params));
     }
-    else if(mode == Filtration)
+    else if(mode == Dumping)
     {
-        filtration.dump_to_file(params);
+        filtration.reset(new FiltrationManager(status, params));
     }
     else if(mode == Analysis)
     {
-        FilteredDataQueue& queue = analysis.init(params);
+        analysis.reset(new AnalysisManager(status, params));
 
-        filtration.read_to_queue(queue, params);
+        FilteredDataQueue& queue = analysis->get_queue();
+
+        filtration.reset(new FiltrationManager(status, queue, params.input_file()));
     }
 }
 
@@ -54,8 +58,11 @@ int Controller::run()
     sig_handler.create();
 
     // Start modules to processing
-    filtration.start();
-    analysis.start();
+    filtration->start();
+    if(analysis)
+    {
+        analysis->start();
+    }
 
     // Waiting some exception or user-signal for handling
     // TODO: add code for recovery processing
@@ -68,8 +75,12 @@ int Controller::run()
     }
     catch(...)
     {
-        filtration.stop();
-        analysis.stop();
+        filtration->stop();
+        if(analysis)
+        {
+            analysis->stop();
+        }
+
         {
             Logger::Buffer buffer;
             status.print(buffer);

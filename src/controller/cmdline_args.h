@@ -38,7 +38,7 @@ struct Args
     };
 
     static const char* const profiling_mode;
-    static const char* const filtration_mode;
+    static const char* const dumping_mode;
     static const char* const analysis_mode;
 
 private:

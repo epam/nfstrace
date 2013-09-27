@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 #include "../analyzer/analysis_manager.h"
 #include "../auxiliary/logger.h"
+#include "../auxiliary/unique_ptr.h"
 #include "../filter/filtration_manager.h"
 #include "parameters.h"
 #include "running_status.h"
@@ -16,6 +17,7 @@
 //------------------------------------------------------------------------------
 using NST::analyzer::AnalysisManager;
 using NST::auxiliary::Logger;
+using NST::auxiliary::UniquePtr;
 using NST::filter::FiltrationManager;
 //------------------------------------------------------------------------------
 namespace NST
@@ -46,8 +48,8 @@ private:
     SynchronousSignalHandling sig_handler;
 
     // controller contains instances of modules
-    FiltrationManager filtration;
-    AnalysisManager   analysis;
+    UniquePtr<AnalysisManager>   analysis;
+    UniquePtr<FiltrationManager> filtration;
 };
 
 } // namespace controller
