@@ -1,8 +1,8 @@
 #/bin/sh
 
-APP=../../release/nfstrace
-MODULES=../../analyzers/release
-
+ROOT=$(dirname $0)/../..
+APP=$ROOT/release/nfstrace
+MOD=$ROOT/analyzers/release
 
 echo '
 -Information:-------------------------------------------------------------------
@@ -48,5 +48,4 @@ PARTS=$(ls -tcr dump.pcap-*.bz2) # list of parts in right order 1,2,3,4,...n
 # Then analyse data of dump.pcap file from stdin by libbreakdown.so module.
 bzcat dump.pcap.bz2 $PARTS | $APP --mode=stat              \
      -I -                                                  \
-     --analyzer=$MODULES/libbreakdown.so
-
+     --analyzer=$MOD/libbreakdown.so

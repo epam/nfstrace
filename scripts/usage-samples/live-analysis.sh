@@ -1,7 +1,8 @@
 #/bin/sh
 
-APP=../../release/nfstrace
-MODULES=../../analyzers/release
+ROOT=$(dirname $0)/../..
+APP=$ROOT/release/nfstrace
+MOD=$ROOT/analyzers/release
 
 echo '
 -Information:-------------------------------------------------------------------
@@ -16,4 +17,4 @@ Exit via Interrupt(Control-C) or Quit(Control-\) signal.
 $APP --mode=live                                           \
      --interface=eth0                                      \
      --filter="tcp or udp port 2049"                       \
-     --analyzer=$MODULES/libbreakdown.so
+     --analyzer=$MOD/libbreakdown.so

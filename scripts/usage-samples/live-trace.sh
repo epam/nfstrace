@@ -1,7 +1,8 @@
 #/bin/sh
 
-APP=../../release/nfstrace
-MODULES=../../analyzers/release
+ROOT=$(dirname $0)/../..
+APP=$ROOT/release/nfstrace
+MOD=$ROOT/analyzers/release
 
 echo '
 -Information:-------------------------------------------------------------------
