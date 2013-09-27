@@ -15,39 +15,38 @@
 //------------------------------------------------------------------------------
 typedef NST::controller::cmdline::Args CLI;
 typedef NST::controller::cmdline::CmdlineParser<CLI> Parser;
-static Parser parser;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
+static Parser parser;
 
-void print_anlyzers_usage(std::ostream& out, Parameters& params)
+Parameters* Parameters::global = NULL;
+
+Parameters::Parameters(int argc, char** argv) : rpc_message_limit(0)
 {
-    const std::vector<AParams> v = params.analyzers();
+    if(global != NULL) return; // init global instance only once
 
-    for(unsigned int i=0; i < v.size(); ++i)
-    {
-        try
-        {
-            NST::analyzer::PluginUsage usage(v[i].path);
-            out << "Usage of " << v[i].path << ":\n" << usage.get() << std::endl;
-        }
-        catch(Exception& e)
-        {
-            out << e.what() << std::endl;
-        }
-    }
-}
-
-bool Parameters::cmdline_args(int argc, char** argv)
-{
     parser.parse(argc, argv);
     if(parser[CLI::HELP].begin()->to_bool())
     {
         parser.print_usage(std::cout, argv[0]);
-        print_anlyzers_usage(std::cout, *this);
-        return false;
+        const std::vector<AParams> v = analyzers();
+
+        for(unsigned int i=0; i < v.size(); ++i)
+        {
+            try
+            {
+                NST::analyzer::PluginUsage usage(v[i].path);
+                std::cout << "Usage of " << v[i].path << ":\n" << usage.get() << std::endl;
+            }
+            catch(Exception& e)
+            {
+                std::cout << e.what() << std::endl;
+            }
+        }
+        return;
     }
     parser.validate();
 
@@ -63,9 +62,8 @@ bool Parameters::cmdline_args(int argc, char** argv)
     }
 
     rpc_message_limit = limit;
-    verbose = parser[CLI::VERBOSE].begin()->to_bool();
 
-    return true;
+    global = this;
 }
 
 const std::string& Parameters::program_name() const
@@ -94,7 +92,7 @@ RunningMode Parameters::running_mode() const
 
 bool Parameters::is_verbose() const
 {
-    return verbose;
+    return parser[CLI::VERBOSE].begin()->to_bool();
 }
 
 const std::string Parameters::interface() const

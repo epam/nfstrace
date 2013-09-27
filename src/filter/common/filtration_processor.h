@@ -407,7 +407,7 @@ struct UDPSession
 public:
     UDPSession()
     {
-        max_hdr = controller::Parameters::instance().rpcmsg_limit();
+        max_hdr = controller::Parameters::instance()->rpcmsg_limit();
     }
     ~UDPSession()
     {
@@ -532,7 +532,7 @@ class RPCFiltrator
 public:
     RPCFiltrator() : writer(NULL)
     {
-        max_hdr = controller::Parameters::instance().rpcmsg_limit();
+        max_hdr = controller::Parameters::instance()->rpcmsg_limit();
         reset();
     }
 

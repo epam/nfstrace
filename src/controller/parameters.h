@@ -33,14 +33,11 @@ struct AParams
 
 class Parameters
 {
+    static Parameters* global;
 public:
-    inline static Parameters& instance()
-    {
-        static Parameters params;
-        return params;
-    }
+    Parameters(int argc, char** argv);
 
-    bool cmdline_args(int argc, char** argv);
+    static Parameters*const instance() { return global; }
 
     // access helpers
     const std::string&  program_name() const;
@@ -59,19 +56,11 @@ public:
     const std::vector<AParams> analyzers() const;
 
 private:
-    Parameters()
-    {
-    }
-    ~Parameters()
-    {
-    }
-
     Parameters(const Parameters&);            // undefined
     Parameters& operator=(const Parameters&); // undefined
 
     // cashed values
     unsigned short rpc_message_limit;
-    bool verbose;
     std::string program;  // name of program in command line
 };
 
