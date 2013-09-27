@@ -27,10 +27,10 @@ namespace analyzer
 class AnalysisManager
 {
 public:
-    AnalysisManager(RunningStatus& running_status);
+    AnalysisManager(RunningStatus& running_status, const Parameters& params);
     ~AnalysisManager();
 
-    FilteredDataQueue& init(const Parameters& params);
+    FilteredDataQueue& get_queue() { return *queue; }
 
     void start();
     void stop();

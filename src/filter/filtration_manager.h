@@ -24,12 +24,10 @@ namespace filter
 class FiltrationManager
 {
 public:
-    FiltrationManager(RunningStatus& s);
+    FiltrationManager(RunningStatus& s, const Parameters& params);                              // dump to file
+    FiltrationManager(RunningStatus& s, FilteredDataQueue& queue, const Parameters& params);    // capture to queue
+    FiltrationManager(RunningStatus& s, FilteredDataQueue& queue, const std::string& ifile);    // read file to queue
     ~FiltrationManager();
-
-    void dump_to_file    (const Parameters& params);
-    void capture_to_queue(FilteredDataQueue& queue, const Parameters& params);
-    void read_to_queue   (FilteredDataQueue& queue, const Parameters& params);
 
     void start();
     void stop();

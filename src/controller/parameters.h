@@ -18,7 +18,7 @@ namespace controller
 enum RunningMode
 {
     Profiling,
-    Filtration,
+    Dumping,
     Analysis
 };
 

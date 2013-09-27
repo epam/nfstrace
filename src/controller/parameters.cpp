@@ -80,9 +80,9 @@ RunningMode Parameters::running_mode() const
     {
         return Profiling;
     }
-    else if(mode == CLI::filtration_mode)
+    else if(mode == CLI::dumping_mode)
     {
-        return Filtration;
+        return Dumping;
     }
     else if(mode == CLI::analysis_mode)
     {
