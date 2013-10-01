@@ -43,7 +43,7 @@ Analyzers::Analyzers(const Parameters& params)
 
     if(params.is_verbose()) // add special analyzer for trace out RPC calls
     {
-        UniquePtr<BaseAnalyzer> print(new PrintAnalyzer(std::cout));
+        UniquePtr<IAnalyzer> print(new PrintAnalyzer(std::cout));
         analyzers.push_back(print.get());
         builtin.push_back(print);
     }

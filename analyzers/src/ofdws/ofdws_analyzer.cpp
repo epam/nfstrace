@@ -152,7 +152,13 @@ OFDWSAnalyzer::Iterator OFDWSAnalyzer::get_file_rw_op(const nfs_fh3& key)
 extern "C"
 {
 
-BaseAnalyzer* create(const char* optarg)
+const char* usage()
+{
+    return "bu_size - for specifying amount of buckets. Range: 1..32767 [16 by default]\n"
+           "bl_size - for specifying block size [KB]. Range: 1..31 [8 by default]";
+}
+
+IAnalyzer* create(const char* optarg)
 {
     enum
     {
@@ -196,15 +202,9 @@ BaseAnalyzer* create(const char* optarg)
     return new OFDWSAnalyzer(bucket_size, block_size);
 }
 
-void destroy(BaseAnalyzer* context)
+void destroy(IAnalyzer* instance)
 {
-    delete context;
-}
-
-const char* usage()
-{
-    return "bu_size - for specifying amount of buckets. Range: 1..32767 [16 by default]"\
-        "\nbl_size - for specifying block size [KB]. Range: 1..31 [8 by default]";
+    delete instance;
 }
 
 }

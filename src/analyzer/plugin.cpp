@@ -25,7 +25,7 @@ Plugin::Plugin(const std::string& path)
 
 PluginInstance::PluginInstance(const std::string& path, const std::string& args) : Plugin(path)
 {
-    analyzer = (BaseAnalyzer*)(*create)(args.c_str());
+    analyzer = (*create)(args.c_str());
     if(!analyzer)
     {
         throw NST::auxiliary::Exception(path + ": create call returns NULL-pointer");

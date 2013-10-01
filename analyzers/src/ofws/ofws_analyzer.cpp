@@ -320,19 +320,19 @@ OFWSAnalyzer::Iterator OFWSAnalyzer::find_or_create_op_counter(const nfs_fh3& ke
 extern "C"
 {
 
-BaseAnalyzer* create(const char* opts)
-{
-    return new OFWSAnalyzer(opts);
-}
-
-void destroy(BaseAnalyzer* context)
-{
-    delete context;
-}
-
 const char* usage()
 {
-    return "Do what you want!";
+    return "Anguments aren't supported. TODO: add description of OFWS Analyser";
+}
+
+IAnalyzer* create(const char* opts)
+{
+    return new OFWSAnalyzer();
+}
+
+void destroy(IAnalyzer* instance)
+{
+    delete instance;
 }
 
 }

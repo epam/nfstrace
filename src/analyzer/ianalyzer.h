@@ -3,8 +3,8 @@
 // Description: Base analyzer, which implement restoring rpc/nfs structures from plain rpc header.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef BASE_ANALYZER_H
-#define BASE_ANALYZER_H
+#ifndef IANALYZER_H
+#define IANALYZER_H
 //------------------------------------------------------------------------------
 #include "../auxiliary/session.h"
 using NST::auxiliary::Session;
@@ -21,14 +21,14 @@ namespace NST
 namespace analyzer
 {
 
-#include "../api/base_analyzer_type.h"
+#include "../api/ianalyzer_type.h"
 
 typedef const char* (*plugin_usage_func)   (); // return description of expected opts for plugin_create_func()
-typedef void*       (*plugin_create_func)  (const char* opts); // create and return an instance of analyzer
-typedef void        (*plugin_destroy_func) (void*   instance); // destroy an instance of analyzer
+typedef IAnalyzer*  (*plugin_create_func)  (const char*    opts); // create and return an instance of analyzer
+typedef void        (*plugin_destroy_func) (IAnalyzer* instance); // destroy an instance of analyzer
 
 } // namespace analyzer
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//BASE_ANALYZER_H
+#endif//IANALYZER_H
 //------------------------------------------------------------------------------

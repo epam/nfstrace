@@ -119,7 +119,7 @@ private:
 
 template
 <
-typename T, // Type of precision 
+typename T, // Data type defines evaluation precision
 template <typename> class Algorithm // Evaluation algorithm
 >
 class Latencies
@@ -157,7 +157,11 @@ private:
     timeval max;
 };
 
-template<typename T, template <class> class Algorithm>
+template
+<
+    typename T,
+    template <class> class Algorithm
+>
 class BreakdownCounter
 {
 public:
@@ -179,8 +183,12 @@ private:
     Latencies<T, Algorithm> latencies[ProcEnum::count];
 };
 
-template<typename T, template <class> class Algorithm>
-class BreakdownAnalyzer : public BaseAnalyzer
+template
+<
+    typename T,
+    template <class> class Algorithm
+>
+class BreakdownAnalyzer : public IAnalyzer
 {
     struct Hash
     {
@@ -404,7 +412,12 @@ private:
 extern "C"
 {
 
-BaseAnalyzer* create(const char* optarg)
+const char* usage()
+{
+    return "ACC - for accurate evaluation, MEM - for memory undemanding evaluation. Options cannot be combined";
+}
+
+IAnalyzer* create(const char* optarg)
 {
     enum
     {
@@ -440,14 +453,9 @@ BaseAnalyzer* create(const char* optarg)
     return NULL;
 }
 
-void destroy(BaseAnalyzer* context)
+void destroy(IAnalyzer* instance)
 {
-    delete context;
-}
-
-const char* usage()
-{
-    return "ACC - for accurate evaluation, MEM - for memory undemanding evaluation. Options cannot be combined";
+    delete instance;
 }
 
 }

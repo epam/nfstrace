@@ -10,7 +10,7 @@
 
 #include "../auxiliary/unique_ptr.h"
 #include "../controller/parameters.h"
-#include "base_analyzer.h"
+#include "ianalyzer.h"
 #include "plugin.h"
 //------------------------------------------------------------------------------
 using NST::auxiliary::UniquePtr;
@@ -23,9 +23,9 @@ namespace analyzer
 
 class Analyzers
 {
-    typedef std::vector<BaseAnalyzer*>               Storage;
+    typedef std::vector<IAnalyzer*>                  Storage;
     typedef std::vector< UniquePtr<PluginInstance> > Plugins;
-    typedef std::vector< UniquePtr<BaseAnalyzer> >   BuiltIns;
+    typedef std::vector< UniquePtr<IAnalyzer> >      BuiltIns;
 
 public:
     Analyzers(const Parameters& params);

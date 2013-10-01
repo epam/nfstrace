@@ -409,7 +409,7 @@ void PrintAnalyzer::commit3(const struct RPCProcedure* proc,
 
 void PrintAnalyzer::flush_statistics()
 {
-    // flush is in each hendler
+    // flush is in each handler
 }
 
 } // namespace analyzer

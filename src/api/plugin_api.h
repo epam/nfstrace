@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Plugin-API describe interface expected by nfstrace.
+// Description: Unique Plugin-API interface header.
+// Aggregated all definitions for plugins' development
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef PLUGIN_API_H
@@ -17,15 +18,16 @@
 #include "rpc_procedure_type.h"
 #include "nfs3_types.h"
 #include "session_type.h"
-#include "base_analyzer_type.h"
+#include "ianalyzer_type.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 extern "C"
 {
 
-BaseAnalyzer* create(const char* opts);// create analyzer
-void destroy(BaseAnalyzer* context);   // destroy analyzer
-const char* usage();    // print info about analyzer usage
+// THESE CALLS MUST BE IMPLEMENTED BY Pluggable Analysis Module
+const char* usage  ();    // return description of expected opts for create(opts)
+IAnalyzer*  create (const char*    opts); // create and return an instance of an Analyzer
+void        destroy(IAnalyzer* instance); // destroy created instance of an Analyzer
 
 }
 //------------------------------------------------------------------------------
