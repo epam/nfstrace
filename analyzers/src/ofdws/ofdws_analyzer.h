@@ -8,14 +8,14 @@
 //------------------------------------------------------------------------------
 #include <tr1/unordered_map>
 
-#include <utils/fh.h>                     //hash-table's key
+#include <utils/fh.h>   //hash-table's key
 #include "file_rw_op.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 static const int32_t g_def_bl_size = 8; // [KB]
 static const int32_t g_def_bu_size = 16;
 
-class OFDWSAnalyzer : public BaseAnalyzer
+class OFDWSAnalyzer : public IAnalyzer
 {
     typedef std::tr1::unordered_map<FH, FileRWOp*, FH::FH_Hash, FH::FH_Eq> OFDWS;
     typedef OFDWS::const_iterator ConstIterator;

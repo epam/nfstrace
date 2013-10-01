@@ -9,10 +9,9 @@
 #include <string>
 
 #include "../auxiliary/dynamic_load.h"
-#include "base_analyzer.h"
+#include "ianalyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-
 namespace NST
 {
 namespace analyzer
@@ -38,7 +37,11 @@ class PluginUsage : private Plugin
 public:
     PluginUsage(const std::string& path) : Plugin(path) {}
 
-    inline const std::string get() const { return usage(); }
+    inline const std::string get() const { return Plugin::usage(); }
+
+private:
+    PluginUsage(const PluginUsage&);            // undefiend
+    PluginUsage& operator=(const PluginUsage&); // undefiend
 };
 
 class PluginInstance : private Plugin
@@ -47,10 +50,13 @@ public:
     PluginInstance(const std::string& path, const std::string& args);
     ~PluginInstance();
 
-    inline BaseAnalyzer* instance() const { return analyzer; }
+    inline IAnalyzer* instance() const { return analyzer; }
 
 private:
-    BaseAnalyzer* analyzer;
+    PluginInstance(const PluginInstance&);            // undefiend
+    PluginInstance& operator=(const PluginInstance&); // undefiend
+
+    IAnalyzer* analyzer;
 };
 
 } // namespace analyzer

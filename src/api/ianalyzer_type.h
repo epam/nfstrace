@@ -1,20 +1,22 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: BaseAnalyzer describe interface expected by nst.
+// Description: IAnalyzer describe interface of analyzers expected by application.
+// The interface define set of NFSv3 Procedure handlers with empty dummy implementation
+// and pure virtual function for flushing analyzer statistics.
 // Copyright (c) 2013 EPAM Systems. All Rights reserved.
 //------------------------------------------------------------------------------
-#ifndef BASE_ANALYZER_TYPE_H
-#define BASE_ANALYZER_TYPE_H
+#ifndef IANALYZER_TYPE_H
+#define IANALYZER_TYPE_H
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 extern "C"
 {
 
-class BaseAnalyzer
+class IAnalyzer
 {
 public:
-    virtual ~BaseAnalyzer() {};
+    virtual ~IAnalyzer() {};
 
     virtual void null(const struct RPCProcedure*,
             const struct NULLargs*,
@@ -88,5 +90,5 @@ public:
 
 }
 //------------------------------------------------------------------------------
-#endif //BASE_ANALYZER_TYPE_H
+#endif //IANALYZER_TYPE_H
 //------------------------------------------------------------------------------

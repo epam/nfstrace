@@ -12,7 +12,7 @@
 #include <utils/fh.h>                     //hash-table's key
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-class OFWSAnalyzer : public BaseAnalyzer
+class OFWSAnalyzer : public IAnalyzer
 {
     class OpCounter
     {
@@ -52,7 +52,7 @@ class OFWSAnalyzer : public BaseAnalyzer
     } iterator_comp;
 
 public:
-    inline OFWSAnalyzer(const char*):out(std::cout) {}
+    inline OFWSAnalyzer():out(std::cout) {}
     virtual ~OFWSAnalyzer();
 
     virtual void null(const struct RPCProcedure* proc,

@@ -1,15 +1,15 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: Plugin-API describe interface expected by nfstrace.
+// Description: Example of usage Plugin-API.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #include <iostream>
 #include <string>
 
-#include "../../src/api/plugin_api.h"
+#include <plugin_api.h> // include plugin development definitions
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-class TestAnalyzer : public BaseAnalyzer
+class TestAnalyzer : public IAnalyzer
 {
 public:
     TestAnalyzer(const char* opts):options(opts)
@@ -192,14 +192,14 @@ const char* usage()
     return "TestAnalyzer: any options";
 }
 
-BaseAnalyzer* create(const char* opts)
+IAnalyzer* create(const char* opts)
 {
     return new TestAnalyzer(opts);
 }
 
-void destroy(BaseAnalyzer* handle)
+void destroy(IAnalyzer* instance)
 {
-    delete handle;
+    delete instance;
 }
 
 }

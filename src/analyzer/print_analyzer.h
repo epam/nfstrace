@@ -6,7 +6,7 @@
 #ifndef PRINT_ANALYZER_H
 #define PRINT_ANALYZER_H
 //------------------------------------------------------------------------------
-#include "base_analyzer.h"
+#include "ianalyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -14,7 +14,7 @@ namespace NST
 namespace analyzer
 {
 
-class PrintAnalyzer : public BaseAnalyzer
+class PrintAnalyzer : public IAnalyzer
 {
 public:
     PrintAnalyzer(std::ostream& o) : out(o)
