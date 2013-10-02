@@ -19,29 +19,19 @@ namespace analyzer
 
 class Plugin : private NST::auxiliary::DynamicLoad
 {
-protected:
-    Plugin(const std::string& path);
+public:
+    static const std::string usage_of(const std::string& path);
 
 private:
     Plugin(const Plugin&);            // undefiend
     Plugin& operator=(const Plugin&); // undefiend
 
 protected:
+    Plugin(const std::string& path);
+
     plugin_usage_func   usage;
     plugin_create_func  create;
     plugin_destroy_func destroy;
-};
-
-class PluginUsage : private Plugin
-{
-public:
-    PluginUsage(const std::string& path) : Plugin(path) {}
-
-    inline const std::string get() const { return Plugin::usage(); }
-
-private:
-    PluginUsage(const PluginUsage&);            // undefiend
-    PluginUsage& operator=(const PluginUsage&); // undefiend
 };
 
 class PluginInstance : private Plugin

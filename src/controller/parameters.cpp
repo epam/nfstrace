@@ -36,10 +36,11 @@ Parameters::Parameters(int argc, char** argv) : rpc_message_limit(0)
 
         for(unsigned int i=0; i < v.size(); ++i)
         {
+            const std::string& path = v[i].path;
             try
             {
-                NST::analyzer::PluginUsage usage(v[i].path);
-                std::cout << "Usage of " << v[i].path << ":\n" << usage.get() << std::endl;
+                std::cout << "Usage of " << path << ":\n";
+                std::cout << NST::analyzer::Plugin::usage_of(path) << std::endl;
             }
             catch(Exception& e)
             {
