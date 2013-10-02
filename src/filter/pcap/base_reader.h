@@ -33,21 +33,7 @@ protected:
     }
 
 public:
-    /*
-       Processor - class that implements following functions accessible from BaseReader:
-       u_char* get_user()
-       static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
-
-       The callback() function will be called for each packet filtered by BPF.
-       The result of get_user() will be passed to callback() as u_char *user.
-    */
-    template<class Processor>
-    inline bool loop(Processor& p, int count=0)
-    {
-        return loop(p.Processor::get_user(), &Processor::callback, count);
-    }
-
-    bool loop(void* user, pcap_handler callback, int count)
+    virtual bool loop(void* user, pcap_handler callback, int count)
     {
         const int err = pcap_loop(handle, count, callback, (u_char*)user);
         if(err == -1) throw PcapError("pcap_loop", pcap_geterr(handle));
@@ -55,7 +41,7 @@ public:
         return err == 0; // count is exhausted
     }
 
-    inline void          break_loop()       { pcap_breakloop(handle); }
+    virtual void         break_loop()       { pcap_breakloop(handle); }
     inline const Handle& get_handle() const { return handle; }
 
     inline        const int   datalink             () const { return pcap_datalink(handle); }
