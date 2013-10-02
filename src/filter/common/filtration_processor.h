@@ -798,7 +798,7 @@ public:
 
     void run()
     {
-        bool done = reader->loop(*this);
+        bool done = reader->loop(this, callback, 0);
         if(done)
         {
             throw Exception("Filtration is done");
@@ -808,11 +808,6 @@ public:
     void stop()
     {
         reader->break_loop();
-    }
-
-    u_char* get_user()
-    {
-        return (u_char*)this;
     }
 
     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)

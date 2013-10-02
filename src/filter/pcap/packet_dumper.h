@@ -30,6 +30,15 @@ public:
         }
     }
 
+    PacketDumper(pcap_t* handle, FILE* wb_stream):dumper(NULL)
+    {
+        dumper = pcap_dump_fopen(handle, wb_stream);
+        if(NULL == dumper)
+        {
+            throw PcapError("pcap_dump_fopen", pcap_geterr(handle));
+        }
+    }
+
     ~PacketDumper()
     {
         pcap_dump_flush(dumper);
