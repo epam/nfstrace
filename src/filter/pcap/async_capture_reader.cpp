@@ -25,16 +25,17 @@ namespace filter
 namespace pcap
 {
 
-AsyncCaptureReader::AsyncCaptureReader(const std::string& interface,
-                   const std::string& filter,
-                   int snaplen,
-                   int to_ms,
-                   int buffer_size)
-                   : CaptureReader(interface, filter, snaplen, to_ms, buffer_size)
-                   , persistent_capture_cycles(buffer_size/snaplen)
-                   , do_capturing(false)
-                   , fd_dump(-1)
-                   , user_loop_tid(0)
+AsyncCaptureReader::AsyncCaptureReader(
+                    const std::string& interface,
+                    const std::string& filter,
+                    int snaplen,
+                    int to_ms,
+                    int buffer_size)
+                    : CaptureReader(interface, filter, snaplen, to_ms, buffer_size)
+                    , persistent_capture_cycles(buffer_size/snaplen)
+                    , do_capturing(false)
+                    , fd_dump(-1)
+                    , user_loop_tid(0)
 {
 }
 AsyncCaptureReader::~AsyncCaptureReader()
@@ -44,7 +45,7 @@ AsyncCaptureReader::~AsyncCaptureReader()
 // typically called from FiltrationProcessor Thread
 bool AsyncCaptureReader::loop(void*const user, const pcap_handler user_callback)
 {
-    user_loop_tid = pthread_self(); // Wait me, if somethig happens!
+    user_loop_tid = pthread_self(); // Wait me if somethig happens!
 
     bool done = false;  // we must return something
 
