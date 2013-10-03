@@ -3,8 +3,8 @@
 // Description: High level interface for passing info Processor.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef BPF2_H
-#define BPF2_H
+#ifndef BPF_H
+#define BPF_H
 //------------------------------------------------------------------------------
 #include <pcap/pcap.h>
 
@@ -44,5 +44,5 @@ private:
 } // namespace filter
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//BPF2_H
+#endif//BPF_H
 //------------------------------------------------------------------------------
