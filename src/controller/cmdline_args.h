@@ -30,6 +30,7 @@ struct Args
         COMMAND,
         DSIZE,
         BSIZE,
+        TMPBUF,
         MSIZE,
         QSIZE,
         VERBOSE,

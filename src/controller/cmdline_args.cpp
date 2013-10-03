@@ -33,6 +33,7 @@ Opt Args::options[Args::num] =
     {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file"},
     {'D', "dump-size",  Opt::REQ, "0",                   "size of dumping file portion in MBytes, 0 = no limit","0.."},
     {'B', "bsize",      Opt::REQ, "2",                   "size of capturing kernel buffer in MBytes",           "1.."},
+    {'T', "tmp-capture",Opt::REQ, "false",               "async capture buffering in tmp files, may be enadled for " LIVE"|"DUMP" modes"},
     {'M', "msg-header", Opt::REQ, "512",                 "RPC message will be truncated to this limit in bytes before passing to Analysis", "1..4000"},
     {'Q', "qcapacity",  Opt::REQ, "256",                 "initial queue capacity of RPC messages",              "1..65535"},
     {'v', "verbose",    Opt::NOA, "false",               "print out additional information and trace to console collected NFSv3 procedures"},

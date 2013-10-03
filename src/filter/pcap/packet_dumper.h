@@ -41,24 +41,23 @@ public:
 
     ~PacketDumper()
     {
-        pcap_dump_flush(dumper);
         pcap_dump_close(dumper);
     }
 
-    inline void dump(const pcap_pkthdr *h, const u_char *sp)
+    inline void dump (const pcap_pkthdr *h, const u_char *sp)
     {
         pcap_dump((u_char*)dumper, h, sp);
     }
 
-    inline FILE* get_stream()
-    {
-        return pcap_dump_file(dumper);
-    }
+    inline void                flush() { pcap_dump_flush(dumper); }
+    inline pcap_dumper_t* get_dumper() { return dumper; }
+    inline FILE*          get_stream() { return pcap_dump_file(dumper); }
 
     void truncate_all_pcap_data_and_header()
     {
         pcap_dump_flush(dumper);
         FILE* stream = pcap_dump_file(dumper);
+        rewind(stream);
         fseek(stream, SEEK_SET, 0); // truncate a file to zero
         pcap_dump_flush(dumper);
     }
