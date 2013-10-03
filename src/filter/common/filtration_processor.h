@@ -798,7 +798,7 @@ public:
 
     void run()
     {
-        bool done = reader->loop(this, callback, 0);
+        bool done = reader->loop(this, callback);
         if(done)
         {
             throw Exception("Filtration is done");
