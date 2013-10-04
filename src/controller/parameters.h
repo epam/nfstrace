@@ -42,7 +42,6 @@ public:
     // access helpers
     const std::string&  program_name() const;
     RunningMode         running_mode() const;
-    bool                tmp_buffering() const;
     bool                is_verbose() const;
     const std::string   interface() const;
     unsigned short      snaplen() const;

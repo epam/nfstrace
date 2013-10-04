@@ -91,11 +91,6 @@ RunningMode Parameters::running_mode() const
     throw cmdline::CLIError(std::string("Unknown mode: ") + mode);
 }
 
-bool Parameters::tmp_buffering() const
-{
-    return parser[CLI::TMPBUF].begin()->to_bool();
-}
-
 bool Parameters::is_verbose() const
 {
     return parser[CLI::VERBOSE].begin()->to_bool();

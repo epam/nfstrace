@@ -1,6 +1,23 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
 // Description: Implementation of Asynchronous Buffered Capturing
+/*
+    The prototype of special CaptureReader - AsyncCaptureReader.
+    Implements buffering of capturing pcap packets in tmpfile().
+    The capturing pcap packets is doing in encapsulated pthread
+    that is created and joined in loop() call.
+    That thread will capture packets and dump them to a pcap 
+    'savefile' created by ::tmpfile(). After capturing some packets
+    it will 'close' tmpfile and pass FD of tmpfile to a thread
+    that invoke the loop() - it is 'user' thread. The loop in
+    loop() waits a completion of filling tmpfile, then read data 
+    from it.and pass captured packets to an user callback.while
+    capturing thread continues capturing files from interface.
+
+    The implementation isn't well done. It uses volatile bool do_capturing;
+    for breaking internal loops. So, live-lock is expected.
+    Error handling isn't good too.
+*/
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #include <stdio.h>  // fdopen() fileno()
@@ -42,7 +59,6 @@ AsyncCaptureReader::~AsyncCaptureReader()
 {
 }
 
-// typically called from FiltrationProcessor Thread
 bool AsyncCaptureReader::loop(void*const user, const pcap_handler user_callback)
 {
     user_loop_tid = pthread_self(); // Wait me if somethig happens!
@@ -111,7 +127,6 @@ bool AsyncCaptureReader::loop(void*const user, const pcap_handler user_callback)
     return done;
 }
 
-// typically called from Controller Thread
 void AsyncCaptureReader::break_loop()
 {
     {
