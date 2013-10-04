@@ -23,6 +23,7 @@ struct Args
         INTERFACE,
         FILTER,
         SNAPLEN,
+        TIMEOUT,
         MODE,
         ANALYZERS,
         IFILE,

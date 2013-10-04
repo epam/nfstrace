@@ -45,6 +45,7 @@ public:
     bool                is_verbose() const;
     const std::string   interface() const;
     unsigned short      snaplen() const;
+    int                 timeout() const;
     const std::string   filter() const;
     const std::string   input_file() const;
     const std::string   output_file() const;
