@@ -4,7 +4,7 @@ The '*' means an estimated complexity of feature implementation.
 
 ***** Implement multi-interface capturing and filtration
 ***** Investigate swintch to netmap capturing instead of libpcap
-**** Add reading multiple compressed files in Stat mode
+. (tiny star) add enumiration of network interfaces in CLI (se ./tests/pcap_if)
 ** Implement MultiblockAllocator as replacement of BlockAllocator
 * Move spinlock from BlockAllocator to Queue
 *** Add support IPv6 protocol
@@ -12,7 +12,7 @@ The '*' means an estimated complexity of feature implementation.
 *** Move assembling RPC Procedures (Call + Reply) from Analysis to Filtration module
 ****** Add support NFSv4 protocol
 ****  Add batching to Analyzers API. Passing a sequence of RPC Procedures to an analyser
-** Finish PrintAnalyzer for correct print-out NFS replies to console
+** Finish PrintAnalyzer for correct print-out NFSv3 replies to console
 ** Fix security issues with superuser privileges required for packet capturing from an interface
 *** Implement Overall File Data Working Set Analyzer and Directory Information Analyzer
 *** Implement drawing graphics in analyzers via gnuplot
