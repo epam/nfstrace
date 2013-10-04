@@ -322,7 +322,7 @@ extern "C"
 
 const char* usage()
 {
-    return "Anguments aren't supported. TODO: add description of OFWS Analyser";
+    return "Arguments aren't supported. TODO: add description of OFWS Analyser";
 }
 
 IAnalyzer* create(const char* opts)

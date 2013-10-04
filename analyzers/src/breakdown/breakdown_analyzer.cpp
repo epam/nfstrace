@@ -310,24 +310,27 @@ public:
                 out << 0;
             out << "%" << std::endl;
         }
-        out << "Per connection info: " << std::endl;
-
-        std::stringstream session;
-        typename PerOpStat::iterator it = per_op_stat.begin();
-        typename PerOpStat::iterator end = per_op_stat.end();
-        for(; it != end; ++it)
+        if(per_op_stat.size())  // is not empty?
         {
-            const Breakdown& current = *it->second;
-            uint64_t s_total = 0;
-            for(int i = 0; i < ProcEnum::count; ++i)
+            out << "Per connection info: " << std::endl;
+
+            std::stringstream session;
+            typename PerOpStat::iterator it = per_op_stat.begin();
+            typename PerOpStat::iterator end = per_op_stat.end();
+            for(; it != end; ++it)
             {
-                s_total += current[i].get_count();
+                const Breakdown& current = *it->second;
+                uint64_t s_total = 0;
+                for(int i = 0; i < ProcEnum::count; ++i)
+                {
+                    s_total += current[i].get_count();
+                }
+                session.str("");
+                session << it->first;
+                print_per_session(current, session.str(), s_total);
+                std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
+                store_per_session(file, current, session.str(), s_total);
             }
-            session.str("");
-            session << it->first;
-            print_per_session(current, session.str(), s_total);
-            std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
-            store_per_session(file, current, session.str(), s_total);
         }
     }
 
