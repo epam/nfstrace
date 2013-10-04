@@ -32,7 +32,7 @@ Opt Args::options[Args::num] =
     {'O', "ofile",      Opt::REQ, "INTERFACE-BPF.pcap",  "output file for "DUMP" mode, the '-' means stdout",   "PATH"},
     {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file"},
     {'D', "dump-size",  Opt::REQ, "0",                   "size of dumping file portion in MBytes, 0 = no limit","0.."},
-    {'B', "bsize",      Opt::REQ, "2",                   "size of capturing kernel buffer in MBytes",           "1.."},
+    {'B', "bsize",      Opt::REQ, "20",                  "size of capturing kernel buffer in MBytes",           "1.."},
     {'T', "tmp-capture",Opt::NOA, "false",               "async capture buffering in tmp files, may be enabled for " LIVE"|"DUMP" modes"},
     {'M', "msg-header", Opt::REQ, "512",                 "RPC message will be truncated to this limit in bytes before passing to Analysis", "1..4000"},
     {'Q', "qcapacity",  Opt::REQ, "256",                 "initial queue capacity of RPC messages",              "1..65535"},
