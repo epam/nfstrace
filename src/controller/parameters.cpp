@@ -114,6 +114,11 @@ unsigned short Parameters::snaplen() const
     return parser[CLI::SNAPLEN].begin()->to_int();
 }
 
+int Parameters::timeout() const
+{
+    return parser[CLI::TIMEOUT].begin()->to_int();
+}
+
 const std::string Parameters::filter() const
 {
     return std::string(*parser[CLI::FILTER].begin());

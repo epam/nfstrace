@@ -23,13 +23,13 @@ namespace filter
 
 static UniquePtr<CaptureReader> create_capture_reader(const Parameters& params)
 {
-    const int read_timeout = 250; // milliseconds
-    UniquePtr<CaptureReader> reader (new CaptureReader(params.interface(),
-                                                       params.filter(),
-                                                       params.snaplen(),
-                                                       read_timeout,
-                                                       params.buffer_size()
-                                                       ));
+    UniquePtr<CaptureReader> reader (new CaptureReader(
+                                       params.interface(),
+                                       params.filter(),
+                                       params.snaplen(),
+                                       params.timeout(),
+                                       params.buffer_size()
+                                     ));
     return reader;
 }
 
