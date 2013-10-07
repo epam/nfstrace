@@ -1,0 +1,1135 @@
+	CROSS SEND (FC18) Volume 2 x 2.1GB /dev/null (SPEED ~50MB/s)
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+^C###  Breakdown analyzer  ###
+Total calls: 47748. Per operation:
+NULL            0   0.00%
+GETATTR        17   0.04%
+SETATTR         4   0.01%
+LOOKUP          8   0.02%
+ACCESS         12   0.03%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE       46917  98.26%
+CREATE          4   0.01%
+MKDIR           4   0.01%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          4   0.01%
+RMDIR           4   0.01%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     8   0.02%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT        766   1.60%
+Per connection info: 
+Session: 192.168.0.1:709 --> 192.168.0.2:2049 [TCP]
+Total: 20038. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    9 (  0.04%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00004007
+SETATTR        Count:    2 (  0.01%) Min: 0.014 Max: 0.022 Avg: 0.018 StDev: 0.00593192
+LOOKUP         Count:    4 (  0.02%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00002004
+ACCESS         Count:    4 (  0.02%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00003216
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:19260 ( 96.12%) Min: 0.000 Max: 1.299 Avg: 0.026 StDev: 0.07421789
+CREATE         Count:    2 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000283
+MKDIR          Count:    2 (  0.01%) Min: 0.000 Max: 0.026 Avg: 0.013 StDev: 0.01844347
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    2 (  0.01%) Min: 0.229 Max: 0.235 Avg: 0.232 StDev: 0.00393222
+RMDIR          Count:    2 (  0.01%) Min: 0.000 Max: 0.032 Avg: 0.016 StDev: 0.02233467
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    5 (  0.02%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00006845
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:  746 (  3.72%) Min: 0.002 Max: 2.241 Avg: 0.378 StDev: 0.36393720
+Session: 192.168.0.2:828 --> 192.168.0.1:2049 [TCP]
+Total: 27710. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    8 (  0.03%) Min: 0.000 Max: 0.017 Avg: 0.006 StDev: 0.00734563
+SETATTR        Count:    2 (  0.01%) Min: 0.019 Max: 0.025 Avg: 0.022 StDev: 0.00419244
+LOOKUP         Count:    4 (  0.01%) Min: 0.000 Max: 0.017 Avg: 0.008 StDev: 0.00813220
+ACCESS         Count:    8 (  0.03%) Min: 0.000 Max: 0.018 Avg: 0.007 StDev: 0.00631853
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:27657 ( 99.81%) Min: 0.000 Max: 2.782 Avg: 0.011 StDev: 0.10018106
+CREATE         Count:    2 (  0.01%) Min: 0.028 Max: 0.048 Avg: 0.038 StDev: 0.01448508
+MKDIR          Count:    2 (  0.01%) Min: 0.045 Max: 0.064 Avg: 0.054 StDev: 0.01286510
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    2 (  0.01%) Min: 0.420 Max: 0.561 Avg: 0.491 StDev: 0.09985055
+RMDIR          Count:    2 (  0.01%) Min: 0.040 Max: 0.055 Avg: 0.048 StDev: 0.01055357
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    3 (  0.01%) Min: 0.000 Max: 0.016 Avg: 0.006 StDev: 0.00914918
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:   20 (  0.07%) Min: 0.000 Max: 4.256 Avg: 0.854 StDev: 1.19323674
+./release/nfstrace: signal: Interrupt
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+create new session 192.168.0.1:709 --> 192.168.0.2:2049 [TCP]
+We are lost 330528 bytes of useful data. lost:344624 msg_len:14096
+create new session 192.168.0.1:2049 --> 192.168.0.2:828 [TCP]
+We are lost 2155096 bytes of useful data. lost:2263936 msg_len:108840
+We are lost 1528840 bytes of useful data. lost:1549352 msg_len:20512
+
+2229935 packets received by filter
+608 packets dropped by kernel
+0 packets dropped by interface
+
+	CROSS SEND (FC12) Volume 2 x 2.1GB /dev/null (SPEED ~50MB/s)
+
+[nst@EPBYMINW1962T6 trunk]$ sudo ./release/nfstrace -i eth0 -B 20 -a ./analyzers/release/libbreakdown.so 
+^C###  Breakdown analyzer  ###
+Total calls: 44682. Per operation:
+NULL            0   0.00%
+GETATTR        18   0.04%
+SETATTR         4   0.01%
+LOOKUP          8   0.02%
+ACCESS         12   0.03%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE       43839  98.11%
+CREATE          4   0.01%
+MKDIR           4   0.01%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          4   0.01%
+RMDIR           4   0.01%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     8   0.02%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT        777   1.74%
+Per connection info: 
+Session: 192.168.0.1:709 --> 192.168.0.2:2049 [TCP]
+Total: 20781. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    9 (  0.04%) Min: 0.000 Max: 0.001 Avg: 0.001 StDev: 0.00021119
+SETATTR        Count:    2 (  0.01%) Min: 0.014 Max: 0.022 Avg: 0.018 StDev: 0.00571130
+LOOKUP         Count:    4 (  0.02%) Min: 0.000 Max: 0.001 Avg: 0.000 StDev: 0.00021495
+ACCESS         Count:    4 (  0.02%) Min: 0.000 Max: 0.001 Avg: 0.000 StDev: 0.00022281
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:19988 ( 96.18%) Min: 0.001 Max: 1.302 Avg: 0.029 StDev: 0.07369837
+CREATE         Count:    2 (  0.01%) Min: 0.000 Max: 0.001 Avg: 0.000 StDev: 0.00037052
+MKDIR          Count:    2 (  0.01%) Min: 0.000 Max: 0.027 Avg: 0.014 StDev: 0.01874752
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    2 (  0.01%) Min: 0.230 Max: 0.235 Avg: 0.232 StDev: 0.00390323
+RMDIR          Count:    2 (  0.01%) Min: 0.001 Max: 0.032 Avg: 0.016 StDev: 0.02215436
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    5 (  0.02%) Min: 0.000 Max: 0.001 Avg: 0.001 StDev: 0.00012738
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:  761 (  3.66%) Min: 0.002 Max: 2.243 Avg: 0.383 StDev: 0.36243382
+Session: 192.168.0.2:828 --> 192.168.0.1:2049 [TCP]
+Total: 23901. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    9 (  0.04%) Min: 0.000 Max: 0.010 Avg: 0.003 StDev: 0.00388705
+SETATTR        Count:    2 (  0.01%) Min: 0.018 Max: 0.019 Avg: 0.018 StDev: 0.00061306
+LOOKUP         Count:    4 (  0.02%) Min: 0.000 Max: 0.015 Avg: 0.005 StDev: 0.00705327
+ACCESS         Count:    8 (  0.03%) Min: 0.000 Max: 0.016 Avg: 0.004 StDev: 0.00538199
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:23851 ( 99.79%) Min: 0.000 Max: 2.800 Avg: 0.014 StDev: 0.14070192
+CREATE         Count:    2 (  0.01%) Min: 0.021 Max: 0.048 Avg: 0.034 StDev: 0.01908128
+MKDIR          Count:    2 (  0.01%) Min: 0.041 Max: 0.062 Avg: 0.051 StDev: 0.01512431
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    2 (  0.01%) Min: 0.420 Max: 0.559 Avg: 0.489 StDev: 0.09824117
+RMDIR          Count:    2 (  0.01%) Min: 0.040 Max: 0.053 Avg: 0.047 StDev: 0.00911673
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    3 (  0.01%) Min: 0.000 Max: 0.009 Avg: 0.003 StDev: 0.00527093
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:   16 (  0.07%) Min: 0.000 Max: 4.255 Avg: 0.951 StDev: 1.29677458
+./release/nfstrace: signal: Interrupt
+[nst@EPBYMINW1962T6 trunk]$ cat nfstrace.log 
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+create new session 192.168.0.1:709 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:828 --> 192.168.0.1:2049 [TCP]
+We are lost 747200 bytes of useful data. lost:823912 msg_len:76712
+We are lost 396928 bytes of useful data. lost:485080 msg_len:88152
+We are lost 192168 bytes of useful data. lost:217880 msg_len:25712
+We are lost 4456 bytes of useful data. lost:8688 msg_len:4232
+We are lost 19656 bytes of useful data. lost:123080 msg_len:103424
+We are lost 31456 bytes of useful data. lost:101360 msg_len:69904
+We are lost 98152 bytes of useful data. lost:168328 msg_len:70176
+We are lost 117824 bytes of useful data. lost:127424 msg_len:9600
+We are lost 288232 bytes of useful data. lost:460784 msg_len:172552
+We are lost 94120 bytes of useful data. lost:181240 msg_len:87120
+We are lost 91920 bytes of useful data. lost:133216 msg_len:41296
+We are lost 393288 bytes of useful data. lost:455184 msg_len:61896
+We are lost 585472 bytes of useful data. lost:610328 msg_len:24856
+We are lost 35216 bytes of useful data. lost:53576 msg_len:18360
+We are lost 57240 bytes of useful data. lost:220096 msg_len:162856
+We are lost 109696 bytes of useful data. lost:233016 msg_len:123320
+We are lost 554024 bytes of useful data. lost:556032 msg_len:2008
+We are lost 27272 bytes of useful data. lost:237472 msg_len:210200
+We are lost 582184 bytes of useful data. lost:734464 msg_len:152280
+We are lost 264000 bytes of useful data. lost:272224 msg_len:8224
+We are lost 51000 bytes of useful data. lost:217200 msg_len:166200
+We are lost 129336 bytes of useful data. lost:149144 msg_len:19808
+We are lost 457952 bytes of useful data. lost:595128 msg_len:137176
+We are lost 11584 bytes of useful data. lost:213096 msg_len:201512
+We are lost 35008 bytes of useful data. lost:63712 msg_len:28704
+We are lost 43128 bytes of useful data. lost:173760 msg_len:130632
+We are lost 616936 bytes of useful data. lost:648704 msg_len:31768
+We are lost 710056 bytes of useful data. lost:916584 msg_len:206528
+We are lost 1298368 bytes of useful data. lost:1459400 msg_len:161032
+We are lost 18296 bytes of useful data. lost:26064 msg_len:7768
+We are lost 101752 bytes of useful data. lost:107192 msg_len:5440
+We are lost 274208 bytes of useful data. lost:286704 msg_len:12496
+We are lost 380944 bytes of useful data. lost:515488 msg_len:134544
+We are lost 294184 bytes of useful data. lost:540584 msg_len:246400
+We are lost 504456 bytes of useful data. lost:731240 msg_len:226784
+We are lost 565376 bytes of useful data. lost:713992 msg_len:148616
+We are lost 5536 bytes of useful data. lost:170864 msg_len:165328
+We are lost 195480 bytes of useful data. lost:450568 msg_len:255088
+We are lost 318800 bytes of useful data. lost:339656 msg_len:20856
+We are lost 220096 bytes of useful data. lost:240576 msg_len:20480
+We are lost 1102392 bytes of useful data. lost:1169984 msg_len:67592
+We are lost 171960 bytes of useful data. lost:193856 msg_len:21896
+We are lost 511456 bytes of useful data. lost:592232 msg_len:80776
+We are lost 36200 bytes of useful data. lost:105944 msg_len:69744
+We are lost 60816 bytes of useful data. lost:73400 msg_len:12584
+We are lost 143016 bytes of useful data. lost:337384 msg_len:194368
+We are lost 106432 bytes of useful data. lost:130320 msg_len:23888
+We are lost 18248 bytes of useful data. lost:85432 msg_len:67184
+We are lost 60104 bytes of useful data. lost:280912 msg_len:220808
+We are lost 127160 bytes of useful data. lost:181000 msg_len:53840
+We are lost 124576 bytes of useful data. lost:217200 msg_len:92624
+We are lost 556776 bytes of useful data. lost:651600 msg_len:94824
+list of unhandled exceptions:
+	signal: Interrupt
+
+5201975 packets received by filter
+16908 packets dropped by kernel
+0 packets dropped by interface
+
+	CROSS SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~35MB/s)
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                                                                                                   255 ↵
+[sudo] password for dzianis: 
+^C###  Breakdown analyzer  ###
+Total calls: 35591. Per operation:
+NULL            0   0.00%
+GETATTR         2   0.01%
+SETATTR         2   0.01%
+LOOKUP          4   0.01%
+ACCESS          4   0.01%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE       35057  98.50%
+CREATE          3   0.01%
+MKDIR           0   0.00%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          0   0.00%
+RMDIR           0   0.00%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     0   0.00%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT        519   1.46%
+Per connection info: 
+Session: 192.168.0.2:976 --> 192.168.0.1:2049 [TCP]
+Total: 17176. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SETATTR        Count:    1 (  0.01%) Min: 0.017 Max: 0.017 Avg: 0.017 StDev: 0.00000000
+LOOKUP         Count:    2 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000778
+ACCESS         Count:    2 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00003536
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:17155 ( 99.88%) Min: 0.001 Max: 7.790 Avg: 0.048 StDev: 0.42919845
+CREATE         Count:    1 (  0.01%) Min: 0.081 Max: 0.081 Avg: 0.081 StDev: 0.00000000
+MKDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:   14 (  0.08%) Min: 0.094 Max: 7.789 Avg: 3.259 StDev: 1.90638835
+Session: 192.168.0.1:899 --> 192.168.0.2:2049 [TCP]
+Total: 18415. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SETATTR        Count:    1 (  0.01%) Min: 0.133 Max: 0.133 Avg: 0.133 StDev: 0.00000000
+LOOKUP         Count:    2 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00001344
+ACCESS         Count:    2 (  0.01%) Min: 0.000 Max: 0.001 Avg: 0.000 StDev: 0.00032951
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:17902 ( 97.21%) Min: 0.000 Max: 2.766 Avg: 0.034 StDev: 0.18547187
+CREATE         Count:    2 (  0.01%) Min: 0.000 Max: 0.065 Avg: 0.033 StDev: 0.04618114
+MKDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:  505 (  2.74%) Min: 0.089 Max: 3.375 Avg: 1.080 StDev: 0.78351744
+./release/nfstrace: signal: Interrupt
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+create new session 192.168.0.1:899 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:976 --> 192.168.0.1:2049 [TCP]
+We are lost 1238872 bytes of useful data. lost:1419040 msg_len:180168
+We are lost 32664 bytes of useful data. lost:47784 msg_len:15120
+
+2489632 packets received by filter
+205 packets dropped by kernel
+0 packets dropped by interface
+
+	CROSS SEND (FC12) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~40MB/s)
+
+[nst@EPBYMINW1962T6 trunk]$ sudo ./release/nfstrace -i eth0 -B 20 -a ./analyzers/release/libbreakdown.so 
+[sudo] password for nst: 
+^C###  Breakdown analyzer  ###
+Total calls: 33177. Per operation:
+NULL            0   0.00%
+GETATTR         2   0.01%
+SETATTR         2   0.01%
+LOOKUP          4   0.01%
+ACCESS          4   0.01%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE       32653  98.42%
+CREATE          3   0.01%
+MKDIR           0   0.00%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          0   0.00%
+RMDIR           0   0.00%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     0   0.00%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT        509   1.53%
+Per connection info: 
+Session: 192.168.0.2:976 --> 192.168.0.1:2049 [TCP]
+Total: 14861. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SETATTR        Count:    1 (  0.01%) Min: 0.017 Max: 0.017 Avg: 0.017 StDev: 0.00000000
+LOOKUP         Count:    2 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000707
+ACCESS         Count:    2 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00002687
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:14842 ( 99.87%) Min: 0.000 Max: 7.789 Avg: 0.042 StDev: 0.40825347
+CREATE         Count:    1 (  0.01%) Min: 0.081 Max: 0.081 Avg: 0.081 StDev: 0.00000000
+MKDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:   12 (  0.08%) Min: 0.094 Max: 7.789 Avg: 3.270 StDev: 2.07079659
+Session: 192.168.0.1:899 --> 192.168.0.2:2049 [TCP]
+Total: 18316. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SETATTR        Count:    1 (  0.01%) Min: 0.133 Max: 0.133 Avg: 0.133 StDev: 0.00000000
+LOOKUP         Count:    2 (  0.01%) Min: 0.000 Max: 0.001 Avg: 0.000 StDev: 0.00027224
+ACCESS         Count:    2 (  0.01%) Min: 0.000 Max: 0.001 Avg: 0.001 StDev: 0.00058973
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:17811 ( 97.24%) Min: 0.001 Max: 2.768 Avg: 0.038 StDev: 0.18264988
+CREATE         Count:    2 (  0.01%) Min: 0.000 Max: 0.066 Avg: 0.033 StDev: 0.04627872
+MKDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:  497 (  2.71%) Min: 0.092 Max: 3.378 Avg: 1.088 StDev: 0.78457037
+./release/nfstrace: signal: Interrupt
+[nst@EPBYMINW1962T6 trunk]$ cat nfstrace.log 
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+create new session 192.168.0.1:899 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:976 --> 192.168.0.1:2049 [TCP]
+We are lost 678640 bytes of useful data. lost:757304 msg_len:78664
+We are lost 15736 bytes of useful data. lost:150592 msg_len:134856
+We are lost 31784 bytes of useful data. lost:68056 msg_len:36272
+We are lost 45112 bytes of useful data. lost:118736 msg_len:73624
+We are lost 35288 bytes of useful data. lost:55024 msg_len:19736
+We are lost 7488 bytes of useful data. lost:73848 msg_len:66360
+We are lost 533424 bytes of useful data. lost:640016 msg_len:106592
+We are lost 122160 bytes of useful data. lost:189688 msg_len:67528
+We are lost 35520 bytes of useful data. lost:111496 msg_len:75976
+We are lost 43808 bytes of useful data. lost:44888 msg_len:1080
+We are lost 292664 bytes of useful data. lost:313256 msg_len:20592
+We are lost 145016 bytes of useful data. lost:227336 msg_len:82320
+We are lost 970072 bytes of useful data. lost:1051248 msg_len:81176
+We are lost 161176 bytes of useful data. lost:183896 msg_len:22720
+We are lost 14808 bytes of useful data. lost:21720 msg_len:6912
+We are lost 19712 bytes of useful data. lost:99912 msg_len:80200
+We are lost 81088 bytes of useful data. lost:327488 msg_len:246400
+We are lost 146304 bytes of useful data. lost:150592 msg_len:4288
+We are lost 222888 bytes of useful data. lost:263536 msg_len:40648
+We are lost 414008 bytes of useful data. lost:598024 msg_len:184016
+We are lost 461864 bytes of useful data. lost:543000 msg_len:81136
+We are lost 1587248 bytes of useful data. lost:1694640 msg_len:107392
+We are lost 4294706816 bytes of useful data. lost:4294836976 msg_len:130160
+We are lost 35520 bytes of useful data. lost:83984 msg_len:48464
+We are lost 6128 bytes of useful data. lost:121632 msg_len:115504
+We are lost 69920 bytes of useful data. lost:91224 msg_len:21304
+We are lost 297112 bytes of useful data. lost:389512 msg_len:92400
+We are lost 36200 bytes of useful data. lost:36440 msg_len:240
+We are lost 191624 bytes of useful data. lost:330144 msg_len:138520
+We are lost 852400 bytes of useful data. lost:1009256 msg_len:156856
+We are lost 1399496 bytes of useful data. lost:1607280 msg_len:207784
+We are lost 88176 bytes of useful data. lost:89776 msg_len:1600
+We are lost 14880 bytes of useful data. lost:37648 msg_len:22768
+We are lost 107704 bytes of useful data. lost:169416 msg_len:61712
+We are lost 32264 bytes of useful data. lost:65160 msg_len:32896
+We are lost 641216 bytes of useful data. lost:760200 msg_len:118984
+We are lost 129344 bytes of useful data. lost:379376 msg_len:250032
+We are lost 88792 bytes of useful data. lost:124528 msg_len:35736
+We are lost 8776 bytes of useful data. lost:240368 msg_len:231592
+We are lost 96848 bytes of useful data. lost:170864 msg_len:74016
+We are lost 162464 bytes of useful data. lost:169416 msg_len:6952
+We are lost 73848 bytes of useful data. lost:74144 msg_len:296
+We are lost 244712 bytes of useful data. lost:322872 msg_len:78160
+We are lost 639224 bytes of useful data. lost:824808 msg_len:185584
+We are lost 118736 bytes of useful data. lost:176896 msg_len:58160
+list of unhandled exceptions:
+	signal: Interrupt
+
+5809961 packets received by filter
+19686 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~56MB/s) wsize=32K
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+^C###  Breakdown analyzer  ###
+Total calls: 143629. Per operation:
+NULL            0   0.00%
+GETATTR         0   0.00%
+SETATTR         1   0.00%
+LOOKUP          1   0.00%
+ACCESS          1   0.00%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE       143614  99.99%
+CREATE          1   0.00%
+MKDIR           0   0.00%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          0   0.00%
+RMDIR           0   0.00%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     0   0.00%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT         11   0.01%
+Per connection info: 
+Session: 192.168.0.2:813 --> 192.168.0.1:2049 [TCP]
+Total: 143629. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SETATTR        Count:    1 (  0.00%) Min: 0.017 Max: 0.017 Avg: 0.017 StDev: 0.00000000
+LOOKUP         Count:    1 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+ACCESS         Count:    1 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:143614 ( 99.99%) Min: 0.000 Max: 5.175 Avg: 0.015 StDev: 0.22261072
+CREATE         Count:    1 (  0.00%) Min: 0.044 Max: 0.044 Avg: 0.044 StDev: 0.00000000
+MKDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:   11 (  0.01%) Min: 0.000 Max: 5.175 Avg: 2.829 StDev: 1.95954985
+./release/nfstrace: signal: Interrupt
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+create new session 192.168.0.2:813 --> 192.168.0.1:2049 [TCP]
+
+2085581 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~51MB/s) wsize=64K
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+[sudo] password for dzianis: 
+^C###  Breakdown analyzer  ###
+Total calls: 72171. Per operation:
+NULL            0   0.00%
+GETATTR         2   0.00%
+SETATTR         1   0.00%
+LOOKUP          0   0.00%
+ACCESS          1   0.00%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE       72157  99.98%
+CREATE          0   0.00%
+MKDIR           0   0.00%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          0   0.00%
+RMDIR           0   0.00%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     0   0.00%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT         10   0.01%
+Per connection info: 
+Session: 192.168.0.2:680 --> 192.168.0.1:2049 [TCP]
+Total: 72171. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    2 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00002333
+SETATTR        Count:    1 (  0.00%) Min: 0.756 Max: 0.756 Avg: 0.756 StDev: 0.00000000
+LOOKUP         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+ACCESS         Count:    1 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:72157 ( 99.98%) Min: 0.000 Max: 5.714 Avg: 0.018 StDev: 0.25705040
+CREATE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:   10 (  0.01%) Min: 0.053 Max: 5.710 Avg: 3.402 StDev: 2.09587608
+./release/nfstrace: signal: Interrupt
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log 
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+create new session 192.168.0.2:680 --> 192.168.0.1:2049 [TCP]
+
+1980583 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~55MB/s) wsize=128K
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                                                                                                   255 ↵
+^C###  Breakdown analyzer  ###
+Total calls: 36439. Per operation:
+NULL            0   0.00%
+GETATTR         2   0.01%
+SETATTR         1   0.00%
+LOOKUP          0   0.00%
+ACCESS          1   0.00%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE       36425  99.96%
+CREATE          0   0.00%
+MKDIR           0   0.00%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          0   0.00%
+RMDIR           0   0.00%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     0   0.00%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT         10   0.03%
+Per connection info: 
+Session: 192.168.0.2:1003 --> 192.168.0.1:2049 [TCP]
+Total: 36439. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    2 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00004667
+SETATTR        Count:    1 (  0.00%) Min: 0.732 Max: 0.732 Avg: 0.732 StDev: 0.00000000
+LOOKUP         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+ACCESS         Count:    1 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:36425 ( 99.96%) Min: 0.000 Max: 5.617 Avg: 0.021 StDev: 0.27411602
+CREATE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:   10 (  0.03%) Min: 0.082 Max: 5.613 Avg: 2.763 StDev: 1.96735514
+./release/nfstrace: signal: Interrupt
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+create new session 192.168.0.2:1003 --> 192.168.0.1:2049 [TCP]
+
+1947817 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~54MB/s) wsize=256K
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+^[OF^C###  Breakdown analyzer  ###
+Total calls: 17196. Per operation:
+NULL            0   0.00%
+GETATTR         2   0.01%
+SETATTR         1   0.01%
+LOOKUP          0   0.00%
+ACCESS          1   0.01%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE       17182  99.92%
+CREATE          0   0.00%
+MKDIR           0   0.00%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          0   0.00%
+RMDIR           0   0.00%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     0   0.00%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT         10   0.06%
+Per connection info: 
+Session: 192.168.0.2:716 --> 192.168.0.1:2049 [TCP]
+Total: 17196. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    2 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00006718
+SETATTR        Count:    1 (  0.01%) Min: 0.728 Max: 0.728 Avg: 0.728 StDev: 0.00000000
+LOOKUP         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+ACCESS         Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:17182 ( 99.92%) Min: 0.001 Max: 5.487 Avg: 0.032 StDev: 0.35386485
+CREATE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:   10 (  0.06%) Min: 0.264 Max: 5.454 Avg: 3.023 StDev: 2.15713864
+./release/nfstrace: signal: Interrupt
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+create new session 192.168.0.2:716 --> 192.168.0.1:2049 [TCP]
+We are lost 21304 bytes of useful data. lost:222992 msg_len:201688
+
+1931643 packets received by filter
+89 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~54MB/s) wsize=512K
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+^C###  Breakdown analyzer  ###
+Total calls: 9599. Per operation:
+NULL            0   0.00%
+GETATTR         2   0.02%
+SETATTR         1   0.01%
+LOOKUP          0   0.00%
+ACCESS          1   0.01%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE        9584  99.84%
+CREATE          0   0.00%
+MKDIR           0   0.00%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          0   0.00%
+RMDIR           0   0.00%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     0   0.00%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT         11   0.11%
+Per connection info: 
+Session: 192.168.0.2:843 --> 192.168.0.1:2049 [TCP]
+Total: 9599. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    2 (  0.02%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00009051
+SETATTR        Count:    1 (  0.01%) Min: 0.734 Max: 0.734 Avg: 0.734 StDev: 0.00000000
+LOOKUP         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+ACCESS         Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count: 9584 ( 99.84%) Min: 0.001 Max: 5.376 Avg: 0.040 StDev: 0.36903889
+CREATE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:   11 (  0.11%) Min: 0.000 Max: 5.369 Avg: 2.846 StDev: 2.12255833
+./release/nfstrace: signal: Interrupt
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+create new session 192.168.0.2:843 --> 192.168.0.1:2049 [TCP]
+
+1924383 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~54MB/s) wsize=1024K
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                               
+^C###  Breakdown analyzer  ###
+Total calls: 9467. Per operation:
+NULL            0   0.00%
+GETATTR         2   0.02%
+SETATTR         1   0.01%
+LOOKUP          0   0.00%
+ACCESS          1   0.01%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE        9453  99.85%
+CREATE          0   0.00%
+MKDIR           0   0.00%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          0   0.00%
+RMDIR           0   0.00%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     0   0.00%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT         10   0.11%
+Per connection info: 
+Session: 192.168.0.2:921 --> 192.168.0.1:2049 [TCP]
+Total: 9467. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    2 (  0.02%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00004596
+SETATTR        Count:    1 (  0.01%) Min: 0.724 Max: 0.724 Avg: 0.724 StDev: 0.00000000
+LOOKUP         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+ACCESS         Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count: 9453 ( 99.85%) Min: 0.001 Max: 5.279 Avg: 0.040 StDev: 0.37424270
+CREATE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:   10 (  0.11%) Min: 0.171 Max: 5.271 Avg: 2.870 StDev: 2.04650689
+./release/nfstrace: signal: Interrupt
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+create new session 192.168.0.2:921 --> 192.168.0.1:2049 [TCP]
+
+1924339 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
+	DUMPING (FC12-client, FC18-server,nfstrace) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv wsize=512K
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Dumping packets to file:em1-tcp port 2049.pcap
+create new session 192.168.0.1:901 --> 192.168.0.2:2049 [TCP]
+
+541174 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  ls -la --si em1-tcp\ port\ 2049.pcap
+-rw-r--r--. 1 root root 363M Oct  4 11:34 em1-tcp port 2049.pcap
+
+	DUMPING (FC12-client, FC18-server,nfstrace) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv wsize=32K
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
+[sudo] password for dzianis: 
+^C./release/nfstrace: signal: Interrupt
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Dumping packets to file:em1-tcp port 2049.pcap
+create new session 192.168.0.1:855 --> 192.168.0.2:2049 [TCP]
+We are lost 579880 bytes of useful data. lost:592168 msg_len:12288
+We are lost 165040 bytes of useful data. lost:174368 msg_len:9328
+We are lost 513608 bytes of useful data. lost:514248 msg_len:640
+We are lost 1448 bytes of useful data. lost:7880 msg_len:6432
+We are lost 427232 bytes of useful data. lost:436560 msg_len:9328
+We are lost 11280720 bytes of useful data. lost:11290048 msg_len:9328
+We are lost 331536 bytes of useful data. lost:339728 msg_len:8192
+
+1290131 packets received by filter
+8971 packets dropped by kernel
+0 packets dropped by interface
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  ls -la --si em1-tcp\ port\ 2049.pcap
+-rw-r--r--. 1 root root 3.4G Oct  4 11:40 em1-tcp port 2049.pcap
+
+	DUMPING (FC12-client, FC18-server,nfstrace) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv wsize=1024K
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
+[sudo] password for dzianis: 
+^C./release/nfstrace: signal: Interrupt
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Dumping packets to file:em1-tcp port 2049.pcap
+create new session 192.168.0.1:905 --> 192.168.0.2:2049 [TCP]
+We are lost 6264816 bytes of useful data. lost:7087688 msg_len:822872
+We are lost 3003248 bytes of useful data. lost:3068768 msg_len:65520
+
+443358 packets received by filter
+824 packets dropped by kernel
+0 packets dropped by interface
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  ls -la --si em1-tcp\ port\ 2049.pcap
+-rw-r--r--. 1 root root 93M Oct  4 11:45 em1-tcp port 2049.pcap
+
+	One Direction SEND (FC12->FC18) Volume 2 x 1.5GB (SPEED ~113MB/s) wsize=512K
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+^C###  Breakdown analyzer  ###
+Total calls: 3369. Per operation:
+NULL            0   0.00%
+GETATTR         4   0.12%
+SETATTR         2   0.06%
+LOOKUP          4   0.12%
+ACCESS          3   0.09%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE        3000  89.05%
+CREATE          2   0.06%
+MKDIR           2   0.06%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          2   0.06%
+RMDIR           2   0.06%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     8   0.24%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT        340  10.09%
+Per connection info: 
+Session: 192.168.0.1:820 --> 192.168.0.2:2049 [TCP]
+Total: 3369. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    4 (  0.12%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000634
+SETATTR        Count:    2 (  0.06%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00001061
+LOOKUP         Count:    4 (  0.12%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00001196
+ACCESS         Count:    3 (  0.09%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00002684
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count: 3000 ( 89.05%) Min: 0.009 Max: 0.053 Avg: 0.010 StDev: 0.00090622
+CREATE         Count:    2 (  0.06%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00001414
+MKDIR          Count:    2 (  0.06%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00001768
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    2 (  0.06%) Min: 0.141 Max: 0.143 Avg: 0.142 StDev: 0.00150189
+RMDIR          Count:    2 (  0.06%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00001273
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    8 (  0.24%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00004464
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:  340 ( 10.09%) Min: 0.000 Max: 0.001 Avg: 0.000 StDev: 0.00016828
+./release/nfstrace: signal: Interrupt
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+create new session 192.168.0.1:820 --> 192.168.0.2:2049 [TCP]
+
+321925 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~110MB/s) wsize=32K (63835/64000)
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log 
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+Loading module: './analyzers/release/libofws.so' with args: []
+Loading module: './analyzers/release/libofdws.so' with args: []
+create new session 192.168.0.1:907 --> 192.168.0.2:2049 [TCP]
+We are lost 11456 bytes of useful data. lost:17376 msg_len:5920
+
+371712 packets received by filter
+6 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~112MB/s) wsize=64K (32000/32000)
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+Loading module: './analyzers/release/libofws.so' with args: []
+Loading module: './analyzers/release/libofdws.so' with args: []
+create new session 192.168.0.1:719 --> 192.168.0.2:2049 [TCP]
+
+318908 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~112MB/s) wsize=128K (16322/16000)
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+Loading module: './analyzers/release/libofws.so' with args: []
+Loading module: './analyzers/release/libofdws.so' with args: []
+create new session 192.168.0.1:952 --> 192.168.0.2:2049 [TCP]
+
+279913 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~112MB/s) wsize=256K (8000/8000)
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+Loading module: './analyzers/release/libofws.so' with args: []
+Loading module: './analyzers/release/libofdws.so' with args: []
+create new session 192.168.0.1:884 --> 192.168.0.2:2049 [TCP]
+
+261182 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~112MB/s) wsize=512K (5767/4000)
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+Loading module: './analyzers/release/libofws.so' with args: []
+Loading module: './analyzers/release/libofdws.so' with args: []
+create new session 192.168.0.1:697 --> 192.168.0.2:2049 [TCP]
+
+249711 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
+	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~111MB/s) wsize=1024K (2000/2000)
+
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  cat
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+Loading module: './analyzers/release/libofws.so' with args: []
+Loading module: './analyzers/release/libofdws.so' with args: []
+create new session 192.168.0.1:860 --> 192.168.0.2:2049 [TCP]
+
+214056 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
+FC18
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  hardinfo
+Processor	4x Intel(R) Core(TM) i5 CPU 650 @ 3.20GHz
+Memory	7972MB (3641MB used)
+Operating System	Fedora release 18 (Spherical Cow)
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  uname -a 
+Linux epbyminw3646.minsk.epam.com 3.10.12-100.fc18.x86_64 #1 SMP Mon Sep 16 13:05:36 UTC 2013 x86_64 x86_64 x86_64 GNU/Linux
+╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
+╰─➤  ethtool  em1                                                                                                                                                                     75 ↵
+Settings for em1:
+	Supported ports: [ TP ]
+	Supported link modes:   10baseT/Half 10baseT/Full 
+	                        100baseT/Half 100baseT/Full 
+	                        1000baseT/Full 
+	Supported pause frame use: No
+	Supports auto-negotiation: Yes
+	Advertised link modes:  10baseT/Half 10baseT/Full 
+	                        100baseT/Half 100baseT/Full 
+	                        1000baseT/Full 
+	Advertised pause frame use: No
+	Advertised auto-negotiation: Yes
+	Speed: 1000Mb/s
+	Duplex: Full
+	Port: Twisted Pair
+	PHYAD: 2
+	Transceiver: internal
+	Auto-negotiation: on
+	MDI-X: off
+Cannot get wake-on-lan settings: Operation not permitted
+	Current message level: 0x00000007 (7)
+			       drv probe link
+	Link detected: yes
+
+FC12
+[nst@EPBYMINW1962T6 trunk]$ hardinfo
+Processor		: 2x Intel(R) Core(TM)2 Duo CPU     E7500  @ 2.93GHz
+Memory			: 4017MB (411MB used)
+Operating System	: Fedora release 12 (Constantine)
+[nst@EPBYMINW1962T6 trunk]$ sudo ethtool eth0
+[sudo] password for nst: 
+Settings for eth0:
+	Supported ports: [ TP ]
+	Supported link modes:   10baseT/Half 10baseT/Full 
+	                        100baseT/Half 100baseT/Full 
+	                        1000baseT/Full 
+	Supports auto-negotiation: Yes
+	Advertised link modes:  10baseT/Half 10baseT/Full 
+	                        100baseT/Half 100baseT/Full 
+	                        1000baseT/Full 
+	Advertised auto-negotiation: Yes
+	Speed: 100Mb/s
+	Duplex: Full
+	Port: Twisted Pair
+	PHYAD: 2
+	Transceiver: internal
+	Auto-negotiation: on
+	Supports Wake-on: pumbag
+	Wake-on: g
+	Current message level: 0x00000001 (1)
+	Link detected: yes
+[nst@EPBYMINW1962T6 trunk]$ uname -a
+Linux EPBYMINW1962T6.minsk.epam.com 2.6.32.26-175.fc12.x86_64 #1 SMP Wed Dec 1 21:39:34 UTC 2010 x86_64 x86_64 x86_64 GNU/Linux
+
