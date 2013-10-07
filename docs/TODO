@@ -2,9 +2,9 @@ This is TODO list of required enhancements and features.
 The '*' means an estimated complexity of feature implementation.
 
 
+*** Switch to C++11 and CMake
 ***** Implement multi-interface capturing and filtration
-***** Investigate swintch to netmap capturing instead of libpcap
-. (tiny star) add enumiration of network interfaces in CLI (se ./tests/pcap_if)
+. (tiny star) add enumeration of network interfaces in CLI (see ./tests/pcap_if)
 ** Implement MultiblockAllocator as replacement of BlockAllocator
 * Move spinlock from BlockAllocator to Queue
 *** Add support IPv6 protocol
@@ -15,4 +15,5 @@ The '*' means an estimated complexity of feature implementation.
 ** Finish PrintAnalyzer for correct print-out NFSv3 replies to console
 ** Fix security issues with superuser privileges required for packet capturing from an interface
 *** Implement Overall File Data Working Set Analyzer and Directory Information Analyzer
-*** Implement drawing graphics in analyzers via gnuplot
+*** Implement drawing graphics in analyzers via gnuplot directly, without external .sh script
+**** Implement libpyadapter.so or libjavaadapter.so
