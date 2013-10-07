@@ -1,8 +1,72 @@
-	CROSS SEND (FC18) Volume 2 x 2.1GB /dev/null (SPEED ~50MB/s)
+=================================================================================
+    Test environment
+=================================================================================
+Machine 1:
+$ hardinfo
+Processor	4x Intel(R) Core(TM) i5 CPU 650 @ 3.20GHz
+Memory	7972MB (3641MB used)
+Operating System	Fedora release 18 (Spherical Cow)
+$ ethtool  em1                                                                                                                                                                     75 ↵
+Settings for em1:
+	Supported ports: [ TP ]
+	Supported link modes:   10baseT/Half 10baseT/Full 
+	                        100baseT/Half 100baseT/Full 
+	                        1000baseT/Full 
+	Supported pause frame use: No
+	Supports auto-negotiation: Yes
+	Advertised link modes:  10baseT/Half 10baseT/Full 
+	                        100baseT/Half 100baseT/Full 
+	                        1000baseT/Full 
+	Advertised pause frame use: No
+	Advertised auto-negotiation: Yes
+	Speed: 1000Mb/s
+	Duplex: Full
+	Port: Twisted Pair
+	PHYAD: 2
+	Transceiver: internal
+	Auto-negotiation: on
+	MDI-X: off
+Cannot get wake-on-lan settings: Operation not permitted
+	Current message level: 0x00000007 (7)
+			       drv probe link
+	Link detected: yes
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
-^C###  Breakdown analyzer  ###
+Machine 2:
+$ hardinfo
+Processor		: 2x Intel(R) Core(TM)2 Duo CPU     E7500  @ 2.93GHz
+Memory			: 4017MB (411MB used)
+Operating System	: Fedora release 12 (Constantine)
+$ ethtool eth0
+Settings for eth0:
+	Supported ports: [ TP ]
+	Supported link modes:   10baseT/Half 10baseT/Full 
+	                        100baseT/Half 100baseT/Full 
+	                        1000baseT/Full 
+	Supports auto-negotiation: Yes
+	Advertised link modes:  10baseT/Half 10baseT/Full 
+	                        100baseT/Half 100baseT/Full 
+	                        1000baseT/Full 
+	Advertised auto-negotiation: Yes
+	Speed: 100Mb/s
+	Duplex: Full
+	Port: Twisted Pair
+	PHYAD: 2
+	Transceiver: internal
+	Auto-negotiation: on
+	Supports Wake-on: pumbag
+	Wake-on: g
+	Current message level: 0x00000001 (1)
+	Link detected: yes
+
+=================================================================================
+    TESTS
+=================================================================================
+
+=================================================================================
+	CROSS SEND (Machine 1) Volume 2 x 2.1GB /dev/null (SPEED ~50MB/s)
+
+# sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+###  Breakdown analyzer  ###
 Total calls: 47748. Per operation:
 NULL            0   0.00%
 GETATTR        17   0.04%
@@ -75,9 +139,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   20 (  0.07%) Min: 0.000 Max: 4.256 Avg: 0.854 StDev: 1.19323674
-./release/nfstrace: signal: Interrupt
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 create new session 192.168.0.1:709 --> 192.168.0.2:2049 [TCP]
@@ -90,10 +152,11 @@ We are lost 1528840 bytes of useful data. lost:1549352 msg_len:20512
 608 packets dropped by kernel
 0 packets dropped by interface
 
-	CROSS SEND (FC12) Volume 2 x 2.1GB /dev/null (SPEED ~50MB/s)
+=================================================================================
+	CROSS SEND (Machine 2) Volume 2 x 2.1GB /dev/null (SPEED ~50MB/s)
 
-[nst@EPBYMINW1962T6 trunk]$ sudo ./release/nfstrace -i eth0 -B 20 -a ./analyzers/release/libbreakdown.so 
-^C###  Breakdown analyzer  ###
+$ sudo ./release/nfstrace -i eth0 -B 20 -a ./analyzers/release/libbreakdown.so 
+###  Breakdown analyzer  ###
 Total calls: 44682. Per operation:
 NULL            0   0.00%
 GETATTR        18   0.04%
@@ -166,8 +229,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   16 (  0.07%) Min: 0.000 Max: 4.255 Avg: 0.951 StDev: 1.29677458
-./release/nfstrace: signal: Interrupt
-[nst@EPBYMINW1962T6 trunk]$ cat nfstrace.log 
+$ cat nfstrace.log 
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 create new session 192.168.0.1:709 --> 192.168.0.2:2049 [TCP]
@@ -231,12 +293,11 @@ list of unhandled exceptions:
 16908 packets dropped by kernel
 0 packets dropped by interface
 
-	CROSS SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~35MB/s)
+=================================================================================
+	CROSS SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~35MB/s)
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                                                                                                   255 ↵
-[sudo] password for dzianis: 
-^C###  Breakdown analyzer  ###
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                                                                                                   255 ↵
+###  Breakdown analyzer  ###
 Total calls: 35591. Per operation:
 NULL            0   0.00%
 GETATTR         2   0.01%
@@ -309,9 +370,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:  505 (  2.74%) Min: 0.089 Max: 3.375 Avg: 1.080 StDev: 0.78351744
-./release/nfstrace: signal: Interrupt
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 create new session 192.168.0.1:899 --> 192.168.0.2:2049 [TCP]
@@ -323,11 +382,11 @@ We are lost 32664 bytes of useful data. lost:47784 msg_len:15120
 205 packets dropped by kernel
 0 packets dropped by interface
 
-	CROSS SEND (FC12) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~40MB/s)
+=================================================================================
+	CROSS SEND (Machine 2) Volume 4.4GB movie.avi (SPEED ~40MB/s)
 
-[nst@EPBYMINW1962T6 trunk]$ sudo ./release/nfstrace -i eth0 -B 20 -a ./analyzers/release/libbreakdown.so 
-[sudo] password for nst: 
-^C###  Breakdown analyzer  ###
+$ sudo ./release/nfstrace -i eth0 -B 20 -a ./analyzers/release/libbreakdown.so 
+###  Breakdown analyzer  ###
 Total calls: 33177. Per operation:
 NULL            0   0.00%
 GETATTR         2   0.01%
@@ -400,8 +459,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:  497 (  2.71%) Min: 0.092 Max: 3.378 Avg: 1.088 StDev: 0.78457037
-./release/nfstrace: signal: Interrupt
-[nst@EPBYMINW1962T6 trunk]$ cat nfstrace.log 
+$ cat nfstrace.log 
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 create new session 192.168.0.1:899 --> 192.168.0.2:2049 [TCP]
@@ -458,11 +516,11 @@ list of unhandled exceptions:
 19686 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~56MB/s) wsize=32K
+================================================================================
+	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~56MB/s) wsize=32K
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
-^C###  Breakdown analyzer  ###
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+###  Breakdown analyzer  ###
 Total calls: 143629. Per operation:
 NULL            0   0.00%
 GETATTR         0   0.00%
@@ -511,9 +569,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   11 (  0.01%) Min: 0.000 Max: 5.175 Avg: 2.829 StDev: 1.95954985
-./release/nfstrace: signal: Interrupt
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 create new session 192.168.0.2:813 --> 192.168.0.1:2049 [TCP]
@@ -522,12 +578,11 @@ create new session 192.168.0.2:813 --> 192.168.0.1:2049 [TCP]
 0 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~51MB/s) wsize=64K
+================================================================================
+	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~51MB/s) wsize=64K
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
-[sudo] password for dzianis: 
-^C###  Breakdown analyzer  ###
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+###  Breakdown analyzer  ###
 Total calls: 72171. Per operation:
 NULL            0   0.00%
 GETATTR         2   0.00%
@@ -576,9 +631,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   10 (  0.01%) Min: 0.053 Max: 5.710 Avg: 3.402 StDev: 2.09587608
-./release/nfstrace: signal: Interrupt
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log 
+$ cat nfstrace.log 
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 create new session 192.168.0.2:680 --> 192.168.0.1:2049 [TCP]
@@ -587,11 +640,11 @@ create new session 192.168.0.2:680 --> 192.168.0.1:2049 [TCP]
 0 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~55MB/s) wsize=128K
+================================================================================
+	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~55MB/s) wsize=128K
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                                                                                                   255 ↵
-^C###  Breakdown analyzer  ###
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                                                                                                   255 ↵
+###  Breakdown analyzer  ###
 Total calls: 36439. Per operation:
 NULL            0   0.00%
 GETATTR         2   0.01%
@@ -640,9 +693,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   10 (  0.03%) Min: 0.082 Max: 5.613 Avg: 2.763 StDev: 1.96735514
-./release/nfstrace: signal: Interrupt
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 create new session 192.168.0.2:1003 --> 192.168.0.1:2049 [TCP]
@@ -651,11 +702,11 @@ create new session 192.168.0.2:1003 --> 192.168.0.1:2049 [TCP]
 0 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~54MB/s) wsize=256K
+================================================================================
+	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~54MB/s) wsize=256K
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
-^[OF^C###  Breakdown analyzer  ###
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+###  Breakdown analyzer  ###
 Total calls: 17196. Per operation:
 NULL            0   0.00%
 GETATTR         2   0.01%
@@ -704,9 +755,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   10 (  0.06%) Min: 0.264 Max: 5.454 Avg: 3.023 StDev: 2.15713864
-./release/nfstrace: signal: Interrupt
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 create new session 192.168.0.2:716 --> 192.168.0.1:2049 [TCP]
@@ -716,11 +765,11 @@ We are lost 21304 bytes of useful data. lost:222992 msg_len:201688
 89 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~54MB/s) wsize=512K
+================================================================================
+	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~54MB/s) wsize=512K
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
-^C###  Breakdown analyzer  ###
+sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+###  Breakdown analyzer  ###
 Total calls: 9599. Per operation:
 NULL            0   0.00%
 GETATTR         2   0.02%
@@ -769,9 +818,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   11 (  0.11%) Min: 0.000 Max: 5.369 Avg: 2.846 StDev: 2.12255833
-./release/nfstrace: signal: Interrupt
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 create new session 192.168.0.2:843 --> 192.168.0.1:2049 [TCP]
@@ -780,11 +827,11 @@ create new session 192.168.0.2:843 --> 192.168.0.1:2049 [TCP]
 0 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC18) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv (SPEED ~54MB/s) wsize=1024K
+================================================================================
+	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~54MB/s) wsize=1024K
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                               
-^C###  Breakdown analyzer  ###
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                               
+###  Breakdown analyzer  ###
 Total calls: 9467. Per operation:
 NULL            0   0.00%
 GETATTR         2   0.02%
@@ -833,9 +880,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   10 (  0.11%) Min: 0.171 Max: 5.271 Avg: 2.870 StDev: 2.04650689
-./release/nfstrace: signal: Interrupt
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 create new session 192.168.0.2:921 --> 192.168.0.1:2049 [TCP]
@@ -844,12 +889,12 @@ create new session 192.168.0.2:921 --> 192.168.0.1:2049 [TCP]
 0 packets dropped by kernel
 0 packets dropped by interface
 
-	DUMPING (FC12-client, FC18-server,nfstrace) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv wsize=512K
+================================================================================
+	DUMPING (Machine 2-client, Machine 1-server,nfstrace) Volume 4.4GB movie.avi wsize=512K
+        363/4400
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Dumping packets to file:em1-tcp port 2049.pcap
 create new session 192.168.0.1:901 --> 192.168.0.2:2049 [TCP]
@@ -857,18 +902,15 @@ create new session 192.168.0.1:901 --> 192.168.0.2:2049 [TCP]
 541174 packets received by filter
 0 packets dropped by kernel
 0 packets dropped by interface
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  ls -la --si em1-tcp\ port\ 2049.pcap
+$ ls -la --si em1-tcp\ port\ 2049.pcap
 -rw-r--r--. 1 root root 363M Oct  4 11:34 em1-tcp port 2049.pcap
 
-	DUMPING (FC12-client, FC18-server,nfstrace) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv wsize=32K
+================================================================================
+	DUMPING (Machine 2-client, Machine 1-server,nfstrace) Volume 4.4GB movie.avi wsize=32K
+        3400/4400
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
-[sudo] password for dzianis: 
-^C./release/nfstrace: signal: Interrupt
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Dumping packets to file:em1-tcp port 2049.pcap
 create new session 192.168.0.1:855 --> 192.168.0.2:2049 [TCP]
@@ -883,18 +925,15 @@ We are lost 331536 bytes of useful data. lost:339728 msg_len:8192
 1290131 packets received by filter
 8971 packets dropped by kernel
 0 packets dropped by interface
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  ls -la --si em1-tcp\ port\ 2049.pcap
+$ ls -la --si em1-tcp\ port\ 2049.pcap
 -rw-r--r--. 1 root root 3.4G Oct  4 11:40 em1-tcp port 2049.pcap
 
-	DUMPING (FC12-client, FC18-server,nfstrace) Volume 4.4GB District.9.2009.BDRip.1080p.Rus.mkv wsize=1024K
+================================================================================
+	DUMPING (Machine 2-client, Machine 1-server,nfstrace) Volume 4.4GB movie.avi wsize=1024K
+        93/4400
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
-[sudo] password for dzianis: 
-^C./release/nfstrace: signal: Interrupt
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Dumping packets to file:em1-tcp port 2049.pcap
 create new session 192.168.0.1:905 --> 192.168.0.2:2049 [TCP]
@@ -904,15 +943,14 @@ We are lost 3003248 bytes of useful data. lost:3068768 msg_len:65520
 443358 packets received by filter
 824 packets dropped by kernel
 0 packets dropped by interface
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  ls -la --si em1-tcp\ port\ 2049.pcap
+$ ls -la --si em1-tcp\ port\ 2049.pcap
 -rw-r--r--. 1 root root 93M Oct  4 11:45 em1-tcp port 2049.pcap
 
-	One Direction SEND (FC12->FC18) Volume 2 x 1.5GB (SPEED ~113MB/s) wsize=512K
+================================================================================
+	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1.5GB (SPEED ~113MB/s) wsize=512K
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
-^C###  Breakdown analyzer  ###
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
+###  Breakdown analyzer  ###
 Total calls: 3369. Per operation:
 NULL            0   0.00%
 GETATTR         4   0.12%
@@ -961,9 +999,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:  340 ( 10.09%) Min: 0.000 Max: 0.001 Avg: 0.000 StDev: 0.00016828
-./release/nfstrace: signal: Interrupt
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 create new session 192.168.0.1:820 --> 192.168.0.2:2049 [TCP]
@@ -972,12 +1008,11 @@ create new session 192.168.0.1:820 --> 192.168.0.2:2049 [TCP]
 0 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~110MB/s) wsize=32K (63835/64000)
+================================================================================
+	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~110MB/s) wsize=32K (63835/64000)
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log 
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+$ cat nfstrace.log 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 Loading module: './analyzers/release/libofws.so' with args: []
 Loading module: './analyzers/release/libofdws.so' with args: []
@@ -988,12 +1023,11 @@ We are lost 11456 bytes of useful data. lost:17376 msg_len:5920
 6 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~112MB/s) wsize=64K (32000/32000)
+================================================================================
+	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~112MB/s) wsize=64K (32000/32000)
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat nfstrace.log                                                                                                                                                               255 ↵
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+$ cat nfstrace.log                                                                                                                                                               255 ↵
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 Loading module: './analyzers/release/libofws.so' with args: []
@@ -1004,12 +1038,11 @@ create new session 192.168.0.1:719 --> 192.168.0.2:2049 [TCP]
 0 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~112MB/s) wsize=128K (16322/16000)
+================================================================================
+	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~112MB/s) wsize=128K (16322/16000)
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+$ cat
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 Loading module: './analyzers/release/libofws.so' with args: []
@@ -1020,12 +1053,11 @@ create new session 192.168.0.1:952 --> 192.168.0.2:2049 [TCP]
 0 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~112MB/s) wsize=256K (8000/8000)
+================================================================================
+	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~112MB/s) wsize=256K (8000/8000)
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+$ cat
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 Loading module: './analyzers/release/libofws.so' with args: []
@@ -1036,12 +1068,11 @@ create new session 192.168.0.1:884 --> 192.168.0.2:2049 [TCP]
 0 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~112MB/s) wsize=512K (5767/4000)
+================================================================================
+	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~112MB/s) wsize=512K (5767/4000)
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+$ cat
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 Loading module: './analyzers/release/libofws.so' with args: []
@@ -1052,12 +1083,11 @@ create new session 192.168.0.1:697 --> 192.168.0.2:2049 [TCP]
 0 packets dropped by kernel
 0 packets dropped by interface
 
-	One Direction SEND (FC12->FC18) Volume 2 x 1GB (SPEED ~111MB/s) wsize=1024K (2000/2000)
+================================================================================
+	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~111MB/s) wsize=1024K (2000/2000)
 
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  cat
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
+$ cat
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 Loading module: './analyzers/release/libofws.so' with args: []
@@ -1067,69 +1097,3 @@ create new session 192.168.0.1:860 --> 192.168.0.2:2049 [TCP]
 214056 packets received by filter
 0 packets dropped by kernel
 0 packets dropped by interface
-
-FC18
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  hardinfo
-Processor	4x Intel(R) Core(TM) i5 CPU 650 @ 3.20GHz
-Memory	7972MB (3641MB used)
-Operating System	Fedora release 18 (Spherical Cow)
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  uname -a 
-Linux epbyminw3646.minsk.epam.com 3.10.12-100.fc18.x86_64 #1 SMP Mon Sep 16 13:05:36 UTC 2013 x86_64 x86_64 x86_64 GNU/Linux
-╭─dzianis@epbyminw3646.minsk.epam.com ~/src/NST/trunk  ‹dev*› 
-╰─➤  ethtool  em1                                                                                                                                                                     75 ↵
-Settings for em1:
-	Supported ports: [ TP ]
-	Supported link modes:   10baseT/Half 10baseT/Full 
-	                        100baseT/Half 100baseT/Full 
-	                        1000baseT/Full 
-	Supported pause frame use: No
-	Supports auto-negotiation: Yes
-	Advertised link modes:  10baseT/Half 10baseT/Full 
-	                        100baseT/Half 100baseT/Full 
-	                        1000baseT/Full 
-	Advertised pause frame use: No
-	Advertised auto-negotiation: Yes
-	Speed: 1000Mb/s
-	Duplex: Full
-	Port: Twisted Pair
-	PHYAD: 2
-	Transceiver: internal
-	Auto-negotiation: on
-	MDI-X: off
-Cannot get wake-on-lan settings: Operation not permitted
-	Current message level: 0x00000007 (7)
-			       drv probe link
-	Link detected: yes
-
-FC12
-[nst@EPBYMINW1962T6 trunk]$ hardinfo
-Processor		: 2x Intel(R) Core(TM)2 Duo CPU     E7500  @ 2.93GHz
-Memory			: 4017MB (411MB used)
-Operating System	: Fedora release 12 (Constantine)
-[nst@EPBYMINW1962T6 trunk]$ sudo ethtool eth0
-[sudo] password for nst: 
-Settings for eth0:
-	Supported ports: [ TP ]
-	Supported link modes:   10baseT/Half 10baseT/Full 
-	                        100baseT/Half 100baseT/Full 
-	                        1000baseT/Full 
-	Supports auto-negotiation: Yes
-	Advertised link modes:  10baseT/Half 10baseT/Full 
-	                        100baseT/Half 100baseT/Full 
-	                        1000baseT/Full 
-	Advertised auto-negotiation: Yes
-	Speed: 100Mb/s
-	Duplex: Full
-	Port: Twisted Pair
-	PHYAD: 2
-	Transceiver: internal
-	Auto-negotiation: on
-	Supports Wake-on: pumbag
-	Wake-on: g
-	Current message level: 0x00000001 (1)
-	Link detected: yes
-[nst@EPBYMINW1962T6 trunk]$ uname -a
-Linux EPBYMINW1962T6.minsk.epam.com 2.6.32.26-175.fc12.x86_64 #1 SMP Wed Dec 1 21:39:34 UTC 2010 x86_64 x86_64 x86_64 GNU/Linux
-
