@@ -1072,6 +1072,17 @@ File ranked:
 01000101010000000c1b5452277d030000000000 0 1048576000
 Once accessed: 100.00%
 
+$ cat nfstrace.log
+
+Loading module: './analyzers/release/libbreakdown.so' with args: []
+Loading module: './analyzers/release/libofws.so' with args: []
+Loading module: './analyzers/release/libofdws.so' with args: []
+create new session 192.168.0.2:831 --> 192.168.0.1:2049 [TCP]
+
+178048 packets received by filter
+0 packets dropped by kernel
+0 packets dropped by interface
+
 $ ls
 01000101010000000c1b5452277d030000000000  breakdown_192.168.0.2:831 --> 192.168.0.1:2049 [TCP].dat
 
