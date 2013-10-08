@@ -6,7 +6,7 @@ $ hardinfo
 Processor	4x Intel(R) Core(TM) i5 CPU 650 @ 3.20GHz
 Memory	7972MB (3641MB used)
 Operating System	Fedora release 18 (Spherical Cow)
-$ ethtool  em1                                                                                                                                                                     75 ↵
+$ ethtool  em1
 Settings for em1:
 	Supported ports: [ TP ]
 	Supported link modes:   10baseT/Half 10baseT/Full 
@@ -63,7 +63,7 @@ Settings for eth0:
 =================================================================================
 
 =================================================================================
-	CROSS SEND (Machine 1) Volume 2 x 2.1GB /dev/null (SPEED ~50MB/s)
+	CROSS SEND (Machine 2-client,server, Machine 1-client,server,nfstrace) Volume 2 x 2.1GB /dev/null (SPEED ~50MB/s)
 
 # sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
 ###  Breakdown analyzer  ###
@@ -91,7 +91,7 @@ FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT        766   1.60%
 Per connection info: 
-Session: 192.168.0.1:709 --> 192.168.0.2:2049 [TCP]
+Session: 192.168.0.2:709 --> 192.168.0.1:2049 [TCP]
 Total: 20038. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    9 (  0.04%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00004007
@@ -115,7 +115,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:  746 (  3.72%) Min: 0.002 Max: 2.241 Avg: 0.378 StDev: 0.36393720
-Session: 192.168.0.2:828 --> 192.168.0.1:2049 [TCP]
+Session: 192.168.0.1:828 --> 192.168.0.2:2049 [TCP]
 Total: 27710. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    8 (  0.03%) Min: 0.000 Max: 0.017 Avg: 0.006 StDev: 0.00734563
@@ -139,12 +139,12 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   20 (  0.07%) Min: 0.000 Max: 4.256 Avg: 0.854 StDev: 1.19323674
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
-create new session 192.168.0.1:709 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:709 --> 192.168.0.1:2049 [TCP]
 We are lost 330528 bytes of useful data. lost:344624 msg_len:14096
-create new session 192.168.0.1:2049 --> 192.168.0.2:828 [TCP]
+create new session 192.168.0.2:2049 --> 192.168.0.1:828 [TCP]
 We are lost 2155096 bytes of useful data. lost:2263936 msg_len:108840
 We are lost 1528840 bytes of useful data. lost:1549352 msg_len:20512
 
@@ -153,7 +153,7 @@ We are lost 1528840 bytes of useful data. lost:1549352 msg_len:20512
 0 packets dropped by interface
 
 =================================================================================
-	CROSS SEND (Machine 2) Volume 2 x 2.1GB /dev/null (SPEED ~50MB/s)
+	CROSS SEND (Machine 2-client,server,nfstrace, Machine 1-client,server) Volume 2 x 2.1GB /dev/null (SPEED ~50MB/s)
 
 $ sudo ./release/nfstrace -i eth0 -B 20 -a ./analyzers/release/libbreakdown.so 
 ###  Breakdown analyzer  ###
@@ -181,7 +181,7 @@ FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT        777   1.74%
 Per connection info: 
-Session: 192.168.0.1:709 --> 192.168.0.2:2049 [TCP]
+Session: 192.168.0.2:709 --> 192.168.0.1:2049 [TCP]
 Total: 20781. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    9 (  0.04%) Min: 0.000 Max: 0.001 Avg: 0.001 StDev: 0.00021119
@@ -205,7 +205,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:  761 (  3.66%) Min: 0.002 Max: 2.243 Avg: 0.383 StDev: 0.36243382
-Session: 192.168.0.2:828 --> 192.168.0.1:2049 [TCP]
+Session: 192.168.0.1:828 --> 192.168.0.2:2049 [TCP]
 Total: 23901. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    9 (  0.04%) Min: 0.000 Max: 0.010 Avg: 0.003 StDev: 0.00388705
@@ -232,8 +232,8 @@ COMMIT         Count:   16 (  0.07%) Min: 0.000 Max: 4.255 Avg: 0.951 StDev: 1.2
 $ cat nfstrace.log 
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
-create new session 192.168.0.1:709 --> 192.168.0.2:2049 [TCP]
-create new session 192.168.0.2:828 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.2:709 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.1:828 --> 192.168.0.2:2049 [TCP]
 We are lost 747200 bytes of useful data. lost:823912 msg_len:76712
 We are lost 396928 bytes of useful data. lost:485080 msg_len:88152
 We are lost 192168 bytes of useful data. lost:217880 msg_len:25712
@@ -294,9 +294,9 @@ list of unhandled exceptions:
 0 packets dropped by interface
 
 =================================================================================
-	CROSS SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~35MB/s)
+	CROSS SEND (Machine 2-client,server, Machine 1-client,server,nfstrace) Volume 4.4GB movie.avi (SPEED ~35MB/s)
 
-$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                                                                                                   255 ↵
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
 ###  Breakdown analyzer  ###
 Total calls: 35591. Per operation:
 NULL            0   0.00%
@@ -322,7 +322,7 @@ FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT        519   1.46%
 Per connection info: 
-Session: 192.168.0.2:976 --> 192.168.0.1:2049 [TCP]
+Session: 192.168.0.1:976 --> 192.168.0.2:2049 [TCP]
 Total: 17176. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
@@ -346,7 +346,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   14 (  0.08%) Min: 0.094 Max: 7.789 Avg: 3.259 StDev: 1.90638835
-Session: 192.168.0.1:899 --> 192.168.0.2:2049 [TCP]
+Session: 192.168.0.2:899 --> 192.168.0.1:2049 [TCP]
 Total: 18415. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
@@ -370,11 +370,11 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:  505 (  2.74%) Min: 0.089 Max: 3.375 Avg: 1.080 StDev: 0.78351744
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
-create new session 192.168.0.1:899 --> 192.168.0.2:2049 [TCP]
-create new session 192.168.0.2:976 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.2:899 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.1:976 --> 192.168.0.2:2049 [TCP]
 We are lost 1238872 bytes of useful data. lost:1419040 msg_len:180168
 We are lost 32664 bytes of useful data. lost:47784 msg_len:15120
 
@@ -383,7 +383,7 @@ We are lost 32664 bytes of useful data. lost:47784 msg_len:15120
 0 packets dropped by interface
 
 =================================================================================
-	CROSS SEND (Machine 2) Volume 4.4GB movie.avi (SPEED ~40MB/s)
+	CROSS SEND (Machine 2-client,server,nfstrace, Machine 1-client,server) Volume 4.4GB movie.avi (SPEED ~40MB/s)
 
 $ sudo ./release/nfstrace -i eth0 -B 20 -a ./analyzers/release/libbreakdown.so 
 ###  Breakdown analyzer  ###
@@ -411,7 +411,7 @@ FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT        509   1.53%
 Per connection info: 
-Session: 192.168.0.2:976 --> 192.168.0.1:2049 [TCP]
+Session: 192.168.0.1:976 --> 192.168.0.2:2049 [TCP]
 Total: 14861. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
@@ -435,7 +435,7 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   12 (  0.08%) Min: 0.094 Max: 7.789 Avg: 3.270 StDev: 2.07079659
-Session: 192.168.0.1:899 --> 192.168.0.2:2049 [TCP]
+Session: 192.168.0.2:899 --> 192.168.0.1:2049 [TCP]
 Total: 18316. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
@@ -462,8 +462,8 @@ COMMIT         Count:  497 (  2.71%) Min: 0.092 Max: 3.378 Avg: 1.088 StDev: 0.7
 $ cat nfstrace.log 
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
-create new session 192.168.0.1:899 --> 192.168.0.2:2049 [TCP]
-create new session 192.168.0.2:976 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.2:899 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.1:976 --> 192.168.0.2:2049 [TCP]
 We are lost 678640 bytes of useful data. lost:757304 msg_len:78664
 We are lost 15736 bytes of useful data. lost:150592 msg_len:134856
 We are lost 31784 bytes of useful data. lost:68056 msg_len:36272
@@ -517,7 +517,7 @@ list of unhandled exceptions:
 0 packets dropped by interface
 
 ================================================================================
-	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~56MB/s) wsize=32K
+	One Direction SEND (Machine 2-server, Machine 1-client,nfstrace) Volume 4.4GB movie.avi (SPEED ~56MB/s) wsize=32K
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
 ###  Breakdown analyzer  ###
@@ -545,7 +545,7 @@ FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT         11   0.01%
 Per connection info: 
-Session: 192.168.0.2:813 --> 192.168.0.1:2049 [TCP]
+Session: 192.168.0.1:813 --> 192.168.0.2:2049 [TCP]
 Total: 143629. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
@@ -569,17 +569,17 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   11 (  0.01%) Min: 0.000 Max: 5.175 Avg: 2.829 StDev: 1.95954985
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
-create new session 192.168.0.2:813 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.1:813 --> 192.168.0.2:2049 [TCP]
 
 2085581 packets received by filter
 0 packets dropped by kernel
 0 packets dropped by interface
 
 ================================================================================
-	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~51MB/s) wsize=64K
+	One Direction SEND (Machine 2-server, Machine 1-client,nfstrace) Volume 4.4GB movie.avi (SPEED ~51MB/s) wsize=64K
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
 ###  Breakdown analyzer  ###
@@ -607,7 +607,7 @@ FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT         10   0.01%
 Per connection info: 
-Session: 192.168.0.2:680 --> 192.168.0.1:2049 [TCP]
+Session: 192.168.0.1:680 --> 192.168.0.2:2049 [TCP]
 Total: 72171. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    2 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00002333
@@ -634,16 +634,16 @@ COMMIT         Count:   10 (  0.01%) Min: 0.053 Max: 5.710 Avg: 3.402 StDev: 2.0
 $ cat nfstrace.log 
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
-create new session 192.168.0.2:680 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.1:680 --> 192.168.0.2:2049 [TCP]
 
 1980583 packets received by filter
 0 packets dropped by kernel
 0 packets dropped by interface
 
 ================================================================================
-	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~55MB/s) wsize=128K
+	One Direction SEND (Machine 2-server, Machine 1-client,nfstrace) Volume 4.4GB movie.avi (SPEED ~55MB/s) wsize=128K
 
-$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                                                                                                   255 ↵
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
 ###  Breakdown analyzer  ###
 Total calls: 36439. Per operation:
 NULL            0   0.00%
@@ -669,7 +669,7 @@ FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT         10   0.03%
 Per connection info: 
-Session: 192.168.0.2:1003 --> 192.168.0.1:2049 [TCP]
+Session: 192.168.0.1:1003 --> 192.168.0.2:2049 [TCP]
 Total: 36439. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    2 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00004667
@@ -693,17 +693,17 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   10 (  0.03%) Min: 0.082 Max: 5.613 Avg: 2.763 StDev: 1.96735514
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
-create new session 192.168.0.2:1003 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.1:1003 --> 192.168.0.2:2049 [TCP]
 
 1947817 packets received by filter
 0 packets dropped by kernel
 0 packets dropped by interface
 
 ================================================================================
-	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~54MB/s) wsize=256K
+	One Direction SEND (Machine 2-server, Machine 1-client,nfstrace) Volume 4.4GB movie.avi (SPEED ~54MB/s) wsize=256K
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
 ###  Breakdown analyzer  ###
@@ -731,7 +731,7 @@ FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT         10   0.06%
 Per connection info: 
-Session: 192.168.0.2:716 --> 192.168.0.1:2049 [TCP]
+Session: 192.168.0.1:716 --> 192.168.0.2:2049 [TCP]
 Total: 17196. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    2 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00006718
@@ -755,10 +755,10 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   10 (  0.06%) Min: 0.264 Max: 5.454 Avg: 3.023 StDev: 2.15713864
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
-create new session 192.168.0.2:716 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.1:716 --> 192.168.0.2:2049 [TCP]
 We are lost 21304 bytes of useful data. lost:222992 msg_len:201688
 
 1931643 packets received by filter
@@ -766,7 +766,7 @@ We are lost 21304 bytes of useful data. lost:222992 msg_len:201688
 0 packets dropped by interface
 
 ================================================================================
-	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~54MB/s) wsize=512K
+	One Direction SEND (Machine 2-server, Machine 1-client,nfstrace) Volume 4.4GB movie.avi (SPEED ~54MB/s) wsize=512K
 
 sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
 ###  Breakdown analyzer  ###
@@ -794,7 +794,7 @@ FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT         11   0.11%
 Per connection info: 
-Session: 192.168.0.2:843 --> 192.168.0.1:2049 [TCP]
+Session: 192.168.0.1:843 --> 192.168.0.2:2049 [TCP]
 Total: 9599. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    2 (  0.02%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00009051
@@ -818,19 +818,19 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   11 (  0.11%) Min: 0.000 Max: 5.369 Avg: 2.846 StDev: 2.12255833
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
-create new session 192.168.0.2:843 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.1:843 --> 192.168.0.2:2049 [TCP]
 
 1924383 packets received by filter
 0 packets dropped by kernel
 0 packets dropped by interface
 
 ================================================================================
-	One Direction SEND (Machine 1) Volume 4.4GB movie.avi (SPEED ~54MB/s) wsize=1024K
+	One Direction SEND (Machine 2-server, Machine 1-client,nfstrace) Volume 4.4GB movie.avi (SPEED ~54MB/s) wsize=1024K
 
-$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so                               
+$ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
 ###  Breakdown analyzer  ###
 Total calls: 9467. Per operation:
 NULL            0   0.00%
@@ -856,7 +856,7 @@ FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT         10   0.11%
 Per connection info: 
-Session: 192.168.0.2:921 --> 192.168.0.1:2049 [TCP]
+Session: 192.168.0.1:921 --> 192.168.0.2:2049 [TCP]
 Total: 9467. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    2 (  0.02%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00004596
@@ -880,10 +880,10 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:   10 (  0.11%) Min: 0.171 Max: 5.271 Avg: 2.870 StDev: 2.04650689
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
-create new session 192.168.0.2:921 --> 192.168.0.1:2049 [TCP]
+create new session 192.168.0.1:921 --> 192.168.0.2:2049 [TCP]
 
 1924339 packets received by filter
 0 packets dropped by kernel
@@ -894,10 +894,10 @@ create new session 192.168.0.2:921 --> 192.168.0.1:2049 [TCP]
         363/4400
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Dumping packets to file:em1-tcp port 2049.pcap
-create new session 192.168.0.1:901 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:901 --> 192.168.0.1:2049 [TCP]
 
 541174 packets received by filter
 0 packets dropped by kernel
@@ -910,10 +910,10 @@ $ ls -la --si em1-tcp\ port\ 2049.pcap
         3400/4400
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Dumping packets to file:em1-tcp port 2049.pcap
-create new session 192.168.0.1:855 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:855 --> 192.168.0.1:2049 [TCP]
 We are lost 579880 bytes of useful data. lost:592168 msg_len:12288
 We are lost 165040 bytes of useful data. lost:174368 msg_len:9328
 We are lost 513608 bytes of useful data. lost:514248 msg_len:640
@@ -933,10 +933,10 @@ $ ls -la --si em1-tcp\ port\ 2049.pcap
         93/4400
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so --mode=dump
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Dumping packets to file:em1-tcp port 2049.pcap
-create new session 192.168.0.1:905 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:905 --> 192.168.0.1:2049 [TCP]
 We are lost 6264816 bytes of useful data. lost:7087688 msg_len:822872
 We are lost 3003248 bytes of useful data. lost:3068768 msg_len:65520
 
@@ -947,7 +947,7 @@ $ ls -la --si em1-tcp\ port\ 2049.pcap
 -rw-r--r--. 1 root root 93M Oct  4 11:45 em1-tcp port 2049.pcap
 
 ================================================================================
-	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1.5GB (SPEED ~113MB/s) wsize=512K
+	One Direction SEND (Machine 2-client, Machine 1-server,nfstrace) Volume 2 x 1.5GB (SPEED ~113MB/s) wsize=512K
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so
 ###  Breakdown analyzer  ###
@@ -975,7 +975,7 @@ FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT        340  10.09%
 Per connection info: 
-Session: 192.168.0.1:820 --> 192.168.0.2:2049 [TCP]
+Session: 192.168.0.2:820 --> 192.168.0.1:2049 [TCP]
 Total: 3369. Per operation:
 NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR        Count:    4 (  0.12%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000634
@@ -999,47 +999,106 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:  340 ( 10.09%) Min: 0.000 Max: 0.001 Avg: 0.000 StDev: 0.00016828
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
-create new session 192.168.0.1:820 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:820 --> 192.168.0.1:2049 [TCP]
 
 321925 packets received by filter
 0 packets dropped by kernel
 0 packets dropped by interface
 
 ================================================================================
-	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~110MB/s) wsize=32K (63835/64000)
+	One Direction SEND (Machine 2-client, Machine 1-server,nfstrace) Volume 1GB (SPEED ~111MB/s) wsize=32K (32000/32000)
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
-$ cat nfstrace.log 
-Loading module: './analyzers/release/libbreakdown.so' with args: []
-Loading module: './analyzers/release/libofws.so' with args: []
-Loading module: './analyzers/release/libofdws.so' with args: []
-create new session 192.168.0.1:907 --> 192.168.0.2:2049 [TCP]
-We are lost 11456 bytes of useful data. lost:17376 msg_len:5920
+###  Breakdown analyzer  ###
+Total calls: 32195. Per operation:
+NULL            0   0.00%
+GETATTR         1   0.00%
+SETATTR         1   0.00%
+LOOKUP          0   0.00%
+ACCESS          2   0.01%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE       32000  99.39%
+CREATE          0   0.00%
+MKDIR           0   0.00%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          0   0.00%
+RMDIR           0   0.00%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS     0   0.00%
+FSSTAT          0   0.00%
+FSINFO          0   0.00%
+PATHCONF        0   0.00%
+COMMIT        191   0.59%
+Per connection info: 
+Session: 192.168.0.2:831 --> 192.168.0.1:2049 [TCP]
+Total: 32195. Per operation:
+NULL           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR        Count:    1 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SETATTR        Count:    1 (  0.00%) Min: 0.091 Max: 0.091 Avg: 0.091 StDev: 0.00000000
+LOOKUP         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+ACCESS         Count:    2 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00003960
+READLINK       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE          Count:32000 ( 99.39%) Min: 0.000 Max: 0.006 Avg: 0.000 StDev: 0.00030652
+CREATE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT         Count:  191 (  0.59%) Min: 0.000 Max: 0.002 Avg: 0.000 StDev: 0.00023698
+###  Overall File Working Set (OFWS) analyzer  ###
+Total number of files accessed: 2
+FileHandle,NFS Ops,NULL,GETATTR,SETATTR,LOOKUP,ACCESS,READLINK,READ,WRITE,CREATE,MKDIR,SYMLINK,MKNOD,REMOVE,RMDIR,RENAME,LINK,READDIR,READDIRPLUS,FSSTAT,FSINFO,PATHCONF,COMMIT
+0100010001000000,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+01000101010000000c1b5452277d030000000000,32194,0,1,1,0,1,0,0,32000,0,0,0,0,0,0,0,0,0,0,0,0,0,191
+### OFDWS Analyzer ###
+Read total: 0 Write total: 1048576000
+File ranked:
+01000101010000000c1b5452277d030000000000 0 1048576000
+Once accessed: 100.00%
 
-371712 packets received by filter
-6 packets dropped by kernel
-0 packets dropped by interface
+$ ls
+01000101010000000c1b5452277d030000000000  breakdown_192.168.0.2:831 --> 192.168.0.1:2049 [TCP].dat
+
+$ ./analyzers/nst.sh -a ./analyzers/breakdown.plt -f ./breakdown_192.168.0.2:831\ --\>\ 192.168.0.1:2049\ \[TCP\].dat -v
+gnuplot -e "i_file='./breakdown_192.168.0.2:831 --> 192.168.0.1:2049 [TCP].dat';o_file='./breakdown_192.168.0.2:831 --> 192.168.0.1:2049 [TCP].dat.png'" ./analyzers/breakdown.plt
+
+$ ls
+breakdown_192.168.0.2:831 --> 192.168.0.1:2049 [TCP].dat
+breakdown_192.168.0.2:831 --> 192.168.0.1:2049 [TCP].dat.png
 
 ================================================================================
-	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~112MB/s) wsize=64K (32000/32000)
+	One Direction SEND (Machine 2-client, Machine 1-server,nfstrace) Volume 2 x 1GB (SPEED ~112MB/s) wsize=64K (32000/32000)
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
-$ cat nfstrace.log                                                                                                                                                               255 ↵
+$ cat nfstrace.log
 
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 Loading module: './analyzers/release/libofws.so' with args: []
 Loading module: './analyzers/release/libofdws.so' with args: []
-create new session 192.168.0.1:719 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:719 --> 192.168.0.1:2049 [TCP]
 
 318908 packets received by filter
 0 packets dropped by kernel
 0 packets dropped by interface
 
 ================================================================================
-	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~112MB/s) wsize=128K (16322/16000)
+	One Direction SEND (Machine 2-client, Machine 1-server,nfstrace) Volume 2 x 1GB (SPEED ~112MB/s) wsize=128K (16322/16000)
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
 $ cat
@@ -1047,14 +1106,14 @@ $ cat
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 Loading module: './analyzers/release/libofws.so' with args: []
 Loading module: './analyzers/release/libofdws.so' with args: []
-create new session 192.168.0.1:952 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:952 --> 192.168.0.1:2049 [TCP]
 
 279913 packets received by filter
 0 packets dropped by kernel
 0 packets dropped by interface
 
 ================================================================================
-	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~112MB/s) wsize=256K (8000/8000)
+	One Direction SEND (Machine 2-client, Machine 1-server,nfstrace) Volume 2 x 1GB (SPEED ~112MB/s) wsize=256K (8000/8000)
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
 $ cat
@@ -1062,14 +1121,14 @@ $ cat
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 Loading module: './analyzers/release/libofws.so' with args: []
 Loading module: './analyzers/release/libofdws.so' with args: []
-create new session 192.168.0.1:884 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:884 --> 192.168.0.1:2049 [TCP]
 
 261182 packets received by filter
 0 packets dropped by kernel
 0 packets dropped by interface
 
 ================================================================================
-	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~112MB/s) wsize=512K (5767/4000)
+	One Direction SEND (Machine 2-client, Machine 1-server,nfstrace) Volume 2 x 1GB (SPEED ~112MB/s) wsize=512K (5767/4000)
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
 $ cat
@@ -1077,14 +1136,14 @@ $ cat
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 Loading module: './analyzers/release/libofws.so' with args: []
 Loading module: './analyzers/release/libofdws.so' with args: []
-create new session 192.168.0.1:697 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:697 --> 192.168.0.1:2049 [TCP]
 
 249711 packets received by filter
 0 packets dropped by kernel
 0 packets dropped by interface
 
 ================================================================================
-	One Direction SEND (Machine 2-client, Machine 1-server) Volume 2 x 1GB (SPEED ~111MB/s) wsize=1024K (2000/2000)
+	One Direction SEND (Machine 2-client, Machine 1-server,nfstrace) Volume 2 x 1GB (SPEED ~111MB/s) wsize=1024K (2000/2000)
 
 $ sudo ./release/nfstrace  -i em1 -B 20 -a ./analyzers/release/libbreakdown.so -a ./analyzers/release/libofws.so -a ./analyzers/release/libofdws.so
 $ cat
@@ -1092,7 +1151,7 @@ $ cat
 Loading module: './analyzers/release/libbreakdown.so' with args: []
 Loading module: './analyzers/release/libofws.so' with args: []
 Loading module: './analyzers/release/libofdws.so' with args: []
-create new session 192.168.0.1:860 --> 192.168.0.2:2049 [TCP]
+create new session 192.168.0.2:860 --> 192.168.0.1:2049 [TCP]
 
 214056 packets received by filter
 0 packets dropped by kernel
