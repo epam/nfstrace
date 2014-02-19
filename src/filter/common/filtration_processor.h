@@ -680,16 +680,24 @@ public:
         assert(msg_len == 0);   // RPC Message still undetected
 
         //if(rm->is_last()); // TODO: handle sequence field of record mark
-        if(validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
+    /*    if(rm->fragment_len() == 0 || rm->is_last())
+        {
+            std::cerr << "fragment len " << rm->fragment_len() << '\n';
+            std::cerr << "is last " << rm->is_last() << '\n';
+            assert(rm->fragment_len() > 0);
+        }*/
+        if(rm->fragment_len() > 0 && validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
         {
             assert(msg_len != 0);   // message is found
 
             const uint32_t written = collection.size();
             if(written != 0) // a message was partially written to collection
             {
+                assert( (msg_len - written) <  msg_len );
                 msg_len -= written;
                 if(hdr_len != 0) // we want to collect header of this RPC message
                 {
+                assert( (hdr_len - written) <  hdr_len );
                     hdr_len -= written;
                 }
             }
