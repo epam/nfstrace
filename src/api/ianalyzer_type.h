@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: IAnalyzer describe interface of analyzers expected by application.
+// Description: IAnalyzer describe interface of analysiss expected by application.
 // The interface define set of NFSv3 Procedure handlers with empty dummy implementation
-// and pure virtual function for flushing analyzer statistics.
+// and pure virtual function for flushing analysis statistics.
 // Copyright (c) 2013 EPAM Systems. All Rights reserved.
 //------------------------------------------------------------------------------
 #ifndef IANALYZER_TYPE_H

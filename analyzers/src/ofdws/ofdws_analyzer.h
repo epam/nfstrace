@@ -6,7 +6,7 @@
 #ifndef OFDWS_ANALYZER_H
 #define OFDWS_ANALYZER_H
 //------------------------------------------------------------------------------
-#include <tr1/unordered_map>
+#include <unordered_map>
 
 #include <utils/fh.h>   //hash-table's key
 #include "file_rw_op.h"
@@ -17,7 +17,7 @@ static const int32_t g_def_bu_size = 16;
 
 class OFDWSAnalyzer : public IAnalyzer
 {
-    typedef std::tr1::unordered_map<FH, FileRWOp*, FH::FH_Hash, FH::FH_Eq> OFDWS;
+    typedef std::unordered_map<FH, FileRWOp*, FH::FH_Hash, FH::FH_Eq> OFDWS;
     typedef OFDWS::const_iterator ConstIterator;
     typedef OFDWS::iterator Iterator;
     typedef OFDWS::value_type Pair;
