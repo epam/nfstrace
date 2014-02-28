@@ -2,14 +2,14 @@
 #include <cstring>
 #include <cassert>
 
-#include "../../src/auxiliary/block_allocator.h"
+#include "utils/block_allocator.h"
 
-using NST::auxiliary::BlockAllocator;
+using NST::utils::BlockAllocator;
 #define CHUNK_SIZE (128)
 #define BLOCK_SIZE (8)
 #define MAX_BLOCK_COUNT (3)
 
-int main(int argc, char** argv)
+int main()
 {
     // Test for base functions
     {

@@ -325,7 +325,7 @@ const char* usage()
     return "Arguments aren't supported. TODO: add description of OFWS Analyser";
 }
 
-IAnalyzer* create(const char* opts)
+IAnalyzer* create(const char* /*opts*/)
 {
     return new OFWSAnalyzer();
 }

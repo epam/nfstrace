@@ -6,7 +6,7 @@
 #ifndef FILE_RW_OP_H
 #define FILE_RW_OP_H
 //------------------------------------------------------------------------------
-#include <tr1/unordered_map>
+#include <unordered_map>
 #include <vector>
 
 #include <utils/fh.h>                     //hash-table's key
@@ -34,7 +34,7 @@ public:
         uint32_t write_freq;
     };
 
-    typedef std::tr1::unordered_map<uint64_t, RWTime*> BucketTable;
+    typedef std::unordered_map<uint64_t, RWTime*> BucketTable;
     typedef BucketTable::const_iterator ConstIterator;
     typedef BucketTable::iterator Iterator;
     typedef BucketTable::value_type Pair;

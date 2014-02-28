@@ -1,19 +1,19 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Test for NST:auxiliary::Queue<T>
+// Description: Test for NST:utils::Queue<T>
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #include <cassert>
 #include <iostream>
 
-#include "../../src/auxiliary/queue.h"
+#include "utils/queue.h"
 //------------------------------------------------------------------------------
 struct Data
 {
     int value;
 };
 
-typedef NST::auxiliary::Queue<Data> Queue;
+typedef NST::utils::Queue<Data> Queue;
 //------------------------------------------------------------------------------
 void push(Queue& queue, unsigned int n)
 {
@@ -47,7 +47,7 @@ void pop_print(Queue& queue)
     std::cout << std::endl;
 }
 
-int main(int argc, char **argv)
+int main()
 {
     Queue queue(10, 2); // two blocks of 10 elements
 

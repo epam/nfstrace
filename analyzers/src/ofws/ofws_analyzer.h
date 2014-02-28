@@ -6,7 +6,7 @@
 #ifndef OFWS_ANALYZER_H
 #define OFWS_ANALYZER_H
 //------------------------------------------------------------------------------
-#include <tr1/unordered_map>
+#include <unordered_map>
 
 #include <utils/plugin_api_struct.h>
 #include <utils/fh.h>                     //hash-table's key
@@ -37,7 +37,7 @@ class OFWSAnalyzer : public IAnalyzer
         uint64_t total;
     };
 
-    typedef std::tr1::unordered_map<FH, OpCounter*, FH::FH_Hash, FH::FH_Eq> OFWS;
+    typedef std::unordered_map<FH, OpCounter*, FH::FH_Hash, FH::FH_Eq> OFWS;
     typedef OFWS::value_type Pair;
     typedef OFWS::iterator Iterator;
     typedef OFWS::const_iterator ConstIterator;

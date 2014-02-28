@@ -7,18 +7,18 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 //------------------------------------------------------------------------------
-#include "../analyzer/analysis_manager.h"
-#include "../auxiliary/logger.h"
-#include "../auxiliary/unique_ptr.h"
-#include "../filter/filtration_manager.h"
-#include "parameters.h"
-#include "running_status.h"
-#include "synchronous_signal_handling.h"
+#include <memory>
+
+#include "analysis/analysis_manager.h"
+#include "filtration/filtration_manager.h"
+#include "controller/parameters.h"
+#include "controller/running_status.h"
+#include "controller/signal_handler.h"
+#include "utils/logger.h"
 //------------------------------------------------------------------------------
-using NST::analyzer::AnalysisManager;
-using NST::auxiliary::Logger;
-using NST::auxiliary::UniquePtr;
-using NST::filter::FiltrationManager;
+using NST::analysis::AnalysisManager;
+using NST::utils::Logger;
+using NST::filtration::FiltrationManager;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -28,15 +28,14 @@ namespace controller
 class Controller
 {
 public:
-
     Controller(const Parameters& parameters);
+    Controller(const Controller&)            = delete;
+    Controller& operator=(const Controller&) = delete;
     ~Controller();
 
     int run();
 
 private:
-    Controller(const Controller&);            // undefined
-    Controller& operator=(const Controller&); // undefined
 
     // global used logger
     Logger logger;
@@ -44,16 +43,16 @@ private:
     // container for generated exceptions
     RunningStatus status;
 
-    // signal handler. Working in its own thread
-    SynchronousSignalHandling sig_handler;
+    // signal handler
+    SignalHandler signals;
 
     // controller contains instances of modules
-    UniquePtr<AnalysisManager>   analysis;
-    UniquePtr<FiltrationManager> filtration;
+    std::unique_ptr<AnalysisManager>   analysis;
+    std::unique_ptr<FiltrationManager> filtration;
 };
 
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif //CONTROLLER_H
+#endif//CONTROLLER_H
 //------------------------------------------------------------------------------

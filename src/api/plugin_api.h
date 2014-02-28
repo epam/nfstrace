@@ -13,12 +13,12 @@
 
 #include <sys/time.h>
 
-#include "xdr_types.h"
-#include "rpc_types.h"
-#include "rpc_procedure_type.h"
-#include "nfs3_types.h"
-#include "session_type.h"
-#include "ianalyzer_type.h"
+#include "api/xdr_types.h"
+#include "api/rpc_types.h"
+#include "api/rpc_procedure_type.h"
+#include "api/nfs3_types.h"
+#include "api/session_type.h"
+#include "api/ianalyzer_type.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 extern "C"
