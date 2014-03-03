@@ -6,13 +6,16 @@
 #ifndef FILTRATION_MANAGER_H
 #define FILTRATION_MANAGER_H
 //------------------------------------------------------------------------------
+#include <memory>
+#include <vector>
+
 #include "utils/filtered_data.h"
-#include "utils/thread_group.h"
+#include "utils/thread.h"
 #include "controller/parameters.h"
 #include "controller/running_status.h"
 //------------------------------------------------------------------------------
 using NST::utils::FilteredDataQueue;
-using NST::utils::ThreadGroup;
+using NST::utils::Thread;
 using NST::controller::Parameters;
 using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
@@ -33,11 +36,12 @@ public:
     void stop();
 
 private:
-    FiltrationManager(const FiltrationManager&);            // undefined
-    FiltrationManager& operator=(const FiltrationManager&); // undefined
+    FiltrationManager(const FiltrationManager&)            = delete;
+    FiltrationManager& operator=(const FiltrationManager&) = delete;
 
-    ThreadGroup threads;
     RunningStatus& status;
+
+    std::vector< std::unique_ptr<Thread> > threads;
 };
 
 } // namespace filtration

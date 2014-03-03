@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 #include <algorithm>
 #include <cassert>
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -16,7 +17,6 @@
 
 #include "utils/logger.h"
 #include "utils/session.h"
-#include "utils/unique_ptr.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
 #include "protocols/rpc/rpc_header.h"
@@ -24,7 +24,6 @@
 //------------------------------------------------------------------------------
 using NST::utils::Logger;
 using NST::utils::Session;
-using NST::utils::UniquePtr;
 
 using namespace NST::protocols::rpc;
 //------------------------------------------------------------------------------
@@ -753,7 +752,10 @@ class FiltrationProcessor
 {
 public:
 
-    FiltrationProcessor(UniquePtr<Reader>& r, UniquePtr<Writer>& w) : reader(r), writer(w)
+    explicit FiltrationProcessor(std::unique_ptr<Reader>& r,
+                                 std::unique_ptr<Writer>& w)
+    : reader{std::move(r)}
+    , writer{std::move(w)}
     {
         // check datalink layer
         datalink = reader->datalink();
@@ -816,8 +818,8 @@ public:
 
 private:
 
-    UniquePtr<Reader> reader;
-    UniquePtr<Writer> writer;
+    std::unique_ptr<Reader> reader;
+    std::unique_ptr<Writer> writer;
     int datalink;
     SessionCollectors< IPv4TCPMapper < TCPSession < RPCFiltrator < Writer > > > > tcp_sessions;
     SessionCollectors< IPv4UDPMapper < UDPSession < Writer > > >                  udp_sessions;
