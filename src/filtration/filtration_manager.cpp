@@ -91,8 +91,7 @@ static auto create_capture_reader(const Parameters& params)
 } // unnamed namespace
 
 // capture from network interface and dump to file  - OnlineDumping(Dumping)
-FiltrationManager::FiltrationManager(RunningStatus& s, const Parameters& params)
-: status(s)
+void FiltrationManager::add_online_dumping(const Parameters& params)
 {
     std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
     std::unique_ptr<Dumping>       writer { new Dumping{
@@ -107,10 +106,8 @@ FiltrationManager::FiltrationManager(RunningStatus& s, const Parameters& params)
 }
 
 // capture from network interface and pass to queue - OnlineAnalysis(Profiling)
-FiltrationManager::FiltrationManager(RunningStatus& s,
-                                     FilteredDataQueue& queue,
-                                     const Parameters& params)
-: status(s)
+void FiltrationManager::add_online_analysis(const Parameters& params,
+                                            FilteredDataQueue& queue)
 {
     std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
     std::unique_ptr<Queueing>      writer { new Queueing{queue}           };
@@ -119,15 +116,18 @@ FiltrationManager::FiltrationManager(RunningStatus& s,
 }
 
 // read from file and pass to queue - OfflineAnalysis(Analysis)
-FiltrationManager::FiltrationManager(RunningStatus& s,
-                                     FilteredDataQueue& queue,
-                                     const std::string& ifile)
-: status(s)
+void FiltrationManager::add_offline_analysis(const std::string& ifile,
+                                             FilteredDataQueue& queue)
 {
     std::unique_ptr<FileReader> reader { new FileReader{ifile} };
     std::unique_ptr<Queueing>   writer { new Queueing{queue}   };
 
     threads.emplace_back(create_thread(reader, writer, status));
+}
+
+FiltrationManager::FiltrationManager(RunningStatus& s)
+: status(s)
+{
 }
 
 FiltrationManager::~FiltrationManager()

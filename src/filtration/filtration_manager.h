@@ -26,17 +26,19 @@ namespace filtration
 class FiltrationManager
 {
 public:
-    FiltrationManager(RunningStatus& s, const Parameters& params);                              // dump to file
-    FiltrationManager(RunningStatus& s, FilteredDataQueue& queue, const Parameters& params);    // capture to queue
-    FiltrationManager(RunningStatus& s, FilteredDataQueue& queue, const std::string& ifile);    // read file to queue
+    FiltrationManager(RunningStatus& s);
     ~FiltrationManager();
+    FiltrationManager(const FiltrationManager&)            = delete;
+    FiltrationManager& operator=(const FiltrationManager&) = delete;
+
+    void add_online_dumping  (const Parameters& params);  // dump to file
+    void add_online_analysis (const Parameters& params, FilteredDataQueue& queue);    // capture to queue
+    void add_offline_analysis(const std::string& ifile, FilteredDataQueue& queue);    // read file to queue
 
     void start();
     void stop();
 
 private:
-    FiltrationManager(const FiltrationManager&)            = delete;
-    FiltrationManager& operator=(const FiltrationManager&) = delete;
 
     RunningStatus& status;
 
