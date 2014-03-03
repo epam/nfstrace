@@ -24,7 +24,7 @@ const char* const Args::analysis_mode  = STAT;
 Opt Args::options[Args::num] =
 {
     {'i', "interface",  Opt::REQ, "",                    "listen interface, it is required for " LIVE " and " DUMP " modes", "INTERFACE",      nullptr, false},
-    {'f', "filtration", Opt::REQ, "tcp port 2049",       "a packet filtration in libpcap BPF syntax",                        "BPF",            nullptr, false},
+    {'f', "filtration", Opt::REQ, "tcp or udp port 2049","a packet filtration in libpcap BPF syntax",                        "BPF",            nullptr, false},
     {'s', "snaplen",    Opt::REQ, "65535",               "max length of raw captured packet. May be used ONLY FOR UDP",      "0..65535",       nullptr, false},
     {'t', "timeout",    Opt::REQ, "250",                 "set the read timeout that will be used on a capture",              "Milliseconds",   nullptr, false},
     {'m', "mode",       Opt::REQ, LIVE,                  "set runing mode",                                          LIVE "|" DUMP "|" STAT,   nullptr, false},
