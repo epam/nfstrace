@@ -10,12 +10,11 @@
 #include <vector>
 
 #include "utils/filtered_data.h"
-#include "utils/thread.h"
 #include "controller/parameters.h"
 #include "controller/running_status.h"
+#include "filtration/processing_thread.h"
 //------------------------------------------------------------------------------
 using NST::utils::FilteredDataQueue;
-using NST::utils::Thread;
 using NST::controller::Parameters;
 using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
@@ -41,7 +40,7 @@ private:
 
     RunningStatus& status;
 
-    std::vector< std::unique_ptr<Thread> > threads;
+    std::vector< std::unique_ptr<ProcessingThread> > threads;
 };
 
 } // namespace filtration

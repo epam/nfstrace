@@ -6,7 +6,6 @@
 #ifndef DYNAMIC_LOAD_H
 #define DYNAMIC_LOAD_H
 //------------------------------------------------------------------------------
-#include <cassert>
 #include <stdexcept>
 
 #include <dlfcn.h>
@@ -44,7 +43,6 @@ protected:
     inline void load_address_of(const char* name, SymbolPtr& address)
     {
         static_assert(sizeof(void*) == sizeof(SymbolPtr), "object pointer and function pointer sizes must be equal");
-        assert( sizeof(void*) == sizeof(SymbolPtr) );
 
         // suppression warning: ISO C++ forbids casting between pointer-to-function and pointer-to-object
         using hook_dlsym_t = SymbolPtr (*)(void *, const char *);
