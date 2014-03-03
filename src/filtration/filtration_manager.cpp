@@ -19,7 +19,63 @@ namespace NST
 namespace filtration
 {
 
-static std::unique_ptr<CaptureReader> create_capture_reader(const Parameters& params)
+namespace // unnamed
+{
+
+// FiltrationProcessor in separate processing thread
+template
+<
+    typename Reader,
+    typename Writer
+>
+class FiltrationImpl : public ProcessingThread
+{
+public:
+    explicit FiltrationImpl(std::unique_ptr<Reader>& reader,
+                            std::unique_ptr<Writer>& writer,
+                            RunningStatus& status)
+    : ProcessingThread {status}
+    , processor{reader, writer}
+    {
+    }
+    ~FiltrationImpl() = default;
+    FiltrationImpl(const FiltrationImpl&)            = delete;
+    FiltrationImpl& operator=(const FiltrationImpl&) = delete;
+
+    virtual void stop() override final
+    {
+        processor.stop();
+    }
+private:
+
+    virtual void run() override final
+    {
+        processor.run();
+    }
+
+    FiltrationProcessor<Reader, Writer> processor;
+};
+
+// create Filtration thread emplaced in unique_ptr
+template
+<
+    typename Reader,
+    typename Writer
+>
+static auto create_thread(std::unique_ptr<Reader>& reader,
+                          std::unique_ptr<Writer>& writer,
+                          RunningStatus& status)
+        -> std::unique_ptr<FiltrationImpl<Reader, Writer>>
+{
+    using Thread = FiltrationImpl<Reader, Writer>;
+
+    return std::unique_ptr<Thread>{new Thread{reader, writer, status}};
+}
+
+
+// create CaptureReader from Parameters emplaced in unique_ptr
+static auto create_capture_reader(const Parameters& params)
+        -> std::unique_ptr<CaptureReader>
 {
     return std::unique_ptr<CaptureReader>{
                                 new CaptureReader{
@@ -32,12 +88,12 @@ static std::unique_ptr<CaptureReader> create_capture_reader(const Parameters& pa
                                 };
 }
 
+} // unnamed namespace
+
+// capture from network interface and dump to file  - OnlineDumping(Dumping)
 FiltrationManager::FiltrationManager(RunningStatus& s, const Parameters& params)
 : status(s)
 {
-    using Processor     = FiltrationProcessor<CaptureReader, Dumping>;
-    using OnlineDumping = ProcessingThread<Processor>;
-
     std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
     std::unique_ptr<Dumping>       writer { new Dumping{
                                                 reader->get_handle(),
@@ -47,42 +103,33 @@ FiltrationManager::FiltrationManager(RunningStatus& s, const Parameters& params)
                                             }
                                           };
 
-    std::unique_ptr<Processor>     processor {new Processor{reader, writer}};
-
-    std::unique_ptr<Thread> thread{new OnlineDumping{processor, status}};
-
-    threads.emplace_back(std::move(thread));
+    threads.emplace_back(create_thread(reader, writer, status));
 }
-FiltrationManager::FiltrationManager(RunningStatus& s, FilteredDataQueue& queue, const Parameters& params)
+
+// capture from network interface and pass to queue - OnlineAnalysis(Profiling)
+FiltrationManager::FiltrationManager(RunningStatus& s,
+                                     FilteredDataQueue& queue,
+                                     const Parameters& params)
 : status(s)
 {
-    using Processor       = FiltrationProcessor<CaptureReader, Queueing>;
-    using OnlineAnalyzing = ProcessingThread<Processor>;
-
     std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
-    std::unique_ptr<Queueing>      writer { new Queueing(queue)           };
+    std::unique_ptr<Queueing>      writer { new Queueing{queue}           };
 
-    std::unique_ptr<Processor>     processor{new Processor{reader, writer}};
-
-    std::unique_ptr<Thread> thread{new OnlineAnalyzing{processor, status}};
-
-    threads.emplace_back(std::move(thread));
+    threads.emplace_back(create_thread(reader, writer, status));
 }
-FiltrationManager::FiltrationManager(RunningStatus& s, FilteredDataQueue& queue, const std::string& ifile)
+
+// read from file and pass to queue - OfflineAnalysis(Analysis)
+FiltrationManager::FiltrationManager(RunningStatus& s,
+                                     FilteredDataQueue& queue,
+                                     const std::string& ifile)
 : status(s)
 {
-    using Processor        = FiltrationProcessor<FileReader, Queueing>;
-    using OfflineAnalyzing = ProcessingThread<Processor>;
-
     std::unique_ptr<FileReader> reader { new FileReader{ifile} };
     std::unique_ptr<Queueing>   writer { new Queueing{queue}   };
 
-    std::unique_ptr<Processor> processor{new Processor{reader, writer}};
-
-    std::unique_ptr<Thread>    thread{new OfflineAnalyzing{processor, status}};
-
-    threads.emplace_back(std::move(thread));
+    threads.emplace_back(create_thread(reader, writer, status));
 }
+
 FiltrationManager::~FiltrationManager()
 {
     stop(); // additional checking before cleaning table
@@ -92,7 +139,7 @@ void FiltrationManager::start()
 {
     for(auto& th : threads)
     {
-        th->create();
+        th->start();
     }
 }
 

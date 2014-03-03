@@ -6,57 +6,59 @@
 #ifndef PROCESSING_THREAD_H
 #define PROCESSING_THREAD_H
 //------------------------------------------------------------------------------
-#include <memory>
-#include <stdexcept>
+#include <thread>
 
-#include "utils/thread.h"
 #include "controller/running_status.h"
 //------------------------------------------------------------------------------
-using NST::utils::Thread;
-using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
 
-template<typename Processor>
-class ProcessingThread : public Thread
+class ProcessingThread
 {
-public:
-    explicit ProcessingThread(std::unique_ptr<Processor>& p, RunningStatus& s)
-    : processor {std::move(p)}
-    , status    (s)
+protected:
+    ProcessingThread(NST::controller::RunningStatus& s)
+    : status     (s)
+    , processing {}
     {
     }
-    ~ProcessingThread()
+public:
+    virtual ~ProcessingThread()
     {
+        if(processing.joinable())
+        {
+            processing.join();
+        }
     }
 
-    virtual void* run()
+    void start()
+    {
+        if(processing.joinable()) return;   // already started
+
+        processing = std::thread(&ProcessingThread::thread, this);
+    }
+
+    virtual void stop()= 0;
+
+private:
+    virtual void run() = 0;
+
+    inline void thread()
     {
         try
         {
-            processor->run();
+            this->run();    // virtual call
         }
         catch(...)
         {
             status.push_current_exception();
         }
-        return NULL;
     }
 
-    virtual void stop()
-    {
-        processor->stop();
-    }
-
-private:
-    ProcessingThread(const ProcessingThread&)            = delete;
-    ProcessingThread& operator=(const ProcessingThread&) = delete;
-
-    std::unique_ptr<Processor> processor;
-    RunningStatus& status;
+    NST::controller::RunningStatus& status;
+    std::thread processing;
 };
 
 } // namespace filtration
