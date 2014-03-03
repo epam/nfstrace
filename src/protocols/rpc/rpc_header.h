@@ -237,11 +237,27 @@ private:
     RPCProgramValidator() = delete;
 };
 
-// TODO: move to special NFSv3 header
-using NFSv3Validator = RPCProgramValidator<100003,// SunRPC/NFS program
-                                3,      // v3
-                                0,      // NFSPROC3_NULL
-                                21>;    // NFSPROC3_COMMIT
+template
+<
+    uint32_t Program,
+    uint32_t Version,
+    uint32_t MaxProc
+>
+class RPCProgramValidator<Program, Version, 0, MaxProc>
+{
+public:
+    static inline bool check(const CallHeader*const call)
+    {
+        const uint32_t proc = call->proc();
+
+        // do not compare uint32_t with 0 (MinProc)
+        return          proc <= MaxProc &&
+                call->prog() == Program &&
+                call->vers() == Version ;
+    }
+private:
+    RPCProgramValidator() = delete;
+};
 
 } // namespace rpc
 } // namespace protocols

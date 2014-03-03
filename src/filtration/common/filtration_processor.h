@@ -20,6 +20,7 @@
 #include "controller/parameters.h"
 #include "filtration/packet.h"
 #include "protocols/rpc/rpc_header.h"
+#include "protocols/nfs3/nfs_structs.h"
 //------------------------------------------------------------------------------
 using NST::utils::Logger;
 using NST::utils::Session;
@@ -406,7 +407,7 @@ public:
             case SUNRPC_CALL:
             {
                 const CallHeader*const call = static_cast<const CallHeader*const>(msg);
-                if(RPCValidator::check(call) && NFSv3Validator::check(call))
+                if(RPCValidator::check(call) && NFS3::Validator::check(call))
                 {
                     hdr_len = std::min(info.dlen, max_hdr);
                 }
@@ -687,7 +688,7 @@ public:
                 {
                     msg_len = len;   // length of current RPC message
 
-                    if(NFSv3Validator::check(call))
+                    if(NFS3::Validator::check(call))
                     {
                         hdr_len = std::min(msg_len, max_hdr);
                         //TRACE("MATCH RPC Call xid:%u len: %u procedure: %u", call->xid(), msg_len, call->proc());
