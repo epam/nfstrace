@@ -11,7 +11,7 @@
 #include "analysis/nfs_parser_thread.h"
 #include "protocols/nfs3/nfs_procedure.h"
 #include "protocols/rpc/rpc_header.h"
-#include "protocols/rpc/rpc_reader.h"
+#include "protocols/nfs3/nfs_structs.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::NFS3;
 using namespace NST::protocols::xdr;
@@ -101,7 +101,7 @@ void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
             if(ptr->dlen < sizeof(CallHeader)) return;
 
             const CallHeader* call = static_cast<const CallHeader*>(msg);
-            if(RPCValidator::check(call) && NFSv3Validator::check(call))
+            if(RPCValidator::check(call) && Validator::check(call))
             {
                 RPCSession* session = sessions.get_session(ptr->session, RPCSessions::Type::DIRECT);
                 if(session)

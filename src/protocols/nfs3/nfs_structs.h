@@ -10,6 +10,7 @@
 #include <ostream>
 
 #include "protocols/xdr/xdr_reader.h"
+#include "protocols/rpc/rpc_header.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::xdr;
 //------------------------------------------------------------------------------
@@ -55,9 +56,17 @@ struct Proc
     static const char* Titles[Proc::num];
 
 private:
-    Proc(const Proc&);            // undefiend
-    Proc& operator=(const Proc&); // undefiend
+    Proc(const Proc&)            = delete;
+    Proc& operator=(const Proc&) = delete;
 };
+
+using Validator = rpc::RPCProgramValidator
+                <
+                    100003,         // SunRPC/NFS program
+                    3,              // v3
+                    Proc::NFS_NULL, // NFSPROC3_NULL
+                    Proc::COMMIT    // NFSPROC3_COMMIT
+                >;
 
 inline std::ostream& operator<<(std::ostream& out, const Proc::Enum proc);
 
