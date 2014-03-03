@@ -21,8 +21,8 @@ namespace pcap
 class FileReader : public BaseReader
 {
 public:
-    FileReader(const std::string& file);
-    FileReader(FILE* rb_stream);
+    explicit FileReader(const std::string& file);
+    explicit FileReader(FILE* rb_stream);
     ~FileReader();
 
     inline FILE* get_file() { return pcap_file(handle); }

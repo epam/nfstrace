@@ -57,7 +57,7 @@ public:
     std::string         output_file() const;
     std::string         dumping_cmd() const;
     unsigned int        dumping_size() const;
-    unsigned int        buffer_size() const;
+             int        buffer_size() const;
     unsigned short      rpcmsg_limit() const;
     unsigned short      queue_capacity() const;
     const std::vector<AParams>& analysiss() const;

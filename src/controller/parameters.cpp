@@ -170,7 +170,7 @@ unsigned int Parameters::dumping_size() const
     return dsize * 1024 * 1024; // MBytes
 }
 
-unsigned int Parameters::buffer_size() const
+int Parameters::buffer_size() const
 {
     const int size = get(CLI::BSIZE).to_int();
     if(size < 1)

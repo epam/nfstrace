@@ -6,14 +6,13 @@
 #ifndef PROCESSING_THREAD_H
 #define PROCESSING_THREAD_H
 //------------------------------------------------------------------------------
+#include <memory>
 #include <stdexcept>
 
 #include "utils/thread.h"
-#include "utils/unique_ptr.h"
 #include "controller/running_status.h"
 //------------------------------------------------------------------------------
 using NST::utils::Thread;
-using NST::utils::UniquePtr;
 using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
 namespace NST
@@ -25,7 +24,9 @@ template<typename Processor>
 class ProcessingThread : public Thread
 {
 public:
-    ProcessingThread(UniquePtr<Processor>& p, RunningStatus &s) : processor(p), status(s)
+    explicit ProcessingThread(std::unique_ptr<Processor>& p, RunningStatus& s)
+    : processor {std::move(p)}
+    , status    (s)
     {
     }
     ~ProcessingThread()
@@ -51,10 +52,10 @@ public:
     }
 
 private:
-    ProcessingThread(const ProcessingThread&);           // undefined
-    ProcessingThread& operator=(const ProcessingThread&);// undefined
+    ProcessingThread(const ProcessingThread&)            = delete;
+    ProcessingThread& operator=(const ProcessingThread&) = delete;
 
-    UniquePtr<Processor> processor;
+    std::unique_ptr<Processor> processor;
     RunningStatus& status;
 };
 
