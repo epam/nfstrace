@@ -3,13 +3,13 @@
 // Description: Manager for all instances created inside filtration module.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include "filtration/common/filtration_processor.h"
-#include "filtration/common/dumping.h"
-#include "filtration/common/queueing.h"
+#include "filtration/dumping.h"
 #include "filtration/filtration_manager.h"
+#include "filtration/filtration_processor.h"
 #include "filtration/pcap/capture_reader.h"
 #include "filtration/pcap/file_reader.h"
 #include "filtration/processing_thread.h"
+#include "filtration/queueing.h"
 //------------------------------------------------------------------------------
 using NST::filtration::pcap::CaptureReader;
 using NST::filtration::pcap::FileReader;
