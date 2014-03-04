@@ -9,7 +9,6 @@
 #include <memory>
 
 #include "utils/block_allocator.h"
-#include "utils/logger.h"
 #include "utils/spinlock.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -60,7 +59,6 @@ public:
         {
             while(ptr)
             {
-                TRACE("free element of list");
                 free_current();
             }
         }
@@ -91,8 +89,7 @@ public:
     }
     ~Queue()
     {
-        TRACE("Items in queue:");
-        List list{*this};
+        List list{*this};   // deallocate items by destructor of List
     }
 
     inline T* allocate()

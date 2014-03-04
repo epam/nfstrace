@@ -21,18 +21,18 @@
     substantial performance penalties because of the synchronization that must
     be built into the implementations of the functions for the sake of reentrancy.
 */
-#ifdef DEBUG
+#ifdef NDEBUG
+#define TRACE(...)
+#else
 #define STRINGIZE(x) DO_STRINGIZE(x)
 #define DO_STRINGIZE(x) #x
-// TODO: DANGEROUS MACRO !!! Passing custom client string as format to printf().
-// May SIGSEGV
+// TODO: DANGEROUS MACRO ! Passing custom client string as format to printf().
+// May be cause of SIGSEGV
 #define TRACE(...) {\
     NST::utils::Logger& log = NST::utils::Logger::get_global();\
     log.print("\n" __FILE__ ":" STRINGIZE(__LINE__) ": " __VA_ARGS__);\
     log.flush();\
 }
-#else
-#define TRACE(...)
 #endif
 
 #define LOG(...) {\
