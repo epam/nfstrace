@@ -57,6 +57,7 @@ private:
         }
     }
 
+protected:
     NST::controller::RunningStatus& status;
     std::thread processing;
 };
