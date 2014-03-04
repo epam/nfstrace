@@ -12,11 +12,13 @@
 #include <memory>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include <unistd.h>
 #include <sys/time.h>
 
 #include "utils/logger.h"
+#include "filtration/packet.h"
 #include "filtration/pcap/handle.h"
 #include "filtration/pcap/packet_dumper.h"
 //------------------------------------------------------------------------------
