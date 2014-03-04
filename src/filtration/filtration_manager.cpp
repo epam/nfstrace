@@ -50,7 +50,14 @@ private:
 
     virtual void run() override final
     {
-        processor.run();
+        try
+        {
+            processor.run();
+        }
+        catch(...)
+        {
+            ProcessingThread::status.push_current_exception();
+        }
     }
 
     FiltrationProcessor<Reader, Writer> processor;
