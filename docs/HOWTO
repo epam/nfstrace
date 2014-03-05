@@ -1,0 +1,46 @@
+Build by CMake =================================================================
+Create a build directory in top-level directory:
+
+    $ mkdir ./release
+
+Change into your build directory:
+
+    $ cd ./release
+
+Run cmake pointing it to the directory of the top-level CMakeLists.txt.
+The -DCMAKE_BUILD_TYPE=Release produces release configuration.
+Other configurations(Debug, MinSizeRel, RelWithDebInfo) are avaliable likewise.
+CMake will check compiler, libraries and generate build scripts for main 
+application, analyzers and tests. All files will be created in current directory.
+
+    $ cmake -DCMAKE_BUILD_TYPE=Release ../
+
+After that, you can start to build application:
+
+    $ make
+
+Binaries will be created in current directory
+
+
+
+Build by CMake with special compiler ===========================================
+Set up environment variables with path to the compiler:
+
+for Linux:
+    export CC="/usr/bin/gcc"
+    export CXX="/usr/bin/g++"
+
+for FreeBSD:
+    setenv CC "/usr/local/bin/gcc48"
+    setenv CXX "/usr/local/bin/g++48"
+
+Then build by CMake as described above.
+
+
+
+Test by CMake ==================================================================
+Build application and run following command from build directory:
+
+    $ make test
+
+Scripts will compare output of processing traces with reference results.

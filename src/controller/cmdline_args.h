@@ -6,7 +6,7 @@
 #ifndef CMDLINE_ARGS_H
 #define CMDLINE_ARGS_H
 //------------------------------------------------------------------------------
-#include "cmdline_parser.h"
+#include "controller/cmdline_parser.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -19,7 +19,8 @@ struct Args
 {
     friend class CmdlineParser<Args>;
 
-    enum Names {
+    enum Names
+    {
         INTERFACE,
         FILTER,
         SNAPLEN,
@@ -45,7 +46,7 @@ struct Args
 private:
     static Opt options[num];
 
-    explicit Args();  // undefined
+    Args() = delete;
 };
 
 } // namespace cmdline
