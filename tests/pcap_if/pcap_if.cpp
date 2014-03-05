@@ -5,14 +5,14 @@
 //------------------------------------------------------------------------------
 #include <iostream>
 
-#include "../../src/filter/pcap/network_interfaces.h"
-#include "../../src/filter/pcap/pcap_error.h"
+#include "filtration/pcap/network_interfaces.h"
+#include "filtration/pcap/pcap_error.h"
 //------------------------------------------------------------------------------
-using NST::filter::pcap::NetworkInterfaces;
-using NST::filter::pcap::PcapError;
+using NST::filtration::pcap::NetworkInterfaces;
+using NST::filtration::pcap::PcapError;
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-int main(int argc, char **argv)
+int main()
 {
     std::cout << "Note: Reading list of network interface may require that you have special privileges." << std::endl;
     try

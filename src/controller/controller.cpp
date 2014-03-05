@@ -4,11 +4,11 @@
 // of the application.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include "controller.h"
-#include "parameters.h"
-#include "../auxiliary/filtered_data.h"
+#include "utils/filtered_data.h"
+#include "controller/controller.h"
+#include "controller/parameters.h"
 //------------------------------------------------------------------------------
-using NST::auxiliary::FilteredDataQueue;
+using NST::utils::FilteredDataQueue;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -16,35 +16,32 @@ namespace controller
 {
 
 Controller::Controller(const Parameters& params)
-    : logger(::stderr)
-    , sig_handler(status)
-    , analysis   (NULL)
-    , filtration (NULL)
+    : logger     {::stderr}
+    , signals    {status}
+    , analysis   {}
+    , filtration {new FiltrationManager{status}}
 {
     logger.set_output_file(params.program_name() + ".log");
-    NST::auxiliary::Logger::set_global(&logger);
+    NST::utils::Logger::set_global(&logger);
 
     const RunningMode mode = params.running_mode();
 
     if(mode == Profiling)
     {
-        analysis.reset(new AnalysisManager(status, params));
+        analysis.reset(new AnalysisManager{status, params});
 
-        FilteredDataQueue& queue = analysis->get_queue();
-
-        filtration.reset(new FiltrationManager(status, queue, params));
+        filtration->add_online_analysis(params, analysis->get_queue());
     }
     else if(mode == Dumping)
     {
-        filtration.reset(new FiltrationManager(status, params));
+        filtration->add_online_dumping(params);
     }
     else if(mode == Analysis)
     {
-        analysis.reset(new AnalysisManager(status, params));
+        analysis.reset(new AnalysisManager{status, params});
 
-        FilteredDataQueue& queue = analysis->get_queue();
-
-        filtration.reset(new FiltrationManager(status, queue, params.input_file()));
+        filtration->add_offline_analysis(params.input_file(),
+                                         analysis->get_queue());
     }
 }
 
@@ -54,9 +51,6 @@ Controller::~Controller()
 
 int Controller::run()
 {
-    // Start handling user signals
-    sig_handler.create();
-
     // Start modules to processing
     filtration->start();
     if(analysis)
@@ -85,7 +79,7 @@ int Controller::run()
             Logger::Buffer buffer;
             status.print(buffer);
         }
-        sig_handler.stop();
+
         throw;
     }
 

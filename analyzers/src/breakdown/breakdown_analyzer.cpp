@@ -4,12 +4,13 @@
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #include <cmath>
+#include <cstdint>
+#include <cstdlib>
 #include <list>
 #include <fstream>
 #include <sstream>
-#include <stdint.h>
-#include <stdlib.h>
-#include <tr1/unordered_map>
+#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include <sys/time.h>
@@ -208,9 +209,20 @@ class BreakdownAnalyzer : public IAnalyzer
                     (a.ip.v4.addr[1] == b.ip.v4.addr[1]);
         }
     };
+    
+    struct Less
+    {
+        bool operator() (const Session& a, const Session& b) const
+        {
+            return (a.port[0] < b.port[0]) &&
+                    (a.port[1] < b.port[1]) &&
+                    (a.ip.v4.addr[0] < b.ip.v4.addr[0]) &&
+                    (a.ip.v4.addr[1] < b.ip.v4.addr[1]);
+        }
+    };
 
     typedef BreakdownCounter<T, Algorithm> Breakdown;
-    typedef std::tr1::unordered_map<Session, Breakdown*, Hash, Pred> PerOpStat;
+    typedef std::unordered_map<Session, Breakdown*, Hash, Pred> PerOpStat;
     typedef typename PerOpStat::value_type Pair;
 public:
     BreakdownAnalyzer(std::ostream& o = std::cout) : total(0), ops_count(22, 0), out(o) { }
@@ -310,23 +322,27 @@ public:
                 out << 0;
             out << "%" << std::endl;
         }
+
         if(per_op_stat.size())  // is not empty?
         {
             out << "Per connection info: " << std::endl;
 
             std::stringstream session;
-            typename PerOpStat::iterator it = per_op_stat.begin();
-            typename PerOpStat::iterator end = per_op_stat.end();
-            for(; it != end; ++it)
+
+            // sort statistics by sessions
+            typedef std::multimap<Session, Breakdown*, Less> Map;
+            Map ordered(per_op_stat.begin(), per_op_stat.end());
+
+            for(auto& it : ordered)
             {
-                const Breakdown& current = *it->second;
+                const Breakdown& current = *it.second;
                 uint64_t s_total = 0;
                 for(int i = 0; i < ProcEnum::count; ++i)
                 {
                     s_total += current[i].get_count();
                 }
                 session.str("");
-                session << it->first;
+                session << it.first;
                 print_per_session(current, session.str(), s_total);
                 std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
                 store_per_session(file, current, session.str(), s_total);

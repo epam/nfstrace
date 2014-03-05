@@ -8,58 +8,54 @@
 
 #include <unistd.h>
 
-#include "cmdline_args.h"
-#include "cmdline_parser.h"
-#include "parameters.h"
-#include "../analyzer/plugin.h"
+#include "controller/parameters.h"
+#include "analysis/plugin.h"
 //------------------------------------------------------------------------------
-typedef NST::controller::cmdline::Args CLI;
-typedef NST::controller::cmdline::CmdlineParser<CLI> Parser;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
-static Parser parser;
 
-Parameters* Parameters::global = NULL;
+using CLI = NST::controller::cmdline::Args;
+
+Parameters* Parameters::global = nullptr;
 
 Parameters::Parameters(int argc, char** argv) : rpc_message_limit(0)
 {
-    if(global != NULL) return; // init global instance only once
+    if(global != nullptr) return; // init global instance only once
 
-    parser.parse(argc, argv);
-    if(parser[CLI::HELP].begin()->to_bool())
+    parse(argc, argv);
+    if(get(CLI::HELP).to_bool())
     {
-        parser.print_usage(std::cout, argv[0]);
-        const std::vector<AParams> v = analyzers();
+        print_usage(std::cout, argv[0]);
 
-        for(unsigned int i=0; i < v.size(); ++i)
+        for(auto& a : analysiss())
         {
-            const std::string& path = v[i].path;
+            const std::string& path = a.path;
             try
             {
                 std::cout << "Usage of " << path << ":\n";
-                std::cout << NST::analyzer::Plugin::usage_of(path) << std::endl;
+                std::cout << NST::analysis::Plugin::usage_of(path) << std::endl;
             }
-            catch(Exception& e)
+            catch(std::runtime_error& e)
             {
                 std::cout << e.what() << std::endl;
             }
         }
         return;
     }
-    parser.validate();
+    validate();
 
     // cashed values
     const std::string program_path(argv[0]);
     size_t found = program_path.find_last_of("/\\");
     program = program_path.substr(found+1);
 
-    const int limit = parser[CLI::MSIZE].begin()->to_int();
+    const int limit = get(CLI::MSIZE).to_int();
     if(limit < 1 || limit > 4000)
     {
-        throw cmdline::CLIError(std::string("Invalid limit of RPC messages: ") + parser[CLI::MSIZE].begin()->to_cstr());
+        throw cmdline::CLIError(std::string("Invalid limit of RPC messages: ") + get(CLI::MSIZE).to_cstr());
     }
 
     rpc_message_limit = limit;
@@ -74,7 +70,7 @@ const std::string& Parameters::program_name() const
 
 RunningMode Parameters::running_mode() const
 {
-    const std::string mode = *parser[CLI::MODE].begin();
+    const std::string mode = get(CLI::MODE);
     if(mode == CLI::profiling_mode)
     {
         return Profiling;
@@ -93,17 +89,17 @@ RunningMode Parameters::running_mode() const
 
 bool Parameters::is_verbose() const
 {
-    return parser[CLI::VERBOSE].begin()->to_bool();
+    return get(CLI::VERBOSE).to_bool();
 }
 
-const std::string Parameters::interface() const
+std::string Parameters::interface() const
 {
-    const std::string itf(*parser[CLI::INTERFACE].begin());
+    const std::string itf = get(CLI::INTERFACE);
 
     if(itf.empty())
     {
-        const char* mode = parser[CLI::MODE].begin()->to_cstr();
-        throw cmdline::CLIError(std::string("interface is required for ") + mode + " mode");
+        const char* mode = get(CLI::MODE).to_cstr();
+        throw cmdline::CLIError(std::string("Interface is required for ") + mode + " mode");
     }
 
     return itf;
@@ -111,61 +107,61 @@ const std::string Parameters::interface() const
 
 unsigned short Parameters::snaplen() const
 {
-    return parser[CLI::SNAPLEN].begin()->to_int();
+    return get(CLI::SNAPLEN).to_int();
 }
 
 int Parameters::timeout() const
 {
-    return parser[CLI::TIMEOUT].begin()->to_int();
+    return get(CLI::TIMEOUT).to_int();
 }
 
-const std::string Parameters::filter() const
+std::string Parameters::filtration() const
 {
-    return std::string(*parser[CLI::FILTER].begin());
+    return get(CLI::FILTER);
 }
 
-const std::string Parameters::input_file() const
+std::string Parameters::input_file() const
 {
     std::string ifile;
-    if(parser.is_default(CLI::IFILE))
+    if(is_default(CLI::IFILE))
     {
         std::stringstream buffer;
-        buffer << parser[CLI::INTERFACE].begin()->to_cstr() << '-' << parser[CLI::FILTER].begin()->to_cstr() << ".pcap";
+        buffer << get(CLI::INTERFACE).to_cstr() << '-' << get(CLI::FILTER).to_cstr() << ".pcap";
         ifile = buffer.str();
     }
     else
     {
-        ifile = *parser[CLI::IFILE].begin();
+        ifile = get(CLI::IFILE);
     }
     // TODO: add file validation
     return ifile;
 }
 
-const std::string Parameters::output_file() const
+std::string Parameters::output_file() const
 {
     std::string ofile;
-    if(parser.is_default(CLI::OFILE))
+    if(is_default(CLI::OFILE))
     {
         std::stringstream buffer;
-        buffer << parser[CLI::INTERFACE].begin()->to_cstr() << '-' << parser[CLI::FILTER].begin()->to_cstr() << ".pcap";
+        buffer << get(CLI::INTERFACE).to_cstr() << '-' << get(CLI::FILTER).to_cstr() << ".pcap";
         ofile = buffer.str();
     }
     else
     {
-        ofile = *parser[CLI::OFILE].begin();
+        ofile = get(CLI::OFILE);
     }
     // TODO: add file validation
     return ofile;
 }
 
-const std::string Parameters::dumping_cmd() const
+std::string Parameters::dumping_cmd() const
 {
-    return parser[CLI::COMMAND].begin()->to_cstr();
+    return get(CLI::COMMAND);
 }
 
 unsigned int Parameters::dumping_size() const
 {
-    unsigned int dsize = parser[CLI::DSIZE].begin()->to_int();
+    const int dsize = get(CLI::DSIZE).to_int();
     if(dsize != 0 && output_file() == "-") // '-' is alias for stdout in libpcap dumps
     {
         throw cmdline::CLIError(std::string("Output file \"-\" means stdout, the dump-size must be 0"));
@@ -174,12 +170,12 @@ unsigned int Parameters::dumping_size() const
     return dsize * 1024 * 1024; // MBytes
 }
 
-unsigned int Parameters::buffer_size() const
+int Parameters::buffer_size() const
 {
-    const int size = parser[CLI::BSIZE].begin()->to_int();
+    const int size = get(CLI::BSIZE).to_int();
     if(size < 1)
     {
-        throw cmdline::CLIError(std::string("Invalid value of kernel buffer size: ") + parser[CLI::BSIZE].begin()->to_cstr());
+        throw cmdline::CLIError(std::string("Invalid value of kernel buffer size: ") + get(CLI::BSIZE).to_cstr());
     }
 
     return size * 1024 * 1024; // MBytes
@@ -192,39 +188,37 @@ unsigned short Parameters::rpcmsg_limit() const
 
 unsigned short Parameters::queue_capacity() const
 {
-    const int capacity = parser[CLI::QSIZE].begin()->to_int();
+    const int capacity = get(CLI::QSIZE).to_int();
     if(capacity < 1 || capacity > 65535)
     {
-        throw cmdline::CLIError(std::string("Invalid value of queue capacity: ") + parser[CLI::QSIZE].begin()->to_cstr());
+        throw cmdline::CLIError(std::string("Invalid value of queue capacity: ") + get(CLI::QSIZE).to_cstr());
     }
 
     return capacity;
 }
 
-const std::vector<AParams> Parameters::analyzers() const
+const std::vector<AParams>& Parameters::analysiss() const
 {
-    std::vector<AParams> analyzers;
+    return analysiss_params;
+}
 
-    Parser::ParamValsCIter it = parser[CLI::ANALYZERS].begin();
-    Parser::ParamValsCIter end = parser[CLI::ANALYZERS].end();
-    for(;it != end; ++it)
+void Parameters::set_multiple_value(int index, char *const v)
+{
+    if(index == CLI::ANALYZERS) // may have multiple values
     {
-        if(*it->to_cstr() == '\0')
-            continue;
-        std::string arg(it->to_cstr());
+        std::string arg(v);
         size_t ind = arg.find('#');
         if(ind == std::string::npos)
         {
-            analyzers.push_back(AParams(arg));
+            analysiss_params.push_back(AParams(arg));
         }
         else
         {
             std::string path(arg, 0, ind);
             std::string args(arg, ind + 1);
-            analyzers.push_back(AParams(path, args));
+            analysiss_params.push_back(AParams(path, args));
         }
     }
-    return analyzers;
 }
 
 } // namespace controller

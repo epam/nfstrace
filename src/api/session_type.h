@@ -23,13 +23,15 @@ struct Session
     {
         v4=0,
         v6=1
-    } ip_type:16;    //16 bit for alignment following integers
+    } ip_type:16;       //16 bit for alignment following integers
 
     enum Type
     {
         TCP=0,
         UDP=1
-    } type:16;    //16 bit for alignment following integers
+    } type:16;          //16 bit for alignment following integers
+
+    uint16_t port[2];   // 2 ports in host byte order
 
     union IPAddress
     {
@@ -42,8 +44,6 @@ struct Session
             uint8_t addr[2][16];// 2 IPv6 addresses in host byte order
         } v6;
     } ip;
-
-    uint16_t port[2];           // 2 ports in host byte order
 };
 
 }
