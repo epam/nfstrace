@@ -16,7 +16,7 @@
 #include <pcap/pcap.h>
 
 #include "utils/logger.h"
-#include "utils/application_session.h"
+#include "utils/session.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
 #include "filtration/sessions_hash.h"
@@ -25,7 +25,7 @@
 //------------------------------------------------------------------------------
 using NST::utils::Logger;
 using NST::utils::Session;
-using NST::utils::ApplicationSession;
+using NST::utils::AppSession;
 
 using namespace NST::protocols::rpc;
 //------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ namespace filtration
 
 // Represents UDP datagrams interchange between node A and node B
 template <typename Writer>
-struct UDPSession : public utils::ApplicationSession
+struct UDPSession : public utils::AppSession
 {
 public:
     UDPSession(Writer* w, uint32_t max_rpc_hdr)
@@ -48,7 +48,7 @@ public:
     UDPSession(const UDPSession&)            = delete;
     UDPSession& operator=(const UDPSession&) = delete;
 
-    void collect(PacketInfo& info, Session::Direction /*d*/)
+    void collect(PacketInfo& info)
     {
         // TODO: this code must be generalized with RPCFiltrator class
     
@@ -99,7 +99,7 @@ public:
 
 // Represents TCP conversation between node A and node B
 template <typename StreamReader>
-class TCPSession : public utils::ApplicationSession
+class TCPSession : public utils::AppSession
 {
 public:
 
@@ -335,14 +335,14 @@ public:
     TCPSession(const TCPSession&)            = delete;
     TCPSession& operator=(const TCPSession&) = delete;
 
-    void collect(PacketInfo& info, Session::Direction d)
+    void collect(PacketInfo& info)
     {
         const uint32_t ack = info.tcp->ack();
 
         //check whether this frame acks fragments that were already seen.
-        while( flows[1-d].check_fragments(ack) );
+        while( flows[1-info.direction].check_fragments(ack) );
 
-        flows[d].reassemble(info);
+        flows[info.direction].reassemble(info);
     }
 
     Flow flows[2];
@@ -376,7 +376,7 @@ public:
         collection.reset();     // skip collected data
     }
 
-    inline void set_writer(ApplicationSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
+    inline void set_writer(AppSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {
         assert(w);
         collection.set(*w, session_ptr);

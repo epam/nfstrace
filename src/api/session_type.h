@@ -16,20 +16,21 @@ struct Session
     enum Direction
     {
         Source      =0,
-        Destination =1
+        Destination =1,
+        Uninialized =0xBAD
     };
 
     enum IPType
     {
         v4=0,
         v6=1
-    } ip_type:16;       //16 bit for alignment following integers
+    } ip_type:16;       // 16 bit for alignment following integers
 
     enum Type
     {
         TCP=0,
         UDP=1
-    } type:16;          //16 bit for alignment following integers
+    } type   :16;       // 16 bit for alignment following integers
 
     uint16_t port[2];   // 2 ports in host byte order
 
