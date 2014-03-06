@@ -8,9 +8,9 @@
 //------------------------------------------------------------------------------
 #include <string>
 
-#include "utils/application_session.h"
 #include "utils/filtered_data.h"
 #include "utils/logger.h"
+#include "utils/session.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -34,7 +34,7 @@ public:
         , session {nullptr}
         {
         }
-        inline Collection(Queueing* q, utils::ApplicationSession* app)
+        inline Collection(Queueing* q, utils::AppSession* app)
         : queue   {&q->queue}
         , ptr     {nullptr}
         , session {app}
@@ -51,7 +51,7 @@ public:
         Collection(const Collection&)            = delete;
         Collection& operator=(const Collection&) = delete;
 
-        inline void set(Queueing& q, utils::ApplicationSession* app)
+        inline void set(Queueing& q, utils::AppSession* app)
         {
             queue = &q.queue;
             session = app;
@@ -106,11 +106,9 @@ public:
             assert(ptr);
             assert(ptr->dlen > 0);
 
-            ptr->timestamp = info.header->ts;
-            ptr->session_ptr = session;
-
-            // TODO: replace this code with correct reading of current Conversation (Session)
-            //info.fill(ptr->session);
+            ptr->timestamp   = info.header->ts;
+            ptr->application = session;
+            ptr->direction   = info.direction;
 
             queue->push(ptr);
             ptr = nullptr;
@@ -123,7 +121,7 @@ public:
     private:
         Queue* queue;
         Data*  ptr;
-        ApplicationSession* session;
+        AppSession* session;
     };
 
     Queueing(Queue& q)
