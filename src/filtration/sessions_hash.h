@@ -2,14 +2,13 @@
 // Author: Pavel Karneliuk
 // Description: Hash for network sessions
 // Copyright (c) 2014 EPAM Systems. All Rights Reserved.
-// TODO: THIS CODE MUST BE TOTALLY REFACTORED!
 //------------------------------------------------------------------------------
 #ifndef SESSIONS_HASH_H
 #define SESSIONS_HASH_H
 //------------------------------------------------------------------------------
 #include <cassert>
 #include <memory>
-#include <string>
+#include <type_traits>
 #include <unordered_map>
 
 #include <pcap/pcap.h>
@@ -29,32 +28,41 @@ namespace filtration
 
 struct IPv4TCPMapper
 {
-    static inline Session::Direction fill_session(const PacketInfo& info, Session& s)
+    static void fill_session(const PacketInfo& info, Session& session)
     {
-        s.ip_type = Session::v4;
-        s.ip.v4.addr[0] = info.ipv4->src();
-        s.ip.v4.addr[1] = info.ipv4->dst();
+        session.ip_type = Session::v4;
+        session.ip.v4.addr[0] = info.ipv4->src();
+        session.ip.v4.addr[1] = info.ipv4->dst();
 
-        s.type = Session::TCP;
-        s.port[0] = info.tcp->sport();
-        s.port[1] = info.tcp->dport();
-
-        if(s.ip.v4.addr[0] < s.ip.v4.addr[1]) return Session::Source;
-        else
-        if(s.ip.v4.addr[0] > s.ip.v4.addr[1]) return Session::Destination;
-        else // Ok, addresses are equal, compare ports
-        return (s.port[0] < s.port[1]) ? Session::Source : Session::Destination;
+        session.type = Session::TCP;
+        session.port[0] = info.tcp->sport();
+        session.port[1] = info.tcp->dport();
     }
 
-    struct Hash
+    static inline Session::Direction fill_hash_key(const PacketInfo& info, Session& key)
     {
-        std::size_t operator() (const Session& s) const
+        key.ip.v4.addr[0] = info.ipv4->network_bo_src();
+        key.ip.v4.addr[1] = info.ipv4->network_bo_dst();
+
+        key.port[0] = info.tcp->network_bo_sport();
+        key.port[1] = info.tcp->network_bo_dport();
+
+        if(key.ip.v4.addr[0] < key.ip.v4.addr[1]) return Session::Source;
+        else
+        if(key.ip.v4.addr[0] > key.ip.v4.addr[1]) return Session::Destination;
+        else // Ok, addresses are equal, compare ports
+        return (key.port[0] < key.port[1]) ? Session::Source : Session::Destination;
+    }
+
+    struct KeyHash
+    {
+        std::size_t operator() (const Session& key) const
         {
-            return s.port[0] + s.port[1] + s.ip.v4.addr[0] + s.ip.v4.addr[1];
+            return key.port[0] + key.port[1] + key.ip.v4.addr[0] + key.ip.v4.addr[1];
         }
     };
 
-    struct Pred
+    struct KeyEqual
     {
         bool operator() (const Session& a, const Session& b) const
         {
@@ -76,32 +84,41 @@ struct IPv4TCPMapper
 
 struct IPv4UDPMapper
 {
-    static inline Session::Direction fill_session(const PacketInfo& info, Session& s)
+    static void fill_session(const PacketInfo& info, Session& session)
     {
-        s.ip_type = Session::v4;
-        s.ip.v4.addr[0] = info.ipv4->src();
-        s.ip.v4.addr[1] = info.ipv4->dst();
+        session.ip_type = Session::v4;
+        session.ip.v4.addr[0] = info.ipv4->src();
+        session.ip.v4.addr[1] = info.ipv4->dst();
 
-        s.type = Session::UDP;
-        s.port[0] = info.udp->sport();
-        s.port[1] = info.udp->dport();
-
-        if(s.ip.v4.addr[0] < s.ip.v4.addr[1]) return Session::Source;
-        else
-        if(s.ip.v4.addr[0] > s.ip.v4.addr[1]) return Session::Destination;
-        else // Ok, addresses are equal, compare ports
-        return (s.port[0] < s.port[1]) ? Session::Source : Session::Destination;
+        session.type = Session::UDP;
+        session.port[0] = info.udp->sport();
+        session.port[1] = info.udp->dport();
     }
 
-    struct Hash
+    static inline Session::Direction fill_hash_key(const PacketInfo& info, Session& key)
     {
-        std::size_t operator() (const Session& s) const
+        key.ip.v4.addr[0] = info.ipv4->network_bo_src();
+        key.ip.v4.addr[1] = info.ipv4->network_bo_dst();
+
+        key.port[0] = info.udp->network_bo_sport();
+        key.port[1] = info.udp->network_bo_dport();
+
+        if(key.ip.v4.addr[0] < key.ip.v4.addr[1]) return Session::Source;
+        else
+        if(key.ip.v4.addr[0] > key.ip.v4.addr[1]) return Session::Destination;
+        else // Ok, addresses are equal, compare ports
+        return (key.port[0] < key.port[1]) ? Session::Source : Session::Destination;
+    }
+
+    struct KeyHash
+    {
+        std::size_t operator() (const Session& key) const
         {
-            return s.port[0] + s.port[1] + s.ip.v4.addr[0] + s.ip.v4.addr[1];
+            return key.port[0] + key.port[1] + key.ip.v4.addr[0] + key.ip.v4.addr[1];
         }
     };
 
-    struct Pred
+    struct KeyEqual
     {
         bool operator() (const Session& a, const Session& b) const
         {
@@ -121,14 +138,23 @@ struct IPv4UDPMapper
     };
 };
 
-template<typename Mapper, typename Collector, typename Writer>
+// SessionsHash creates sessions and stores them in hash
+// Also it
+template
+<
+    typename Mapper,        // map PacketInfo& to SessionImpl*
+    typename SessionImpl,   // mapped type
+    typename Writer
+>
 class SessionsHash
 {
 public:
+    static_assert(std::is_convertible<SessionImpl, utils::Session>::value,
+                  "SessionImpl must be convertible to utils::Session");
 
-    using Container = std::unordered_map<Session, Collector*,
-                                         typename Mapper::Hash,
-                                         typename Mapper::Pred>;
+    using Container = std::unordered_map<utils::Session, SessionImpl*,
+                                         typename Mapper::KeyHash,
+                                         typename Mapper::KeyEqual>;
 
     SessionsHash(Writer* w)
     : sessions  { }
@@ -147,18 +173,22 @@ public:
 
     void collect_packet(PacketInfo& info)
     {
-        Session key;
-        const Session::Direction direction = Mapper::fill_session(info, key);
+        utils::Session key;
+        const Session::Direction direction = Mapper::fill_hash_key(info, key);
 
         auto i = sessions.find(key);
         if(i == sessions.end())
         {
-            auto res = sessions.emplace(key, new Collector{writer, max_hdr});
+            auto res = sessions.emplace(key, new SessionImpl{writer, max_hdr});
             i = res.first;
-            if(res.second)
+            if(res.second) // add new - success
             {
+                // fill new session after construction
+                utils::Session& session = *(res.first->second);
+                Mapper::fill_session(info, session);
+
                 Logger::Buffer buffer;
-                buffer << "create new session " << key;
+                buffer << "create new session " << session;
             }
         }
 

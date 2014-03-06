@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 #include <string>
 
+#include "utils/application_session.h"
 #include "utils/filtered_data.h"
 #include "utils/logger.h"
 //------------------------------------------------------------------------------
@@ -28,13 +29,15 @@ public:
     {
     public:
         inline Collection()
-        : queue{nullptr}
-        , ptr  {nullptr}
+        : queue   {nullptr}
+        , ptr     {nullptr}
+        , session {nullptr}
         {
         }
-        inline Collection(Queueing* q)
-        : queue{ &q->queue}
-        , ptr  { nullptr  }
+        inline Collection(Queueing* q, utils::ApplicationSession* app)
+        : queue   {&q->queue}
+        , ptr     {nullptr}
+        , session {app}
         {
         }
         inline ~Collection()
@@ -48,9 +51,10 @@ public:
         Collection(const Collection&)            = delete;
         Collection& operator=(const Collection&) = delete;
 
-        inline void set(Queueing& q)
+        inline void set(Queueing& q, utils::ApplicationSession* app)
         {
             queue = &q.queue;
+            session = app;
         }
 
         inline void allocate()
@@ -103,9 +107,10 @@ public:
             assert(ptr->dlen > 0);
 
             ptr->timestamp = info.header->ts;
+            ptr->session_ptr = session;
 
             // TODO: replace this code with correct reading of current Conversation (Session)
-            info.fill(ptr->session);
+            //info.fill(ptr->session);
 
             queue->push(ptr);
             ptr = nullptr;
@@ -118,6 +123,7 @@ public:
     private:
         Queue* queue;
         Data*  ptr;
+        ApplicationSession* session;
     };
 
     Queueing(Queue& q)

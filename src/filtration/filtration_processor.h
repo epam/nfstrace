@@ -16,7 +16,7 @@
 #include <pcap/pcap.h>
 
 #include "utils/logger.h"
-#include "utils/session.h"
+#include "utils/application_session.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
 #include "filtration/sessions_hash.h"
@@ -25,6 +25,7 @@
 //------------------------------------------------------------------------------
 using NST::utils::Logger;
 using NST::utils::Session;
+using NST::utils::ApplicationSession;
 
 using namespace NST::protocols::rpc;
 //------------------------------------------------------------------------------
@@ -33,9 +34,72 @@ namespace NST
 namespace filtration
 {
 
+// Represents UDP datagrams interchange between node A and node B
+template <typename Writer>
+struct UDPSession : public utils::ApplicationSession
+{
+public:
+    UDPSession(Writer* w, uint32_t max_rpc_hdr)
+    : collection{w, this}
+    , max_hdr{max_rpc_hdr}
+    {
+    }
+    UDPSession(UDPSession&&)                 = delete;
+    UDPSession(const UDPSession&)            = delete;
+    UDPSession& operator=(const UDPSession&) = delete;
+
+    void collect(PacketInfo& info, Session::Direction /*d*/)
+    {
+        // TODO: this code must be generalized with RPCFiltrator class
+    
+        uint32_t hdr_len = 0;
+        auto msg = reinterpret_cast<const MessageHeader*const>(info.data);
+        switch(msg->type())
+        {
+            case SUNRPC_CALL:
+            {
+                auto call = static_cast<const CallHeader*const>(msg);
+                if(RPCValidator::check(call) && NFS3::Validator::check(call))
+                {
+                    hdr_len = std::min(info.dlen, max_hdr);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            break;
+            case SUNRPC_REPLY:
+            {
+                auto reply = static_cast<const ReplyHeader*const>(msg);
+                if(RPCValidator::check(reply))
+                {
+                    hdr_len = std::min(info.dlen, max_hdr);
+                }
+                else // isn't RPC reply, stream is corrupt
+                {
+                    return;
+                }
+            }
+            break;
+            default:
+                return;
+        }
+
+        collection.allocate();
+
+        collection.push(info, hdr_len);
+
+        collection.complete(info);
+    }
+
+    typename Writer::Collection collection;
+    uint32_t max_hdr;
+};
+
 // Represents TCP conversation between node A and node B
 template <typename StreamReader>
-class TCPSession
+class TCPSession : public utils::ApplicationSession
 {
 public:
 
@@ -264,8 +328,8 @@ public:
     template <typename Writer>
     TCPSession(Writer* w, uint32_t max_rpc_hdr)
     {
-        flows[0].reader.set_writer(w, max_rpc_hdr);
-        flows[1].reader.set_writer(w, max_rpc_hdr);
+        flows[0].reader.set_writer(this, w, max_rpc_hdr);
+        flows[1].reader.set_writer(this, w, max_rpc_hdr);
     }
     TCPSession(TCPSession&&)                 = delete;
     TCPSession(const TCPSession&)            = delete;
@@ -282,69 +346,6 @@ public:
     }
 
     Flow flows[2];
-};
-
-// Represents UDP datagrams interchange between node A and node B
-template <typename Writer>
-struct UDPSession
-{
-public:
-    UDPSession(Writer* w, uint32_t max_rpc_hdr)
-    : collection{w}
-    , max_hdr{max_rpc_hdr}
-    {
-    }
-    UDPSession(UDPSession&&)                 = delete;
-    UDPSession(const UDPSession&)            = delete;
-    UDPSession& operator=(const UDPSession&) = delete;
-
-    void collect(PacketInfo& info, Session::Direction /*d*/)
-    {
-        // TODO: this code must be generalized with RPCFiltrator class
-    
-        uint32_t hdr_len = 0;
-        const MessageHeader*const msg = reinterpret_cast<const MessageHeader*>(info.data);
-        switch(msg->type())
-        {
-            case SUNRPC_CALL:
-            {
-                const CallHeader*const call = static_cast<const CallHeader*const>(msg);
-                if(RPCValidator::check(call) && NFS3::Validator::check(call))
-                {
-                    hdr_len = std::min(info.dlen, max_hdr);
-                }
-                else
-                {
-                    return;
-                }
-            }
-            break;
-            case SUNRPC_REPLY:
-            {
-                const ReplyHeader*const reply = static_cast<const ReplyHeader*const>(msg);
-                if(RPCValidator::check(reply))
-                {
-                    hdr_len = std::min(info.dlen, max_hdr);
-                }
-                else // isn't RPC reply, stream is corrupt
-                {
-                    return;
-                }
-            }
-            break;
-            default:
-                return;
-        }
-
-        collection.allocate();
-
-        collection.push(info, hdr_len);
-
-        collection.complete(info);
-    }
-
-    typename Writer::Collection collection;
-    uint32_t max_hdr;
 };
 
 
@@ -375,10 +376,10 @@ public:
         collection.reset();     // skip collected data
     }
 
-    inline void set_writer(Writer* w, uint32_t max_rpc_hdr)
+    inline void set_writer(ApplicationSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {
         assert(w);
-        collection.set(*w);
+        collection.set(*w, session_ptr);
         max_hdr = max_rpc_hdr;
     }
 
@@ -543,7 +544,7 @@ public:
         {
             case SUNRPC_CALL:
             {
-                const CallHeader*const call = static_cast<const CallHeader*const>(msg);
+                auto call = static_cast<const CallHeader*const>(msg);
                 if(RPCValidator::check(call))
                 {
                     msg_len = len;   // length of current RPC message
@@ -568,7 +569,7 @@ public:
             break;
             case SUNRPC_REPLY:
             {
-                const ReplyHeader*const reply = static_cast<const ReplyHeader*const>(msg);
+                auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
                 {
                     msg_len = len;   // length of current RPC message

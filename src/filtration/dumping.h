@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+#include "utils/application_session.h"
 #include "utils/logger.h"
 #include "filtration/packet.h"
 #include "filtration/pcap/handle.h"
@@ -43,7 +44,7 @@ public:
             reset();
             timerclear(&last);
         }
-        inline Collection(Dumping* d)
+        inline Collection(Dumping* d, utils::ApplicationSession* /*unused*/)
         : dumper {d}
         {
             reset();
@@ -56,7 +57,7 @@ public:
         Collection(const Collection&)            = delete;
         Collection& operator=(const Collection&) = delete;
 
-        inline void set(Dumping& d)
+        inline void set(Dumping& d, utils::ApplicationSession* /*unused*/)
         {
             dumper = &d;
             reset();
