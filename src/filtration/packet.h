@@ -135,29 +135,6 @@ struct PacketInfo
         udp = header;
     }
 
-    inline void fill(Session& session) const
-    {
-        if(ipv4)
-        {
-            session.ip_type = Session::v4;
-            session.ip.v4.addr[0] = ipv4->src();
-            session.ip.v4.addr[1] = ipv4->dst();
-        }
-
-        if(tcp)
-        {
-            session.type = Session::TCP;
-            session.port[0] = tcp->sport();
-            session.port[1] = tcp->dport();
-        }
-        else if(udp)
-        {
-            session.type = Session::UDP;
-            session.port[0] = udp->sport();
-            session.port[1] = udp->dport();
-        }
-    }
-
     // libpcap structures
     const pcap_pkthdr*              header;
     const uint8_t*                  packet; // real length is in header->caplen
@@ -184,7 +161,7 @@ struct PacketInfo
     uint32_t                        dlen;   // length of payload data
 };
 
-// this structure in memory followed by captured data of PCAP packet
+// PCAP packet in dynamic allocated memory
 struct Packet: public PacketInfo
 {
     Packet()                         = delete;
