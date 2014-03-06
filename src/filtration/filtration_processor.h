@@ -19,6 +19,7 @@
 #include "utils/session.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
+#include "filtration/sessions_hash.h"
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/nfs3/nfs_structs.h"
 //------------------------------------------------------------------------------
@@ -57,9 +58,9 @@ public:
         {
             reset();
         }
-
-//        Flow(const Flow&)            = delete;
-//        Flow& operator=(const Flow&) = delete;
+        Flow(Flow&&)                 = delete;
+        Flow(const Flow&)            = delete;
+        Flow& operator=(const Flow&) = delete;
 
         void reset()
         {
@@ -266,7 +267,7 @@ public:
         flows[0].reader.set_writer(w, max_rpc_hdr);
         flows[1].reader.set_writer(w, max_rpc_hdr);
     }
-    TCPSession(TCPSession&&)                = default;
+    TCPSession(TCPSession&&)                 = delete;
     TCPSession(const TCPSession&)            = delete;
     TCPSession& operator=(const TCPSession&) = delete;
 
@@ -283,115 +284,17 @@ public:
     Flow flows[2];
 };
 
-
-template<typename SessionCollector>
-struct IPv4TCPMapper
-{
-    typedef SessionCollector Collector;
-
-    static inline Session::Direction fill_session(const PacketInfo& info, Session& s)
-    {
-        s.ip_type = Session::v4;
-        s.ip.v4.addr[0] = info.ipv4->src();
-        s.ip.v4.addr[1] = info.ipv4->dst();
-
-        s.type = Session::TCP;
-        s.port[0] = info.tcp->sport();
-        s.port[1] = info.tcp->dport();
-
-        if(s.ip.v4.addr[0] < s.ip.v4.addr[1]) return Session::Source;
-        else
-        if(s.ip.v4.addr[0] > s.ip.v4.addr[1]) return Session::Destination;
-        else // Ok, addresses are equal, compare ports
-        return (s.port[0] < s.port[1]) ? Session::Source : Session::Destination;
-    }
-
-    struct Hash
-    {
-        std::size_t operator() (const Session& s) const
-        {
-            return s.port[0] + s.port[1] + s.ip.v4.addr[0] + s.ip.v4.addr[1];
-        }
-    };
-
-    struct Pred
-    {
-        bool operator() (const Session& a, const Session& b) const
-        {
-            if((a.port[0] == b.port[0]) &&
-               (a.port[1] == b.port[1]) &&
-               (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
-               (a.ip.v4.addr[1] == b.ip.v4.addr[1]))
-                return true;
-
-            if((a.port[1] == b.port[0]) &&
-               (a.port[0] == b.port[1]) &&
-               (a.ip.v4.addr[1] == b.ip.v4.addr[0]) &&
-               (a.ip.v4.addr[0] == b.ip.v4.addr[1]))
-                return true;
-            return false;
-        }
-    };
-};
-
-
-template<typename SessionCollector>
-struct IPv4UDPMapper
-{
-    typedef SessionCollector Collector;
-
-    static inline Session::Direction fill_session(const PacketInfo& info, Session& s)
-    {
-        s.ip_type = Session::v4;
-        s.ip.v4.addr[0] = info.ipv4->src();
-        s.ip.v4.addr[1] = info.ipv4->dst();
-
-        s.type = Session::UDP;
-        s.port[0] = info.udp->sport();
-        s.port[1] = info.udp->dport();
-
-        if(s.ip.v4.addr[0] < s.ip.v4.addr[1]) return Session::Source;
-        else
-        if(s.ip.v4.addr[0] > s.ip.v4.addr[1]) return Session::Destination;
-        else // Ok, addresses are equal, compare ports
-        return (s.port[0] < s.port[1]) ? Session::Source : Session::Destination;
-    }
-
-    struct Hash
-    {
-        std::size_t operator() (const Session& s) const
-        {
-            return s.port[0] + s.port[1] + s.ip.v4.addr[0] + s.ip.v4.addr[1];
-        }
-    };
-
-    struct Pred
-    {
-        bool operator() (const Session& a, const Session& b) const
-        {
-            if((a.port[0] == b.port[0]) &&
-               (a.port[1] == b.port[1]) &&
-               (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
-               (a.ip.v4.addr[1] == b.ip.v4.addr[1]))
-                return true;
-
-            if((a.port[1] == b.port[0]) &&
-               (a.port[0] == b.port[1]) &&
-               (a.ip.v4.addr[1] == b.ip.v4.addr[0]) &&
-               (a.ip.v4.addr[0] == b.ip.v4.addr[1]))
-                return true;
-            return false;
-        }
-    };
-};
-
 // Represents UDP datagrams interchange between node A and node B
 template <typename Writer>
 struct UDPSession
 {
 public:
-    UDPSession(Writer* w, uint32_t max_rpc_hdr) : writer{w}, max_hdr{max_rpc_hdr}{}
-    UDPSession(UDPSession&&)                = default;
+    UDPSession(Writer* w, uint32_t max_rpc_hdr)
+    : collection{w}
+    , max_hdr{max_rpc_hdr}
+    {
+    }
+    UDPSession(UDPSession&&)                 = delete;
     UDPSession(const UDPSession&)            = delete;
     UDPSession& operator=(const UDPSession&) = delete;
 
@@ -433,59 +336,15 @@ public:
                 return;
         }
 
-        typename Writer::Collection collection;
-        collection = *writer;
+        collection.allocate();
 
         collection.push(info, hdr_len);
 
         collection.complete(info);
     }
 
-    Writer* writer;
+    typename Writer::Collection collection;
     uint32_t max_hdr;
-};
-
-template<typename Mapper>
-class SessionCollectors
-{
-
-public:
-
-    typedef std::unordered_map<Session, typename Mapper::Collector,
-                                        typename Mapper::Hash,
-                                        typename Mapper::Pred> Container;
-
-    SessionCollectors()
-    {
-    }
-    ~SessionCollectors()
-    {
-    }
-
-    template <typename Writer>
-    void collect_packet(PacketInfo& info, Writer* writer)
-    {
-        Session key;
-        const Session::Direction direction = Mapper::fill_session(info, key);
-
-        auto i = container.find(key);
-        if(i == container.end())
-        {
-            uint32_t max_hdr = controller::Parameters::instance()->rpcmsg_limit();
-            auto res = container.emplace(key, typename Mapper::Collector(writer, max_hdr));
-            i = res.first;
-            if(res.second)
-            {
-                Logger::Buffer buffer;
-                buffer << "create new session " << key;
-            }
-        }
-
-        i->second.collect(info, direction);
-    }
-
-private:
-    Container container;
 };
 
 
@@ -499,13 +358,15 @@ template<typename Writer>
 class RPCFiltrator
 {
 public:
-    RPCFiltrator() : writer(NULL)
+    RPCFiltrator()
+    : collection{}
     {
         reset();
     }
 
-//    RPCFiltrator(const RPCFiltrator&);            // undefiend
-//    RPCFiltrator& operator=(const RPCFiltrator&); // undefiend
+    RPCFiltrator(RPCFiltrator&&)                 = delete;
+    RPCFiltrator(const RPCFiltrator&)            = delete;
+    RPCFiltrator& operator=(const RPCFiltrator&) = delete;
 
     inline void reset()
     {
@@ -517,7 +378,7 @@ public:
     inline void set_writer(Writer* w, uint32_t max_rpc_hdr)
     {
         assert(w);
-        writer = w;
+        collection.set(*w);
         max_hdr = max_rpc_hdr;
     }
 
@@ -629,7 +490,7 @@ public:
         }
         else // collection is empty
         {
-            collection = *writer;   // allocate new collection from writer
+            collection.allocate();   // allocate new collection from writer
 
             if(info.dlen >= max_header)  // is data enougth to message validation?
             {
@@ -670,7 +531,7 @@ public:
             assert(msg_len == 0);   // message is not found
             assert(hdr_len == 0);   // header should be skipped
             collection.reset();     // skip collected data
-            // skip data od current packet at all
+            // skip data of current packet at all
             //info.data = NULL; optimization
             info.dlen = 0;
         }
@@ -738,8 +599,6 @@ private:
     uint32_t    msg_len;  // length of current RPC message + RM
     uint32_t    hdr_len;  // min(max_hdr, msg_len) or 0 in case of unknown msg
 
-    Writer*     writer;
-
     typename Writer::Collection collection;    // storage for collection packet data
 };
 
@@ -756,6 +615,8 @@ public:
                                  std::unique_ptr<Writer>& w)
     : reader{std::move(r)}
     , writer{std::move(w)}
+    , tcp_sessions{writer.get()}
+    , udp_sessions{writer.get()}
     {
         // check datalink layer
         datalink = reader->datalink();
@@ -786,7 +647,7 @@ public:
 
     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
     {
-        FiltrationProcessor* processor = (FiltrationProcessor*) user;
+        auto processor = reinterpret_cast<FiltrationProcessor*>(user);
 
         PacketInfo info(pkthdr, packet, processor->datalink);
 
@@ -796,7 +657,7 @@ public:
             {
                 if(pkthdr->caplen == pkthdr->len)
                 {
-                    return processor->tcp_sessions.collect_packet(info, processor->writer.get());
+                    return processor->tcp_sessions.collect_packet(info);
                 }
                 else
                 {
@@ -807,7 +668,7 @@ public:
             }
             else if(info.udp)// Ethernet:IPv4:UDP
             {
-                return processor->udp_sessions.collect_packet(info, processor->writer.get());
+                return processor->udp_sessions.collect_packet(info);
             }
         }
         else
@@ -821,8 +682,8 @@ private:
     std::unique_ptr<Reader> reader;
     std::unique_ptr<Writer> writer;
     int datalink;
-    SessionCollectors< IPv4TCPMapper < TCPSession < RPCFiltrator < Writer > > > > tcp_sessions;
-    SessionCollectors< IPv4UDPMapper < UDPSession < Writer > > >                  udp_sessions;
+    SessionsHash< IPv4TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > tcp_sessions;
+    SessionsHash< IPv4UDPMapper, UDPSession < Writer > , Writer >                  udp_sessions;
 };
 
 } // namespace filtration
