@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Struct represented tcp session.
+// Description: Struct represented network session.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef SESSION_TYPE_H

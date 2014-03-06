@@ -22,13 +22,11 @@ namespace NST
 namespace analysis
 {
 
-NFSParserThread::NFSParserThread(FilteredDataQueue& q,
-                                 Analyzers&         a,
-                                 RunningStatus&     rs)
-                                    :   status(rs)
-                                    ,   analysiss(a)
-                                    ,   queue(q)
-                                    ,   runing()
+NFSParserThread::NFSParserThread(FilteredDataQueue& q, Analyzers& a,RunningStatus& rs)
+: status   (rs)
+, analysiss(a)
+, queue    (q)
+, runing   {}
 {
 }
 NFSParserThread::~NFSParserThread()
@@ -93,17 +91,17 @@ inline void NFSParserThread::process_queue()
 void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
 {
     if(ptr->dlen < sizeof(MessageHeader)) return;
-    const MessageHeader* msg = (MessageHeader*)ptr->data;
+    auto msg = reinterpret_cast<const MessageHeader*>(ptr->data);
     switch(msg->type())
     {
     case SUNRPC_CALL:
         {
             if(ptr->dlen < sizeof(CallHeader)) return;
 
-            const CallHeader* call = static_cast<const CallHeader*>(msg);
+            auto call = static_cast<const CallHeader*>(msg);
             if(RPCValidator::check(call) && Validator::check(call))
             {
-                RPCSession* session = sessions.get_session(ptr->session, RPCSessions::Type::DIRECT);
+                RPCSession* session = sessions.get_session(ptr->session_ptr, RPCSessions::MsgType::SUNRPC_CALL);
                 if(session)
                 {
                     session->save_nfs_call_data(call->xid(), std::move(ptr));
@@ -114,12 +112,12 @@ void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
     case SUNRPC_REPLY:
         {
             if(ptr->dlen < sizeof(ReplyHeader)) return;
-            const ReplyHeader* reply = static_cast<const ReplyHeader*>(msg);
 
-            RPCSession* session = sessions.get_session(ptr->session, RPCSessions::Type::REVERSE);
+            RPCSession* session = sessions.get_session(ptr->session_ptr, RPCSessions::MsgType::SUNRPC_REPLY);
 
             if(session == NULL) return;
 
+            auto reply = static_cast<const ReplyHeader*>(msg);
             FilteredDataQueue::Ptr&& call_data = session->get_nfs_call_data(reply->xid());
             if(call_data)
             {
@@ -141,7 +139,7 @@ void NFSParserThread::create_nfs_operation( FilteredDataQueue::Ptr&& call,
                                             FilteredDataQueue::Ptr&& reply,
                                             RPCSession* session)
 {
-    const CallHeader* header = reinterpret_cast<const CallHeader*>(call->data);
+    auto header = reinterpret_cast<const CallHeader*>(call->data);
     const uint32_t procedure = header->proc();
     try
     {

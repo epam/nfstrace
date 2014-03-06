@@ -1,15 +1,12 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Struct represents network layer session.
+// Description: Struct represents application layer session.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef SESSION_H
-#define SESSION_H
+#ifndef APPLICATION_SESSION_H
+#define APPLICATION_SESSION_H
 //------------------------------------------------------------------------------
-#include <ostream>
-
-#include <stddef.h>
-#include <stdint.h>
+#include "utils/session.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -17,12 +14,19 @@ namespace NST
 namespace utils
 {
 
-#include "api/session_type.h"
+struct ApplicationSession : public utils::Session
+{
+public:
+    ApplicationSession()
+    : application {nullptr}
+    {
+    }
 
-std::ostream& operator<<(std::ostream& out, const Session& session);
+    void* application; // pointer to implementation
+};
 
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif //SESSION_H
+#endif //APPLICATION_SESSION_H
 //------------------------------------------------------------------------------
