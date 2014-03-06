@@ -1,17 +1,15 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Base structure for nfs-info.
+// Description: Definition and fill up NFSv3 procedures.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef NFS_PROCEDURE_H
 #define NFS_PROCEDURE_H
 //------------------------------------------------------------------------------
-#include "utils/filtered_data.h"
 #include "protocols/rpc/rpc_procedure_struct.h"
 #include "protocols/rpc/rpc_reader.h"
 #include "protocols/nfs3/nfs_structs.h"
 //------------------------------------------------------------------------------
-using NST::utils::FilteredDataQueue;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -44,28 +42,28 @@ public:
     ResType res;
 };
 
-typedef NFSProcedure <NULLargs,         NULLres>            NFSPROC3_NULL;
-typedef NFSProcedure <GETATTR3args,     GETATTR3res>        NFSPROC3_GETATTR;
-typedef NFSProcedure <SETATTR3args,     SETATTR3res>        NFSPROC3_SETATTR;
-typedef NFSProcedure <LOOKUP3args,      LOOKUP3res>         NFSPROC3_LOOKUP;
-typedef NFSProcedure <ACCESS3args,      ACCESS3res>         NFSPROC3_ACCESS;
-typedef NFSProcedure <READLINK3args,    READLINK3res>       NFSPROC3_READLINK;
-typedef NFSProcedure <READ3args,        READ3res>           NFSPROC3_READ;
-typedef NFSProcedure <WRITE3args,       WRITE3res>          NFSPROC3_WRITE;
-typedef NFSProcedure <CREATE3args,      CREATE3res>         NFSPROC3_CREATE;
-typedef NFSProcedure <MKDIR3args,       MKDIR3res>          NFSPROC3_MKDIR;
-typedef NFSProcedure <SYMLINK3args,     SYMLINK3res>        NFSPROC3_SYMLINK;
-typedef NFSProcedure <MKNOD3args,       MKNOD3res>          NFSPROC3_MKNOD;
-typedef NFSProcedure <REMOVE3args,      REMOVE3res>         NFSPROC3_REMOVE;
-typedef NFSProcedure <RMDIR3args,       RMDIR3res>          NFSPROC3_RMDIR;
-typedef NFSProcedure <RENAME3args,      RENAME3res>         NFSPROC3_RENAME;
-typedef NFSProcedure <LINK3args,        LINK3res>           NFSPROC3_LINK;
-typedef NFSProcedure <READDIR3args,     READDIR3res>        NFSPROC3_READDIR;
-typedef NFSProcedure <READDIRPLUS3args, READDIRPLUS3res>    NFSPROC3_READDIRPLUS;
-typedef NFSProcedure <FSSTAT3args,      FSSTAT3res>         NFSPROC3_FSSTAT;
-typedef NFSProcedure <FSINFO3args,      FSINFO3res>         NFSPROC3_FSINFO;
-typedef NFSProcedure <PATHCONF3args,    PATHCONF3res>       NFSPROC3_PATHCONF;
-typedef NFSProcedure <COMMIT3args,      COMMIT3res>         NFSPROC3_COMMIT;
+using NFSPROC3_NULL        = NFSProcedure <NULLargs,         NULLres>;
+using NFSPROC3_GETATTR     = NFSProcedure <GETATTR3args,     GETATTR3res>;
+using NFSPROC3_SETATTR     = NFSProcedure <SETATTR3args,     SETATTR3res>;
+using NFSPROC3_LOOKUP      = NFSProcedure <LOOKUP3args,      LOOKUP3res>;
+using NFSPROC3_ACCESS      = NFSProcedure <ACCESS3args,      ACCESS3res>;
+using NFSPROC3_READLINK    = NFSProcedure <READLINK3args,    READLINK3res>;
+using NFSPROC3_READ        = NFSProcedure <READ3args,        READ3res>;
+using NFSPROC3_WRITE       = NFSProcedure <WRITE3args,       WRITE3res>;
+using NFSPROC3_CREATE      = NFSProcedure <CREATE3args,      CREATE3res>;
+using NFSPROC3_MKDIR       = NFSProcedure <MKDIR3args,       MKDIR3res>;
+using NFSPROC3_SYMLINK     = NFSProcedure <SYMLINK3args,     SYMLINK3res>;
+using NFSPROC3_MKNOD       = NFSProcedure <MKNOD3args,       MKNOD3res>;
+using NFSPROC3_REMOVE      = NFSProcedure <REMOVE3args,      REMOVE3res>;
+using NFSPROC3_RMDIR       = NFSProcedure <RMDIR3args,       RMDIR3res>;
+using NFSPROC3_RENAME      = NFSProcedure <RENAME3args,      RENAME3res>;
+using NFSPROC3_LINK        = NFSProcedure <LINK3args,        LINK3res>;
+using NFSPROC3_READDIR     = NFSProcedure <READDIR3args,     READDIR3res>;
+using NFSPROC3_READDIRPLUS = NFSProcedure <READDIRPLUS3args, READDIRPLUS3res>;
+using NFSPROC3_FSSTAT      = NFSProcedure <FSSTAT3args,      FSSTAT3res>;
+using NFSPROC3_FSINFO      = NFSProcedure <FSINFO3args,      FSINFO3res>;
+using NFSPROC3_PATHCONF    = NFSProcedure <PATHCONF3args,    PATHCONF3res>;
+using NFSPROC3_COMMIT      = NFSProcedure <COMMIT3args,      COMMIT3res>;
 
 } // namespace NFS3
 } // namespace protocols

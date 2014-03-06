@@ -8,11 +8,11 @@
 //------------------------------------------------------------------------------
 #include <memory>
 
-#include "utils/filtered_data.h"
+#include "analysis/analyzers.h"
+#include "analysis/nfs_parser_thread.h"
 #include "controller/parameters.h"
 #include "controller/running_status.h"
-#include "analysis/nfs_parser_thread.h"
-#include "analysis/analyzers.h"
+#include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
 using NST::controller::Parameters;
 using NST::controller::RunningStatus;

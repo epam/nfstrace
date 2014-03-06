@@ -9,10 +9,10 @@
 #include <atomic>
 #include <thread>
 
-#include "utils/filtered_data.h"
-#include "controller/running_status.h"
 #include "analysis/analyzers.h"
 #include "analysis/rpc_sessions.h"
+#include "controller/running_status.h"
+#include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
 using NST::utils::FilteredDataQueue;
 using NST::controller::RunningStatus;

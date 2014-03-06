@@ -6,19 +6,18 @@
 #ifndef PACKET_H
 #define PACKET_H
 //------------------------------------------------------------------------------
+#include <algorithm>    // for std::min()
 #include <cassert>
-#include <cstring> // for memcpy()
+#include <cstring>      // for memcpy()
 
 #include <pcap/pcap.h>
 
-#include "utils/session.h"
 #include "protocols/ethernet/ethernet_header.h"
 #include "protocols/ip/ipv4_header.h"
 #include "protocols/tcp/tcp_header.h"
 #include "protocols/udp/udp_header.h"
+#include "utils/session.h"
 //------------------------------------------------------------------------------
-using NST::utils::Session;
-
 using namespace NST::protocols;
 using namespace NST::protocols::ethernet;
 using namespace NST::protocols::ip;
@@ -33,9 +32,12 @@ namespace filtration
 // Structure of pointers to captured pcap packet's headers. WITHOUT data.
 struct PacketInfo
 {
+    using Direction = NST::utils::Session::Direction;
+
     inline PacketInfo(const pcap_pkthdr* h, const uint8_t* p, const uint32_t datalink)
-    : header{h}
-    , packet{p}
+    : header   {h}
+    , packet   {p}
+    , direction{Direction::Uninialized}
     {
         eth  = NULL;
         ipv4 = NULL;
@@ -157,8 +159,9 @@ struct PacketInfo
     // UDP
     const udp::UDPHeader*           udp;
 
-    const uint8_t*                  data;   // pointer to payload data
-    uint32_t                        dlen;   // length of payload data
+    const uint8_t*                  data;  // pointer to packet data
+    uint32_t                        dlen;  // length of packet data
+    Direction                  direction;  // packet transmission direction
 };
 
 // PCAP packet in dynamic allocated memory
@@ -195,6 +198,7 @@ struct Packet: public PacketInfo
 
         fragment->data  = packet + (info.data - info.packet);
         fragment->dlen  = info.dlen;
+        fragment->direction = info.direction;
 
         fragment->next  = next;
 

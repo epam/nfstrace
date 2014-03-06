@@ -10,7 +10,7 @@
 
 #include <sys/time.h>
 
-#include "utils/application_session.h"
+#include "utils/session.h"
 #include "utils/queue.h"
 //------------------------------------------------------------------------------
 using NST::utils::Session;
@@ -23,14 +23,14 @@ namespace utils
 struct FilteredData
 {
 public:
-    struct timeval  timestamp;
-    struct ApplicationSession* session_ptr; // pointer to immutable session in Filtration
-
+    struct timeval     timestamp;
+    struct AppSession* application; // pointer to immutable session in Filtration
+    Session::Direction direction;   // direction of data transmission
 
     uint32_t dlen;  // length of filtered data
     uint8_t* data;  // pointer to data in memory
 
-    uint8_t  memory[4000]; // raw filtrationed data in network byte order
+    uint8_t  memory[4000]; // raw filtrated data in network byte order
 
     FilteredData(const FilteredData&)            = delete;
     FilteredData& operator=(const FilteredData&) = delete;
