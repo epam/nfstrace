@@ -27,16 +27,25 @@ namespace analysis
 class RPCSession
 {
 public:
-    using Session = NST::utils::Session;
+    using AppSession = NST::utils::AppSession;
 
-    RPCSession(const Session& s) : session(s)
+    RPCSession(const AppSession& s, NST::utils::Session::Direction dir) : session(s)
+    {
+//        std::cout << "new RPCSession" << " session direction:" << s.direction << " msg direction:" << dir << std::endl;
+
+        // TODO: rewrite this code!
+        if(s.direction != dir)
+        {
+            std::swap(session.ip.v4.addr[0], session.ip.v4.addr[1]);
+            std::swap(session.port[0],       session.port[1]);
+        }
+
+    }
+    ~RPCSession()
     {
     }
     RPCSession(const RPCSession&)            = delete;
     RPCSession& operator=(const RPCSession&) = delete;
-    ~RPCSession()
-    {
-    }
     
     void save_nfs_call_data(uint32_t xid, FilteredDataQueue::Ptr&& data)
     {
@@ -90,29 +99,25 @@ class RPCSessions
 public:
     using MsgType = NST::protocols::rpc::MsgType;
 
-    RPCSessions()
-    {
-    }
-    ~RPCSessions()
-    {
-    }
+    RPCSessions() = default;
+    ~RPCSessions()= default;
     RPCSessions(const RPCSessions&)           = delete;
     RPCSessions operator=(const RPCSessions&) = delete;
 
-    RPCSession* get_session(utils::ApplicationSession* key, MsgType type)
+    RPCSession* get_session(utils::AppSession* app, NST::utils::Session::Direction dir, MsgType type)
     {
-        if(key->application == nullptr)
+        if(app->impl == nullptr)
         {
             if(type == MsgType::SUNRPC_CALL) // add new session only for Call
             {
-                std::unique_ptr<RPCSession> ptr{ new RPCSession(*key) };
+                std::unique_ptr<RPCSession> ptr{ new RPCSession{*app, dir} };
                 sessions.emplace_back(std::move(ptr));
 
-                key->application = sessions.back().get(); // set reference
+                app->impl = sessions.back().get(); // set reference
             }
         }
 
-        return reinterpret_cast<RPCSession*>(key->application);
+        return reinterpret_cast<RPCSession*>(app->impl);
     }
 
 private:

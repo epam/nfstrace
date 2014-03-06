@@ -17,11 +17,11 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-#include "utils/application_session.h"
-#include "utils/logger.h"
 #include "filtration/packet.h"
 #include "filtration/pcap/handle.h"
 #include "filtration/pcap/packet_dumper.h"
+#include "utils/logger.h"
+#include "utils/session.h"
 //------------------------------------------------------------------------------
 using NST::filtration::pcap::Handle;
 using NST::filtration::pcap::PacketDumper;
@@ -44,7 +44,7 @@ public:
             reset();
             timerclear(&last);
         }
-        inline Collection(Dumping* d, utils::ApplicationSession* /*unused*/)
+        inline Collection(Dumping* d, utils::AppSession* /*unused*/)
         : dumper {d}
         {
             reset();
@@ -57,7 +57,7 @@ public:
         Collection(const Collection&)            = delete;
         Collection& operator=(const Collection&) = delete;
 
-        inline void set(Dumping& d, utils::ApplicationSession* /*unused*/)
+        inline void set(Dumping& d, utils::AppSession* /*unused*/)
         {
             dumper = &d;
             reset();

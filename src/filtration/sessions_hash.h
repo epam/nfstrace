@@ -13,13 +13,14 @@
 
 #include <pcap/pcap.h>
 
-#include "utils/logger.h"
-#include "utils/session.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
+#include "utils/logger.h"
+#include "utils/session.h"
 //------------------------------------------------------------------------------
 using NST::utils::Logger;
 using NST::utils::Session;
+using NST::utils::AppSession;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -28,30 +29,32 @@ namespace filtration
 
 struct IPv4TCPMapper
 {
-    static void fill_session(const PacketInfo& info, Session& session)
+    static inline void fill_session(const PacketInfo& info, AppSession& session)
     {
-        session.ip_type = Session::v4;
-        session.ip.v4.addr[0] = info.ipv4->src();
-        session.ip.v4.addr[1] = info.ipv4->dst();
+        session.ip_type   = Session::v4;
+        session.type      = Session::TCP;
+        session.direction = info.direction;
 
-        session.type = Session::TCP;
         session.port[0] = info.tcp->sport();
         session.port[1] = info.tcp->dport();
+
+        session.ip.v4.addr[0] = info.ipv4->src();
+        session.ip.v4.addr[1] = info.ipv4->dst();
     }
 
-    static inline Session::Direction fill_hash_key(const PacketInfo& info, Session& key)
+    static inline void fill_hash_key(PacketInfo& info, Session& key)
     {
-        key.ip.v4.addr[0] = info.ipv4->network_bo_src();
-        key.ip.v4.addr[1] = info.ipv4->network_bo_dst();
-
         key.port[0] = info.tcp->network_bo_sport();
         key.port[1] = info.tcp->network_bo_dport();
 
-        if(key.ip.v4.addr[0] < key.ip.v4.addr[1]) return Session::Source;
+        key.ip.v4.addr[0] = info.ipv4->network_bo_src();
+        key.ip.v4.addr[1] = info.ipv4->network_bo_dst();
+
+        if(key.ip.v4.addr[0] < key.ip.v4.addr[1]) info.direction = Session::Source;
         else
-        if(key.ip.v4.addr[0] > key.ip.v4.addr[1]) return Session::Destination;
+        if(key.ip.v4.addr[0] > key.ip.v4.addr[1]) info.direction = Session::Destination;
         else // Ok, addresses are equal, compare ports
-        return (key.port[0] < key.port[1]) ? Session::Source : Session::Destination;
+        info.direction =  (key.port[0] < key.port[1]) ? Session::Source : Session::Destination;
     }
 
     struct KeyHash
@@ -84,30 +87,32 @@ struct IPv4TCPMapper
 
 struct IPv4UDPMapper
 {
-    static void fill_session(const PacketInfo& info, Session& session)
+    static inline void fill_session(const PacketInfo& info, AppSession& session)
     {
-        session.ip_type = Session::v4;
-        session.ip.v4.addr[0] = info.ipv4->src();
-        session.ip.v4.addr[1] = info.ipv4->dst();
+        session.ip_type   = Session::v4;
+        session.type      = Session::UDP;
+        session.direction = info.direction;
 
-        session.type = Session::UDP;
         session.port[0] = info.udp->sport();
         session.port[1] = info.udp->dport();
+
+        session.ip.v4.addr[0] = info.ipv4->src();
+        session.ip.v4.addr[1] = info.ipv4->dst();
     }
 
-    static inline Session::Direction fill_hash_key(const PacketInfo& info, Session& key)
+    static inline void fill_hash_key(PacketInfo& info, Session& key)
     {
-        key.ip.v4.addr[0] = info.ipv4->network_bo_src();
-        key.ip.v4.addr[1] = info.ipv4->network_bo_dst();
-
         key.port[0] = info.udp->network_bo_sport();
         key.port[1] = info.udp->network_bo_dport();
 
-        if(key.ip.v4.addr[0] < key.ip.v4.addr[1]) return Session::Source;
+        key.ip.v4.addr[0] = info.ipv4->network_bo_src();
+        key.ip.v4.addr[1] = info.ipv4->network_bo_dst();
+
+        if(key.ip.v4.addr[0] < key.ip.v4.addr[1]) info.direction = Session::Source;
         else
-        if(key.ip.v4.addr[0] > key.ip.v4.addr[1]) return Session::Destination;
+        if(key.ip.v4.addr[0] > key.ip.v4.addr[1]) info.direction = Session::Destination;
         else // Ok, addresses are equal, compare ports
-        return (key.port[0] < key.port[1]) ? Session::Source : Session::Destination;
+        info.direction = (key.port[0] < key.port[1]) ? Session::Source : Session::Destination;
     }
 
     struct KeyHash
@@ -149,8 +154,8 @@ template
 class SessionsHash
 {
 public:
-    static_assert(std::is_convertible<SessionImpl, utils::Session>::value,
-                  "SessionImpl must be convertible to utils::Session");
+    static_assert(std::is_convertible<SessionImpl, utils::AppSession>::value,
+                  "SessionImpl must be convertible to utils::AppSession");
 
     using Container = std::unordered_map<utils::Session, SessionImpl*,
                                          typename Mapper::KeyHash,
@@ -174,17 +179,21 @@ public:
     void collect_packet(PacketInfo& info)
     {
         utils::Session key;
-        const Session::Direction direction = Mapper::fill_hash_key(info, key);
+        Mapper::fill_hash_key(info, key);
 
         auto i = sessions.find(key);
         if(i == sessions.end())
         {
-            auto res = sessions.emplace(key, new SessionImpl{writer, max_hdr});
-            i = res.first;
+            std::unique_ptr<SessionImpl> ptr{ new SessionImpl{writer, max_hdr} };
+
+            auto res = sessions.emplace(key, ptr.get());
             if(res.second) // add new - success
             {
+                ptr.release();
+                i = res.first;
+
                 // fill new session after construction
-                utils::Session& session = *(res.first->second);
+                utils::AppSession& session = *(res.first->second);
                 Mapper::fill_session(info, session);
 
                 Logger::Buffer buffer;
@@ -192,7 +201,7 @@ public:
             }
         }
 
-        i->second->collect(info, direction);
+        i->second->collect(info);
     }
 
 private:
