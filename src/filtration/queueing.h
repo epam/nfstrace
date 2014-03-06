@@ -23,19 +23,39 @@ class Queueing
     using Data  = NST::utils::FilteredData;
 
 public:
-    Queueing(const Queueing&)            = delete;
-    Queueing& operator=(const Queueing&) = delete;
 
     class Collection
     {
     public:
-        inline Collection(): queue(NULL), ptr(NULL)
+        inline Collection()
+        : queue{nullptr}
+        , ptr  {nullptr}
         {
         }
-
-        inline void operator=(const Queueing& t) // initialization
+        inline Collection(Queueing* q)
+        : queue{ &q->queue}
+        , ptr  { nullptr  }
         {
-            queue = &t.queue;
+        }
+        inline ~Collection()
+        {
+            if(ptr)
+            {
+                queue->deallocate(ptr);
+            }
+        }
+        Collection(Collection&&)                 = delete;
+        Collection(const Collection&)            = delete;
+        Collection& operator=(const Collection&) = delete;
+
+        inline void set(Queueing& q)
+        {
+            queue = &q.queue;
+        }
+
+        inline void allocate()
+        {
+            // we have a reference to queue, just do allocate and reset
             ptr = queue->allocate();
             if(ptr)
             {
@@ -45,31 +65,6 @@ public:
             {
                 LOG("free elements of the Queue are exhausted");
             }
-        }
-        inline ~Collection()
-        {
-            if(ptr)
-            {
-                queue->deallocate(ptr);
-            }
-        }
-
-//        Collection(const Collection&);            // undefiend
-//        Collection& operator=(const Collection&); // undefiend
-        inline Collection(const Collection& p) // move
-        {
-            queue = p.queue;
-            ptr   = p.ptr;
-            p.queue = NULL;
-            p.ptr   = NULL;
-        }
-        inline Collection& operator=(const Collection& p) // move
-        {
-            queue = p.queue;
-            ptr   = p.ptr;
-            p.queue = NULL;
-            p.ptr   = NULL;
-            return *this;
         }
 
         inline void reset()
@@ -113,24 +108,28 @@ public:
             info.fill(ptr->session);
 
             queue->push(ptr);
-            ptr = NULL;
+            ptr = nullptr;
         }
 
         inline uint32_t size() const { return ptr->dlen; }
         inline uint8_t* data() const { return ptr->data; }
-        inline operator bool() const { return ptr != NULL; }
+        inline operator bool() const { return ptr != nullptr; }
 
     private:
-        mutable Queue*      queue;
-        mutable Data*       ptr;
+        Queue* queue;
+        Data*  ptr;
     };
 
-    Queueing(Queue& q) : queue(q)
+    Queueing(Queue& q)
+    : queue(q)
     {
     }
     ~Queueing()
     {
     }
+    Queueing(Queueing&&)                 = delete;
+    Queueing(const Queueing&)            = delete;
+    Queueing& operator=(const Queueing&) = delete;
 
 private:
     Queue& queue;

@@ -37,30 +37,35 @@ public:
     class Collection
     {
     public:
-        inline Collection() : dumper{nullptr}
+        inline Collection()
+        : dumper {nullptr}
         {
             reset();
             timerclear(&last);
         }
-
-        inline void operator=(Dumping& d) // initialization
+        inline Collection(Dumping* d)
+        : dumper {d}
         {
-            dumper = &d;
             reset();
+            timerclear(&last);
         }
         inline ~Collection()
         {
         }
+        Collection(Collection&&)                 = delete;
+        Collection(const Collection&)            = delete;
+        Collection& operator=(const Collection&) = delete;
 
-//        Collection(const Collection&);            // undefiend
-//        Collection& operator=(const Collection&); // undefiend
-        inline Collection(const Collection& /*p*/) // move
+        inline void set(Dumping& d)
         {
-
+            dumper = &d;
+            reset();
         }
-        inline Collection& operator=(const Collection& /*p*/) // move
+
+        inline void allocate()
         {
-            return *this;
+            // we have a reference to dumper, just do reset
+            reset();
         }
 
         inline void reset()
@@ -94,7 +99,6 @@ public:
         {
             assert(dumper);
             reset();
-            dumper = nullptr;
         }
 
         inline       uint32_t size() const { return payload_len;       }
@@ -119,12 +123,12 @@ public:
     {
         open_dumping_file(name);
     }
-    Dumping(const Dumping&)            = delete;
-    Dumping& operator=(const Dumping&) = delete;
     ~Dumping()
     {
         close_dumping_file();
     }
+    Dumping(const Dumping&)            = delete;
+    Dumping& operator=(const Dumping&) = delete;
 
     inline void dump(const pcap_pkthdr* header, const u_char* packet)
     {
@@ -155,7 +159,7 @@ private:
     {
         const char* path = file_path.c_str();
         LOG("Dumping packets to file:%s", path);
-        dumper.reset(new PacketDumper(handle, path));
+        dumper.reset(new PacketDumper{handle, path});
     }
 
     inline void close_dumping_file()
@@ -172,33 +176,35 @@ private:
 
         if(pid_t pid = fork()) // spawn child process
         {
-            // parrent process
+            // parent process
             LOG("Try to execute(%s %s) in %u child process", command.c_str(), name.c_str(), pid);
             NST::utils::Logger::get_global().flush();   // force flush buffer
             return;
         }
-
-        // child process
-        std::istringstream ss(command);
-        std::vector<std::string> tokens;
-        std::vector<char*> args;
-
-        // TODO: this parser doesn't work with dual quotes, like rm "a file.cpp"
-        for(std::string arg; ss >> arg;)
+        else
         {
-           tokens.push_back(arg);
-           args  .push_back(const_cast<char*>(tokens.back().c_str()));
-        }
-        args.push_back(const_cast<char*>(name.c_str()));
-        args.push_back(NULL);  // need termination null pointer
+            // child process
+            std::istringstream ss(command);
+            std::vector<std::string> tokens;
+            std::vector<char*> args;
 
-        if(execvp(args[0], &args[0]) == -1)
-        {
-            LOG("execvp(%s,%s %s) return: %s", args[0], command.c_str(), name.c_str(), strerror(errno));
-        }
+            // TODO: this parser doesn't work with dual quotes, like rm "a file.cpp"
+            for(std::string arg; ss >> arg;)
+            {
+               tokens.push_back(arg);
+               args  .push_back(const_cast<char*>(tokens.back().c_str()));
+            }
+            args.push_back(const_cast<char*>(name.c_str()));
+            args.push_back(NULL);  // need termination null pointer
 
-        LOG("child process %u will be terminated.", getpid());
-        std::terminate();
+            if(execvp(args[0], &args[0]) == -1)
+            {
+                LOG("execvp(%s,%s %s) return: %s", args[0], command.c_str(), name.c_str(), strerror(errno));
+            }
+
+            LOG("child process %u will be terminated.", getpid());
+            std::terminate();
+        }
     }
 
     std::unique_ptr<PacketDumper> dumper;
