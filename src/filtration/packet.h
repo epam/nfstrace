@@ -37,15 +37,14 @@ struct PacketInfo
     inline PacketInfo(const pcap_pkthdr* h, const uint8_t* p, const uint32_t datalink)
     : header   {h}
     , packet   {p}
-    , direction{Direction::Uninialized}
+    , eth      {nullptr}
+    , ipv4     {nullptr}
+    , tcp      {nullptr}
+    , udp      {nullptr}
+    , data     {packet}
+    , dlen     {header->caplen}
+    , direction{Direction::Unknown}
     {
-        eth  = NULL;
-        ipv4 = NULL;
-        tcp  = NULL;
-        udp  = NULL;
-        data = packet;
-        dlen = header->caplen;
-
         switch(datalink)
         {
         case DLT_EN10MB:    check_eth(); break;
@@ -161,7 +160,9 @@ struct PacketInfo
 
     const uint8_t*                  data;  // pointer to packet data
     uint32_t                        dlen;  // length of packet data
-    Direction                  direction;  // packet transmission direction
+
+    // Packet transmission direction, set after match packet to session
+    Direction                  direction;
 };
 
 // PCAP packet in dynamic allocated memory
@@ -171,10 +172,12 @@ struct Packet: public PacketInfo
     Packet(const Packet&)            = delete;
     Packet& operator=(const Packet&) = delete;
 
-    Packet* next;     // pointer to next packet or NULL
+    Packet* next;     // pointer to next packet or nullptr
 
     static Packet* create(const PacketInfo& info, Packet* next)
     {
+        assert(info.direction != Direction::Unknown);
+
         // allocate memory for Packet structure and PCAP packet data
         // TODO: performance drop! improve data alignment!
         uint8_t* memory    =  new uint8_t[sizeof(Packet) + sizeof(pcap_pkthdr) + info.header->caplen];

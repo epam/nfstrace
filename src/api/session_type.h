@@ -17,7 +17,7 @@ struct Session
     {
         Source      =0,
         Destination =1,
-        Uninialized =0xBAD
+        Unknown     =0xBAD
     };
 
     enum IPType

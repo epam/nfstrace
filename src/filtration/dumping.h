@@ -44,7 +44,7 @@ public:
             reset();
             timerclear(&last);
         }
-        inline Collection(Dumping* d, utils::AppSession* /*unused*/)
+        inline Collection(Dumping* d, utils::NetworkSession* /*unused*/)
         : dumper {d}
         {
             reset();
@@ -57,7 +57,7 @@ public:
         Collection(const Collection&)            = delete;
         Collection& operator=(const Collection&) = delete;
 
-        inline void set(Dumping& d, utils::AppSession* /*unused*/)
+        inline void set(Dumping& d, utils::NetworkSession* /*unused*/)
         {
             dumper = &d;
             reset();
