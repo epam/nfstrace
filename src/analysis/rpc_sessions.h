@@ -27,19 +27,10 @@ namespace analysis
 class RPCSession
 {
 public:
-    using AppSession = NST::utils::AppSession;
 
-    RPCSession(const AppSession& s, NST::utils::Session::Direction dir) : session(s)
+    RPCSession(const utils::NetworkSession& s, utils::Session::Direction call_direction)
+    : session {s, call_direction}
     {
-//        std::cout << "new RPCSession" << " session direction:" << s.direction << " msg direction:" << dir << std::endl;
-
-        // TODO: rewrite this code!
-        if(s.direction != dir)
-        {
-            std::swap(session.ip.v4.addr[0], session.ip.v4.addr[1]);
-            std::swap(session.port[0],       session.port[1]);
-        }
-
     }
     ~RPCSession()
     {
@@ -90,7 +81,8 @@ public:
 private:
     mutable std::string session_str; // cached string representation of session
 
-    Session session;
+    utils::ApplicationsSession session;
+
     std::unordered_map<uint32_t, FilteredDataQueue::Ptr> operations;
 };
 
@@ -104,20 +96,20 @@ public:
     RPCSessions(const RPCSessions&)           = delete;
     RPCSessions operator=(const RPCSessions&) = delete;
 
-    RPCSession* get_session(utils::AppSession* app, NST::utils::Session::Direction dir, MsgType type)
+    RPCSession* get_session(utils::NetworkSession* app, NST::utils::Session::Direction dir, MsgType type)
     {
-        if(app->impl == nullptr)
+        if(app->application == nullptr)
         {
             if(type == MsgType::SUNRPC_CALL) // add new session only for Call
             {
                 std::unique_ptr<RPCSession> ptr{ new RPCSession{*app, dir} };
                 sessions.emplace_back(std::move(ptr));
 
-                app->impl = sessions.back().get(); // set reference
+                app->application = sessions.back().get(); // set reference
             }
         }
 
-        return reinterpret_cast<RPCSession*>(app->impl);
+        return reinterpret_cast<RPCSession*>(app->application);
     }
 
 private:

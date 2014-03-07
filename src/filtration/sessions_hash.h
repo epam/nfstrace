@@ -20,7 +20,7 @@
 //------------------------------------------------------------------------------
 using NST::utils::Logger;
 using NST::utils::Session;
-using NST::utils::AppSession;
+using NST::utils::NetworkSession;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -29,7 +29,7 @@ namespace filtration
 
 struct IPv4TCPMapper
 {
-    static inline void fill_session(const PacketInfo& info, AppSession& session)
+    static inline void fill_session(const PacketInfo& info, NetworkSession& session)
     {
         session.ip_type   = Session::v4;
         session.type      = Session::TCP;
@@ -87,7 +87,7 @@ struct IPv4TCPMapper
 
 struct IPv4UDPMapper
 {
-    static inline void fill_session(const PacketInfo& info, AppSession& session)
+    static inline void fill_session(const PacketInfo& info, NetworkSession& session)
     {
         session.ip_type   = Session::v4;
         session.type      = Session::UDP;
@@ -154,8 +154,8 @@ template
 class SessionsHash
 {
 public:
-    static_assert(std::is_convertible<SessionImpl, utils::AppSession>::value,
-                  "SessionImpl must be convertible to utils::AppSession");
+    static_assert(std::is_convertible<SessionImpl, utils::NetworkSession>::value,
+                  "SessionImpl must be convertible to utils::NetworkSession");
 
     using Container = std::unordered_map<utils::Session, SessionImpl*,
                                          typename Mapper::KeyHash,
@@ -193,7 +193,7 @@ public:
                 i = res.first;
 
                 // fill new session after construction
-                utils::AppSession& session = *(res.first->second);
+                NetworkSession& session = *(res.first->second);
                 Mapper::fill_session(info, session);
 
                 Logger::Buffer buffer;

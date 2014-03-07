@@ -6,14 +6,13 @@
 #ifndef FILTERED_DATA_H
 #define FILTERED_DATA_H
 //------------------------------------------------------------------------------
-#include <stdint.h>
+#include <cstdint>
 
 #include <sys/time.h>
 
 #include "utils/session.h"
 #include "utils/queue.h"
 //------------------------------------------------------------------------------
-using NST::utils::Session;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -22,10 +21,11 @@ namespace utils
 
 struct FilteredData
 {
+    using Direction = NST::utils::Session::Direction;
 public:
-    struct timeval     timestamp;
-    struct AppSession* application; // pointer to immutable session in Filtration
-    Session::Direction direction;   // direction of data transmission
+    NetworkSession* session;   // pointer to immutable session in Filtration
+    struct timeval  timestamp; // timestamp of last collected packet
+    Direction       direction; // direction of data transmission
 
     uint32_t dlen;  // length of filtered data
     uint8_t* data;  // pointer to data in memory
@@ -41,5 +41,5 @@ using FilteredDataQueue = Queue<FilteredData>;
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif //FILTERED_DATA_H
+#endif//FILTERED_DATA_H
 //------------------------------------------------------------------------------
