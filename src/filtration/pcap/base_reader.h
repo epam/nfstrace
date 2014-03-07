@@ -22,6 +22,8 @@ namespace filtration
 namespace pcap
 {
 
+inline const char* library_version() { return pcap_lib_version(); }
+
 class BaseReader
 {
 protected:

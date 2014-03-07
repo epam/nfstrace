@@ -22,7 +22,7 @@ FileReader::FileReader(const std::string& file) : BaseReader()
     handle = pcap_open_offline(file.c_str(), errbuf);
     if(!handle)
     {
-        throw PcapError("pcap_open_live", errbuf);
+        throw PcapError("pcap_open_offline", errbuf);
     }
 }
 
@@ -34,7 +34,7 @@ FileReader::FileReader(FILE* rb_stream) : BaseReader()
     handle = pcap_fopen_offline(rb_stream, errbuf);
     if(!handle)
     {
-        throw PcapError("pcap_fopen_live", errbuf);
+        throw PcapError("pcap_fopen_offline", errbuf);
     }
 }
 

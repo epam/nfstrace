@@ -1,19 +1,18 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Structure for passing filtrationed data to Analyser module.
+// Description: Structure for passing filtered data to Analysis module.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef FILTERED_DATA_H
 #define FILTERED_DATA_H
 //------------------------------------------------------------------------------
-#include <stdint.h>
+#include <cstdint>
 
 #include <sys/time.h>
 
 #include "utils/session.h"
 #include "utils/queue.h"
 //------------------------------------------------------------------------------
-using NST::utils::Session;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -22,15 +21,16 @@ namespace utils
 
 struct FilteredData
 {
+    using Direction = NST::utils::Session::Direction;
 public:
-    struct timeval timestamp;
+    NetworkSession* session;   // pointer to immutable session in Filtration
+    struct timeval  timestamp; // timestamp of last collected packet
+    Direction       direction; // direction of data transmission
 
-    struct Session session;
-
-    uint32_t dlen;  // length of filtrationed payload
+    uint32_t dlen;  // length of filtered data
     uint8_t* data;  // pointer to data in memory
 
-    uint8_t  memory[4000]; // raw filtrationed data in network byte order
+    uint8_t  memory[4000]; // raw filtrated data in network byte order
 
     FilteredData(const FilteredData&)            = delete;
     FilteredData& operator=(const FilteredData&) = delete;
@@ -41,5 +41,5 @@ using FilteredDataQueue = Queue<FilteredData>;
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif //FILTERED_DATA_H
+#endif//FILTERED_DATA_H
 //------------------------------------------------------------------------------

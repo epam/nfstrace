@@ -9,6 +9,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 #include <unordered_map>
 #include <utility>
 
@@ -26,16 +27,16 @@ namespace analysis
 class RPCSession
 {
 public:
-    using Session = NST::utils::Session;
 
-    RPCSession(const Session& s) : session(s)
+    RPCSession(const utils::NetworkSession& s, utils::Session::Direction call_direction)
+    : session {s, call_direction}
+    {
+    }
+    ~RPCSession()
     {
     }
     RPCSession(const RPCSession&)            = delete;
     RPCSession& operator=(const RPCSession&) = delete;
-    ~RPCSession()
-    {
-    }
     
     void save_nfs_call_data(uint32_t xid, FilteredDataQueue::Ptr&& data)
     {
@@ -80,134 +81,39 @@ public:
 private:
     mutable std::string session_str; // cached string representation of session
 
-    Session session;
+    utils::ApplicationsSession session;
+
     std::unordered_map<uint32_t, FilteredDataQueue::Ptr> operations;
 };
 
 class RPCSessions
 {
 public:
-    enum class Type { DIRECT, REVERSE };
+    using MsgType = NST::protocols::rpc::MsgType;
 
-    RPCSessions()
-    {
-    }
+    RPCSessions() = default;
+    ~RPCSessions()= default;
     RPCSessions(const RPCSessions&)           = delete;
     RPCSessions operator=(const RPCSessions&) = delete;
-    ~RPCSessions()
-    {
-        for(auto& i : sessions)
-        {
-            delete i.second;
-        }
-    }
 
-    RPCSession* get_session(const Session& key, Type type)
+    RPCSession* get_session(utils::NetworkSession* app, NST::utils::Session::Direction dir, MsgType type)
     {
-        auto el = sessions.find(key);
-        if(el == sessions.end())
+        if(app->application == nullptr)
         {
-            if(type == Type::DIRECT) // add new session only for Call (type == DIRECT)
+            if(type == MsgType::SUNRPC_CALL) // add new session only for Call
             {
-                std::auto_ptr<RPCSession> s(new RPCSession(key));
-                auto in_res = sessions.emplace(key, s.release());
-                if(in_res.second == false)
-                {
-                    return NULL;
-                }
-                el = in_res.first;
-            }
-            else
-            {
-                return NULL;
+                std::unique_ptr<RPCSession> ptr{ new RPCSession{*app, dir} };
+                sessions.emplace_back(std::move(ptr));
+
+                app->application = sessions.back().get(); // set reference
             }
         }
 
-        return el->second;
+        return reinterpret_cast<RPCSession*>(app->application);
     }
 
 private:
-
-    struct Hash
-    {
-        std::size_t operator()(const Session& s) const
-        {
-            std::size_t key = s.port[0] + s.port[1];
-
-            if(s.ip_type == Session::v4)
-            {
-                key += s.ip.v4.addr[0] + s.ip.v4.addr[1];
-            }
-            else
-            {
-                for(int i = 0; i < 16; ++i)
-                {
-                    key += s.ip.v6.addr[0][i] + s.ip.v6.addr[1][i];
-                }
-            }
-            key <<= s.type;
-            return key;
-        }
-    };
-
-    struct Pred
-    {
-        bool operator() (const Session& a, const Session& b) const
-        {
-            if((a.ip_type != b.ip_type) || (a.type != b.type)) return false;
-
-            switch(a.ip_type)
-            {
-                case Session::v4:
-                {
-                    if((a.port[0] == b.port[0]) &&
-                       (a.port[1] == b.port[1]) &&
-                       (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
-                       (a.ip.v4.addr[1] == b.ip.v4.addr[1]))
-                        return true;
-
-                    if((a.port[1] == b.port[0]) &&
-                       (a.port[0] == b.port[1]) &&
-                       (a.ip.v4.addr[1] == b.ip.v4.addr[0]) &&
-                       (a.ip.v4.addr[0] == b.ip.v4.addr[1]))
-                        return true;
-                }
-                break;
-                case Session::v6:
-                {
-                    if((a.port[0] == b.port[0]) &&
-                       (a.port[1] == b.port[1]) )
-                    {
-                        int i = 0;
-                        for(; i < 16; ++i)
-                        {
-                            if((a.ip.v6.addr[0][i] != b.ip.v6.addr[0][i]) ||
-                               (a.ip.v6.addr[1][i] != b.ip.v6.addr[1][i]))
-                                break;
-                        }
-                        if(i == 16) return true;
-                    }
-
-                    if((a.port[1] == b.port[0]) &&
-                       (a.port[0] == b.port[1]) )
-                    {
-                        int i = 0;
-                        for(; i < 16; ++i)
-                        {
-                            if((a.ip.v6.addr[1][i] != b.ip.v6.addr[0][i]) ||
-                               (a.ip.v6.addr[0][i] != b.ip.v6.addr[1][i]))
-                                break;
-                        }
-                        if(i == 16) return true;
-                    }
-                }
-                break;
-            }
-            return false;
-        }
-    };
-
-    std::unordered_map<Session, RPCSession*, Hash, Pred> sessions;
+    std::vector< std::unique_ptr<RPCSession> > sessions;
 };
 
 } // namespace analysis
