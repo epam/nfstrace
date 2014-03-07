@@ -34,10 +34,10 @@ public:
         , session {nullptr}
         {
         }
-        inline Collection(Queueing* q, utils::AppSession* app)
+        inline Collection(Queueing* q, utils::NetworkSession* s)
         : queue   {&q->queue}
         , ptr     {nullptr}
-        , session {app}
+        , session {s}
         {
         }
         inline ~Collection()
@@ -51,10 +51,10 @@ public:
         Collection(const Collection&)            = delete;
         Collection& operator=(const Collection&) = delete;
 
-        inline void set(Queueing& q, utils::AppSession* app)
+        inline void set(Queueing& q, utils::NetworkSession* s)
         {
             queue = &q.queue;
-            session = app;
+            session = s;
         }
 
         inline void allocate()
@@ -105,10 +105,11 @@ public:
         {
             assert(ptr);
             assert(ptr->dlen > 0);
+            assert(info.direction != Direction::Unknown);
 
-            ptr->timestamp   = info.header->ts;
-            ptr->application = session;
-            ptr->direction   = info.direction;
+            ptr->session   = session;
+            ptr->timestamp = info.header->ts;
+            ptr->direction = info.direction;
 
             queue->push(ptr);
             ptr = nullptr;
@@ -121,7 +122,7 @@ public:
     private:
         Queue* queue;
         Data*  ptr;
-        AppSession* session;
+        utils::NetworkSession* session;
     };
 
     Queueing(Queue& q)

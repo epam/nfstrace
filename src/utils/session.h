@@ -1,15 +1,14 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Struct represents network session.
+// Description: Structs represents session.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef SESSION_H
 #define SESSION_H
 //------------------------------------------------------------------------------
+#include <cstddef>
+#include <cstdint>
 #include <ostream>
-
-#include <stddef.h>
-#include <stdint.h>
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -19,18 +18,35 @@ namespace utils
 
 #include "api/session_type.h"   // definition of utils::Session
 
-// application layer session
-struct AppSession : public utils::Session
+// Network layer session
+struct NetworkSession : public utils::Session
 {
 public:
-    AppSession()
-    : impl      {nullptr}
-    , direction {Direction::Uninialized}
+    NetworkSession()
+    : application {nullptr}
+    , direction   {Direction::Unknown}
     {
     }
 
-    void*     impl;  // pointer to application protocol implementation
+    void*     application;  // pointer to application protocol implementation
     Direction direction;
+};
+
+
+// Application layer session representation
+struct ApplicationsSession : public utils::Session
+{
+public:
+    ApplicationsSession(const NetworkSession& s, Direction from_client)
+    : utils::Session (s)
+    {
+        if(s.direction != from_client)
+        {
+            //TODO: implement correct swap_src_dst()
+            std::swap(ip.v4.addr[0], ip.v4.addr[1]);
+            std::swap(port[0],       port[1]);
+        }
+    }
 };
 
 std::ostream& operator<<(std::ostream& out, const Session& session);
@@ -38,5 +54,5 @@ std::ostream& operator<<(std::ostream& out, const Session& session);
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif //SESSION_H
+#endif//SESSION_H
 //------------------------------------------------------------------------------
