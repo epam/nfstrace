@@ -10,6 +10,7 @@
 
 #include "utils/filtered_data.h"
 #include "utils/logger.h"
+#include "utils/session.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -23,19 +24,42 @@ class Queueing
     using Data  = NST::utils::FilteredData;
 
 public:
-    Queueing(const Queueing&)            = delete;
-    Queueing& operator=(const Queueing&) = delete;
 
     class Collection
     {
     public:
-        inline Collection(): queue(NULL), ptr(NULL)
+        inline Collection()
+        : queue   {nullptr}
+        , ptr     {nullptr}
+        , session {nullptr}
         {
         }
-
-        inline void operator=(const Queueing& t) // initialization
+        inline Collection(Queueing* q, utils::NetworkSession* s)
+        : queue   {&q->queue}
+        , ptr     {nullptr}
+        , session {s}
         {
-            queue = &t.queue;
+        }
+        inline ~Collection()
+        {
+            if(ptr)
+            {
+                queue->deallocate(ptr);
+            }
+        }
+        Collection(Collection&&)                 = delete;
+        Collection(const Collection&)            = delete;
+        Collection& operator=(const Collection&) = delete;
+
+        inline void set(Queueing& q, utils::NetworkSession* s)
+        {
+            queue = &q.queue;
+            session = s;
+        }
+
+        inline void allocate()
+        {
+            // we have a reference to queue, just do allocate and reset
             ptr = queue->allocate();
             if(ptr)
             {
@@ -45,31 +69,6 @@ public:
             {
                 LOG("free elements of the Queue are exhausted");
             }
-        }
-        inline ~Collection()
-        {
-            if(ptr)
-            {
-                queue->deallocate(ptr);
-            }
-        }
-
-//        Collection(const Collection&);            // undefiend
-//        Collection& operator=(const Collection&); // undefiend
-        inline Collection(const Collection& p) // move
-        {
-            queue = p.queue;
-            ptr   = p.ptr;
-            p.queue = NULL;
-            p.ptr   = NULL;
-        }
-        inline Collection& operator=(const Collection& p) // move
-        {
-            queue = p.queue;
-            ptr   = p.ptr;
-            p.queue = NULL;
-            p.ptr   = NULL;
-            return *this;
         }
 
         inline void reset()
@@ -106,31 +105,36 @@ public:
         {
             assert(ptr);
             assert(ptr->dlen > 0);
+            assert(info.direction != Direction::Unknown);
 
+            ptr->session   = session;
             ptr->timestamp = info.header->ts;
-
-            // TODO: replace this code with correct reading of current Conversation (Session)
-            info.fill(ptr->session);
+            ptr->direction = info.direction;
 
             queue->push(ptr);
-            ptr = NULL;
+            ptr = nullptr;
         }
 
         inline uint32_t size() const { return ptr->dlen; }
         inline uint8_t* data() const { return ptr->data; }
-        inline operator bool() const { return ptr != NULL; }
+        inline operator bool() const { return ptr != nullptr; }
 
     private:
-        mutable Queue*      queue;
-        mutable Data*       ptr;
+        Queue* queue;
+        Data*  ptr;
+        utils::NetworkSession* session;
     };
 
-    Queueing(Queue& q) : queue(q)
+    Queueing(Queue& q)
+    : queue(q)
     {
     }
     ~Queueing()
     {
     }
+    Queueing(Queueing&&)                 = delete;
+    Queueing(const Queueing&)            = delete;
+    Queueing& operator=(const Queueing&) = delete;
 
 private:
     Queue& queue;
