@@ -25,7 +25,6 @@
 //------------------------------------------------------------------------------
 using NST::utils::Logger;
 using NST::utils::Session;
-using NST::utils::AppSession;
 
 using namespace NST::protocols::rpc;
 //------------------------------------------------------------------------------
@@ -36,7 +35,7 @@ namespace filtration
 
 // Represents UDP datagrams interchange between node A and node B
 template <typename Writer>
-struct UDPSession : public utils::AppSession
+struct UDPSession : public utils::NetworkSession
 {
 public:
     UDPSession(Writer* w, uint32_t max_rpc_hdr)
@@ -99,7 +98,7 @@ public:
 
 // Represents TCP conversation between node A and node B
 template <typename StreamReader>
-class TCPSession : public utils::AppSession
+class TCPSession : public utils::NetworkSession
 {
 public:
 
@@ -376,7 +375,7 @@ public:
         collection.reset();     // skip collected data
     }
 
-    inline void set_writer(AppSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
+    inline void set_writer(NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {
         assert(w);
         collection.set(*w, session_ptr);
