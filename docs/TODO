@@ -5,7 +5,6 @@ The '*' means an estimated complexity of feature implementation.
 ***** Implement multi-interface capturing and filtration
 . (tiny star) add enumeration of network interfaces in CLI (see ./tests/pcap_if)
 ** Implement MultiblockAllocator as replacement of BlockAllocator
-* Move spinlock from BlockAllocator to Queue
 *** Add support IPv6 protocol
 *** Replace hardcoded limit(4k) of RPC messages with elastic limit
 ****** Add support NFSv4 protocol
