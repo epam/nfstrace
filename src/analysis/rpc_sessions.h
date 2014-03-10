@@ -82,6 +82,9 @@ private:
     mutable std::string session_str; // cached string representation of session
 
     utils::ApplicationsSession session;
+
+    // TODO: add custom allocator based on BlockAllocator
+    // to decrease cost of expensive insert/erase operations
     std::unordered_map<uint32_t, FilteredDataQueue::Ptr> operations;
 };
 
