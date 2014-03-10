@@ -7,7 +7,6 @@
 #define PACKET_H
 //------------------------------------------------------------------------------
 #include <algorithm>    // for std::min()
-#include <iostream>
 #include <cassert>
 #include <cstring>      // for memcpy()
 
@@ -129,7 +128,7 @@ struct PacketInfo
         uint8_t offset = header->offset();
         if(offset < 20 || offset > 60) return; // invalid length of TCP header
 
-        if(dlen < offset) return;
+        if(dlen < offset) return; // if truncated packet
 
         data += offset;
         dlen -= offset;
