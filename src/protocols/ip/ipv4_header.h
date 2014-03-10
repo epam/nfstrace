@@ -6,7 +6,7 @@
 #ifndef IPV4_HEADER_H
 #define IPV4_HEADER_H
 //------------------------------------------------------------------------------
-#include <stdint.h>
+#include <cstdint>
 
 #include <arpa/inet.h>  // for ntohs()/ntohl()
 #include <netinet/in.h> // for in_addr
