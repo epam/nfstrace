@@ -647,6 +647,7 @@ public:
 
     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
     {
+        static bool unknown_protocols_logged = false;
         auto processor = reinterpret_cast<FiltrationProcessor*>(user);
 
         PacketInfo info(pkthdr, packet, processor->datalink);
@@ -671,9 +672,10 @@ public:
                 return processor->udp_sessions.collect_packet(info);
             }
         }
-        else
+        else if(!unknown_protocols_logged)
         {
             LOG("only following stack of protocol is supported: Ethernet IPv4 TCP | UDP");
+            unknown_protocols_logged = true;
         }
     }
 
