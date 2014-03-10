@@ -69,7 +69,7 @@ public:
         {
             Element* tmp = ptr;
             ptr = ptr->prev;
-            return Ptr(&tmp->data, ElementDeleter(queue));
+            return Ptr{&tmp->data, ElementDeleter{queue}};
         }
         inline void free_current() // deallocate element and switch to next
         {
