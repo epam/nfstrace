@@ -78,8 +78,8 @@ public:
             ptr = tmp;
         }
     private:
-        mutable Element* ptr;
-        mutable Queue* queue;
+        Element* ptr;
+        Queue* queue;
     };
 
 
@@ -94,8 +94,9 @@ public:
 
     inline T* allocate()
     {
-        Element* e = (Element*)allocator.allocate(); // may throw std::bad_alloc
-        return &(e->data);
+        Spinlock::Lock lock{a_spinlock};
+            Element* e = (Element*)allocator.allocate(); // may throw std::bad_alloc
+            return &(e->data);
     }
 
     inline void deallocate(T* ptr)
@@ -107,7 +108,7 @@ public:
     inline void push(T* ptr)
     {
         Element* e = (Element*)( ((char*)ptr) - sizeof(Element*) );
-        Spinlock::Lock lock(q_spinlock);
+        Spinlock::Lock lock{q_spinlock};
             if(last)
             {
                 last->prev = e;
@@ -124,7 +125,7 @@ public:
         Element* list = nullptr;
         if(last)
         {
-            Spinlock::Lock lock(q_spinlock);
+            Spinlock::Lock lock{q_spinlock};
                 if(last)
                 {
                     list = first;
@@ -139,10 +140,12 @@ private:
     // accessible from Queue::List and Queue::Ptr
     inline void deallocate(Element* e)
     {
-        allocator.deallocate(e);
+        Spinlock::Lock lock{a_spinlock};
+            allocator.deallocate(e);
     }
 
     BlockAllocator allocator;
+    Spinlock a_spinlock; // for allocate/deallocate
     Spinlock q_spinlock; // for queue push/pop
 
     // queue empty:   last->nullptr<-first
