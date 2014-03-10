@@ -433,7 +433,7 @@ extern "C"
 
 const char* usage()
 {
-    return "ACC - for accurate evaluation, MEM - for memory undemanding evaluation. Options cannot be combined";
+    return "ACC - for accurate evaluation, MEM - for memory efficient evaluation(default). Options cannot be combined";
 }
 
 IAnalyzer* create(const char* optarg)
@@ -451,7 +451,7 @@ IAnalyzer* create(const char* optarg)
 
     char* value = NULL;
     if(*optarg == '\0')
-        return new BreakdownAnalyzer<long double, TwoPassVariance>();
+        return new BreakdownAnalyzer<long double, OnlineVariance>();
     else
         do
         {

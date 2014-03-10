@@ -82,7 +82,6 @@ private:
     mutable std::string session_str; // cached string representation of session
 
     utils::ApplicationsSession session;
-
     std::unordered_map<uint32_t, FilteredDataQueue::Ptr> operations;
 };
 
