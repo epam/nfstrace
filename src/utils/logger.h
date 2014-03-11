@@ -39,6 +39,11 @@
     NST::utils::Logger& log = NST::utils::Logger::get_global();\
     log.print("\n" __VA_ARGS__);\
 }
+
+#define LOGONCE(...) {\
+    static bool notyet = true; \
+    if(notyet) { LOG(__VA_ARGS__); notyet = false; }\
+}
 //------------------------------------------------------------------------------
 namespace NST
 {
