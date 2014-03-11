@@ -6,7 +6,8 @@
 #ifndef TCP_HEADER_H
 #define TCP_HEADER_H
 //------------------------------------------------------------------------------
-#include <stdint.h>
+#include <cstdint>
+
 #include <arpa/inet.h>  // for ntohs()/ntohl()
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -49,7 +50,7 @@ struct TCPHeader : private tcp_header
     inline uint16_t dport() const { return ntohs(tcp_dport); }
     inline uint32_t   seq() const { return ntohl(tcp_seq); }
     inline uint32_t   ack() const { return ntohl(tcp_ack); }
-    inline uint8_t offset() const { return (tcp_rsrvd_off & 0xf0) >> 2; }
+    inline uint8_t offset() const { return (tcp_rsrvd_off & 0xf0) >> 2 /* *4 */; } // return number of bytes
     inline uint8_t  flags() const { return tcp_flags; }
     inline bool is(tcp_header::Flag flag) const { return tcp_flags & flag; }
     inline uint16_t window()   const { return ntohs(tcp_win); }
