@@ -104,7 +104,7 @@ struct PacketInfo
         }
 
         const uint32_t ihl = header->ihl();
-        if(dlen < ihl) return; // if truncated packet
+        if(dlen < ihl) return; // truncated packet
 
         data += ihl;
         dlen = (std::min((uint16_t)dlen, header->length())) - ihl;  // trunk data to length of IP packet
@@ -122,13 +122,17 @@ struct PacketInfo
 
     inline void check_tcp()
     {
-        if(dlen < sizeof(TCPHeader)) return;   // fragmented TCP header
+        if(dlen < sizeof(TCPHeader)) return;   // truncated TCP header
         auto header = reinterpret_cast<const TCPHeader*>(data);
 
         uint8_t offset = header->offset();
         if(offset < 20 || offset > 60) return; // invalid length of TCP header
 
-        if(dlen < offset) return; // if truncated packet
+        if(dlen < offset) return; // truncated packet
+
+        // RFC-793 Section 3.1 Header Format says:
+        //    A TCP must implement all options.
+        // Here we skip them all
 
         data += offset;
         dlen -= offset;
