@@ -3,10 +3,6 @@
 // Description: Parser of filtrated NFSv3 Procedures.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include <algorithm>
-
-#include <pthread.h>    // for pthread_yield()
-
 #include "analysis/nfs_parser_thread.h"
 #include "protocols/nfs3/nfs_procedure.h"
 #include "protocols/nfs3/nfs_structs.h"
@@ -22,7 +18,7 @@ namespace NST
 namespace analysis
 {
 
-NFSParserThread::NFSParserThread(FilteredDataQueue& q, Analyzers& a,RunningStatus& s)
+NFSParserThread::NFSParserThread(FilteredDataQueue& q, Analyzers& a, RunningStatus& s)
 : status   (s)
 , analysiss(a)
 , queue    (q)
@@ -55,8 +51,8 @@ inline void NFSParserThread::thread()
             // process all available items from queue
             process_queue();
 
-            // then yield this thread
-            pthread_yield(); //    std::this_thread::yield(); does not work! see <thread> _GLIBCXX_USE_SCHED_YIELD
+            // then sleep this thread
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         process_queue(); // flush data from queue
     }
@@ -76,8 +72,7 @@ inline void NFSParserThread::process_queue()
         {
             do
             {
-                FilteredDataQueue::Ptr&& data = list.get_current();
-                parse_data(std::move(data));
+                parse_data(list.get_current());
             }
             while(list);
         }
