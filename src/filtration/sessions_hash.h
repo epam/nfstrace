@@ -144,7 +144,6 @@ struct IPv4UDPMapper
 };
 
 // SessionsHash creates sessions and stores them in hash
-// Also it
 template
 <
     typename Mapper,        // map PacketInfo& to SessionImpl*

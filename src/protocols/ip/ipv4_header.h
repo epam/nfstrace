@@ -6,7 +6,7 @@
 #ifndef IPV4_HEADER_H
 #define IPV4_HEADER_H
 //------------------------------------------------------------------------------
-#include <stdint.h>
+#include <cstdint>
 
 #include <arpa/inet.h>  // for ntohs()/ntohl()
 #include <netinet/in.h> // for in_addr
@@ -86,9 +86,9 @@ struct ipv4_header
 struct IPv4Header : private ipv4_header
 {
     inline uint8_t  version()  const { return (ipv4_vhl & 0xf0) >> 4; }
-    inline uint8_t  ihl()      const { return (ipv4_vhl & 0x0f)*4;  }
+    inline uint8_t  ihl()      const { return (ipv4_vhl & 0x0f) << 2 /* *4 */; } // return number of bytes
     inline uint16_t length()   const { return ntohs(ipv4_len);      }
-    inline uint16_t offset()   const { return ipv4_fragmentation & OFFMASK; }
+    inline uint16_t offset()   const { return (ntohs(ipv4_fragmentation) & OFFMASK) << 3 /* *8 */; } // return number of bytes
     inline uint8_t  protocol() const { return ipv4_protocol;        }
     inline uint32_t src()      const { return ntohl(ipv4_src.s_addr); }
     inline uint32_t dst()      const { return ntohl(ipv4_dst.s_addr); }
@@ -97,7 +97,11 @@ struct IPv4Header : private ipv4_header
     inline uint32_t network_bo_src() const { return ipv4_src.s_addr; }
     inline uint32_t network_bo_dst() const { return ipv4_dst.s_addr; }
 
-    inline bool     is_fragmented() const { return ipv4_fragmentation & (MF | OFFMASK); }
+    inline bool is_fragmented() const { return ipv4_fragmentation & 0xff3f /*0xff3f == htons(MF | OFFMASK)*/; }
+    inline bool is_fragmented_and_not_the_first_part() const
+    {
+        return ipv4_fragmentation & 0xff1f /*offset() != 0*/;
+    }
 } __attribute__ ((__packed__));
 
 } // namespace ip

@@ -3,10 +3,6 @@
 // Description: Parser of filtrated NFSv3 Procedures.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include <algorithm>
-
-#include <pthread.h>    // for pthread_yield()
-
 #include "analysis/nfs_parser_thread.h"
 #include "protocols/nfs3/nfs_procedure.h"
 #include "protocols/nfs3/nfs_structs.h"
@@ -22,7 +18,7 @@ namespace NST
 namespace analysis
 {
 
-NFSParserThread::NFSParserThread(FilteredDataQueue& q, Analyzers& a,RunningStatus& s)
+NFSParserThread::NFSParserThread(FilteredDataQueue& q, Analyzers& a, RunningStatus& s)
 : status   (s)
 , analysiss(a)
 , queue    (q)
@@ -55,8 +51,8 @@ inline void NFSParserThread::thread()
             // process all available items from queue
             process_queue();
 
-            // then yield this thread
-            pthread_yield(); //    std::this_thread::yield(); does not work! see <thread> _GLIBCXX_USE_SCHED_YIELD
+            // then sleep this thread
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         process_queue(); // flush data from queue
     }
@@ -76,8 +72,7 @@ inline void NFSParserThread::process_queue()
         {
             do
             {
-                FilteredDataQueue::Ptr&& data = list.get_current();
-                parse_data(std::move(data));
+                parse_data(list.get_current());
             }
             while(list);
         }
@@ -96,49 +91,48 @@ void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
     switch(msg->type())
     {
     case SUNRPC_CALL:
+    {
+        if(ptr->dlen < sizeof(CallHeader)) return;
+        auto call = static_cast<const CallHeader*>(msg);
+
+        if(RPCValidator::check(call) && Validator::check(call))
         {
-            if(ptr->dlen < sizeof(CallHeader)) return;
-
-            auto call = static_cast<const CallHeader*>(msg);
-            if(RPCValidator::check(call) && Validator::check(call))
+            RPCSession* session = sessions.get_session(ptr->session, ptr->direction, RPCSessions::MsgType::SUNRPC_CALL);
+            if(session)
             {
-                RPCSession* session = sessions.get_session(ptr->session, ptr->direction, RPCSessions::MsgType::SUNRPC_CALL);
-                if(session)
-                {
-                    session->save_nfs_call_data(call->xid(), std::move(ptr));
-                }
-            }
-        }
-        break;
-    case SUNRPC_REPLY:
-        {
-            if(ptr->dlen < sizeof(ReplyHeader)) return;
-
-            RPCSession* session = sessions.get_session(ptr->session, ptr->direction, RPCSessions::MsgType::SUNRPC_REPLY);
-
-            if(session == NULL) return;
-
-            auto reply = static_cast<const ReplyHeader*>(msg);
-            FilteredDataQueue::Ptr&& call_data = session->get_nfs_call_data(reply->xid());
-            if(call_data)
-            {
-                if(reply->stat() == SUNRPC_MSG_ACCEPTED)
-                {
-                    // TODO: check msg-length before cast
-                    auto areply = static_cast<const AcceptedReplyHeader*>(msg);
-                    if(areply->astat() == SUNRPC_SUCCESS)
-                    {
-                        create_nfs_operation(std::move(call_data), std::move(ptr), session);
-                    }
-                }
+                session->save_nfs_call_data(call->xid(), std::move(ptr));
             }
         }
     }
+    break;
+    case SUNRPC_REPLY:
+    {
+        if(ptr->dlen < sizeof(ReplyHeader)) return;
+        auto reply = static_cast<const ReplyHeader*>(msg);
+
+        RPCSession* session = sessions.get_session(ptr->session, ptr->direction, RPCSessions::MsgType::SUNRPC_REPLY);
+
+        if(session)
+        {
+            FilteredDataQueue::Ptr&& call_data = session->get_nfs_call_data(reply->xid());
+            if(call_data)
+            {
+                // TODO: replace these checks with correct parsing by RPCReader
+                // analyze only success operations
+                if(reply->stat() != SUNRPC_MSG_ACCEPTED) return;
+                auto areply = static_cast<const AcceptedReplyHeader*>(msg);
+                if(areply->astat() != SUNRPC_SUCCESS) return;
+
+                analyze_nfs_operation(std::move(call_data), std::move(ptr), session);
+            }
+        }
+    }
+    }
 }
 
-void NFSParserThread::create_nfs_operation( FilteredDataQueue::Ptr&& call,
-                                            FilteredDataQueue::Ptr&& reply,
-                                            RPCSession* session)
+void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
+                                             FilteredDataQueue::Ptr&& reply,
+                                             RPCSession* session)
 {
     auto header = reinterpret_cast<const CallHeader*>(call->data);
     const uint32_t procedure = header->proc();
