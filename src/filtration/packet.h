@@ -62,7 +62,7 @@ struct PacketInfo
     inline void check_eth()
     {
         if(dlen < sizeof(EthernetHeader)) return;
-        const EthernetHeader* header = reinterpret_cast<const EthernetHeader*>(data);
+        auto header = reinterpret_cast<const EthernetHeader*>(data);
 
         data += sizeof(EthernetHeader);
         dlen -= sizeof(EthernetHeader);
@@ -86,17 +86,28 @@ struct PacketInfo
     inline void check_ipv4()
     {
         if(dlen < sizeof(IPv4Header)) return;
+        auto header = reinterpret_cast<const IPv4Header*>(data);
 
-        const IPv4Header* header = reinterpret_cast<const IPv4Header*>(data);
+        if(header->version() != 4)  return;
 
-        if(header->version()  != 4) return;
-//        if(header->length() > dlen) return; // fragmented payload
+        /*
+            IP packet may be fragmented by NIC or snaplen parameter of libpcap
+            IP is fragmented AND it is first part of original (offset == 0)
+            - Ok, pass it.
+
+            IP is fragmented AND it is not first part of it (offset != 0)
+             - DISCARD IT! We do not reassemble fragmented IP packets at all
+        */
+        if(header->is_fragmented_and_not_the_first_part())
+        {
+            return; // discard tail of fragmented ip packets
+        }
 
         const uint32_t ihl = header->ihl();
-        if(ihl < 20 || ihl > 60) return;    // invalid IPv4  header length
+        if(dlen < ihl) return; // truncated packet
 
         data += ihl;
-        dlen = std::min(dlen, header->length() - ihl);  // trunk data to length of IP packet
+        dlen = (std::min((uint16_t)dlen, header->length())) - ihl;  // trunk data to length of IP packet
 
         switch(header->protocol())
         {
@@ -111,13 +122,17 @@ struct PacketInfo
 
     inline void check_tcp()
     {
-        if(dlen < sizeof(TCPHeader)) return;   // fragmented TCP header
-        const TCPHeader* header = reinterpret_cast<const TCPHeader*>(data);
+        if(dlen < sizeof(TCPHeader)) return;   // truncated TCP header
+        auto header = reinterpret_cast<const TCPHeader*>(data);
 
         uint8_t offset = header->offset();
         if(offset < 20 || offset > 60) return; // invalid length of TCP header
 
-        if(dlen < offset) return;
+        if(dlen < offset) return; // truncated packet
+
+        // RFC-793 Section 3.1 Header Format says:
+        //    A TCP must implement all options.
+        // Here we skip them all
 
         data += offset;
         dlen -= offset;

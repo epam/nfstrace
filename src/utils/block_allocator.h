@@ -6,10 +6,8 @@
 #ifndef BLOCK_ALLOCATOR_H
 #define BLOCK_ALLOCATOR_H
 //------------------------------------------------------------------------------
-#include <inttypes.h>    // for uintXX_t
-#include <cstring>       // for memset()
-
-#include "utils/spinlock.h"
+#include <cstdint>
+#include <cstring> // for memset()
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -26,7 +24,14 @@ class BlockAllocator
     };
 public:
 
-    BlockAllocator() : chunk{0}, block{0}, limit{0}, nfree{0}, allocated{0}, blocks{nullptr}, list{nullptr}
+    BlockAllocator()
+    : chunk{0}
+    , block{0}
+    , limit{0}
+    , nfree{0}
+    , allocated{0}
+    , blocks{nullptr}
+    , list{nullptr}
     {
     }
 
@@ -52,30 +57,28 @@ public:
 
     inline void* allocate()
     {
-        Spinlock::Lock lock(spinlock);
-            if(list == nullptr)
+        if(list == nullptr)
+        {
+            if(allocated == limit) // all blocks are allocated!
             {
-                if(allocated == limit) // all blocks are allocated!
-                {
-                    increase_blocks_limit();
-                }
-
-                list = blocks[allocated] = new_block();
+                increase_blocks_limit();
             }
 
-            Chunk* c = list;
-            list = list->next;
-            --nfree;
-            return c;
+            list = blocks[allocated] = new_block();
+        }
+
+        Chunk* c = list;
+        list = list->next;
+        --nfree;
+        return c;
     }
 
     inline void deallocate(void* ptr)
     {
         Chunk* c = (Chunk*) ptr;
-        Spinlock::Lock lock(spinlock);
-            c->next = list;
-            list = c;
-            ++nfree;
+        c->next = list;
+        list = c;
+        ++nfree;
     }
 
     // limits
@@ -118,8 +121,6 @@ private:
     uint32_t allocated;   // num of allocated blocks, up to limit
     Chunk** blocks;       // array of blocks
     Chunk* list;          // list of free chunks
-
-    Spinlock spinlock;    // for allocate/deallocate
 };
 
 } // namespace utils

@@ -38,18 +38,17 @@ public:
     RPCSession(const RPCSession&)            = delete;
     RPCSession& operator=(const RPCSession&) = delete;
     
-    void save_nfs_call_data(uint32_t xid, FilteredDataQueue::Ptr&& data)
+    void save_nfs_call_data(const uint32_t xid, FilteredDataQueue::Ptr&& data)
     {
-        auto res = operations.emplace(xid, std::move(data));
-        if(res.second == false) // we have some Call data with same XID
+        FilteredDataQueue::Ptr& e = operations[xid];
+        if(e)                   // xid call already exists
         {
-            //TODO: add tracing
-
-            operations.erase(res.first);    // remove existing data
-            operations.emplace(xid, std::move(data));  // insert new data
+            LOG("replace RPC Call XID:%u for %s", xid, str().c_str());
         }
+
+        e = std::move(data);    // replace existing or set new
     }
-    inline FilteredDataQueue::Ptr get_nfs_call_data(uint32_t xid)
+    inline FilteredDataQueue::Ptr get_nfs_call_data(const uint32_t xid)
     {
         FilteredDataQueue::Ptr ptr;
 
@@ -59,6 +58,11 @@ public:
             ptr = std::move(i->second);
             operations.erase(i);
         }
+        else
+        {
+            LOG("RPC Call XID:%u is not found for %s", xid, str().c_str());
+        }
+
         return ptr;
     }
 
@@ -83,6 +87,8 @@ private:
 
     utils::ApplicationsSession session;
 
+    // TODO: add custom allocator based on BlockAllocator
+    // to decrease cost of expensive insert/erase operations
     std::unordered_map<uint32_t, FilteredDataQueue::Ptr> operations;
 };
 

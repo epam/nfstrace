@@ -599,7 +599,7 @@ private:
     uint32_t    msg_len;  // length of current RPC message + RM
     uint32_t    hdr_len;  // min(max_hdr, msg_len) or 0 in case of unknown msg
 
-    typename Writer::Collection collection;    // storage for collection packet data
+    typename Writer::Collection collection;// storage for collection packet data
 };
 
 template
@@ -661,8 +661,8 @@ public:
                 }
                 else
                 {
-                    // the pcap packet was truncated by snaplen option
-                    // this packed won't correclty reassembled to TCP stream
+                    LOGONCE("pcap packet was truncated by snaplen option this "
+                            "packed won't correclty reassembled to TCP stream");
                     return;
                 }
             }
@@ -673,7 +673,8 @@ public:
         }
         else
         {
-            LOG("only following stack of protocol is supported: Ethernet IPv4 TCP | UDP");
+            LOGONCE("only following stack of protocol is supported: "
+                    "Ethernet II:IPv4(except additional fragments):TCP|UDP");
         }
     }
 
@@ -681,9 +682,10 @@ private:
 
     std::unique_ptr<Reader> reader;
     std::unique_ptr<Writer> writer;
-    int datalink;
     SessionsHash< IPv4TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > tcp_sessions;
     SessionsHash< IPv4UDPMapper, UDPSession < Writer > , Writer >                  udp_sessions;
+
+    int datalink;
 };
 
 } // namespace filtration
