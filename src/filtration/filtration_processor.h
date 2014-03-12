@@ -673,7 +673,8 @@ public:
         }
         else
         {
-            LOGONCE("only following stack of protocol is supported: Ethernet IPv4 TCP | UDP");
+            LOGONCE("only following stack of protocol is supported: "
+                    "Ethernet II:IPv4(except additional fragments):TCP|UDP");
         }
     }
 
