@@ -36,9 +36,9 @@ private:
     inline void process_queue();
 
     void parse_data(FilteredDataQueue::Ptr&& data);
-    void create_nfs_operation(FilteredDataQueue::Ptr&& call,
-                              FilteredDataQueue::Ptr&& reply,
-                              RPCSession* session);
+    void analyze_nfs_operation(FilteredDataQueue::Ptr&& call,
+                               FilteredDataQueue::Ptr&& reply,
+                               RPCSession* session);
 
     RunningStatus& status;
     Analyzers& analysiss;
