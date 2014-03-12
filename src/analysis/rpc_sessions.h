@@ -41,9 +41,9 @@ public:
     void save_nfs_call_data(const uint32_t xid, FilteredDataQueue::Ptr&& data)
     {
         FilteredDataQueue::Ptr& e = operations[xid];
-        if(e)   // xid call already exists
+        if(e)                   // xid call already exists
         {
-            LOG("replace call XID:%u in %s", xid, str().c_str());
+            LOG("replace RPC Call XID:%u for %s", xid, str().c_str());
         }
 
         e = std::move(data);    // replace existing or set new
@@ -60,7 +60,7 @@ public:
         }
         else
         {
-            LOG("RPC call XID:%u is not found in %s", xid, str().c_str());
+            LOG("RPC Call XID:%u is not found for %s", xid, str().c_str());
         }
 
         return ptr;
