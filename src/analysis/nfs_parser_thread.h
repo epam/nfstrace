@@ -46,7 +46,7 @@ private:
     RPCSessions sessions;
 
     std::thread parsing;
-    std::atomic_flag runing;
+    std::atomic_flag running;
 };
 
 } // namespace analysis
