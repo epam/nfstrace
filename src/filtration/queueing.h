@@ -105,7 +105,7 @@ public:
         {
             assert(ptr);
             assert(ptr->dlen > 0);
-            assert(info.direction != Direction::Unknown);
+            assert(info.direction != utils::Session::Direction::Unknown);
 
             ptr->session   = session;
             ptr->timestamp = info.header->ts;
