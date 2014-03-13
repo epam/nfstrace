@@ -24,24 +24,28 @@ Controller::Controller(const Parameters& params)
     logger.set_output_file(params.program_name() + ".log");
     NST::utils::Logger::set_global(&logger);
 
-    const RunningMode mode = params.running_mode();
-
-    if(mode == Profiling)
+    switch(params.running_mode())
     {
-        analysis.reset(new AnalysisManager{status, params});
+        case RunningMode::Profiling:
+        {
+            analysis.reset(new AnalysisManager{status, params});
 
-        filtration->add_online_analysis(params, analysis->get_queue());
-    }
-    else if(mode == Dumping)
-    {
-        filtration->add_online_dumping(params);
-    }
-    else if(mode == Analysis)
-    {
-        analysis.reset(new AnalysisManager{status, params});
+            filtration->add_online_analysis(params, analysis->get_queue());
+        }
+        break;
+        case RunningMode::Dumping:
+        {
+            filtration->add_online_dumping(params);
+        }
+        break;
+        case RunningMode::Analysis:
+        {
+            analysis.reset(new AnalysisManager{status, params});
 
-        filtration->add_offline_analysis(params.input_file(),
-                                         analysis->get_queue());
+            filtration->add_offline_analysis(params.input_file(),
+                                             analysis->get_queue());
+        }
+        break;
     }
 }
 
@@ -76,7 +80,7 @@ int Controller::run()
         }
 
         {
-            Logger::Buffer buffer;
+            utils::Logger::Buffer buffer;
             status.print(buffer);
         }
 
