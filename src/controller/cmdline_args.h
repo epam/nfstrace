@@ -24,8 +24,8 @@ struct Args
         INTERFACE,
         FILTER,
         SNAPLEN,
-        BSIZE,
         TIMEOUT,
+        BSIZE,
         MODE,
         ANALYZERS,
         IFILE,
@@ -34,6 +34,7 @@ struct Args
         DSIZE,
         MSIZE,
         QSIZE,
+        TRACE,
         VERBOSE,
         HELP,
         num
