@@ -115,6 +115,17 @@ int Parameters::timeout() const
     return get(CLI::TIMEOUT).to_int();
 }
 
+int Parameters::buffer_size() const
+{
+    const int size = get(CLI::BSIZE).to_int();
+    if(size < 1)
+    {
+        throw cmdline::CLIError(std::string("Invalid value of kernel buffer size: ") + get(CLI::BSIZE).to_cstr());
+    }
+
+    return size * 1024 * 1024; // MBytes
+}
+
 std::string Parameters::filtration() const
 {
     return get(CLI::FILTER);
@@ -170,17 +181,6 @@ unsigned int Parameters::dumping_size() const
     return dsize * 1024 * 1024; // MBytes
 }
 
-int Parameters::buffer_size() const
-{
-    const int size = get(CLI::BSIZE).to_int();
-    if(size < 1)
-    {
-        throw cmdline::CLIError(std::string("Invalid value of kernel buffer size: ") + get(CLI::BSIZE).to_cstr());
-    }
-
-    return size * 1024 * 1024; // MBytes
-}
-
 unsigned short Parameters::rpcmsg_limit() const
 {
     return rpc_message_limit;
@@ -195,6 +195,12 @@ unsigned short Parameters::queue_capacity() const
     }
 
     return capacity;
+}
+
+bool Parameters::trace() const
+{
+    // enable tracing if no analysis module was passed
+    return get(CLI::TRACE).to_bool() || analysiss().empty();
 }
 
 const std::vector<AParams>& Parameters::analysiss() const
