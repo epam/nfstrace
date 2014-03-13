@@ -52,14 +52,15 @@ public:
     std::string         interface() const;
     unsigned short      snaplen() const;
     int                 timeout() const;
+    int                 buffer_size() const;
     std::string         filtration() const;
     std::string         input_file() const;
     std::string         output_file() const;
     std::string         dumping_cmd() const;
     unsigned int        dumping_size() const;
-             int        buffer_size() const;
     unsigned short      rpcmsg_limit() const;
     unsigned short      queue_capacity() const;
+    bool                trace() const;
     const std::vector<AParams>& analysiss() const;
 
 protected:

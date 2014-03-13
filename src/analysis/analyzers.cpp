@@ -36,7 +36,7 @@ Analyzers::Analyzers(const Parameters& params)
         }
     }
 
-    if(params.is_verbose()) // add special analysis for trace out RPC calls
+    if(params.trace()) // add special module for tracing RPC procedures
     {
         std::unique_ptr<IAnalyzer> print{new PrintAnalyzer(std::cout)};
         analysiss.push_back(print.get());
