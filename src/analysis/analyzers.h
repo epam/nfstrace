@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Storage for populating Analyzers
+// Description: Storage for Analyzers, load plugins and processing
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef ANALYZERS_H
@@ -9,11 +9,10 @@
 #include <memory>
 #include <vector>
 
-#include "controller/parameters.h"
 #include "analysis/ianalyzer.h"
 #include "analysis/plugin.h"
+#include "controller/parameters.h"
 //------------------------------------------------------------------------------
-using NST::controller::Parameters;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -27,7 +26,7 @@ class Analyzers
     using BuiltIns= std::vector< std::unique_ptr<IAnalyzer> >;
 
 public:
-    Analyzers(const Parameters& params);
+    Analyzers(const controller::Parameters& params);
     Analyzers(const Analyzers&)            = delete;
     Analyzers& operator=(const Analyzers&) = delete;
 
@@ -38,25 +37,22 @@ public:
     >
     inline void operator()(Handle handle, const Procedure& proc)
     {
-        const auto*const arg = &(proc.arg);
-        const auto*const res = &(proc.res);
-
-        for(const auto a : analysiss)
+        for(const auto a : modules)
         {
-            (a->*handle)(&proc, arg, res);
+            (a->*handle)(&proc, &proc.arg, &proc.res);
         }
     }
 
     inline void flush_statistics()
     {
-        for(const auto a : analysiss)
+        for(const auto a : modules)
         {
             a->flush_statistics();
         }
     }
 
 private:
-    Storage  analysiss;
+    Storage  modules; // pointers to all modules (plugins and builtins)
     Plugins  plugins;
     BuiltIns builtin;
 };

@@ -30,7 +30,7 @@ Parameters::Parameters(int argc, char** argv) : rpc_message_limit(0)
     {
         print_usage(std::cout, argv[0]);
 
-        for(auto& a : analysiss())
+        for(const auto& a : analysis_modules())
         {
             const std::string& path = a.path;
             try
@@ -73,15 +73,15 @@ RunningMode Parameters::running_mode() const
     const std::string mode = get(CLI::MODE);
     if(mode == CLI::profiling_mode)
     {
-        return Profiling;
+        return RunningMode::Profiling;
     }
     else if(mode == CLI::dumping_mode)
     {
-        return Dumping;
+        return RunningMode::Dumping;
     }
     else if(mode == CLI::analysis_mode)
     {
-        return Analysis;
+        return RunningMode::Analysis;
     }
 
     throw cmdline::CLIError(std::string("Unknown mode: ") + mode);
@@ -200,10 +200,10 @@ unsigned short Parameters::queue_capacity() const
 bool Parameters::trace() const
 {
     // enable tracing if no analysis module was passed
-    return get(CLI::TRACE).to_bool() || analysiss().empty();
+    return get(CLI::TRACE).to_bool() || analysis_modules().empty();
 }
 
-const std::vector<AParams>& Parameters::analysiss() const
+const std::vector<AParams>& Parameters::analysis_modules() const
 {
     return analysiss_params;
 }
