@@ -18,7 +18,7 @@ namespace NST
 namespace controller
 {
 
-enum RunningMode
+enum class RunningMode
 {
     Profiling,
     Dumping,
@@ -27,7 +27,7 @@ enum RunningMode
 
 struct AParams
 {
-    AParams(const std::string& p) : path{p} {}
+    AParams(const std::string& p) : path{p}, args{} {}
     AParams(const std::string& p, const std::string& a) : path{p}, args{a} {}
     AParams(AParams&&) = default;
 
@@ -61,7 +61,7 @@ public:
     unsigned short      rpcmsg_limit() const;
     unsigned short      queue_capacity() const;
     bool                trace() const;
-    const std::vector<AParams>& analysiss() const;
+    const std::vector<AParams>& analysis_modules() const;
 
 protected:
     void set_multiple_value(int index, char *const v) override;
