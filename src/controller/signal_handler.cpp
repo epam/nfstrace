@@ -25,7 +25,7 @@ SignalHandler::Signal::Signal(int sig) : std::runtime_error(::strsignal(sig))
 {
 }
 
-static void handle_signals(RunningStatus& status)
+static void handle_signals(std::atomic_flag& running, RunningStatus& status)
 {
     sigset_t mask;
     ::sigfillset(&mask);
@@ -35,39 +35,41 @@ static void handle_signals(RunningStatus& status)
     ::sigaddset(&mask, SIGINT);
     ::sigaddset(&mask, SIGQUIT);
     ::sigaddset(&mask, SIGCHLD);
-    ::sigaddset(&mask, SIGUSR2);
 
     int signo = 0;
 
-    while(true)
+    while(running.test_and_set())
     {
         ::sigwait(&mask, &signo);   // synchronously wait of the signals
 
         if(signo == SIGCHLD)
         {
+            // wait childern(compression in dumping mode may call fork())
             ::wait(NULL);
-            continue;
         }
-
-        if(signo == SIGUSR2)
+        else
         {
-            ::wait(NULL);
-            return;
+            status.push(SignalHandler::Signal(signo));
         }
-        status.push(SignalHandler::Signal(signo));
     }
 }
 
-SignalHandler::SignalHandler(RunningStatus& s) : handler(handle_signals, std::ref(s))
+SignalHandler::SignalHandler(RunningStatus& s)
+: handler{}
+, running{ATOMIC_FLAG_INIT} // false
 {
     sigset_t mask;
     ::sigfillset(&mask);
     ::pthread_sigmask(SIG_BLOCK, &mask, NULL);
+
+    running.test_and_set();
+    handler = std::thread{handle_signals, std::ref(running), std::ref(s)};
 }
 SignalHandler::~SignalHandler()
 {
+    running.clear();
     // send signal ourself to stop thread execution via unblock sigwait()
-    ::kill(::getpid(), SIGUSR2);
+    ::kill(::getpid(), SIGCHLD);
     handler.join();
 }
 

@@ -22,7 +22,7 @@ NFSParserThread::NFSParserThread(FilteredDataQueue& q, Analyzers& a, RunningStat
 : status   (s)
 , analysiss(a)
 , queue    (q)
-, runing   {}
+, running  {ATOMIC_FLAG_INIT} // false
 {
 }
 NFSParserThread::~NFSParserThread()
@@ -32,13 +32,13 @@ NFSParserThread::~NFSParserThread()
 
 void NFSParserThread::start()
 {
-    if(runing.test_and_set()) return;
+    if(running.test_and_set()) return;
     parsing = std::thread(&NFSParserThread::thread, this);
 }
 
 void NFSParserThread::stop()
 {
-    runing.clear();
+    running.clear();
     parsing.join();
 }
 
@@ -46,7 +46,7 @@ inline void NFSParserThread::thread()
 {
     try
     {
-        while(runing.test_and_set())
+        while(running.test_and_set())
         {
             // process all available items from queue
             process_queue();
