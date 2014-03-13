@@ -6,6 +6,7 @@
 #ifndef SIGNAL_HANDLER_H
 #define SIGNAL_HANDLER_H
 //------------------------------------------------------------------------------
+#include <atomic>
 #include <stdexcept>
 #include <thread>
 
@@ -33,6 +34,7 @@ public:
 
 private:
     std::thread handler;
+    std::atomic_flag running;
 };
 
 } // namespace controller
