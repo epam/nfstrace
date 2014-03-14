@@ -18,7 +18,6 @@
 #include "utils/logger.h"
 #include "utils/session.h"
 //------------------------------------------------------------------------------
-using NST::utils::Logger;
 using NST::utils::Session;
 using NST::utils::NetworkSession;
 //------------------------------------------------------------------------------
@@ -195,8 +194,8 @@ public:
                 NetworkSession& session = *(res.first->second);
                 Mapper::fill_session(info, session);
 
-                Logger::Buffer buffer;
-                buffer << "create new session " << session;
+                utils::logger::Buffer message;
+                message << "detect new session " << session;
             }
         }
 
