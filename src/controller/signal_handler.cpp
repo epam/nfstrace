@@ -26,7 +26,7 @@ SignalHandler::Signal::Signal(int sig) : std::runtime_error(::strsignal(sig))
 
 static void dummy(int) {}
 
-static void handle_signals(const sigset_t /*mask*/, std::atomic_flag& running, RunningStatus& status)
+static void handle_signals(const sigset_t mask, std::atomic_flag& running, RunningStatus& status)
 {
     while(running.test_and_set())
     {
