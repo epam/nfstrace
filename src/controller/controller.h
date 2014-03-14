@@ -37,8 +37,8 @@ public:
 
 private:
 
-    // global used logger
-    utils::Logger logger;
+    // initializer of global logger
+    utils::logger::Global glogger;
 
     // container for generated exceptions
     RunningStatus status;
