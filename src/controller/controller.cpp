@@ -16,14 +16,11 @@ namespace controller
 {
 
 Controller::Controller(const Parameters& params)
-    : logger     {::stderr}
+    : glogger    {params.program_name() + ".log"}
     , signals    {status}
     , analysis   {}
     , filtration {new FiltrationManager{status}}
 {
-    logger.set_output_file(params.program_name() + ".log");
-    NST::utils::Logger::set_global(&logger);
-
     switch(params.running_mode())
     {
         case RunningMode::Profiling:
@@ -80,8 +77,8 @@ int Controller::run()
         }
 
         {
-            utils::Logger::Buffer buffer;
-            status.print(buffer);
+            utils::logger::Buffer message;
+            status.print(message);
         }
 
         throw;

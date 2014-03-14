@@ -173,13 +173,13 @@ private:
     {
         if(command.empty()) return;
 
-        NST::utils::Logger::get_global().flush();   // force flush buffer
+        NST::utils::logger::flush();   // force flush buffer
 
         if(pid_t pid = fork()) // spawn child process
         {
             // parent process
             LOG("Try to execute(%s %s) in %u child process", command.c_str(), name.c_str(), pid);
-            NST::utils::Logger::get_global().flush();   // force flush buffer
+            NST::utils::logger::flush();   // force flush buffer
             return;
         }
         else

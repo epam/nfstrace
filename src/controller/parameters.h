@@ -48,9 +48,8 @@ public:
     // access helpers
     const std::string&  program_name() const;
     RunningMode         running_mode() const;
-    bool                is_verbose() const;
     std::string         interface() const;
-    unsigned short      snaplen() const;
+    int                 snaplen() const;
     int                 timeout() const;
     int                 buffer_size() const;
     std::string         filtration() const;
@@ -61,6 +60,7 @@ public:
     unsigned short      rpcmsg_limit() const;
     unsigned short      queue_capacity() const;
     bool                trace() const;
+    unsigned int        verbose_level() const;
     const std::vector<AParams>& analysis_modules() const;
 
 protected:

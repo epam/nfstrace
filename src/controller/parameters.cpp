@@ -87,11 +87,6 @@ RunningMode Parameters::running_mode() const
     throw cmdline::CLIError(std::string("Unknown mode: ") + mode);
 }
 
-bool Parameters::is_verbose() const
-{
-    return get(CLI::VERBOSE).to_bool();
-}
-
 std::string Parameters::interface() const
 {
     const std::string itf = get(CLI::INTERFACE);
@@ -105,7 +100,7 @@ std::string Parameters::interface() const
     return itf;
 }
 
-unsigned short Parameters::snaplen() const
+int Parameters::snaplen() const
 {
     return get(CLI::SNAPLEN).to_int();
 }
@@ -203,6 +198,11 @@ bool Parameters::trace() const
     return get(CLI::TRACE).to_bool() || analysis_modules().empty();
 }
 
+unsigned int Parameters::verbose_level() const
+{
+    return get(CLI::VERBOSE).to_int();
+}
+
 const std::vector<AParams>& Parameters::analysis_modules() const
 {
     return analysiss_params;
@@ -212,17 +212,17 @@ void Parameters::set_multiple_value(int index, char *const v)
 {
     if(index == CLI::ANALYZERS) // may have multiple values
     {
-        std::string arg(v);
+        const std::string arg(v);
         size_t ind = arg.find('#');
         if(ind == std::string::npos)
         {
-            analysiss_params.push_back(AParams(arg));
+            analysiss_params.emplace_back(arg);
         }
         else
         {
-            std::string path(arg, 0, ind);
-            std::string args(arg, ind + 1);
-            analysiss_params.push_back(AParams(path, args));
+            const std::string path(arg, 0, ind);
+            const std::string args(arg, ind + 1);
+            analysiss_params.emplace_back(path, args);
         }
     }
 }
