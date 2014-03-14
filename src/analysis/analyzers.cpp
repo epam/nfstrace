@@ -17,7 +17,7 @@ Analyzers::Analyzers(const controller::Parameters& params)
 {
     for(const auto& a : params.analysis_modules())
     {
-        utils::Logger::Buffer message;
+        utils::logger::Buffer message;
         try // try to load plugin
         {
             message << "Loading module: '" << a.path << "' with args: [" << a.args << "]";

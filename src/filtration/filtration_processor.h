@@ -23,7 +23,6 @@
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/nfs3/nfs_structs.h"
 //------------------------------------------------------------------------------
-using NST::utils::Logger;
 using NST::utils::Session;
 
 using namespace NST::protocols::rpc;
@@ -627,8 +626,8 @@ public:
     }
     ~FiltrationProcessor()
     {
-        Logger::Buffer buffer;
-        reader->print_statistic(buffer);
+        utils::logger::Buffer message;
+        reader->print_statistic(message);
     }
 
     void run()
