@@ -70,21 +70,21 @@ const std::string& Parameters::program_name() const
 
 RunningMode Parameters::running_mode() const
 {
-    const std::string mode = get(CLI::MODE);
-    if(mode == CLI::profiling_mode)
+    const auto& mode = get(CLI::MODE);
+    if(mode.is(CLI::profiling_mode))
     {
         return RunningMode::Profiling;
     }
-    else if(mode == CLI::dumping_mode)
+    else if(mode.is(CLI::dumping_mode))
     {
         return RunningMode::Dumping;
     }
-    else if(mode == CLI::analysis_mode)
+    else if(mode.is(CLI::analysis_mode))
     {
         return RunningMode::Analysis;
     }
 
-    throw cmdline::CLIError(std::string("Unknown mode: ") + mode);
+    throw cmdline::CLIError{std::string("Unknown mode: ") + mode.to_cstr()};
 }
 
 std::string Parameters::input_file() const
@@ -188,22 +188,22 @@ const Parameters::CaptureParams Parameters::capture_params() const
     }
 
     // check and set capture direction
-    const std::string direction{get(CLI::DIRECTION)};
-    if(direction == "in")
+    const auto& direction = get(CLI::DIRECTION);
+    if(direction.is("in"))
     {
         params.direction = decltype(params.direction)::IN;
     }
-    else if(direction == "out")
+    else if(direction.is("out"))
     {
         params.direction = decltype(params.direction)::OUT;
     }
-    else if(direction == "inout")
+    else if(direction.is("inout"))
     {
         params.direction = decltype(params.direction)::INOUT;
     }
     else
     {
-        throw cmdline::CLIError{std::string{"Unknown capturing direction: "} + direction};
+        throw cmdline::CLIError{std::string{"Unknown capturing direction: "} + direction.to_cstr()};
     }
 
     return params;
