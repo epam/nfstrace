@@ -16,7 +16,8 @@ namespace controller
 {
 
 Controller::Controller(const Parameters& params)
-    : glogger    {params.program_name() + ".log"}
+    : glog       {params.program_name() + ".log"}
+    , gout       {(utils::Out::Level)params.verbose_level()}
     , signals    {status}
     , analysis   {}
     , filtration {new FiltrationManager{status}}
@@ -77,7 +78,7 @@ int Controller::run()
         }
 
         {
-            utils::logger::Buffer message;
+            utils::Log message;
             status.print(message);
         }
 
