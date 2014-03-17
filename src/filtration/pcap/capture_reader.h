@@ -1,11 +1,13 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Move data from interface passing info Processor.
+// Description: Class for capturing network packets and pass them to filtration.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef CAPTURE_READER_H
 #define CAPTURE_READER_H
 //------------------------------------------------------------------------------
+#include <ostream>
+
 #include "filtration/pcap/base_reader.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -19,26 +21,31 @@ namespace pcap
 class CaptureReader : public BaseReader
 {
 public:
-    enum class Direction
+    enum class Direction : int
     {
-        IO = PCAP_D_INOUT,
-        I  = PCAP_D_IN,
-        O  = PCAP_D_OUT
+        INOUT,
+        IN,
+        OUT,
     };
 
-    CaptureReader(const std::string& interface,
-                  const std::string& filtration,
-                  int snaplen,
-                  int to_ms,
-                  int buffer_size);
+    struct Params
+    {
+        std::string interface  { };
+        std::string filter     { };
+        int         snaplen    {0};
+        int         timeout_ms {0};
+        int         buffer_size{0};
+        bool        promisc    {true};
+        Direction   direction  {Direction::INOUT};
+    };
+
+    CaptureReader(const Params& params);
     ~CaptureReader() = default;
 
-    inline void set_direction(Direction direction)
-    {
-        pcap_setdirection(handle, static_cast<pcap_direction_t>(direction));
-    }
     void print_statistic(std::ostream& out) const override;
 };
+
+std::ostream& operator<<(std::ostream&, const CaptureReader::Params&);
 
 } // namespace pcap
 } // namespace filtration
