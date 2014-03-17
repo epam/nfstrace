@@ -15,7 +15,7 @@
 
 #include "controller/parameters.h"
 #include "filtration/packet.h"
-#include "utils/logger.h"
+#include "utils/out.h"
 #include "utils/session.h"
 //------------------------------------------------------------------------------
 using NST::utils::Session;
@@ -194,7 +194,7 @@ public:
                 NetworkSession& session = *(res.first->second);
                 Mapper::fill_session(info, session);
 
-                utils::logger::Buffer message;
+                utils::Out message;
                 message << "detect new session " << session;
             }
         }

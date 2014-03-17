@@ -15,7 +15,8 @@
 
 #include <pcap/pcap.h>
 
-#include "utils/logger.h"
+#include "utils/log.h"
+#include "utils/out.h"
 #include "utils/session.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
@@ -626,7 +627,7 @@ public:
     }
     ~FiltrationProcessor()
     {
-        utils::logger::Buffer message;
+        utils::Out message;
         reader->print_statistic(message);
     }
 

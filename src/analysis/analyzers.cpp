@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 #include "analysis/analyzers.h"
 #include "analysis/print_analyzer.h"
-#include "utils/logger.h"
+#include "utils/out.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -17,7 +17,7 @@ Analyzers::Analyzers(const controller::Parameters& params)
 {
     for(const auto& a : params.analysis_modules())
     {
-        utils::logger::Buffer message;
+        utils::Out message;
         try // try to load plugin
         {
             message << "Loading module: '" << a.path << "' with args: [" << a.args << "]";
