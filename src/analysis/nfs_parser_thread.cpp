@@ -7,7 +7,7 @@
 #include "protocols/nfs3/nfs_procedure.h"
 #include "protocols/nfs3/nfs_structs.h"
 #include "protocols/rpc/rpc_header.h"
-#include "utils/logger.h"
+#include "utils/log.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::NFS3;
 using namespace NST::protocols::xdr;

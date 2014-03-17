@@ -10,7 +10,7 @@
 
 #include <sys/file.h>
 
-#include "utils/logger.h"
+#include "utils/log.h"
 //------------------------------------------------------------------------------
 /*  http://www.unix.org/whitepapers/reentrant.html
     The POSIX.1 and C-language functions that operate on character streams
@@ -26,26 +26,25 @@ namespace NST
 namespace utils
 {
 
+static FILE* log_file = nullptr;
+static bool  own_file = false;
 
-namespace logger
+Log::Global::Global(const std::string& path)
 {
-
-static FILE* log = nullptr;
-static bool  own = false;
-
-Global::Global(const std::string& path)
-{
-    if(log != nullptr)
+    if(log_file != nullptr)
     {
         throw std::runtime_error{"Global Logger already have been created"};
     }
 
-    // default is stderr, used if below code is going to throw exception
-    log = ::stderr;
-
+    // default is stderr
+    if(path.empty())
+    {
+        log_file = ::stderr;
+        return;
+    }
 
     FILE* file = fopen(path.c_str(), "w");
-    if(file == nullptr)
+    if(file == NULL)
     {
         throw std::runtime_error{"Logger can not open file for write: " + path};
     }
@@ -56,21 +55,19 @@ Global::Global(const std::string& path)
         throw std::runtime_error{"File: " + path + " opened in another thread"};
     }
 
-    log = file;
-    own = true;
+    log_file = file;
+    own_file = true;
 }
-
-Global::~Global()
+Log::Global::~Global()
 {
-    if(own)
+    if(own_file)
     {
-        flock(fileno(log), LOCK_UN);
-        fclose(log);
+        flock(fileno(log_file), LOCK_UN);
+        fclose(log_file);
     }
 }
 
-
-Buffer::Buffer()
+Log::Log()
 : std::stringbuf {ios_base::out}
 , std::ostream   {nullptr}
 {
@@ -78,28 +75,25 @@ Buffer::Buffer()
     std::ostream::init(static_cast<std::stringbuf*>(this));
     std::ostream::put('\n');
 }
-Buffer::~Buffer()
+Log::~Log()
 {
     size_t len = pptr() - pbase();
-    fwrite(pbase(), len, 1, log);
+    fwrite(pbase(), len, 1, log_file);
 }
 
-void print(const char* format, ...)
+void Log::message(const char* format, ...)
 {
     va_list args;
     va_start(args, format);
-    vfprintf(log, format, args);
+    vfprintf(log_file, format, args);
     va_end(args);
 }
-void flush()
+
+void Log::flush()
 {
-    fflush(log);
+    fflush(log_file);
 }
 
-
-} // namespace logger
-
-
-}
-}
+} // namespace utils
+} // namespace NST
 //------------------------------------------------------------------------------
