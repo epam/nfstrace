@@ -11,6 +11,7 @@
 
 #include "controller/cmdline_args.h"
 #include "controller/cmdline_parser.h"
+#include "filtration/pcap/capture_reader.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -29,7 +30,6 @@ struct AParams
 {
     AParams(const std::string& p) : path{p}, args{} {}
     AParams(const std::string& p, const std::string& a) : path{p}, args{a} {}
-    AParams(AParams&&) = default;
 
     const std::string path;
     const std::string args;
@@ -39,6 +39,8 @@ class Parameters : private cmdline::CmdlineParser<cmdline::Args>
 {
     static Parameters* global;
 public:
+    using CaptureParams = filtration::pcap::CaptureReader::Params;
+
     Parameters(int argc, char** argv);
     Parameters(const Parameters&)            = delete;
     Parameters& operator=(const Parameters&) = delete;
@@ -48,11 +50,6 @@ public:
     // access helpers
     const std::string&  program_name() const;
     RunningMode         running_mode() const;
-    std::string         interface() const;
-    int                 snaplen() const;
-    int                 timeout() const;
-    int                 buffer_size() const;
-    std::string         filtration() const;
     std::string         input_file() const;
     std::string         output_file() const;
     std::string         dumping_cmd() const;
@@ -60,7 +57,8 @@ public:
     unsigned short      rpcmsg_limit() const;
     unsigned short      queue_capacity() const;
     bool                trace() const;
-    unsigned int        verbose_level() const;
+    int                 verbose_level() const;
+    const CaptureParams capture_params() const;
     const std::vector<AParams>& analysis_modules() const;
 
 protected:
