@@ -14,7 +14,8 @@
 #include "controller/parameters.h"
 #include "controller/running_status.h"
 #include "controller/signal_handler.h"
-#include "utils/logger.h"
+#include "utils/log.h"
+#include "utils/out.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -38,7 +39,9 @@ public:
 private:
 
     // initializer of global logger
-    utils::logger::Global glogger;
+    utils::Log::Global glog;
+    // initializer of global outptut
+    utils::Out::Global gout;
 
     // container for generated exceptions
     RunningStatus status;

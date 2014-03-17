@@ -9,7 +9,7 @@
 #include <string>
 
 #include "utils/filtered_data.h"
-#include "utils/logger.h"
+#include "utils/log.h"
 #include "utils/session.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------

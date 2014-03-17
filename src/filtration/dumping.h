@@ -20,7 +20,7 @@
 #include "filtration/packet.h"
 #include "filtration/pcap/handle.h"
 #include "filtration/pcap/packet_dumper.h"
-#include "utils/logger.h"
+#include "utils/log.h"
 #include "utils/session.h"
 //------------------------------------------------------------------------------
 using NST::filtration::pcap::Handle;
@@ -76,7 +76,7 @@ public:
 
         inline void push(const PacketInfo& info, const uint32_t len)
         {
-            if(timercmp(&last, &info.header->ts, !=))  // timestamps aren't equal
+            if(timercmp(&last, &info.header->ts, !=)) // timestamps aren't equal
             {
                 last = info.header->ts;
                 // direct dumping without waiting completeness of analysis and complete() call
@@ -173,13 +173,13 @@ private:
     {
         if(command.empty()) return;
 
-        NST::utils::logger::flush();   // force flush buffer
+        NST::utils::Log::flush();   // force flush buffer
 
         if(pid_t pid = fork()) // spawn child process
         {
             // parent process
             LOG("Try to execute(%s %s) in %u child process", command.c_str(), name.c_str(), pid);
-            NST::utils::logger::flush();   // force flush buffer
+            NST::utils::Log::flush();   // force flush buffer
             return;
         }
         else

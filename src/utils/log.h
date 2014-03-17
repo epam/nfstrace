@@ -3,8 +3,8 @@
 // Description: Thread-safe logger interface
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef LOG_H
+#define LOG_H
 //------------------------------------------------------------------------------
 #include <sstream>
 //------------------------------------------------------------------------------
@@ -16,13 +16,13 @@
 // TODO: DANGEROUS MACRO ! Passing custom client string as format to printf().
 // May be cause of SIGSEGV
 #define TRACE(...) {\
-    NST::utils::logger::print("\n" __FILE__ ":" STRINGIZE(__LINE__) ": " __VA_ARGS__);\
-    NST::utils::logger::flush();\
+    NST::utils::Log::message("\n" __FILE__ ":" STRINGIZE(__LINE__) ": " __VA_ARGS__);\
+    NST::utils::Log::flush();\
 }
 #endif
 
 #define LOG(...) {\
-    NST::utils::logger::print("\n" __VA_ARGS__);\
+    NST::utils::Log::message("\n" __VA_ARGS__);\
 }
 
 #define LOGONCE(...) {\
@@ -35,9 +35,9 @@ namespace NST
 namespace utils
 {
 
-
-namespace logger
+class Log : private std::stringbuf, public std::ostream
 {
+public:
     // helper for creation and destruction logging subsystem
     // isn't thread-safe!
     struct Global
@@ -48,26 +48,20 @@ namespace logger
         Global& operator=(const Global&) = delete;
     };
 
-    // buffer for logging composite messages
-    class Buffer : private std::stringbuf, public std::ostream
-    {
-    public:
-        Buffer();
-        ~Buffer();
-        Buffer(const Buffer&)            = delete;
-        Buffer& operator=(const Buffer&) = delete;
-    private:
-        char buffer[256];
-    };
+    Log();
+    ~Log();
+    Log(const Log&)            = delete;
+    Log& operator=(const Log&) = delete;
 
     // lightweight logging
-    void print(const char* format, ...);
-    void flush();
-} // namespace logger
-
+    static void message(const char* format, ...);
+    static void flush();
+private:
+    char buffer[256];
+};
 
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif //LOGGER_H
+#endif//LOG_H
 //------------------------------------------------------------------------------
