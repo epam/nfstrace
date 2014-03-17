@@ -87,45 +87,6 @@ RunningMode Parameters::running_mode() const
     throw cmdline::CLIError(std::string("Unknown mode: ") + mode);
 }
 
-std::string Parameters::interface() const
-{
-    const std::string itf = get(CLI::INTERFACE);
-
-    if(itf.empty())
-    {
-        const char* mode = get(CLI::MODE).to_cstr();
-        throw cmdline::CLIError(std::string("Interface is required for ") + mode + " mode");
-    }
-
-    return itf;
-}
-
-int Parameters::snaplen() const
-{
-    return get(CLI::SNAPLEN).to_int();
-}
-
-int Parameters::timeout() const
-{
-    return get(CLI::TIMEOUT).to_int();
-}
-
-int Parameters::buffer_size() const
-{
-    const int size = get(CLI::BSIZE).to_int();
-    if(size < 1)
-    {
-        throw cmdline::CLIError(std::string("Invalid value of kernel buffer size: ") + get(CLI::BSIZE).to_cstr());
-    }
-
-    return size * 1024 * 1024; // MBytes
-}
-
-std::string Parameters::filtration() const
-{
-    return get(CLI::FILTER);
-}
-
 std::string Parameters::input_file() const
 {
     std::string ifile;
@@ -198,9 +159,54 @@ bool Parameters::trace() const
     return get(CLI::TRACE).to_bool() || analysis_modules().empty();
 }
 
-unsigned int Parameters::verbose_level() const
+int Parameters::verbose_level() const
 {
     return get(CLI::VERBOSE).to_int();
+}
+
+const Parameters::CaptureParams Parameters::capture_params() const
+{
+    Parameters::CaptureParams params;
+    params.interface    = get(CLI::INTERFACE);
+    params.filter       = get(CLI::FILTER);
+    params.snaplen      = get(CLI::SNAPLEN).to_int();
+    params.timeout_ms   = get(CLI::TIMEOUT).to_int();
+    params.buffer_size  = get(CLI::BSIZE).to_int() * 1024 * 1024; // MBytes
+    params.promisc      = get(CLI::PROMISC).to_bool();
+
+    // check interface
+    if(params.interface.empty())
+    {
+        const char* mode = get(CLI::MODE).to_cstr();
+        throw cmdline::CLIError{std::string{"Interface is required for "} + mode + " mode"};
+    }
+
+    // check capture buffer size
+    if(params.buffer_size < 1024 * 1024) // less than 1 MBytes
+    {
+        throw cmdline::CLIError{std::string{"Invalid value of kernel buffer size: "} + get(CLI::BSIZE).to_cstr()};
+    }
+
+    // check and set capture direction
+    const std::string direction{get(CLI::DIRECTION)};
+    if(direction == "in")
+    {
+        params.direction = decltype(params.direction)::IN;
+    }
+    else if(direction == "out")
+    {
+        params.direction = decltype(params.direction)::OUT;
+    }
+    else if(direction == "inout")
+    {
+        params.direction = decltype(params.direction)::INOUT;
+    }
+    else
+    {
+        throw cmdline::CLIError{std::string{"Unknown capturing direction: "} + direction};
+    }
+
+    return params;
 }
 
 const std::vector<AParams>& Parameters::analysis_modules() const

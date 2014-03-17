@@ -84,15 +84,12 @@ static auto create_thread(std::unique_ptr<Reader>& reader,
 static auto create_capture_reader(const Parameters& params)
         -> std::unique_ptr<CaptureReader>
 {
-    return std::unique_ptr<CaptureReader>{
-                                new CaptureReader{
-                                        params.interface(),
-                                        params.filtration(),
-                                        params.snaplen(),
-                                        params.timeout(),
-                                        params.buffer_size()
-                                     }
-                                };
+    auto&& capture_params = params.capture_params();
+    {
+        utils::Out message; // print parameters to user
+        message << capture_params;
+    }
+    return std::unique_ptr<CaptureReader>{ new CaptureReader{capture_params} };
 }
 
 } // unnamed namespace

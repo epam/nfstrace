@@ -193,9 +193,6 @@ public:
                 // fill new session after construction
                 NetworkSession& session = *(res.first->second);
                 Mapper::fill_session(info, session);
-
-                utils::Out message;
-                message << "detect new session " << session;
             }
         }
 
