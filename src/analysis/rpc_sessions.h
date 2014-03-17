@@ -15,6 +15,7 @@
 
 #include "utils/filtered_data.h"
 #include "utils/log.h"
+#include "utils/out.h"
 #include "utils/session.h"
 //------------------------------------------------------------------------------
 using NST::utils::FilteredDataQueue;
@@ -31,10 +32,10 @@ public:
     RPCSession(const utils::NetworkSession& s, utils::Session::Direction call_direction)
     : session {s, call_direction}
     {
+        utils::Out message;
+        message << "Create RPC session " << session;
     }
-    ~RPCSession()
-    {
-    }
+    ~RPCSession() = default;
     RPCSession(const RPCSession&)            = delete;
     RPCSession& operator=(const RPCSession&) = delete;
     

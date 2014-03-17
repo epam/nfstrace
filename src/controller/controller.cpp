@@ -17,7 +17,7 @@ namespace controller
 
 Controller::Controller(const Parameters& params)
     : glog       {params.program_name() + ".log"}
-    , gout       {(utils::Out::Level)params.verbose_level()}
+    , gout       {utils::Out::Level(params.verbose_level())}
     , signals    {status}
     , analysis   {}
     , filtration {new FiltrationManager{status}}
