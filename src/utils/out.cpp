@@ -11,11 +11,6 @@ namespace NST
 namespace utils
 {
 
-inline bool operator >=(const Out::Level a, const Out::Level b)
-{
-    return (int)a >= (int)b;
-}
-
 static Out::Level global = Out::Level::Info;
 
 Out::Global::Global(const Level verbose_level)
@@ -24,6 +19,11 @@ Out::Global::Global(const Level verbose_level)
 }
 Out::Global::~Global()
 {
+}
+
+Out::Level Out::Global::get_level()
+{
+    return global;
 }
 
 Out::Out(Level level)
