@@ -37,16 +37,11 @@ public:
 struct ApplicationsSession : public utils::Session
 {
 public:
-    ApplicationsSession(const NetworkSession& s, Direction from_client)
-    : utils::Session (s)
-    {
-        if(s.direction != from_client)
-        {
-            //TODO: implement correct swap_src_dst()
-            std::swap(ip.v4.addr[0], ip.v4.addr[1]);
-            std::swap(port[0],       port[1]);
-        }
-    }
+    ApplicationsSession(const NetworkSession& s, Direction from_client);
+
+    const std::string& str() const { return session_str; }
+private:
+    std::string session_str;
 };
 
 std::ostream& operator<<(std::ostream& out, const Session& session);
