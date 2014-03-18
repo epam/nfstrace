@@ -88,7 +88,7 @@ public:
     {
         if(app->application == nullptr)
         {
-            if(type == MsgType::SUNRPC_CALL) // add new session only for Call
+            if(type == MsgType::CALL) // add new session only for Call
             {
                 std::unique_ptr<RPCSession> ptr{ new RPCSession{*app, dir} };
                 sessions.emplace_back(std::move(ptr));
