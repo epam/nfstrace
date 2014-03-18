@@ -84,7 +84,7 @@ static auto create_thread(std::unique_ptr<Reader>& reader,
 static auto create_capture_reader(const Parameters& params)
         -> std::unique_ptr<CaptureReader>
 {
-    auto&& capture_params = params.capture_params();
+    auto& capture_params = params.capture_params();
     {
         utils::Out message; // print parameters to user
         message << capture_params;
@@ -98,12 +98,15 @@ static auto create_capture_reader(const Parameters& params)
 void FiltrationManager::add_online_dumping(const Parameters& params)
 {
     std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
-    std::unique_ptr<Dumping>       writer { new Dumping{
-                                                reader->get_handle(),
-                                                params.output_file(),
-                                                params.dumping_cmd(),
-                                                params.dumping_size()
-                                            }
+
+    auto& dumping_params = params.dumping_params();
+    {
+        utils::Out message; // print parameters to user
+        message << dumping_params;
+    }
+    std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),
+                                                         dumping_params
+                                                       }
                                           };
 
     threads.emplace_back(create_thread(reader, writer, status));

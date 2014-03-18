@@ -97,13 +97,12 @@ void CaptureReader::print_statistic(std::ostream& out) const
 std::ostream& operator<<(std::ostream& out, const CaptureReader::Params& params)
 {
     out << "Capture from interface: " << params.interface << '\n'
-        << "  BPF filter  : " << params.filter << "\n"
+        << "  BPF filter  : " << params.filter << '\n'
         << "  snapshot len: " << params.snaplen << " bytes\n"
         << "  read timeout: " << params.timeout_ms << " ms\n"
         << "  buffer size : " << params.buffer_size << " bytes\n"
         << "  promiscuous mode: " << (params.promisc ? "on" : "off") << '\n'
         << "  capture traffic : ";
-
         switch(params.direction)
         {
             using Direction = CaptureReader::Direction;
