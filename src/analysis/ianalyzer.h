@@ -9,8 +9,8 @@
 #include "utils/session.h"
 using NST::utils::Session;
 
-#include "protocols/nfs3/nfs_structs.h"        // api/nfs3_types.h
-#include "protocols/rpc/rpc_procedure_struct.h"// api/rpc_procedure_type.h
+#include "protocols/nfs3/nfs_structs.h" // api/nfs3_types.h
+#include "protocols/rpc/rpc_procedure.h"// api/rpc_procedure_type.h
 //------------------------------------------------------------------------------
 using namespace NST::protocols::NFS3;
 

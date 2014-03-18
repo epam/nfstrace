@@ -656,6 +656,7 @@ inline XDRReader& operator>>(XDRReader& in, READDIR3res& o)
     {
         in >> o.u.resok.dir_attributes;
         in.read_fixed_len(o.u.resok.cookieverf, NFS3_COOKIEVERFSIZE);
+        // TODO: Parse entries
         o.u.resok.reply.entries = NULL;
         o.u.resok.reply.eof = true;
     }
@@ -682,6 +683,7 @@ inline XDRReader& operator>>(XDRReader& in, READDIRPLUS3res& o)
     {
         in >> o.u.resok.dir_attributes;
         in.read_fixed_len(o.u.resok.cookieverf, NFS3_COOKIEVERFSIZE);
+        // TODO: Parse entries
         o.u.resok.reply.entries = NULL;
         o.u.resok.reply.eof = true;
     }

@@ -41,7 +41,7 @@ private:
                                RPCSession* session);
 
     RunningStatus& status;
-    Analyzers& analysiss;
+    Analyzers& analyzers;
     FilteredDataQueue& queue;
     RPCSessions sessions;
 

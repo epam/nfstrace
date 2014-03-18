@@ -409,7 +409,7 @@ struct READ3res
         post_op_attr file_attributes;
         count3 count;
         uint32_t eof; // bool
-//        Opaque data; skiped on filtration
+//        Opaque data; skipped on filtration
     };
 
     struct READ3resfail
@@ -447,7 +447,7 @@ struct WRITE3args
     offset3     offset;
     count3      count;
     stable_how  stable;
-//    Opaque   data; skiped on filtration
+//    Opaque   data; skipped on filtration
 };
 
 struct WRITE3res
@@ -763,15 +763,15 @@ struct READDIR3res
         fileid3 fileid;
         filename3 name;
         cookie3 cookie;
-        entry3* nextentry;  //It is not implemented now.
+        entry3* nextentry;  //It is not implemented yet.
     };
 
     //
-    // dirlist3 is payload
+    // dirlist3 is payload and truncated on filtration stage.
     //
     struct dirlist3
     {
-        entry3* entries;    //It is not implemented now.
+        entry3* entries;    //It is not implemented yet.
         uint32_t eof;
     };
 
@@ -815,15 +815,15 @@ struct READDIRPLUS3res
         cookie3 cookie;
         post_op_attr name_attributes;
         post_op_fh3 name_handle;
-        entryplus3* nextentry;  //It is not implemented now.
+        entryplus3* nextentry;  //It is not implemented yet.
     };
 
     //
-    // dirlistplus3 is payload
+    // dirlist3 is payload and truncated on filtration stage.
     //
     struct dirlistplus3
     {
-        entryplus3* entries;    //It is not implemented now.
+        entryplus3* entries;    //It is not implemented yet.
         uint32_t eof;
     };
 
