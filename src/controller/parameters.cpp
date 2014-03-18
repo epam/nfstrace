@@ -3,8 +3,8 @@
 // Description: Class provides validation and access to application parameters
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
+#include <algorithm>
 #include <iostream>
-#include <sstream>
 
 #include <unistd.h>
 
@@ -89,52 +89,8 @@ RunningMode Parameters::running_mode() const
 
 std::string Parameters::input_file() const
 {
-    std::string ifile;
-    if(is_default(CLI::IFILE))
-    {
-        std::stringstream buffer;
-        buffer << get(CLI::INTERFACE).to_cstr() << '-' << get(CLI::FILTER).to_cstr() << ".pcap";
-        ifile = buffer.str();
-    }
-    else
-    {
-        ifile = get(CLI::IFILE);
-    }
     // TODO: add file validation
-    return ifile;
-}
-
-std::string Parameters::output_file() const
-{
-    std::string ofile;
-    if(is_default(CLI::OFILE))
-    {
-        std::stringstream buffer;
-        buffer << get(CLI::INTERFACE).to_cstr() << '-' << get(CLI::FILTER).to_cstr() << ".pcap";
-        ofile = buffer.str();
-    }
-    else
-    {
-        ofile = get(CLI::OFILE);
-    }
-    // TODO: add file validation
-    return ofile;
-}
-
-std::string Parameters::dumping_cmd() const
-{
-    return get(CLI::COMMAND);
-}
-
-unsigned int Parameters::dumping_size() const
-{
-    const int dsize = get(CLI::DSIZE).to_int();
-    if(dsize != 0 && output_file() == "-") // '-' is alias for stdout in libpcap dumps
-    {
-        throw cmdline::CLIError(std::string("Output file \"-\" means stdout, the dump-size must be 0"));
-    }
-
-    return dsize * 1024 * 1024; // MBytes
+    return is_default(CLI::IFILE) ? default_iofile() : get(CLI::IFILE);
 }
 
 unsigned short Parameters::rpcmsg_limit() const
@@ -209,6 +165,24 @@ const Parameters::CaptureParams Parameters::capture_params() const
     return params;
 }
 
+const Parameters::DumpingParams Parameters::dumping_params() const
+{
+    std::string ofile = is_default(CLI::OFILE) ? default_iofile() : get(CLI::OFILE);
+    // TODO: add file validation
+
+    const int dsize = get(CLI::DSIZE).to_int();
+    if(dsize != 0 && ofile == "-") // '-' is alias for stdout in libpcap dumps
+    {
+        throw cmdline::CLIError(std::string("Output file \"-\" means stdout, the dump-size must be 0"));
+    }
+
+    Parameters::DumpingParams params;
+    params.output_file = ofile;
+    params.command     = get(CLI::COMMAND);
+    params.size_limit  = dsize * 1024 * 1024; // MBytes
+    return params;
+}
+
 const std::vector<AParams>& Parameters::analysis_modules() const
 {
     return analysiss_params;
@@ -231,6 +205,17 @@ void Parameters::set_multiple_value(int index, char *const v)
             analysiss_params.emplace_back(path, args);
         }
     }
+}
+
+std::string Parameters::default_iofile() const
+{
+    // make string: INTERFACE-BPF-FILTER.pcap
+    std::string str = get(CLI::INTERFACE).to_cstr();
+    str.push_back('-');
+    str.append(get(CLI::FILTER).to_cstr());
+    str.append(".pcap");
+    std::replace(str.begin(), str.end(), ' ', '-');
+    return str;
 }
 
 } // namespace controller

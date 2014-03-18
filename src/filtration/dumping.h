@@ -1,20 +1,15 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Dump filtrationed packets to .pcap file
+// Description: Dump filtered packets to .pcap file
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef DUMPING_H
 #define DUMPING_H
 //------------------------------------------------------------------------------
-#include <cerrno>
 #include <cstring> // memcpy()
-#include <exception> // std::terminate()
 #include <memory>
 #include <string>
-#include <sstream>
-#include <vector>
 
-#include <unistd.h>
 #include <sys/time.h>
 
 #include "filtration/packet.h"
@@ -23,8 +18,6 @@
 #include "utils/log.h"
 #include "utils/session.h"
 //------------------------------------------------------------------------------
-using NST::filtration::pcap::Handle;
-using NST::filtration::pcap::PacketDumper;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -96,7 +89,7 @@ public:
         {
         }
 
-        void complete(const PacketInfo& /*info*/)
+        inline void complete(const PacketInfo& /*info*/)
         {
             assert(dumper);
             reset();
@@ -110,24 +103,18 @@ public:
         Dumping* dumper;
         uint8_t payload[4096];
         uint32_t payload_len;
-        struct  timeval last;   // use timestamp as unique ID of packet
+        struct  timeval last;   // use timestamp as unique ID of last packet
     };
 
-    Dumping(const Handle& h, const std::string& path, const std::string&& cmd, uint32_t size_limit)
-        : handle  (h)
-        , base    {path}
-        , name    {path}
-        , command {cmd}
-        , part    {0}
-        , size    {0}
-        , limit   {size_limit}
+    struct Params
     {
-        open_dumping_file(name);
-    }
-    ~Dumping()
-    {
-        close_dumping_file();
-    }
+        std::string output_file{ };
+        std::string command    { };
+        uint32_t    size_limit {0};
+    };
+
+    Dumping(const pcap::Handle& h, const Params& params);
+    ~Dumping();
     Dumping(const Dumping&)            = delete;
     Dumping& operator=(const Dumping&) = delete;
 
@@ -146,6 +133,7 @@ public:
                 size = 0;
                 open_dumping_file(name);
 
+                // new part of dump file shouldn't have ./pcap header
                 dumper->truncate_all_pcap_data_and_header();
             }
             size += sizeof(pcap_pkthdr) + header->caplen;
@@ -155,68 +143,21 @@ public:
     }
 
 private:
+    void open_dumping_file(const std::string& file_path);
+    void close_dumping_file();
+    void exec_command() const;
 
-    inline void open_dumping_file(const std::string& file_path)
-    {
-        const char* path = file_path.c_str();
-        LOG("Dumping packets to file:%s", path);
-        dumper.reset(new PacketDumper{handle, path});
-    }
-
-    inline void close_dumping_file()
-    {
-        dumper.reset(); // close current dumper
-        exec_command();
-    }
-
-    void exec_command()
-    {
-        if(command.empty()) return;
-
-        NST::utils::Log::flush();   // force flush buffer
-
-        if(pid_t pid = fork()) // spawn child process
-        {
-            // parent process
-            LOG("Try to execute(%s %s) in %u child process", command.c_str(), name.c_str(), pid);
-            NST::utils::Log::flush();   // force flush buffer
-            return;
-        }
-        else
-        {
-            // child process
-            std::istringstream ss(command);
-            std::vector<std::string> tokens;
-            std::vector<char*> args;
-
-            // TODO: this parser doesn't work with dual quotes, like rm "a file.cpp"
-            for(std::string arg; ss >> arg;)
-            {
-               tokens.push_back(arg);
-               args  .push_back(const_cast<char*>(tokens.back().c_str()));
-            }
-            args.push_back(const_cast<char*>(name.c_str()));
-            args.push_back(NULL);  // need termination null pointer
-
-            if(execvp(args[0], &args[0]) == -1)
-            {
-                LOG("execvp(%s,%s %s) return: %s", args[0], command.c_str(), name.c_str(), strerror(errno));
-            }
-
-            LOG("child process %u will be terminated.", getpid());
-            std::terminate();
-        }
-    }
-
-    std::unique_ptr<PacketDumper> dumper;
-    const Handle& handle;
-    std::string base;
-    std::string name;
-    std::string command;
-    uint32_t    part;
-    uint32_t    size;
-    const uint32_t limit;
+    std::unique_ptr<pcap::PacketDumper> dumper;
+    const pcap::Handle& handle;
+    std::string         base;
+    std::string         name;
+    std::string         command;
+    const uint32_t      limit;
+    uint32_t            part;
+    uint32_t            size;
 };
+
+std::ostream& operator<<(std::ostream& out, const Dumping::Params& params);
 
 } // namespace filtration
 } // namespace NST
