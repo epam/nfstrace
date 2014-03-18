@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Definitions of Sun RPC (Remote Procedure Call) protocol headers.
+// Description: Reduced definitions of RPC headers for fast parsing.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef RPC_HEADER_H
@@ -8,7 +8,9 @@
 //------------------------------------------------------------------------------
 #include <stdint.h>
 
-#include <arpa/inet.h> // for ntohl() by Single UNIX ® Specification, Version 2
+#include <arpa/inet.h> // for ntohl()
+
+#include "protocols/xdr/xdr_structs.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -18,102 +20,21 @@ namespace protocols
 namespace rpc
 {
 
-const uint32_t SUNRPC_MSG_VERSION = 2;
+using namespace xdr;
 
-enum MsgType
-{
-    SUNRPC_CALL =0,
-    SUNRPC_REPLY=1
-};
-
-enum ReplyStat
-{
-    SUNRPC_MSG_ACCEPTED=0,
-    SUNRPC_MSG_DENIED  =1
-};
-
-enum AcceptStat
-{
-    SUNRPC_SUCCESS      =0, /* RPC executed successfully             */
-    SUNRPC_PROG_UNAVAIL =1, /* remote hasn't exported program        */
-    SUNRPC_PROG_MISMATCH=2, /* remote can't support version #        */
-    SUNRPC_PROC_UNAVAIL =3, /* program can't support procedure       */
-    SUNRPC_GARBAGE_ARGS =4, /* procedure can't decode params         */
-    SUNRPC_SYSTEM_ERR   =5  /* errors like memory allocation failure */
-};
-
-enum RejectStat
-{
-    SUNRPC_RPC_MISMATCH =0, /* RPC version number != 2          */
-    SUNRPC_AUTH_ERROR   =1  /* remote can't authenticate caller */
-};
-
-// Status returned from authentication check
-enum AuthStat
-{
-    SUNRPC_AUTH_OK          =0, /* success                          */
-    /*
-     * failed at remote end
-     */
-    SUNRPC_AUTH_BADCRED     =1, /* bad credential (seal broken)     */
-    SUNRPC_AUTH_REJECTEDCRED=2, /* client must begin new session    */
-    SUNRPC_AUTH_BADVERF     =3, /* bad verifier (seal broken)       */
-    SUNRPC_AUTH_REJECTEDVERF=4, /* verifier expired or replayed     */
-    SUNRPC_AUTH_TOOWEAK     =5, /* rejected for security reasons    */
-    /*
-     * failed locally
-     */
-    SUNRPC_AUTH_INVALIDRESP =6, /* bogus response verifier          */
-    SUNRPC_AUTH_FAILED      =7  /* reason unknown                   */
-};
-
-enum AuthFlavor
-{
-     AUTH_NONE       = 0,
-     AUTH_SYS        = 1,
-     AUTH_SHORT      = 2
-};
-
-
-struct MessageHeader; // forward declaration
-
-struct RecordMark   //  RFC 1831 section.10
-{
-    inline bool            is_last() const { return ntohl(mark) & 0x80000000; /*1st bit*/  }
-    inline uint32_t   fragment_len() const { return ntohl(mark) & 0x7FFFFFFF; /*31 bits*/  }
-    inline MessageHeader* fragment() const { return (MessageHeader*)(this+1);              }
-private:
-    RecordMark() = delete;
-
-    uint32_t mark;
-}__attribute__ ((__packed__));
-
-
-struct OpaqueAuthHeader
-{
-    inline uint32_t   flavor() const { return ntohl(m_flavor);  }
-    inline uint32_t      len() const { return ntohl(m_len);     }
-    inline char* opaque_data() const { return (char*)(this+1);  }
-private:
-    OpaqueAuthHeader() = delete;
-
-    uint32_t m_flavor;
-    uint32_t m_len;
-
-}__attribute__ ((__packed__));
+#include "api/rpc_types.h"
 
 
 struct MessageHeader
 {
-    inline uint32_t xid () const { return ntohl(m_xid);  }
-    inline uint32_t type() const { return ntohl(m_type); }
+    inline uint32_t xid () const { return ntohl(m_xid);           }
+    inline MsgType  type() const { return MsgType(ntohl(m_type)); }
 private:
-    MessageHeader(); // undefined
+    MessageHeader() = delete;
 
     uint32_t m_xid;
     uint32_t m_type;
-} __attribute__ ((__packed__));
-
+};
 
 struct CallHeader: public MessageHeader
 {
@@ -122,15 +43,8 @@ struct CallHeader: public MessageHeader
     inline uint32_t    vers() const { return ntohl(m_vers); }
     inline uint32_t    proc() const { return ntohl(m_proc); }
 
-    inline OpaqueAuthHeader* credential() const
-    {
-        return (OpaqueAuthHeader*)(this+1);
-    }
-    inline OpaqueAuthHeader*   verifier() const
-    {
-        const OpaqueAuthHeader* cred = credential();
-        return (OpaqueAuthHeader*)(cred->opaque_data() + cred->len());
-    }
+    // OpaqueAuth cred - skipped
+    // OpaqueAuth verf - skipped
 private:
     CallHeader() = delete;
 
@@ -138,51 +52,29 @@ private:
     uint32_t m_prog;
     uint32_t m_vers;
     uint32_t m_proc;
-} __attribute__ ((__packed__));
+};
 
-
-// TODO: finish definitions of RPC replies!
 struct ReplyHeader: public MessageHeader
 {
-    inline uint32_t stat() const { return ntohl(m_stat); }
+    inline ReplyStat stat() const { return ReplyStat(ntohl(m_stat)); }
 
+    // accepted_reply areply - skipped
+    // rejected_reply rreply - skipped
 private:
     ReplyHeader() = delete;
 
-    uint32_t m_stat;   // enum ReplyStat
+    uint32_t m_stat;
 };
 
-
-struct AcceptedReplyHeader: public ReplyHeader
+struct RecordMark   //  RFC 5531 section 11 Record Marking Standard
 {
-    inline OpaqueAuthHeader* verifier() const
-    {
-        return (OpaqueAuthHeader*)(this);
-    }
-    inline uint32_t astat() const
-    {
-        const OpaqueAuthHeader* verf = verifier();
-        const uint32_t* stat = (uint32_t*)(verf->opaque_data() + verf->len());
-        return ntohl(*stat);
-    }
-    inline char* reply_data() const
-    {
-        const OpaqueAuthHeader* verf = verifier();
-        return (verf->opaque_data() + verf->len() + sizeof(uint32_t)/*stat*/);
-    }
+    inline bool            is_last() const { return ntohl(mark) & 0x80000000; /*1st bit*/  }
+    inline uint32_t   fragment_len() const { return ntohl(mark) & 0x7FFFFFFF; /*31 bits*/  }
+    inline MessageHeader* fragment() const { return (MessageHeader*)(this+1);              }
 private:
-    AcceptedReplyHeader() = delete;
-};
+    RecordMark() = delete;
 
-
-struct RejectedReplyHeader: public ReplyHeader
-{
-    inline uint32_t          stat() const { return ntohl(m_stat);         }
-    inline const char* reply_data() const { return (const char*)(this+1); }
-private:
-    RejectedReplyHeader() = delete;
-
-    uint32_t m_stat;   // enum RejectStat
+    uint32_t mark;
 };
 
 
@@ -191,10 +83,10 @@ class RPCValidator
 public:
     static inline bool check(const MessageHeader*const msg)
     {
-        const uint32_t type = msg->type();
+        const MsgType type = msg->type();
 
-        return type == SUNRPC_CALL ||
-               type == SUNRPC_REPLY;
+        return type == MsgType::CALL ||
+               type == MsgType::REPLY;
     }
 
     static inline bool check(const CallHeader*const call)
@@ -204,10 +96,10 @@ public:
 
     static inline bool check(const ReplyHeader*const reply)
     {
-        const uint32_t stat = reply->stat();
-        
-        return stat == SUNRPC_MSG_ACCEPTED ||
-               stat == SUNRPC_MSG_DENIED;
+        const ReplyStat stat = reply->stat();
+
+        return stat == ReplyStat::MSG_ACCEPTED ||
+               stat == ReplyStat::MSG_DENIED;
     }
 private:
     RPCValidator() = delete;

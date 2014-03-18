@@ -55,7 +55,7 @@ public:
         auto msg = reinterpret_cast<const MessageHeader*const>(info.data);
         switch(msg->type())
         {
-            case SUNRPC_CALL:
+            case MsgType::CALL:
             {
                 auto call = static_cast<const CallHeader*const>(msg);
                 if(RPCValidator::check(call) && NFS3::Validator::check(call))
@@ -68,7 +68,7 @@ public:
                 }
             }
             break;
-            case SUNRPC_REPLY:
+            case MsgType::REPLY:
             {
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
@@ -541,7 +541,7 @@ public:
     {
         switch(msg->type())
         {
-            case SUNRPC_CALL:
+            case MsgType::CALL:
             {
                 auto call = static_cast<const CallHeader*const>(msg);
                 if(RPCValidator::check(call))
@@ -566,7 +566,7 @@ public:
                 }
             }
             break;
-            case SUNRPC_REPLY:
+            case MsgType::REPLY:
             {
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
