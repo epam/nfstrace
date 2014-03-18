@@ -39,7 +39,7 @@ public:
     {
         for(const auto a : modules)
         {
-            (a->*handle)(&proc, &proc.arg, &proc.res);
+            (a->*handle)(&proc, proc.parg, proc.pres);
         }
     }
 

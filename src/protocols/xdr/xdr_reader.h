@@ -27,29 +27,34 @@ namespace xdr
 class XDRError : public std::runtime_error
 {
 public:
-    explicit XDRError(const std::string& msg) : std::runtime_error(msg) { }
+    explicit XDRError(const std::string& msg) : std::runtime_error{msg} { }
 };
 
 class XDRReader
 {
 public:
-    XDRReader(const uint8_t* ptr, size_t len) : beg(ptr), it(ptr), last(ptr + len)
+    XDRReader(const uint8_t* ptr, size_t len)
+    : beg {ptr}
+    , it  {ptr}
+    , last{ptr + len}
     {
     }
 
-    inline size_t   size() const { return last-it; }
+    inline size_t         size() const { return last-it; }
     inline const uint8_t* data() const { return it;      }
-
-    inline uint32_t get_offset() const
-    {
-        return it - beg;
-    }
+    inline size_t       offset() const { return it-beg;  }
 
     inline void reset(const uint8_t* ptr, size_t len)
     {
         beg = ptr;
         it = ptr;
         last = ptr+len;
+    }
+
+    inline void read_unchecked(int32_t& v)
+    {
+        v = (int32_t)ntohl(*(uint32_t*)it);
+        it += sizeof(v);
     }
 
     inline void read_unchecked(uint32_t& v)
@@ -103,7 +108,7 @@ public:
     {
         if(it+size > last)
         {
-            throw XDRError("XDRReader::read action cannot be done");
+            throw XDRError{"XDRReader::read action cannot be done"};
         }
     }
 
@@ -113,7 +118,6 @@ protected:
         uint32_t mod = size % XDR_ALIGN;
         return (mod) ? size - mod + XDR_ALIGN : size;
     }
-
 
     const uint8_t* beg;
     const uint8_t* it;
