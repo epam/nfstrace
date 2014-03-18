@@ -68,18 +68,16 @@ inline void NFSParserThread::process_queue()
     {
         // take all items from the queue
         FilteredDataQueue::List list{queue};
-        if(list)    // list isn't empty
+        if(!list)
         {
-            do
-            {
-                parse_data(list.get_current());
-            }
-            while(list);
+            return; // list from queue is empty, break infinity loop
         }
-        else
+
+        do
         {
-            break; // list is empty, break infinity loop
+            parse_data(list.get_current());
         }
+        while(list);
     }
 }
 

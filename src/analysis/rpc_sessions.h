@@ -7,7 +7,6 @@
 #define RPC_SESSIONS_H
 //------------------------------------------------------------------------------
 #include <memory>
-#include <sstream>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -25,15 +24,15 @@ namespace NST
 namespace analysis
 {
 
-class RPCSession
+class RPCSession : public utils::ApplicationsSession
 {
 public:
 
     RPCSession(const utils::NetworkSession& s, utils::Session::Direction call_direction)
-    : session {s, call_direction}
+    : utils::ApplicationsSession{s, call_direction}
     {
         utils::Out message;
-        message << "Create RPC session " << session;
+        message << "Create RPC session " << str();
     }
     ~RPCSession() = default;
     RPCSession(const RPCSession&)            = delete;
@@ -67,26 +66,8 @@ public:
         return ptr;
     }
 
-    inline const Session* get_session() const
-    {
-        return &session;
-    }
-
-    const std::string& str() const
-    {
-        if(session_str.empty())
-        {
-            std::stringstream stream(std::ios_base::out);
-            stream << session;
-            session_str = stream.str();
-        }
-        return session_str;
-    }
-
+    inline const Session* get_session() const { return this; }
 private:
-    mutable std::string session_str; // cached string representation of session
-
-    utils::ApplicationsSession session;
 
     // TODO: add custom allocator based on BlockAllocator
     // to decrease cost of expensive insert/erase operations
