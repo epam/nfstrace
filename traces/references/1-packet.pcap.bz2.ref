@@ -1,0 +1,25 @@
+###  Breakdown analyzer  ###
+Total calls: 0. Per operation:
+NULL            0      0%
+GETATTR         0      0%
+SETATTR         0      0%
+LOOKUP          0      0%
+ACCESS          0      0%
+READLINK        0      0%
+READ            0      0%
+WRITE           0      0%
+CREATE          0      0%
+MKDIR           0      0%
+SYMLINK         0      0%
+MKNOD           0      0%
+REMOVE          0      0%
+RMDIR           0      0%
+RENAME          0      0%
+LINK            0      0%
+READDIR         0      0%
+READDIRPLUS     0      0%
+FSSTAT          0      0%
+FSINFO          0      0%
+PATHCONF        0      0%
+COMMIT          0      0%
+./nfstrace: Filtration is done

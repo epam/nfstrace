@@ -7,14 +7,14 @@
 #define RPC_SESSIONS_H
 //------------------------------------------------------------------------------
 #include <memory>
-#include <sstream>
 #include <string>
 #include <vector>
 #include <unordered_map>
 #include <utility>
 
 #include "utils/filtered_data.h"
-#include "utils/logger.h"
+#include "utils/log.h"
+#include "utils/out.h"
 #include "utils/session.h"
 //------------------------------------------------------------------------------
 using NST::utils::FilteredDataQueue;
@@ -24,17 +24,17 @@ namespace NST
 namespace analysis
 {
 
-class RPCSession
+class RPCSession : public utils::ApplicationsSession
 {
 public:
 
     RPCSession(const utils::NetworkSession& s, utils::Session::Direction call_direction)
-    : session {s, call_direction}
+    : utils::ApplicationsSession{s, call_direction}
     {
+        utils::Out message;
+        message << "Detect session " << str();
     }
-    ~RPCSession()
-    {
-    }
+    ~RPCSession() = default;
     RPCSession(const RPCSession&)            = delete;
     RPCSession& operator=(const RPCSession&) = delete;
     
@@ -66,26 +66,8 @@ public:
         return ptr;
     }
 
-    inline const Session* get_session() const
-    {
-        return &session;
-    }
-
-    const std::string& str() const
-    {
-        if(session_str.empty())
-        {
-            std::stringstream stream(std::ios_base::out);
-            stream << session;
-            session_str = stream.str();
-        }
-        return session_str;
-    }
-
+    inline const Session* get_session() const { return this; }
 private:
-    mutable std::string session_str; // cached string representation of session
-
-    utils::ApplicationsSession session;
 
     // TODO: add custom allocator based on BlockAllocator
     // to decrease cost of expensive insert/erase operations
@@ -106,7 +88,7 @@ public:
     {
         if(app->application == nullptr)
         {
-            if(type == MsgType::SUNRPC_CALL) // add new session only for Call
+            if(type == MsgType::CALL) // add new session only for Call
             {
                 std::unique_ptr<RPCSession> ptr{ new RPCSession{*app, dir} };
                 sessions.emplace_back(std::move(ptr));

@@ -26,7 +26,7 @@ namespace cmdline
 class CLIError : public std::runtime_error
 {
 public:
-    explicit CLIError(const std::string& msg) : std::runtime_error(msg) { }
+    explicit CLIError(const std::string& msg) : std::runtime_error{msg} { }
 };
 
 struct Opt
@@ -71,12 +71,12 @@ public:
     CmdlineParser(const CmdlineParser&)                  = delete;
     const CmdlineParser& operator=(const CmdlineParser&) = delete;
 
-    void parse(int argc, char** argv) throw (CLIError);
+    void parse(int argc, char** argv);
     void validate();
 
     static Opt::Value get(typename CLI::Names name)
     {
-        return Opt::Value(CLI::options[name].value);
+        return Opt::Value{CLI::options[name].value};
     }
 
     static bool is_passed(typename CLI::Names name)
@@ -87,7 +87,7 @@ public:
     static bool is_default(typename CLI::Names name)
     {
         const Opt& a = CLI::options[name];
-        return a.value == a.deflt;
+        return a.value == a.deflt;  // compare pointers
     }
 
     static void print_usage(std::ostream& out, const char* executable);
@@ -111,8 +111,11 @@ private:
 
     static std::string build_name(char short_name, const std::string& long_name)
     {
-       return std::string("\'") +
-              (short_name ? std::string("-") + char(short_name) : long_name) + '\'';
+        if(short_name)
+        {
+            return { '\'', '-', short_name, '\'' };
+        }
+        return std::string{'\''} + long_name + '\'';
     }
 
     static int short_opt_index(const char c)
@@ -129,7 +132,7 @@ private:
 };
 
 template <typename CLI>
-void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
+void CmdlineParser<CLI>::parse(int argc, char** argv)
 {
     // generate input data for getopt_long()
     option long_opts[CLI::num + 1]; // +1 for NULL-option
@@ -163,12 +166,11 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
     memset(&long_opts[CLI::num], 0, sizeof(long_opts[CLI::num]));
 
     // assuming that argc and argv are the same as those passed to program
-    int opt = 0;
     int opt_index = 0;
 
     while(true)
     {
-        opt = getopt_long(argc, argv, short_opts, long_opts, &opt_index);
+        int opt = getopt_long(argc, argv, short_opts, long_opts, &opt_index);
         if(opt == -1)
         {
             break;
@@ -183,25 +185,24 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
 
         case '?':
         {
-            std::string unkn = build_name(optopt, std::string(argv[optind - 1]));
-            throw CLIError(std::string("Unrecognized option: ") + unkn);
+            std::string unkn{ build_name(optopt, argv[optind-1]) };
+            throw CLIError{std::string{"Unrecognized option: "} + unkn};
         }
 
         case ':':
         {
-            std::string miss = build_name(optopt, std::string(argv[optind - 1]));
-            throw CLIError(std::string("Option requires an argument: ") + miss);
+            std::string miss{ build_name(optopt, argv[optind-1]) };
+            throw CLIError{std::string{"Option requires an argument: "} + miss};
         }
 
         default:
         {
             // if short option found
-            int index = short_opt_index(opt);
+            const int index = short_opt_index(opt);
             if(index != -1)
             {
                 set_value(index, optarg);
             }
-            break;
         }
         }
     }
@@ -210,9 +211,9 @@ void CmdlineParser<CLI>::parse(int argc, char** argv) throw (CLIError)
     if(optind != argc)
     {
         // quote non-option
-        std::string name = build_name(0, std::string(argv[optind]));
-        throw CLIError(std::string("Unexpected operand on command line: ")
-                + name);
+        std::string name { build_name(0, std::string(argv[optind])) };
+        throw CLIError{std::string{"Unexpected operand on command line: "}
+                + name};
     }
 
     // set default values
@@ -235,9 +236,9 @@ void CmdlineParser<CLI>::validate()
     {
         if(o.value == nullptr) // is value still uninitialized?
         {
-            std::string long_opt = o.long_opt ? std::string("--") + o.long_opt : "";
-            std::string name = build_name(o.short_opt, long_opt);
-            throw CLIError(std::string("Missing required option: ") + name);
+            std::string lopt{ o.long_opt ? std::string("--") + o.long_opt : ""};
+            std::string name{ build_name(o.short_opt, lopt) };
+            throw CLIError{std::string{"Missing required option: "} + name};
         }
     }
 }
@@ -293,5 +294,5 @@ void CmdlineParser<CLI>::print_usage(std::ostream& out, const char* name)
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif //CMDLINE_PARSER_H
+#endif//CMDLINE_PARSER_H
 //------------------------------------------------------------------------------

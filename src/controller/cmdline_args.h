@@ -21,19 +21,22 @@ struct Args
 
     enum Names
     {
+        MODE,
         INTERFACE,
         FILTER,
         SNAPLEN,
         TIMEOUT,
-        MODE,
+        BSIZE,
+        PROMISC,
+        DIRECTION,
         ANALYZERS,
         IFILE,
         OFILE,
         COMMAND,
         DSIZE,
-        BSIZE,
         MSIZE,
         QSIZE,
+        TRACE,
         VERBOSE,
         HELP,
         num

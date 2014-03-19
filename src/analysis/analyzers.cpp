@@ -1,34 +1,30 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Storage for populating Analyzers
+// Description: Storage for Analyzers, load plugins and processing
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include <utility>
-
-#include "utils/logger.h"
 #include "analysis/analyzers.h"
 #include "analysis/print_analyzer.h"
+#include "utils/out.h"
 //------------------------------------------------------------------------------
-using NST::utils::Logger;
-using NST::controller::Parameters;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis
 {
 
-Analyzers::Analyzers(const Parameters& params)
+Analyzers::Analyzers(const controller::Parameters& params)
 {
-    for(const auto& a : params.analysiss())
+    for(const auto& a : params.analysis_modules())
     {
-        Logger::Buffer message;
+        utils::Out message;
         try // try to load plugin
         {
             message << "Loading module: '" << a.path << "' with args: [" << a.args << "]";
 
-            std::unique_ptr<PluginInstance> plugin{new PluginInstance(a.path, a.args)};
-            analysiss.push_back(plugin->instance());
-            plugins.push_back(std::move(plugin));
+            std::unique_ptr<PluginInstance> plugin{new PluginInstance{a.path, a.args}};
+            modules.emplace_back(plugin->instance());
+            plugins.emplace_back(std::move(plugin));
         }
         catch(std::runtime_error& e)
         {
@@ -36,11 +32,11 @@ Analyzers::Analyzers(const Parameters& params)
         }
     }
 
-    if(params.is_verbose()) // add special analysis for trace out RPC calls
+    if(params.trace()) // add special module for tracing RPC procedures
     {
-        std::unique_ptr<IAnalyzer> print{new PrintAnalyzer(std::cout)};
-        analysiss.push_back(print.get());
-        builtin.push_back(std::move(print));
+        std::unique_ptr<IAnalyzer> tracer{new PrintAnalyzer{std::cout}};
+        modules.emplace_back(tracer.get());
+        builtin.emplace_back(std::move(tracer));
     }
 }
 
