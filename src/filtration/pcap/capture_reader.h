@@ -43,6 +43,9 @@ public:
     ~CaptureReader() = default;
 
     void print_statistic(std::ostream& out) const override;
+
+private:
+    std::string interface_name;
 };
 
 std::ostream& operator<<(std::ostream&, const CaptureReader::Params&);
