@@ -17,9 +17,10 @@ namespace pcap
 
 CaptureReader::CaptureReader(const Params& params)
     : BaseReader()
+    , interface_name{params.interface}
 {
     char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
-    const char* device = params.interface.c_str();
+    const char* device = interface_name.c_str();
 
     handle = pcap_create(device, errbuf);
     if(!handle)
@@ -84,9 +85,10 @@ void CaptureReader::print_statistic(std::ostream& out) const
     struct pcap_stat stat={0,0,0};
     if(pcap_stats(handle, &stat) == 0)
     {
-        out << "packets received by filtration:" << stat.ps_recv << '\n'
-            << "packets dropped by kernel     :" << stat.ps_drop << '\n'
-            << "packets dropped by interface  :" << stat.ps_ifdrop;
+        out << "Statistic from interface: " << interface_name       << '\n'
+            << "  packets received by filtration: " << stat.ps_recv << '\n'
+            << "  packets dropped by kernel     : " << stat.ps_drop << '\n'
+            << "  packets dropped by interface  : " << stat.ps_ifdrop;
     }
     else
     {

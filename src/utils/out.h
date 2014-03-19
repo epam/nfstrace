@@ -35,7 +35,7 @@ public:
         static Level get_level();   // return global level of verbosity
     };
 
-    Out(Level level=Level::Info);   // verbose level
+    Out(Level level=Level::Info);   // verbose level of message
     ~Out();
     Out(const Out&)            = delete;
     Out& operator=(const Out&) = delete;

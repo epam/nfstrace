@@ -32,7 +32,7 @@ public:
     : utils::ApplicationsSession{s, call_direction}
     {
         utils::Out message;
-        message << "Create RPC session " << str();
+        message << "Detect session " << str();
     }
     ~RPCSession() = default;
     RPCSession(const RPCSession&)            = delete;
