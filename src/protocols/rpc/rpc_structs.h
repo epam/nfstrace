@@ -21,6 +21,7 @@ namespace rpc
 
 #include "api/rpc_types.h"
 
+
 inline XDRReader& operator>>(XDRReader& in, OpaqueAuth& o)
 {
     in >> o.flavor;
@@ -62,16 +63,16 @@ inline XDRReader& operator>>(XDRReader& in, AcceptedReply& o)
     in >> o.verf >> o.stat;
     switch(o.stat)
     {
-        case SUNRPC_SUCCESS:
+        case AcceptStat::SUCCESS:
             // Data will be parsed in the specific reader.
             break;
-        case SUNRPC_PROG_MISMATCH:
+        case AcceptStat::PROG_MISMATCH:
             in >> o.mismatch_info;
             break;
-        case SUNRPC_PROG_UNAVAIL:
-        case SUNRPC_PROC_UNAVAIL:
-        case SUNRPC_GARBAGE_ARGS:
-        case SUNRPC_SYSTEM_ERR:
+        case AcceptStat::PROG_UNAVAIL:
+        case AcceptStat::PROC_UNAVAIL:
+        case AcceptStat::GARBAGE_ARGS:
+        case AcceptStat::SYSTEM_ERR:
             break;
     }
     return in;
@@ -82,8 +83,8 @@ inline XDRReader& operator>>(XDRReader& in, RejectedReply& o)
     in >> o.stat;
     switch(o.stat)
     {
-        case SUNRPC_RPC_MISMATCH:   in >> o.u.mismatch_info; break;
-        case SUNRPC_AUTH_ERROR:     in >> o.u.auth_stat;     break;
+        case RejectStat::RPC_MISMATCH:   in >> o.u.mismatch_info; break;
+        case RejectStat::AUTH_ERROR:     in >> o.u.auth_stat;     break;
     }
     return in;
 }
@@ -99,8 +100,8 @@ inline XDRReader& operator>>(XDRReader& in, RPCReply& o)
     in.read_unchecked(o.stat);
     switch(o.stat)
     {
-        case SUNRPC_MSG_ACCEPTED:  in >> o.u.accepted; break;
-        case SUNRPC_MSG_DENIED:    in >> o.u.rejected; break;
+        case ReplyStat::MSG_ACCEPTED:  in >> o.u.accepted; break;
+        case ReplyStat::MSG_DENIED:    in >> o.u.rejected; break;
     }
     return in;
 }

@@ -15,7 +15,8 @@
 
 #include <pcap/pcap.h>
 
-#include "utils/logger.h"
+#include "utils/log.h"
+#include "utils/out.h"
 #include "utils/session.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
@@ -23,7 +24,6 @@
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/nfs3/nfs_structs.h"
 //------------------------------------------------------------------------------
-using NST::utils::Logger;
 using NST::utils::Session;
 
 using namespace NST::protocols::rpc;
@@ -55,7 +55,7 @@ public:
         auto msg = reinterpret_cast<const MessageHeader*const>(info.data);
         switch(msg->type())
         {
-            case SUNRPC_CALL:
+            case MsgType::CALL:
             {
                 auto call = static_cast<const CallHeader*const>(msg);
                 if(RPCValidator::check(call) && NFS3::Validator::check(call))
@@ -68,7 +68,7 @@ public:
                 }
             }
             break;
-            case SUNRPC_REPLY:
+            case MsgType::REPLY:
             {
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
@@ -541,7 +541,7 @@ public:
     {
         switch(msg->type())
         {
-            case SUNRPC_CALL:
+            case MsgType::CALL:
             {
                 auto call = static_cast<const CallHeader*const>(msg);
                 if(RPCValidator::check(call))
@@ -566,7 +566,7 @@ public:
                 }
             }
             break;
-            case SUNRPC_REPLY:
+            case MsgType::REPLY:
             {
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
@@ -627,8 +627,8 @@ public:
     }
     ~FiltrationProcessor()
     {
-        Logger::Buffer buffer;
-        reader->print_statistic(buffer);
+        utils::Out message;
+        reader->print_statistic(message);
     }
 
     void run()

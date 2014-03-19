@@ -6,9 +6,9 @@
 #ifndef NFS_PROCEDURE_H
 #define NFS_PROCEDURE_H
 //------------------------------------------------------------------------------
-#include "protocols/rpc/rpc_procedure_struct.h"
-#include "protocols/rpc/rpc_reader.h"
 #include "protocols/nfs3/nfs_structs.h"
+#include "protocols/rpc/rpc_procedure.h"
+#include "protocols/rpc/rpc_reader.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -28,9 +28,21 @@ class NFSProcedure: public rpc::RPCProcedure
 public:
 
     inline NFSProcedure(rpc::RPCReader& c, rpc::RPCReader& r, const Session* s)
+    : parg{&arg}    // set pointer to argument
+    , pres{&res}    // set pointer to result
     {
-        c >> call  >> arg;    // fill procedure call and arguments
-        r >> reply >> res;    // fill procedure reply and results
+        c >> call >> arg;   // fill procedure call and arguments
+        r >> reply;         // fill procedure reply
+
+        if(reply.stat == ReplyStat::MSG_ACCEPTED &&
+           reply.u.accepted.stat == AcceptStat::SUCCESS)
+        {
+            r >> res;   // fill procedure results, only if status is SUCCESS
+        }
+        else    // procedure isn't success, there is no valid result data
+        {
+            pres = nullptr;
+        }
 
         session = s;
 
@@ -38,6 +50,11 @@ public:
         rtimestamp = &r.data().timestamp;
     }
 
+    // pointers to procedure specific argument and result
+    ArgType* parg;
+    ResType* pres;
+
+private:
     ArgType arg;
     ResType res;
 };

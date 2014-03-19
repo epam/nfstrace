@@ -15,10 +15,9 @@
 
 #include "controller/parameters.h"
 #include "filtration/packet.h"
-#include "utils/logger.h"
+#include "utils/out.h"
 #include "utils/session.h"
 //------------------------------------------------------------------------------
-using NST::utils::Logger;
 using NST::utils::Session;
 using NST::utils::NetworkSession;
 //------------------------------------------------------------------------------
@@ -194,9 +193,6 @@ public:
                 // fill new session after construction
                 NetworkSession& session = *(res.first->second);
                 Mapper::fill_session(info, session);
-
-                Logger::Buffer buffer;
-                buffer << "create new session " << session;
             }
         }
 

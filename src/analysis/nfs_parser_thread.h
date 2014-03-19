@@ -41,12 +41,12 @@ private:
                                RPCSession* session);
 
     RunningStatus& status;
-    Analyzers& analysiss;
+    Analyzers& analyzers;
     FilteredDataQueue& queue;
     RPCSessions sessions;
 
     std::thread parsing;
-    std::atomic_flag runing;
+    std::atomic_flag running;
 };
 
 } // namespace analysis

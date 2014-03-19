@@ -84,15 +84,12 @@ static auto create_thread(std::unique_ptr<Reader>& reader,
 static auto create_capture_reader(const Parameters& params)
         -> std::unique_ptr<CaptureReader>
 {
-    return std::unique_ptr<CaptureReader>{
-                                new CaptureReader{
-                                        params.interface(),
-                                        params.filtration(),
-                                        params.snaplen(),
-                                        params.timeout(),
-                                        params.buffer_size()
-                                     }
-                                };
+    auto& capture_params = params.capture_params();
+    {
+        utils::Out message; // print parameters to user
+        message << capture_params;
+    }
+    return std::unique_ptr<CaptureReader>{ new CaptureReader{capture_params} };
 }
 
 } // unnamed namespace
@@ -101,12 +98,15 @@ static auto create_capture_reader(const Parameters& params)
 void FiltrationManager::add_online_dumping(const Parameters& params)
 {
     std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
-    std::unique_ptr<Dumping>       writer { new Dumping{
-                                                reader->get_handle(),
-                                                params.output_file(),
-                                                params.dumping_cmd(),
-                                                params.dumping_size()
-                                            }
+
+    auto& dumping_params = params.dumping_params();
+    {
+        utils::Out message; // print parameters to user
+        message << dumping_params;
+    }
+    std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),
+                                                         dumping_params
+                                                       }
                                           };
 
     threads.emplace_back(create_thread(reader, writer, status));
@@ -135,6 +135,8 @@ void FiltrationManager::add_offline_analysis(const std::string& ifile,
 FiltrationManager::FiltrationManager(RunningStatus& s)
 : status(s)
 {
+    utils::Out message(utils::Out::Level::All);
+    message << "Libpcap version: " << pcap::library_version();
 }
 
 FiltrationManager::~FiltrationManager()

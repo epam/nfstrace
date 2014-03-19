@@ -7,7 +7,7 @@
 #include "protocols/nfs3/nfs_procedure.h"
 #include "protocols/nfs3/nfs_structs.h"
 #include "protocols/rpc/rpc_header.h"
-#include "utils/logger.h"
+#include "utils/log.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::NFS3;
 using namespace NST::protocols::xdr;
@@ -20,9 +20,9 @@ namespace analysis
 
 NFSParserThread::NFSParserThread(FilteredDataQueue& q, Analyzers& a, RunningStatus& s)
 : status   (s)
-, analysiss(a)
+, analyzers(a)
 , queue    (q)
-, runing   {}
+, running  {ATOMIC_FLAG_INIT} // false
 {
 }
 NFSParserThread::~NFSParserThread()
@@ -32,13 +32,13 @@ NFSParserThread::~NFSParserThread()
 
 void NFSParserThread::start()
 {
-    if(runing.test_and_set()) return;
+    if(running.test_and_set()) return;
     parsing = std::thread(&NFSParserThread::thread, this);
 }
 
 void NFSParserThread::stop()
 {
-    runing.clear();
+    running.clear();
     parsing.join();
 }
 
@@ -46,7 +46,7 @@ inline void NFSParserThread::thread()
 {
     try
     {
-        while(runing.test_and_set())
+        while(running.test_and_set())
         {
             // process all available items from queue
             process_queue();
@@ -68,18 +68,16 @@ inline void NFSParserThread::process_queue()
     {
         // take all items from the queue
         FilteredDataQueue::List list{queue};
-        if(list)    // list isn't empty
+        if(!list)
         {
-            do
-            {
-                parse_data(list.get_current());
-            }
-            while(list);
+            return; // list from queue is empty, break infinity loop
         }
-        else
+
+        do
         {
-            break; // list is empty, break infinity loop
+            parse_data(list.get_current());
         }
+        while(list);
     }
 }
 
@@ -90,14 +88,14 @@ void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
     auto msg = reinterpret_cast<const MessageHeader*>(ptr->data);
     switch(msg->type())
     {
-    case SUNRPC_CALL:
+    case MsgType::CALL:
     {
         if(ptr->dlen < sizeof(CallHeader)) return;
         auto call = static_cast<const CallHeader*>(msg);
 
         if(RPCValidator::check(call) && Validator::check(call))
         {
-            RPCSession* session = sessions.get_session(ptr->session, ptr->direction, RPCSessions::MsgType::SUNRPC_CALL);
+            RPCSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL);
             if(session)
             {
                 session->save_nfs_call_data(call->xid(), std::move(ptr));
@@ -105,24 +103,19 @@ void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
         }
     }
     break;
-    case SUNRPC_REPLY:
+    case MsgType::REPLY:
     {
         if(ptr->dlen < sizeof(ReplyHeader)) return;
         auto reply = static_cast<const ReplyHeader*>(msg);
 
-        RPCSession* session = sessions.get_session(ptr->session, ptr->direction, RPCSessions::MsgType::SUNRPC_REPLY);
+        if(!RPCValidator::check(reply)) return;
 
+        RPCSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY);
         if(session)
         {
             FilteredDataQueue::Ptr&& call_data = session->get_nfs_call_data(reply->xid());
             if(call_data)
             {
-                // TODO: replace these checks with correct parsing by RPCReader
-                // analyze only success operations
-                if(reply->stat() != SUNRPC_MSG_ACCEPTED) return;
-                auto areply = static_cast<const AcceptedReplyHeader*>(msg);
-                if(areply->astat() != SUNRPC_SUCCESS) return;
-
                 analyze_nfs_operation(std::move(call_data), std::move(ptr), session);
             }
         }
@@ -144,28 +137,28 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
 
         switch(procedure)
         {
-        case Proc::NFS_NULL:    return analysiss(&IAnalyzer::null,       NFSPROC3_NULL       {c, r, s});
-        case Proc::GETATTR:     return analysiss(&IAnalyzer::getattr3,   NFSPROC3_GETATTR    {c, r, s});
-        case Proc::SETATTR:     return analysiss(&IAnalyzer::setattr3,   NFSPROC3_SETATTR    {c, r, s});
-        case Proc::LOOKUP:      return analysiss(&IAnalyzer::lookup3,    NFSPROC3_LOOKUP     {c, r, s});
-        case Proc::ACCESS:      return analysiss(&IAnalyzer::access3,    NFSPROC3_ACCESS     {c, r, s});
-        case Proc::READLINK:    return analysiss(&IAnalyzer::readlink3,  NFSPROC3_READLINK   {c, r, s});
-        case Proc::READ:        return analysiss(&IAnalyzer::read3,      NFSPROC3_READ       {c, r, s});
-        case Proc::WRITE:       return analysiss(&IAnalyzer::write3,     NFSPROC3_WRITE      {c, r, s});
-        case Proc::CREATE:      return analysiss(&IAnalyzer::create3,    NFSPROC3_CREATE     {c, r, s});
-        case Proc::MKDIR:       return analysiss(&IAnalyzer::mkdir3,     NFSPROC3_MKDIR      {c, r, s});
-        case Proc::SYMLINK:     return analysiss(&IAnalyzer::symlink3,   NFSPROC3_SYMLINK    {c, r, s});
-        case Proc::MKNOD:       return analysiss(&IAnalyzer::mknod3,     NFSPROC3_MKNOD      {c, r, s});
-        case Proc::REMOVE:      return analysiss(&IAnalyzer::remove3,    NFSPROC3_REMOVE     {c, r, s});
-        case Proc::RMDIR:       return analysiss(&IAnalyzer::rmdir3,     NFSPROC3_RMDIR      {c, r, s});
-        case Proc::RENAME:      return analysiss(&IAnalyzer::rename3,    NFSPROC3_RENAME     {c, r, s});
-        case Proc::LINK:        return analysiss(&IAnalyzer::link3,      NFSPROC3_LINK       {c, r, s});
-        case Proc::READDIR:     return analysiss(&IAnalyzer::readdir3,   NFSPROC3_READDIR    {c, r, s});
-        case Proc::READDIRPLUS: return analysiss(&IAnalyzer::readdirplus3, NFSPROC3_READDIRPLUS{c, r, s});
-        case Proc::FSSTAT:      return analysiss(&IAnalyzer::fsstat3,    NFSPROC3_FSSTAT     {c, r, s});
-        case Proc::FSINFO:      return analysiss(&IAnalyzer::fsinfo3,    NFSPROC3_FSINFO     {c, r, s});
-        case Proc::PATHCONF:    return analysiss(&IAnalyzer::pathconf3,  NFSPROC3_PATHCONF   {c, r, s});
-        case Proc::COMMIT:      return analysiss(&IAnalyzer::commit3,    NFSPROC3_COMMIT     {c, r, s});
+        case Proc::NFS_NULL:    return analyzers(&IAnalyzer::null,       NFSPROC3_NULL       {c, r, s});
+        case Proc::GETATTR:     return analyzers(&IAnalyzer::getattr3,   NFSPROC3_GETATTR    {c, r, s});
+        case Proc::SETATTR:     return analyzers(&IAnalyzer::setattr3,   NFSPROC3_SETATTR    {c, r, s});
+        case Proc::LOOKUP:      return analyzers(&IAnalyzer::lookup3,    NFSPROC3_LOOKUP     {c, r, s});
+        case Proc::ACCESS:      return analyzers(&IAnalyzer::access3,    NFSPROC3_ACCESS     {c, r, s});
+        case Proc::READLINK:    return analyzers(&IAnalyzer::readlink3,  NFSPROC3_READLINK   {c, r, s});
+        case Proc::READ:        return analyzers(&IAnalyzer::read3,      NFSPROC3_READ       {c, r, s});
+        case Proc::WRITE:       return analyzers(&IAnalyzer::write3,     NFSPROC3_WRITE      {c, r, s});
+        case Proc::CREATE:      return analyzers(&IAnalyzer::create3,    NFSPROC3_CREATE     {c, r, s});
+        case Proc::MKDIR:       return analyzers(&IAnalyzer::mkdir3,     NFSPROC3_MKDIR      {c, r, s});
+        case Proc::SYMLINK:     return analyzers(&IAnalyzer::symlink3,   NFSPROC3_SYMLINK    {c, r, s});
+        case Proc::MKNOD:       return analyzers(&IAnalyzer::mknod3,     NFSPROC3_MKNOD      {c, r, s});
+        case Proc::REMOVE:      return analyzers(&IAnalyzer::remove3,    NFSPROC3_REMOVE     {c, r, s});
+        case Proc::RMDIR:       return analyzers(&IAnalyzer::rmdir3,     NFSPROC3_RMDIR      {c, r, s});
+        case Proc::RENAME:      return analyzers(&IAnalyzer::rename3,    NFSPROC3_RENAME     {c, r, s});
+        case Proc::LINK:        return analyzers(&IAnalyzer::link3,      NFSPROC3_LINK       {c, r, s});
+        case Proc::READDIR:     return analyzers(&IAnalyzer::readdir3,   NFSPROC3_READDIR    {c, r, s});
+        case Proc::READDIRPLUS: return analyzers(&IAnalyzer::readdirplus3, NFSPROC3_READDIRPLUS{c, r, s});
+        case Proc::FSSTAT:      return analyzers(&IAnalyzer::fsstat3,    NFSPROC3_FSSTAT     {c, r, s});
+        case Proc::FSINFO:      return analyzers(&IAnalyzer::fsinfo3,    NFSPROC3_FSINFO     {c, r, s});
+        case Proc::PATHCONF:    return analyzers(&IAnalyzer::pathconf3,  NFSPROC3_PATHCONF   {c, r, s});
+        case Proc::COMMIT:      return analyzers(&IAnalyzer::commit3,    NFSPROC3_COMMIT     {c, r, s});
         case Proc::num:;
         }
     }

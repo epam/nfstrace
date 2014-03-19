@@ -11,6 +11,8 @@
 
 #include "controller/cmdline_args.h"
 #include "controller/cmdline_parser.h"
+#include "filtration/dumping.h"
+#include "filtration/pcap/capture_reader.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -18,7 +20,7 @@ namespace NST
 namespace controller
 {
 
-enum RunningMode
+enum class RunningMode
 {
     Profiling,
     Dumping,
@@ -27,9 +29,8 @@ enum RunningMode
 
 struct AParams
 {
-    AParams(const std::string& p) : path{p} {}
+    AParams(const std::string& p) : path{p}, args{} {}
     AParams(const std::string& p, const std::string& a) : path{p}, args{a} {}
-    AParams(AParams&&) = default;
 
     const std::string path;
     const std::string args;
@@ -39,6 +40,9 @@ class Parameters : private cmdline::CmdlineParser<cmdline::Args>
 {
     static Parameters* global;
 public:
+    using CaptureParams = filtration::pcap::CaptureReader::Params;
+    using DumpingParams = filtration::Dumping::Params;
+
     Parameters(int argc, char** argv);
     Parameters(const Parameters&)            = delete;
     Parameters& operator=(const Parameters&) = delete;
@@ -48,24 +52,20 @@ public:
     // access helpers
     const std::string&  program_name() const;
     RunningMode         running_mode() const;
-    bool                is_verbose() const;
-    std::string         interface() const;
-    unsigned short      snaplen() const;
-    int                 timeout() const;
-    std::string         filtration() const;
     std::string         input_file() const;
-    std::string         output_file() const;
-    std::string         dumping_cmd() const;
-    unsigned int        dumping_size() const;
-             int        buffer_size() const;
     unsigned short      rpcmsg_limit() const;
     unsigned short      queue_capacity() const;
-    const std::vector<AParams>& analysiss() const;
+    bool                trace() const;
+    int                 verbose_level() const;
+    const CaptureParams capture_params() const;
+    const DumpingParams dumping_params() const;
+    const std::vector<AParams>& analysis_modules() const;
 
 protected:
     void set_multiple_value(int index, char *const v) override;
 
 private:
+    std::string default_iofile() const;
 
     // cashed values
     unsigned short rpc_message_limit;

@@ -14,11 +14,9 @@
 #include "controller/parameters.h"
 #include "controller/running_status.h"
 #include "controller/signal_handler.h"
-#include "utils/logger.h"
+#include "utils/log.h"
+#include "utils/out.h"
 //------------------------------------------------------------------------------
-using NST::analysis::AnalysisManager;
-using NST::utils::Logger;
-using NST::filtration::FiltrationManager;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -27,6 +25,9 @@ namespace controller
 
 class Controller
 {
+    using AnalysisManager   = NST::analysis::AnalysisManager;
+    using FiltrationManager = NST::filtration::FiltrationManager;
+
 public:
     Controller(const Parameters& parameters);
     Controller(const Controller&)            = delete;
@@ -37,8 +38,10 @@ public:
 
 private:
 
-    // global used logger
-    Logger logger;
+    // initializer of global logger
+    utils::Log::Global glog;
+    // initializer of global outptut
+    utils::Out::Global gout;
 
     // container for generated exceptions
     RunningStatus status;

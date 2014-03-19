@@ -3,13 +3,14 @@
 // Description: Handling signals and map them to exceptions.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include <iostream>
-#include <functional>
+#include <cerrno>
+#include <functional>   // std::ref
+#include <system_error>
 
 #include <unistd.h>
 #include <pthread.h>
 #include <signal.h>
-#include <string.h> // for strsignal()
+#include <string.h>     // for strsignal()
 
 #include <sys/wait.h>
 
@@ -25,49 +26,75 @@ SignalHandler::Signal::Signal(int sig) : std::runtime_error(::strsignal(sig))
 {
 }
 
-static void handle_signals(RunningStatus& status)
+// synchronously wait signals and pass them to RunningStatus as an exception
+static void handle_signals(const sigset_t    waitmask,
+                           std::atomic_flag& running,
+                           RunningStatus&    status)
 {
-    sigset_t mask;
-    ::sigfillset(&mask);
-    ::pthread_sigmask(SIG_BLOCK, &mask, NULL);
-
-    ::sigemptyset(&mask);
-    ::sigaddset(&mask, SIGINT);
-    ::sigaddset(&mask, SIGQUIT);
-    ::sigaddset(&mask, SIGCHLD);
-    ::sigaddset(&mask, SIGUSR2);
-
-    int signo = 0;
-
-    while(true)
+    while(running.test_and_set())
     {
-        ::sigwait(&mask, &signo);   // synchronously wait of the signals
+        int signo = 0;
+        const int err = ::sigwait(&waitmask, &signo);
+        if(err != 0)
+        {
+            status.push(std::system_error(err, std::system_category(),
+                                          "error in SignalHandler sigwait"));
+            return;
+        }
 
         if(signo == SIGCHLD)
         {
-            ::wait(NULL);
-            continue;
+            // wait childern(compression in dumping mode may call fork())
+            const pid_t pid = ::wait(NULL);
+            if(pid == -1 && errno != ECHILD)
+            {
+                status.push(std::system_error(errno, std::system_category(),
+                                              "error in SignalHandler wait"));
+            }
         }
-
-        if(signo == SIGUSR2)
+        else
         {
-            ::wait(NULL);
-            return;
+            status.push(SignalHandler::Signal(signo));
         }
-        status.push(SignalHandler::Signal(signo));
     }
 }
 
-SignalHandler::SignalHandler(RunningStatus& s) : handler(handle_signals, std::ref(s))
+static void dummy(int) {}
+
+SignalHandler::SignalHandler(RunningStatus& s)
+: handler{}
+, running{ATOMIC_FLAG_INIT} // false
 {
+    // set dummy handler for SIGCHLD to prevent ignoring it
+    // in ::sigwait() on FreeBSD by default
+    struct sigaction chld;
+    memset(&chld, 0, sizeof(chld));
+    chld.sa_handler = dummy;
+    if(::sigaction(SIGCHLD, &chld, NULL) != 0)
+    {
+        throw std::system_error(errno, std::system_category(),
+                                "error in SignalHandler sigaction");
+    }
+
     sigset_t mask;
-    ::sigfillset(&mask);
-    ::pthread_sigmask(SIG_BLOCK, &mask, NULL);
+    ::sigemptyset(&mask);
+    ::sigaddset(&mask, SIGINT);  // correct exit from program by Ctrl-C
+    ::sigaddset(&mask, SIGCHLD); // stop sigwait-thread and wait children
+    const int err = ::pthread_sigmask(SIG_BLOCK, &mask, NULL);
+    if(err != 0)
+    {
+        throw std::system_error(err, std::system_category(),
+                               "error in SignalHandler pthread_sigmask");
+    }
+
+    running.test_and_set();
+    handler = std::thread{handle_signals, mask, std::ref(running), std::ref(s)};
 }
 SignalHandler::~SignalHandler()
 {
-    // send signal ourself to stop thread execution via unblock sigwait()
-    ::kill(::getpid(), SIGUSR2);
+    running.clear();
+    // send signal to stop handler thread execution via unblock sigwait()
+    ::pthread_kill(handler.native_handle(), SIGCHLD);
     handler.join();
 }
 
