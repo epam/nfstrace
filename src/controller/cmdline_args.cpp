@@ -34,7 +34,7 @@ Opt Args::options[Args::num] =
     {'a', "analysis",   Opt::MUL, "",                    "specify path to analysis module and set desired options",  "PATH#opt1,opt2=val,...", nullptr, false},
     {'I', "ifile",      Opt::REQ, "INTERFACE-BPF.pcap",  "input file for " STAT " mode, the '-' means stdin",        "PATH",   nullptr, false},
     {'O', "ofile",      Opt::REQ, "INTERFACE-BPF.pcap",  "output file for " DUMP " mode, the '-' means stdout",      "PATH",   nullptr, false},
-    {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file",                     nullptr,  nullptr, false},
+    {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file",                     "\"shell command\"",  nullptr, false},
     {'D', "dump-size",  Opt::REQ, "0",                   "size of dumping file portion, 0 = no limit",               "MBytes", nullptr, false},
     {'M', "msg-header", Opt::REQ, "512",                 "RPC message will be truncated to this limit in bytes before passing to Analysis", "1..4000", nullptr, false},
     {'Q', "qcapacity",  Opt::REQ, "4096",                "initial queue capacity of RPC messages",                                         "1..65535", nullptr, false},
