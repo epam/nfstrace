@@ -9,8 +9,6 @@
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/xdr/xdr_reader.h"
 //------------------------------------------------------------------------------
-using namespace NST::protocols::rpc;
-using namespace NST::protocols::xdr;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -19,8 +17,7 @@ namespace protocols
 namespace rpc
 {
 
-#include "api/rpc_types.h"
-
+using namespace NST::protocols::xdr;
 
 inline XDRReader& operator>>(XDRReader& in, OpaqueAuth& o)
 {

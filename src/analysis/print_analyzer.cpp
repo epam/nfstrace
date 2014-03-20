@@ -6,7 +6,10 @@
 #include <iostream>
 
 #include "analysis/print_analyzer.h"
+#include "protocols/nfs3/nfs_utils.h"
+#include "utils/session.h"
 //------------------------------------------------------------------------------
+using namespace NST::protocols::NFS3;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -53,9 +56,12 @@ std::ostream& operator += (std::ostream& out, const nfs_fh3& fh)
     return out;
 }
 
-inline std::ostream& operator << (std::ostream& out, const struct RPCProcedure* proc)
+std::ostream& print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 {
-    return out << *(proc->session) << ' ' << Proc::Titles[proc->call.proc] << " XID: " << proc->call.xid;
+    out //<< *(proc->session) << ' '
+        << ProcEnum::NFSProcedure(proc->call.proc)
+        << " XID: " << proc->call.xid;
+    return out;
 }
 
 void PrintAnalyzer::null(const struct RPCProcedure* proc,

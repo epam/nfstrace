@@ -7,19 +7,9 @@
 #ifndef PLUGIN_API_H
 #define PLUGIN_API_H
 //------------------------------------------------------------------------------
-#include <stdint.h>
-#include <stddef.h>
-#include <string.h>
-
-#include <sys/time.h>
-
-#include "api/xdr_types.h"
-#include "api/rpc_types.h"
-#include "api/rpc_procedure_type.h"
-#include "api/nfs3_types.h"
-#include "api/session_type.h"
 #include "api/ianalyzer_type.h"
 //------------------------------------------------------------------------------
+using namespace NST::API;
 //------------------------------------------------------------------------------
 extern "C"
 {

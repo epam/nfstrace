@@ -6,11 +6,11 @@
 #ifndef RPC_HEADER_H
 #define RPC_HEADER_H
 //------------------------------------------------------------------------------
-#include <stdint.h>
+#include <cstdint>
 
 #include <arpa/inet.h> // for ntohl()
 
-#include "protocols/xdr/xdr_structs.h"
+#include "api/rpc_types.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -20,10 +20,7 @@ namespace protocols
 namespace rpc
 {
 
-using namespace xdr;
-
-#include "api/rpc_types.h"
-
+using namespace NST::API;
 
 struct MessageHeader
 {

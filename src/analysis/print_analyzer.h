@@ -6,6 +6,8 @@
 #ifndef PRINT_ANALYZER_H
 #define PRINT_ANALYZER_H
 //------------------------------------------------------------------------------
+#include <ostream>
+
 #include "analysis/ianalyzer.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -91,7 +93,7 @@ public:
             const struct COMMIT3args* args,
             const struct COMMIT3res* res) override final;
 
-    virtual void flush_statistics();
+    virtual void flush_statistics() override final;
 
 private:
     PrintAnalyzer(const PrintAnalyzer&)            = delete;

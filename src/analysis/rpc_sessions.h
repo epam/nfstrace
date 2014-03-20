@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "protocols/rpc/rpc_header.h"
 #include "utils/filtered_data.h"
 #include "utils/log.h"
 #include "utils/out.h"
