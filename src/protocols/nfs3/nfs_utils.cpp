@@ -1,12 +1,13 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: All RFC1813 declared structures.
+// Description: Helpers for parsing NFS structures.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #include <cassert>
 
-#include "protocols/nfs3/nfs_structs.h"
+#include "protocols/nfs3/nfs_utils.h"
 //------------------------------------------------------------------------------
+using namespace NST::protocols::xdr;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -15,21 +16,25 @@ namespace protocols
 namespace NFS3
 {
 
-const char* Proc::Titles[Proc::num] =
+const std::string to_string(const Opaque& opaque)
 {
-  "NULL",       "GETATTR",      "SETATTR",  "LOOKUP",
-  "ACCESS",     "READLINK",     "READ",     "WRITE",
-  "CREATE",     "MKDIR",        "SYMLINK",  "MKNOD",
-  "REMOVE",     "RMDIR",        "RENAME",   "LINK",
-  "READDIR",    "READDIRPLUS",  "FSSTAT",   "FSINFO",
-  "PATHCONF",   "COMMIT"
-};
-
-std::ostream& operator<<(std::ostream& out, const Proc::Enum proc)
-{
-    return out << Proc::Titles[proc];
+    return std::string((char*)opaque.ptr, opaque.len);
 }
 
+std::ostream& operator <<(std::ostream& out, const Opaque& opaque)
+{
+    out << std::hex;
+    for(uint32_t i = 0; i < opaque.len; i++)
+    {
+        out << (uint32_t) opaque.ptr[i];
+    }
+    return out << std::dec;
+}
+
+std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc)
+{
+    return out << NFSProcedureTitles[proc];
+}
 
 std::ostream& operator<<(std::ostream& out, const mode3 m)
 {
@@ -230,6 +235,17 @@ std::ostream& operator<<(std::ostream& out, const diropargs3& obj)
 {
     out << " dir: "  << obj.dir;
     out << " name: " << to_string(obj.name);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const stable_how& obj)
+{
+    switch(obj.stable)
+    {
+        case stable_how::UNSTABLE:  out << "UNSTABLE";  break;
+        case stable_how::DATA_SYNC: out << "DATA_SYNC"; break;
+        case stable_how::FILE_SYNC: out << "FILE_SYNC"; break;
+    }
     return out;
 }
 
