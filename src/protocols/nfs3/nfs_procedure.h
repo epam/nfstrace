@@ -6,9 +6,11 @@
 #ifndef NFS_PROCEDURE_H
 #define NFS_PROCEDURE_H
 //------------------------------------------------------------------------------
-#include "protocols/nfs3/nfs_structs.h"
+#include "protocols/nfs3/nfs_utils.h"
 #include "protocols/rpc/rpc_procedure.h"
 #include "protocols/rpc/rpc_reader.h"
+#include "protocols/rpc/rpc_structs.h"
+#include "utils/session.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -17,6 +19,9 @@ namespace protocols
 {
 namespace NFS3
 {
+
+using namespace NST::protocols::rpc;
+using namespace NST::utils;
 
 template
 <

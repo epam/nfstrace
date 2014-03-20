@@ -22,7 +22,7 @@
 #include "filtration/packet.h"
 #include "filtration/sessions_hash.h"
 #include "protocols/rpc/rpc_header.h"
-#include "protocols/nfs3/nfs_structs.h"
+#include "protocols/nfs3/nfs_utils.h"
 //------------------------------------------------------------------------------
 using NST::utils::Session;
 
