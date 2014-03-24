@@ -10,7 +10,7 @@
 #include "protocols/rpc/rpc_procedure.h"
 #include "protocols/rpc/rpc_reader.h"
 #include "protocols/rpc/rpc_structs.h"
-#include "utils/session.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST

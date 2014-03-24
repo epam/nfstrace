@@ -16,7 +16,7 @@
 #include "protocols/ip/ipv4_header.h"
 #include "protocols/tcp/tcp_header.h"
 #include "protocols/udp/udp_header.h"
-#include "utils/session.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST

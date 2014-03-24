@@ -17,21 +17,20 @@
 
 #include "utils/log.h"
 #include "utils/out.h"
-#include "utils/session.h"
+#include "utils/sessions.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
 #include "filtration/sessions_hash.h"
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/nfs3/nfs_utils.h"
 //------------------------------------------------------------------------------
-using NST::utils::Session;
-
-using namespace NST::protocols::rpc;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
+
+using namespace NST::protocols::rpc;
 
 // Represents UDP datagrams interchange between node A and node B
 template <typename Writer>
