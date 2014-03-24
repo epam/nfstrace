@@ -289,12 +289,12 @@ inline XDRReader& operator>>(XDRReader& in, ACCESS3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.access;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.access;
     }
     else
     {
-        in >> o.u.resfail.obj_attributes;
+        in >> o.resfail.obj_attributes;
     }
     return in;
 }
@@ -311,12 +311,12 @@ inline XDRReader& operator>>(XDRReader& in, READLINK3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.symlink_attributes;
-        in.read_variable_len(o.u.resok.data);
+        in >> o.resok.symlink_attributes;
+        in.read_variable_len(o.resok.data);
     }
     else
     {
-        in >> o.u.resfail.symlink_attributes;
+        in >> o.resfail.symlink_attributes;
     }
     return in;
 }

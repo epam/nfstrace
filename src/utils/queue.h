@@ -49,7 +49,7 @@ public:
     class List  // List of elements for client code
     {
     public:
-        inline List(Queue& q) : queue{&q}
+        inline explicit List(Queue& q) : queue{&q}
         {
             ptr = queue->pop_list();
         }

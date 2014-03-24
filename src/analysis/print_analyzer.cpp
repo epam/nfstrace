@@ -15,15 +15,21 @@ namespace NST
 namespace analysis
 {
 
-using Out = NST::utils::Out;
 using namespace NST::protocols::NFS3;   // NFSv3 helpers
 using namespace NST::protocols::rpc;    // Sun/RPC helpers
 
 namespace
 {
 
+inline bool out_all()
+{
+    using Out = NST::utils::Out;
+
+    return Out::Global::get_level() == Out::Level::All;
+}
+
 // Special helper for print-out short representation of NFS FH
-std::ostream& operator += (std::ostream& out, const nfs_fh3& fh)
+std::ostream& print_nfs_fh3(std::ostream& out, const nfs_fh3& fh)
 {
     static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
@@ -31,7 +37,7 @@ std::ostream& operator += (std::ostream& out, const nfs_fh3& fh)
     const uint8_t* data = opaque.data();
     const uint32_t size = opaque.size();
 
-    if(size <= 8)
+    if(size <= 8 || out_all())
     {
         for(uint32_t j = 0; j < size; j++)
         {
@@ -66,7 +72,7 @@ bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 {
     bool result = false;
     NST::utils::operator<<(out, *(proc->session));
-    if(Out::Global::get_level() == Out::Level::All)
+    if(out_all())
     {
         auto& call = proc->call;
         out << " XID: "         << call.xid;
@@ -130,114 +136,185 @@ bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 
 } // unnamed namespace
 
+// Print NFSv3 procedures
+// 1st line - PRC information: src and dst hosts, status of RPC procedure
+// 2nd line - <tabulation>related RPC procedure-specific arguments
+// 3rd line - <tabulation>related RPC procedure-specific results
+
+
 void PrintAnalyzer::null(const struct RPCProcedure* proc,
                          const struct NULLargs*,
                          const struct NULLres*)
 {
-    print_procedure(out, proc);
-    out << " CALL [] REPLY []";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    out << "\tCALL  []\n\tREPLY []\n";
 }
 
 void PrintAnalyzer::getattr3(const RPCProcedure* proc,
                              const struct GETATTR3args* args,
                              const struct GETATTR3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " object: " += args->object;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " object: "; print_nfs_fh3(out, args->object);
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(res->status == nfsstat3::OK && out_all())
+        {
+            out << " obj_attributes: " << res->resok.obj_attributes;
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::setattr3(const RPCProcedure* proc,
                              const struct SETATTR3args* args,
                              const struct SETATTR3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " object: "         += args->object;
-    out << " new_attributes: " << args->new_attributes;
-    out << " guard: "          << args->guard;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " object: "; print_nfs_fh3(out, args->object);
+        out << " new_attributes: " << args->new_attributes;
+        out << " guard: "          << args->guard;
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " obj_wcc: " << res->resok.obj_wcc;
+            }
+            else
+            {
+                out << " obj_wcc: " << res->resfail.obj_wcc;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::lookup3(const RPCProcedure* proc,
                             const struct LOOKUP3args* args,
                             const struct LOOKUP3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " what: " << args->what;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    if(res->status == nfsstat3::OK)
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
     {
-        out << " object: "          += res->resok.object;
-        out << " obj_attributes: "  << res->resok.obj_attributes;
-        out << " dir_attributes: "  << res->resok.dir_attributes;
+        out << "\tCALL  [";
+        out << " what: " << args->what;
+        out << " ]\n";
     }
-    else
+    if(res)
     {
-        out << " dir_attributes: "  << res->resfail.dir_attributes;
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " object: "; print_nfs_fh3(out, res->resok.object);
+                out << " obj_attributes: "  << res->resok.obj_attributes;
+                out << " dir_attributes: "  << res->resok.dir_attributes;
+            }
+            else
+            {
+                out << " dir_attributes: "  << res->resfail.dir_attributes;
+            }
+        }
+        out << " ]\n";
     }
-    out << " ]";
-    out << std::endl;
 }
 
 void PrintAnalyzer::access3(const struct RPCProcedure* proc,
                             const struct ACCESS3args* args,
                             const struct ACCESS3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " object: " += args->object;
-    out << " access: ";
-    if(args->access & ACCESS3args::ACCESS3_READ)   out << "READ ";
-    if(args->access & ACCESS3args::ACCESS3_LOOKUP) out << "LOOKUP ";
-    if(args->access & ACCESS3args::ACCESS3_MODIFY) out << "MODIFY ";
-    if(args->access & ACCESS3args::ACCESS3_EXTEND) out << "EXTEND ";
-    if(args->access & ACCESS3args::ACCESS3_DELETE) out << "DELETE ";
-    if(args->access & ACCESS3args::ACCESS3_EXECUTE)out << "EXECUTE ";
+    if(!print_procedure(out, proc)) return;
 
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    if(res->status == nfsstat3::OK)
+    if(args)
     {
-        out << " obj_attributes: " << res->u.resok.obj_attributes;
+        out << "\tCALL  [";
+        out << " object: "; print_nfs_fh3(out, args->object);
         out << " access: ";
-        uint32_t access = res->u.resok.access;
-        if(access & ACCESS3args::ACCESS3_READ)   out << "READ ";
-        if(access & ACCESS3args::ACCESS3_LOOKUP) out << "LOOKUP ";
-        if(access & ACCESS3args::ACCESS3_MODIFY) out << "MODIFY ";
-        if(access & ACCESS3args::ACCESS3_EXTEND) out << "EXTEND ";
-        if(access & ACCESS3args::ACCESS3_DELETE) out << "DELETE ";
-        if(access & ACCESS3args::ACCESS3_EXECUTE)out << "EXECUTE ";
+        if(args->access & ACCESS3args::ACCESS3_READ)   out << "READ ";
+        if(args->access & ACCESS3args::ACCESS3_LOOKUP) out << "LOOKUP ";
+        if(args->access & ACCESS3args::ACCESS3_MODIFY) out << "MODIFY ";
+        if(args->access & ACCESS3args::ACCESS3_EXTEND) out << "EXTEND ";
+        if(args->access & ACCESS3args::ACCESS3_DELETE) out << "DELETE ";
+        if(args->access & ACCESS3args::ACCESS3_EXECUTE)out << "EXECUTE ";
+        out << "]\n";
     }
-    else
+    if(res)
     {
-        out << " obj_attributes: " << res->u.resfail.obj_attributes;
+        out << "\tREPLY ["
+            << " status: " << res->status;
+            if(res->status == nfsstat3::OK)
+            {
+                out << " obj_attributes: " << res->resok.obj_attributes;
+                out << " access: ";
+                uint32_t access = res->resok.access;
+                if(access & ACCESS3args::ACCESS3_READ)   out << "READ ";
+                if(access & ACCESS3args::ACCESS3_LOOKUP) out << "LOOKUP ";
+                if(access & ACCESS3args::ACCESS3_MODIFY) out << "MODIFY ";
+                if(access & ACCESS3args::ACCESS3_EXTEND) out << "EXTEND ";
+                if(access & ACCESS3args::ACCESS3_DELETE) out << "DELETE ";
+                if(access & ACCESS3args::ACCESS3_EXECUTE)out << "EXECUTE ";
+            }
+            else
+            {
+                out << " obj_attributes: " << res->resfail.obj_attributes;
+                out << ' ';
+            }
+        out << "]\n";
     }
-    out << " ]";
-    out << std::endl;
 }
 
 void PrintAnalyzer::readlink3(const struct RPCProcedure* proc,
                               const struct READLINK3args* args,
                               const struct READLINK3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " symlink: " += args->symlink;
-    out << "] REPLY [";
-    out << " status: "  << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " symlink: "; print_nfs_fh3(out, args->symlink);
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " symlink_attributes: " << res->resok.symlink_attributes;
+                out << " data: "  << to_string(res->resok.data);
+            }
+            else
+            {
+                out << " symlink_attributes: " << res->resfail.symlink_attributes;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::read3(const struct RPCProcedure* proc,
@@ -246,7 +323,7 @@ void PrintAnalyzer::read3(const struct RPCProcedure* proc,
 {
     print_procedure(out, proc);
     out << " CALL [";
-    out << " file: "   += args->file;
+    out << " file: "; print_nfs_fh3(out, args->file);
     out << " offset: " << args->offset;
     out << " count: "  << args->count;
     out << "] REPLY [";
@@ -261,7 +338,7 @@ void PrintAnalyzer::write3(const struct RPCProcedure* proc,
 {
     print_procedure(out, proc);
     out << " CALL [";
-    out << " file: "   += args->file;
+    out << " file: "; print_nfs_fh3(out, args->file);
     out << " offset: " << args->offset;
     out << " count: "  << args->count;
     out << " stable: " << args->stable;
@@ -379,7 +456,7 @@ void PrintAnalyzer::link3(const struct RPCProcedure* proc,
 {
     print_procedure(out, proc);
     out << " CALL [";
-    out << " file: " += args->file;
+    out << " file: "; print_nfs_fh3(out, args->file);;
     out << " link: " << args->link;
     out << "] REPLY [";
     out << " status: " << res->status;
@@ -393,7 +470,7 @@ void PrintAnalyzer::readdir3(const struct RPCProcedure* proc,
 {
     print_procedure(out, proc);
     out << " CALL [";
-    out << " dir: "         += args->dir;
+    out << " dir: "; print_nfs_fh3(out, args->dir);
     out << " cookie: "      << args->cookie;
     out << " cookieverf: "  << args->cookieverf;
     out << " count: "       << args->count;
@@ -409,7 +486,7 @@ void PrintAnalyzer::readdirplus3(const struct RPCProcedure* proc,
 {
     print_procedure(out, proc);
     out << " CALL [";
-    out << " dir: "         += args->dir;
+    out << " dir: "; print_nfs_fh3(out, args->dir);
     out << " cookie: "      << args->cookie;
     out << " cookieverf: "  << args->cookieverf;
     out << " dircount: "    << args->dircount;
@@ -431,7 +508,7 @@ void PrintAnalyzer::fsstat3(const struct RPCProcedure* proc,
 {
     print_procedure(out, proc);
     out << " CALL [";
-    out << " fsroot: " += args->fsroot;
+    out << " fsroot: "; print_nfs_fh3(out, args->fsroot);
     out << "] REPLY [";
     out << " status: " << res->status;
     out << " ]";
@@ -444,7 +521,7 @@ void PrintAnalyzer::fsinfo3(const struct RPCProcedure* proc,
 {
     print_procedure(out, proc);
     out << " CALL [";
-    out << " fsroot: " += args->fsroot;
+    out << " fsroot: "; print_nfs_fh3(out, args->fsroot);
     out << "] REPLY [";
     out << " status: " << res->status;
     out << " ]";
@@ -457,7 +534,7 @@ void PrintAnalyzer::pathconf3(const struct RPCProcedure* proc,
 {
     print_procedure(out, proc);
     out << " CALL [";
-    out << " object: " += args->object;
+    out << " object: "; print_nfs_fh3(out, args->object);
     out << "] REPLY [";
     out << " status: " << res->status;
     out << " ]";
@@ -470,7 +547,7 @@ void PrintAnalyzer::commit3(const struct RPCProcedure* proc,
 {
     print_procedure(out, proc);
     out << " CALL [";
-    out << " file: "    += args->file;
+    out << " file: "; print_nfs_fh3(out, args->file);
     out << " offset: "  << args->offset;
     out << " count: "   << args->count;
     out << "] REPLY [";
