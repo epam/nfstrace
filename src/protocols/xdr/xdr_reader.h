@@ -140,6 +140,8 @@ inline std::ostream& operator <<(std::ostream& out, const Opaque& opaque)
     out << std::hex;
     for(uint32_t i = 0; i < opaque.len; i++)
     {
+        out.fill('0');
+        out.width(2);
         out << (uint32_t) opaque.ptr[i];
     }
     return out << std::dec;

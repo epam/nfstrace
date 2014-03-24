@@ -421,11 +421,11 @@ struct READ3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         READ3resok   resok;
         READ3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 7: WRITE - Write to file
@@ -469,11 +469,11 @@ struct WRITE3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         WRITE3resok   resok;
         WRITE3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 8: CREATE - Create a file
@@ -516,11 +516,11 @@ struct CREATE3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         CREATE3resok   resok;
         CREATE3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 9: MKDIR - Create a directory
@@ -546,11 +546,11 @@ struct MKDIR3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         MKDIR3resok   resok;
         MKDIR3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 10: SYMLINK - Create a symbolic link
@@ -582,11 +582,11 @@ struct SYMLINK3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         SYMLINK3resok   resok;
         SYMLINK3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 11: MKNOD - Create a special device
@@ -628,11 +628,11 @@ struct MKNOD3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         MKNOD3resok   resok;
         MKNOD3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 12: REMOVE - Remove a File
@@ -655,11 +655,11 @@ struct REMOVE3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         REMOVE3resok   resok;
         REMOVE3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 13: RMDIR - Remove a Directory
@@ -682,11 +682,11 @@ struct RMDIR3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         RMDIR3resok   resok;
         RMDIR3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 14: RENAME - Rename a File or Directory
@@ -712,11 +712,11 @@ struct RENAME3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         RENAME3resok   resok;
         RENAME3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 15: LINK - Create Link to an object
@@ -742,11 +742,11 @@ struct LINK3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         LINK3resok   resok;
         LINK3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 16: READDIR - Read From Directory
@@ -791,11 +791,11 @@ struct READDIR3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         READDIR3resok   resok;
         READDIR3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 17: READDIRPLUS - Extended read from directory
@@ -843,11 +843,11 @@ struct READDIRPLUS3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         READDIRPLUS3resok   resok;
         READDIRPLUS3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 18: FSSTAT - Get dynamic file system information
@@ -877,11 +877,11 @@ struct FSSTAT3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         FSSTAT3resok   resok;
         FSSTAT3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 19: FSINFO - Get static file system Information
@@ -922,11 +922,11 @@ struct FSINFO3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         FSINFO3resok   resok;
         FSINFO3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 20: PATHCONF - Retrieve POSIX information
@@ -944,7 +944,7 @@ struct PATHCONF3res
         uint32_t linkmax;
         uint32_t name_max;
         uint32_t no_trunc;
-        uint32_t shown_restricted;
+        uint32_t chown_restricted;
         uint32_t case_insensitive;
         uint32_t case_preserving;
     };
@@ -955,11 +955,11 @@ struct PATHCONF3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         PATHCONF3resok   resok;
         PATHCONF3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 21: COMMIT - Commit cached data on a server to stable storage
@@ -985,11 +985,11 @@ struct COMMIT3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         COMMIT3resok   resok;
         COMMIT3resfail resfail;
-    } u;
+    };
 };
 
 } // namespace API
