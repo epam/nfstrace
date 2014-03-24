@@ -10,6 +10,7 @@
 #include "utils/log.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::NFS3;
+using namespace NST::protocols::rpc;
 //------------------------------------------------------------------------------
 namespace NST
 {
