@@ -9,7 +9,7 @@
 #include "api/rpc_procedure_type.h"
 #include "protocols/nfs3/nfs_utils.h"
 #include "protocols/rpc/rpc_reader.h"
-#include "protocols/rpc/rpc_structs.h"
+#include "protocols/rpc/rpc_utils.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
