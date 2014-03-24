@@ -333,13 +333,13 @@ inline XDRReader& operator>>(XDRReader& in, READ3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.file_attributes;
-        in >> o.u.resok.count;
-        in >> o.u.resok.eof;
+        in >> o.resok.file_attributes;
+        in >> o.resok.count;
+        in >> o.resok.eof;
     }
     else
     {
-        in >> o.u.resfail.file_attributes;
+        in >> o.resfail.file_attributes;
     }
     return in;
 }
@@ -361,14 +361,14 @@ inline XDRReader& operator>>(XDRReader& in, WRITE3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.file_wcc;
-        in >> o.u.resok.count;
-        in >> o.u.resok.committed;
-        in.read_fixed_len(o.u.resok.verf, NFS3_WRITEVERFSIZE);
+        in >> o.resok.file_wcc;
+        in >> o.resok.count;
+        in >> o.resok.committed;
+        in.read_fixed_len(o.resok.verf, NFS3_WRITEVERFSIZE);
     }
     else
     {
-        in >> o.u.resfail.file_wcc;
+        in >> o.resfail.file_wcc;
     }
     return in;
 }
@@ -399,13 +399,13 @@ inline XDRReader& operator>>(XDRReader& in, CREATE3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj;
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.obj;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -422,13 +422,13 @@ inline XDRReader& operator>>(XDRReader& in, MKDIR3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj;
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.obj;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -452,13 +452,13 @@ inline XDRReader& operator>>(XDRReader& in, SYMLINK3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj;
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.obj;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -503,13 +503,13 @@ inline XDRReader& operator>>(XDRReader& in, MKNOD3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj;
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.obj;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -526,11 +526,11 @@ inline XDRReader& operator>>(XDRReader& in, REMOVE3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -547,11 +547,11 @@ inline XDRReader& operator>>(XDRReader& in, RMDIR3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -568,13 +568,13 @@ inline XDRReader& operator>>(XDRReader& in, RENAME3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.fromdir_wcc;
-        in >> o.u.resok.todir_wcc;
+        in >> o.resok.fromdir_wcc;
+        in >> o.resok.todir_wcc;
     }
     else
     {
-        in >> o.u.resfail.fromdir_wcc;
-        in >> o.u.resfail.todir_wcc;
+        in >> o.resfail.fromdir_wcc;
+        in >> o.resfail.todir_wcc;
     }
     return in;
 }
@@ -591,13 +591,13 @@ inline XDRReader& operator>>(XDRReader& in, LINK3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.file_attributes;
-        in >> o.u.resok.linkdir_wcc;
+        in >> o.resok.file_attributes;
+        in >> o.resok.linkdir_wcc;
     }
     else
     {
-        in >> o.u.resfail.file_attributes;
-        in >> o.u.resfail.linkdir_wcc;
+        in >> o.resfail.file_attributes;
+        in >> o.resfail.linkdir_wcc;
     }
     return in;
 }
@@ -617,15 +617,15 @@ inline XDRReader& operator>>(XDRReader& in, READDIR3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.dir_attributes;
-        in.read_fixed_len(o.u.resok.cookieverf, NFS3_COOKIEVERFSIZE);
+        in >> o.resok.dir_attributes;
+        in.read_fixed_len(o.resok.cookieverf, NFS3_COOKIEVERFSIZE);
         // TODO: Parse entries
-        o.u.resok.reply.entries = NULL;
-        o.u.resok.reply.eof = true;
+        o.resok.reply.entries = NULL;
+        o.resok.reply.eof = true;
     }
     else
     {
-        in >> o.u.resfail.dir_attributes;
+        in >> o.resfail.dir_attributes;
     }
     return in;
 }
@@ -644,15 +644,15 @@ inline XDRReader& operator>>(XDRReader& in, READDIRPLUS3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.dir_attributes;
-        in.read_fixed_len(o.u.resok.cookieverf, NFS3_COOKIEVERFSIZE);
+        in >> o.resok.dir_attributes;
+        in.read_fixed_len(o.resok.cookieverf, NFS3_COOKIEVERFSIZE);
         // TODO: Parse entries
-        o.u.resok.reply.entries = NULL;
-        o.u.resok.reply.eof = true;
+        o.resok.reply.entries = NULL;
+        o.resok.reply.eof = true;
     }
     else
     {
-        in >> o.u.resfail.dir_attributes;
+        in >> o.resfail.dir_attributes;
     }
     return in;
 }
@@ -669,18 +669,18 @@ inline XDRReader& operator>>(XDRReader& in, FSSTAT3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.tbytes;
-        in >> o.u.resok.fbytes;
-        in >> o.u.resok.abytes;
-        in >> o.u.resok.tfiles;
-        in >> o.u.resok.ffiles;
-        in >> o.u.resok.afiles;
-        in >> o.u.resok.invarsec;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.tbytes;
+        in >> o.resok.fbytes;
+        in >> o.resok.abytes;
+        in >> o.resok.tfiles;
+        in >> o.resok.ffiles;
+        in >> o.resok.afiles;
+        in >> o.resok.invarsec;
     }
     else
     {
-        in >> o.u.resfail.obj_attributes;
+        in >> o.resfail.obj_attributes;
     }
     return in;
 }
@@ -698,21 +698,21 @@ inline XDRReader& operator>>(XDRReader& in, FSINFO3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.rtmax;
-        in >> o.u.resok.rtpref;
-        in >> o.u.resok.rtmult;
-        in >> o.u.resok.wtmax;
-        in >> o.u.resok.wtpref;
-        in >> o.u.resok.wtmult;
-        in >> o.u.resok.dtpref;
-        in >> o.u.resok.maxfilesize;
-        in >> o.u.resok.time_delta;
-        in >> o.u.resok.properties;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.rtmax;
+        in >> o.resok.rtpref;
+        in >> o.resok.rtmult;
+        in >> o.resok.wtmax;
+        in >> o.resok.wtpref;
+        in >> o.resok.wtmult;
+        in >> o.resok.dtpref;
+        in >> o.resok.maxfilesize;
+        in >> o.resok.time_delta;
+        in >> o.resok.properties;
     }
     else
     {
-        in >> o.u.resfail.obj_attributes;
+        in >> o.resfail.obj_attributes;
     }
     return in;
 }
@@ -729,17 +729,17 @@ inline XDRReader& operator>>(XDRReader& in, PATHCONF3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.linkmax;
-        in >> o.u.resok.name_max;
-        in >> o.u.resok.no_trunc;
-        in >> o.u.resok.shown_restricted;
-        in >> o.u.resok.case_insensitive;
-        in >> o.u.resok.case_preserving;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.linkmax;
+        in >> o.resok.name_max;
+        in >> o.resok.no_trunc;
+        in >> o.resok.chown_restricted;
+        in >> o.resok.case_insensitive;
+        in >> o.resok.case_preserving;
     }
     else
     {
-        in >> o.u.resfail.obj_attributes;
+        in >> o.resfail.obj_attributes;
     }
     return in;
 }
@@ -756,12 +756,12 @@ inline XDRReader& operator>>(XDRReader& in, COMMIT3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.file_wcc;
-        in.read_fixed_len(o.u.resok.verf, NFS3_WRITEVERFSIZE);
+        in >> o.resok.file_wcc;
+        in.read_fixed_len(o.resok.verf, NFS3_WRITEVERFSIZE);
     }
     else
     {
-        in >> o.u.resfail.file_wcc;
+        in >> o.resfail.file_wcc;
     }
     return in;
 }

@@ -262,8 +262,10 @@ void PrintAnalyzer::access3(const struct RPCProcedure* proc,
     }
     if(res)
     {
-        out << "\tREPLY ["
-            << " status: " << res->status;
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
             if(res->status == nfsstat3::OK)
             {
                 out << " obj_attributes: " << res->resok.obj_attributes;
@@ -281,6 +283,7 @@ void PrintAnalyzer::access3(const struct RPCProcedure* proc,
                 out << " obj_attributes: " << res->resfail.obj_attributes;
                 out << ' ';
             }
+        }
         out << "]\n";
     }
 }
@@ -321,239 +324,570 @@ void PrintAnalyzer::read3(const struct RPCProcedure* proc,
                           const struct READ3args* args,
                           const struct READ3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " file: "; print_nfs_fh3(out, args->file);
-    out << " offset: " << args->offset;
-    out << " count: "  << args->count;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " file: "; print_nfs_fh3(out, args->file);
+        out << " offset: " << args->offset;
+        out << " count: "  << args->count;
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " file_attributes: " << res->resok.file_attributes;
+                out << " count: "           << res->resok.count;
+                out << " eof: "             << bool(res->resok.eof);
+                out << " data: skipped on filtration";
+            }
+            else
+            {
+                out << " file_attributes: " << res->resfail.file_attributes;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::write3(const struct RPCProcedure* proc,
                            const struct WRITE3args* args,
                            const struct WRITE3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " file: "; print_nfs_fh3(out, args->file);
-    out << " offset: " << args->offset;
-    out << " count: "  << args->count;
-    out << " stable: " << args->stable;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " file: "; print_nfs_fh3(out, args->file);
+        out << " offset: " << args->offset;
+        out << " count: "  << args->count;
+        out << " stable: " << args->stable;
+        if(out_all())
+        {
+            out << " data: skipped on filtration";
+        }
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " file_wcc: "  << res->resok.file_wcc;
+                out << " count: "     << res->resok.count;
+                out << " committed: " << res->resok.committed;
+                out << " verf: "      << res->resok.verf;
+            }
+            else
+            {
+                out << " file_wcc: " << res->resfail.file_wcc;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::create3(const struct RPCProcedure* proc,
                             const struct CREATE3args* args,
                             const struct CREATE3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " where: " << args->where;
-    out << " how: "   << args->how;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    if(res->status == nfsstat3::OK)
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
     {
-        out << " obj: "            << res->u.resok.obj;
-        out << " obj_attributes: " << res->u.resok.obj_attributes;
-        out << " dir_wcc: "        << res->u.resok.dir_wcc;
+        out << "\tCALL  [";
+        out << " where: " << args->where;
+        out << " how: "   << args->how;
+        out << " ]\n";
     }
-    out << " ]";
-    out << std::endl;
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " obj: "            << res->resok.obj;
+                out << " obj_attributes: " << res->resok.obj_attributes;
+                out << " dir_wcc: "        << res->resok.dir_wcc;
+            }
+            else
+            {
+                out << " dir_wcc: " << res->resfail.dir_wcc;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::mkdir3(const struct RPCProcedure* proc,
                            const struct MKDIR3args* args,
                            const struct MKDIR3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " where: "      << args->where;
-    out << " attributes: " << args->attributes;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " where: "      << args->where;
+        out << " attributes: " << args->attributes;
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " obj: "            << res->resok.obj;
+                out << " obj_attributes: " << res->resok.obj_attributes;
+                out << " dir_wcc: "        << res->resok.dir_wcc;
+            }
+            else
+            {
+                out << " dir_wcc: " << res->resfail.dir_wcc;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::symlink3(const struct RPCProcedure* proc,
                              const struct SYMLINK3args* args,
                              const struct SYMLINK3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " where: "       << args->where;
-    out << " symlinkdata: " << args->symlink;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " where: "       << args->where;
+        out << " symlinkdata: " << args->symlink;
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " obj: "            << res->resok.obj;
+                out << " obj_attributes: " << res->resok.obj_attributes;
+                out << " dir_wcc: "        << res->resok.dir_wcc;
+            }
+            else
+            {
+                out << " dir_wcc: " << res->resfail.dir_wcc;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::mknod3(const struct RPCProcedure* proc,
                            const struct MKNOD3args* args,
                            const struct MKNOD3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " where: " << args->where;
-    out << " what: "  << args->what;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " where: " << args->where;
+        out << " what: "  << args->what;
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " obj: "            << res->resok.obj;
+                out << " obj_attributes: " << res->resok.obj_attributes;
+                out << " dir_wcc: "        << res->resok.dir_wcc;
+            }
+            else
+            {
+                out << " dir_wcc: " << res->resfail.dir_wcc;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::remove3(const struct RPCProcedure* proc,
                             const struct REMOVE3args* args,
                             const struct REMOVE3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " object: " << args->object;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " object: " << args->object;
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " dir_wcc: " << res->resok.dir_wcc;
+            }
+            else
+            {
+                out << " dir_wcc: " << res->resfail.dir_wcc;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::rmdir3(const struct RPCProcedure* proc,
                            const struct RMDIR3args* args,
                            const struct RMDIR3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " object: " << args->object;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " object: " << args->object;
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " dir_wcc: " << res->resok.dir_wcc;
+            }
+            else
+            {
+                out << " dir_wcc: " << res->resfail.dir_wcc;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::rename3(const struct RPCProcedure* proc,
                             const struct RENAME3args* args,
                             const struct RENAME3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " from: " << args->from;
-    out << " to: "   << args->to;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " from: " << args->from;
+        out << " to: "   << args->to;
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " fromdir_wcc: " << res->resok.fromdir_wcc;
+                out << " todir_wcc: "   << res->resok.todir_wcc;
+            }
+            else
+            {
+                out << " fromdir_wcc: " << res->resfail.fromdir_wcc;
+                out << " todir_wcc: "   << res->resfail.todir_wcc;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::link3(const struct RPCProcedure* proc,
                           const struct LINK3args* args,
                           const struct LINK3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " file: "; print_nfs_fh3(out, args->file);;
-    out << " link: " << args->link;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " file: "; print_nfs_fh3(out, args->file);;
+        out << " link: " << args->link;
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " file_attributes: " << res->resok.file_attributes;
+                out << " linkdir_wcc: "     << res->resok.linkdir_wcc;
+            }
+            else
+            {
+                out << " file_attributes: " << res->resfail.file_attributes;
+                out << " linkdir_wcc: "     << res->resfail.linkdir_wcc;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::readdir3(const struct RPCProcedure* proc,
                              const struct READDIR3args* args,
                              const struct READDIR3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " dir: "; print_nfs_fh3(out, args->dir);
-    out << " cookie: "      << args->cookie;
-    out << " cookieverf: "  << args->cookieverf;
-    out << " count: "       << args->count;
-    out << "] REPLY [";
-    out << " status: "      << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " dir: "; print_nfs_fh3(out, args->dir);
+        out << " cookie: "      << args->cookie;
+        out << " cookieverf: "  << args->cookieverf;
+        out << " count: "       << args->count;
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " dir_attributes: " << res->resok.dir_attributes;
+                out << " cookieverf: "     << res->resok.cookieverf;
+                out << " reply: Not implemented";//     << res->resok.reply;
+            }
+            else
+            {
+                out << " dir_attributes: " << res->resfail.dir_attributes;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::readdirplus3(const struct RPCProcedure* proc,
                                  const struct READDIRPLUS3args* args,
                                  const struct READDIRPLUS3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " dir: "; print_nfs_fh3(out, args->dir);
-    out << " cookie: "      << args->cookie;
-    out << " cookieverf: "  << args->cookieverf;
-    out << " dircount: "    << args->dircount;
-    out << " maxcount: "    << args->maxcount;
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    if(res->status == nfsstat3::OK)
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
     {
-        out << " dir_attributes: " << res->u.resok.dir_attributes;
-        out << " cookieverf: "     << res->u.resok.cookieverf;
+        out << "\tCALL  [";
+        out << " dir: "; print_nfs_fh3(out, args->dir);
+        out << " cookie: "      << args->cookie;
+        out << " cookieverf: "  << args->cookieverf;
+        out << " dircount: "    << args->dircount;
+        out << " maxcount: "    << args->maxcount;
+        out << " ]\n";
     }
-    out << " ]";
-    out << std::endl;
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " dir_attributes: " << res->resok.dir_attributes;
+                out << " cookieverf: "     << res->resok.cookieverf;
+                out << " reply: Not implemented";//     << res->resok.reply;
+            }
+            else
+            {
+                out << " dir_attributes: " << res->resfail.dir_attributes;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::fsstat3(const struct RPCProcedure* proc,
                             const struct FSSTAT3args* args,
                             const struct FSSTAT3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " fsroot: "; print_nfs_fh3(out, args->fsroot);
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " fsroot: "; print_nfs_fh3(out, args->fsroot);
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " obj_attributes: " << res->resok.obj_attributes;
+                out << " tbytes: "     << res->resok.tbytes;
+                out << " fbytes: "     << res->resok.fbytes;
+                out << " abytes: "     << res->resok.abytes;
+                out << " tfiles: "     << res->resok.tfiles;
+                out << " ffiles: "     << res->resok.ffiles;
+                out << " afiles: "     << res->resok.afiles;
+                out << " invarsec: "   << res->resok.invarsec;
+            }
+            else
+            {
+                out << " obj_attributes: " << res->resfail.obj_attributes;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::fsinfo3(const struct RPCProcedure* proc,
                             const struct FSINFO3args* args,
                             const struct FSINFO3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " fsroot: "; print_nfs_fh3(out, args->fsroot);
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " fsroot: "; print_nfs_fh3(out, args->fsroot);
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " obj_attributes: " << res->resok.obj_attributes;
+                out << " rtmax: "       << res->resok.rtmax;
+                out << " rtpref: "      << res->resok.rtpref;
+                out << " rtmult: "      << res->resok.rtmult;
+                out << " wtmax: "       << res->resok.wtmax;
+                out << " wtpref: "      << res->resok.wtpref;
+                out << " wtmult: "      << res->resok.wtmult;
+                out << " dtpref: "      << res->resok.dtpref;
+                out << " maxfilesize: " << res->resok.maxfilesize;
+                out << " time_delta: "  << res->resok.time_delta;
+                out << " properties: ";
+                out << " LINK:"        << bool(res->resok.properties & FSINFO3res::FSINFO3resok::FSF3_LINK);
+                out << " SYMLINK:"     << bool(res->resok.properties & FSINFO3res::FSINFO3resok::FSF3_SYMLINK);
+                out << " HOMOGENEOUS:" << bool(res->resok.properties & FSINFO3res::FSINFO3resok::FSF3_HOMOGENEOUS);
+                out << " CANSETTIME:"  << bool(res->resok.properties & FSINFO3res::FSINFO3resok::FSF3_CANSETTIME);
+            }
+            else
+            {
+                out << " obj_attributes: " << res->resfail.obj_attributes;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::pathconf3(const struct RPCProcedure* proc,
                               const struct PATHCONF3args* args,
                               const struct PATHCONF3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " object: "; print_nfs_fh3(out, args->object);
-    out << "] REPLY [";
-    out << " status: " << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " object: "; print_nfs_fh3(out, args->object);
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " obj_attributes: "   << res->resok.obj_attributes;
+                out << " linkmax: "          << res->resok.linkmax;
+                out << " name_max: "         << res->resok.name_max;
+                out << " no_trunc: "         << bool(res->resok.no_trunc);
+                out << " chown_restricted: " << bool(res->resok.chown_restricted);
+                out << " case_insensitive: " << bool(res->resok.case_insensitive);
+                out << " case_preserving: "  << bool(res->resok.case_preserving);
+            }
+            else
+            {
+                out << " obj_attributes: " << res->resfail.obj_attributes;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::commit3(const struct RPCProcedure* proc,
                             const struct COMMIT3args* args,
                             const struct COMMIT3res* res)
 {
-    print_procedure(out, proc);
-    out << " CALL [";
-    out << " file: "; print_nfs_fh3(out, args->file);
-    out << " offset: "  << args->offset;
-    out << " count: "   << args->count;
-    out << "] REPLY [";
-    out << " status: "  << res->status;
-    out << " ]";
-    out << std::endl;
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " file: "; print_nfs_fh3(out, args->file);
+        out << " offset: "  << args->offset;
+        out << " count: "   << args->count;
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " status: " << res->status;
+        if(out_all())
+        {
+            if(res->status == nfsstat3::OK)
+            {
+                out << " file_wcc: " << res->resok.file_wcc;
+                out << " verf: "     << res->resok.verf;
+            }
+            else
+            {
+                out << " file_wcc: " << res->resfail.file_wcc;
+            }
+        }
+        out << " ]\n";
+    }
 }
 
 void PrintAnalyzer::flush_statistics()

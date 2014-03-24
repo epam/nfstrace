@@ -29,12 +29,12 @@ void OFDWSAnalyzer::read3(const struct RPCProcedure*,
                           const struct READ3args* args,
                           const struct READ3res*  res)
 {
-    if(res->status == nfsstat3::OK)
+    if(res && res->status == nfsstat3::OK)
     {
-        read_total += res->u.resok.count;
+        read_total += res->resok.count;
 
         Iterator i = get_file_rw_op(args->file);
-        i->second->calculate(ProcEnum::READ, args->offset, res->u.resok.count);
+        i->second->calculate(ProcEnum::READ, args->offset, res->resok.count);
     }
 }
 
@@ -42,12 +42,12 @@ void OFDWSAnalyzer::write3(const struct RPCProcedure*,
                            const struct WRITE3args* args,
                            const struct WRITE3res*  res)
 {
-    if(res->status == nfsstat3::OK)
+    if(res && res->status == nfsstat3::OK)
     {
-        write_total += res->u.resok.count;
+        write_total += res->resok.count;
 
         Iterator i = get_file_rw_op(args->file);
-        i->second->calculate(ProcEnum::WRITE, args->offset, res->u.resok.count);
+        i->second->calculate(ProcEnum::WRITE, args->offset, res->resok.count);
     }
 }
 
