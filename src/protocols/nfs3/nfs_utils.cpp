@@ -33,7 +33,6 @@ std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc)
 
 std::ostream& operator<<(std::ostream& out, const mode3 m)
 {
-    out << " mode: ";
     if(m & mode3::USER_ID_EXEC)      out << "USER_ID_EXEC ";
     if(m & mode3::GROUP_ID_EXEC)     out << "GROUP_ID_EXEC ";
     if(m & mode3::SAVE_SWAPPED_TEXT) out << "SAVE_SWAPPED_TEXT ";
@@ -298,7 +297,6 @@ std::ostream& operator<<(std::ostream& out, const devicedata3& obj)
 std::ostream& operator<<(std::ostream& out, const mknoddata3& obj)
 {
     out << " type: " << obj.type;
-    
     switch(obj.type)
     {
         case ftype3::CHR:
