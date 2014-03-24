@@ -3,8 +3,8 @@
 // Description: Struct represented network session.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef SESSION_TYPE_H
-#define SESSION_TYPE_H
+#ifndef SESSION_H
+#define SESSION_H
 //------------------------------------------------------------------------------
 #include <cstdint>
 //------------------------------------------------------------------------------
@@ -53,5 +53,5 @@ struct Session
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//SESSION_TYPE_H
+#endif//SESSION_H
 //------------------------------------------------------------------------------

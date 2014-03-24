@@ -10,7 +10,7 @@
 
 #include "utils/filtered_data.h"
 #include "utils/log.h"
-#include "utils/session.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST

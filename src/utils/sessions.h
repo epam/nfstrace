@@ -3,14 +3,14 @@
 // Description: Structs for sessions.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef SESSION_H
-#define SESSION_H
+#ifndef SESSIONS_H
+#define SESSIONS_H
 //------------------------------------------------------------------------------
 #include <cstddef>
 #include <cstdint>
 #include <ostream>
 
-#include "api/session_type.h"
+#include "api/session.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -51,5 +51,5 @@ std::ostream& operator<<(std::ostream& out, const Session& session);
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//SESSION_H
+#endif//SESSIONS_H
 //------------------------------------------------------------------------------
