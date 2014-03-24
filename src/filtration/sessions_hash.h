@@ -16,7 +16,7 @@
 #include "controller/parameters.h"
 #include "filtration/packet.h"
 #include "utils/out.h"
-#include "utils/session.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST

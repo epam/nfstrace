@@ -16,7 +16,7 @@
 #include "utils/filtered_data.h"
 #include "utils/log.h"
 #include "utils/out.h"
-#include "utils/session.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 using NST::utils::FilteredDataQueue;
 //------------------------------------------------------------------------------

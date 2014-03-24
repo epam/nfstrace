@@ -7,7 +7,7 @@
 #include "protocols/nfs3/nfs_utils.h"
 #include "protocols/rpc/rpc_structs.h"
 #include "utils/out.h"
-#include "utils/session.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST

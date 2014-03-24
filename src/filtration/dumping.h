@@ -16,7 +16,7 @@
 #include "filtration/pcap/handle.h"
 #include "filtration/pcap/packet_dumper.h"
 #include "utils/log.h"
-#include "utils/session.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST

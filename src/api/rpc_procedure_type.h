@@ -9,7 +9,7 @@
 #include <sys/time.h>
 
 #include "api/rpc_types.h"
-#include "api/session_type.h"
+#include "api/session.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
