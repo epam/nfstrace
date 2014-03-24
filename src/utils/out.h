@@ -27,7 +27,7 @@ public:
     // helper for creation and destruction global level of messages
     struct Global
     {
-        Global(const Level verbose_level);
+        explicit Global(const Level verbose_level);
         ~Global();
         Global(const Global&)            = delete;
         Global& operator=(const Global&) = delete;
@@ -35,7 +35,7 @@ public:
         static Level get_level();   // return global level of verbosity
     };
 
-    Out(Level level=Level::Info);   // verbose level of message
+    explicit Out(Level level=Level::Info);   // verbose level of message
     ~Out();
     Out(const Out&)            = delete;
     Out& operator=(const Out&) = delete;

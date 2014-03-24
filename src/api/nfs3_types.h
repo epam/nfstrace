@@ -361,11 +361,11 @@ struct ACCESS3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         ACCESS3resok   resok;
         ACCESS3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 5: READLINK - Read from symbolic link
@@ -389,11 +389,11 @@ struct READLINK3res
     };
 
     nfsstat3 status;
-    union U
+    union
     {
         READLINK3resok   resok;
         READLINK3resfail resfail;
-    } u;
+    };
 };
 
 // Procedure 6: READ - Read From file

@@ -21,7 +21,7 @@ class PcapError : public std::runtime_error
 {
 public:
     explicit PcapError(const char* func, const char* errbuf)
-        : std::runtime_error(std::string(func)+"():"+std::string(errbuf)) { }
+        : std::runtime_error{std::string{func}+"():"+std::string{errbuf}} { }
 };
 
 } // namespace pcap
