@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 #include "analysis/print_analyzer.h"
 #include "protocols/nfs3/nfs_utils.h"
-#include "protocols/rpc/rpc_structs.h"
+#include "protocols/rpc/rpc_utils.h"
 #include "utils/out.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
