@@ -18,13 +18,14 @@
 #include "utils/out.h"
 #include "utils/session.h"
 //------------------------------------------------------------------------------
-using NST::utils::Session;
-using NST::utils::NetworkSession;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
+
+using Session        = NST::utils::Session;
+using NetworkSession = NST::utils::NetworkSession;
 
 struct IPv4TCPMapper
 {

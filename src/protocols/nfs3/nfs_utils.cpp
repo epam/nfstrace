@@ -16,11 +16,6 @@ namespace protocols
 namespace NFS3
 {
 
-const std::string to_string(const Opaque& opaque)
-{
-    return std::string((char*)opaque.ptr, opaque.len);
-}
-
 std::ostream& operator <<(std::ostream& out, const Opaque& opaque)
 {
     out << std::hex;
