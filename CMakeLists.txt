@@ -7,7 +7,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")   # require at least gcc 4.8
         message (FATAL_ERROR "GCC version must be at least 4.8!")
     endif ()
 else ()
-    message (WARNING "Compilation has only been tested with GCC 4.8.")
+    message (WARNING "Compilation has only been tested with GCC 4.8")
 endif ()
 
 find_package(Threads REQUIRED) # POSIX Threads
@@ -17,6 +17,10 @@ find_package(Threads REQUIRED) # POSIX Threads
 # build application ============================================================
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra")
 
+set (NST_BUILD_VERSION  "${PROJECT_NAME} 0.2-alpha (${CMAKE_BUILD_TYPE})")
+set (NST_BUILD_PLATFORM "${CMAKE_SYSTEM}")
+set (NST_BUILD_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+
 include_directories (src)
 file (GLOB_RECURSE SRCS "src/*.cpp")
 set  (LIBS  ${CMAKE_DL_LIBS}            # libdl with dlopen()
@@ -24,9 +28,12 @@ set  (LIBS  ${CMAKE_DL_LIBS}            # libdl with dlopen()
             pcap                        # libpcap
             )
 
+add_definitions (-DNST_BUILD_VERSION=${NST_BUILD_VERSION};
+                 -DNST_BUILD_PLATFORM=${NST_BUILD_PLATFORM};
+                 -DNST_BUILD_COMPILER=${NST_BUILD_COMPILER})
+
 add_executable        (${PROJECT_NAME} ${SRCS})
 target_link_libraries (${PROJECT_NAME} ${LIBS})
-
 # build analyzers ==============================================================
 add_subdirectory (analyzers)
 
