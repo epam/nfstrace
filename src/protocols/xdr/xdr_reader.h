@@ -14,7 +14,7 @@
 #  include <sys/endian.h>
 #endif
 
-#include "protocols/xdr/xdr_structs.h"
+#include "api/xdr_types.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -23,6 +23,12 @@ namespace protocols
 {
 namespace xdr
 {
+
+
+using namespace NST::API;
+
+
+const size_t XDR_ALIGN = 4;
 
 class XDRError : public std::runtime_error
 {
@@ -123,6 +129,23 @@ protected:
     const uint8_t* it;
     const uint8_t* last;
 };
+
+inline const std::string to_string(const Opaque& opaque)
+{
+    return std::string((char*)opaque.ptr, opaque.len);
+}
+
+inline std::ostream& operator <<(std::ostream& out, const Opaque& opaque)
+{
+    out << std::hex;
+    for(uint32_t i = 0; i < opaque.len; i++)
+    {
+        out.fill('0');
+        out.width(2);
+        out << (uint32_t) opaque.ptr[i];
+    }
+    return out << std::dec;
+}
 
 } // namespace xdr
 } // namespace protocols

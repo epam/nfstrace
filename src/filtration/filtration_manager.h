@@ -9,14 +9,11 @@
 #include <memory>
 #include <vector>
 
-#include "utils/filtered_data.h"
 #include "controller/parameters.h"
 #include "controller/running_status.h"
 #include "filtration/processing_thread.h"
+#include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
-using NST::utils::FilteredDataQueue;
-using NST::controller::Parameters;
-using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -25,6 +22,10 @@ namespace filtration
 
 class FiltrationManager
 {
+    using Parameters        = NST::controller::Parameters;
+    using RunningStatus     = NST::controller::RunningStatus;
+    using FilteredDataQueue = NST::utils::FilteredDataQueue;
+
 public:
     FiltrationManager(RunningStatus& s);
     ~FiltrationManager();

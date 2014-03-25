@@ -14,9 +14,6 @@
 #include "controller/running_status.h"
 #include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
-using NST::controller::Parameters;
-using NST::controller::RunningStatus;
-using NST::utils::FilteredDataQueue;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -25,6 +22,10 @@ namespace analysis
 
 class AnalysisManager
 {
+    using Parameters        = NST::controller::Parameters;
+    using RunningStatus     = NST::controller::RunningStatus;
+    using FilteredDataQueue = NST::utils::FilteredDataQueue;
+
 public:
     AnalysisManager(RunningStatus& status, const Parameters& params);
     AnalysisManager(const AnalysisManager&)            = delete;

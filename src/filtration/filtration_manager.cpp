@@ -11,13 +11,18 @@
 #include "filtration/processing_thread.h"
 #include "filtration/queueing.h"
 //------------------------------------------------------------------------------
-using NST::filtration::pcap::CaptureReader;
-using NST::filtration::pcap::FileReader;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
+
+using CaptureReader = NST::filtration::pcap::CaptureReader;
+using FileReader    = NST::filtration::pcap::FileReader;
+
+using Parameters        = NST::controller::Parameters;
+using RunningStatus     = NST::controller::RunningStatus;
+using FilteredDataQueue = NST::utils::FilteredDataQueue;
 
 namespace // unnamed
 {

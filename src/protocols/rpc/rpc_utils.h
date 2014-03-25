@@ -3,14 +3,12 @@
 // Description: Different rpc structures.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef RPC_STRUCTS_H
-#define RPC_STRUCTS_H
+#ifndef RPC_UTILS_H
+#define RPC_UTILS_H
 //------------------------------------------------------------------------------
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/xdr/xdr_reader.h"
 //------------------------------------------------------------------------------
-using namespace NST::protocols::rpc;
-using namespace NST::protocols::xdr;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -19,8 +17,7 @@ namespace protocols
 namespace rpc
 {
 
-#include "api/rpc_types.h"
-
+using namespace NST::protocols::xdr;
 
 inline XDRReader& operator>>(XDRReader& in, OpaqueAuth& o)
 {
@@ -110,5 +107,5 @@ inline XDRReader& operator>>(XDRReader& in, RPCReply& o)
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//RPC_STRUCTS_H
+#endif//RPC_UTILS_H
 //------------------------------------------------------------------------------

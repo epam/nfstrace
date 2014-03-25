@@ -6,9 +6,11 @@
 #ifndef NFS_PROCEDURE_H
 #define NFS_PROCEDURE_H
 //------------------------------------------------------------------------------
-#include "protocols/nfs3/nfs_structs.h"
-#include "protocols/rpc/rpc_procedure.h"
+#include "api/rpc_procedure_type.h"
+#include "protocols/nfs3/nfs_utils.h"
 #include "protocols/rpc/rpc_reader.h"
+#include "protocols/rpc/rpc_utils.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -23,7 +25,7 @@ template
     typename ArgType,   // structure of RPC procedure parameters
     typename ResType    // structure of RPC procedure results
 >
-class NFSProcedure: public rpc::RPCProcedure
+class NFSProcedure: public NST::API::RPCProcedure
 {
 public:
 
