@@ -1,12 +1,13 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: All RFC1813 declared structures.
+// Description: Helpers for parsing NFS structures.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #include <cassert>
 
-#include "protocols/nfs3/nfs_structs.h"
+#include "protocols/nfs3/nfs_utils.h"
 //------------------------------------------------------------------------------
+using namespace NST::protocols::xdr;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -15,25 +16,23 @@ namespace protocols
 namespace NFS3
 {
 
-const char* Proc::Titles[Proc::num] =
+std::ostream& operator <<(std::ostream& out, const Opaque& opaque)
 {
-  "NULL",       "GETATTR",      "SETATTR",  "LOOKUP",
-  "ACCESS",     "READLINK",     "READ",     "WRITE",
-  "CREATE",     "MKDIR",        "SYMLINK",  "MKNOD",
-  "REMOVE",     "RMDIR",        "RENAME",   "LINK",
-  "READDIR",    "READDIRPLUS",  "FSSTAT",   "FSINFO",
-  "PATHCONF",   "COMMIT"
-};
-
-std::ostream& operator<<(std::ostream& out, const Proc::Enum proc)
-{
-    return out << Proc::Titles[proc];
+    out << std::hex;
+    for(uint32_t i = 0; i < opaque.len; i++)
+    {
+        out << (uint32_t) opaque.ptr[i];
+    }
+    return out << std::dec;
 }
 
+std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc)
+{
+    return out << NFSProcedureTitles[proc];
+}
 
 std::ostream& operator<<(std::ostream& out, const mode3 m)
 {
-    out << " mode: ";
     if(m & mode3::USER_ID_EXEC)      out << "USER_ID_EXEC ";
     if(m & mode3::GROUP_ID_EXEC)     out << "GROUP_ID_EXEC ";
     if(m & mode3::SAVE_SWAPPED_TEXT) out << "SAVE_SWAPPED_TEXT ";
@@ -233,6 +232,17 @@ std::ostream& operator<<(std::ostream& out, const diropargs3& obj)
     return out;
 }
 
+std::ostream& operator<<(std::ostream& out, const stable_how& obj)
+{
+    switch(obj.stable)
+    {
+        case stable_how::UNSTABLE:  out << "UNSTABLE";  break;
+        case stable_how::DATA_SYNC: out << "DATA_SYNC"; break;
+        case stable_how::FILE_SYNC: out << "FILE_SYNC"; break;
+    }
+    return out;
+}
+
 std::ostream& operator<<(std::ostream& out, const sattrguard3& obj)
 {
     if(obj.check)
@@ -287,7 +297,6 @@ std::ostream& operator<<(std::ostream& out, const devicedata3& obj)
 std::ostream& operator<<(std::ostream& out, const mknoddata3& obj)
 {
     out << " type: " << obj.type;
-    
     switch(obj.type)
     {
         case ftype3::CHR:

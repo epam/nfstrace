@@ -6,10 +6,15 @@
 #ifndef RPC_PROCEDURE_TYPE_H
 #define RPC_PROCEDURE_TYPE_H
 //------------------------------------------------------------------------------
+#include <sys/time.h>
+
 #include "api/rpc_types.h"
+#include "api/session.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-extern "C"
+namespace NST
+{
+namespace API
 {
 
 struct RPCProcedure
@@ -21,7 +26,8 @@ struct RPCProcedure
     const struct timeval* rtimestamp;
 };
 
-}
+} // namespace API
+} // namespace NST
 //------------------------------------------------------------------------------
 #endif//RPC_PROCEDURE_TYPE_H
 //------------------------------------------------------------------------------

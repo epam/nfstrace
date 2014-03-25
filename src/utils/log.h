@@ -42,7 +42,7 @@ public:
     // isn't thread-safe!
     struct Global
     {
-        Global(const std::string& file_path);
+        explicit Global(const std::string& file_path);
         ~Global();
         Global(const Global&)            = delete;
         Global& operator=(const Global&) = delete;

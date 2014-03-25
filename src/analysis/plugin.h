@@ -23,7 +23,7 @@ public:
     static const std::string usage_of(const std::string& path);
 
 protected:
-    Plugin(const std::string& path);
+    explicit Plugin(const std::string& path);
     Plugin(const Plugin&)            = delete;
     Plugin& operator=(const Plugin&) = delete;
 

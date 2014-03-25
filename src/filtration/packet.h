@@ -16,18 +16,20 @@
 #include "protocols/ip/ipv4_header.h"
 #include "protocols/tcp/tcp_header.h"
 #include "protocols/udp/udp_header.h"
-#include "utils/session.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
-using namespace NST::protocols;
-using namespace NST::protocols::ethernet;
-using namespace NST::protocols::ip;
-using namespace NST::protocols::tcp;
-using namespace NST::protocols::udp;
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
+
+using namespace NST::protocols;
+using namespace NST::protocols::ethernet;
+using namespace NST::protocols::ip;
+using namespace NST::protocols::tcp;
+using namespace NST::protocols::udp;
+
 
 // Structure of pointers to captured pcap packet's headers. WITHOUT data.
 struct PacketInfo

@@ -1,11 +1,11 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Implementation of network session things.
+// Description: Structs for sessions.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #include <sstream>
 
-#include "utils/session.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST

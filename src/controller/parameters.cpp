@@ -19,6 +19,21 @@ namespace controller
 
 using CLI = NST::controller::cmdline::Args;
 
+static const char program_build_information[]=
+// the NST_BUILD_VERSION, NST_BUILD_PLATFORM and NST_BUILD_COMPILER
+// should be defined by compilation options
+#ifdef NST_BUILD_VERSION
+    #define STR(x) DO_STR(x)
+    #define DO_STR(x) #x
+        STR(NST_BUILD_VERSION) "\n"
+       "built on " STR(NST_BUILD_PLATFORM) "\n"
+       "by C++ compiler " STR(NST_BUILD_COMPILER);
+    #undef DO_STR
+    #undef STR
+#else
+    "";
+#endif
+
 Parameters* Parameters::global = nullptr;
 
 Parameters::Parameters(int argc, char** argv) : rpc_message_limit(0)
@@ -28,6 +43,7 @@ Parameters::Parameters(int argc, char** argv) : rpc_message_limit(0)
     parse(argc, argv);
     if(get(CLI::HELP).to_bool())
     {
+        std::cout << program_build_information << std::endl;
         print_usage(std::cout, argv[0]);
 
         for(const auto& a : analysis_modules())

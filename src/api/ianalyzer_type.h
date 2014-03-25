@@ -8,9 +8,13 @@
 #ifndef IANALYZER_TYPE_H
 #define IANALYZER_TYPE_H
 //------------------------------------------------------------------------------
+#include "api/nfs3_types.h"
+#include "api/rpc_procedure_type.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-extern "C"
+namespace NST
+{
+namespace API
 {
 
 class IAnalyzer
@@ -88,7 +92,8 @@ public:
     virtual void flush_statistics() = 0;
 };
 
-}
+} // namespace API
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif //IANALYZER_TYPE_H
+#endif//IANALYZER_TYPE_H
 //------------------------------------------------------------------------------

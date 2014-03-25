@@ -1,14 +1,16 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Structs represents session.
+// Description: Structs for sessions.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef SESSION_H
-#define SESSION_H
+#ifndef SESSIONS_H
+#define SESSIONS_H
 //------------------------------------------------------------------------------
 #include <cstddef>
 #include <cstdint>
 #include <ostream>
+
+#include "api/session.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -16,10 +18,10 @@ namespace NST
 namespace utils
 {
 
-#include "api/session_type.h"   // definition of utils::Session
+using Session = NST::API::Session;
 
 // Network layer session
-struct NetworkSession : public utils::Session
+struct NetworkSession : public Session
 {
 public:
     NetworkSession()
@@ -33,8 +35,8 @@ public:
 };
 
 
-// Application layer session representation
-struct ApplicationsSession : public utils::Session
+// Application layer session
+struct ApplicationsSession : public Session
 {
 public:
     ApplicationsSession(const NetworkSession& s, Direction from_client);
@@ -49,5 +51,5 @@ std::ostream& operator<<(std::ostream& out, const Session& session);
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//SESSION_H
+#endif//SESSIONS_H
 //------------------------------------------------------------------------------

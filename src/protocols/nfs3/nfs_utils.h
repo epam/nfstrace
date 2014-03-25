@@ -1,18 +1,19 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
-// Description: All RFC1813 declared structures.
+// Description: Helpers for parsing NFS structures.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef NFS_STRUCTS_H
-#define NFS_STRUCTS_H
+#ifndef NFS_UTILS_H
+#define NFS_UTILS_H
 //------------------------------------------------------------------------------
 #include <cassert>
 #include <ostream>
 
+#include "api/nfs3_types.h"
+
 #include "protocols/xdr/xdr_reader.h"
 #include "protocols/rpc/rpc_header.h"
 //------------------------------------------------------------------------------
-using namespace NST::protocols::xdr;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -21,54 +22,27 @@ namespace protocols
 namespace NFS3
 {
 
-#include "api/nfs3_types.h"
+using namespace NST::API;
 
-// Artificial structure for enumeration of the NFS procedures
-struct Proc
-{
-    enum Enum
-    {
-        NFS_NULL    = 0,
-        GETATTR     = 1,
-        SETATTR     = 2,
-        LOOKUP      = 3,
-        ACCESS      = 4,
-        READLINK    = 5,
-        READ        = 6,
-        WRITE       = 7,
-        CREATE      = 8,
-        MKDIR       = 9,
-        SYMLINK     = 10,
-        MKNOD       = 11,
-        REMOVE      = 12,
-        RMDIR       = 13,
-        RENAME      = 14,
-        LINK        = 15,
-        READDIR     = 16,
-        READDIRPLUS = 17,
-        FSSTAT      = 18,
-        FSINFO      = 19,
-        PATHCONF    = 20,
-        COMMIT      = 21,
-        num         = 22
-    };
-
-    static const char* Titles[Proc::num];
-
-private:
-    Proc(const Proc&)            = delete;
-    Proc& operator=(const Proc&) = delete;
-};
+using namespace NST::protocols::xdr;
 
 using Validator = rpc::RPCProgramValidator
                 <
-                    100003,         // SunRPC/NFS program
-                    3,              // v3
-                    Proc::NFS_NULL, // NFSPROC3_NULL
-                    Proc::COMMIT    // NFSPROC3_COMMIT
+                    100003,             // SunRPC/NFS program
+                    3,                  // v3
+                    ProcEnum::NFS_NULL, // NFSPROC3_NULL
+                    ProcEnum::COMMIT    // NFSPROC3_COMMIT
                 >;
 
-inline std::ostream& operator<<(std::ostream& out, const Proc::Enum proc);
+static const char*const NFSProcedureTitles[ProcEnum::count] =
+{
+  "NULL",       "GETATTR",      "SETATTR",  "LOOKUP",
+  "ACCESS",     "READLINK",     "READ",     "WRITE",
+  "CREATE",     "MKDIR",        "SYMLINK",  "MKNOD",
+  "REMOVE",     "RMDIR",        "RENAME",   "LINK",
+  "READDIR",    "READDIRPLUS",  "FSSTAT",   "FSINFO",
+  "PATHCONF",   "COMMIT"
+};
 
 inline XDRReader& operator>>(XDRReader& in, mode3& obj)
 {
@@ -315,12 +289,12 @@ inline XDRReader& operator>>(XDRReader& in, ACCESS3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.access;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.access;
     }
     else
     {
-        in >> o.u.resfail.obj_attributes;
+        in >> o.resfail.obj_attributes;
     }
     return in;
 }
@@ -337,12 +311,12 @@ inline XDRReader& operator>>(XDRReader& in, READLINK3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.symlink_attributes;
-        in.read_variable_len(o.u.resok.data);
+        in >> o.resok.symlink_attributes;
+        in.read_variable_len(o.resok.data);
     }
     else
     {
-        in >> o.u.resfail.symlink_attributes;
+        in >> o.resfail.symlink_attributes;
     }
     return in;
 }
@@ -359,13 +333,13 @@ inline XDRReader& operator>>(XDRReader& in, READ3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.file_attributes;
-        in >> o.u.resok.count;
-        in >> o.u.resok.eof;
+        in >> o.resok.file_attributes;
+        in >> o.resok.count;
+        in >> o.resok.eof;
     }
     else
     {
-        in >> o.u.resfail.file_attributes;
+        in >> o.resfail.file_attributes;
     }
     return in;
 }
@@ -375,17 +349,6 @@ inline XDRReader& operator>>(XDRReader& in, READ3res& o)
 inline XDRReader& operator>>(XDRReader& in, stable_how& obj)
 {
     return in >> obj.stable;
-}
-
-inline std::ostream& operator<<(std::ostream& out, const stable_how& obj)
-{
-    switch(obj.stable)
-    {
-        case stable_how::UNSTABLE:  out << "UNSTABLE";  break;
-        case stable_how::DATA_SYNC: out << "DATA_SYNC"; break;
-        case stable_how::FILE_SYNC: out << "FILE_SYNC"; break;
-    }
-    return out;
 }
 
 inline XDRReader& operator>>(XDRReader& in, WRITE3args& o)
@@ -398,14 +361,14 @@ inline XDRReader& operator>>(XDRReader& in, WRITE3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.file_wcc;
-        in >> o.u.resok.count;
-        in >> o.u.resok.committed;
-        in.read_fixed_len(o.u.resok.verf, NFS3_WRITEVERFSIZE);
+        in >> o.resok.file_wcc;
+        in >> o.resok.count;
+        in >> o.resok.committed;
+        in.read_fixed_len(o.resok.verf, NFS3_WRITEVERFSIZE);
     }
     else
     {
-        in >> o.u.resfail.file_wcc;
+        in >> o.resfail.file_wcc;
     }
     return in;
 }
@@ -436,13 +399,13 @@ inline XDRReader& operator>>(XDRReader& in, CREATE3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj;
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.obj;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -459,13 +422,13 @@ inline XDRReader& operator>>(XDRReader& in, MKDIR3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj;
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.obj;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -489,13 +452,13 @@ inline XDRReader& operator>>(XDRReader& in, SYMLINK3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj;
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.obj;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -540,13 +503,13 @@ inline XDRReader& operator>>(XDRReader& in, MKNOD3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj;
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.obj;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -563,11 +526,11 @@ inline XDRReader& operator>>(XDRReader& in, REMOVE3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -584,11 +547,11 @@ inline XDRReader& operator>>(XDRReader& in, RMDIR3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.dir_wcc;
+        in >> o.resok.dir_wcc;
     }
     else
     {
-        in >> o.u.resfail.dir_wcc;
+        in >> o.resfail.dir_wcc;
     }
     return in;
 }
@@ -605,13 +568,13 @@ inline XDRReader& operator>>(XDRReader& in, RENAME3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.fromdir_wcc;
-        in >> o.u.resok.todir_wcc;
+        in >> o.resok.fromdir_wcc;
+        in >> o.resok.todir_wcc;
     }
     else
     {
-        in >> o.u.resfail.fromdir_wcc;
-        in >> o.u.resfail.todir_wcc;
+        in >> o.resfail.fromdir_wcc;
+        in >> o.resfail.todir_wcc;
     }
     return in;
 }
@@ -628,13 +591,13 @@ inline XDRReader& operator>>(XDRReader& in, LINK3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.file_attributes;
-        in >> o.u.resok.linkdir_wcc;
+        in >> o.resok.file_attributes;
+        in >> o.resok.linkdir_wcc;
     }
     else
     {
-        in >> o.u.resfail.file_attributes;
-        in >> o.u.resfail.linkdir_wcc;
+        in >> o.resfail.file_attributes;
+        in >> o.resfail.linkdir_wcc;
     }
     return in;
 }
@@ -654,15 +617,15 @@ inline XDRReader& operator>>(XDRReader& in, READDIR3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.dir_attributes;
-        in.read_fixed_len(o.u.resok.cookieverf, NFS3_COOKIEVERFSIZE);
+        in >> o.resok.dir_attributes;
+        in.read_fixed_len(o.resok.cookieverf, NFS3_COOKIEVERFSIZE);
         // TODO: Parse entries
-        o.u.resok.reply.entries = NULL;
-        o.u.resok.reply.eof = true;
+        o.resok.reply.entries = NULL;
+        o.resok.reply.eof = true;
     }
     else
     {
-        in >> o.u.resfail.dir_attributes;
+        in >> o.resfail.dir_attributes;
     }
     return in;
 }
@@ -681,15 +644,15 @@ inline XDRReader& operator>>(XDRReader& in, READDIRPLUS3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.dir_attributes;
-        in.read_fixed_len(o.u.resok.cookieverf, NFS3_COOKIEVERFSIZE);
+        in >> o.resok.dir_attributes;
+        in.read_fixed_len(o.resok.cookieverf, NFS3_COOKIEVERFSIZE);
         // TODO: Parse entries
-        o.u.resok.reply.entries = NULL;
-        o.u.resok.reply.eof = true;
+        o.resok.reply.entries = NULL;
+        o.resok.reply.eof = true;
     }
     else
     {
-        in >> o.u.resfail.dir_attributes;
+        in >> o.resfail.dir_attributes;
     }
     return in;
 }
@@ -706,18 +669,18 @@ inline XDRReader& operator>>(XDRReader& in, FSSTAT3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.tbytes;
-        in >> o.u.resok.fbytes;
-        in >> o.u.resok.abytes;
-        in >> o.u.resok.tfiles;
-        in >> o.u.resok.ffiles;
-        in >> o.u.resok.afiles;
-        in >> o.u.resok.invarsec;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.tbytes;
+        in >> o.resok.fbytes;
+        in >> o.resok.abytes;
+        in >> o.resok.tfiles;
+        in >> o.resok.ffiles;
+        in >> o.resok.afiles;
+        in >> o.resok.invarsec;
     }
     else
     {
-        in >> o.u.resfail.obj_attributes;
+        in >> o.resfail.obj_attributes;
     }
     return in;
 }
@@ -735,21 +698,21 @@ inline XDRReader& operator>>(XDRReader& in, FSINFO3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.rtmax;
-        in >> o.u.resok.rtpref;
-        in >> o.u.resok.rtmult;
-        in >> o.u.resok.wtmax;
-        in >> o.u.resok.wtpref;
-        in >> o.u.resok.wtmult;
-        in >> o.u.resok.dtpref;
-        in >> o.u.resok.maxfilesize;
-        in >> o.u.resok.time_delta;
-        in >> o.u.resok.properties;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.rtmax;
+        in >> o.resok.rtpref;
+        in >> o.resok.rtmult;
+        in >> o.resok.wtmax;
+        in >> o.resok.wtpref;
+        in >> o.resok.wtmult;
+        in >> o.resok.dtpref;
+        in >> o.resok.maxfilesize;
+        in >> o.resok.time_delta;
+        in >> o.resok.properties;
     }
     else
     {
-        in >> o.u.resfail.obj_attributes;
+        in >> o.resfail.obj_attributes;
     }
     return in;
 }
@@ -766,17 +729,17 @@ inline XDRReader& operator>>(XDRReader& in, PATHCONF3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.obj_attributes;
-        in >> o.u.resok.linkmax;
-        in >> o.u.resok.name_max;
-        in >> o.u.resok.no_trunc;
-        in >> o.u.resok.shown_restricted;
-        in >> o.u.resok.case_insensitive;
-        in >> o.u.resok.case_preserving;
+        in >> o.resok.obj_attributes;
+        in >> o.resok.linkmax;
+        in >> o.resok.name_max;
+        in >> o.resok.no_trunc;
+        in >> o.resok.chown_restricted;
+        in >> o.resok.case_insensitive;
+        in >> o.resok.case_preserving;
     }
     else
     {
-        in >> o.u.resfail.obj_attributes;
+        in >> o.resfail.obj_attributes;
     }
     return in;
 }
@@ -793,16 +756,17 @@ inline XDRReader& operator>>(XDRReader& in, COMMIT3res& o)
     in >> o.status;
     if(o.status == nfsstat3::OK)
     {
-        in >> o.u.resok.file_wcc;
-        in.read_fixed_len(o.u.resok.verf, NFS3_WRITEVERFSIZE);
+        in >> o.resok.file_wcc;
+        in.read_fixed_len(o.resok.verf, NFS3_WRITEVERFSIZE);
     }
     else
     {
-        in >> o.u.resfail.file_wcc;
+        in >> o.resfail.file_wcc;
     }
     return in;
 }
 
+std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc);
 std::ostream& operator<<(std::ostream& out, const mode3 obj);
 std::ostream& operator<<(std::ostream& out, const nfsstat3& obj);
 std::ostream& operator<<(std::ostream& out, const ftype3& obj);
@@ -817,28 +781,16 @@ std::ostream& operator<<(std::ostream& out, const wcc_data& obj);
 std::ostream& operator<<(std::ostream& out, const post_op_fh3& obj);
 std::ostream& operator<<(std::ostream& out, const sattr3& obj);
 std::ostream& operator<<(std::ostream& out, const diropargs3& obj);
-
+std::ostream& operator<<(std::ostream& out, const stable_how& obj);
 std::ostream& operator<<(std::ostream& out, const sattrguard3& obj);
-std::ostream& operator<<(std::ostream& out, const SETATTR3args& obj);
-
-std::ostream& operator<<(std::ostream& out, const WRITE3args& obj);
-
 std::ostream& operator<<(std::ostream& out, const createhow3& obj);
-std::ostream& operator<<(std::ostream& out, const CREATE3args& obj);
-
-std::ostream& operator<<(std::ostream& out, const MKDIR3args& obj);
-
 std::ostream& operator<<(std::ostream& out, const symlinkdata3& obj);
-std::ostream& operator<<(std::ostream& out, const SYMLINK3args& obj);
-
 std::ostream& operator<<(std::ostream& out, const devicedata3& obj);
 std::ostream& operator<<(std::ostream& out, const mknoddata3& obj);
-std::ostream& operator<<(std::ostream& out, const MKNOD3args& obj);
-
 
 } // namespace NFS3
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS_STRUCTS_H
+#endif//NFS_UTILS_H
 //------------------------------------------------------------------------------
