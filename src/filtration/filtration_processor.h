@@ -206,7 +206,7 @@ public:
             }
             else // out of order packet
             {
-                if(info.dlen > 0 && (seq > sequence) )
+                if(info.dlen > 0 && GT_SEQ(seq, sequence) )
                 {
                     //TRACE("ADD FRAGMENT seq: %u dlen: %u sequence: %u", seq, info.dlen, sequence);
                     fragments = Packet::create(info, fragments);
@@ -231,9 +231,8 @@ public:
                         lowest_seq = current_seq;
                     }
 
-                    if( current_seq < sequence )
+                    if( LT_SEQ(current_seq, sequence) ) // current_seq < sequence
                     {
-                        bool has_data = false;
                         // this sequence number seems dated, but
                         // check the end to make sure it has no more
                         // info than we have already seen
@@ -249,11 +248,10 @@ public:
 
                             if ( current->dlen > new_pos )
                             {
-                                has_data = true;
                                 current->data += new_pos;
                                 current->dlen -= new_pos;
+                                reader.push(*current);
                             }
-
                         }
 
                         // Remove the fragment from the list as the "new" part of it
@@ -261,20 +259,11 @@ public:
                         // another packet.
                         if( prev )
                         {
-                          prev->next = current->next;
-                        } else
-                        {
-                          fragments = current->next;
-                        }
-
-                        if(has_data)
-                        {
-                            TRACE("accepted payload new seq:%u len:%u", sequence, current_len);
-                            reader.push(*current);
+                            prev->next = current->next;
                         }
                         else
                         {
-                            TRACE("drop part of stream seq:%u len:%u", current_seq, current_len);
+                            fragments = current->next;
                         }
 
                         Packet::destroy(current);
@@ -314,6 +303,7 @@ public:
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -387,12 +377,12 @@ public:
         {
             if(hdr_len == 0 && msg_len >= n)
             {
-                //TRACE("We are lost %u bytes of payload marked for discard", n);
+                TRACE("We are lost %u bytes of payload marked for discard", n);
                 msg_len -= n;
             }
             else
             {
-                LOG("We are lost %u bytes of useful data. lost:%u msg_len:%u", n - msg_len, n, msg_len);
+                TRACE("We are lost %u bytes of useful data. lost:%u msg_len:%u", n - msg_len, n, msg_len);
                 reset();
             }
         }
