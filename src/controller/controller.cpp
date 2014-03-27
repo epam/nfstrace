@@ -60,6 +60,11 @@ int Controller::run()
         analysis->start();
     }
 
+    {
+        utils::Out message;
+        message << "Processing packets. Press CTRL-C to quit and view results.";
+    }
+
     // Waiting some exception or user-signal for handling
     // TODO: add code for recovery processing
     try
