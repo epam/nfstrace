@@ -14,8 +14,6 @@
 #include "controller/running_status.h"
 #include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
-using NST::utils::FilteredDataQueue;
-using NST::controller::RunningStatus;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -24,6 +22,8 @@ namespace analysis
 
 class NFSParserThread
 {
+    using RunningStatus     = NST::controller::RunningStatus;
+    using FilteredDataQueue = NST::utils::FilteredDataQueue;
 public:
     NFSParserThread(FilteredDataQueue& q, Analyzers& a, RunningStatus& rs);
     ~NFSParserThread();
