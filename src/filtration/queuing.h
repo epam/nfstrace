@@ -3,8 +3,8 @@
 // Description: Push FilteredData to queue for further analysis.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#ifndef QUEUEING_H
-#define QUEUEING_H
+#ifndef QUEUING_H
+#define QUEUING_H
 //------------------------------------------------------------------------------
 #include <string>
 
@@ -143,5 +143,5 @@ private:
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//QUEUEING_H
+#endif//QUEUING_H
 //------------------------------------------------------------------------------
