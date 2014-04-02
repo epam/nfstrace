@@ -160,13 +160,13 @@ public:
 
             // if we are here, we have already seen this src, let's
             // try and figure out if this packet is in the right place
-            if( seq < sequence )
+            if( LT_SEQ(seq, sequence) )
             {
                 // this sequence number seems dated, but
                 // check the end to make sure it has no more
                 // info than we have already seen
                 uint32_t newseq = seq + len;
-                if( newseq > sequence )
+                if( GT_SEQ(newseq, sequence) )
                 {
 
                     // this one has more than we have seen. let's get the
@@ -192,7 +192,7 @@ public:
                 }
             }
 
-            if ( seq == sequence ) // right on time
+            if ( EQ_SEQ(seq, sequence) ) // right on time
             {
                 sequence += len;
                 if( info.tcp->is(tcp_header::SYN) ) sequence++;
@@ -237,7 +237,7 @@ public:
                         // check the end to make sure it has no more
                         // info than we have already seen
                         uint32_t newseq = current_seq + current_len;
-                        if( newseq > sequence )
+                        if( GT_SEQ(newseq, sequence) )
                         {
                             // this one has more than we have seen. let's get the
                             // payload that we have not seen. This happens when
@@ -271,7 +271,7 @@ public:
                         return true;
                     }
 
-                    if( current_seq == sequence )
+                    if( EQ_SEQ(current_seq, sequence) )
                     {
                         // this fragment fits the stream
                         sequence += current_len;
