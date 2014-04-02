@@ -22,7 +22,6 @@ After that, you can start to build application:
 Binaries will be created in current directory
 
 
-
 Build by CMake with special compiler ===========================================
 Set up environment variables with path to the compiler:
 
@@ -34,8 +33,9 @@ for FreeBSD:
     setenv CC "/usr/local/bin/gcc48"
     setenv CXX "/usr/local/bin/g++48"
 
-Then build by CMake as described above.
-
+Then build by CMake as described above or pass these variables to shell
+directly for cmake command, f.e.:
+CC="/usr/bin/gcc48" CXX="/usr/bin/g++48" cmake -DCMAKE_BUILD_TYPE=Release ../
 
 
 Test by CMake ==================================================================
