@@ -258,7 +258,7 @@ void PrintAnalyzer::access3(const struct RPCProcedure* proc,
         if(args->access & ACCESS3args::ACCESS3_EXTEND) out << "EXTEND ";
         if(args->access & ACCESS3args::ACCESS3_DELETE) out << "DELETE ";
         if(args->access & ACCESS3args::ACCESS3_EXECUTE)out << "EXECUTE ";
-        out << "]\n";
+        out << " ]\n";
     }
     if(res)
     {
@@ -284,7 +284,7 @@ void PrintAnalyzer::access3(const struct RPCProcedure* proc,
                 out << ' ';
             }
         }
-        out << "]\n";
+        out << " ]\n";
     }
 }
 

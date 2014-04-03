@@ -9,7 +9,7 @@
 #include "filtration/pcap/capture_reader.h"
 #include "filtration/pcap/file_reader.h"
 #include "filtration/processing_thread.h"
-#include "filtration/queueing.h"
+#include "filtration/queuing.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
