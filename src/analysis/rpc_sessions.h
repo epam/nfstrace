@@ -18,7 +18,6 @@
 #include "utils/out.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
-using NST::utils::FilteredDataQueue;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -27,6 +26,7 @@ namespace analysis
 
 class RPCSession : public utils::ApplicationsSession
 {
+    using FilteredDataQueue = NST::utils::FilteredDataQueue;
 public:
 
     RPCSession(const utils::NetworkSession& s, utils::Session::Direction call_direction)
