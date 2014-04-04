@@ -42,9 +42,10 @@ $APP --mode=dump                                           \
 echo "wait end of compression all parts (10 seconds)"
 sleep 10 # wait end of compression process
 
-PARTS=$(ls -tcr dump.pcap*.bz2) # list of parts in right order: head,1,2,3,...n
+# list of parts in right order: dump.pcap.bz2 dump.pcap-1.bz2 dump.pcap-2.bz2
+PARTS=$(ls dump.pcap*.bz2 | sort -n -t - -k 2)
 echo "
-The list of compressed parts(ordered by creation time):
+The list of compressed parts:
 $PARTS
 "
 
