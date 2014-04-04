@@ -2,7 +2,7 @@
 
 ROOT=$(dirname $0)/../..
 APP=$ROOT/release/nfstrace
-MOD=$ROOT/analyzers/release
+MOD=$ROOT/release/analyzers
 
 echo '
 -Information:-------------------------------------------------------------------
@@ -16,17 +16,17 @@ After that, the application runs in statistic mode to analyse filtered packets
 by Operation Breakdown analyser.
 
 Capturing from network interface requires superuser privileges.
-Exit via Interrupt(Control-C) or Quit(Control-\) signal.
+Exit via Interrupt(Control-C) signal.
 --------------------------------------------------------------------------------
 '
 
 # Dumping to dump.pcap file
 $APP --mode=dump                                           \
      --interface=eth0                                      \
-     --filter="tcp or udp port 2049"                       \
+     --filtration="ip and port 2049"                       \
      -O dump.pcap
 
 # Analyse dump.pcap file by libbreakdown.so module
 $APP --mode=stat                                           \
      -I dump.pcap                                          \
-     --analyzer=$MOD/libbreakdown.so
+     --analysis=$MOD/libbreakdown.so
