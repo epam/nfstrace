@@ -2,7 +2,7 @@
 
 ROOT=$(dirname $0)/../..
 APP=$ROOT/release/nfstrace
-MOD=$ROOT/analyzers/release
+MOD=$ROOT/release/analyzers
 
 echo '
 -Information:-------------------------------------------------------------------
@@ -12,6 +12,6 @@ pluggable analysis modules.
 '
 
 $APP --help                             \
-     --analyzer=$MOD/libbreakdown.so    \
-     --analyzer=$MOD/libofws.so         \
-     --analyzer=$MOD/libofdws.so
+     --analysis=$MOD/libbreakdown.so    \
+     --analysis=$MOD/libofws.so         \
+     --analysis=$MOD/libofdws.so
