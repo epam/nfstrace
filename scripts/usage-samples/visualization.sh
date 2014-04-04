@@ -1,11 +1,11 @@
 #/bin/sh
-PWD=$(dirname $0)
-ROOT=$PWD/../..
+
+ROOT=$(dirname $0)/../..
 APP=$ROOT/release/nfstrace
-MOD=$ROOT/analyzers/release
+MOD=$ROOT/release/analyzers
 SCR=$ROOT/analyzers/nst.sh
 PLT=$ROOT/analyzers/breakdown.plt
-DATA=$ROOT/data-assets/2sessions-tcp-wsize32k-tcp-wsize512k.pcap.bz2
+DATA=$ROOT/traces/2sessions-tcp-wsize32k-tcp-wsize512k.pcap.bz2
 
 echo "
 -Information:-------------------------------------------------------------------
@@ -24,4 +24,4 @@ Dependencies:
 "
 
 bzcat $DATA | $APP -m stat -I - -a $MOD/libbreakdown.so
-$SCR -a $PLT -d . -p 'breakdown*.dat' -v 
+$SCR -a $PLT -d . -p 'breakdown*.dat' -v
