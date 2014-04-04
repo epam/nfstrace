@@ -2,7 +2,7 @@
 
 ROOT=$(dirname $0)/../..
 APP=$ROOT/release/nfstrace
-MOD=$ROOT/analyzers/release
+MOD=$ROOT/release/analyzers
 
 echo '
 -Information:-------------------------------------------------------------------
@@ -22,20 +22,19 @@ by Operation Breakdown analyser.
 
 Capturing from network interface requires superuser privileges.
 The bzip2 and bzcat tools are used too.
-Exit via Interrupt(Control-C) or Quit(Control-\) signal and wait finish of compression.
+Exit via Interrupt(Control-C) signal and wait finish of compression.
 --------------------------------------------------------------------------------
 '
 
 # Dumping to dump.pcap file with compression output by bzip2 after end of capturing
 $APP --mode=dump                                           \
      --interface=eth0                                      \
-     --filter="tcp or udp port 2049"                       \
+     --filtration="ip and port 2049"                       \
      -O dump.pcap                                          \
      -C "bzip2 -f -9"
 
-sleep 3 # wait end of compression process
-
-# Extract dump.pcap from dump.pcap.bz2 and analyse data of dump.pcap file from stdin by libbreakdown.so module
+# Extract dump.pcap from dump.pcap.bz2 and analyse data
+# of dump.pcap file from stdin by libbreakdown.so module
 bzcat dump.pcap.bz2 | $APP --mode=stat                     \
      -I -                                                  \
-     --analyzer=$MOD/libbreakdown.so
+     --analysis=$MOD/libbreakdown.so
