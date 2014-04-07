@@ -3,6 +3,8 @@
 // Description: Entry for all operations under plugin_api.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
+#include <arpa/inet.h> // for inet_ntop(), ntohs()
+
 #include "plugin_api_struct.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -11,34 +13,41 @@ std::ostream& operator<<(std::ostream& out, const Session& session)
 {
     switch(session.ip_type)
     {
-        case Session::v4:
+        case Session::IPType::v4:
         {
-            uint32_t ip = session.ip.v4.addr[Session::Source];
-            out << ((ip >> 24) & 0xFF);
-            out << '.';
-            out << ((ip >> 16) & 0xFF);
-            out << '.';
-            out << ((ip >> 8) & 0xFF);
-            out << '.';
-            out << ((ip >> 0) & 0xFF);
-            out << ':' << session.port[Session::Source];
-        }
+            static_assert(sizeof(session.ip.v4.addr[Session::Source]) == sizeof(struct in_addr), "they should be equal");
+
+            char buf[INET_ADDRSTRLEN];
+            {
+                const char* str = inet_ntop(AF_INET, &(session.ip.v4.addr[Session::Source]), buf, sizeof(buf));
+                out << (str ? str : "Invalid IPv4 address of source host")
+                    << ':' << ntohs(session.port[Session::Source]);
+            }
             out << " --> ";
-        {
-            uint32_t ip = session.ip.v4.addr[Session::Destination];
-            out << ((ip >> 24) & 0xFF);
-            out << '.';
-            out << ((ip >> 16) & 0xFF);
-            out << '.';
-            out << ((ip >> 8) & 0xFF);
-            out << '.';
-            out << ((ip >> 0) & 0xFF);
-            out << ':' << session.port[Session::Destination];
+            {
+                const char* str = inet_ntop(AF_INET, &(session.ip.v4.addr[Session::Destination]), buf, sizeof(buf));
+                out << (str ? str : "Invalid IPv4 address of destination host")
+                    << ':' << ntohs(session.port[Session::Destination]);
+            }
         }
         break;
-        case Session::v6:
-            out << "IPv6 is not supported yet.";
-        break;
+        case Session::IPType::v6:
+        {
+            static_assert(sizeof(session.ip.v6.addr[Session::Source]) == sizeof(struct in6_addr), "they should be equal");
+
+            char buf[INET6_ADDRSTRLEN];
+            {
+                const char* str = inet_ntop(AF_INET6, &(session.ip.v6.addr[Session::Source]), buf, sizeof(buf));
+                out << (str ? str : "Invalid IPv6 address of source host")
+                    << ':' << ntohs(session.port[Session::Source]);
+            }
+            out << " --> ";
+            {
+                const char* str = inet_ntop(AF_INET6, &(session.ip.v6.addr[Session::Destination]), buf, sizeof(buf));
+                out << (str ? str : "Invalid IPv6 address of destination host")
+                    << ':' << ntohs(session.port[Session::Destination]);
+            }
+        }
     }
     switch(session.type)
     {

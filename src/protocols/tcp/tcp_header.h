@@ -9,6 +9,7 @@
 #include <cstdint>
 
 #include <arpa/inet.h>  // for ntohs()/ntohl()
+#include <netinet/in.h> // for in_port_t
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -33,8 +34,8 @@ struct tcp_header
         CWR = 0x80      // congestion window reduced
     };
 
-    uint16_t tcp_sport;     // source port
-    uint16_t tcp_dport;     // destination port
+    in_port_t tcp_sport;    // source port
+    in_port_t tcp_dport;    // destination port
     uint32_t tcp_seq;       // sequence number
     uint32_t tcp_ack;       // acknowledgement number
     uint8_t  tcp_rsrvd_off; // (unused) and data offset
@@ -46,8 +47,8 @@ struct tcp_header
 
 struct TCPHeader : private tcp_header
 {
-    inline uint16_t sport() const { return ntohs(tcp_sport); }
-    inline uint16_t dport() const { return ntohs(tcp_dport); }
+    inline in_port_t sport() const { return tcp_sport; }
+    inline in_port_t dport() const { return tcp_dport; }
     inline uint32_t   seq() const { return ntohl(tcp_seq); }
     inline uint32_t   ack() const { return ntohl(tcp_ack); }
     inline uint8_t offset() const { return (tcp_rsrvd_off & 0xf0) >> 2 /* *4 */; } // return number of bytes
@@ -56,9 +57,6 @@ struct TCPHeader : private tcp_header
     inline uint16_t window()   const { return ntohs(tcp_win); }
     inline uint16_t checksum() const { return ntohs(tcp_sum); }
     inline uint16_t urgent()   const { return ntohs(tcp_urp); }
-
-    inline uint16_t network_bo_sport() const { return tcp_sport; }
-    inline uint16_t network_bo_dport() const { return tcp_dport; }
 } __attribute__ ((__packed__));
 
 } // namespace tcp
