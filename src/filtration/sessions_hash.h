@@ -44,11 +44,11 @@ struct IPv4TCPMapper
 
     static inline void fill_hash_key(PacketInfo& info, Session& key)
     {
-        key.port[0] = info.tcp->network_bo_sport();
-        key.port[1] = info.tcp->network_bo_dport();
+        key.port[0] = info.tcp->sport();
+        key.port[1] = info.tcp->dport();
 
-        key.ip.v4.addr[0] = info.ipv4->network_bo_src();
-        key.ip.v4.addr[1] = info.ipv4->network_bo_dst();
+        key.ip.v4.addr[0] = info.ipv4->src();
+        key.ip.v4.addr[1] = info.ipv4->dst();
 
         if(key.ip.v4.addr[0] < key.ip.v4.addr[1]) info.direction = Session::Source;
         else
@@ -61,7 +61,10 @@ struct IPv4TCPMapper
     {
         std::size_t operator() (const Session& key) const
         {
-            return key.port[0] + key.port[1] + key.ip.v4.addr[0] + key.ip.v4.addr[1];
+            return key.port[0] +
+                   key.port[1] +
+                   key.ip.v4.addr[0] +
+                   key.ip.v4.addr[1];
         }
     };
 
@@ -102,11 +105,11 @@ struct IPv4UDPMapper
 
     static inline void fill_hash_key(PacketInfo& info, Session& key)
     {
-        key.port[0] = info.udp->network_bo_sport();
-        key.port[1] = info.udp->network_bo_dport();
+        key.port[0] = info.udp->sport();
+        key.port[1] = info.udp->dport();
 
-        key.ip.v4.addr[0] = info.ipv4->network_bo_src();
-        key.ip.v4.addr[1] = info.ipv4->network_bo_dst();
+        key.ip.v4.addr[0] = info.ipv4->src();
+        key.ip.v4.addr[1] = info.ipv4->dst();
 
         if(key.ip.v4.addr[0] < key.ip.v4.addr[1]) info.direction = Session::Source;
         else
@@ -119,7 +122,10 @@ struct IPv4UDPMapper
     {
         std::size_t operator() (const Session& key) const
         {
-            return key.port[0] + key.port[1] + key.ip.v4.addr[0] + key.ip.v4.addr[1];
+            return key.port[0] +
+                   key.port[1] +
+                   key.ip.v4.addr[0] +
+                   key.ip.v4.addr[1];
         }
     };
 
@@ -138,6 +144,148 @@ struct IPv4UDPMapper
                (a.ip.v4.addr[1] == b.ip.v4.addr[0]) &&
                (a.ip.v4.addr[0] == b.ip.v4.addr[1]))
                 return true;
+            return false;
+        }
+    };
+};
+
+struct IPv6TCPMapper
+{
+    static inline void fill_session(const PacketInfo& info, NetworkSession& session)
+    {
+        session.ip_type   = Session::v6;
+        session.type      = Session::TCP;
+        session.direction = info.direction;
+
+        session.port[0] = info.tcp->sport();
+        session.port[1] = info.tcp->dport();
+
+        memcpy(session.ip.v6.addr[0], &(info.ipv6->src()), sizeof(session.ip.v6.addr[0]));
+        memcpy(session.ip.v6.addr[1], &(info.ipv6->dst()), sizeof(session.ip.v6.addr[1]));
+    }
+
+    static inline void fill_hash_key(PacketInfo& info, Session& key)
+    {
+        key.port[0] = info.tcp->sport();
+        key.port[1] = info.tcp->dport();
+
+        memcpy(key.ip.v6.addr[0], &(info.ipv6->src()), sizeof(key.ip.v6.addr[0]));
+        memcpy(key.ip.v6.addr[1], &(info.ipv6->dst()), sizeof(key.ip.v6.addr[1]));
+
+        const int r = memcmp(key.ip.v6.addr[0], key.ip.v6.addr[1], sizeof(key.ip.v6.addr[0]));
+
+        if(r < 0) info.direction = Session::Source;
+        else
+        if(r > 0) info.direction = Session::Destination;
+        else // Ok, addresses are equal, compare ports
+        info.direction =  (key.port[0] < key.port[1]) ? Session::Source : Session::Destination;
+    }
+
+    struct KeyHash
+    {
+        std::size_t operator() (const Session& key) const
+        {
+            std::size_t ret = key.port[0] + key.port[1];
+            for(std::size_t i=0; i<sizeof(key.ip.v6.addr[0]); ++i)
+            {
+                ret += key.ip.v6.addr[0][i];
+            }
+            for(std::size_t i=0; i<sizeof(key.ip.v6.addr[1]); ++i)
+            {
+                ret += key.ip.v6.addr[1][i];
+            }
+            return ret;
+        }
+    };
+
+    struct KeyEqual
+    {
+        bool operator() (const Session& a, const Session& b) const
+        {
+            if((a.port[0] == b.port[0]) && (a.port[1] == b.port[1]))
+            {
+                // compare src and dst addresses in one call
+                if(memcmp(&(a.ip.v6), &(b.ip.v6), sizeof(a.ip.v6)) == 0)
+                    return true;
+            }
+
+            if((a.port[1] == b.port[0]) && (a.port[0] == b.port[1]))
+            {
+                if( memcmp(a.ip.v6.addr[1], b.ip.v6.addr[0], sizeof(a.ip.v6.addr[1])) == 0
+                &&  memcmp(a.ip.v6.addr[0], b.ip.v6.addr[1], sizeof(a.ip.v6.addr[0])) == 0)
+                    return true;
+            }
+            return false;
+        }
+    };
+};
+
+struct IPv6UDPMapper
+{
+    static inline void fill_session(const PacketInfo& info, NetworkSession& session)
+    {
+        session.ip_type   = Session::v6;
+        session.type      = Session::UDP;
+        session.direction = info.direction;
+
+        session.port[0] = info.udp->sport();
+        session.port[1] = info.udp->dport();
+
+        memcpy(session.ip.v6.addr[0], &(info.ipv6->src()), sizeof(session.ip.v6.addr[0]));
+        memcpy(session.ip.v6.addr[1], &(info.ipv6->dst()), sizeof(session.ip.v6.addr[1]));
+    }
+
+    static inline void fill_hash_key(PacketInfo& info, Session& key)
+    {
+        key.port[0] = info.udp->sport();
+        key.port[1] = info.udp->dport();
+
+        memcpy(key.ip.v6.addr[0], &(info.ipv6->src()), sizeof(key.ip.v6.addr[0]));
+        memcpy(key.ip.v6.addr[1], &(info.ipv6->dst()), sizeof(key.ip.v6.addr[1]));
+
+        const int r = memcmp(key.ip.v6.addr[0], key.ip.v6.addr[1], sizeof(key.ip.v6.addr[0]));
+
+        if(r < 0) info.direction = Session::Source;
+        else
+        if(r > 0) info.direction = Session::Destination;
+        else // Ok, addresses are equal, compare ports
+        info.direction =  (key.port[0] < key.port[1]) ? Session::Source : Session::Destination;
+    }
+
+    struct KeyHash
+    {
+        std::size_t operator() (const Session& key) const
+        {
+            std::size_t ret = key.port[0] + key.port[1];
+            for(std::size_t i=0; i<sizeof(key.ip.v6.addr[0]); ++i)
+            {
+                ret += key.ip.v6.addr[0][i];
+            }
+            for(std::size_t i=0; i<sizeof(key.ip.v6.addr[1]); ++i)
+            {
+                ret += key.ip.v6.addr[1][i];
+            }
+            return ret;
+        }
+    };
+
+    struct KeyEqual
+    {
+        bool operator() (const Session& a, const Session& b) const
+        {
+            if((a.port[0] == b.port[0]) && (a.port[1] == b.port[1]))
+            {
+                // compare src and dst addresses in one call
+                if(memcmp(&(a.ip.v6), &(b.ip.v6), sizeof(a.ip.v6)) == 0)
+                    return true;
+            }
+
+            if((a.port[1] == b.port[0]) && (a.port[0] == b.port[1]))
+            {
+                if( memcmp(a.ip.v6.addr[1], b.ip.v6.addr[0], sizeof(a.ip.v6.addr[1])) == 0
+                &&  memcmp(a.ip.v6.addr[0], b.ip.v6.addr[1], sizeof(a.ip.v6.addr[0])) == 0)
+                    return true;
+            }
             return false;
         }
     };
