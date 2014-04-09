@@ -59,6 +59,14 @@ struct ipv6_route {
 
 // Fragment header
 struct ipv6_frag {
+
+    enum Fragmentation : uint16_t
+    {
+        MORE    = 0x0001, // more-fragments flag
+        RESERVED= 0x0006, // mask out reserved bits
+        OFFSET  = 0xfff8  // mask out offset from frag_offlg
+    };
+
     uint8_t  frag_nexthdr;  // next header
     uint8_t  frag_reserved; // reserved field
     uint16_t frag_offlg;    // offset, reserved, and flag

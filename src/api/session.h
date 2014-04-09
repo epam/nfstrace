@@ -41,14 +41,15 @@ struct Session
 
     union IPAddress
     {
-        struct
+        struct  // 2 IPv4 addresses in network byte order
         {
-            in_addr_t addr[2];    // 2 IPv4 addresses in network byte order
+            in_addr_t addr[2];
         } v4;
-        struct
+        union   // 2 IPv6 addresses in network byte order
         {
-            uint8_t addr[2][16];   // 2 IPv6 addresses in network byte order
-        } v6;
+            uint8_t  addr       [2][16];
+            uint32_t addr_uint32[2][4];
+        } __attribute__ ((__packed__)) v6;
     } ip;
 };
 

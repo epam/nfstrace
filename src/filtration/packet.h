@@ -140,7 +140,7 @@ struct PacketInfo
         dlen = payload; // skip padding at the end
         // handling optional headers
         uint8_t htype = header->nexthdr();
-        switch_type:
+        switch_type:    // TODO: remove ugly goto
         switch(htype)
         {
         case ip::NextProtocol::TCP: check_tcp(); break;
@@ -149,7 +149,7 @@ struct PacketInfo
         case ip::NextProtocol::HOPOPTS:
         {
             auto hbh = reinterpret_cast<const ipv6_hbh*>(data);
-            const uint8_t size = 1 + hbh->hbh_len;
+            const unsigned int size{1U + hbh->hbh_len};
 
             if(dlen < size) return; // truncated packet
 
@@ -163,7 +163,7 @@ struct PacketInfo
         case ip::NextProtocol::DSTOPTS:
         {
             auto dest = reinterpret_cast<const ipv6_dest*>(data);
-            const uint8_t size = 1 + dest->dest_len;
+            const unsigned int size{1U + dest->dest_len};
 
             if(dlen < size) return; // truncated packet
 
@@ -177,7 +177,7 @@ struct PacketInfo
         case ip::NextProtocol::ROUTING:
         {
             auto route = reinterpret_cast<const ipv6_route*>(data);
-            const uint8_t size = 1 + route->route_len;
+            const unsigned int size{1U + route->route_len};
 
             if(dlen < size) return; // truncated packet
 
@@ -188,7 +188,23 @@ struct PacketInfo
             goto switch_type;
         }
 
-        case ip::NextProtocol::FRAGMENT: // TODO: add support fragmented IPv6 packets
+        case ip::NextProtocol::FRAGMENT:
+        {
+            auto frag = reinterpret_cast<const ipv6_frag*>(data);
+
+            // isn't first fragment (offset != 0)
+            if((ntohs(frag->frag_offlg) & ipv6_frag::OFFSET) != 0) return;
+
+            const unsigned int size{sizeof(ipv6_frag)};
+
+            if(dlen < size) return; // truncated packet
+
+            data += size;
+            dlen -= size;
+
+            htype = frag->frag_nexthdr;
+            goto switch_type;
+        }
         case ip::NextProtocol::NONE:
         default:    // unknown header
             return;
