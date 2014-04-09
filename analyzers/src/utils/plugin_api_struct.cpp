@@ -3,7 +3,8 @@
 // Description: Entry for all operations under plugin_api.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include <arpa/inet.h> // for inet_ntop(), ntohs()
+#include <arpa/inet.h>  // for inet_ntop(), ntohs()
+#include <sys/socket.h> // for AF_INET/AF_INET6
 
 #include "plugin_api_struct.h"
 //------------------------------------------------------------------------------

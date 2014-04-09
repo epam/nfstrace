@@ -5,7 +5,8 @@
 //------------------------------------------------------------------------------
 #include <sstream>
 
-#include <arpa/inet.h> // for inet_ntop(), ntohs()
+#include <arpa/inet.h>  // for inet_ntop(), ntohs()
+#include <sys/socket.h> // for AF_INET/AF_INET6
 
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
