@@ -642,47 +642,33 @@ public:
 
         PacketInfo info(pkthdr, packet, processor->datalink);
 
-        if(info.eth)
+        if(info.tcp)
         {
-            if(info.ipv4)
+            if(pkthdr->caplen != pkthdr->len)
             {
-                if(info.tcp)     // Ethernet:IPv4:TCP
-                {
-                    if(pkthdr->caplen == pkthdr->len)
-                    {
-                        return processor->ipv4_tcp_sessions.collect_packet(info);
-                    }
-                    else
-                    {
-                        LOGONCE("pcap packet was truncated by snaplen option this "
-                                "packed won't correclty reassembled to TCP stream");
-                        return;
-                    }
-                }
-                else if(info.udp)// Ethernet:IPv4:UDP
-                {
-                    return processor->ipv4_udp_sessions.collect_packet(info);
-                }
+                LOGONCE("pcap packet was truncated by snaplen option this "
+                        "packed won't correclty reassembled to TCP stream");
+                return;
             }
-            else if(info.ipv6)
+
+            if(info.ipv4)       // Ethernet:IPv4:TCP
             {
-                if(info.tcp)     // Ethernet:IPv6:TCP
-                {
-                    if(pkthdr->caplen == pkthdr->len)
-                    {
-                        return processor->ipv6_tcp_sessions.collect_packet(info);
-                    }
-                    else
-                    {
-                        LOGONCE("pcap packet was truncated by snaplen option this "
-                                "packed won't correclty reassembled to TCP stream");
-                        return;
-                    }
-                }
-                else if(info.udp)// Ethernet:IPv6:UDP
-                {
-                    return processor->ipv6_udp_sessions.collect_packet(info);
-                }
+                return processor->ipv4_tcp_sessions.collect_packet(info);
+            }
+            else if(info.ipv6)  // Ethernet:IPv6:TCP
+            {
+                return processor->ipv6_tcp_sessions.collect_packet(info);
+            }
+        }
+        else if(info.udp)
+        {
+            if(info.ipv4)       // Ethernet:IPv4:UDP
+            {
+                return processor->ipv4_udp_sessions.collect_packet(info);
+            }
+            else if(info.ipv6)  // Ethernet:IPv6:UDP
+            {
+                return processor->ipv6_udp_sessions.collect_packet(info);
             }
         }
 
