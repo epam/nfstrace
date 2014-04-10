@@ -24,7 +24,7 @@ public:
         All    = 2,
     };
 
-    // helper for creation and destruction global level of messages
+    // helper for creation and destruction global level of verbosity
     struct Global
     {
         explicit Global(const Level verbose_level);

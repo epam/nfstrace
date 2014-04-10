@@ -8,8 +8,8 @@
 
 #include <unistd.h>
 
-#include "controller/parameters.h"
 #include "analysis/plugin.h"
+#include "controller/parameters.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -225,8 +225,8 @@ void Parameters::set_multiple_value(int index, char *const v)
 
 std::string Parameters::default_iofile() const
 {
-    // make string: INTERFACE-BPF-FILTER.pcap
-    std::string str = get(CLI::INTERFACE).to_cstr();
+    // create string: INTERFACE-BPF-FILTER.pcap
+    std::string str{ get(CLI::INTERFACE).to_cstr() };
     str.push_back('-');
     str.append(get(CLI::FILTER).to_cstr());
     str.append(".pcap");

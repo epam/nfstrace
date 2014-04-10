@@ -39,7 +39,7 @@ struct Opt
         Value(const Value&)                  = delete;
         const Value& operator=(const Value&) = delete;
 
-        operator std::string() const { return std::string(value);           }
+        operator std::string() const { return std::string{value};           }
         const char*  to_cstr() const { return value;                        }
         int           to_int() const { return atoi(value);                  }
         bool         to_bool() const { return strcmp(value, "true") == 0;   }
@@ -211,7 +211,7 @@ void CmdlineParser<CLI>::parse(int argc, char** argv)
     if(optind != argc)
     {
         // quote non-option
-        std::string name { build_name(0, std::string(argv[optind])) };
+        std::string name{ build_name(0, argv[optind]) };
         throw CLIError{std::string{"Unexpected operand on command line: "}
                 + name};
     }
@@ -256,13 +256,13 @@ void CmdlineParser<CLI>::print_usage(std::ostream& out, const char* name)
 
         if(o.short_opt) // print out short key
         {
-            char tmp[] = { '-', o.short_opt, ' ', '\0' };
+            char tmp[]{ '-', o.short_opt, ' ', '\0' };
             if(o.long_opt) tmp[2] = ',';
-            s_opt = std::string("   ") + tmp; //indentation
+            s_opt = std::string{"   "} + tmp; //indentation
         }
         if(o.long_opt) // print out long key
         {
-            l_opt = std::string(" --") + std::string(o.long_opt);
+            l_opt = std::string{" --"} + o.long_opt;
 
             if(o.value_pattern)
             {
@@ -272,7 +272,7 @@ void CmdlineParser<CLI>::print_usage(std::ostream& out, const char* name)
         }
         if(o.deflt) // has default value?
         {
-            text = std::string("(default:") + o.deflt + ") ";
+            text = std::string{"(default:"} + o.deflt + ") ";
         }
         else
         {

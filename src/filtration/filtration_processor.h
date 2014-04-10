@@ -364,7 +364,7 @@ public:
         collection.reset();     // skip collected data
     }
 
-    inline void set_writer(NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
+    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {
         assert(w);
         collection.set(*w, session_ptr);
