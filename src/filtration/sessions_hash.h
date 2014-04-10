@@ -24,11 +24,11 @@ namespace NST
 namespace filtration
 {
 
-using Session        = NST::utils::Session;
-using NetworkSession = NST::utils::NetworkSession;
-
 struct MapperImpl
 {
+    using Session        = NST::utils::Session;
+    using NetworkSession = NST::utils::NetworkSession;
+
     MapperImpl() = delete;
 
     static inline Session::Direction ipv4_direction(const Session& key)
@@ -317,7 +317,7 @@ public:
                 i = res.first;
 
                 // fill new session after construction
-                NetworkSession& session = *(res.first->second);
+                utils::NetworkSession& session = *(res.first->second);
                 Mapper::fill_session(info, session);
             }
         }
