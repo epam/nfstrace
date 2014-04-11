@@ -36,10 +36,10 @@ public:
 
 
 // Application layer session
-struct ApplicationsSession : public Session
+struct ApplicationSession : public Session
 {
 public:
-    ApplicationsSession(const NetworkSession& s, Direction from_client);
+    ApplicationSession(const NetworkSession& s, Direction from_client);
 
     const std::string& str() const { return session_str; }
 private:
