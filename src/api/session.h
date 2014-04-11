@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Struct represented network session.
+// Description: Session structure.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef SESSION_H
@@ -37,7 +37,7 @@ struct Session
         v6=1
     } ip_type:16;       // 16 bit for alignment following integers
 
-    in_port_t port[2];   // 2 ports in network byte order
+    in_port_t port[2];  // 2 ports in network byte order
 
     union IPAddress
     {
