@@ -15,7 +15,7 @@ int main(int argc, char **argv) try
 {
     Parameters params(argc, argv); // set and validate CLI options
 
-    if(!Parameters::instance())
+    if(params.show_help())
     {
         return 0; // -h was passed
     }

@@ -9,8 +9,6 @@
 #include <string>
 #include <vector>
 
-#include "controller/cmdline_args.h"
-#include "controller/cmdline_parser.h"
 #include "filtration/dumping.h"
 #include "filtration/pcap/capture_reader.h"
 //------------------------------------------------------------------------------
@@ -36,24 +34,25 @@ struct AParams
     const std::string args;
 };
 
-class Parameters : private cmdline::CmdlineParser<cmdline::Args>
+class Parameters
 {
-    static Parameters* global;
-public:
     using CaptureParams = filtration::pcap::CaptureReader::Params;
     using DumpingParams = filtration::Dumping::Params;
 
+public:
+    // initialize global instance
     Parameters(int argc, char** argv);
+    ~Parameters();
+
     Parameters(const Parameters&)            = delete;
     Parameters& operator=(const Parameters&) = delete;
 
-    static Parameters* instance() { return global; }
+    bool show_help() const;
 
     // access helpers
     const std::string&  program_name() const;
     RunningMode         running_mode() const;
     std::string         input_file() const;
-    unsigned short      rpcmsg_limit() const;
     unsigned short      queue_capacity() const;
     bool                trace() const;
     int                 verbose_level() const;
@@ -61,16 +60,7 @@ public:
     const DumpingParams dumping_params() const;
     const std::vector<AParams>& analysis_modules() const;
 
-protected:
-    void set_multiple_value(int index, char *const v) override;
-
-private:
-    std::string default_iofile() const;
-
-    // cashed values
-    unsigned short rpc_message_limit;
-    std::string program;  // name of program in command line
-    std::vector<AParams> analysiss_params;
+    static unsigned short rpcmsg_limit();
 };
 
 } // namespace controller

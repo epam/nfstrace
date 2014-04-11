@@ -11,7 +11,6 @@
 
 #include "controller/parameters.h"
 #include "controller/running_status.h"
-#include "filtration/processing_thread.h"
 #include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -43,7 +42,7 @@ private:
 
     RunningStatus& status;
 
-    std::vector< std::unique_ptr<ProcessingThread> > threads;
+    std::vector< std::unique_ptr<class ProcessingThread> > threads;
 };
 
 } // namespace filtration

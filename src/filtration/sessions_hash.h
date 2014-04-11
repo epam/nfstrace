@@ -290,7 +290,7 @@ public:
     , writer    {w}
     , max_hdr   {0}
     {
-        max_hdr = controller::Parameters::instance()->rpcmsg_limit();
+        max_hdr = controller::Parameters::rpcmsg_limit();
     }
     ~SessionsHash()
     {
