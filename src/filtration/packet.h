@@ -86,7 +86,7 @@ struct PacketInfo
     // TODO: add support Linux cooked sockets
     }
 
-    inline void check_ipv4()
+    inline void check_ipv4() __attribute__((always_inline))
     {
         if(dlen < sizeof(IPv4Header)) return;
         auto header = reinterpret_cast<const IPv4Header*>(data);
@@ -123,7 +123,7 @@ struct PacketInfo
         ipv4 = header;
     }
 
-    inline void check_ipv6()
+    inline void check_ipv6() __attribute__((always_inline))
     {
         if(dlen < sizeof(IPv6Header)) return;
         auto header = reinterpret_cast<const IPv6Header*>(data);
@@ -213,7 +213,7 @@ struct PacketInfo
         ipv6 = header;
     }
 
-    inline void check_tcp()
+    inline void check_tcp() __attribute__((always_inline))
     {
         if(dlen < sizeof(TCPHeader)) return;   // truncated TCP header
         auto header = reinterpret_cast<const TCPHeader*>(data);
@@ -233,7 +233,7 @@ struct PacketInfo
         tcp = header;
     }
 
-    inline void check_udp()
+    inline void check_udp() __attribute__((always_inline))
     {
         if(dlen < sizeof(UDPHeader)) return;   // fragmented UDP header
         const UDPHeader* header = reinterpret_cast<const UDPHeader*>(data);
