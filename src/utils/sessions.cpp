@@ -93,7 +93,7 @@ void print_ipv4_port_as_hostname_service(std::ostream& out,
                                                   NI_NAMEREQD );
     if(err == 0)
     {
-        out << "(" << hostname << ":" << service << ")";
+        out << '(' << hostname << ':' << service << ')';
     }
 }
 
@@ -116,7 +116,7 @@ void print_ipv6_port_as_hostname_service(std::ostream& out,
                                         NI_NAMEREQD );
     if(err == 0)
     {
-        out << "(" << hostname << ":" << service << ")";
+        out << '(' << hostname << ':' << service << ')';
     }
 }
 
