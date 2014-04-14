@@ -76,15 +76,9 @@ void print_ipv6_port(std::ostream& out, const uint8_t (&ipv6)[16], in_port_t por
         << ':' << ntohs(port);
 }
 
-void print_ipv4_port_as_hostname_service(std::ostream& out,
-                                            in_addr_t ipv4,
-                                            in_port_t port)
+template<typename SockAddr>
+void print_sockaddr(std::ostream& out, SockAddr& addr)
 {
-    sockaddr_in addr;
-    addr.sin_family     = AF_INET;
-    addr.sin_port       = port;
-    addr.sin_addr.s_addr= ipv4;
-
     char hostname[1025];
     char service [65];
     const int err = getnameinfo((sockaddr*)&addr, sizeof(addr),
@@ -95,6 +89,18 @@ void print_ipv4_port_as_hostname_service(std::ostream& out,
     {
         out << '(' << hostname << ':' << service << ')';
     }
+}
+
+void print_ipv4_port_as_hostname_service(std::ostream& out,
+                                            in_addr_t ipv4,
+                                            in_port_t port)
+{
+    sockaddr_in addr;
+    addr.sin_family     = AF_INET;
+    addr.sin_port       = port;
+    addr.sin_addr.s_addr= ipv4;
+
+    print_sockaddr(out, addr);
 }
 
 void print_ipv6_port_as_hostname_service(std::ostream& out,
@@ -108,16 +114,7 @@ void print_ipv6_port_as_hostname_service(std::ostream& out,
     addr.sin6_addr      = (in6_addr&)ipv6;
     addr.sin6_scope_id  = 0;
 
-    char hostname[1025];
-    char service [65];
-    const int err = getnameinfo((sockaddr*)&addr, sizeof(addr),
-                                        hostname, sizeof(hostname),
-                                         service, sizeof(service),
-                                        NI_NAMEREQD );
-    if(err == 0)
-    {
-        out << '(' << hostname << ':' << service << ')';
-    }
+    print_sockaddr(out, addr);
 }
 
 } // unnamed namespace
