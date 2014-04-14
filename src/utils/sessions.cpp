@@ -38,6 +38,10 @@ ApplicationSession::ApplicationSession(const NetworkSession& s, Direction from_c
         }
     }
 
+    // TODO: print network addresses in human readable form and
+    //       potential host name lookup may be expensive, to try to use
+    //       std::future(async | deferred, ...) and std::promise, to perform
+    //       this operation asynchronously
     std::stringstream stream(std::ios_base::out);
     stream << *this;
     session_str = stream.str();
@@ -76,6 +80,7 @@ void print_ipv6_port(std::ostream& out, const uint8_t (&ipv6)[16], in_port_t por
         << ':' << ntohs(port);
 }
 
+// TODO: getnameinfo call may be expensive
 template<typename SockAddr>
 void print_sockaddr(std::ostream& out, SockAddr& addr)
 {
