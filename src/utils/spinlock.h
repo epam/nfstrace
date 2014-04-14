@@ -1,11 +1,13 @@
 //------------------------------------------------------------------------------
 // Author: Yauheni Azaranka
-// Description: Wrapper for spinlock and lock guard based on RAII idiom.
+// Description: Wrapper for pthread spinlock. It implements BasicLockable concept.
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef SPINLOCK_H
 #define SPINLOCK_H
 //------------------------------------------------------------------------------
+#include <mutex>    // for std::lock_guard
+
 #include <pthread.h>
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -17,40 +19,39 @@ namespace utils
 class Spinlock
 {
 public:
-    Spinlock()
+    Spinlock() noexcept
     {
         pthread_spin_init(&spinlock, PTHREAD_PROCESS_PRIVATE);
     }
     Spinlock(const Spinlock&)            = delete;
     Spinlock& operator=(const Spinlock&) = delete;
-    ~Spinlock()
+    ~Spinlock() noexcept
     {
         pthread_spin_destroy(&spinlock);
     }
 
-    class Lock
+    bool try_lock() noexcept
     {
-    public:
-        Lock(const Spinlock& m) : locked(m)
-        {
-            pthread_spin_lock(&locked.spinlock);
-        }
-        Lock(const Lock&)            = delete;
-        Lock& operator=(const Lock&) = delete;
-        ~Lock()
-        {
-            pthread_spin_unlock(&locked.spinlock);
-        }
+        return 0 == pthread_spin_trylock(&spinlock);
+    }
 
-    private:
-        const Spinlock& locked;
-    };
+    void lock() noexcept
+    {
+        pthread_spin_lock(&spinlock);
+    }
+
+    void unlock() noexcept
+    {
+        pthread_spin_unlock(&spinlock);
+    }
+
+    using Lock = std::lock_guard<Spinlock>;
 
 private:
     mutable pthread_spinlock_t spinlock;
 };
 
-} // utils
+} // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
 #endif//SPINLOCK_H

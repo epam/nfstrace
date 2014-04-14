@@ -22,27 +22,28 @@ class NetworkInterfaces
 {
 public:
 
-    class iterator
+    class Interface
     {
         friend class NetworkInterfaces;
     public:
 
-        inline    operator bool() const { return ptr != nullptr; }
-        inline const char* name() const { return ptr->name; }
-        inline const char* dscr() const { return ptr->description; }
-        inline bool is_loopback() const { return ptr->flags & PCAP_IF_LOOPBACK; }
+        inline const char* name() const noexcept { return ptr->name; }
+        inline const char* dscr() const noexcept { return ptr->description; }
+        inline bool is_loopback() const noexcept { return ptr->flags & PCAP_IF_LOOPBACK; }
 
-        void next(){ ptr = ptr->next; }
+        inline      operator bool() const noexcept { return ptr != nullptr; }
+        inline void operator   ++() const noexcept { ptr = ptr->next; }
+        inline bool operator   !=(const Interface& i) const noexcept { return ptr != i.ptr; }
+        inline const Interface operator*() const noexcept { return *this; }
 
-        iterator(const iterator& i) : ptr{i.ptr}{}
+        Interface(const Interface& i) : ptr{i.ptr}{}
     private:
-        iterator(pcap_if_t* p) : ptr{p}{}
-        iterator& operator=(const iterator&) = delete;
+        Interface(pcap_if_t* p) : ptr{p}{}
 
-        pcap_if_t* ptr;
+        mutable pcap_if_t* ptr;
     };
 
-    inline NetworkInterfaces() : interfaces(nullptr)
+    inline NetworkInterfaces() noexcept : interfaces{nullptr}
     {
         char errbuf[PCAP_ERRBUF_SIZE];
         if(pcap_findalldevs(&interfaces, errbuf) == -1)
@@ -50,17 +51,32 @@ public:
             throw PcapError("pcap_findalldevs", errbuf);
         }
     }
-    inline ~NetworkInterfaces()
+    inline ~NetworkInterfaces() noexcept
     {
         pcap_freealldevs(interfaces);
     }
 
-    const iterator first() const { return iterator(interfaces); }
+    const Interface begin() const noexcept { return Interface{interfaces}; }
+    const Interface   end() const noexcept { return Interface{nullptr};    }
 
 private:
     pcap_if_t* interfaces;
 };
 
+std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Interface& i)
+{
+    out << i.name();
+    const char* dscr = i.dscr();
+    if(dscr)
+    {
+        out << " (" << dscr << ')';
+    }
+    if(i.is_loopback())
+    {
+        out << " (loopback)";
+    }
+    return out;
+}
 
 } // namespace pcap
 } // namespace filtration

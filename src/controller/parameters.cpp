@@ -3,13 +3,12 @@
 // Description: Class provides validation and access to application parameters
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
-#include <algorithm>
 #include <iostream>
 
-#include <unistd.h>
-
-#include "controller/parameters.h"
 #include "analysis/plugin.h"
+#include "controller/cmdline_args.h"
+#include "controller/cmdline_parser.h"
+#include "controller/parameters.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -17,7 +16,8 @@ namespace NST
 namespace controller
 {
 
-using CLI = NST::controller::cmdline::Args;
+namespace // implementation
+{
 
 static const char program_build_information[]=
 // the NST_BUILD_VERSION, NST_BUILD_PLATFORM and NST_BUILD_COMPILER
@@ -34,59 +34,123 @@ static const char program_build_information[]=
     "";
 #endif
 
-Parameters* Parameters::global = nullptr;
+static const class ParametersImpl* impl = nullptr;
 
-Parameters::Parameters(int argc, char** argv) : rpc_message_limit(0)
+using CLI = NST::controller::cmdline::Args;
+
+class ParametersImpl : public cmdline::CmdlineParser<CLI>
 {
-    if(global != nullptr) return; // init global instance only once
+    friend class NST::controller::Parameters;
 
-    parse(argc, argv);
-    if(get(CLI::HELP).to_bool())
+    ParametersImpl(int argc, char** argv)
+    : rpc_message_limit{0}
     {
-        std::cout << program_build_information << std::endl;
-        print_usage(std::cout, argv[0]);
-
-        for(const auto& a : analysis_modules())
+        parse(argc, argv);
+        if(get(CLI::HELP).to_bool())
         {
-            const std::string& path = a.path;
-            try
+            std::cout << program_build_information << std::endl;
+            print_usage(std::cout, argv[0]);
+
+            for(const auto& a : analysis_modules)
             {
-                std::cout << "Usage of " << path << ":\n";
-                std::cout << NST::analysis::Plugin::usage_of(path) << std::endl;
+                const std::string& path = a.path;
+                try
+                {
+                    std::cout << "Usage of " << path << ":\n";
+                    std::cout << NST::analysis::Plugin::usage_of(path) << std::endl;
+                }
+                catch(std::runtime_error& e)
+                {
+                    std::cout << e.what() << std::endl;
+                }
             }
-            catch(std::runtime_error& e)
+            return;
+        }
+        validate();
+
+        // cashed values
+        const std::string program_path(argv[0]);
+        size_t found = program_path.find_last_of("/\\");
+        program = program_path.substr(found+1);
+
+        const int limit = get(CLI::MSIZE).to_int();
+        if(limit < 1 || limit > 4000)
+        {
+            throw cmdline::CLIError{std::string{"Invalid limit of RPC messages: "} + get(CLI::MSIZE).to_cstr()};
+        }
+
+        rpc_message_limit = limit;
+    }
+    virtual ~ParametersImpl(){}
+    ParametersImpl(const ParametersImpl&)            = delete;
+    ParametersImpl& operator=(const ParametersImpl&) = delete;
+
+protected:
+    void set_multiple_value(int index, char *const v) override
+    {
+        if(index == CLI::ANALYZERS) // may have multiple values
+        {
+            const std::string arg{v};
+            size_t ind = arg.find('#');
+            if(ind == std::string::npos)
             {
-                std::cout << e.what() << std::endl;
+                analysis_modules.emplace_back(arg);
+            }
+            else
+            {
+                const std::string path{arg, 0, ind};
+                const std::string args{arg, ind + 1};
+                analysis_modules.emplace_back(path, args);
             }
         }
-        return;
     }
-    validate();
+
+private:
+    std::string default_iofile() const
+    {
+        // create string: INTERFACE-BPF-FILTER.pcap
+        std::string str{ get(CLI::INTERFACE).to_cstr() };
+        str.push_back('-');
+        str.append(get(CLI::FILTER).to_cstr());
+        str.append(".pcap");
+        std::replace(str.begin(), str.end(), ' ', '-');
+        return str;
+    }
 
     // cashed values
-    const std::string program_path(argv[0]);
-    size_t found = program_path.find_last_of("/\\");
-    program = program_path.substr(found+1);
+    unsigned short rpc_message_limit;
+    std::string program;  // name of program in command line
+    std::vector<AParams> analysis_modules;
+};
 
-    const int limit = get(CLI::MSIZE).to_int();
-    if(limit < 1 || limit > 4000)
-    {
-        throw cmdline::CLIError(std::string("Invalid limit of RPC messages: ") + get(CLI::MSIZE).to_cstr());
-    }
+} // unnamed namespace
 
-    rpc_message_limit = limit;
+Parameters::Parameters(int argc, char** argv)
+{
+    // init global instance only once
+    if(impl) throw std::runtime_error{"initialized twice"};
+    impl = new ParametersImpl(argc, argv);
+}
 
-    global = this;
+Parameters::~Parameters()
+{
+    delete impl;
+    impl = nullptr;
+}
+
+bool Parameters::show_help() const
+{
+    return impl->get(CLI::HELP).to_bool();
 }
 
 const std::string& Parameters::program_name() const
 {
-    return program;
+    return impl->program;
 }
 
 RunningMode Parameters::running_mode() const
 {
-    const auto& mode = get(CLI::MODE);
+    const auto& mode = impl->get(CLI::MODE);
     if(mode.is(CLI::profiling_mode))
     {
         return RunningMode::Profiling;
@@ -100,26 +164,22 @@ RunningMode Parameters::running_mode() const
         return RunningMode::Analysis;
     }
 
-    throw cmdline::CLIError{std::string("Unknown mode: ") + mode.to_cstr()};
+    throw cmdline::CLIError{std::string{"Unknown mode: "} + mode.to_cstr()};
 }
 
 std::string Parameters::input_file() const
 {
     // TODO: add file validation
-    return is_default(CLI::IFILE) ? default_iofile() : get(CLI::IFILE);
-}
-
-unsigned short Parameters::rpcmsg_limit() const
-{
-    return rpc_message_limit;
+    return impl->is_default(CLI::IFILE) ? impl->default_iofile() : impl->get(CLI::IFILE);
 }
 
 unsigned short Parameters::queue_capacity() const
 {
-    const int capacity = get(CLI::QSIZE).to_int();
+    const int capacity = impl->get(CLI::QSIZE).to_int();
     if(capacity < 1 || capacity > 65535)
     {
-        throw cmdline::CLIError(std::string("Invalid value of queue capacity: ") + get(CLI::QSIZE).to_cstr());
+        throw cmdline::CLIError(std::string{"Invalid value of queue capacity: "}
+                                 + impl->get(CLI::QSIZE).to_cstr());
     }
 
     return capacity;
@@ -128,39 +188,40 @@ unsigned short Parameters::queue_capacity() const
 bool Parameters::trace() const
 {
     // enable tracing if no analysis module was passed
-    return get(CLI::TRACE).to_bool() || analysis_modules().empty();
+    return impl->get(CLI::TRACE).to_bool() || impl->analysis_modules.empty();
 }
 
 int Parameters::verbose_level() const
 {
-    return get(CLI::VERBOSE).to_int();
+    return impl->get(CLI::VERBOSE).to_int();
 }
 
 const Parameters::CaptureParams Parameters::capture_params() const
 {
     Parameters::CaptureParams params;
-    params.interface    = get(CLI::INTERFACE);
-    params.filter       = get(CLI::FILTER);
-    params.snaplen      = get(CLI::SNAPLEN).to_int();
-    params.timeout_ms   = get(CLI::TIMEOUT).to_int();
-    params.buffer_size  = get(CLI::BSIZE).to_int() * 1024 * 1024; // MBytes
-    params.promisc      = get(CLI::PROMISC).to_bool();
+    params.interface    = impl->get(CLI::INTERFACE);
+    params.filter       = impl->get(CLI::FILTER);
+    params.snaplen      = impl->get(CLI::SNAPLEN).to_int();
+    params.timeout_ms   = impl->get(CLI::TIMEOUT).to_int();
+    params.buffer_size  = impl->get(CLI::BSIZE).to_int() * 1024 * 1024; // MBytes
+    params.promisc      = impl->get(CLI::PROMISC).to_bool();
 
     // check interface
     if(params.interface.empty())
     {
-        const char* mode = get(CLI::MODE).to_cstr();
+        const char* mode = impl->get(CLI::MODE).to_cstr();
         throw cmdline::CLIError{std::string{"Interface is required for "} + mode + " mode"};
     }
 
     // check capture buffer size
     if(params.buffer_size < 1024 * 1024) // less than 1 MBytes
     {
-        throw cmdline::CLIError{std::string{"Invalid value of kernel buffer size: "} + get(CLI::BSIZE).to_cstr()};
+        throw cmdline::CLIError{std::string{"Invalid value of kernel buffer size: "}
+                                 + impl->get(CLI::BSIZE).to_cstr()};
     }
 
     // check and set capture direction
-    const auto& direction = get(CLI::DIRECTION);
+    const auto& direction = impl->get(CLI::DIRECTION);
     if(direction.is("in"))
     {
         params.direction = decltype(params.direction)::IN;
@@ -175,7 +236,8 @@ const Parameters::CaptureParams Parameters::capture_params() const
     }
     else
     {
-        throw cmdline::CLIError{std::string{"Unknown capturing direction: "} + direction.to_cstr()};
+        throw cmdline::CLIError{std::string{"Unknown capturing direction: "}
+                                 + direction.to_cstr()};
     }
 
     return params;
@@ -183,55 +245,30 @@ const Parameters::CaptureParams Parameters::capture_params() const
 
 const Parameters::DumpingParams Parameters::dumping_params() const
 {
-    std::string ofile = is_default(CLI::OFILE) ? default_iofile() : get(CLI::OFILE);
+    std::string ofile = impl->is_default(CLI::OFILE) ? impl->default_iofile() : impl->get(CLI::OFILE);
     // TODO: add file validation
 
-    const int dsize = get(CLI::DSIZE).to_int();
+    const int dsize = impl->get(CLI::DSIZE).to_int();
     if(dsize != 0 && ofile == "-") // '-' is alias for stdout in libpcap dumps
     {
-        throw cmdline::CLIError(std::string("Output file \"-\" means stdout, the dump-size must be 0"));
+        throw cmdline::CLIError{std::string{"Output file \"-\" means stdout, the dump-size must be 0"}};
     }
 
     Parameters::DumpingParams params;
     params.output_file = ofile;
-    params.command     = get(CLI::COMMAND);
+    params.command     = impl->get(CLI::COMMAND);
     params.size_limit  = dsize * 1024 * 1024; // MBytes
     return params;
 }
 
 const std::vector<AParams>& Parameters::analysis_modules() const
 {
-    return analysiss_params;
+    return impl->analysis_modules;
 }
 
-void Parameters::set_multiple_value(int index, char *const v)
+unsigned short Parameters::rpcmsg_limit()
 {
-    if(index == CLI::ANALYZERS) // may have multiple values
-    {
-        const std::string arg(v);
-        size_t ind = arg.find('#');
-        if(ind == std::string::npos)
-        {
-            analysiss_params.emplace_back(arg);
-        }
-        else
-        {
-            const std::string path(arg, 0, ind);
-            const std::string args(arg, ind + 1);
-            analysiss_params.emplace_back(path, args);
-        }
-    }
-}
-
-std::string Parameters::default_iofile() const
-{
-    // make string: INTERFACE-BPF-FILTER.pcap
-    std::string str = get(CLI::INTERFACE).to_cstr();
-    str.push_back('-');
-    str.append(get(CLI::FILTER).to_cstr());
-    str.append(".pcap");
-    std::replace(str.begin(), str.end(), ' ', '-');
-    return str;
+    return impl->rpc_message_limit;
 }
 
 } // namespace controller

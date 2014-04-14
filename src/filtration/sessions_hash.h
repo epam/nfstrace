@@ -24,11 +24,143 @@ namespace NST
 namespace filtration
 {
 
-using Session        = NST::utils::Session;
-using NetworkSession = NST::utils::NetworkSession;
-
-struct IPv4TCPMapper
+struct MapperImpl
 {
+    using Session        = NST::utils::Session;
+    using NetworkSession = NST::utils::NetworkSession;
+
+    MapperImpl() = delete;
+
+    static inline Session::Direction ipv4_direction(const Session& key)
+    {
+        if(key.port[0] < key.port[1]) return Session::Source;
+        else
+        if(key.port[0] > key.port[1]) return Session::Destination;
+
+        // Ok, ports are equal, compare addresses
+        return (key.ip.v4.addr[0] < key.ip.v4.addr[1]) ? Session::Source : Session::Destination;
+    }
+
+    struct IPv4PortsKeyHash
+    {
+        inline std::size_t operator() (const Session& key) const
+        {
+            return key.port[0] +
+                   key.port[1] +
+                   key.ip.v4.addr[0] +
+                   key.ip.v4.addr[1];
+        }
+    };
+
+    struct IPv4PortsKeyEqual
+    {
+        inline bool operator() (const Session& a, const Session& b) const
+        {
+            if((a.port[0] == b.port[0]) &&
+               (a.port[1] == b.port[1]) &&
+               (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
+               (a.ip.v4.addr[1] == b.ip.v4.addr[1]))
+                return true;
+
+            if((a.port[1] == b.port[0]) &&
+               (a.port[0] == b.port[1]) &&
+               (a.ip.v4.addr[1] == b.ip.v4.addr[0]) &&
+               (a.ip.v4.addr[0] == b.ip.v4.addr[1]))
+                return true;
+            return false;
+        }
+    };
+
+    static inline Session::Direction ipv6_direction(const Session& key)
+    {
+        if(key.port[0] < key.port[1]) return Session::Source;
+        else
+        if(key.port[0] > key.port[1]) return Session::Destination;
+
+        // Ok, ports are equal, compare addresses
+        const uint32_t* s = key.ip.v6.addr_uint32[0];
+        const uint32_t* d = key.ip.v6.addr_uint32[1];
+
+        if(s[0] != d[0]) return (s[0] < d[0]) ? Session::Source : Session::Destination;
+        if(s[1] != d[1]) return (s[1] < d[1]) ? Session::Source : Session::Destination;
+        if(s[2] != d[2]) return (s[2] < d[2]) ? Session::Source : Session::Destination;
+
+                         return (s[3] < d[3]) ? Session::Source : Session::Destination;
+    }
+
+    static inline void copy_ipv6(uint32_t dst[4], const uint8_t src[16])
+    {
+        // TODO:: fix alignment of src!
+        const uint32_t* s = reinterpret_cast<const uint32_t*>(src);
+        dst[0] = s[0];
+        dst[1] = s[1];
+        dst[2] = s[2];
+        dst[3] = s[3];
+    }
+
+    struct IPv6PortsKeyHash
+    {
+        std::size_t operator() (const Session& key) const
+        {
+            std::size_t ret = key.port[0] + key.port[1];
+
+            ret += key.ip.v6.addr_uint32[0][0];
+            ret += key.ip.v6.addr_uint32[0][1];
+            ret += key.ip.v6.addr_uint32[0][2];
+            ret += key.ip.v6.addr_uint32[0][3];
+
+            ret += key.ip.v6.addr_uint32[1][0];
+            ret += key.ip.v6.addr_uint32[1][1];
+            ret += key.ip.v6.addr_uint32[1][2];
+            ret += key.ip.v6.addr_uint32[1][3];
+
+            return ret;
+        }
+    };
+
+    struct IPv6PortsKeyEqual
+    {
+        static inline bool eq_ipv6_address(const uint32_t a[4], const uint32_t b[4])
+        {
+            return a[0] == b[0] &&
+                   a[1] == b[1] &&
+                   a[2] == b[2] &&
+                   a[3] == b[3];
+        }
+
+        bool operator() (const Session& a, const Session& b) const
+        {
+            if((a.port[0] == b.port[0]) && (a.port[1] == b.port[1]))
+            {
+                if( eq_ipv6_address(a.ip.v6.addr_uint32[0], b.ip.v6.addr_uint32[0] )
+                &&  eq_ipv6_address(a.ip.v6.addr_uint32[1], b.ip.v6.addr_uint32[1] ))
+                    return true;
+            }
+
+            if((a.port[1] == b.port[0]) && (a.port[0] == b.port[1]))
+            {
+                if( eq_ipv6_address(a.ip.v6.addr_uint32[1], b.ip.v6.addr_uint32[0] )
+                &&  eq_ipv6_address(a.ip.v6.addr_uint32[0], b.ip.v6.addr_uint32[1] ))
+                    return true;
+            }
+            return false;
+        }
+    };
+};
+
+struct IPv4TCPMapper : private MapperImpl
+{
+    static inline void fill_hash_key(PacketInfo& info, Session& key)
+    {
+        key.port[0] = info.tcp->sport();
+        key.port[1] = info.tcp->dport();
+
+        key.ip.v4.addr[0] = info.ipv4->src();
+        key.ip.v4.addr[1] = info.ipv4->dst();
+
+        info.direction = MapperImpl::ipv4_direction(key);
+    }
+
     static inline void fill_session(const PacketInfo& info, NetworkSession& session)
     {
         session.ip_type   = Session::v4;
@@ -42,51 +174,23 @@ struct IPv4TCPMapper
         session.ip.v4.addr[1] = info.ipv4->dst();
     }
 
-    static inline void fill_hash_key(PacketInfo& info, Session& key)
-    {
-        key.port[0] = info.tcp->network_bo_sport();
-        key.port[1] = info.tcp->network_bo_dport();
-
-        key.ip.v4.addr[0] = info.ipv4->network_bo_src();
-        key.ip.v4.addr[1] = info.ipv4->network_bo_dst();
-
-        if(key.ip.v4.addr[0] < key.ip.v4.addr[1]) info.direction = Session::Source;
-        else
-        if(key.ip.v4.addr[0] > key.ip.v4.addr[1]) info.direction = Session::Destination;
-        else // Ok, addresses are equal, compare ports
-        info.direction =  (key.port[0] < key.port[1]) ? Session::Source : Session::Destination;
-    }
-
-    struct KeyHash
-    {
-        std::size_t operator() (const Session& key) const
-        {
-            return key.port[0] + key.port[1] + key.ip.v4.addr[0] + key.ip.v4.addr[1];
-        }
-    };
-
-    struct KeyEqual
-    {
-        bool operator() (const Session& a, const Session& b) const
-        {
-            if((a.port[0] == b.port[0]) &&
-               (a.port[1] == b.port[1]) &&
-               (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
-               (a.ip.v4.addr[1] == b.ip.v4.addr[1]))
-                return true;
-
-            if((a.port[1] == b.port[0]) &&
-               (a.port[0] == b.port[1]) &&
-               (a.ip.v4.addr[1] == b.ip.v4.addr[0]) &&
-               (a.ip.v4.addr[0] == b.ip.v4.addr[1]))
-                return true;
-            return false;
-        }
-    };
+    using KeyHash  = MapperImpl::IPv4PortsKeyHash;
+    using KeyEqual = MapperImpl::IPv4PortsKeyEqual;
 };
 
-struct IPv4UDPMapper
+struct IPv4UDPMapper : private MapperImpl
 {
+    static inline void fill_hash_key(PacketInfo& info, Session& key)
+    {
+        key.port[0] = info.udp->sport();
+        key.port[1] = info.udp->dport();
+
+        key.ip.v4.addr[0] = info.ipv4->src();
+        key.ip.v4.addr[1] = info.ipv4->dst();
+
+        info.direction = MapperImpl::ipv4_direction(key);
+    }
+
     static inline void fill_session(const PacketInfo& info, NetworkSession& session)
     {
         session.ip_type   = Session::v4;
@@ -100,47 +204,68 @@ struct IPv4UDPMapper
         session.ip.v4.addr[1] = info.ipv4->dst();
     }
 
+    using KeyHash  = MapperImpl::IPv4PortsKeyHash;
+    using KeyEqual = MapperImpl::IPv4PortsKeyEqual;
+};
+
+struct IPv6TCPMapper : private MapperImpl
+{
     static inline void fill_hash_key(PacketInfo& info, Session& key)
     {
-        key.port[0] = info.udp->network_bo_sport();
-        key.port[1] = info.udp->network_bo_dport();
+        key.port[0] = info.tcp->sport();
+        key.port[1] = info.tcp->dport();
 
-        key.ip.v4.addr[0] = info.ipv4->network_bo_src();
-        key.ip.v4.addr[1] = info.ipv4->network_bo_dst();
+        MapperImpl::copy_ipv6(key.ip.v6.addr_uint32[0], info.ipv6->src());
+        MapperImpl::copy_ipv6(key.ip.v6.addr_uint32[1], info.ipv6->dst());
 
-        if(key.ip.v4.addr[0] < key.ip.v4.addr[1]) info.direction = Session::Source;
-        else
-        if(key.ip.v4.addr[0] > key.ip.v4.addr[1]) info.direction = Session::Destination;
-        else // Ok, addresses are equal, compare ports
-        info.direction = (key.port[0] < key.port[1]) ? Session::Source : Session::Destination;
+        info.direction = MapperImpl::ipv6_direction(key);
     }
 
-    struct KeyHash
+    static inline void fill_session(const PacketInfo& info, NetworkSession& session)
     {
-        std::size_t operator() (const Session& key) const
-        {
-            return key.port[0] + key.port[1] + key.ip.v4.addr[0] + key.ip.v4.addr[1];
-        }
-    };
+        session.ip_type   = Session::v6;
+        session.type      = Session::TCP;
+        session.direction = info.direction;
 
-    struct KeyEqual
+        session.port[0] = info.tcp->sport();
+        session.port[1] = info.tcp->dport();
+
+        MapperImpl::copy_ipv6(session.ip.v6.addr_uint32[0], info.ipv6->src());
+        MapperImpl::copy_ipv6(session.ip.v6.addr_uint32[1], info.ipv6->dst());
+    }
+
+    using KeyHash  = MapperImpl::IPv6PortsKeyHash;
+    using KeyEqual = MapperImpl::IPv6PortsKeyEqual;
+};
+
+struct IPv6UDPMapper : private MapperImpl
+{
+    static inline void fill_hash_key(PacketInfo& info, Session& key)
     {
-        bool operator() (const Session& a, const Session& b) const
-        {
-            if((a.port[0] == b.port[0]) &&
-               (a.port[1] == b.port[1]) &&
-               (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
-               (a.ip.v4.addr[1] == b.ip.v4.addr[1]))
-                return true;
+        key.port[0] = info.udp->sport();
+        key.port[1] = info.udp->dport();
 
-            if((a.port[1] == b.port[0]) &&
-               (a.port[0] == b.port[1]) &&
-               (a.ip.v4.addr[1] == b.ip.v4.addr[0]) &&
-               (a.ip.v4.addr[0] == b.ip.v4.addr[1]))
-                return true;
-            return false;
-        }
-    };
+        MapperImpl::copy_ipv6(key.ip.v6.addr_uint32[0], info.ipv6->src());
+        MapperImpl::copy_ipv6(key.ip.v6.addr_uint32[1], info.ipv6->dst());
+
+        info.direction = MapperImpl::ipv6_direction(key);
+    }
+
+    static inline void fill_session(const PacketInfo& info, NetworkSession& session)
+    {
+        session.ip_type   = Session::v6;
+        session.type      = Session::UDP;
+        session.direction = info.direction;
+
+        session.port[0] = info.udp->sport();
+        session.port[1] = info.udp->dport();
+
+        MapperImpl::copy_ipv6(session.ip.v6.addr_uint32[0], info.ipv6->src());
+        MapperImpl::copy_ipv6(session.ip.v6.addr_uint32[1], info.ipv6->dst());
+    }
+
+    using KeyHash  = MapperImpl::IPv6PortsKeyHash;
+    using KeyEqual = MapperImpl::IPv6PortsKeyEqual;
 };
 
 // SessionsHash creates sessions and stores them in hash
@@ -165,7 +290,7 @@ public:
     , writer    {w}
     , max_hdr   {0}
     {
-        max_hdr = controller::Parameters::instance()->rpcmsg_limit();
+        max_hdr = controller::Parameters::rpcmsg_limit();
     }
     ~SessionsHash()
     {
@@ -192,7 +317,7 @@ public:
                 i = res.first;
 
                 // fill new session after construction
-                NetworkSession& session = *(res.first->second);
+                utils::NetworkSession& session = *(res.first->second);
                 Mapper::fill_session(info, session);
             }
         }

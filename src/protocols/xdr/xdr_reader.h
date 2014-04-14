@@ -138,12 +138,13 @@ inline const std::string to_string(const Opaque& opaque)
 inline std::ostream& operator <<(std::ostream& out, const Opaque& opaque)
 {
     out << std::hex;
+    out.fill('0');
     for(uint32_t i = 0; i < opaque.len; i++)
     {
-        out.fill('0');
         out.width(2);
         out << (uint32_t) opaque.ptr[i];
     }
+    out.fill(' ');
     return out << std::dec;
 }
 

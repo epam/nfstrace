@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Thread-safe logger interface
+// Description: Reentrant logger interface
 // Copyright (c) 2013 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 #ifndef LOG_H
