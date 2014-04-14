@@ -38,18 +38,18 @@ public:
 
 private:
 
-    // initializer of global logger
+    // initializer for global logger
     utils::Log::Global glog;
-    // initializer of global outptut
+    // initializer for global outptut
     utils::Out::Global gout;
 
-    // container for generated exceptions
+    // storage for exceptions
     RunningStatus status;
 
     // signal handler
     SignalHandler signals;
 
-    // controller contains instances of modules
+    // controller subsystems
     std::unique_ptr<AnalysisManager>   analysis;
     std::unique_ptr<FiltrationManager> filtration;
 };

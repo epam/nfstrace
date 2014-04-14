@@ -364,7 +364,7 @@ public:
         collection.reset();     // skip collected data
     }
 
-    inline void set_writer(NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
+    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {
         assert(w);
         collection.set(*w, session_ptr);
@@ -604,8 +604,10 @@ public:
                                  std::unique_ptr<Writer>& w)
     : reader{std::move(r)}
     , writer{std::move(w)}
-    , tcp_sessions{writer.get()}
-    , udp_sessions{writer.get()}
+    , ipv4_tcp_sessions{writer.get()}
+    , ipv4_udp_sessions{writer.get()}
+    , ipv6_tcp_sessions{writer.get()}
+    , ipv6_udp_sessions{writer.get()}
     {
         // check datalink layer
         datalink = reader->datalink();
@@ -640,39 +642,50 @@ public:
 
         PacketInfo info(pkthdr, packet, processor->datalink);
 
-        if(info.eth && info.ipv4)
+        if(info.tcp)
         {
-            if(info.tcp)     // Ethernet:IPv4:TCP
+            if(pkthdr->caplen != pkthdr->len)
             {
-                if(pkthdr->caplen == pkthdr->len)
-                {
-                    return processor->tcp_sessions.collect_packet(info);
-                }
-                else
-                {
-                    LOGONCE("pcap packet was truncated by snaplen option this "
-                            "packed won't correclty reassembled to TCP stream");
-                    return;
-                }
+                LOGONCE("pcap packet was truncated by snaplen option this "
+                        "packed won't correclty reassembled to TCP stream");
+                return;
             }
-            else if(info.udp)// Ethernet:IPv4:UDP
+
+            if(info.ipv4)       // Ethernet:IPv4:TCP
             {
-                return processor->udp_sessions.collect_packet(info);
+                return processor->ipv4_tcp_sessions.collect_packet(info);
+            }
+            else if(info.ipv6)  // Ethernet:IPv6:TCP
+            {
+                return processor->ipv6_tcp_sessions.collect_packet(info);
             }
         }
-        else
+        else if(info.udp)
         {
-            LOGONCE("only following stack of protocol is supported: "
-                    "Ethernet II:IPv4(except additional fragments):TCP|UDP");
+            if(info.ipv4)       // Ethernet:IPv4:UDP
+            {
+                return processor->ipv4_udp_sessions.collect_packet(info);
+            }
+            else if(info.ipv6)  // Ethernet:IPv6:UDP
+            {
+                return processor->ipv6_udp_sessions.collect_packet(info);
+            }
         }
+
+        LOGONCE("only following stack of protocol is supported: "
+                "Ethernet II:IPv4|IPv6(except additional fragments):TCP|UDP");
     }
 
 private:
 
     std::unique_ptr<Reader> reader;
     std::unique_ptr<Writer> writer;
-    SessionsHash< IPv4TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > tcp_sessions;
-    SessionsHash< IPv4UDPMapper, UDPSession < Writer > , Writer >                  udp_sessions;
+
+    SessionsHash< IPv4TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > ipv4_tcp_sessions;
+    SessionsHash< IPv4UDPMapper, UDPSession < Writer > , Writer >                  ipv4_udp_sessions;
+
+    SessionsHash< IPv6TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > ipv6_tcp_sessions;
+    SessionsHash< IPv6UDPMapper, UDPSession < Writer > , Writer >                  ipv6_udp_sessions;
 
     int datalink;
 };

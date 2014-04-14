@@ -13,7 +13,7 @@
 #include <pcap/pcap.h>
 
 #include "protocols/ethernet/ethernet_header.h"
-#include "protocols/ip/ipv4_header.h"
+#include "protocols/ip/ip_header.h"
 #include "protocols/tcp/tcp_header.h"
 #include "protocols/udp/udp_header.h"
 #include "utils/sessions.h"
@@ -41,6 +41,7 @@ struct PacketInfo
     , packet   {p}
     , eth      {nullptr}
     , ipv4     {nullptr}
+    , ipv6     {nullptr}
     , tcp      {nullptr}
     , udp      {nullptr}
     , data     {packet}
@@ -72,7 +73,7 @@ struct PacketInfo
         switch(header->type())
         {
         case ethernet_header::IP:   check_ipv4(); break;
-        case ethernet_header::IPV6: // TODO: implement IPv6
+        case ethernet_header::IPV6: check_ipv6(); break;
         default:
             return;
         }
@@ -85,7 +86,7 @@ struct PacketInfo
     // TODO: add support Linux cooked sockets
     }
 
-    inline void check_ipv4()
+    inline void check_ipv4() __attribute__((always_inline))
     {
         if(dlen < sizeof(IPv4Header)) return;
         auto header = reinterpret_cast<const IPv4Header*>(data);
@@ -113,8 +114,8 @@ struct PacketInfo
 
         switch(header->protocol())
         {
-        case ipv4_header::TCP: check_tcp(); break;
-        case ipv4_header::UDP: check_udp(); break;
+        case ip::NextProtocol::TCP: check_tcp(); break;
+        case ip::NextProtocol::UDP: check_udp(); break;
         default:
             return;
         }
@@ -122,7 +123,97 @@ struct PacketInfo
         ipv4 = header;
     }
 
-    inline void check_tcp()
+    inline void check_ipv6() __attribute__((always_inline))
+    {
+        if(dlen < sizeof(IPv6Header)) return;
+        auto header = reinterpret_cast<const IPv6Header*>(data);
+
+        if(header->version() != 6)  return;
+
+        data += sizeof(IPv6Header);
+        dlen -= sizeof(IPv6Header);
+
+        const uint32_t payload = header->payload_len();
+        if(payload == 0) return; // The length is set to zero when a Hop-by-Hop extension header carries a Jumbo Payload option
+        if(dlen < payload) return; // truncated packet
+
+        dlen = payload; // skip padding at the end
+        // handling optional headers
+        uint8_t htype = header->nexthdr();
+        switch_type:    // TODO: remove ugly goto
+        switch(htype)
+        {
+        case ip::NextProtocol::TCP: check_tcp(); break;
+        case ip::NextProtocol::UDP: check_udp(); break;
+
+        case ip::NextProtocol::HOPOPTS:
+        {
+            auto hbh = reinterpret_cast<const ipv6_hbh*>(data);
+            const unsigned int size{1U + hbh->hbh_len};
+
+            if(dlen < size) return; // truncated packet
+
+            data += size;
+            dlen -= size;
+
+            htype = hbh->hbh_nexthdr;
+            goto switch_type;
+        }
+
+        case ip::NextProtocol::DSTOPTS:
+        {
+            auto dest = reinterpret_cast<const ipv6_dest*>(data);
+            const unsigned int size{1U + dest->dest_len};
+
+            if(dlen < size) return; // truncated packet
+
+            data += size;
+            dlen -= size;
+
+            htype = dest->dest_nexthdr;
+            goto switch_type;
+        }
+
+        case ip::NextProtocol::ROUTING:
+        {
+            auto route = reinterpret_cast<const ipv6_route*>(data);
+            const unsigned int size{1U + route->route_len};
+
+            if(dlen < size) return; // truncated packet
+
+            data += size;
+            dlen -= size;
+
+            htype = route->route_nexthdr;
+            goto switch_type;
+        }
+
+        case ip::NextProtocol::FRAGMENT:
+        {
+            auto frag = reinterpret_cast<const ipv6_frag*>(data);
+
+            // isn't first fragment (offset != 0)
+            if((ntohs(frag->frag_offlg) & ipv6_frag::OFFSET) != 0) return;
+
+            const unsigned int size{sizeof(ipv6_frag)};
+
+            if(dlen < size) return; // truncated packet
+
+            data += size;
+            dlen -= size;
+
+            htype = frag->frag_nexthdr;
+            goto switch_type;
+        }
+        case ip::NextProtocol::NONE:
+        default:    // unknown header
+            return;
+        }
+
+        ipv6 = header;
+    }
+
+    inline void check_tcp() __attribute__((always_inline))
     {
         if(dlen < sizeof(TCPHeader)) return;   // truncated TCP header
         auto header = reinterpret_cast<const TCPHeader*>(data);
@@ -142,7 +233,7 @@ struct PacketInfo
         tcp = header;
     }
 
-    inline void check_udp()
+    inline void check_udp() __attribute__((always_inline))
     {
         if(dlen < sizeof(UDPHeader)) return;   // fragmented UDP header
         const UDPHeader* header = reinterpret_cast<const UDPHeader*>(data);
@@ -167,7 +258,7 @@ struct PacketInfo
     // IP version 4
     const ip::IPv4Header*           ipv4;
     // IP version 6
-    // TODO: add IPv6 support
+    const ip::IPv6Header*           ipv6;
 
     // Transport Layer
     // TCP
@@ -213,6 +304,7 @@ struct Packet: public PacketInfo
         // fix pointers from PacketInfo to point to owned copy of packet data
         fragment->eth   = info.eth  ? (const ethernet::EthernetHeader*) (packet + ( ((const uint8_t*)info.eth ) - info.packet)) : nullptr;
         fragment->ipv4  = info.ipv4 ? (const ip::IPv4Header*)           (packet + ( ((const uint8_t*)info.ipv4) - info.packet)) : nullptr;
+        fragment->ipv6  = info.ipv6 ? (const ip::IPv6Header*)           (packet + ( ((const uint8_t*)info.ipv6) - info.packet)) : nullptr;
         fragment->tcp   = info.tcp  ? (const tcp::TCPHeader*)           (packet + ( ((const uint8_t*)info.tcp ) - info.packet)) : nullptr;
         fragment->udp   = info.udp  ? (const udp::UDPHeader*)           (packet + ( ((const uint8_t*)info.udp ) - info.packet)) : nullptr;
 

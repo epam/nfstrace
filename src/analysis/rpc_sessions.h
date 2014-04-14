@@ -24,13 +24,13 @@ namespace NST
 namespace analysis
 {
 
-class RPCSession : public utils::ApplicationsSession
+class RPCSession : public utils::ApplicationSession
 {
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
 public:
 
     RPCSession(const utils::NetworkSession& s, utils::Session::Direction call_direction)
-    : utils::ApplicationsSession{s, call_direction}
+    : utils::ApplicationSession{s, call_direction}
     {
         utils::Out message;
         message << "Detect session " << str();
