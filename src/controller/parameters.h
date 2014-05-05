@@ -48,6 +48,7 @@ public:
     Parameters& operator=(const Parameters&) = delete;
 
     bool show_help() const;
+    bool show_list() const;
 
     // access helpers
     const std::string&  program_name() const;
