@@ -9,6 +9,7 @@
 #include "controller/cmdline_args.h"
 #include "controller/cmdline_parser.h"
 #include "controller/parameters.h"
+#include "filtration/pcap/network_interfaces.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
@@ -67,6 +68,17 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
             return;
         }
         validate();
+
+        if(get(CLI::LIST).to_bool())
+        {
+            NST::filtration::pcap::NetworkInterfaces interfaces;
+            for(auto& i : interfaces)
+            {
+                std::cout << i << '\n';
+                for(auto a : i) std::cout << '\t' << a << '\n';
+            } 
+            std::cout << "[default]: " <<  interfaces.default_device() << '\n';
+        }
 
         // cashed values
         const std::string program_path(argv[0]);
@@ -143,6 +155,11 @@ bool Parameters::show_help() const
     return impl->get(CLI::HELP).to_bool();
 }
 
+bool Parameters::show_list() const
+{
+    return impl->get(CLI::LIST).to_bool();
+}
+
 const std::string& Parameters::program_name() const
 {
     return impl->program;
@@ -207,10 +224,9 @@ const Parameters::CaptureParams Parameters::capture_params() const
     params.promisc      = impl->get(CLI::PROMISC).to_bool();
 
     // check interface
-    if(params.interface.empty())
+    if(impl->is_default(CLI::INTERFACE))
     {
-        const char* mode = impl->get(CLI::MODE).to_cstr();
-        throw cmdline::CLIError{std::string{"Interface is required for "} + mode + " mode"};
+        params.interface = NST::filtration::pcap::NetworkInterfaces::default_device();
     }
 
     // check capture buffer size
