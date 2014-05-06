@@ -8,6 +8,8 @@
 //------------------------------------------------------------------------------
 #include <pcap/pcap.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 
 #include "filtration/pcap/pcap_error.h"
 //------------------------------------------------------------------------------
