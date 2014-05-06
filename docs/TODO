@@ -3,8 +3,6 @@ The '*' means an estimated complexity of implementation.
 
 
 ***** Implement multi-interface capturing and filtration
-. (tiny star) Add enumeration of avaliable network interfaces in CLI (see ./tests/pcap_if)
-* Add usage of first network interface in live and dump mode by default
 ** Fix security issues with superuser privileges required for packet capturing from an interface
 ***** Add defragmentation IP packets(v4/v6)
 **** Replace handmade parsing RPC messages with rpcgen tool and standard facilities
