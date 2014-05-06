@@ -21,9 +21,11 @@ namespace // implementation
 {
 
 static const char program_build_information[]=
-// the NST_BUILD_VERSION, NST_BUILD_PLATFORM and NST_BUILD_COMPILER
+// the NST_BUILD_VERSION, NST_BUILD_PLATFORM and NST_BUILD_COMPILER macros
 // should be defined by compilation options
-#ifdef NST_BUILD_VERSION
+#if defined(NST_BUILD_VERSION)  \
+and defined(NST_BUILD_PLATFORM) \
+and defined(NST_BUILD_COMPILER)
     #define STR(x) DO_STR(x)
     #define DO_STR(x) #x
         STR(NST_BUILD_VERSION) "\n"
@@ -32,7 +34,7 @@ static const char program_build_information[]=
     #undef DO_STR
     #undef STR
 #else
-    "";
+    "build information is unknown";
 #endif
 
 static const class ParametersImpl* impl = nullptr;
@@ -72,12 +74,20 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
         if(get(CLI::LIST).to_bool())
         {
             NST::filtration::pcap::NetworkInterfaces interfaces;
-            for(auto& i : interfaces)
+            if(interfaces.begin() != interfaces.end())
             {
-                std::cout << i << '\n';
-                for(auto a : i) std::cout << '\t' << a << '\n';
-            } 
-            std::cout << "[default]: " <<  interfaces.default_device() << '\n';
+                for(auto i : interfaces)
+                {
+                    std::cout << i << '\n';
+                    for(auto a : i) std::cout << '\t' << a << '\n';
+                }
+                std::cout << "[default]: " <<  interfaces.default_device() << '\n';
+            }
+            else
+            {
+                std::cerr << "Note: Reading list of network interfaces may "
+                       "require that you have special privileges." << std::endl;
+            }
         }
 
         // cashed values
