@@ -5,7 +5,9 @@ include_directories (../src/)
 
 file (GLOB tests "*")
 foreach (test ${tests})
-    if (IS_DIRECTORY ${test})
+    get_filename_component (name ${test} NAME)
+    if (IS_DIRECTORY ${test}
+      AND NOT(${name} STREQUAL CMakeFiles)) # cmake 2.8.12 fix
         get_filename_component (name ${test} NAME)
         file (GLOB SRCS "${test}/*.cpp")
 
