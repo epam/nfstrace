@@ -7,6 +7,9 @@
 #define NETWORK_INTERFACES_H
 //------------------------------------------------------------------------------
 #include <pcap/pcap.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 
 #include "filtration/pcap/pcap_error.h"
 //------------------------------------------------------------------------------
@@ -21,29 +24,63 @@ namespace pcap
 class NetworkInterfaces
 {
 public:
+    class Interface;
+    class Address
+    {
+        friend class Interface;
+    public:
+        inline sockaddr*   address() const noexcept { return addr->addr;      }
+        inline sockaddr*   netmask() const noexcept { return addr->netmask;   }
+        inline sockaddr* broadaddr() const noexcept { return addr->broadaddr; }
+        inline sockaddr*  destaddr() const noexcept { return addr->dstaddr;   }
+
+        Address& operator= (const Address&) = delete;
+        void     operator&               () = delete;
+        void*    operator new      (size_t) = delete;
+        void     operator delete    (void*) = delete;
+
+        inline      operator bool() const noexcept { return addr != nullptr; }
+        inline void operator   ++() noexcept { addr = addr->next; }
+        inline bool operator   !=(const Address& a) const noexcept { return addr != a.addr; }
+        inline const Address operator*() const noexcept { return *this; }
+
+        Address(const Address& a) : addr{a.addr}{}
+        
+    private:
+        Address(pcap_addr_t* a) : addr{a}{}
+        pcap_addr_t* addr;
+    };
 
     class Interface
     {
         friend class NetworkInterfaces;
     public:
 
-        inline const char* name() const noexcept { return ptr->name; }
-        inline const char* dscr() const noexcept { return ptr->description; }
-        inline bool is_loopback() const noexcept { return ptr->flags & PCAP_IF_LOOPBACK; }
+        inline const char*  name() const noexcept { return ptr->name;                     }
+        inline const char*  dscr() const noexcept { return ptr->description;              }
+        inline bool  is_loopback() const noexcept { return ptr->flags & PCAP_IF_LOOPBACK; }
+
+        Interface& operator= (const Interface&) = delete;
+        void       operator& ()                 = delete;
+        void* operator new   (size_t)           = delete;
+        void operator delete (void*)            = delete;
 
         inline      operator bool() const noexcept { return ptr != nullptr; }
-        inline void operator   ++() const noexcept { ptr = ptr->next; }
+        inline void operator   ++() noexcept { ptr = ptr->next; }
         inline bool operator   !=(const Interface& i) const noexcept { return ptr != i.ptr; }
         inline const Interface operator*() const noexcept { return *this; }
 
         Interface(const Interface& i) : ptr{i.ptr}{}
+
+        const Address begin() const noexcept { return Address{ptr->addresses}; }
+        const Address   end() const noexcept { return Address{nullptr};        }
+
     private:
         Interface(pcap_if_t* p) : ptr{p}{}
-
-        mutable pcap_if_t* ptr;
+        pcap_if_t* ptr;
     };
 
-    inline NetworkInterfaces() noexcept : interfaces{nullptr}
+    inline NetworkInterfaces() : interfaces{nullptr}
     {
         char errbuf[PCAP_ERRBUF_SIZE];
         if(pcap_findalldevs(&interfaces, errbuf) == -1)
@@ -56,6 +93,23 @@ public:
         pcap_freealldevs(interfaces);
     }
 
+    inline static std::string default_device()
+    {
+        char errbuf[PCAP_ERRBUF_SIZE];
+        const char* default_device = pcap_lookupdev(errbuf);
+        if(default_device == nullptr)
+        {
+            throw PcapError("pcap_lookupdev", errbuf);
+        }
+        return default_device;
+    }
+
+    NetworkInterfaces(const NetworkInterfaces&)            = delete;
+    NetworkInterfaces& operator=(const NetworkInterfaces&) = delete;
+    void  operator&            () = delete;
+    void* operator new   (size_t) = delete;
+    void  operator delete (void*) = delete;
+
     const Interface begin() const noexcept { return Interface{interfaces}; }
     const Interface   end() const noexcept { return Interface{nullptr};    }
 
@@ -65,15 +119,72 @@ private:
 
 std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Interface& i)
 {
-    out << i.name();
+    out.width(8);
+    out << std::left << i.name();
     const char* dscr = i.dscr();
     if(dscr)
     {
-        out << " (" << dscr << ')';
+        out << '(' << dscr << ')';
     }
     if(i.is_loopback())
     {
-        out << " (loopback)";
+        out << "(loopback)";
+    }
+    return out;
+}
+
+std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Address& a)
+{
+    sockaddr* s_address=a.address();
+    sockaddr* s_netmask=a.netmask();
+    if(s_address)
+    {
+        switch(s_address->sa_family)
+        {
+        case AF_INET:
+        {
+            char ip[INET_ADDRSTRLEN]{};
+            char netmask[INET_ADDRSTRLEN]{};
+
+            inet_ntop(AF_INET,&(reinterpret_cast<sockaddr_in*>(s_address)->sin_addr), ip, sizeof(ip));
+            out << "inet " << ip;
+            inet_ntop(AF_INET,&(reinterpret_cast<sockaddr_in*>(s_netmask)->sin_addr), netmask, sizeof(netmask));
+            out << " netmask " << netmask;
+
+            sockaddr* s_broadaddr=a.broadaddr();
+            if(s_broadaddr)
+            {
+                char broadaddr[INET_ADDRSTRLEN]{};
+                inet_ntop(AF_INET,&(reinterpret_cast<sockaddr_in*>(s_broadaddr)->sin_addr), broadaddr, sizeof(broadaddr));
+                out << " broadcast " << broadaddr;
+            }
+
+            sockaddr* s_destaddr=a.destaddr();
+            if(s_destaddr)
+            {
+                char destaddr[INET_ADDRSTRLEN]{};
+                inet_ntop(AF_INET,&(reinterpret_cast<sockaddr_in*>(s_destaddr)->sin_addr), destaddr, sizeof(destaddr));
+                out << " destadrr " << destaddr;
+            }
+            break;
+        }
+        case AF_INET6:
+        {
+            char ip6[INET6_ADDRSTRLEN]{};
+            char netmask6[INET6_ADDRSTRLEN]{};
+            inet_ntop(AF_INET6,&(reinterpret_cast<sockaddr_in6*>(s_address)->sin6_addr), ip6, sizeof(ip6));
+            out << "inet6 " << ip6;
+            out << " scopeid " << std::showbase << std::hex << reinterpret_cast<sockaddr_in6*>(s_address)->sin6_scope_id << std::dec;
+
+            inet_ntop(AF_INET6,&(reinterpret_cast<sockaddr_in6*>(s_netmask)->sin6_addr), netmask6, sizeof(netmask6));
+            out << " netmask " << netmask6;
+            break;
+        }
+        default:
+        {
+            out << "Unsupported address family(" << s_address->sa_family << ')';
+        }
+        }
     }
     return out;
 }

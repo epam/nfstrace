@@ -24,7 +24,7 @@ const char* const Args::analysis_mode  = STAT;
 Opt Args::options[Args::num] =
 {
     {'m', "mode",       Opt::REQ, LIVE,                  "set runing mode",                                          LIVE "|" DUMP "|" STAT,   nullptr, false},
-    {'i', "interface",  Opt::REQ, "",                    "listen interface, it is required for " LIVE " and " DUMP " modes", "INTERFACE",      nullptr, false},
+    {'i', "interface",  Opt::REQ, "PCAP-DEFAULT",        "listen interface, it is required for " LIVE " and " DUMP " modes", "INTERFACE",      nullptr, false},
     {'f', "filtration", Opt::REQ, "port 2049",           "a packet filtration in libpcap BPF syntax",                        "BPF",            nullptr, false},
     {'s', "snaplen",    Opt::REQ, "65535",               "max length of raw captured packet. May be used ONLY FOR UDP",      "0..65535",       nullptr, false},
     {'t', "timeout",    Opt::REQ, "100",                 "set the read timeout that will be used on a capture",              "Milliseconds",   nullptr, false},
@@ -36,6 +36,7 @@ Opt Args::options[Args::num] =
     {'O', "ofile",      Opt::REQ, "INTERFACE-BPF.pcap",  "output file for " DUMP " mode, the '-' means stdout",      "PATH",   nullptr, false},
     {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file",                     "\"shell command\"",  nullptr, false},
     {'D', "dump-size",  Opt::REQ, "0",                   "size of dumping file portion, 0 = no limit",               "MBytes", nullptr, false},
+    {'L', "list",       Opt::NOA, "false",               "list all available network interfaces",                     nullptr, nullptr, false},
     {'M', "msg-header", Opt::REQ, "512",                 "RPC message will be truncated to this limit in bytes before passing to Analysis", "1..4000", nullptr, false},
     {'Q', "qcapacity",  Opt::REQ, "4096",                "initial queue capacity of RPC messages",                                         "1..65535", nullptr, false},
     {'T', "trace",      Opt::NOA, "false",               "print collected NFSv3 procedures, true if no modules were passed(by -a)",        nullptr, nullptr, false},

@@ -15,9 +15,9 @@ int main(int argc, char **argv) try
 {
     Parameters params(argc, argv); // set and validate CLI options
 
-    if(params.show_help())
+    if(params.show_help() || params.show_list())
     {
-        return 0; // -h was passed
+        return 0; // -h or -L was passed
     }
 
     Controller controller(params);
