@@ -34,6 +34,7 @@ struct Args
         OFILE,
         COMMAND,
         DSIZE,
+        LIST,
         MSIZE,
         QSIZE,
         TRACE,
