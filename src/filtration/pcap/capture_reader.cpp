@@ -15,12 +15,10 @@ namespace filtration
 namespace pcap
 {
 
-CaptureReader::CaptureReader(const Params& params)
-    : BaseReader()
-    , interface_name{params.interface}
+CaptureReader::CaptureReader(const Params& params) : BaseReader{params.interface}
 {
     char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
-    const char* device = interface_name.c_str();
+    const char* device = source.c_str();
 
     handle = pcap_create(device, errbuf);
     if(!handle)
@@ -85,7 +83,7 @@ void CaptureReader::print_statistic(std::ostream& out) const
     struct pcap_stat stat={0,0,0};
     if(pcap_stats(handle, &stat) == 0)
     {
-        out << "Statistic from interface: " << interface_name       << '\n'
+        out << "Statistic from interface: " << source << '\n'
             << "  packets received by filtration: " << stat.ps_recv << '\n'
             << "  packets dropped by kernel     : " << stat.ps_drop << '\n'
             << "  packets dropped by interface  : " << stat.ps_ifdrop;
@@ -98,7 +96,7 @@ void CaptureReader::print_statistic(std::ostream& out) const
 
 std::ostream& operator<<(std::ostream& out, const CaptureReader::Params& params)
 {
-    out << "Capture from interface: " << params.interface << '\n'
+    out << "Read from interface: " << params.interface << '\n'
         << "  BPF filter  : " << params.filter << '\n'
         << "  snapshot len: " << params.snaplen << " bytes\n"
         << "  read timeout: " << params.timeout_ms << " ms\n"
