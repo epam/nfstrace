@@ -132,6 +132,11 @@ void FiltrationManager::add_offline_analysis(const std::string& ifile,
                                              FilteredDataQueue& queue)
 {
     std::unique_ptr<FileReader> reader { new FileReader{ifile} };
+
+    {
+        utils::Out message; // print parameters to user
+        message << *reader.get();
+    }
     std::unique_ptr<Queueing>   writer { new Queueing{queue}   };
 
     threads.emplace_back(create_thread(reader, writer, status));
