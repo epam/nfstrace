@@ -27,6 +27,7 @@ inline const char* library_version() { return pcap_lib_version(); }
 class BaseReader
 {
 protected:
+    BaseReader(const std::string& input) : source{input}{};
     BaseReader()          = default;
     virtual ~BaseReader() = default;
 
@@ -50,6 +51,7 @@ public:
 
 protected:
     Handle handle;
+    const std::string source;
 };
 
 } // namespace pcap

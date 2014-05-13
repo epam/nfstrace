@@ -14,7 +14,7 @@ namespace filtration
 namespace pcap
 {
 
-FileReader::FileReader(const std::string& file) : BaseReader()
+FileReader::FileReader(const std::string& file) : BaseReader{file}
 {
     char errbuf[PCAP_ERRBUF_SIZE];
 
@@ -41,6 +41,17 @@ FileReader::FileReader(FILE* rb_stream) : BaseReader()
 FileReader::~FileReader()
 {
 }
+
+std::ostream& operator<<(std::ostream& out, FileReader& f)
+{
+    out << "Read packets from: " << f.source << '\n';
+    const int dlt = f.datalink();
+    out << "  datalink: " << f.datalink_name(dlt) << " (" << f.datalink_description(dlt) << ")\n";
+    out << "  version: " << f.major_version() << '.' << f.minor_version();
+    if(f.is_swapped()) out << "\n  Note: file has data in swapped byte-order";
+    return out;
+}   
+
 
 } // namespace pcap
 } // namespace filtration

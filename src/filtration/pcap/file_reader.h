@@ -28,6 +28,12 @@ public:
     inline FILE* get_file() { return pcap_file(handle); }
 
     void print_statistic(std::ostream& /*out*/) const override { /*dummy method*/ }
+
+    inline int  major_version() { return pcap_major_version(handle); }
+    inline int  minor_version() { return pcap_minor_version(handle); }
+    inline bool    is_swapped() { return pcap_is_swapped(handle);    }
+
+    friend std::ostream& operator<<(std::ostream& out, FileReader& f);
 };
 
 } // namespace pcap
