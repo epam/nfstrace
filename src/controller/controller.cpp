@@ -13,8 +13,6 @@
 #include "controller/controller.h"
 #include "controller/parameters.h"
 //------------------------------------------------------------------------------
-using NST::utils::FilteredDataQueue;
-//------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
@@ -45,7 +43,7 @@ Controller::Controller(const Parameters& params) try
         {
             analysis.reset(new AnalysisManager{status, params});
 
-             filtration->add_offline_analysis(params.input_file(),
+            filtration->add_offline_analysis(params.input_file(),
                                              analysis->get_queue());
         }
         break;
@@ -54,9 +52,11 @@ Controller::Controller(const Parameters& params) try
 }
 catch(const filtration::pcap::PcapError& e)
 {
-    utils::Out message;
+    if(utils::Out message{})
+    {
     message << "Note: This operation may require that you have "
                "special privileges.";
+    }
     throw;    
 }
 
