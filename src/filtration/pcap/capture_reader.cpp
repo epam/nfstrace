@@ -19,7 +19,6 @@ CaptureReader::CaptureReader(const Params& params) : BaseReader{params.interface
 {
     char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
     const char* device = source.c_str();
-
     handle = pcap_create(device, errbuf);
     if(!handle)
     {
