@@ -8,7 +8,6 @@
 #include "controller/controller.h"
 #include "controller/parameters.h"
 //------------------------------------------------------------------------------
-using NST::utils::FilteredDataQueue;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -60,8 +59,8 @@ int Controller::run()
         analysis->start();
     }
 
+    if(utils::Out message{})
     {
-        utils::Out message;
         message << "Processing packets. Press CTRL-C to quit and view results.";
     }
 
@@ -82,8 +81,8 @@ int Controller::run()
             analysis->stop();
         }
 
+        if(utils::Log message{})
         {
-            utils::Log message;
             status.print(message);
         }
 
