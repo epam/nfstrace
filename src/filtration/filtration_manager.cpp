@@ -145,8 +145,10 @@ void FiltrationManager::add_offline_analysis(const std::string& ifile,
 FiltrationManager::FiltrationManager(RunningStatus& s)
 : status(s)
 {
-    utils::Out message(utils::Out::Level::All);
-    message << "Libpcap version: " << pcap::library_version();
+    if(utils::Out message{utils::Out::Level::All})
+    {
+        message << "Libpcap version: " << pcap::library_version();
+    }
 }
 
 FiltrationManager::~FiltrationManager()
