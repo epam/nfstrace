@@ -90,8 +90,8 @@ static auto create_capture_reader(const Parameters& params)
         -> std::unique_ptr<CaptureReader>
 {
     auto& capture_params = params.capture_params();
+    if(utils::Out message{}) // print parameters to user
     {
-        utils::Out message; // print parameters to user
         message << capture_params;
     }
     return std::unique_ptr<CaptureReader>{ new CaptureReader{capture_params} };
@@ -105,8 +105,8 @@ void FiltrationManager::add_online_dumping(const Parameters& params)
     std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
 
     auto& dumping_params = params.dumping_params();
+    if(utils::Out message{}) // print parameters to user
     {
-        utils::Out message; // print parameters to user
         message << dumping_params;
     }
     std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),

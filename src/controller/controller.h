@@ -23,6 +23,12 @@ namespace NST
 namespace controller
 {
 
+class ControllerError : public std::runtime_error
+{
+public:
+    explicit ControllerError(const std::string& msg) : std::runtime_error{msg} { }
+};
+
 class Controller
 {
     using AnalysisManager   = NST::analysis::AnalysisManager;
@@ -53,6 +59,8 @@ private:
     std::unique_ptr<AnalysisManager>   analysis;
     std::unique_ptr<FiltrationManager> filtration;
 };
+
+void droproot(const std::string& dropuser);
 
 } // namespace controller
 } // namespace NST
