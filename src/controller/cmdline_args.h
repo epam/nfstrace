@@ -38,6 +38,7 @@ struct Args
         MSIZE,
         QSIZE,
         TRACE,
+        DROPROOT,
         VERBOSE,
         HELP,
         num

@@ -86,7 +86,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
             else
             {
                 std::cerr << "Note: Reading list of network interfaces may "
-                       "require that you have special privileges." << std::endl;
+                             "require that you have special privileges." << std::endl;
             }
         }
 
@@ -130,8 +130,8 @@ protected:
 private:
     std::string default_iofile() const
     {
-        // create string: INTERFACE-BPF-FILTER.pcap
-        std::string str{ get(CLI::INTERFACE).to_cstr() };
+        // create string: PROGRAMNAME-BPF-FILTER.pcap
+        std::string str { impl->program };
         str.push_back('-');
         str.append(get(CLI::FILTER).to_cstr());
         str.append(".pcap");
@@ -198,6 +198,11 @@ std::string Parameters::input_file() const
 {
     // TODO: add file validation
     return impl->is_default(CLI::IFILE) ? impl->default_iofile() : impl->get(CLI::IFILE);
+}
+
+const std::string Parameters::dropuser() const
+{
+    return impl->get(CLI::DROPROOT);
 }
 
 unsigned short Parameters::queue_capacity() const

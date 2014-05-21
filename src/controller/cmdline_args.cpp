@@ -32,16 +32,17 @@ Opt Args::options[Args::num] =
     {'p', "promisc",    Opt::REQ, "true",                "put the interface into promiscuous mode",                          nullptr,          nullptr, false},
     {'d', "direction",  Opt::REQ, "inout",               "set the direction for which packets will be captured",             "in|out|inout",   nullptr, false},
     {'a', "analysis",   Opt::MUL, "",                    "specify path to analysis module and set desired options",  "PATH#opt1,opt2=val,...", nullptr, false},
-    {'I', "ifile",      Opt::REQ, "INTERFACE-BPF.pcap",  "input file for " STAT " mode, the '-' means stdin",        "PATH",   nullptr, false},
-    {'O', "ofile",      Opt::REQ, "INTERFACE-BPF.pcap",  "output file for " DUMP " mode, the '-' means stdout",      "PATH",   nullptr, false},
-    {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file",                     "\"shell command\"",  nullptr, false},
+    {'I', "ifile",      Opt::REQ, "PROGRAMNAME-BPF.pcap","input file for " STAT " mode, the '-' means stdin",        "PATH",   nullptr, false},
+    {'O', "ofile",      Opt::REQ, "PROGRAMNAME-BPF.pcap","output file for " DUMP " mode, the '-' means stdout",      "PATH",   nullptr, false},
+    {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file",         "\"shell command\"",  nullptr, false},
     {'D', "dump-size",  Opt::REQ, "0",                   "size of dumping file portion, 0 = no limit",               "MBytes", nullptr, false},
     {'L', "list",       Opt::NOA, "false",               "list all available network interfaces",                     nullptr, nullptr, false},
-    {'M', "msg-header", Opt::REQ, "512",                 "RPC message will be truncated to this limit in bytes before passing to Analysis", "1..4000", nullptr, false},
-    {'Q', "qcapacity",  Opt::REQ, "4096",                "initial queue capacity of RPC messages",                                         "1..65535", nullptr, false},
-    {'T', "trace",      Opt::NOA, "false",               "print collected NFSv3 procedures, true if no modules were passed(by -a)",        nullptr, nullptr, false},
-    {'v', "verbose",    Opt::REQ, "1",                   "level of print out additional information",                                     "0|1|2",  nullptr, false},
-    {'h', "help",       Opt::NOA, "false",               "print this help message and usage for modules passed via -a options, then exit", nullptr, nullptr, false}
+    {'M', "msg-header", Opt::REQ, "512",                 "RPC message will be truncated to this limit in bytes before passing to Analysis",     "1..4000", nullptr, false},
+    {'Q', "qcapacity",  Opt::REQ, "4096",                "initial queue capacity of RPC messages",                                             "1..65535", nullptr, false},
+    {'T', "trace",      Opt::NOA, "false",               "print collected NFSv3 procedures, true if no modules were passed(by -a)",               nullptr, nullptr, false},
+    {'Z', "droproot",   Opt::REQ, "",                    "drops root privileges, after opening the capture device, but before reading from it","username", nullptr, false},
+    {'v', "verbose",    Opt::REQ, "1",                   "level of print out additional information",                                            "0|1|2",  nullptr, false},
+    {'h', "help",       Opt::NOA, "false",               "print this help message and usage for modules passed via -a options, then exit",        nullptr, nullptr, false}
 };
 
 } // namespace cmdline
