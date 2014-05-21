@@ -54,6 +54,7 @@ public:
     const std::string&  program_name() const;
     RunningMode         running_mode() const;
     std::string         input_file() const;
+    const std::string   dropuser() const;
     unsigned short      queue_capacity() const;
     bool                trace() const;
     int                 verbose_level() const;
