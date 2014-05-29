@@ -34,7 +34,7 @@ using Validator = rpc::RPCProgramValidator
                     ProcEnum::COMMIT    // NFSPROC3_COMMIT
                 >;
 
-static const char*const NFSProcedureTitles[ProcEnum::count] =
+static const char* const NFSProcedureTitles[ProcEnum::count] =
 {
   "NULL",       "GETATTR",      "SETATTR",  "LOOKUP",
   "ACCESS",     "READLINK",     "READ",     "WRITE",
@@ -765,6 +765,9 @@ inline XDRReader& operator>>(XDRReader& in, COMMIT3res& o)
     }
     return in;
 }
+
+extern"C"
+std::ostream& print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);
 
 std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc);
 std::ostream& operator<<(std::ostream& out, const mode3 obj);

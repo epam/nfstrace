@@ -28,6 +28,11 @@ std::ostream& operator <<(std::ostream& out, const Opaque& opaque)
 
 std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc)
 {
+    return print_nfs3_procedures(out, proc);
+}
+
+std::ostream& print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc)
+{
     return out << NFSProcedureTitles[proc];
 }
 

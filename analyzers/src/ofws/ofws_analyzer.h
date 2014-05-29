@@ -8,8 +8,7 @@
 //------------------------------------------------------------------------------
 #include <unordered_map>
 
-#include <utils/plugin_api_struct.h>
-#include <utils/fh.h>                     //hash-table's key
+#include <api/plugin_api.h>
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 class OFWSAnalyzer : public IAnalyzer

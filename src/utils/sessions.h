@@ -46,6 +46,9 @@ private:
     std::string session_str;
 };
 
+extern "C"
+std::ostream& print_session(std::ostream& out, const Session& session);
+
 std::ostream& operator<<(std::ostream& out, const Session& session);
 
 } // namespace utils

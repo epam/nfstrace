@@ -6,10 +6,10 @@
 #ifndef FILE_RW_OP_H
 #define FILE_RW_OP_H
 //------------------------------------------------------------------------------
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
 
-#include <utils/fh.h>                     //hash-table's key
+#include <api/plugin_api.h>
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 class FileRWOp

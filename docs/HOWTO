@@ -21,7 +21,6 @@ After that, you can start to build application:
 
 Binaries will be created in current directory
 
-
 Build by CMake with special compiler ===========================================
 Set up environment variables with path to the compiler:
 
@@ -37,6 +36,25 @@ Then build by CMake as described above or pass these variables to shell
 directly for cmake command, f.e.:
 CC="/usr/bin/gcc48" CXX="/usr/bin/g++48" cmake -DCMAKE_BUILD_TYPE=Release ../
 
+Installation by CMake ==========================================================
+Create a build directory in top-level directory:
+
+    $ mkdir ./release
+
+Change into your build directory:
+
+    $ cd ./release
+
+Run CMake to generate build scripts main application and it's plugins
+(Note: Use /usr or /usr/local for most cases):
+
+    $ cmake .. -DCMAKE_INSTALL_PREFIX=/your/path
+
+Run make. It will build and install nfstrace and it's plugins and plugin api
+headers in /your/path/bin, /your/path/lib/nfstrace/ and 
+/your/path/include/nfstrace respectively:
+
+    $ sudo make install
 
 Test by CMake ==================================================================
 Build application and run following command from build directory:
