@@ -9,6 +9,8 @@
 #include <stdexcept>
 
 #include <sys/file.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "utils/log.h"
 //------------------------------------------------------------------------------
@@ -48,6 +50,8 @@ Log::Global::Global(const std::string& path)
     {
         throw std::runtime_error{"Logger can not open file for write: " + path};
     }
+
+    chmod(path.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
 
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
     {
