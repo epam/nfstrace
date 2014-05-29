@@ -15,9 +15,9 @@ find_package(Threads REQUIRED) # POSIX Threads
 #find_package(PCAP REQUIRED) # libpcap
 
 # build application ============================================================
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra")
-
-set (NST_BUILD_VERSION  "${PROJECT_NAME} 0.2-alpha (${CMAKE_BUILD_TYPE})")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC")
+set (PROJECT_VERSION "0.2-alpha")
+set (NST_BUILD_VERSION  "${PROJECT_NAME} ${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 set (NST_BUILD_PLATFORM "${CMAKE_SYSTEM}")
 set (NST_BUILD_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
@@ -34,11 +34,33 @@ add_definitions (-DNST_BUILD_VERSION=${NST_BUILD_VERSION};
 
 add_executable        (${PROJECT_NAME} ${SRCS})
 target_link_libraries (${PROJECT_NAME} ${LIBS})
+
 # build analyzers ==============================================================
-add_subdirectory (analyzers)
+add_library (breakdown    SHARED analyzers/src/breakdown/breakdown_analyzer.cpp)
+add_library (ofws         SHARED analyzers/src/ofws/ofws_analyzer.cpp)
+add_library (ofdws        SHARED analyzers/src/ofdws/ofdws_analyzer.cpp
+                                 analyzers/src/ofdws/file_rw_op.cpp)
+add_library (testanalyzer SHARED analyzers/src/test/test_analyzer.cpp)
 
 # build tests ==================================================================
 add_subdirectory (tests)
+
+# installation of main application and plugins =================================
+install(TARGETS ${PROJECT_NAME} breakdown ofws ofdws
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib/nfstrace)
+
+# installation of api headers ==================================================
+file(GLOB headers "src/api/*.h")
+install(FILES ${headers} DESTINATION include/nfstrace/api)
+
+# build packages ===============================================================
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Pavel Karneliuk")
+set(CPACK_GENERATOR "RPM;DEB;TGZ")
+set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), gcc(>= 4.8), libpcap-dev (>=1.3.0-1)")
+include(CPack)
 
 # testing ======================================================================
 enable_testing ()
@@ -62,12 +84,4 @@ foreach (trace ${traces})
     add_test (NAME ${name}
               COMMAND sh ${check_pcapbz2} ${trace} ${result} ${reference} )
 endforeach ()
-
-
-
-
-
-
-
-
 

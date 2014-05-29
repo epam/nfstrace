@@ -8,8 +8,8 @@
 #ifndef IANALYZER_TYPE_H
 #define IANALYZER_TYPE_H
 //------------------------------------------------------------------------------
-#include "api/nfs3_types.h"
-#include "api/rpc_procedure_type.h"
+#include "nfs3_types.h"
+#include "rpc_procedure_type.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST

@@ -126,6 +126,11 @@ void print_ipv6_port_as_hostname_service(std::ostream& out,
 
 std::ostream& operator<<(std::ostream& out, const Session& session)
 {
+    return print_session(out, session);
+}
+
+std::ostream& print_session(std::ostream& out, const Session& session)
+{
     switch(session.ip_type)
     {
         case Session::IPType::v4:
