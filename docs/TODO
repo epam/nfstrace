@@ -3,7 +3,6 @@ The '*' means an estimated complexity of implementation.
 
 
 ***** Implement multi-interface capturing and filtration
-** Fix security issues with superuser privileges required for packet capturing from an interface
 ***** Add defragmentation IP packets(v4/v6)
 **** Replace handmade parsing RPC messages with rpcgen tool and standard facilities
 ** Implement MultiBlockAllocator

@@ -15,4 +15,3 @@ foreach (test ${tests})
         target_link_libraries (${name} ${LIBS}) # libs from main CMakeList.txt
     endif ()
 endforeach ()
-

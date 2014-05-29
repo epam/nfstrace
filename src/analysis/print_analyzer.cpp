@@ -29,43 +29,41 @@ inline bool out_all()
 }
 
 // Special helper for print-out short representation of NFS FH
-std::ostream& print_nfs_fh3(std::ostream& out, const nfs_fh3& fh)
+std::ostream& print_nfs_fh3(std::ostream& out, const uint8_t* data, const uint32_t size)
 {
-    static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
-    const Opaque& opaque = fh.data;
-    const uint8_t* data = opaque.data();
-    const uint32_t size = opaque.size();
-
+    out << std::hex << std::setfill('0') << std::setw(2);
     if(size <= 8 || out_all())
     {
         for(uint32_t j = 0; j < size; j++)
         {
-            uint8_t value = data[j];
-            out << hex[value & 0xF];
-            value >>= 4;
-            out << hex[value & 0xF];
+            out << std::setw(2) << (uint32_t)data[j];
         }
     }
     else // truncate binary data to: 00112233...CCDDEEFF
     {
         for(uint32_t j = 0; j < 4; j++)
         {
-            uint8_t value = data[j];
-            out << hex[value & 0xF];
-            value >>= 4;
-            out << hex[value & 0xF];
+            out << std::setw(2) << (uint32_t)data[j];
         }
         out << "...";
         for(uint32_t j = size-4; j < size; j++)
         {
-            uint8_t value = data[j];
-            out << hex[value & 0xF];
-            value >>= 4;
-            out << hex[value & 0xF];
+            out << std::setw(2) << (uint32_t)data[j];
         }
     }
+    out << std::dec;
     return out;
+}
+
+std::ostream& print_nfs_fh3(std::ostream& out, const nfs_fh3& fh)
+{
+    return print_nfs_fh3(out, fh.data.data(), fh.data.size());
+}
+
+extern "C"
+std::ostream& print_nfs_fh3(std::ostream& out, const FH& fh)
+{
+    return print_nfs_fh3(out, fh.data, fh.len);
 }
 
 bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
