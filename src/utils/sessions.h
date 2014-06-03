@@ -47,7 +47,7 @@ private:
 };
 
 extern "C"
-std::ostream& print_session(std::ostream& out, const Session& session);
+void print_session(std::ostream& out, const Session& session);
 
 std::ostream& operator<<(std::ostream& out, const Session& session);
 

@@ -28,7 +28,6 @@ Exit via Interrupt(Control-C) signal and wait finish of compression.
 
 # Dumping to dump.pcap file with compression output by bzip2 after end of capturing
 $APP --mode=dump                                           \
-     --interface=eth0                                      \
      --filtration="ip and port 2049"                       \
      -O dump.pcap                                          \
      -C "bzip2 -f -9"
