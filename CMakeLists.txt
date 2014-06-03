@@ -41,6 +41,8 @@ add_library (ofws         SHARED analyzers/src/ofws/ofws_analyzer.cpp)
 add_library (ofdws        SHARED analyzers/src/ofdws/ofdws_analyzer.cpp
                                  analyzers/src/ofdws/file_rw_op.cpp)
 add_library (testanalyzer SHARED analyzers/src/test/test_analyzer.cpp)
+set_target_properties (breakdown ofws ofdws testanalyzer
+                       PROPERTIES LIBRARY_OUTPUT_DIRECTORY "analyzers")
 
 # build tests ==================================================================
 add_subdirectory (tests)

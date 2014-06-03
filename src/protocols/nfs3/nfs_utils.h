@@ -767,7 +767,7 @@ inline XDRReader& operator>>(XDRReader& in, COMMIT3res& o)
 }
 
 extern"C"
-std::ostream& print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);
+void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);
 
 std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc);
 std::ostream& operator<<(std::ostream& out, const mode3 obj);

@@ -57,7 +57,7 @@ private:
 };
 
 extern "C"
-std::ostream& print_nfs_fh3(std::ostream& out, const FH& fh);
+void print_nfs_fh3(std::ostream& out, const FH& fh);
 
 inline int FH::FH_Hash::operator()(const FH& fh) const
 {
@@ -92,7 +92,8 @@ inline std::string FH::to_string() const
 
 inline std::ostream& operator<<(std::ostream& out, const FH& fh)
 {
-    return print_nfs_fh3(out, fh);
+    print_nfs_fh3(out, fh);
+    return out;
 }
 
 } // namespace API
