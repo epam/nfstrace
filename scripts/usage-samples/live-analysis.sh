@@ -15,6 +15,5 @@ Exit via Interrupt(Control-C) signal.
 '
 
 $APP --mode=live                                           \
-     --interface=eth0                                      \
      --filtration="ip and port 2049"                       \
      --analysis=$MOD/libbreakdown.so

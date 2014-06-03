@@ -61,9 +61,9 @@ std::ostream& print_nfs_fh3(std::ostream& out, const nfs_fh3& fh)
 }
 
 extern "C"
-std::ostream& print_nfs_fh3(std::ostream& out, const FH& fh)
+void print_nfs_fh3(std::ostream& out, const FH& fh)
 {
-    return print_nfs_fh3(out, fh.data, fh.len);
+    print_nfs_fh3(out, fh.data, fh.len);
 }
 
 bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
