@@ -10,8 +10,10 @@ Change into your build directory:
 Run cmake pointing it to the directory of the top-level CMakeLists.txt.
 The -DCMAKE_BUILD_TYPE=Release produces release configuration.
 Other configurations(Debug, MinSizeRel, RelWithDebInfo) are avaliable likewise.
-CMake will check compiler, libraries and generate build scripts for main 
+CMake will check compiler, libraries and generate build scripts for main
 application, analyzers and tests. All files will be created in current directory.
+Note: In FreeBSD 8.4 your need to install gcc >= 4.8 and edit /etc/libmap.conf
+according to: http://www.freebsd.org/doc/en/articles/custom-gcc/article.html
 
     $ cmake -DCMAKE_BUILD_TYPE=Release ../
 
@@ -51,7 +53,7 @@ Run CMake to generate build scripts main application and it's plugins
     $ cmake .. -DCMAKE_INSTALL_PREFIX=/your/path
 
 Run make. It will build and install nfstrace and it's plugins and plugin api
-headers in /your/path/bin, /your/path/lib/nfstrace/ and 
+headers in /your/path/bin, /your/path/lib/nfstrace/ and
 /your/path/include/nfstrace respectively:
 
     $ sudo make install

@@ -22,7 +22,6 @@ Exit via Interrupt(Control-C) signal.
 
 # Dumping to dump.pcap file
 $APP --mode=dump                                           \
-     --interface=eth0                                      \
      --filtration="ip and port 2049"                       \
      -O dump.pcap
 
