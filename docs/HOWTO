@@ -50,7 +50,7 @@ Change into your build directory:
 Run CMake to generate build scripts main application and it's plugins
 (Note: Use /usr or /usr/local for most cases):
 
-    $ cmake .. -DCMAKE_INSTALL_PREFIX=/your/path
+    $ cmake -DCMAKE_INSTALL_PREFIX=/your/path ../
 
 Run make. It will build and install nfstrace and it's plugins and plugin api
 headers in /your/path/bin, /your/path/lib/nfstrace/ and
