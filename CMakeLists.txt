@@ -16,7 +16,7 @@ find_package(Threads REQUIRED) # POSIX Threads
 
 # build application ============================================================
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC")
-set (PROJECT_VERSION "0.2-alpha")
+set (PROJECT_VERSION "0.2")
 set (NST_BUILD_VERSION  "${PROJECT_NAME} ${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 set (NST_BUILD_PLATFORM "${CMAKE_SYSTEM}")
 set (NST_BUILD_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
