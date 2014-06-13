@@ -3,14 +3,29 @@
 // Description: IAnalyzer describe interface of analysiss expected by application.
 // The interface define set of NFSv3 Procedure handlers with empty dummy implementation
 // and pure virtual function for flushing analysis statistics.
-// Copyright (c) 2013 EPAM Systems. All Rights reserved.
+// Copyright (c) 2013 EPAM Systems
+//------------------------------------------------------------------------------
+/*
+    This file is part of Nfstrace.
+
+    Nfstrace is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 2 of the License.
+
+    Nfstrace is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
+*/
 //------------------------------------------------------------------------------
 #ifndef IANALYZER_TYPE_H
 #define IANALYZER_TYPE_H
 //------------------------------------------------------------------------------
 #include "nfs3_types.h"
 #include "rpc_procedure_type.h"
-//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
 {
