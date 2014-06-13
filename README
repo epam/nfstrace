@@ -1,3 +1,22 @@
+README =========================================================================
+
+This is NFSTRACE also known as NST (NAS Sizing Tool/NFS Statistic Tool).
+It helps to determine NFS procedures in network traffic and performs packet’s
+capturing, filtration, dumping traces to .pcap file, compression by external
+tool, some kind of statistical analysis and provides API for custom
+analysis modules.
+
+Detailed technical description you can find in docs/NFSTRACE.Releasenotes.pdf
+
+Problems, bugs, questions, desirable enhancements, etc. should be sent
+to Pavel Karneliuk (Pavel_Karneliuk@epam.com)
+
+Original authors:
+Yauheni Azaranka        Yauheni_Azaranka@epam.com
+Dzianis Huznou          Dzianis_Huznou@epam.com
+Pavel   Karneliuk       Pavel_Karneliuk@epam.com
+
+
 Build by CMake =================================================================
 Create a build directory in top-level directory:
 
@@ -11,7 +30,7 @@ Run cmake pointing it to the directory of the top-level CMakeLists.txt.
 The -DCMAKE_BUILD_TYPE=Release produces release configuration.
 Other configurations(Debug, MinSizeRel, RelWithDebInfo) are avaliable likewise.
 CMake will check compiler, libraries and generate build scripts for main
-application, analyzers and tests. All files will be created in current directory.
+application, analyzers and tests. All files will be created in current directory
 Note: In FreeBSD 8.4 your need to install gcc >= 4.8 and edit /etc/libmap.conf
 according to: http://www.freebsd.org/doc/en/articles/custom-gcc/article.html
 
