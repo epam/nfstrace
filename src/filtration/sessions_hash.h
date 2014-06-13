@@ -1,7 +1,23 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
 // Description: Hash for network sessions
-// Copyright (c) 2014 EPAM Systems. All Rights Reserved.
+// Copyright (c) 2014 EPAM Systems
+//------------------------------------------------------------------------------
+/*
+    This file is part of Nfstrace.
+
+    Nfstrace is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 2 of the License.
+
+    Nfstrace is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
+*/
 //------------------------------------------------------------------------------
 #ifndef SESSIONS_HASH_H
 #define SESSIONS_HASH_H
@@ -17,7 +33,6 @@
 #include "filtration/packet.h"
 #include "utils/out.h"
 #include "utils/sessions.h"
-//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 namespace NST
 {
