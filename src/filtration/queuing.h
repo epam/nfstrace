@@ -72,13 +72,13 @@ public:
             session = s;
         }
 
-        inline void allocate()
+        inline void allocate(size_t bytes)
         {
             // we have a reference to queue, just do allocate and reset
             ptr = queue->allocate();
             if(ptr)
             {
-                reset();
+				ptr->allocate(bytes);
             }
             else
             {
@@ -90,19 +90,18 @@ public:
         {
             if(ptr)
             {
-                ptr->dlen = 0;
-                ptr->data = ptr->memory;
+				ptr->reset();
             }
         }
 
         inline void push(const PacketInfo& info, const uint32_t len)
         {
             uint8_t* const offset_ptr = ptr->data + ptr->dlen;
-            const uint32_t capacity = sizeof(ptr->memory) - (offset_ptr - ptr->memory);
-            if(len > capacity)
+            const uint32_t avail = ptr->size() - ptr->dlen; 
+            if(len > avail)
             {
-                LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, capacity, len);
-                assert(capacity >= len);
+                LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, avail, len);
+                assert(avail >= len);
             }
             memcpy(offset_ptr, info.data, len);
             ptr->dlen += len;
