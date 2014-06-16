@@ -65,7 +65,7 @@ public:
     {
         // TODO: this code must be generalized with RPCFiltrator class
     
-        uint32_t hdr_len = 0;
+        uint32_t msg_hdr = 0;
         auto msg = reinterpret_cast<const MessageHeader*const>(info.data);
         switch(msg->type())
         {
@@ -74,7 +74,7 @@ public:
                 auto call = static_cast<const CallHeader*const>(msg);
                 if(RPCValidator::check(call) && NFS3::Validator::check(call))
                 {
-                    hdr_len = std::min(info.dlen, max_hdr);
+                    msg_hdr = std::min(info.dlen, max_hdr);
                 }
                 else
                 {
@@ -87,7 +87,7 @@ public:
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
                 {
-                    hdr_len = std::min(info.dlen, max_hdr);
+                    msg_hdr = std::min(info.dlen, max_hdr);
                 }
                 else // isn't RPC reply, stream is corrupt
                 {
@@ -101,7 +101,7 @@ public:
 
         collection.allocate();
 
-        collection.push(info, hdr_len);
+        collection.push(info, msg_hdr);
 
         collection.complete(info);
     }
@@ -329,10 +329,10 @@ public:
     };
 
     template <typename Writer>
-    TCPSession(Writer* w, uint32_t max_rpc_hdr)
+    TCPSession(Writer* w, uint32_t) // omit max_rpc_hdr from external relations
     {
-        flows[0].reader.set_writer(this, w, max_rpc_hdr);
-        flows[1].reader.set_writer(this, w, max_rpc_hdr);
+        flows[0].reader.set_writer(this, w);
+        flows[1].reader.set_writer(this, w);
     }
     TCPSession(TCPSession&&)                 = delete;
     TCPSession(const TCPSession&)            = delete;
@@ -375,22 +375,21 @@ public:
     inline void reset()
     {
         msg_len = 0;
-        hdr_len = 0;
+        msg_hdr = 0;
         collection.reset();     // skip collected data
     }
-
-    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
+	//
+    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w)
     {
         assert(w);
         collection.set(*w, session_ptr);
-        max_hdr = max_rpc_hdr;
     }
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
         if(msg_len != 0)
         {
-            if(hdr_len == 0 && msg_len >= n)
+            if(msg_hdr == 0 && msg_len >= n)
             {
                 TRACE("We are lost %u bytes of payload marked for discard", n);
                 msg_len -= n;
@@ -415,7 +414,7 @@ public:
         {
             if(msg_len != 0)    // we are on-stream and we are looking to some message
             {
-                if(hdr_len == 0)    // message header is readout, discard the unused tail of message
+                if(msg_hdr == 0)    // message header is readout, discard the unused tail of message
                 {
                     if(msg_len >= info.dlen) // discard whole new packet
                     {
@@ -431,25 +430,25 @@ public:
                         msg_len = 0; find_message(info); // <- optimization
                     }
                 }
-                else // hdr_len != 0, readout a part of header of current message
+                else // msg_hdr != 0, readout a part of header of current message
                 {
-                    if(hdr_len > info.dlen) // got new part of header (not the all!)
+                    if(msg_hdr > info.dlen) // got new part of header (not the all!)
                     {
                         //TRACE("got new part of header (not the all!)");
                         collection.push(info, info.dlen);
-                        hdr_len     -= info.dlen;
+                        msg_hdr     -= info.dlen;
                         msg_len     -= info.dlen;
                         info.dlen = 0;  // return from while
                     }
-                    else // hdr_len <= dlen, current message will be complete, also we have some additional data
+                    else // msg_hdr <= dlen, current message will be complete, also we have some additional data
                     {
                         //TRACE("current message will be complete, also we have some additional data");
-                        collection.push(info, hdr_len);
-                        info.dlen   -= hdr_len;
-                        info.data   += hdr_len;
+                        collection.push(info, msg_hdr);
+                        info.dlen   -= msg_hdr;
+                        info.data   += msg_hdr;
 
-                        msg_len -= hdr_len;
-                        hdr_len -= hdr_len; // set 0
+                        msg_len -= msg_hdr;
+                        msg_hdr -= msg_hdr; // set 0
 
                         // we should remove RM(uin32_t) from collected data
                         collection.skip_first(sizeof(RecordMark));
@@ -465,49 +464,21 @@ public:
         }
     }
 
+	// Find next message in packet info
     inline void find_message(PacketInfo& info)
     {
         static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
-        const RecordMark* rm;
-
-        if(collection) // collection is allocated
-        {
-            const uint32_t tocopy = max_header-collection.size();
-
-            if(info.dlen < tocopy)
-            {
-                collection.push(info, info.dlen);
-                //info.data += info.dlen;   optimization
-                info.dlen = 0;
-                return;
-            }
-            else // info.dlen >= tocopy
-            {
-                collection.push(info, tocopy);
-                info.dlen -= tocopy;
-                info.data += tocopy;
-
-                assert(max_header == collection.size());
-
-                rm = reinterpret_cast<const RecordMark*>(collection.data());
-            }
-        }
-        else // collection is empty
-        {
-            collection.allocate();   // allocate new collection from writer
-
-            if(info.dlen >= max_header)  // is data enougth to message validation?
-            {
-                rm = reinterpret_cast<const RecordMark*>(info.data);
-            }
-            else // push them into collection to validation after supplement by next data
-            {
-                collection.push(info, info.dlen);
-                //info.data += info.dlen;   optimization
-                info.dlen = 0;
-                return;
-            }
-        }
+        const RecordMark* rm = reinterpret_cast<const RecordMark*>(info.data);
+		
+		// Now collection is empty
+		//(!) We can't reuse previous collection element in view of different sizes of elements
+		collection.allocate(sizeof(RecordMark) + rm->fragment_len()); // allocate new collection from writer
+		if (info.dlen < max_header) {
+			collection.push(info, info.dlen);
+			//info.data += info.dlen;   optimization
+			info.dlen = 0;
+			return;
+		}
 
         assert(collection);     // collection must be initialized
         assert(rm != NULL);     // RM must be initialized
@@ -521,19 +492,17 @@ public:
             const uint32_t written = collection.size();
             if(written != 0) // a message was partially written to collection
             {
-                assert( (msg_len - written) <  msg_len );
                 msg_len -= written;
-                if(hdr_len != 0) // we want to collect header of this RPC message
+                if(msg_hdr != 0) // we want to collect header of this RPC message
                 {
-                assert( (hdr_len - written) <  hdr_len );
-                    hdr_len -= written;
+                    msg_hdr -= written;
                 }
             }
         }
         else    // unknown data in packet payload
         {
             assert(msg_len == 0);   // message is not found
-            assert(hdr_len == 0);   // header should be skipped
+            assert(msg_hdr == 0);   // header should be skipped
             collection.reset();     // skip collected data
             // skip data of current packet at all
             //info.data = NULL; optimization
@@ -554,12 +523,12 @@ public:
 
                     if(NFS3::Validator::check(call))
                     {
-                        hdr_len = std::min(msg_len, max_hdr);
+						msg_hdr = msg_len;
                         //TRACE("MATCH RPC Call xid:%u len: %u procedure: %u", call->xid(), msg_len, call->proc());
                     }
                     else
                     {
-                        hdr_len = 0; // don't collect headers of unknown calls
+                        msg_hdr = 0; // don't collect headers of unknown calls
                         //TRACE("Unknown RPC call of program: %u version: %u procedure: %u", call->prog(), call->vers(), call->proc());
                     }
                     return true;
@@ -575,15 +544,14 @@ public:
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
                 {
-                    msg_len = len;   // length of current RPC message
-                    hdr_len = std::min(msg_len, max_hdr);
+                    msg_len = msg_hdr = len;   // length of current RPC message
                     //TRACE("MATCH RPC Reply xid:%u len: %u", reply->xid(), msg_len);
                     return true;
                 }
                 else // isn't RPC reply, stream is corrupt
                 {
                     msg_len = 0;
-                    hdr_len = 0;
+                    msg_hdr = 0;
                     return false;
                 }
             }
@@ -599,9 +567,8 @@ public:
     }
 
 private:
-    uint32_t    max_hdr;  // max length of RPC message that will be collected
     uint32_t    msg_len;  // length of current RPC message + RM
-    uint32_t    hdr_len;  // min(max_hdr, msg_len) or 0 in case of unknown msg
+    uint32_t    msg_hdr;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
 
     typename Writer::Collection collection;// storage for collection packet data
 };
@@ -620,9 +587,9 @@ public:
     : reader{std::move(r)}
     , writer{std::move(w)}
     , ipv4_tcp_sessions{writer.get()}
-    , ipv4_udp_sessions{writer.get()}
-    , ipv6_tcp_sessions{writer.get()}
-    , ipv6_udp_sessions{writer.get()}
+    //, ipv4_udp_sessions{writer.get()}
+    //, ipv6_tcp_sessions{writer.get()}
+    //, ipv6_udp_sessions{writer.get()}
     {
         // check datalink layer
         datalink = reader->datalink();
@@ -672,19 +639,31 @@ public:
             }
             else if(info.ipv6)  // Ethernet:IPv6:TCP
             {
-                return processor->ipv6_tcp_sessions.collect_packet(info);
+				//>>>>>>>>>>>>
+                //return processor->ipv6_tcp_sessions.collect_packet(info);
+				//<<<<<<<<<<<<
+                LOGONCE("pcap packet ipv6 not handled "
+                        "packed won't be reassembled to TCP stream");
+				//<<<<<<<<<<<<
+				return;
             }
         }
         else if(info.udp)
         {
-            if(info.ipv4)       // Ethernet:IPv4:UDP
-            {
-                return processor->ipv4_udp_sessions.collect_packet(info);
-            }
-            else if(info.ipv6)  // Ethernet:IPv6:UDP
-            {
-                return processor->ipv6_udp_sessions.collect_packet(info);
-            }
+			//>>>>>>>>>>>
+            // if(info.ipv4)       // Ethernet:IPv4:UDP
+            // {
+            //     return processor->ipv4_udp_sessions.collect_packet(info);
+            // }
+            // else if(info.ipv6)  // Ethernet:IPv6:UDP
+            // {
+            //     return processor->ipv6_udp_sessions.collect_packet(info);
+            // }
+			//<<<<<<<<<<<
+            LOGONCE("pcap packets udp not handled "
+                    "packed won't be reassembled to TCP stream");
+			//<<<<<<<<<<<
+			return;
         }
 
         LOGONCE("only following stack of protocol is supported: "
@@ -697,10 +676,10 @@ private:
     std::unique_ptr<Writer> writer;
 
     SessionsHash< IPv4TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > ipv4_tcp_sessions;
-    SessionsHash< IPv4UDPMapper, UDPSession < Writer > , Writer >                  ipv4_udp_sessions;
+    //SessionsHash< IPv4UDPMapper, UDPSession < Writer > , Writer >                  ipv4_udp_sessions;
 
-    SessionsHash< IPv6TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > ipv6_tcp_sessions;
-    SessionsHash< IPv6UDPMapper, UDPSession < Writer > , Writer >                  ipv6_udp_sessions;
+    //SessionsHash< IPv6TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > ipv6_tcp_sessions;
+    //SessionsHash< IPv6UDPMapper, UDPSession < Writer > , Writer >                  ipv6_udp_sessions;
 
     int datalink;
 };

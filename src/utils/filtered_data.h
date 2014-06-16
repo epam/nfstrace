@@ -23,6 +23,7 @@
 #define FILTERED_DATA_H
 //------------------------------------------------------------------------------
 #include <cstdint>
+#include <cassert>
 
 #include <sys/time.h>
 
@@ -38,17 +39,62 @@ struct FilteredData
 {
     using Direction = NST::utils::Session::Direction;
 public:
-    NetworkSession* session;   // pointer to immutable session in Filtration
+    NetworkSession* session{nullptr};   // pointer to immutable session in Filtration
     struct timeval  timestamp; // timestamp of last collected packet
     Direction       direction; // direction of data transmission
 
-    uint32_t dlen;  // length of filtered data
-    uint8_t* data;  // pointer to data in memory
+    uint32_t dlen{0};  // length of filtered data
+    uint8_t* data{nullptr};  // pointer to data in memory
 
-    uint8_t  memory[4000]; // raw filtrated data in network byte order
-
+private:
+    uint8_t*  memory{nullptr}; // internal dynamic memory buffer, raw filtrated data in network byte order
+	size_t memsize{0}; // size of dynamic memory
+	
+public:
+	// disable copying
     FilteredData(const FilteredData&)            = delete;
     FilteredData& operator=(const FilteredData&) = delete;
+
+	inline ~FilteredData() {
+		if (nullptr != memory) {
+			assert(nullptr == memory);
+			//throw std::logic_error(std::string(__FUNCTION__) + ": improper memory deallocation"); 
+			delete[] memory;
+		}
+	}
+	inline size_t size() const { return memsize; }
+
+	uint8_t* allocate(size_t bytes) 
+	{
+		assert(nullptr == data == memory);
+		if (memory) {
+			//throw std::logic_error(std::string(__FUNCTION__) + ": repeat allocation");
+			memsize = 0;
+			delete[] memory;
+			memory = nullptr;
+		}
+		dlen = 0;
+		data = memory = new uint8_t[bytes]; // TODO: bad_alloc processing
+		memsize = bytes;
+		memset(memory, 0, bytes);
+		return data;
+	}
+	void deallocate() {
+		assert(nullptr != memory == data);
+		if (memory) {
+			memsize = 0;
+			delete[] memory;
+			memory = nullptr;
+		}
+		data = nullptr;
+		dlen = 0;
+	}
+	inline void reset() {
+		memsize = 0;
+		delete[] memory;
+		dlen = 0;
+		data = memory = nullptr;
+	}
 };
 
 using FilteredDataQueue = Queue<FilteredData>;

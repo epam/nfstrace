@@ -115,21 +115,21 @@ static auto create_capture_reader(const Parameters& params)
 } // unnamed namespace
 
 // capture from network interface and dump to file  - OnlineDumping(Dumping)
-void FiltrationManager::add_online_dumping(const Parameters& params)
+void FiltrationManager::add_online_dumping(const Parameters& )// params)
 {
-    std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
+    // std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
 
-    auto& dumping_params = params.dumping_params();
-    if(utils::Out message{}) // print parameters to user
-    {
-        message << dumping_params;
-    }
-    std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),
-                                                         dumping_params
-                                                       }
-                                          };
+    // auto& dumping_params = params.dumping_params();
+    // if(utils::Out message{}) // print parameters to user
+    // {
+    //     message << dumping_params;
+    // }
+    // std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),
+    //                                                      dumping_params
+    //                                                    }
+    //                                       };
 
-    threads.emplace_back(create_thread(reader, writer, status));
+    // threads.emplace_back(create_thread(reader, writer, status));
 }
 
 // capture from network interface and pass to queue - OnlineAnalysis(Profiling)
