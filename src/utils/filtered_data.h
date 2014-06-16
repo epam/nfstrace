@@ -48,53 +48,53 @@ public:
 
 private:
     uint8_t*  memory{nullptr}; // internal dynamic memory buffer, raw filtrated data in network byte order
-	size_t memsize{0}; // size of dynamic memory
-	
+    size_t memsize{0}; // size of dynamic memory
+    
 public:
-	// disable copying
+    // disable copying
     FilteredData(const FilteredData&)            = delete;
     FilteredData& operator=(const FilteredData&) = delete;
 
-	inline ~FilteredData() {
-		if (nullptr != memory) {
-			assert(nullptr == memory);
-			//throw std::logic_error(std::string(__FUNCTION__) + ": improper memory deallocation"); 
-			delete[] memory;
-		}
-	}
-	inline size_t size() const { return memsize; }
+    inline ~FilteredData() {
+        if (nullptr != memory) {
+            assert(nullptr == memory);
+            //throw std::logic_error(std::string(__FUNCTION__) + ": improper memory deallocation"); 
+            delete[] memory;
+        }
+    }
+    inline size_t size() const { return memsize; }
 
-	uint8_t* allocate(size_t bytes) 
-	{
-		assert(nullptr == data == memory);
-		if (memory) {
-			//throw std::logic_error(std::string(__FUNCTION__) + ": repeat allocation");
-			memsize = 0;
-			delete[] memory;
-			memory = nullptr;
-		}
-		dlen = 0;
-		data = memory = new uint8_t[bytes]; // TODO: bad_alloc processing
-		memsize = bytes;
-		memset(memory, 0, bytes);
-		return data;
-	}
-	void deallocate() {
-		assert(nullptr != memory == data);
-		if (memory) {
-			memsize = 0;
-			delete[] memory;
-			memory = nullptr;
-		}
-		data = nullptr;
-		dlen = 0;
-	}
-	inline void reset() {
-		memsize = 0;
-		delete[] memory;
-		dlen = 0;
-		data = memory = nullptr;
-	}
+    uint8_t* allocate(size_t bytes) 
+    {
+        assert(nullptr == data == memory);
+        if (memory) {
+            //throw std::logic_error(std::string(__FUNCTION__) + ": repeat allocation");
+            memsize = 0;
+            delete[] memory;
+            memory = nullptr;
+        }
+        dlen = 0;
+        data = memory = new uint8_t[bytes]; // TODO: bad_alloc processing
+        memsize = bytes;
+        memset(memory, 0, bytes);
+        return data;
+    }
+    void deallocate() {
+        assert(nullptr != memory == data);
+        if (memory) {
+            memsize = 0;
+            delete[] memory;
+            memory = nullptr;
+        }
+        data = nullptr;
+        dlen = 0;
+    }
+    inline void reset() {
+        memsize = 0;
+        delete[] memory;
+        dlen = 0;
+        data = memory = nullptr;
+    }
 };
 
 using FilteredDataQueue = Queue<FilteredData>;

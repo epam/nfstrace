@@ -78,7 +78,7 @@ public:
             ptr = queue->allocate();
             if(ptr)
             {
-				ptr->allocate(bytes);
+                ptr->allocate(bytes);
             }
             else
             {
@@ -90,7 +90,7 @@ public:
         {
             if(ptr)
             {
-				ptr->reset();
+                ptr->reset();
             }
         }
 

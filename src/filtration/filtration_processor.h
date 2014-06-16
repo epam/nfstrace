@@ -65,7 +65,7 @@ public:
     {
         // TODO: this code must be generalized with RPCFiltrator class
     
-        uint32_t msg_hdr = 0;
+        uint32_t hdr_len = 0;
         auto msg = reinterpret_cast<const MessageHeader*const>(info.data);
         switch(msg->type())
         {
@@ -74,7 +74,7 @@ public:
                 auto call = static_cast<const CallHeader*const>(msg);
                 if(RPCValidator::check(call) && NFS3::Validator::check(call))
                 {
-                    msg_hdr = std::min(info.dlen, max_hdr);
+                    hdr_len = std::min(info.dlen, max_hdr);
                 }
                 else
                 {
@@ -87,7 +87,7 @@ public:
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
                 {
-                    msg_hdr = std::min(info.dlen, max_hdr);
+                    hdr_len = std::min(info.dlen, max_hdr);
                 }
                 else // isn't RPC reply, stream is corrupt
                 {
@@ -101,7 +101,7 @@ public:
 
         collection.allocate();
 
-        collection.push(info, msg_hdr);
+        collection.push(info, hdr_len);
 
         collection.complete(info);
     }
@@ -375,7 +375,7 @@ public:
     inline void reset()
     {
         msg_len = 0;
-        msg_hdr = 0;
+        hdr_len = 0;
         collection.reset();     // skip collected data
     }
 	//
@@ -389,7 +389,7 @@ public:
     {
         if(msg_len != 0)
         {
-            if(msg_hdr == 0 && msg_len >= n)
+            if(hdr_len == 0 && msg_len >= n)
             {
                 TRACE("We are lost %u bytes of payload marked for discard", n);
                 msg_len -= n;
@@ -414,7 +414,7 @@ public:
         {
             if(msg_len != 0)    // we are on-stream and we are looking to some message
             {
-                if(msg_hdr == 0)    // message header is readout, discard the unused tail of message
+                if(hdr_len == 0)    // message header is readout, discard the unused tail of message
                 {
                     if(msg_len >= info.dlen) // discard whole new packet
                     {
@@ -430,25 +430,25 @@ public:
                         msg_len = 0; find_message(info); // <- optimization
                     }
                 }
-                else // msg_hdr != 0, readout a part of header of current message
+                else // hdr_len != 0, readout a part of header of current message
                 {
-                    if(msg_hdr > info.dlen) // got new part of header (not the all!)
+                    if(hdr_len > info.dlen) // got new part of header (not the all!)
                     {
                         //TRACE("got new part of header (not the all!)");
                         collection.push(info, info.dlen);
-                        msg_hdr     -= info.dlen;
+                        hdr_len     -= info.dlen;
                         msg_len     -= info.dlen;
                         info.dlen = 0;  // return from while
                     }
-                    else // msg_hdr <= dlen, current message will be complete, also we have some additional data
+                    else // hdr_len <= dlen, current message will be complete, also we have some additional data
                     {
                         //TRACE("current message will be complete, also we have some additional data");
-                        collection.push(info, msg_hdr);
-                        info.dlen   -= msg_hdr;
-                        info.data   += msg_hdr;
+                        collection.push(info, hdr_len);
+                        info.dlen   -= hdr_len;
+                        info.data   += hdr_len;
 
-                        msg_len -= msg_hdr;
-                        msg_hdr -= msg_hdr; // set 0
+                        msg_len -= hdr_len;
+                        hdr_len -= hdr_len; // set 0
 
                         // we should remove RM(uin32_t) from collected data
                         collection.skip_first(sizeof(RecordMark));
@@ -493,16 +493,16 @@ public:
             if(written != 0) // a message was partially written to collection
             {
                 msg_len -= written;
-                if(msg_hdr != 0) // we want to collect header of this RPC message
+                if(hdr_len != 0) // we want to collect header of this RPC message
                 {
-                    msg_hdr -= written;
+                    hdr_len -= written;
                 }
             }
         }
         else    // unknown data in packet payload
         {
             assert(msg_len == 0);   // message is not found
-            assert(msg_hdr == 0);   // header should be skipped
+            assert(hdr_len == 0);   // header should be skipped
             collection.reset();     // skip collected data
             // skip data of current packet at all
             //info.data = NULL; optimization
@@ -523,12 +523,12 @@ public:
 
                     if(NFS3::Validator::check(call))
                     {
-						msg_hdr = msg_len;
+						hdr_len = msg_len;
                         //TRACE("MATCH RPC Call xid:%u len: %u procedure: %u", call->xid(), msg_len, call->proc());
                     }
                     else
                     {
-                        msg_hdr = 0; // don't collect headers of unknown calls
+                        hdr_len = 0; // don't collect headers of unknown calls
                         //TRACE("Unknown RPC call of program: %u version: %u procedure: %u", call->prog(), call->vers(), call->proc());
                     }
                     return true;
@@ -544,14 +544,14 @@ public:
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
                 {
-                    msg_len = msg_hdr = len;   // length of current RPC message
+                    msg_len = hdr_len = len;   // length of current RPC message
                     //TRACE("MATCH RPC Reply xid:%u len: %u", reply->xid(), msg_len);
                     return true;
                 }
                 else // isn't RPC reply, stream is corrupt
                 {
                     msg_len = 0;
-                    msg_hdr = 0;
+                    hdr_len = 0;
                     return false;
                 }
             }
@@ -568,7 +568,7 @@ public:
 
 private:
     uint32_t    msg_len;  // length of current RPC message + RM
-    uint32_t    msg_hdr;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
+    uint32_t    hdr_len;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
 
     typename Writer::Collection collection;// storage for collection packet data
 };
