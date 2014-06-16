@@ -22,6 +22,7 @@
 #ifndef RPC_PROCEDURE_TYPE_H
 #define RPC_PROCEDURE_TYPE_H
 //------------------------------------------------------------------------------
+#include <rpc/rpc_msg.h>
 #include <sys/time.h>
 
 #include "rpc_types.h"
@@ -34,6 +35,9 @@ namespace API
 
 struct RPCProcedure
 {
+    struct rpc_msg rpc_call;
+    struct rpc_msg rpc_reply;
+
     struct RPCCall  call;
     struct RPCReply reply;
     const struct Session* session;

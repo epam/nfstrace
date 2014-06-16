@@ -92,6 +92,7 @@ enum AuthStat : int32_t
     RPCSEC_GSS_CTXPROBLEM  = 14 /* problem with context             */
 };
 
+/* conflict with <rpc/auth.h>
 enum AuthFlavor : int32_t
 {
      AUTH_NONE       = 0,
@@ -100,6 +101,7 @@ enum AuthFlavor : int32_t
      AUTH_DH         = 3,
      RPCSEC_GSS      = 6
 };
+*/
 
 struct OpaqueAuth
 {

@@ -28,6 +28,7 @@
 #include "fh.h"
 #include "ianalyzer_type.h"
 #include "nfs3_types.h"
+#include "nfs3_types_rpcgen.h"
 //------------------------------------------------------------------------------
 using namespace NST::API;
 //------------------------------------------------------------------------------

@@ -67,6 +67,21 @@ public:
         rtimestamp = &r.data().timestamp;
     }
 
+    inline NFSProcedure(xdr::XDRDecoder& c, xdr::XDRDecoder& r, const Session* s)
+    : parg{&arg}    // set pointer to argument
+    , pres{&res}    // set pointer to result
+    {
+        std::cout << "DEBUG: read call  rpc_msg : " << xdr_callmsg  (&c.xdr, &rpc_call ) << '\n';
+        std::cout << "DEBUG: read reply rpc_msg : " << xdr_replymsg (&r.xdr, &rpc_reply) << '\n';
+        //c >> rpc_call;
+        //r >> rpc_reply;
+
+        session = s;
+
+        ctimestamp = &c.data().timestamp;
+        rtimestamp = &r.data().timestamp;
+    }
+
     // pointers to procedure specific argument and result
     ArgType* parg;
     ResType* pres;
@@ -98,6 +113,29 @@ using NFSPROC3_FSSTAT      = NFSProcedure <FSSTAT3args,      FSSTAT3res>;
 using NFSPROC3_FSINFO      = NFSProcedure <FSINFO3args,      FSINFO3res>;
 using NFSPROC3_PATHCONF    = NFSProcedure <PATHCONF3args,    PATHCONF3res>;
 using NFSPROC3_COMMIT      = NFSProcedure <COMMIT3args,      COMMIT3res>;
+
+using NFSPROC3RPCGEN_NULL        = NFSProcedure <rpcgen::NULL3args,        rpcgen::NULL3res>;
+using NFSPROC3RPCGEN_GETATTR     = NFSProcedure <rpcgen::GETATTR3args,     rpcgen::GETATTR3res>;
+using NFSPROC3RPCGEN_SETATTR     = NFSProcedure <rpcgen::SETATTR3args,     rpcgen::SETATTR3res>;
+using NFSPROC3RPCGEN_LOOKUP      = NFSProcedure <rpcgen::LOOKUP3args,      rpcgen::LOOKUP3res>;
+using NFSPROC3RPCGEN_ACCESS      = NFSProcedure <rpcgen::ACCESS3args,      rpcgen::ACCESS3res>;
+using NFSPROC3RPCGEN_READLINK    = NFSProcedure <rpcgen::READLINK3args,    rpcgen::READLINK3res>;
+using NFSPROC3RPCGEN_READ        = NFSProcedure <rpcgen::READ3args,        rpcgen::READ3res>;
+using NFSPROC3RPCGEN_WRITE       = NFSProcedure <rpcgen::WRITE3args,       rpcgen::WRITE3res>;
+using NFSPROC3RPCGEN_CREATE      = NFSProcedure <rpcgen::CREATE3args,      rpcgen::CREATE3res>;
+using NFSPROC3RPCGEN_MKDIR       = NFSProcedure <rpcgen::MKDIR3args,       rpcgen::MKDIR3res>;
+using NFSPROC3RPCGEN_SYMLINK     = NFSProcedure <rpcgen::SYMLINK3args,     rpcgen::SYMLINK3res>;
+using NFSPROC3RPCGEN_MKNOD       = NFSProcedure <rpcgen::MKNOD3args,       rpcgen::MKNOD3res>;
+using NFSPROC3RPCGEN_REMOVE      = NFSProcedure <rpcgen::REMOVE3args,      rpcgen::REMOVE3res>;
+using NFSPROC3RPCGEN_RMDIR       = NFSProcedure <rpcgen::RMDIR3args,       rpcgen::RMDIR3res>;
+using NFSPROC3RPCGEN_RENAME      = NFSProcedure <rpcgen::RENAME3args,      rpcgen::RENAME3res>;
+using NFSPROC3RPCGEN_LINK        = NFSProcedure <rpcgen::LINK3args,        rpcgen::LINK3res>;
+using NFSPROC3RPCGEN_READDIR     = NFSProcedure <rpcgen::READDIR3args,     rpcgen::READDIR3res>;
+using NFSPROC3RPCGEN_READDIRPLUS = NFSProcedure <rpcgen::READDIRPLUS3args, rpcgen::READDIRPLUS3res>;
+using NFSPROC3RPCGEN_FSSTAT      = NFSProcedure <rpcgen::FSSTAT3args,      rpcgen::FSSTAT3res>;
+using NFSPROC3RPCGEN_FSINFO      = NFSProcedure <rpcgen::FSINFO3args,      rpcgen::FSINFO3res>;
+using NFSPROC3RPCGEN_PATHCONF    = NFSProcedure <rpcgen::PATHCONF3args,    rpcgen::PATHCONF3res>;
+using NFSPROC3RPCGEN_COMMIT      = NFSProcedure <rpcgen::COMMIT3args,      rpcgen::COMMIT3res>;
 
 } // namespace NFS3
 } // namespace protocols

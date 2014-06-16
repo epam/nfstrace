@@ -27,6 +27,7 @@
 
 #include "api/nfs3_types.h"
 
+#include "protocols/xdr/xdr_decoder.h"
 #include "protocols/xdr/xdr_reader.h"
 #include "protocols/rpc/rpc_header.h"
 //------------------------------------------------------------------------------
@@ -220,6 +221,16 @@ inline XDRReader& operator>>(XDRReader& in, NULLres&)
     return in;
 }
 
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::NULL3args&)
+{
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::NULL3res&)
+{
+    return in;
+}
+
 // Procedure 1: GETATTR - Get file attributes
 // GETATTR3res NFSPROC3_GETATTR(GETATTR3args) = 1;
 inline XDRReader& operator>>(XDRReader& in, GETATTR3args& o)
@@ -234,6 +245,18 @@ inline XDRReader& operator>>(XDRReader& in, GETATTR3res& o)
     {
         in >> o.resok.obj_attributes;
     }
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::GETATTR3args& o)
+{
+    xdr_GETATTR3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::GETATTR3res& o)
+{
+    xdr_GETATTR3res(&in.xdr, &o);
     return in;
 }
 
@@ -270,6 +293,18 @@ inline XDRReader& operator>>(XDRReader& in, SETATTR3res& o)
     return in;
 }
 
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::SETATTR3args& o)
+{
+    xdr_SETATTR3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::SETATTR3res& o)
+{
+    xdr_SETATTR3res(&in.xdr, &o);
+    return in;
+}
+
 // Procedure 3: LOOKUP -  Lookup filename
 // LOOKUP3res NFSPROC3_LOOKUP(LOOKUP3args) = 3;
 inline XDRReader& operator>>(XDRReader& in, LOOKUP3args& o)
@@ -293,6 +328,18 @@ inline XDRReader& operator>>(XDRReader& in, LOOKUP3res& o)
     return in;
 }
 
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::LOOKUP3args& o)
+{
+    xdr_LOOKUP3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::LOOKUP3res& o)
+{
+    xdr_LOOKUP3res(&in.xdr, &o);
+    return in;
+}
+
 // Procedure 4: ACCESS - Check Access Permission
 // ACCESS3res NFSPROC3_ACCESS(ACCESS3args) = 4;
 inline XDRReader& operator>>(XDRReader& in, ACCESS3args& o)
@@ -311,6 +358,18 @@ inline XDRReader& operator>>(XDRReader& in, ACCESS3res& o)
     {
         in >> o.resfail.obj_attributes;
     }
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::ACCESS3args& o)
+{
+    xdr_ACCESS3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::ACCESS3res& o)
+{
+    xdr_ACCESS3res(&in.xdr, &o);
     return in;
 }
 
@@ -336,6 +395,18 @@ inline XDRReader& operator>>(XDRReader& in, READLINK3res& o)
     return in;
 }
 
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READLINK3args& o)
+{
+    xdr_READLINK3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READLINK3res& o)
+{
+    xdr_READLINK3res(&in.xdr, &o);
+    return in;
+}
+
 // Procedure 6: READ - Read From file
 // READ3res NFSPROC3_READ(READ3args) = 6;
 inline XDRReader& operator>>(XDRReader& in, READ3args& o)
@@ -356,6 +427,18 @@ inline XDRReader& operator>>(XDRReader& in, READ3res& o)
     {
         in >> o.resfail.file_attributes;
     }
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READ3args& o)
+{
+    xdr_READ3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READ3res& o)
+{
+    xdr_READ3res(&in.xdr, &o);
     return in;
 }
 
@@ -385,6 +468,18 @@ inline XDRReader& operator>>(XDRReader& in, WRITE3res& o)
     {
         in >> o.resfail.file_wcc;
     }
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::WRITE3args& o)
+{
+    xdr_WRITE3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::WRITE3res& o)
+{
+    xdr_WRITE3res(&in.xdr, &o);
     return in;
 }
 
@@ -425,6 +520,18 @@ inline XDRReader& operator>>(XDRReader& in, CREATE3res& o)
     return in;
 }
 
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::CREATE3args& o)
+{
+    xdr_CREATE3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::CREATE3res& o)
+{
+    xdr_CREATE3res(&in.xdr, &o);
+    return in;
+}
+
 // Procedure 9: MKDIR - Create a directory
 // MKDIR3res NFSPROC3_MKDIR(MKDIR3args) = 9;
 inline XDRReader& operator>>(XDRReader& in, MKDIR3args& o)
@@ -445,6 +552,18 @@ inline XDRReader& operator>>(XDRReader& in, MKDIR3res& o)
     {
         in >> o.resfail.dir_wcc;
     }
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::MKDIR3args& o)
+{
+    xdr_MKDIR3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::MKDIR3res& o)
+{
+    xdr_MKDIR3res(&in.xdr, &o);
     return in;
 }
 
@@ -475,6 +594,18 @@ inline XDRReader& operator>>(XDRReader& in, SYMLINK3res& o)
     {
         in >> o.resfail.dir_wcc;
     }
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::SYMLINK3args& o)
+{
+    xdr_SYMLINK3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::SYMLINK3res& o)
+{
+    xdr_SYMLINK3res(&in.xdr, &o);
     return in;
 }
 
@@ -529,6 +660,18 @@ inline XDRReader& operator>>(XDRReader& in, MKNOD3res& o)
     return in;
 }
 
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::MKNOD3args& o)
+{
+    xdr_MKNOD3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::MKNOD3res& o)
+{
+    xdr_MKNOD3res(&in.xdr, &o);
+    return in;
+}
+
 // Procedure 12: REMOVE - Remove a File
 // REMOVE3res NFSPROC3_REMOVE(REMOVE3args) = 12;
 inline XDRReader& operator>>(XDRReader& in, REMOVE3args& o)
@@ -550,6 +693,18 @@ inline XDRReader& operator>>(XDRReader& in, REMOVE3res& o)
     return in;
 }
 
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::REMOVE3args& o)
+{
+    xdr_REMOVE3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::REMOVE3res& o)
+{
+    xdr_REMOVE3res(&in.xdr, &o);
+    return in;
+}
+
 // Procedure 13: RMDIR - Remove a Directory
 // RMDIR3res NFSPROC3_RMDIR(RMDIR3args) = 13;
 inline XDRReader& operator>>(XDRReader& in, RMDIR3args& o)
@@ -568,6 +723,18 @@ inline XDRReader& operator>>(XDRReader& in, RMDIR3res& o)
     {
         in >> o.resfail.dir_wcc;
     }
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::RMDIR3args& o)
+{
+    xdr_RMDIR3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::RMDIR3res& o)
+{
+    xdr_RMDIR3res(&in.xdr, &o);
     return in;
 }
 
@@ -594,6 +761,18 @@ inline XDRReader& operator>>(XDRReader& in, RENAME3res& o)
     return in;
 }
 
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::RENAME3args& o)
+{
+    xdr_RENAME3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::RENAME3res& o)
+{
+    xdr_RENAME3res(&in.xdr, &o);
+    return in;
+}
+
 // Procedure 15: LINK - Create Link to an object
 // LINK3res NFSPROC3_LINK(LINK3args) = 15;
 inline XDRReader& operator>>(XDRReader& in, LINK3args& o)
@@ -614,6 +793,18 @@ inline XDRReader& operator>>(XDRReader& in, LINK3res& o)
         in >> o.resfail.file_attributes;
         in >> o.resfail.linkdir_wcc;
     }
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::LINK3args& o)
+{
+    xdr_LINK3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::LINK3res& o)
+{
+    xdr_LINK3res(&in.xdr, &o);
     return in;
 }
 
@@ -645,6 +836,18 @@ inline XDRReader& operator>>(XDRReader& in, READDIR3res& o)
     return in;
 }
 
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READDIR3args& o)
+{
+    xdr_READDIR3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READDIR3res& o)
+{
+    xdr_READDIR3res(&in.xdr, &o);
+    return in;
+}
+
 // Procedure 17: READDIRPLUS - Extended read from directory
 // READDIRPLUS3res NFSPROC3_READDIRPLUS(READDIRPLUS3args) = 17;
 inline XDRReader& operator>>(XDRReader& in, READDIRPLUS3args& o)
@@ -669,6 +872,18 @@ inline XDRReader& operator>>(XDRReader& in, READDIRPLUS3res& o)
     {
         in >> o.resfail.dir_attributes;
     }
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READDIRPLUS3args& o)
+{
+    xdr_READDIRPLUS3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READDIRPLUS3res& o)
+{
+    xdr_READDIRPLUS3res(&in.xdr, &o);
     return in;
 }
 
@@ -697,6 +912,18 @@ inline XDRReader& operator>>(XDRReader& in, FSSTAT3res& o)
     {
         in >> o.resfail.obj_attributes;
     }
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::FSSTAT3args& o)
+{
+    xdr_FSSTAT3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::FSSTAT3res& o)
+{
+    xdr_FSSTAT3res(&in.xdr, &o);
     return in;
 }
 
@@ -732,6 +959,18 @@ inline XDRReader& operator>>(XDRReader& in, FSINFO3res& o)
     return in;
 }
 
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::FSINFO3args& o)
+{
+    xdr_FSINFO3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::FSINFO3res& o)
+{
+    xdr_FSINFO3res(&in.xdr, &o);
+    return in;
+}
+
 // Procedure 20: PATHCONF - Retrieve POSIX information
 // PATHCONF3res NFSPROC3_PATHCONF(PATHCONF3args) = 20;
 inline XDRReader& operator>>(XDRReader& in, PATHCONF3args& o)
@@ -759,6 +998,18 @@ inline XDRReader& operator>>(XDRReader& in, PATHCONF3res& o)
     return in;
 }
 
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::PATHCONF3args& o)
+{
+    xdr_PATHCONF3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::PATHCONF3res& o)
+{
+    xdr_PATHCONF3res(&in.xdr, &o);
+    return in;
+}
+
 // Procedure 21: COMMIT - Commit cached data on a server to stable storage
 // COMMIT3res NFSPROC3_COMMIT(COMMIT3args) = 21;
 inline XDRReader& operator>>(XDRReader& in, COMMIT3args& o)
@@ -778,6 +1029,18 @@ inline XDRReader& operator>>(XDRReader& in, COMMIT3res& o)
     {
         in >> o.resfail.file_wcc;
     }
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::COMMIT3args& o)
+{
+    xdr_COMMIT3args(&in.xdr, &o);
+    return in;
+}
+
+inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::COMMIT3res& o)
+{
+    xdr_COMMIT3res(&in.xdr, &o);
     return in;
 }
 
