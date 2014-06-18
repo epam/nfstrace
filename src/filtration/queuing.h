@@ -74,8 +74,14 @@ public:
 
         inline void allocate(size_t bytes)
         {
-            // we have a reference to queue, just do allocate and reset
-            ptr = queue->allocate();
+            if (nullptr != ptr)
+            {
+                ptr->deallocate();
+            }
+            else {
+                // we have a reference to queue, just do allocate and reset
+                ptr = queue->allocate();
+            }
             if(ptr)
             {
                 ptr->allocate(bytes);
@@ -90,7 +96,7 @@ public:
         {
             if(ptr)
             {
-                ptr->reset();
+                ptr->deallocate();
             }
         }
 
