@@ -48,21 +48,21 @@ set_target_properties (breakdown ofws ofdws testanalyzer
 add_subdirectory (tests)
 
 # installation of main application and plugins =================================
-install(TARGETS ${PROJECT_NAME} breakdown ofws ofdws
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib/nfstrace)
+install (TARGETS ${PROJECT_NAME} breakdown ofws ofdws
+         RUNTIME DESTINATION bin
+         LIBRARY DESTINATION lib/nfstrace)
 
 # installation of api headers ==================================================
-file(GLOB headers "src/api/*.h")
-install(FILES ${headers} DESTINATION include/nfstrace/api)
+file (GLOB headers "src/api/*.h")
+install (FILES ${headers} DESTINATION include/nfstrace/api)
 
 # build packages ===============================================================
-set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Pavel Karneliuk")
-set(CPACK_GENERATOR "RPM;DEB;TGZ")
-set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), gcc(>= 4.8), libpcap-dev (>=1.3.0-1)")
-include(CPack)
+set (CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set (CPACK_DEBIAN_PACKAGE_MAINTAINER "Pavel Karneliuk")
+set (CPACK_GENERATOR "RPM;DEB;TGZ")
+set (CPACK_PACKAGING_INSTALL_PREFIX "/")
+set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), gcc(>= 4.8), libpcap-dev (>=1.3.0-1)")
+include (CPack)
 
 # testing ======================================================================
 enable_testing ()
