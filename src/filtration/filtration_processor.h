@@ -28,7 +28,6 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <fstream>
 
 #include <pcap/pcap.h>
 
@@ -379,7 +378,7 @@ public:
         hdr_len = 0;
         collection.reset();     // skip collected data
     }
-	//
+    //
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w)
     {
         assert(w);
@@ -465,46 +464,71 @@ public:
         }
     }
 
-	// Find next message in packet info
-    inline void find_message(PacketInfo& info)
+    inline void collect_header(PacketInfo& info)
     {
         static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
-        const RecordMark* rm = reinterpret_cast<const RecordMark*>(info.data);
 
-		static std::ofstream os("fragment_len.log", std::ios::out);
-		static uint32_t call_ctr = 0;
-		++ call_ctr;
-		
-		// Now collection is empty
-		//(!) We can't reuse previous collection element in view of different sizes of elements
-		collection.allocate(sizeof(RecordMark) + rm->fragment_len()); // allocate new collection from writer
-		if (info.dlen < max_header) {
-			//os << "(" << call_ctr << ") " << "(!!) INFO.DLEN < MAX_HEADER (!!), fragment_len=" << rm->fragment_len() << std::endl;
+        if(collection) // collection is allocated
+        {
+            assert(collection.capacity() >= max_header);
+            const uint32_t tocopy = max_header - collection.size();
 
-			collection.push(info, info.dlen);
-			//info.data += info.dlen;   optimization
-			info.dlen = 0;
-			return;
-		}
+            if(info.dlen < tocopy)
+            {
+                collection.push(info, info.dlen);
+                //info.data += info.dlen;   optimization
+                info.dlen = 0;
+
+                return false;
+            }
+            else // info.dlen >= tocopy
+            {
+                collection.push(info, tocopy);
+                info.dlen -= tocopy;
+                info.data += tocopy;
+
+                assert(max_header == collection.size());
+            }
+        }
+        else // collection is empty
+        {
+            collection.allocate(max_header); // allocate space for header loading
+
+            if (info.dlen < max_header)
+            {
+                collection.push(info, info.dlen);
+                //info.data += info.dlen;   optimization
+                info.dlen = 0;
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Find next message in packet info
+    inline void find_message(PacketInfo& info)
+    {
+        assert(msg_len == 0);   // RPC Message still undetected
+
+        if (!collect_header(info))
+            return;
 
         assert(collection);     // collection must be initialized
-        assert(rm != NULL);     // RM must be initialized
-        assert(msg_len == 0);   // RPC Message still undetected
+        assert(collection.data_size() == sizeof(RecordMark)+sizeof(CallHeader));
+
+        const RecordMark* rm = reinterpret_cast<const RecordMark*>(collection.data());
 
         //if(rm->is_last()); // TODO: handle sequence field of record mark
         if(rm->fragment_len() > 0 && validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
         {
-			/*os << "(" << call_ctr << ") " << __FUNCTION__ << "fragment_len=" << rm->fragment_len() << std::endl;
-			if (!rm->is_last()) {
-				os << __FUNCTION__ << "(!!!!) NOT LAST FRAGMENT (!!!!)" << std::endl;
-				const uint32_t *xidp = reinterpret_cast<const uint32_t*>(info.data);
-				++ xidp;
-				os << "suppose XID=" << ntohl(*xidp)<< std::endl;
-			}*/
+            if (rm->fragment_len() > sizeof(CallHeader)) 
+                collection.extend(rm->fragment_len() - sizeof(CallHeader));
 
             assert(msg_len != 0);   // message is found
 
-            const uint32_t written = collection.size();
+            const uint32_t written = collection.data_size();
             if(written != 0) // a message was partially written to collection
             {
                 msg_len -= written;
@@ -516,7 +540,6 @@ public:
         }
         else    // unknown data in packet payload
         {
-			//os << "(" << call_ctr << ") " << __FUNCTION__ << "(!!) NOT VALIDATED (!!), fragment_len=" << rm->fragment_len() << std::endl;
             assert(msg_len == 0);   // message is not found
             assert(hdr_len == 0);   // header should be skipped
             collection.reset();     // skip collected data
@@ -539,7 +562,7 @@ public:
 
                     if(NFS3::Validator::check(call))
                     {
-						hdr_len = msg_len;
+                        hdr_len = msg_len;
                         //TRACE("MATCH RPC Call xid:%u len: %u procedure: %u", call->xid(), msg_len, call->proc());
                     }
                     else
@@ -655,18 +678,18 @@ public:
             }
             else if(info.ipv6)  // Ethernet:IPv6:TCP
             {
-				//>>>>>>>>>>>>
+                //>>>>>>>>>>>>
                 //return processor->ipv6_tcp_sessions.collect_packet(info);
-				//<<<<<<<<<<<<
+                //<<<<<<<<<<<<
                 LOGONCE("pcap packet ipv6 not handled "
                         "packed won't be reassembled to TCP stream");
-				//<<<<<<<<<<<<
-				return;
+                //<<<<<<<<<<<<
+                return;
             }
         }
         else if(info.udp)
         {
-			//>>>>>>>>>>>
+            //>>>>>>>>>>>
             // if(info.ipv4)       // Ethernet:IPv4:UDP
             // {
             //     return processor->ipv4_udp_sessions.collect_packet(info);
@@ -675,11 +698,11 @@ public:
             // {
             //     return processor->ipv6_udp_sessions.collect_packet(info);
             // }
-			//<<<<<<<<<<<
+            //<<<<<<<<<<<
             LOGONCE("pcap packets udp not handled "
                     "packed won't be reassembled to TCP stream");
-			//<<<<<<<<<<<
-			return;
+            //<<<<<<<<<<<
+            return;
         }
 
         LOGONCE("only following stack of protocol is supported: "

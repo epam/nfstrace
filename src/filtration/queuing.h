@@ -92,6 +92,18 @@ public:
             }
         }
 
+        inline uint8_t* extend(size_t exbytes)
+        {
+            assert(exbytes >0 && ptr!=nullptr);
+            if (0 == exbytes)
+                return ptr->data;
+            if (nullptr == ptr)
+                return nullptr;
+
+            return  ptr->extend(exbytes);
+        }
+
+
         inline void reset()
         {
             if(ptr)
@@ -135,7 +147,8 @@ public:
             ptr = nullptr;
         }
 
-        inline uint32_t size() const { return ptr->dlen; }
+        inline uint32_t data_size() const { return ptr->dlen; }
+        inline uint32_t capacity() const { return ptr->capacity(); }
         inline uint8_t* data() const { return ptr->data; }
         inline operator bool() const { return ptr != nullptr; }
 
