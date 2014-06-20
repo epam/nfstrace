@@ -47,8 +47,8 @@ public:
     uint8_t* data{nullptr};  // pointer to data in memory
 
 private:
-    uint8_t*    memory{nullptr}; // internal dynamic memory buffer, raw filtrated data in network byte order
-    uint32_t    memsize{0}; // size of dynamic memory
+    uint8_t*    memory{nullptr};
+    uint32_t    memsize{0};
     
 public:
     // disable copying
@@ -61,8 +61,44 @@ public:
             delete[] memory;
         }
     }
-    inline uint32_t size() const { return memsize; }
+    inline uint32_t capacity() const { return memsize; }
+    inline const uint8_t* memory() const { return memory; }
 
+    /*
+     *  Must be called 'allocate' first
+     *  Allocate further on message exceeds first allocated amount 
+     */
+    uint8_t* extend(uint32_t exbytes)
+    {
+        if (nullptr == memory)
+            throw std::logic_error(std::string(__FUNCTION__) + ": memory not allocated");
+            
+        if (0 == exbytes) 
+            return data;
+        
+        const uint32_t newsiz = memsize + exbytes;
+        uint8_t* newmem = new uint8_t[newsiz]; // TODO: bad_alloc handle
+        if ((data - memory) < 0) {
+            assert((data - memory) >= 0);
+            memcpy(newmem, memory, memsize);
+            deallocate();
+            memory = newmem;
+            memsize = newsiz;
+            data = memory;
+            return data;    
+        }
+        uint32_t data_offs = data - memory;
+        memcpy(newmem, memory, data_offs);
+        deallocate();   
+        memory = newmem;
+        memsize = newsiz;
+        data = memory + data_offs;
+        return data;
+    }
+    
+    /*
+     *  Allocate first time :to write message header
+     */
     uint8_t* allocate(size_t bytes) 
     {
         //assert(nullptr == memory && data == memory);
