@@ -376,7 +376,8 @@ public:
     {
         msg_len = 0;
         hdr_len = 0;
-        collection.reset();     // skip collected data
+        collection.deallocate();    // skip collected data. 
+                                    // Deallocate for case of extended collection
     }
     //
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w)
@@ -464,14 +465,14 @@ public:
         }
     }
 
-    inline void collect_header(PacketInfo& info)
+    inline bool collect_header(PacketInfo& info)
     {
         static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
 
         if(collection) // collection is allocated
         {
             assert(collection.capacity() >= max_header);
-            const uint32_t tocopy = max_header - collection.size();
+            const uint32_t tocopy = max_header - collection.data_size();
 
             if(info.dlen < tocopy)
             {
@@ -483,18 +484,22 @@ public:
             }
             else // info.dlen >= tocopy
             {
-                collection.push(info, tocopy);
+                collection.push(info, tocopy); // collection.data_size <= max_header
                 info.dlen -= tocopy;
                 info.data += tocopy;
-
-                assert(max_header == collection.size());
             }
         }
         else // collection is empty
         {
             collection.allocate(max_header); // allocate space for header loading
 
-            if (info.dlen < max_header)
+            if (info.dlen >= max_header)
+            {
+                //collection.push(info, max_header);
+                //info.data += max_header;
+                //info.dlen -= max_header;
+            }
+            else // (info.dlen < max_header)
             {
                 collection.push(info, info.dlen);
                 //info.data += info.dlen;   optimization
@@ -516,27 +521,21 @@ public:
             return;
 
         assert(collection);     // collection must be initialized
-        assert(collection.data_size() == sizeof(RecordMark)+sizeof(CallHeader));
+        //assert(collection.data_size() == sizeof(RecordMark)+sizeof(CallHeader));
 
         const RecordMark* rm = reinterpret_cast<const RecordMark*>(collection.data());
-
         //if(rm->is_last()); // TODO: handle sequence field of record mark
         if(rm->fragment_len() > 0 && validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
         {
-            if (rm->fragment_len() > sizeof(CallHeader)) 
-                collection.extend(rm->fragment_len() - sizeof(CallHeader));
-
             assert(msg_len != 0);   // message is found
 
             const uint32_t written = collection.data_size();
-            if(written != 0) // a message was partially written to collection
+            msg_len -= written; // substract how written (if written)
+            if(hdr_len != 0) // we want to collect header of this RPC message
             {
-                msg_len -= written;
-                if(hdr_len != 0) // we want to collect header of this RPC message
-                {
-                    hdr_len -= written;
-                }
+                hdr_len -= written;
             }
+            assert(msg_len != 0);
         }
         else    // unknown data in packet payload
         {

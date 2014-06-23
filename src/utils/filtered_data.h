@@ -62,40 +62,8 @@ public:
         }
     }
     inline uint32_t capacity() const { return memsize; }
-    inline const uint8_t* memory() const { return memory; }
+    //inline const uint8_t* memory() const { return memory; }
 
-    /*
-     *  Must be called 'allocate' first
-     *  Allocate further on message exceeds first allocated amount 
-     */
-    uint8_t* extend(uint32_t exbytes)
-    {
-        if (nullptr == memory)
-            throw std::logic_error(std::string(__FUNCTION__) + ": memory not allocated");
-            
-        if (0 == exbytes) 
-            return data;
-        
-        const uint32_t newsiz = memsize + exbytes;
-        uint8_t* newmem = new uint8_t[newsiz]; // TODO: bad_alloc handle
-        if ((data - memory) < 0) {
-            assert((data - memory) >= 0);
-            memcpy(newmem, memory, memsize);
-            deallocate();
-            memory = newmem;
-            memsize = newsiz;
-            data = memory;
-            return data;    
-        }
-        uint32_t data_offs = data - memory;
-        memcpy(newmem, memory, data_offs);
-        deallocate();   
-        memory = newmem;
-        memsize = newsiz;
-        data = memory + data_offs;
-        return data;
-    }
-    
     /*
      *  Allocate first time :to write message header
      */
@@ -115,14 +83,51 @@ public:
         data = memory;
         return data;
     }
+    /*
+     *  Allocate further on message exceeds first allocated amount 
+     *  (!) Must be called 'allocate' first
+     */
+    uint8_t* extend(uint32_t exbytes)
+    {
+        if (nullptr == memory)
+            throw std::logic_error(std::string(__FUNCTION__) + ": memory not allocated");
+            
+        if (0 == exbytes) 
+            return data;
+        
+        uint32_t newsiz = memsize + exbytes;
+        uint8_t* newmem = new uint8_t[newsiz]; // TODO: bad_alloc handle
+        uint32_t tdlen = dlen;
+
+        if (0 == dlen) {
+            assert(dlen > 0);
+            memcpy(newmem, memory, memsize);
+        }
+        else {
+            memcpy(newmem, memory, dlen);
+        }
+
+        deallocate();   
+        memory = newmem;
+        memsize = newsiz;
+        data = memory;
+        dlen = tdlen;
+
+        return data;
+    }
     inline void deallocate()
     {
-        //assert(nullptr != memory && memory == data);
-        data = nullptr;
-        dlen = 0;
+        assert(nullptr != memory && memory == data);
+        data = nullptr; dlen = 0;
         memsize = 0;
         delete[] memory;
         memory = nullptr;
+    }
+    inline void reset()
+    {
+        assert(nullptr != memory);
+        assert(memory == data);
+        data = memory; dlen = 0;
     }
 };
 
