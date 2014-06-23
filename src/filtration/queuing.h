@@ -74,6 +74,7 @@ public:
 
         inline void allocate(size_t bytes)
         {
+            assert(nullptr == ptr);
             if (nullptr != ptr)
             {
                 ptr->deallocate();
@@ -92,34 +93,38 @@ public:
             }
         }
 
-        inline uint8_t* extend(size_t exbytes)
+        void deallocate()
         {
-            assert(exbytes >0 && ptr!=nullptr);
-            if (0 == exbytes)
-                return ptr->data;
-            if (nullptr == ptr)
-                return nullptr;
-
-            return  ptr->extend(exbytes);
+            if(ptr)
+            {
+                queue->deallocate(ptr);
+                ptr = nullptr;
+            }
         }
-
 
         inline void reset()
         {
             if(ptr)
             {
-                ptr->deallocate();
+                ptr->reset();
             }
         }
 
         inline void push(const PacketInfo& info, const uint32_t len)
         {
-            uint8_t* const offset_ptr = ptr->data + ptr->dlen;
-            const uint32_t avail = ptr->size() - ptr->dlen; 
+            assert(nullptr != ptr);
+
+            if (!ptr)
+                return;
+
+            uint8_t* offset_ptr = ptr->data + ptr->dlen;
+            const uint32_t avail = ptr->capacity() - ptr->dlen; 
             if(len > avail)
             {
                 LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, avail, len);
-                assert(avail >= len);
+                //assert(avail >= len);
+                ptr->extend(len - avail); // [! infinite extension !]
+                offset_ptr = ptr->data + ptr->dlen; // update pointer
             }
             memcpy(offset_ptr, info.data, len);
             ptr->dlen += len;
