@@ -110,6 +110,7 @@ public:
             }
         }
 
+        // Extend input element automatically
         inline void push(const PacketInfo& info, const uint32_t len)
         {
             assert(nullptr != ptr);
@@ -141,6 +142,7 @@ public:
         void complete(const PacketInfo& info)
         {
             assert(ptr);
+            assert(nullptr != ptr->data);
             assert(ptr->dlen > 0);
             assert(info.direction != utils::Session::Direction::Unknown);
 
