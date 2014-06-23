@@ -89,8 +89,10 @@ public:
      */
     uint8_t* extend(uint32_t exbytes)
     {
-        if (nullptr == memory)
+        if (nullptr == memory) {
+            assert(nullptr != memory);
             throw std::logic_error(std::string(__FUNCTION__) + ": memory not allocated");
+        }
             
         if (0 == exbytes) 
             return data;
@@ -100,7 +102,7 @@ public:
         uint32_t tdlen = dlen;
 
         if (0 == dlen) {
-            assert(dlen > 0);
+            assert(dlen > 0); // spec of usage - extend on data exceeding
             memcpy(newmem, memory, memsize);
         }
         else {

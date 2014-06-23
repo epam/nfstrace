@@ -377,7 +377,7 @@ public:
         msg_len = 0;
         hdr_len = 0;
         collection.deallocate();    // skip collected data. 
-                                    // Deallocate for case of extended collection
+                                    // Deallocate for case of extended collection as we starting to collect header
     }
     //
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w)
@@ -461,6 +461,7 @@ public:
             else // msg_len == 0, no one mesasge is on reading, try to find next message
             {
                 find_message(info);
+                
             }
         }
     }
@@ -495,7 +496,7 @@ public:
 
             if (info.dlen >= max_header)
             {
-                //collection.push(info, max_header);
+                //collection.push(info, max_header); // probability that message will be rejected / probability of valid message
                 //info.data += max_header;
                 //info.dlen -= max_header;
             }
@@ -528,14 +529,17 @@ public:
         if(rm->fragment_len() > 0 && validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
         {
             assert(msg_len != 0);   // message is found
+            assert(msg_len >= collection.data_size());
 
             const uint32_t written = collection.data_size();
             msg_len -= written; // substract how written (if written)
-            if(hdr_len != 0) // we want to collect header of this RPC message
+            hdr_len -= std::min(hdr_len, written);
+            if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "max header len".
+                                // Next find message call will finding next message
             {
-                hdr_len -= written;
+                collection.skip_first(sizeof(RecordMark));
+                collection.complete(info);
             }
-            assert(msg_len != 0);
         }
         else    // unknown data in packet payload
         {
