@@ -461,7 +461,6 @@ public:
             else // msg_len == 0, no one mesasge is on reading, try to find next message
             {
                 find_message(info);
-                
             }
         }
     }
@@ -496,9 +495,9 @@ public:
 
             if (info.dlen >= max_header)
             {
-                //collection.push(info, max_header); // probability that message will be rejected / probability of valid message
-                //info.data += max_header;
-                //info.dlen -= max_header;
+                collection.push(info, max_header); // probability that message will be rejected / probability of valid message
+                info.data += max_header;
+                info.dlen -= max_header;
             }
             else // (info.dlen < max_header)
             {
@@ -530,11 +529,12 @@ public:
         {
             assert(msg_len != 0);   // message is found
             assert(msg_len >= collection.data_size());
+            assert(hdr_len <= msg_len);
 
             const uint32_t written = collection.data_size();
             msg_len -= written; // substract how written (if written)
             hdr_len -= std::min(hdr_len, written);
-            if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "max header len".
+            if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
                                 // Next find message call will finding next message
             {
                 collection.skip_first(sizeof(RecordMark));
