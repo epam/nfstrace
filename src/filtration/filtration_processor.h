@@ -99,7 +99,8 @@ public:
                 return;
         }
 
-        collection.allocate();
+        hdr_len = info.dlen;
+        collection.allocate(hdr_len);
 
         collection.push(info, hdr_len);
 
@@ -629,9 +630,9 @@ public:
     : reader{std::move(r)}
     , writer{std::move(w)}
     , ipv4_tcp_sessions{writer.get()}
-    //, ipv4_udp_sessions{writer.get()}
-    //, ipv6_tcp_sessions{writer.get()}
-    //, ipv6_udp_sessions{writer.get()}
+    , ipv4_udp_sessions{writer.get()}
+    , ipv6_tcp_sessions{writer.get()}
+    , ipv6_udp_sessions{writer.get()}
     {
         // check datalink layer
         datalink = reader->datalink();
@@ -681,31 +682,19 @@ public:
             }
             else if(info.ipv6)  // Ethernet:IPv6:TCP
             {
-                //>>>>>>>>>>>>
-                //return processor->ipv6_tcp_sessions.collect_packet(info);
-                //<<<<<<<<<<<<
-                LOGONCE("pcap packet ipv6 not handled "
-                        "packed won't be reassembled to TCP stream");
-                //<<<<<<<<<<<<
-                return;
+                return processor->ipv6_tcp_sessions.collect_packet(info);
             }
         }
         else if(info.udp)
         {
-            //>>>>>>>>>>>
-            // if(info.ipv4)       // Ethernet:IPv4:UDP
-            // {
-            //     return processor->ipv4_udp_sessions.collect_packet(info);
-            // }
-            // else if(info.ipv6)  // Ethernet:IPv6:UDP
-            // {
-            //     return processor->ipv6_udp_sessions.collect_packet(info);
-            // }
-            //<<<<<<<<<<<
-            LOGONCE("pcap packets udp not handled "
-                    "packed won't be reassembled to TCP stream");
-            //<<<<<<<<<<<
-            return;
+            if(info.ipv4)       // Ethernet:IPv4:UDP
+            {
+                return processor->ipv4_udp_sessions.collect_packet(info);
+            }
+            else if(info.ipv6)  // Ethernet:IPv6:UDP
+            {
+                return processor->ipv6_udp_sessions.collect_packet(info);
+            }
         }
 
         LOGONCE("only following stack of protocol is supported: "
@@ -718,10 +707,10 @@ private:
     std::unique_ptr<Writer> writer;
 
     SessionsHash< IPv4TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > ipv4_tcp_sessions;
-    //SessionsHash< IPv4UDPMapper, UDPSession < Writer > , Writer >                  ipv4_udp_sessions;
+    SessionsHash< IPv4UDPMapper, UDPSession < Writer > , Writer >                  ipv4_udp_sessions;
 
-    //SessionsHash< IPv6TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > ipv6_tcp_sessions;
-    //SessionsHash< IPv6UDPMapper, UDPSession < Writer > , Writer >                  ipv6_udp_sessions;
+    SessionsHash< IPv6TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > ipv6_tcp_sessions;
+    SessionsHash< IPv6UDPMapper, UDPSession < Writer > , Writer >                  ipv6_udp_sessions;
 
     int datalink;
 };
