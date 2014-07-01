@@ -100,7 +100,7 @@ public:
         }
 
         hdr_len = info.dlen;
-        collection.allocate(hdr_len);
+        collection.allocate();
 
         collection.push(info, hdr_len);
 
@@ -377,8 +377,9 @@ public:
     {
         msg_len = 0;
         hdr_len = 0;
-        collection.deallocate();    // skip collected data. 
-                                    // Deallocate for case of extended collection as we starting to collect header
+        // collection.deallocate();    // skip collected data. 
+        //                            // Deallocate for case of extended collection as we starting to collect header
+        collection.reset(); // data in external memory freed
     }
     //
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w)
@@ -492,7 +493,7 @@ public:
         }
         else // collection is empty
         {
-            collection.allocate(max_header); // allocate space for header loading
+            collection.allocate(); // allocate space for header loading
 
             if (info.dlen >= max_header)
             {
@@ -531,6 +532,10 @@ public:
             assert(msg_len != 0);   // message is found
             assert(msg_len >= collection.data_size());
             assert(hdr_len <= msg_len);
+
+            // hdr len is defined by that time
+            if (collection.capacity() < hdr_len)
+                collection.resize(hdr_len);
 
             const uint32_t written = collection.data_size();
             msg_len -= written; // substract how written (if written)

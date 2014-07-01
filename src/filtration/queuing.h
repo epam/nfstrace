@@ -72,24 +72,17 @@ public:
             session = s;
         }
 
-        inline void allocate(size_t bytes)
+        void allocate()
         {
-            assert(nullptr == ptr);
-            if (nullptr != ptr)
-            {
-                ptr->deallocate();
-            }
-            else {
+            if (nullptr == ptr) {
                 // we have a reference to queue, just do allocate and reset
                 ptr = queue->allocate();
+                if (!ptr) {
+                    LOG("free elements of the Queue are exhausted");
+                }
             }
-            if(ptr)
-            {
-                ptr->allocate(bytes);
-            }
-            else
-            {
-                LOG("free elements of the Queue are exhausted");
+            else {
+                assert(nullptr == ptr);
             }
         }
 
@@ -110,6 +103,14 @@ public:
             }
         }
 
+        inline void resize(size_t amount)
+        {
+            if (nullptr == ptr)
+                assert(nullptr != ptr);
+
+            ptr->resize(amount);
+        }
+
         // Extend input element automatically
         inline void push(const PacketInfo& info, const uint32_t len)
         {
@@ -120,11 +121,11 @@ public:
 
             uint8_t* offset_ptr = ptr->data + ptr->dlen;
             const uint32_t avail = ptr->capacity() - ptr->dlen; 
-            if(len > avail)
+            if(len > avail) // inappropriate case. Must be one resize when get entire message size 
             {
-                LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, avail, len);
-                //assert(avail >= len);
-                ptr->extend(len - avail); // [! infinite extension !]
+                assert(avail >= len);
+                //LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, avail, len);
+                ptr->resize(ptr->dlen + len); // [! unbound extension !]
                 offset_ptr = ptr->data + ptr->dlen; // update pointer
             }
             memcpy(offset_ptr, info.data, len);

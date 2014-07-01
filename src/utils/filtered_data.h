@@ -43,10 +43,14 @@ public:
     struct timeval  timestamp; // timestamp of last collected packet
     Direction       direction; // direction of data transmission
 
-    uint32_t dlen{0};  // length of filtered data
-    uint8_t* data{nullptr};  // pointer to data in memory
+    uint32_t    dlen{0};  // length of filtered data
+    uint8_t*    data{cache};  // pointer to data in memory. {Readonly. Always points to proper memory buffer}
 
 private:
+    enum: uint32_t {
+        FIXED_SIZE = 4000 
+    };
+    uint8_t     cache[FIXED_SIZE]{0};
     uint8_t*    memory{nullptr};
     uint32_t    memsize{0};
     
@@ -55,81 +59,61 @@ public:
     //FilteredData(const FilteredData&)            = delete;
     FilteredData& operator=(const FilteredData&) = delete;
 
+    inline FilteredData(): data(cache) {}
     inline ~FilteredData() {
         if (nullptr != memory) {
             //assert(nullptr == memory);
             delete[] memory;
         }
     }
-    inline uint32_t capacity() const { return memsize; }
-    //inline const uint8_t* memory() const { return memory; }
 
-    /*
-     *  Allocate first time :to write message header
-     */
-    uint8_t* allocate(size_t bytes) 
+    inline uint32_t capacity() const {
+        if (nullptr == memory) {
+            assert(data == cache);
+            return FIXED_SIZE;
+        }
+        return memsize;
+    }
+
+    // Resize capacity with data safety
+    void resize(uint32_t newsize)
     {
-        //assert(nullptr == memory && data == memory);
-        dlen = 0;
-        data = nullptr;
-        if (memory) {
+        if (capacity() >= newsize) {// not resize less
+            assert(capacity() <= newsize);
+            return;
+        }
+
+        if (nullptr == memory)
+        {
+            memory = new uint8_t[newsize];
+            memsize = newsize;
+            if (dlen > 0)
+                memcpy(memory, cache, dlen<=FIXED_SIZE?dlen:FIXED_SIZE);
+            data = memory;
+        }
+        else // have some filled memory
+        {
+            uint8_t* mem = new uint8_t[newsize];
+            if (0 != dlen) {
+                memcpy(mem, memory, dlen);
+            }
+            data = mem;
+            delete[] memory;
+            memory = mem;
+            memsize = newsize;
+        }
+    }
+
+    // Reset data. Release free memory if allocated 
+    inline void reset()
+    {
+        if (nullptr != memory) {
             memsize = 0;
             delete[] memory;
             memory = nullptr;
         }
-        memory = new uint8_t[bytes]; // TODO: bad_alloc processing
-        memsize = bytes;
-        memset(memory, 0, bytes);
-        data = memory;
-        return data;
-    }
-    /*
-     *  Allocate further on message exceeds first allocated amount 
-     *  (!) Must be called 'allocate' first
-     */
-    uint8_t* extend(uint32_t exbytes)
-    {
-        if (nullptr == memory) {
-            assert(nullptr != memory);
-            throw std::logic_error(std::string(__FUNCTION__) + ": memory not allocated");
-        }
-            
-        if (0 == exbytes) 
-            return data;
-        
-        uint32_t newsiz = memsize + exbytes;
-        uint8_t* newmem = new uint8_t[newsiz]; // TODO: bad_alloc handle
-        uint32_t tdlen = dlen;
-
-        if (0 == dlen) {
-            assert(dlen > 0); // spec of usage - extend on data exceeding
-            memcpy(newmem, memory, memsize);
-        }
-        else {
-            memcpy(newmem, memory, dlen);
-        }
-
-        deallocate();   
-        memory = newmem;
-        memsize = newsiz;
-        data = memory;
-        dlen = tdlen;
-
-        return data;
-    }
-    inline void deallocate()
-    {
-        assert(nullptr != memory && memory == data);
-        data = nullptr; dlen = 0;
-        memsize = 0;
-        delete[] memory;
-        memory = nullptr;
-    }
-    inline void reset()
-    {
-        assert(nullptr != memory);
-        assert(memory == data);
-        data = memory; dlen = 0;
+        dlen = 0;
+        data = cache;
     }
 };
 
