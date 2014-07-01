@@ -70,8 +70,8 @@ enable_testing ()
 # script for verification processing of compressed .pcap.bz2 traces by diff
 set (check_pcapbz2 ${CMAKE_BINARY_DIR}/check-compressed-trace.sh)
 file (WRITE ${check_pcapbz2}
-"bzcat $1 | ./${PROJECT_NAME} --mode=stat -a ./analyzers/libbreakdown.so -I - -v 0 >$2 2>&1\n"
-"diff -uN $3 $2\n"
+"bzcat \"$1\" | ./${PROJECT_NAME} --mode=stat -a ./analyzers/libbreakdown.so -I - -v 0 >\"$2\" 2>&1\n"
+"diff -uN \"$3\" \"$2\"\n"
 "exit $?"
 )
 
@@ -86,4 +86,3 @@ foreach (trace ${traces})
     add_test (NAME ${name}
               COMMAND sh ${check_pcapbz2} ${trace} ${result} ${reference} )
 endforeach ()
-
