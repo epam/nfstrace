@@ -377,8 +377,6 @@ public:
     {
         msg_len = 0;
         hdr_len = 0;
-        // collection.deallocate();    // skip collected data. 
-        //                            // Deallocate for case of extended collection as we starting to collect header
         collection.reset(); // data in external memory freed
     }
     //
