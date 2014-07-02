@@ -66,7 +66,7 @@ std::ostream& print_nfs_fh3(std::ostream& out, const uint8_t* data, const uint32
             out << std::setw(2) << (uint32_t)data[j];
         }
     }
-    out << std::dec;
+    out << std::dec << std::setfill(' ');
     return out;
 }
 
@@ -83,8 +83,10 @@ void print_nfs_fh3(std::ostream& out, const FH& fh)
 
 bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 {
+// TODO: fix
     bool result = false;
     NST::utils::operator<<(out, *(proc->session));
+/*
     if(out_all())
     {
         auto& call = proc->call;
@@ -143,6 +145,8 @@ bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
             }
         }
     }
+*/
+    result = true;    // TODO: rm
     out << '\n'; // end line of RPC procedure information
     return result;
 }

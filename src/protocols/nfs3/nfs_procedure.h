@@ -22,10 +22,12 @@
 #ifndef NFS_PROCEDURE_H
 #define NFS_PROCEDURE_H
 //------------------------------------------------------------------------------
+#include <rpc/rpc.h>
+
 #include "api/rpc_procedure_type.h"
 #include "protocols/nfs3/nfs_utils.h"
-#include "protocols/rpc/rpc_reader.h"
-#include "protocols/rpc/rpc_utils.h"
+//#include "protocols/rpc/rpc_reader.h"
+//#include "protocols/rpc/rpc_utils.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -43,7 +45,7 @@ template
 class NFSProcedure: public NST::API::RPCProcedure
 {
 public:
-
+/*
     inline NFSProcedure(rpc::RPCReader& c, rpc::RPCReader& r, const Session* s)
     : parg{&arg}    // set pointer to argument
     , pres{&res}    // set pointer to result
@@ -66,15 +68,59 @@ public:
         ctimestamp = &c.data().timestamp;
         rtimestamp = &r.data().timestamp;
     }
-
+*/
     inline NFSProcedure(xdr::XDRDecoder& c, xdr::XDRDecoder& r, const Session* s)
     : parg{&arg}    // set pointer to argument
     , pres{&res}    // set pointer to result
     {
-        std::cout << "DEBUG: read call  rpc_msg : " << xdr_callmsg  (&c.xdr, &rpc_call ) << '\n';
-        std::cout << "DEBUG: read reply rpc_msg : " << xdr_replymsg (&r.xdr, &rpc_reply) << '\n';
-        //c >> rpc_call;
-        //r >> rpc_reply;
+        memset(&rpc_call, 0,sizeof(rpc_call ));
+        memset(&rpc_reply,0,sizeof(rpc_reply));
+        memset(&arg,      0,sizeof(arg));
+        memset(&res,      0,sizeof(res));
+
+        // fill call
+        if(!xdr_callmsg(c.xdr(), &rpc_call))
+        {
+            xdr_free((xdrproc_t)xdr_callmsg, (char*)&rpc_call);
+            throw XDRDecoderError{"XDRDecoder::read call cannot be done"};
+        }
+
+        // fill call arguments
+        if(!proc_t_of(arg)(c.xdr(),&arg))
+        {
+            xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
+            xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call);
+            //throw XDRDecoderError{"XDRDecoder::read call arguments cannot be done"};
+        }
+
+        rpc_reply.ru.RM_rmb.ru.RP_ar.ru.AR_results.proc = &r.return_true;
+
+        // fill reply
+        if(!xdr_replymsg (r.xdr(), &rpc_reply))
+        {
+            xdr_free((xdrproc_t)xdr_replymsg,  (char*)&rpc_reply);
+            xdr_free((xdrproc_t)proc_t_of(arg),(char*)&arg);
+            xdr_free((xdrproc_t)xdr_callmsg,   (char*)&rpc_call);
+            throw XDRDecoderError{"XDRDecoder::read reply cannot be done"};
+        }
+  
+        if(rpc_reply.ru.RM_rmb.rp_stat == reply_stat::MSG_ACCEPTED &&
+           rpc_reply.ru.RM_rmb.ru.RP_ar.ar_stat == accept_stat::SUCCESS)
+        {
+            // fill reply results
+            if(!proc_t_of(res)(r.xdr(),&res))
+            {
+                xdr_free((xdrproc_t)proc_t_of(res), (char*)&res);
+                xdr_free((xdrproc_t)xdr_replymsg,   (char*)&rpc_reply);
+                xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
+                xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call);
+                throw XDRDecoderError{"XDRDecoder::read reply results cannot be done"};
+            }
+        }
+        else
+        {
+            pres = nullptr;
+        }
 
         session = s;
 
@@ -82,15 +128,24 @@ public:
         rtimestamp = &r.data().timestamp;
     }
 
+    inline ~NFSProcedure()
+    {
+        if(pres) xdr_free((xdrproc_t)proc_t_of(res), (char*)&res);
+                 xdr_free((xdrproc_t)xdr_replymsg, (char*)&rpc_reply);
+                 xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
+                 xdr_free((xdrproc_t)xdr_callmsg, (char*)&rpc_call);
+    }
+
     // pointers to procedure specific argument and result
     ArgType* parg;
     ResType* pres;
 
 private:
+
     ArgType arg;
     ResType res;
 };
-
+/*
 using NFSPROC3_NULL        = NFSProcedure <NULLargs,         NULLres>;
 using NFSPROC3_GETATTR     = NFSProcedure <GETATTR3args,     GETATTR3res>;
 using NFSPROC3_SETATTR     = NFSProcedure <SETATTR3args,     SETATTR3res>;
@@ -113,7 +168,7 @@ using NFSPROC3_FSSTAT      = NFSProcedure <FSSTAT3args,      FSSTAT3res>;
 using NFSPROC3_FSINFO      = NFSProcedure <FSINFO3args,      FSINFO3res>;
 using NFSPROC3_PATHCONF    = NFSProcedure <PATHCONF3args,    PATHCONF3res>;
 using NFSPROC3_COMMIT      = NFSProcedure <COMMIT3args,      COMMIT3res>;
-
+*/
 using NFSPROC3RPCGEN_NULL        = NFSProcedure <rpcgen::NULL3args,        rpcgen::NULL3res>;
 using NFSPROC3RPCGEN_GETATTR     = NFSProcedure <rpcgen::GETATTR3args,     rpcgen::GETATTR3res>;
 using NFSPROC3RPCGEN_SETATTR     = NFSProcedure <rpcgen::SETATTR3args,     rpcgen::SETATTR3res>;

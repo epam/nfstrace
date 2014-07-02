@@ -221,16 +221,6 @@ inline XDRReader& operator>>(XDRReader& in, NULLres&)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::NULL3args&)
-{
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::NULL3res&)
-{
-    return in;
-}
-
 // Procedure 1: GETATTR - Get file attributes
 // GETATTR3res NFSPROC3_GETATTR(GETATTR3args) = 1;
 inline XDRReader& operator>>(XDRReader& in, GETATTR3args& o)
@@ -245,18 +235,6 @@ inline XDRReader& operator>>(XDRReader& in, GETATTR3res& o)
     {
         in >> o.resok.obj_attributes;
     }
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::GETATTR3args& o)
-{
-    xdr_GETATTR3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::GETATTR3res& o)
-{
-    xdr_GETATTR3res(&in.xdr, &o);
     return in;
 }
 
@@ -293,18 +271,6 @@ inline XDRReader& operator>>(XDRReader& in, SETATTR3res& o)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::SETATTR3args& o)
-{
-    xdr_SETATTR3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::SETATTR3res& o)
-{
-    xdr_SETATTR3res(&in.xdr, &o);
-    return in;
-}
-
 // Procedure 3: LOOKUP -  Lookup filename
 // LOOKUP3res NFSPROC3_LOOKUP(LOOKUP3args) = 3;
 inline XDRReader& operator>>(XDRReader& in, LOOKUP3args& o)
@@ -328,18 +294,6 @@ inline XDRReader& operator>>(XDRReader& in, LOOKUP3res& o)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::LOOKUP3args& o)
-{
-    xdr_LOOKUP3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::LOOKUP3res& o)
-{
-    xdr_LOOKUP3res(&in.xdr, &o);
-    return in;
-}
-
 // Procedure 4: ACCESS - Check Access Permission
 // ACCESS3res NFSPROC3_ACCESS(ACCESS3args) = 4;
 inline XDRReader& operator>>(XDRReader& in, ACCESS3args& o)
@@ -358,18 +312,6 @@ inline XDRReader& operator>>(XDRReader& in, ACCESS3res& o)
     {
         in >> o.resfail.obj_attributes;
     }
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::ACCESS3args& o)
-{
-    xdr_ACCESS3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::ACCESS3res& o)
-{
-    xdr_ACCESS3res(&in.xdr, &o);
     return in;
 }
 
@@ -395,18 +337,6 @@ inline XDRReader& operator>>(XDRReader& in, READLINK3res& o)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READLINK3args& o)
-{
-    xdr_READLINK3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READLINK3res& o)
-{
-    xdr_READLINK3res(&in.xdr, &o);
-    return in;
-}
-
 // Procedure 6: READ - Read From file
 // READ3res NFSPROC3_READ(READ3args) = 6;
 inline XDRReader& operator>>(XDRReader& in, READ3args& o)
@@ -427,18 +357,6 @@ inline XDRReader& operator>>(XDRReader& in, READ3res& o)
     {
         in >> o.resfail.file_attributes;
     }
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READ3args& o)
-{
-    xdr_READ3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READ3res& o)
-{
-    xdr_READ3res(&in.xdr, &o);
     return in;
 }
 
@@ -468,18 +386,6 @@ inline XDRReader& operator>>(XDRReader& in, WRITE3res& o)
     {
         in >> o.resfail.file_wcc;
     }
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::WRITE3args& o)
-{
-    xdr_WRITE3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::WRITE3res& o)
-{
-    xdr_WRITE3res(&in.xdr, &o);
     return in;
 }
 
@@ -520,18 +426,6 @@ inline XDRReader& operator>>(XDRReader& in, CREATE3res& o)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::CREATE3args& o)
-{
-    xdr_CREATE3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::CREATE3res& o)
-{
-    xdr_CREATE3res(&in.xdr, &o);
-    return in;
-}
-
 // Procedure 9: MKDIR - Create a directory
 // MKDIR3res NFSPROC3_MKDIR(MKDIR3args) = 9;
 inline XDRReader& operator>>(XDRReader& in, MKDIR3args& o)
@@ -552,18 +446,6 @@ inline XDRReader& operator>>(XDRReader& in, MKDIR3res& o)
     {
         in >> o.resfail.dir_wcc;
     }
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::MKDIR3args& o)
-{
-    xdr_MKDIR3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::MKDIR3res& o)
-{
-    xdr_MKDIR3res(&in.xdr, &o);
     return in;
 }
 
@@ -594,18 +476,6 @@ inline XDRReader& operator>>(XDRReader& in, SYMLINK3res& o)
     {
         in >> o.resfail.dir_wcc;
     }
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::SYMLINK3args& o)
-{
-    xdr_SYMLINK3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::SYMLINK3res& o)
-{
-    xdr_SYMLINK3res(&in.xdr, &o);
     return in;
 }
 
@@ -660,18 +530,6 @@ inline XDRReader& operator>>(XDRReader& in, MKNOD3res& o)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::MKNOD3args& o)
-{
-    xdr_MKNOD3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::MKNOD3res& o)
-{
-    xdr_MKNOD3res(&in.xdr, &o);
-    return in;
-}
-
 // Procedure 12: REMOVE - Remove a File
 // REMOVE3res NFSPROC3_REMOVE(REMOVE3args) = 12;
 inline XDRReader& operator>>(XDRReader& in, REMOVE3args& o)
@@ -693,18 +551,6 @@ inline XDRReader& operator>>(XDRReader& in, REMOVE3res& o)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::REMOVE3args& o)
-{
-    xdr_REMOVE3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::REMOVE3res& o)
-{
-    xdr_REMOVE3res(&in.xdr, &o);
-    return in;
-}
-
 // Procedure 13: RMDIR - Remove a Directory
 // RMDIR3res NFSPROC3_RMDIR(RMDIR3args) = 13;
 inline XDRReader& operator>>(XDRReader& in, RMDIR3args& o)
@@ -723,18 +569,6 @@ inline XDRReader& operator>>(XDRReader& in, RMDIR3res& o)
     {
         in >> o.resfail.dir_wcc;
     }
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::RMDIR3args& o)
-{
-    xdr_RMDIR3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::RMDIR3res& o)
-{
-    xdr_RMDIR3res(&in.xdr, &o);
     return in;
 }
 
@@ -761,18 +595,6 @@ inline XDRReader& operator>>(XDRReader& in, RENAME3res& o)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::RENAME3args& o)
-{
-    xdr_RENAME3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::RENAME3res& o)
-{
-    xdr_RENAME3res(&in.xdr, &o);
-    return in;
-}
-
 // Procedure 15: LINK - Create Link to an object
 // LINK3res NFSPROC3_LINK(LINK3args) = 15;
 inline XDRReader& operator>>(XDRReader& in, LINK3args& o)
@@ -793,18 +615,6 @@ inline XDRReader& operator>>(XDRReader& in, LINK3res& o)
         in >> o.resfail.file_attributes;
         in >> o.resfail.linkdir_wcc;
     }
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::LINK3args& o)
-{
-    xdr_LINK3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::LINK3res& o)
-{
-    xdr_LINK3res(&in.xdr, &o);
     return in;
 }
 
@@ -836,18 +646,6 @@ inline XDRReader& operator>>(XDRReader& in, READDIR3res& o)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READDIR3args& o)
-{
-    xdr_READDIR3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READDIR3res& o)
-{
-    xdr_READDIR3res(&in.xdr, &o);
-    return in;
-}
-
 // Procedure 17: READDIRPLUS - Extended read from directory
 // READDIRPLUS3res NFSPROC3_READDIRPLUS(READDIRPLUS3args) = 17;
 inline XDRReader& operator>>(XDRReader& in, READDIRPLUS3args& o)
@@ -872,18 +670,6 @@ inline XDRReader& operator>>(XDRReader& in, READDIRPLUS3res& o)
     {
         in >> o.resfail.dir_attributes;
     }
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READDIRPLUS3args& o)
-{
-    xdr_READDIRPLUS3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::READDIRPLUS3res& o)
-{
-    xdr_READDIRPLUS3res(&in.xdr, &o);
     return in;
 }
 
@@ -912,18 +698,6 @@ inline XDRReader& operator>>(XDRReader& in, FSSTAT3res& o)
     {
         in >> o.resfail.obj_attributes;
     }
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::FSSTAT3args& o)
-{
-    xdr_FSSTAT3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::FSSTAT3res& o)
-{
-    xdr_FSSTAT3res(&in.xdr, &o);
     return in;
 }
 
@@ -959,18 +733,6 @@ inline XDRReader& operator>>(XDRReader& in, FSINFO3res& o)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::FSINFO3args& o)
-{
-    xdr_FSINFO3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::FSINFO3res& o)
-{
-    xdr_FSINFO3res(&in.xdr, &o);
-    return in;
-}
-
 // Procedure 20: PATHCONF - Retrieve POSIX information
 // PATHCONF3res NFSPROC3_PATHCONF(PATHCONF3args) = 20;
 inline XDRReader& operator>>(XDRReader& in, PATHCONF3args& o)
@@ -998,18 +760,6 @@ inline XDRReader& operator>>(XDRReader& in, PATHCONF3res& o)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::PATHCONF3args& o)
-{
-    xdr_PATHCONF3args(&in.xdr, &o);
-    return in;
-}
-
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::PATHCONF3res& o)
-{
-    xdr_PATHCONF3res(&in.xdr, &o);
-    return in;
-}
-
 // Procedure 21: COMMIT - Commit cached data on a server to stable storage
 // COMMIT3res NFSPROC3_COMMIT(COMMIT3args) = 21;
 inline XDRReader& operator>>(XDRReader& in, COMMIT3args& o)
@@ -1032,17 +782,248 @@ inline XDRReader& operator>>(XDRReader& in, COMMIT3res& o)
     return in;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::COMMIT3args& o)
+// Procedure 0: NULL - Do nothing
+inline auto proc_t_of(rpcgen::NULL3args&)->decltype(&rpcgen::xdr_NULL3args)
 {
-    xdr_COMMIT3args(&in.xdr, &o);
-    return in;
+    return &rpcgen::xdr_NULL3args;
 }
 
-inline XDRDecoder& operator>>(XDRDecoder& in, rpcgen::COMMIT3res& o)
+inline auto proc_t_of(rpcgen::NULL3res&)->decltype(&rpcgen::xdr_NULL3res)
 {
-    xdr_COMMIT3res(&in.xdr, &o);
-    return in;
+    return &rpcgen::xdr_NULL3res;
 }
+
+// Procedure 1: GETATTR - Get file attributes
+inline auto proc_t_of(rpcgen::GETATTR3args&)->decltype(&rpcgen::xdr_GETATTR3args)
+{
+    return &rpcgen::xdr_GETATTR3args;
+}
+
+inline auto proc_t_of(rpcgen::GETATTR3res&)->decltype(&rpcgen::xdr_GETATTR3res)
+{
+    return &rpcgen::xdr_GETATTR3res;
+}
+
+// Procedure 2: SETATTR - Set file attributes
+inline auto proc_t_of(rpcgen::SETATTR3args&)->decltype(&rpcgen::xdr_SETATTR3args)
+{
+    return &rpcgen::xdr_SETATTR3args;
+}
+
+inline auto proc_t_of(rpcgen::SETATTR3res&)->decltype(&rpcgen::xdr_SETATTR3res)
+{
+    return &rpcgen::xdr_SETATTR3res;
+}
+
+// Procedure 3: LOOKUP -  Lookup filename
+inline auto proc_t_of(rpcgen::LOOKUP3args&)->decltype(&rpcgen::xdr_LOOKUP3args)
+{
+    return &rpcgen::xdr_LOOKUP3args;
+}
+
+inline auto proc_t_of(rpcgen::LOOKUP3res&)->decltype(&rpcgen::xdr_LOOKUP3res)
+{
+    return &rpcgen::xdr_LOOKUP3res;
+}
+
+// Procedure 4: ACCESS - Check Access Permission
+inline auto proc_t_of(rpcgen::ACCESS3args&)->decltype(&rpcgen::xdr_ACCESS3args)
+{
+    return &rpcgen::xdr_ACCESS3args;
+}
+
+inline auto proc_t_of(rpcgen::ACCESS3res&)->decltype(&rpcgen::xdr_ACCESS3res)
+{
+    return &rpcgen::xdr_ACCESS3res;
+}
+
+// Procedure 5: READLINK - Read from symbolic link
+inline auto proc_t_of(rpcgen::READLINK3args&)->decltype(&rpcgen::xdr_READLINK3args)
+{
+    return &rpcgen::xdr_READLINK3args;
+}
+
+inline auto proc_t_of(rpcgen::READLINK3res&)->decltype(&rpcgen::xdr_READLINK3res)
+{
+    return &rpcgen::xdr_READLINK3res;
+}
+
+// Procedure 6: READ - Read From file
+inline auto proc_t_of(rpcgen::READ3args&)->decltype(&rpcgen::xdr_READ3args)
+{
+    return &rpcgen::xdr_READ3args;
+}
+
+inline auto proc_t_of(rpcgen::READ3res&)->decltype(&rpcgen::xdr_READ3res)
+{
+    return &rpcgen::xdr_READ3res;
+}
+
+// Procedure 7: WRITE - Write to file
+inline auto proc_t_of(rpcgen::WRITE3args&)->decltype(&rpcgen::xdr_WRITE3args)
+{
+    return &rpcgen::xdr_WRITE3args;
+}
+
+inline auto proc_t_of(rpcgen::WRITE3res&)->decltype(&rpcgen::xdr_WRITE3res)
+{
+    return &rpcgen::xdr_WRITE3res;
+}
+
+// Procedure 8: CREATE - Create a file
+inline auto proc_t_of(rpcgen::CREATE3args&)->decltype(&rpcgen::xdr_CREATE3args)
+{
+    return &rpcgen::xdr_CREATE3args;
+}
+
+inline auto proc_t_of(rpcgen::CREATE3res&)->decltype(&rpcgen::xdr_CREATE3res)
+{
+    return &rpcgen::xdr_CREATE3res;
+}
+
+// Procedure 9: MKDIR - Create a directory
+inline auto proc_t_of(rpcgen::MKDIR3args&)->decltype(&rpcgen::xdr_MKDIR3args)
+{
+    return &rpcgen::xdr_MKDIR3args;
+}
+
+inline auto proc_t_of(rpcgen::MKDIR3res&)->decltype(&rpcgen::xdr_MKDIR3res)
+{
+    return &rpcgen::xdr_MKDIR3res;
+}
+
+// Procedure 10: SYMLINK - Create a symbolic link
+inline auto proc_t_of(rpcgen::SYMLINK3args&)->decltype(&rpcgen::xdr_SYMLINK3args)
+{
+    return &rpcgen::xdr_SYMLINK3args;
+}
+
+inline auto proc_t_of(rpcgen::SYMLINK3res&)->decltype(&rpcgen::xdr_SYMLINK3res)
+{
+    return &rpcgen::xdr_SYMLINK3res;
+}
+
+// Procedure 11: MKNOD - Create a special device
+inline auto proc_t_of(rpcgen::MKNOD3args&)->decltype(&rpcgen::xdr_MKNOD3args)
+{
+    return &rpcgen::xdr_MKNOD3args;
+}
+
+inline auto proc_t_of(rpcgen::MKNOD3res&)->decltype(&rpcgen::xdr_MKNOD3res)
+{
+    return &rpcgen::xdr_MKNOD3res;
+}
+
+// Procedure 12: REMOVE - Remove a File
+inline auto proc_t_of(rpcgen::REMOVE3args&)->decltype(&rpcgen::xdr_REMOVE3args)
+{
+    return &rpcgen::xdr_REMOVE3args;
+}
+
+inline auto proc_t_of(rpcgen::REMOVE3res&)->decltype(&rpcgen::xdr_REMOVE3res)
+{
+    return &rpcgen::xdr_REMOVE3res;
+}
+
+// Procedure 13: RMDIR - Remove a Directory
+inline auto proc_t_of(rpcgen::RMDIR3args&)->decltype(&rpcgen::xdr_RMDIR3args)
+{
+    return &rpcgen::xdr_RMDIR3args;
+}
+
+inline auto proc_t_of(rpcgen::RMDIR3res&)->decltype(&rpcgen::xdr_RMDIR3res)
+{
+    return &rpcgen::xdr_RMDIR3res;
+}
+
+// Procedure 14: RENAME - Rename a File or Directory
+inline auto proc_t_of(rpcgen::RENAME3args&)->decltype(&rpcgen::xdr_RENAME3args)
+{
+    return &rpcgen::xdr_RENAME3args;
+}
+
+inline auto proc_t_of(rpcgen::RENAME3res&)->decltype(&rpcgen::xdr_RENAME3res)
+{
+    return &rpcgen::xdr_RENAME3res;
+}
+
+// Procedure 15: LINK - Create Link to an object
+inline auto proc_t_of(rpcgen::LINK3args&)->decltype(&rpcgen::xdr_LINK3args)
+{
+    return &rpcgen::xdr_LINK3args;
+}
+
+inline auto proc_t_of(rpcgen::LINK3res&)->decltype(&rpcgen::xdr_LINK3res)
+{
+    return &rpcgen::xdr_LINK3res;
+}
+
+// Procedure 16: READDIR - Read From Directory
+inline auto proc_t_of(rpcgen::READDIR3args&)->decltype(&rpcgen::xdr_READDIR3args)
+{
+    return &rpcgen::xdr_READDIR3args;
+}
+
+inline auto proc_t_of(rpcgen::READDIR3res&)->decltype(&rpcgen::xdr_READDIR3res)
+{
+    return &rpcgen::xdr_READDIR3res;
+}
+
+// Procedure 17: READDIRPLUS - Extended read from directory
+inline auto proc_t_of(rpcgen::READDIRPLUS3args&)->decltype(&rpcgen::xdr_READDIRPLUS3args)
+{
+    return &rpcgen::xdr_READDIRPLUS3args;
+}
+
+inline auto proc_t_of(rpcgen::READDIRPLUS3res&)->decltype(&rpcgen::xdr_READDIRPLUS3res)
+{
+    return &rpcgen::xdr_READDIRPLUS3res;
+}
+
+// Procedure 18: FSSTAT - Get dynamic file system information
+inline auto proc_t_of(rpcgen::FSSTAT3args&)->decltype(&rpcgen::xdr_FSSTAT3args)
+{
+    return &rpcgen::xdr_FSSTAT3args;
+}
+
+inline auto proc_t_of(rpcgen::FSSTAT3res&)->decltype(&rpcgen::xdr_FSSTAT3res)
+{
+    return &rpcgen::xdr_FSSTAT3res;
+}
+
+// Procedure 19: FSINFO - Get static file system Information
+inline auto proc_t_of(rpcgen::FSINFO3args&)->decltype(&rpcgen::xdr_FSINFO3args)
+{
+    return &rpcgen::xdr_FSINFO3args;
+}
+
+inline auto proc_t_of(rpcgen::FSINFO3res&)->decltype(&rpcgen::xdr_FSINFO3res)
+{
+    return &rpcgen::xdr_FSINFO3res;
+}
+
+// Procedure 20: PATHCONF - Retrieve POSIX information
+inline auto proc_t_of(rpcgen::PATHCONF3args&)->decltype(&rpcgen::xdr_PATHCONF3args)
+{
+    return &rpcgen::xdr_PATHCONF3args;
+}
+
+inline auto proc_t_of(rpcgen::PATHCONF3res&)->decltype(&rpcgen::xdr_PATHCONF3res)
+{
+    return &rpcgen::xdr_PATHCONF3res;
+}
+
+// Procedure 21: COMMIT - Commit cached data on a server to stable storage
+inline auto proc_t_of(rpcgen::COMMIT3args&)->decltype(&rpcgen::xdr_COMMIT3args)
+{
+    return &rpcgen::xdr_COMMIT3args;
+}
+
+inline auto proc_t_of(rpcgen::COMMIT3res&)->decltype(&rpcgen::xdr_COMMIT3res)
+{
+    return &rpcgen::xdr_COMMIT3res;
+}
+
 
 extern"C"
 void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);

@@ -213,6 +213,9 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
     {
         LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), NFSProcedureTitles[procedure], procedure);
     }
+    catch(XDRDecoderError& exception)
+    {
+    }
 }
 
 } // namespace analysis
