@@ -50,7 +50,7 @@ private:
     enum: uint32_t {
         FIXED_SIZE = 4000 
     };
-    uint8_t     cache[FIXED_SIZE]{0};
+    uint8_t     cache[FIXED_SIZE];
     uint8_t*    memory{nullptr};
     uint32_t    memsize{0};
     
@@ -59,7 +59,7 @@ public:
     //FilteredData(const FilteredData&)            = delete;
     FilteredData& operator=(const FilteredData&) = delete;
 
-    inline FilteredData(): data(cache) {}
+    inline FilteredData(): data{cache} {}
     inline ~FilteredData() {
         if (nullptr != memory) {
             //assert(nullptr == memory);

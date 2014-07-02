@@ -119,9 +119,7 @@ public:
 
     inline void deallocate(T* ptr)
     {
-		//ptr->deallocate();
-		//delete(ptr, (void*)nullptr);
-		ptr->~T(); // call destructor of T (placement)
+		ptr->~T(); // placement allocation functions syntax is used 
 
         Element* e = (Element*)( ((char*)ptr) - sizeof(Element*) );
         deallocate(e);
