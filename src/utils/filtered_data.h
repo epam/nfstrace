@@ -48,29 +48,31 @@ public:
 
 private:
     enum: uint32_t {
-        FIXED_SIZE = 4000 
+        CACHE_SIZE = 4000 
     };
-    uint8_t     cache[FIXED_SIZE];
+    uint8_t     cache[CACHE_SIZE];
     uint8_t*    memory{nullptr};
     uint32_t    memsize{0};
     
 public:
     // disable copying
-    //FilteredData(const FilteredData&)            = delete;
+    FilteredData(const FilteredData&)            = delete;
     FilteredData& operator=(const FilteredData&) = delete;
 
     inline FilteredData(): data{cache} {}
     inline ~FilteredData() {
-        if (nullptr != memory) {
-            //assert(nullptr == memory);
+        if (nullptr != memory)
+        {
             delete[] memory;
         }
     }
 
-    inline uint32_t capacity() const {
-        if (nullptr == memory) {
+    inline uint32_t capacity() const
+    {
+        if (nullptr == memory)
+        {
             assert(data == cache);
-            return FIXED_SIZE;
+            return CACHE_SIZE;
         }
         return memsize;
     }
@@ -78,8 +80,8 @@ public:
     // Resize capacity with data safety
     void resize(uint32_t newsize)
     {
-        if (capacity() >= newsize) {// not resize less
-            assert(capacity() <= newsize);
+        if (capacity() >= newsize) // not resize less
+        {
             return;
         }
 
@@ -88,13 +90,14 @@ public:
             memory = new uint8_t[newsize];
             memsize = newsize;
             if (dlen > 0)
-                memcpy(memory, cache, dlen<=FIXED_SIZE?dlen:FIXED_SIZE);
+                memcpy(memory, cache, dlen<=CACHE_SIZE?dlen:CACHE_SIZE);
             data = memory;
         }
         else // have some filled memory
         {
             uint8_t* mem = new uint8_t[newsize];
-            if (0 != dlen) {
+            if (0 != dlen)
+            {
                 memcpy(mem, memory, dlen);
             }
             data = mem;
@@ -107,7 +110,8 @@ public:
     // Reset data. Release free memory if allocated 
     inline void reset()
     {
-        if (nullptr != memory) {
+        if (nullptr != memory)
+        {
             memsize = 0;
             delete[] memory;
             memory = nullptr;
