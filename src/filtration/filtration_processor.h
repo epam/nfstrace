@@ -379,7 +379,7 @@ public:
         hdr_len = 0;
         collection.reset(); // data in external memory freed
     }
-    //
+
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w)
     {
         assert(w);
@@ -491,9 +491,9 @@ public:
         }
         else // collection is empty
         {
-            collection.allocate(); // allocate space for header loading
+            collection.allocate(); // allocate new collection from writer 
 
-            if (info.dlen >= max_header)
+            if(info.dlen >= max_header) // is data enough to message validation?
             {
                 collection.push(info, max_header); // probability that message will be rejected / probability of valid message
                 info.data += max_header;

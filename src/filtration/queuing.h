@@ -107,11 +107,7 @@ public:
 
         inline void resize(uint32_t amount)
         {
-            if (nullptr == ptr)
-            {
-                assert(nullptr != ptr);
-                return;
-            }
+            assert(nullptr != ptr);
 
             ptr->resize(amount);
         }
@@ -120,9 +116,6 @@ public:
         inline void push(const PacketInfo& info, const uint32_t len)
         {
             assert(nullptr != ptr);
-
-            if (!ptr)
-                return;
 
             uint8_t* offset_ptr = ptr->data + ptr->dlen;
             const uint32_t avail = ptr->capacity() - ptr->dlen; 
