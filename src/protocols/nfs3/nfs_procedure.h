@@ -82,7 +82,7 @@ public:
         if(!xdr_callmsg(c.xdr(), &rpc_call))
         {
             xdr_free((xdrproc_t)xdr_callmsg, (char*)&rpc_call);
-            throw XDRDecoderError{"XDRDecoder::read call cannot be done"};
+            throw XDRDecoderError{"XDRDecoder: cann't read call data"};
         }
 
         // fill call arguments
@@ -90,7 +90,7 @@ public:
         {
             xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
             xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call);
-            //throw XDRDecoderError{"XDRDecoder::read call arguments cannot be done"};
+            //throw XDRDecoderError{"XDRDecoder: cann't read call arguments"};
         }
 
         rpc_reply.ru.RM_rmb.ru.RP_ar.ru.AR_results.proc = &r.return_true;
@@ -101,7 +101,7 @@ public:
             xdr_free((xdrproc_t)xdr_replymsg,  (char*)&rpc_reply);
             xdr_free((xdrproc_t)proc_t_of(arg),(char*)&arg);
             xdr_free((xdrproc_t)xdr_callmsg,   (char*)&rpc_call);
-            throw XDRDecoderError{"XDRDecoder::read reply cannot be done"};
+            throw XDRDecoderError{"XDRDecoder: cann't read reply data"};
         }
   
         if(rpc_reply.ru.RM_rmb.rp_stat == reply_stat::MSG_ACCEPTED &&
@@ -114,7 +114,7 @@ public:
                 xdr_free((xdrproc_t)xdr_replymsg,   (char*)&rpc_reply);
                 xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
                 xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call);
-                throw XDRDecoderError{"XDRDecoder::read reply results cannot be done"};
+                throw XDRDecoderError{"XDRDecoder: cann't read reply results"};
             }
         }
         else
