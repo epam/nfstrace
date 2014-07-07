@@ -61,10 +61,7 @@ public:
 
     inline FilteredData(): data{cache} {}
     inline ~FilteredData() {
-        if (nullptr != memory)
-        {
-            delete[] memory;
-        }
+        delete[] memory;
     }
 
     inline uint32_t capacity() const
