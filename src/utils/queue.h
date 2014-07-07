@@ -50,7 +50,6 @@ class Queue
         {
             if(pointer /*&& queue - dont check - optimization*/)
             {
-				//pointer->deallocate();
                 queue->deallocate(pointer);
             }
         }
@@ -112,14 +111,14 @@ public:
     {
         Spinlock::Lock lock{a_spinlock};
             Element* e = (Element*)allocator.allocate(); // may throw std::bad_alloc
-			auto ptr = &(e->data);
-			::new(ptr)T; // only call constructor of T (placement)
+            auto ptr = &(e->data);
+            ::new(ptr)T; // only call constructor of T (placement)
             return ptr;
     }
 
     inline void deallocate(T* ptr)
     {
-		ptr->~T(); // placement allocation functions syntax is used 
+        ptr->~T(); // placement allocation functions syntax is used 
 
         Element* e = (Element*)( ((char*)ptr) - sizeof(Element*) );
         deallocate(e);

@@ -74,10 +74,12 @@ public:
 
         void allocate()
         {
-            if (nullptr == ptr) {
+            if (nullptr == ptr)
+            {
                 // we have a reference to queue, just do allocate and reset
                 ptr = queue->allocate();
-                if (!ptr) {
+                if (!ptr)
+                {
                     LOG("free elements of the Queue are exhausted");
                 }
             }
@@ -103,10 +105,13 @@ public:
             }
         }
 
-        inline void resize(size_t amount)
+        inline void resize(uint32_t amount)
         {
             if (nullptr == ptr)
+            {
                 assert(nullptr != ptr);
+                return;
+            }
 
             ptr->resize(amount);
         }
@@ -157,7 +162,7 @@ public:
 
         inline uint32_t data_size() const { return ptr->dlen; }
         inline uint32_t capacity() const { return ptr->capacity(); }
-        inline uint8_t* data() const { return ptr->data; }
+        inline const uint8_t* data() const { return ptr->data; }
         inline operator bool() const { return ptr != nullptr; }
 
     private:
