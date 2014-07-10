@@ -39,6 +39,7 @@
 #include "filtration/sessions_hash.h"
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/nfs3/nfs_utils.h"
+#include "protocols/nfs4/nfs_utils.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -571,6 +572,10 @@ public:
                     {
                         hdr_len = msg_len;
                         //TRACE("MATCH RPC Call xid:%u len: %u procedure: %u", call->xid(), msg_len, call->proc());
+                    }
+                    else if (NFS4::Validator::check(call))
+                    {
+                        hdr_len = msg_len; // fully collect of NFSv4 messages   
                     }
                     else
                     {
