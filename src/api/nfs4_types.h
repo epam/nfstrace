@@ -1,6 +1,5 @@
 //------------------------------------------------------------------------------
 // Author: Alexey Costroma
-// Description: Helpers for parsing NFS structures.
 // Copyright (c) 2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,36 +18,28 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef NFS4_UTILS_H
-#define NFS4_UTILS_H
+#ifndef NFS4_TYPES_H
+#define NFS4_TYPES_H
 //------------------------------------------------------------------------------
-#include <cassert>
-#include <ostream>
-
-#include "api/nfs4_types.h"
-
-#include "protocols/xdr/xdr_decoder.h"
-#include "protocols/xdr/xdr_reader.h"
-#include "protocols/rpc/rpc_header.h"
+#include "xdr_types.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace protocols
-{
-namespace NFS4
+namespace API
 {
 
-using namespace NST::API;
+struct Proc4Enum
+{
+    enum NFS4Procedure
+    {
+        NFS_NULL    = 0,
+        COMPOUND    = 1
+    };
+    static const int32_t count = 2;
+};
 
-using namespace NST::protocols::xdr;
-
-using Validator = rpc::RPCProgramValidator
-                <
-                    100003,             // SunRPC/NFS program
-                    4,                  // v4
-} // namespace NFS4
-} // namespace protocols
+} // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS4_UTILS_H
+#endif//NFS4_TYPES_H
 //------------------------------------------------------------------------------
