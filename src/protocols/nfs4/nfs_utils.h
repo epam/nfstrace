@@ -46,6 +46,15 @@ using Validator = rpc::RPCProgramValidator
                 <
                     100003,             // SunRPC/NFS program
                     4,                  // v4
+                    Proc4Enum::NFS_NULL,   // NFSPROC4RPCGEN_NULL     (0)
+                    Proc4Enum::COMPOUND    // NFSPROC4RPCGEN_COMPOUND (1)
+                >;
+
+static const char* const NFS4ProcedureTitles[ProcEnum::count] =
+{
+  "NULL",       "COMPOUND"
+};
+
 } // namespace NFS4
 } // namespace protocols
 } // namespace NST

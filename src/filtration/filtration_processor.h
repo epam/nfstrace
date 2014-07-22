@@ -28,6 +28,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <pcap/pcap.h>
 
@@ -48,6 +49,14 @@ namespace filtration
 
 using namespace NST::protocols::rpc;
 
+/*
+ *  uint32_t: Message XID (Call or Reply)
+ */
+typedef std::unordered_set<uint32_t> MessageSet;
+typedef MessageSet::const_iterator  ConstIterator;
+typedef MessageSet::iterator        Iterator;
+typedef MessageSet::value_type      Pair;
+
 // Represents UDP datagrams interchange between node A and node B
 template <typename Writer>
 struct UDPSession : public utils::NetworkSession
@@ -55,7 +64,7 @@ struct UDPSession : public utils::NetworkSession
 public:
     UDPSession(Writer* w, uint32_t max_rpc_hdr)
     : collection{w, this}
-    , max_hdr{max_rpc_hdr}
+    , nfs3_rw_hdr_max{max_rpc_hdr}
     {
     }
     UDPSession(UDPSession&&)                 = delete;
@@ -73,9 +82,28 @@ public:
             case MsgType::CALL:
             {
                 auto call = static_cast<const CallHeader*const>(msg);
-                if(RPCValidator::check(call) && NFS3::Validator::check(call))
+                if(RPCValidator::check(call))
                 {
-                    hdr_len = std::min(info.dlen, max_hdr);
+                    if (NFS3::Validator::check(call))
+                    {
+                        uint32_t proc = call->proc();
+                        if (NFS3::ProcEnum::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
+                            hdr_len = (nfs3_rw_hdr_max < info.dlen ? nfs3_rw_hdr_max : info.dlen);
+                        else
+                        {
+                            if (NFS3::ProcEnum::READ == proc)
+                                nfs3_read_match.insert(call->xid());
+                            hdr_len = info.dlen;
+                        }
+                    }
+                    else if (NFS4::Validator::check(call))
+                    {
+                        hdr_len = info.dlen; // fully collect NFSv4 messages
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
                 else
                 {
@@ -88,7 +116,14 @@ public:
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
                 {
-                    hdr_len = std::min(info.dlen, max_hdr);
+                    // Truncate NFSv3 READ reply message to NFSv3-RW-limit
+                    //* Collect fully if reply received before matching call
+                    if (nfs3_read_match.erase(reply->xid()) > 0)
+                    {
+                        hdr_len = (nfs3_rw_hdr_max < info.dlen ? nfs3_rw_hdr_max : info.dlen);
+                    }
+                    else
+                        hdr_len = info.dlen;
                 }
                 else // isn't RPC reply, stream is corrupt
                 {
@@ -100,7 +135,6 @@ public:
                 return;
         }
 
-        hdr_len = info.dlen;
         collection.allocate();
 
         collection.push(info, hdr_len);
@@ -109,7 +143,8 @@ public:
     }
 
     typename Writer::Collection collection;
-    uint32_t max_hdr;
+    uint32_t nfs3_rw_hdr_max;
+    MessageSet nfs3_read_match;
 };
 
 // Represents TCP conversation between node A and node B
@@ -331,10 +366,10 @@ public:
     };
 
     template <typename Writer>
-    TCPSession(Writer* w, uint32_t) // omit max_rpc_hdr from external relations
+    TCPSession(Writer* w, uint32_t max_rpc_hdr)
     {
-        flows[0].reader.set_writer(this, w);
-        flows[1].reader.set_writer(this, w);
+        flows[0].reader.set_writer(this, w, max_rpc_hdr);
+        flows[1].reader.set_writer(this, w, max_rpc_hdr);
     }
     TCPSession(TCPSession&&)                 = delete;
     TCPSession(const TCPSession&)            = delete;
@@ -381,10 +416,11 @@ public:
         collection.reset(); // data in external memory freed
     }
 
-    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w)
+    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {
         assert(w);
         collection.set(*w, session_ptr);
+        nfs3_rw_hdr_max = max_rpc_hdr;
     }
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
@@ -551,8 +587,7 @@ public:
             assert(msg_len == 0);   // message is not found
             assert(hdr_len == 0);   // header should be skipped
             collection.reset();     // skip collected data
-            // skip data of current packet at all
-            //info.data = NULL; optimization
+            //[ Optimization ] skip data of current packet at all
             info.dlen = 0;
         }
     }
@@ -567,18 +602,26 @@ public:
                 if(RPCValidator::check(call))
                 {
                     msg_len = len;   // length of current RPC message
-
                     if(NFS3::Validator::check(call))
                     {
-                        hdr_len = msg_len;
-                        //TRACE("MATCH RPC Call xid:%u len: %u procedure: %u", call->xid(), msg_len, call->proc());
+                        uint32_t proc = call->proc();
+                        if (NFS3::ProcEnum::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
+                            hdr_len = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
+                        else
+                        {
+                            if (NFS3::ProcEnum::READ == proc)
+                                nfs3_read_match.insert(call->xid());
+                            hdr_len = msg_len;
+                        }
+                        TRACE("%p| MATCH RPC Call  xid:%u len: %u procedure: %u", this, call->xid(), msg_len, call->proc());
                     }
                     else if (NFS4::Validator::check(call))
                     {
-                        hdr_len = msg_len; // fully collect of NFSv4 messages   
+                        hdr_len = msg_len;  // fully collect of NFSv4 messages
                     }
                     else
                     {
+                        //* RPC call message must be read out ==> msg_len !=0
                         hdr_len = 0; // don't collect headers of unknown calls
                         //TRACE("Unknown RPC call of program: %u version: %u procedure: %u", call->prog(), call->vers(), call->proc());
                     }
@@ -595,8 +638,16 @@ public:
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
                 {
-                    msg_len = hdr_len = len;   // length of current RPC message
-                    //TRACE("MATCH RPC Reply xid:%u len: %u", reply->xid(), msg_len);
+                    msg_len = len;
+                    // Truncate NFSv3 READ reply message to NFSv3-RW-limit
+                    //* Collect fully if reply received before matching call
+                    if (nfs3_read_match.erase(reply->xid()) > 0)
+                    {
+                        hdr_len = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
+                    }
+                    else
+                        hdr_len = msg_len; // length of current RPC message
+                    TRACE("%p| MATCH RPC Reply xid:%u len: %u", this, reply->xid(), msg_len);
                     return true;
                 }
                 else // isn't RPC reply, stream is corrupt
@@ -618,10 +669,12 @@ public:
     }
 
 private:
+    uint32_t    nfs3_rw_hdr_max=512; // limit for NFSv3 to truncate WRITE call and READ reply messages
     uint32_t    msg_len;  // length of current RPC message + RM
     uint32_t    hdr_len;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
 
     typename Writer::Collection collection;// storage for collection packet data
+    MessageSet nfs3_read_match;
 };
 
 template
