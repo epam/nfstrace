@@ -53,7 +53,7 @@ Opt Args::options[Args::num] =
     {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file",         "\"shell command\"",  nullptr, false},
     {'D', "dump-size",  Opt::REQ, "0",                   "size of dumping file portion, 0 = no limit",               "MBytes", nullptr, false},
     {'L', "list",       Opt::NOA, "false",               "list all available network interfaces",                     nullptr, nullptr, false},
-    {'M', "msg-header", Opt::REQ, "512",                 "RPC message will be truncated to this limit in bytes before passing to Analysis",     "1..4000", nullptr, false},
+    {'M', "NFSv3-RW-limit", Opt::REQ, "512",                 "RPC NFSv3 WRITE call and READ reply messages will be truncated to this limit in bytes before passing to Analysis",     "1..4000", nullptr, false},
     {'Q', "qcapacity",  Opt::REQ, "4096",                "initial queue capacity of RPC messages",                                             "1..65535", nullptr, false},
     {'T', "trace",      Opt::NOA, "false",               "print collected NFSv3 procedures, true if no modules were passed(by -a)",               nullptr, nullptr, false},
     {'Z', "droproot",   Opt::REQ, "",                    "drops root privileges, after opening the capture device, but before reading from it","username", nullptr, false},
