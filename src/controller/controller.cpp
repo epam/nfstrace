@@ -103,7 +103,6 @@ int Controller::run()
         {
             status.print(message);
         }
-
         throw;
     }
     return 0;
