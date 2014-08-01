@@ -69,8 +69,7 @@ static void handle_signals(const sigset_t    waitmask,
         }
         else if(signo == SIGINT)
         {
-
-        	 status.push(ProcessingDone("Interrupted by user."));
+            status.push(ProcessingDone("Interrupted by user."));
         }
         else
         {

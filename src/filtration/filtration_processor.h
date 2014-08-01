@@ -65,7 +65,6 @@ public:
     void collect(PacketInfo& info)
     {
         // TODO: this code must be generalized with RPCFiltrator class
-    
         uint32_t hdr_len = 0;
         auto msg = reinterpret_cast<const MessageHeader*const>(info.data);
         switch(msg->type())
@@ -632,6 +631,7 @@ public:
             throw std::runtime_error(std::string("Unsupported Data Link Layer: ") + Reader::datalink_description(datalink));
         }
     }
+    
     ~FiltrationProcessor()
     {
         utils::Out message;

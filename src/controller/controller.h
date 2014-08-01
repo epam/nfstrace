@@ -78,32 +78,32 @@ private:
     class Running
     {
     public:
-    	Running(Controller *in)
-    	{
-    		this->temp=in;
-    		this->temp->filtration->start();
-    		if(this->temp->analysis)
-    		{
-    			this->temp->analysis->start();
-    		}
-    	    if(utils::Out message{})
-    	    {
-    	        message << "Processing packets. Press CTRL-C to quit and view results.";
-    	    }
-    	};
-    	Running() 									= delete;
-    	Running(const Running&) 					= delete;
-    	const Running& operator=(const Running&) 	= delete;
-    	inline ~Running()
-    	{
-    		temp->filtration->stop();
-    		if(this->temp->analysis)
-    		{
-    			this->temp->analysis->stop();
-    		}
-    	};
+        Running(Controller *in)
+        {
+            this->temp=in;
+            this->temp->filtration->start();
+            if(this->temp->analysis)
+            {
+                this->temp->analysis->start();
+            }
+            if(utils::Out message{})
+            {
+                message << "Processing packets. Press CTRL-C to quit and view results.";
+            }
+        };
+        Running()                                = delete;
+        Running(const Running&)                  = delete;
+        const Running& operator=(const Running&) = delete;
+        inline ~Running()
+        {
+            temp->filtration->stop();
+            if(this->temp->analysis)
+            {
+                this->temp->analysis->stop();
+            }
+        };
     private:
-    	Controller *temp;//temporary save controller for correct stop
+        Controller *temp;//temporary save controller for correct stop
     };
 };
 void droproot(const std::string& dropuser);
