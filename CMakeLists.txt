@@ -17,8 +17,12 @@ find_package(Threads REQUIRED) # POSIX Threads
 # build application ============================================================
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC")
 set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
-set (PROJECT_VERSION "0.2")
-set (NST_BUILD_VERSION  "${PROJECT_NAME} ${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
+
+set (NST_VERSION_MAJOR "0")
+set (NST_VERSION_MINOR "2")
+set (NST_VERSION_REVISION "0")
+set (NST_VERSION "${NST_VERSION_MAJOR}.${NST_VERSION_MINOR}.${NST_VERSION_REVISION}")
+set (NST_VERSION_FULL  "${PROJECT_NAME} ${NST_VERSION} (${CMAKE_BUILD_TYPE})")
 set (NST_BUILD_PLATFORM "${CMAKE_SYSTEM}")
 set (NST_BUILD_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
@@ -29,9 +33,8 @@ set  (LIBS  ${CMAKE_DL_LIBS}            # libdl with dlopen()
             pcap                        # libpcap
             )
 
-add_definitions (-DNST_BUILD_VERSION=${NST_BUILD_VERSION};
-                 -DNST_BUILD_PLATFORM=${NST_BUILD_PLATFORM};
-                 -DNST_BUILD_COMPILER=${NST_BUILD_COMPILER})
+configure_file(${PROJECT_SOURCE_DIR}/src/controller/build_info.h.in
+               ${PROJECT_SOURCE_DIR}/src/controller/build_info.h)
 
 add_executable        (${PROJECT_NAME} ${SRCS})
 target_link_libraries (${PROJECT_NAME} ${LIBS})

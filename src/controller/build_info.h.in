@@ -1,0 +1,39 @@
+//------------------------------------------------------------------------------
+// Author: Pavel Karneliuk
+// Description: Contains program version and build information.
+// Copyright (c) 2013 EPAM Systems
+//------------------------------------------------------------------------------
+/*
+    This file is part of Nfstrace.
+
+    Nfstrace is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 2 of the License.
+
+    Nfstrace is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
+*/
+//------------------------------------------------------------------------------
+#ifndef BUILD_INFO_H
+#define BUILD_INFO_H
+//------------------------------------------------------------------------------
+namespace NST
+{
+
+constexpr unsigned int NST_VERSION =
+    @NST_VERSION_MAJOR@ * 1000 + @NST_VERSION_MINOR@ * 100 + @NST_VERSION_REVISION@;
+
+constexpr char PROGRAM_BUILD_INFO[]=
+    "@NST_VERSION_FULL@\n"
+    "built on @NST_BUILD_PLATFORM@\n"
+    "by C++ compiler @NST_BUILD_COMPILER@";
+
+} // namespace NST
+//------------------------------------------------------------------------------
+#endif // BUILD_INFO_H
+//------------------------------------------------------------------------------
