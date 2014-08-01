@@ -47,6 +47,7 @@ namespace filtration
 
 using namespace NST::protocols::rpc;
 
+
 // Represents UDP datagrams interchange between node A and node B
 template <typename Writer>
 struct UDPSession : public utils::NetworkSession
@@ -642,7 +643,7 @@ public:
         bool done = reader->loop(this, callback);
         if(done)
         {
-            throw std::runtime_error("Filtration is done");
+            throw controller::ProcessingDone("Filtration is done."); //end work exception
         }
     }
 

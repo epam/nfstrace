@@ -22,4 +22,3 @@ FSSTAT          0      0%
 FSINFO          0      0%
 PATHCONF        0      0%
 COMMIT          0      0%
-./nfstrace: Filtration is done

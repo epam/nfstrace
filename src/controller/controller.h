@@ -44,6 +44,7 @@ public:
     explicit ControllerError(const std::string& msg) : std::runtime_error{msg} { }
 };
 
+
 class Controller
 {
     using AnalysisManager   = NST::analysis::AnalysisManager;
@@ -73,8 +74,38 @@ private:
     // controller subsystems
     std::unique_ptr<AnalysisManager>   analysis;
     std::unique_ptr<FiltrationManager> filtration;
-};
 
+    class Running
+    {
+    public:
+    	Running(Controller *in)
+    	{
+    		this->temp=in;
+    		this->temp->filtration->start();
+    		if(this->temp->analysis)
+    		{
+    			this->temp->analysis->start();
+    		}
+    	    if(utils::Out message{})
+    	    {
+    	        message << "Processing packets. Press CTRL-C to quit and view results.";
+    	    }
+    	};
+    	Running() 									= delete;
+    	Running(const Running&) 					= delete;
+    	const Running& operator=(const Running&) 	= delete;
+    	inline ~Running()
+    	{
+    		temp->filtration->stop();
+    		if(this->temp->analysis)
+    		{
+    			this->temp->analysis->stop();
+    		}
+    	};
+    private:
+    	Controller *temp;//temporary save controller for correct stop
+    };
+};
 void droproot(const std::string& dropuser);
 
 } // namespace controller

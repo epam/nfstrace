@@ -33,6 +33,14 @@ namespace NST
 namespace controller
 {
 
+class ProcessingDone : public std::runtime_error
+{
+public:
+	explicit ProcessingDone(const std::string& in) : std::runtime_error{in}
+	{
+	}
+};
+
 class RunningStatus
 {
 public:
