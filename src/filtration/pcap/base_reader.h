@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk (Dzianis Huznou)
-// Description: High level interface for passing info Processor.
+// Description: High level interface for passing raw frames into Processor.
 // Copyright (c) 2013 EPAM Systems
 //------------------------------------------------------------------------------
 /*
