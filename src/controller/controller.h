@@ -49,36 +49,16 @@ class Controller
     using AnalysisManager   = NST::analysis::AnalysisManager;
     using FiltrationManager = NST::filtration::FiltrationManager;
     
-private:
     class Running
     {
     public:
-        Running(Controller &in)
-        {
-            temp=in;
-            temp->filtration->start();
-            if(temp->analysis)
-            {
-                temp->analysis->start();
-            }
-            if(utils::Out message{})
-            {
-                message << "Processing packets. Press CTRL-C to quit and view results.";
-            }
-        };
+        inline Running(Controller&);
         Running()                                = delete;
         Running(const Running&)                  = delete;
         const Running& operator=(const Running&) = delete;
-        inline ~Running()
-        {
-            temp->filtration->stop();
-            if(temp->analysis)
-            {
-                temp->analysis->stop();
-            }
-        };
+        inline ~Running();
     private:
-        Controller &temp;
+        Controller &controller;
     };
 
 public:

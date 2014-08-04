@@ -33,7 +33,27 @@ namespace NST
 {
 namespace controller
 {
-
+Controller::Running::Running(Controller& in)
+    : controller(in)
+{
+    controller.filtration->start();
+    if(controller.analysis)
+    {
+        controller.analysis->start();
+    }
+    if(utils::Out message{})
+    {
+        message << "Processing packets. Press CTRL-C to quit and view results.";
+    }
+}
+Controller::Running::~Running()
+{
+    controller.filtration->stop();
+    if(controller.analysis)
+    {
+        controller.analysis->stop();
+    }
+};
 Controller::Controller(const Parameters& params) try
     : glog       {params.program_name() + ".log"}
     , gout       {utils::Out::Level(params.verbose_level())}
@@ -73,7 +93,7 @@ catch(const filtration::pcap::PcapError& e)
     message << "Note: This operation may require that you have "
                "special privileges.";
     }
-    throw;
+    throw;    
 }
 
 Controller::~Controller()
@@ -82,30 +102,34 @@ Controller::~Controller()
 
 int Controller::run()
 {
-    //start and end of filtration and analysis add to nested class Running
+	//start and end of filtration and analysis add to nested class Running
     try
     {
-        Running running(this);
-        status.wait_and_rethrow_exception();
+    	Running running(this);
+        while(true)
+        {
+            status.wait_and_rethrow_exception();
+        }
     }
     catch(ProcessingDone &ex)
     {
-        if(utils::Out message{})
-        {
-            message << ex.what();
-        }
+    	if(utils::Out message{})
+    	{
+    	    message << ex.what();
+    	}
     }
     // Waiting some exception or user-signal for handling
     // TODO: add code for recovery processing
     catch(...)
-    {
+	{
         if(utils::Log message{})
         {
             status.print(message);
         }
+
         throw;
-    }
-    return 0;
+	}
+	return 0;
 }
 
 void droproot(const std::string& dropuser)
