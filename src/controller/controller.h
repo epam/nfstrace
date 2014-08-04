@@ -48,8 +48,8 @@ class Controller
 {
     using AnalysisManager   = NST::analysis::AnalysisManager;
     using FiltrationManager = NST::filtration::FiltrationManager;
-
-public:
+    
+private:
     class Running
     {
     public:
@@ -80,6 +80,8 @@ public:
     private:
         Controller &temp;
     };
+
+public:
 
     Controller(const Parameters& parameters);
     Controller(const Controller&)            = delete;
