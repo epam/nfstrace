@@ -47,7 +47,6 @@ namespace filtration
 
 using namespace NST::protocols::rpc;
 
-
 // Represents UDP datagrams interchange between node A and node B
 template <typename Writer>
 struct UDPSession : public utils::NetworkSession
@@ -351,7 +350,6 @@ public:
     Flow flows[2];
 };
 
-
 /*
     Stateful reader of Sun RPC messages 
     Reads data from PacketInfo passed via push() method
@@ -643,7 +641,7 @@ public:
         bool done = reader->loop(this, callback);
         if(done)
         {
-            throw controller::ProcessingDone("Filtration is done."); //end work exception
+            throw controller::ProcessingDone("Filtration is done.");
         }
     }
 
