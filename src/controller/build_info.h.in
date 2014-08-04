@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Pavel Karneliuk
+// Author: Mikhail Litvinets
 // Description: Contains program version and build information.
-// Copyright (c) 2013 EPAM Systems
+// Copyright (c) 2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -26,14 +26,14 @@ namespace NST
 {
 
 constexpr unsigned int NST_VERSION =
-    @NST_VERSION_MAJOR@ * 1000 + @NST_VERSION_MINOR@ * 100 + @NST_VERSION_REVISION@;
+    @NST_V_MAJOR@ * 1000 + @NST_V_MINOR@ * 100 + @NST_V_PATCH@;
 
 constexpr char PROGRAM_BUILD_INFO[]=
     "@NST_VERSION_FULL@\n"
-    "built on @NST_BUILD_PLATFORM@\n"
+    "built on @CMAKE_SYSTEM@\n"
     "by C++ compiler @NST_BUILD_COMPILER@";
 
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif // BUILD_INFO_H
+#endif//BUILD_INFO_H
 //------------------------------------------------------------------------------

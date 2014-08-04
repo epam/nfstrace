@@ -18,12 +18,11 @@ find_package(Threads REQUIRED) # POSIX Threads
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC")
 set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
-set (NST_VERSION_MAJOR "0")
-set (NST_VERSION_MINOR "2")
-set (NST_VERSION_REVISION "0")
-set (NST_VERSION "${NST_VERSION_MAJOR}.${NST_VERSION_MINOR}.${NST_VERSION_REVISION}")
-set (NST_VERSION_FULL  "${PROJECT_NAME} ${NST_VERSION} (${CMAKE_BUILD_TYPE})")
-set (NST_BUILD_PLATFORM "${CMAKE_SYSTEM}")
+set (NST_V_MAJOR "0")
+set (NST_V_MINOR "2")
+set (NST_V_PATCH "0")
+set (NST_VERSION "${NST_V_MAJOR}.${NST_V_MINOR}.${NST_V_PATCH}")
+set (NST_VERSION_FULL "${PROJECT_NAME} ${NST_VERSION} (${CMAKE_BUILD_TYPE})")
 set (NST_BUILD_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
 include_directories (src)
@@ -33,7 +32,7 @@ set  (LIBS  ${CMAKE_DL_LIBS}            # libdl with dlopen()
             pcap                        # libpcap
             )
 
-configure_file(${PROJECT_SOURCE_DIR}/src/controller/build_info.h.in
+configure_file(src/controller/build_info.h.in
                ${PROJECT_SOURCE_DIR}/src/controller/build_info.h)
 
 add_executable        (${PROJECT_NAME} ${SRCS})
@@ -61,7 +60,7 @@ file (GLOB headers "src/api/*.h")
 install (FILES ${headers} DESTINATION include/nfstrace/api)
 
 # build packages ===============================================================
-set (CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set (CPACK_PACKAGE_VERSION ${NST_VERSION})
 set (CPACK_DEBIAN_PACKAGE_MAINTAINER "Pavel Karneliuk")
 set (CPACK_GENERATOR "RPM;DEB;TGZ")
 set (CPACK_PACKAGING_INSTALL_PREFIX "/")
