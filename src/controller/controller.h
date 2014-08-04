@@ -49,7 +49,20 @@ class Controller
     using AnalysisManager   = NST::analysis::AnalysisManager;
     using FiltrationManager = NST::filtration::FiltrationManager;
 
+    class Running
+    {
+    public:
+        inline Running(Controller&);
+        Running()                                = delete;
+        Running(const Running&)                  = delete;
+        const Running& operator=(const Running&) = delete;
+        inline ~Running();
+    private:
+        Controller &controller;
+    };
+
 public:
+
     Controller(const Parameters& parameters);
     Controller(const Controller&)            = delete;
     Controller& operator=(const Controller&) = delete;
@@ -73,8 +86,8 @@ private:
     // controller subsystems
     std::unique_ptr<AnalysisManager>   analysis;
     std::unique_ptr<FiltrationManager> filtration;
-};
 
+};
 void droproot(const std::string& dropuser);
 
 } // namespace controller
