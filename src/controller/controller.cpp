@@ -53,7 +53,7 @@ Controller::Running::~Running()
     {
         controller.analysis->stop();
     }
-};
+}
 Controller::Controller(const Parameters& params) try
     : glog       {params.program_name() + ".log"}
     , gout       {utils::Out::Level(params.verbose_level())}
@@ -90,10 +90,10 @@ catch(const filtration::pcap::PcapError& e)
 {
     if(utils::Out message{})
     {
-    message << "Note: This operation may require that you have "
+        message << "Note: This operation may require that you have "
                "special privileges.";
     }
-    throw;    
+    throw;
 }
 
 Controller::~Controller()
@@ -102,34 +102,20 @@ Controller::~Controller()
 
 int Controller::run()
 {
-	//start and end of filtration and analysis add to nested class Running
+    //start and end of filtration and analysis add to nested class Running
     try
     {
-    	Running running(this);
-        while(true)
-        {
-            status.wait_and_rethrow_exception();
-        }
+        Running running(*this);
+        status.wait_and_rethrow_exception();
     }
     catch(ProcessingDone &ex)
     {
-    	if(utils::Out message{})
-    	{
-    	    message << ex.what();
-    	}
-    }
-    // Waiting some exception or user-signal for handling
-    // TODO: add code for recovery processing
-    catch(...)
-	{
-        if(utils::Log message{})
+        if(utils::Out message{})
         {
-            status.print(message);
+            message << ex.what();
         }
-
-        throw;
-	}
-	return 0;
+    }
+    return 0;
 }
 
 void droproot(const std::string& dropuser)
