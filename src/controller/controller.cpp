@@ -105,10 +105,10 @@ Controller::~Controller()
 
 int Controller::run()
 {
-    //start and end of filtration and analysis add to nested class Running
+    //start and end of filtration are in Controller::Running class
     try
     {
-        Running running(*this);
+        Running running{*this};
         status.wait_and_rethrow_exception();
     }
     catch(ProcessingDone &ex)
@@ -154,7 +154,7 @@ void droproot(const std::string& dropuser)
     {
         utils::Out message;
         message << "Cann't drop root privileges!";
-        throw;    
+        throw;
     }
 }
 

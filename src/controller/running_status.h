@@ -42,7 +42,7 @@ public:
 class RunningStatus
 {
 public:
-    RunningStatus() = default;
+    RunningStatus()                                = default;
     RunningStatus(const RunningStatus&)            = delete;
     RunningStatus& operator=(const RunningStatus&) = delete;
 
