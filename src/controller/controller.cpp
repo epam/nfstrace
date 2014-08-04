@@ -105,7 +105,7 @@ Controller::~Controller()
 
 int Controller::run()
 {
-    //start and end of filtration are in Controller::Running class
+    //Start and stop of Filtration and  Analysis are in Controller::Running class
     try
     {
         Running running{*this};
