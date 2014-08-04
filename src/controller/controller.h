@@ -48,7 +48,7 @@ class Controller
 {
     using AnalysisManager   = NST::analysis::AnalysisManager;
     using FiltrationManager = NST::filtration::FiltrationManager;
-    
+
     class Running
     {
     public:
