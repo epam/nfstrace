@@ -64,6 +64,8 @@ set (CPACK_PACKAGE_VERSION ${NST_VERSION})
 set (CPACK_DEBIAN_PACKAGE_MAINTAINER "Pavel Karneliuk")
 set (CPACK_GENERATOR "RPM;DEB;TGZ")
 set (CPACK_PACKAGING_INSTALL_PREFIX "/")
+set (CPACK_RPM_SPEC_MORE_DEFINE "%define ignore \#")
+set (CPACK_RPM_USER_FILELIST "%ignore /bin" "%ignore /include" "%ignore /lib")
 set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), gcc(>= 4.8), libpcap-dev (>=1.3.0-1)")
 include (CPack)
 
