@@ -47,4 +47,3 @@ FSSTAT         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.0
 FSINFO         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PATHCONF       Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT         Count:    1 (  0.06%) Min: 0.854 Max: 0.854 Avg: 0.854 StDev: 0.00000000
-./nfstrace: Filtration is done

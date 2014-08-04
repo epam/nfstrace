@@ -64,7 +64,6 @@ public:
     void collect(PacketInfo& info)
     {
         // TODO: this code must be generalized with RPCFiltrator class
-    
         uint32_t hdr_len = 0;
         auto msg = reinterpret_cast<const MessageHeader*const>(info.data);
         switch(msg->type())
@@ -351,7 +350,6 @@ public:
     Flow flows[2];
 };
 
-
 /*
     Stateful reader of Sun RPC messages 
     Reads data from PacketInfo passed via push() method
@@ -631,6 +629,7 @@ public:
             throw std::runtime_error(std::string("Unsupported Data Link Layer: ") + Reader::datalink_description(datalink));
         }
     }
+    
     ~FiltrationProcessor()
     {
         utils::Out message;
@@ -642,7 +641,7 @@ public:
         bool done = reader->loop(this, callback);
         if(done)
         {
-            throw std::runtime_error("Filtration is done");
+            throw controller::ProcessingDone("Filtration is done.");
         }
     }
 
