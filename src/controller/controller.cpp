@@ -103,9 +103,8 @@ Controller::~Controller()
 {
 }
 
-int Controller::run()
+int Controller::run()  //Start and stop of Filtration and Analysis are in Controller::Running class
 {
-    //Start and stop of Filtration and  Analysis are in Controller::Running class
     try
     {
         Running running{*this};
