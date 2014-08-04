@@ -31,7 +31,7 @@ constexpr unsigned int NST_VERSION =
 constexpr char PROGRAM_BUILD_INFO[]=
     "@NST_VERSION_FULL@\n"
     "built on @CMAKE_SYSTEM@\n"
-    "by C++ compiler @NST_BUILD_COMPILER@";
+    "by C++ compiler @CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VERSION@";
 
 } // namespace NST
 //------------------------------------------------------------------------------
