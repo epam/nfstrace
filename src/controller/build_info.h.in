@@ -1,0 +1,39 @@
+//------------------------------------------------------------------------------
+// Author: Mikhail Litvinets
+// Description: Contains program version and build information.
+// Copyright (c) 2014 EPAM Systems
+//------------------------------------------------------------------------------
+/*
+    This file is part of Nfstrace.
+
+    Nfstrace is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 2 of the License.
+
+    Nfstrace is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
+*/
+//------------------------------------------------------------------------------
+#ifndef BUILD_INFO_H
+#define BUILD_INFO_H
+//------------------------------------------------------------------------------
+namespace NST
+{
+
+constexpr unsigned int NST_VERSION =
+    @NST_V_MAJOR@ * 1000 + @NST_V_MINOR@ * 100 + @NST_V_PATCH@;
+
+constexpr char PROGRAM_BUILD_INFO[]=
+    "@NST_VERSION_FULL@\n"
+    "built on @CMAKE_SYSTEM@\n"
+    "by C++ compiler @CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VERSION@";
+
+} // namespace NST
+//------------------------------------------------------------------------------
+#endif//BUILD_INFO_H
+//------------------------------------------------------------------------------
