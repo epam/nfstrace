@@ -33,6 +33,7 @@ namespace NST
 {
 namespace controller
 {
+
 Controller::Running::Running(Controller& in)
     : controller(in)
 {
@@ -46,6 +47,7 @@ Controller::Running::Running(Controller& in)
         message << "Processing packets. Press CTRL-C to quit and view results.";
     }
 }
+
 Controller::Running::~Running()
 {
     controller.filtration->stop();
@@ -54,6 +56,7 @@ Controller::Running::~Running()
         controller.analysis->stop();
     }
 }
+
 Controller::Controller(const Parameters& params) try
     : glog       {params.program_name() + ".log"}
     , gout       {utils::Out::Level(params.verbose_level())}
