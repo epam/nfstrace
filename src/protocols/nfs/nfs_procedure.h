@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Pavel Karneliuk
-// Description: Definition and fill up NFSv3 procedures.
+// Description: Definition and fill up NFS procedures.
 // Copyright (c) 2013 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -24,18 +24,17 @@
 //------------------------------------------------------------------------------
 #include <rpc/rpc.h>
 
-#include "api/rpc_procedure_type.h"
-#include "protocols/nfs3/nfs_utils.h"
-//#include "protocols/rpc/rpc_reader.h"
-//#include "protocols/rpc/rpc_utils.h"
+#include "api/rpc_procedure.h"
+#include "protocols/nfs3/nfs3_utils.h"
+#include "protocols/nfs4/nfs4_utils.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace protocols
 {
-namespace NFS3
-{
+using namespace NFS3;
+using namespace NFS4;
 
 template
 <
@@ -45,30 +44,6 @@ template
 class NFSProcedure: public NST::API::RPCProcedure
 {
 public:
-/*
-    inline NFSProcedure(rpc::RPCReader& c, rpc::RPCReader& r, const Session* s)
-    : parg{&arg}    // set pointer to argument
-    , pres{&res}    // set pointer to result
-    {
-        c >> call >> arg;   // fill procedure call and arguments
-        r >> reply;         // fill procedure reply
-
-        if(reply.stat == ReplyStat::MSG_ACCEPTED &&
-           reply.u.accepted.stat == AcceptStat::SUCCESS)
-        {
-            r >> res;   // fill procedure results, only if status is SUCCESS
-        }
-        else    // procedure isn't success, there is no valid result data
-        {
-            pres = nullptr;
-        }
-
-        session = s;
-
-        ctimestamp = &c.data().timestamp;
-        rtimestamp = &r.data().timestamp;
-    }
-*/
     inline NFSProcedure(xdr::XDRDecoder& c, xdr::XDRDecoder& r, const Session* s)
     : parg{&arg}    // set pointer to argument
     , pres{&res}    // set pointer to result
@@ -82,7 +57,7 @@ public:
         if(!xdr_callmsg(c.xdr(), &rpc_call))
         {
             xdr_free((xdrproc_t)xdr_callmsg, (char*)&rpc_call);
-            throw XDRDecoderError{"XDRDecoder: cann't read call data"};
+            throw xdr::XDRDecoderError{"XDRDecoder: cann't read call data"};
         }
 
         // fill call arguments
@@ -90,7 +65,7 @@ public:
         {
             xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
             xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call);
-            //throw XDRDecoderError{"XDRDecoder: cann't read call arguments"};
+            //throw xdr::XDRDecoderError{"XDRDecoder: cann't read call arguments"};
         }
 
         rpc_reply.ru.RM_rmb.ru.RP_ar.ru.AR_results.proc = &r.return_true;
@@ -101,7 +76,7 @@ public:
             xdr_free((xdrproc_t)xdr_replymsg,  (char*)&rpc_reply);
             xdr_free((xdrproc_t)proc_t_of(arg),(char*)&arg);
             xdr_free((xdrproc_t)xdr_callmsg,   (char*)&rpc_call);
-            throw XDRDecoderError{"XDRDecoder: cann't read reply data"};
+            throw xdr::XDRDecoderError{"XDRDecoder: cann't read reply data"};
         }
   
         if(rpc_reply.ru.RM_rmb.rp_stat == reply_stat::MSG_ACCEPTED &&
@@ -114,7 +89,7 @@ public:
                 xdr_free((xdrproc_t)xdr_replymsg,   (char*)&rpc_reply);
                 xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
                 xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call);
-                throw XDRDecoderError{"XDRDecoder: cann't read reply results"};
+                throw xdr::XDRDecoderError{"XDRDecoder: cann't read reply results"};
             }
         }
         else
@@ -145,30 +120,10 @@ private:
     ArgType arg;
     ResType res;
 };
-/*
-using NFSPROC3_NULL        = NFSProcedure <NULLargs,         NULLres>;
-using NFSPROC3_GETATTR     = NFSProcedure <GETATTR3args,     GETATTR3res>;
-using NFSPROC3_SETATTR     = NFSProcedure <SETATTR3args,     SETATTR3res>;
-using NFSPROC3_LOOKUP      = NFSProcedure <LOOKUP3args,      LOOKUP3res>;
-using NFSPROC3_ACCESS      = NFSProcedure <ACCESS3args,      ACCESS3res>;
-using NFSPROC3_READLINK    = NFSProcedure <READLINK3args,    READLINK3res>;
-using NFSPROC3_READ        = NFSProcedure <READ3args,        READ3res>;
-using NFSPROC3_WRITE       = NFSProcedure <WRITE3args,       WRITE3res>;
-using NFSPROC3_CREATE      = NFSProcedure <CREATE3args,      CREATE3res>;
-using NFSPROC3_MKDIR       = NFSProcedure <MKDIR3args,       MKDIR3res>;
-using NFSPROC3_SYMLINK     = NFSProcedure <SYMLINK3args,     SYMLINK3res>;
-using NFSPROC3_MKNOD       = NFSProcedure <MKNOD3args,       MKNOD3res>;
-using NFSPROC3_REMOVE      = NFSProcedure <REMOVE3args,      REMOVE3res>;
-using NFSPROC3_RMDIR       = NFSProcedure <RMDIR3args,       RMDIR3res>;
-using NFSPROC3_RENAME      = NFSProcedure <RENAME3args,      RENAME3res>;
-using NFSPROC3_LINK        = NFSProcedure <LINK3args,        LINK3res>;
-using NFSPROC3_READDIR     = NFSProcedure <READDIR3args,     READDIR3res>;
-using NFSPROC3_READDIRPLUS = NFSProcedure <READDIRPLUS3args, READDIRPLUS3res>;
-using NFSPROC3_FSSTAT      = NFSProcedure <FSSTAT3args,      FSSTAT3res>;
-using NFSPROC3_FSINFO      = NFSProcedure <FSINFO3args,      FSINFO3res>;
-using NFSPROC3_PATHCONF    = NFSProcedure <PATHCONF3args,    PATHCONF3res>;
-using NFSPROC3_COMMIT      = NFSProcedure <COMMIT3args,      COMMIT3res>;
-*/
+
+
+namespace NFS3
+{
 using NFSPROC3RPCGEN_NULL        = NFSProcedure <rpcgen::NULL3args,        rpcgen::NULL3res>;
 using NFSPROC3RPCGEN_GETATTR     = NFSProcedure <rpcgen::GETATTR3args,     rpcgen::GETATTR3res>;
 using NFSPROC3RPCGEN_SETATTR     = NFSProcedure <rpcgen::SETATTR3args,     rpcgen::SETATTR3res>;
@@ -191,8 +146,14 @@ using NFSPROC3RPCGEN_FSSTAT      = NFSProcedure <rpcgen::FSSTAT3args,      rpcge
 using NFSPROC3RPCGEN_FSINFO      = NFSProcedure <rpcgen::FSINFO3args,      rpcgen::FSINFO3res>;
 using NFSPROC3RPCGEN_PATHCONF    = NFSProcedure <rpcgen::PATHCONF3args,    rpcgen::PATHCONF3res>;
 using NFSPROC3RPCGEN_COMMIT      = NFSProcedure <rpcgen::COMMIT3args,      rpcgen::COMMIT3res>;
+}
 
-} // namespace NFS3
+namespace NFS4
+{
+using NFSPROC4RPCGEN_NULL        = NFSProcedure <rpcgen::NULL4args,     rpcgen::NULL4res>;
+using NFSPROC4RPCGEN_COMPOUND    = NFSProcedure <rpcgen::COMPOUND4args, rpcgen::COMPOUND4res>;
+}
+
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------

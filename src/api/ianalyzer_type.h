@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou
 // Description: IAnalyzer describe interface of analysiss expected by application.
-// The interface define set of NFSv3 Procedure handlers with empty dummy implementation
+// The interface define set of NFS Procedure handlers with empty dummy implementation
 // and pure virtual function for flushing analysis statistics.
 // Copyright (c) 2013 EPAM Systems
 //------------------------------------------------------------------------------
@@ -26,14 +26,16 @@
 //------------------------------------------------------------------------------
 #include "nfs3_types.h"
 #include "nfs3_types_rpcgen.h"
-#include "rpc_procedure_type.h"
+#include "nfs4_types.h"
+#include "nfs4_types_rpcgen.h"
+#include "rpc_procedure.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace API
 {
 
-class nfsv3rpcgen
+class INFSv3rpcgen
 {
 public:
     virtual void null(const struct RPCProcedure*,
@@ -104,7 +106,7 @@ public:
             const struct rpcgen::COMMIT3res*) {}
 };
 
-class nfsv3handmade
+class INFSv3handmade
 {
 public:
     virtual void null(const struct RPCProcedure*,
@@ -175,7 +177,18 @@ public:
             const struct COMMIT3res*) {}
 };
 
-class IAnalyzer : public nfsv3handmade, public nfsv3rpcgen
+class INFSv4rpcgen
+{
+public:
+    virtual void null(const struct RPCProcedure*,
+            const struct rpcgen::NULL4args*,
+            const struct rpcgen::NULL4res*) {}
+    virtual void compound4(const struct RPCProcedure*,
+            const struct rpcgen::COMPOUND4args*,
+            const struct rpcgen::COMPOUND4res*) {}
+};
+
+class IAnalyzer : public INFSv3handmade, public INFSv3rpcgen, public INFSv4rpcgen
 {
 public:
     virtual ~IAnalyzer() {};

@@ -322,7 +322,6 @@ struct READ3resok {
     post_op_attr   file_attributes;
     count3         count;
     bool           eof;
-    opaque         data<>;
 };
 
 struct READ3resfail {
@@ -347,7 +346,6 @@ struct WRITE3args {
     offset3     offset;
     count3      count;
     stable_how  stable;
-    opaque      data<>;
 };
 
 struct WRITE3resok {

@@ -39,8 +39,8 @@
 #include "filtration/packet.h"
 #include "filtration/sessions_hash.h"
 #include "protocols/rpc/rpc_header.h"
-#include "protocols/nfs3/nfs_utils.h"
-#include "protocols/nfs4/nfs_utils.h"
+#include "protocols/nfs3/nfs3_utils.h"
+#include "protocols/nfs4/nfs4_utils.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -87,11 +87,11 @@ public:
                     if (NFS3::Validator::check(call))
                     {
                         uint32_t proc = call->proc();
-                        if (NFS3::ProcEnum::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
+                        if (API::ProcEnum::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
                             hdr_len = (nfs3_rw_hdr_max < info.dlen ? nfs3_rw_hdr_max : info.dlen);
                         else
                         {
-                            if (NFS3::ProcEnum::READ == proc)
+                            if (API::ProcEnum::READ == proc)
                                 nfs3_read_match.insert(call->xid());
                             hdr_len = info.dlen;
                         }
@@ -605,11 +605,11 @@ public:
                     if(NFS3::Validator::check(call))
                     {
                         uint32_t proc = call->proc();
-                        if (NFS3::ProcEnum::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
+                        if (API::ProcEnum::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
                             hdr_len = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
                         else
                         {
-                            if (NFS3::ProcEnum::READ == proc)
+                            if (API::ProcEnum::READ == proc)
                                 nfs3_read_match.insert(call->xid());
                             hdr_len = msg_len;
                         }

@@ -20,7 +20,7 @@
 */
 //------------------------------------------------------------------------------
 #include "analysis/print_analyzer.h"
-#include "protocols/nfs3/nfs_utils.h"
+#include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/rpc/rpc_utils.h"
 #include "utils/out.h"
 #include "utils/sessions.h"
@@ -157,7 +157,6 @@ bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 // 1st line - PRC information: src and dst hosts, status of RPC procedure
 // 2nd line - <tabulation>related RPC procedure-specific arguments
 // 3rd line - <tabulation>related RPC procedure-specific results
-
 
 void PrintAnalyzer::null(const struct RPCProcedure* proc,
                          const struct NULLargs*,
@@ -906,6 +905,7 @@ void PrintAnalyzer::commit3(const struct RPCProcedure* proc,
         out << " ]\n";
     }
 }
+
 
 void PrintAnalyzer::flush_statistics()
 {

@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef NFS_UTILS_H
-#define NFS_UTILS_H
+#ifndef NFS3_UTILS_H
+#define NFS3_UTILS_H
 //------------------------------------------------------------------------------
 #include <cassert>
 #include <ostream>
@@ -31,16 +31,15 @@
 #include "protocols/xdr/xdr_reader.h"
 #include "protocols/rpc/rpc_header.h"
 //------------------------------------------------------------------------------
+using namespace NST::API;
+using namespace NST::protocols::xdr;
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace protocols
 {
 namespace NFS3
 {
-
-using namespace NST::API;
-
-using namespace NST::protocols::xdr;
 
 using Validator = rpc::RPCProgramValidator
                 <
@@ -1054,5 +1053,5 @@ std::ostream& operator<<(std::ostream& out, const mknoddata3& obj);
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS_UTILS_H
+#endif//NFS3_UTILS_H
 //------------------------------------------------------------------------------

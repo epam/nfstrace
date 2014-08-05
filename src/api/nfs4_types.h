@@ -28,9 +28,9 @@ namespace NST
 namespace API
 {
 
-struct Proc4Enum
+struct ProcEnumNFS4
 {
-    enum NFS4Procedure
+    enum NFSProcedure
     {
         NFS_NULL    = 0,
         COMPOUND    = 1
