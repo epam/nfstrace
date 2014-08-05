@@ -43,6 +43,7 @@ void        destroy(IAnalyzer* instance); // destroy created instance of an Anal
 
 // These calls implemented by nfstrace
 void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);
+void print_nfs4_procedures(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc);
 void print_session(std::ostream& out, const Session& session);
 void print_nfs_fh3(std::ostream& out, const FH& fh);
 }
@@ -56,6 +57,12 @@ inline std::ostream& operator<<(std::ostream& out, const Session& session)
 inline std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc)
 {
     print_nfs3_procedures(out, proc);
+    return out;
+}
+
+inline std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc)
+{
+    print_nfs4_procedures(out, proc);
     return out;
 }
 //------------------------------------------------------------------------------
