@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef RPC_PROCEDURE_TYPE_H
-#define RPC_PROCEDURE_TYPE_H
+#ifndef RPC_PROCEDURE_H
+#define RPC_PROCEDURE_H
 //------------------------------------------------------------------------------
 #include <rpc/rpc_msg.h>
 #include <sys/time.h>
@@ -48,5 +48,5 @@ struct RPCProcedure
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//RPC_PROCEDURE_TYPE_H
+#endif//RPC_PROCEDURE_H
 //------------------------------------------------------------------------------

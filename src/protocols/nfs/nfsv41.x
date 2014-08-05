@@ -25,10 +25,10 @@
  * Basic typedefs for RFC 1832 data type definitions
  */
 
-typedef int			int32_t;
-typedef unsigned int		uint32_t;
-typedef hyper			int64_t;
-typedef unsigned hyper		uint64_t;
+typedef int         int32_t;
+typedef unsigned int        uint32_t;
+typedef hyper           int64_t;
+typedef unsigned hyper      uint64_t;
 
 /*
  * FRED - added missing referents
@@ -41,11 +41,11 @@ const AUTH_SYS   = 1;
 const RPCSEC_GSS = 6;
 
 struct authsys_parms {
-	unsigned int stamp;
-	string machinename<255>;
-	unsigned int uid;
-	unsigned int gid;
-	unsigned int gids<16>;
+    unsigned int stamp;
+    string machinename<255>;
+    unsigned int uid;
+    unsigned int gid;
+    unsigned int gids<16>;
 };
 
 /*

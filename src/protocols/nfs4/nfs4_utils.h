@@ -22,13 +22,11 @@
 #ifndef NFS4_UTILS_H
 #define NFS4_UTILS_H
 //------------------------------------------------------------------------------
-#include <cassert>
-#include <ostream>
+#include <iostream>
 
 #include "api/nfs4_types.h"
+#include "api/nfs4_types_rpcgen.h"
 
-#include "protocols/xdr/xdr_decoder.h"
-#include "protocols/xdr/xdr_reader.h"
 #include "protocols/rpc/rpc_header.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -37,23 +35,42 @@ namespace protocols
 {
 namespace NFS4
 {
-
-using namespace NST::API;
-
-using namespace NST::protocols::xdr;
+using ProcEnumNFS4 = API::ProcEnumNFS4;
 
 using Validator = rpc::RPCProgramValidator
                 <
-                    100003,             // SunRPC/NFS program
-                    4,                  // v4
-                    Proc4Enum::NFS_NULL,   // NFSPROC4RPCGEN_NULL     (0)
-                    Proc4Enum::COMPOUND    // NFSPROC4RPCGEN_COMPOUND (1)
+                    100003,                   // SunRPC/NFS program
+                    4,                        // v4
+                    ProcEnumNFS4::NFS_NULL,   // NFSPROC4RPCGEN_NULL     (0)
+                    ProcEnumNFS4::COMPOUND    // NFSPROC4RPCGEN_COMPOUND (1)
                 >;
 
-static const char* const NFS4ProcedureTitles[ProcEnum::count] =
+static const char* const NFSProcedure4Titles[ProcEnumNFS4::count] =
 {
   "NULL",       "COMPOUND"
 };
+
+// Procedure 0: NULL - Do nothing
+inline auto proc_t_of(rpcgen::NULL4args&)->decltype(&rpcgen::xdr_NULL4args)
+{
+    return &rpcgen::xdr_NULL4args;
+}
+
+inline auto proc_t_of(rpcgen::NULL4res&)->decltype(&rpcgen::xdr_NULL4res)
+{
+    return &rpcgen::xdr_NULL4res;
+}
+
+// Procedure 1: COMPOUND
+inline auto proc_t_of(rpcgen::COMPOUND4args&)->decltype(&rpcgen::xdr_COMPOUND4args)
+{
+    return &rpcgen::xdr_COMPOUND4args;
+}
+
+inline auto proc_t_of(rpcgen::COMPOUND4res&)->decltype(&rpcgen::xdr_COMPOUND4res)
+{
+    return &rpcgen::xdr_COMPOUND4res;
+}
 
 } // namespace NFS4
 } // namespace protocols
