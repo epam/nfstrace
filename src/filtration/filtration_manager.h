@@ -41,7 +41,7 @@ class FiltrationManager
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
 
 public:
-    FiltrationManager(RunningStatus& s);
+    FiltrationManager(RunningStatus&);
     ~FiltrationManager();
     FiltrationManager(const FiltrationManager&)            = delete;
     FiltrationManager& operator=(const FiltrationManager&) = delete;
