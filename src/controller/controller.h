@@ -58,12 +58,12 @@ class Controller
         const Running& operator=(const Running&) = delete;
         inline ~Running();
     private:
-        Controller &controller;
+        Controller& controller;
     };
 
 public:
 
-    Controller(const Parameters& parameters);
+    Controller(const Parameters&);
     Controller(const Controller&)            = delete;
     Controller& operator=(const Controller&) = delete;
     ~Controller();

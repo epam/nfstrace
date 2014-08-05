@@ -34,8 +34,8 @@ namespace NST
 namespace controller
 {
 
-Controller::Running::Running(Controller& in)
-    : controller(in)
+Controller::Running::Running(Controller& i)
+    : controller(i)
 {
     controller.filtration->start();
     if(controller.analysis)
@@ -110,12 +110,16 @@ int Controller::run()  //Start and stop of Filtration and Analysis are in Contro
         Running running{*this};
         status.wait_and_rethrow_exception();
     }
-    catch(ProcessingDone &ex)
+    catch(ProcessingDone& e)
     {
         if(utils::Out message{})
         {
-            message << ex.what();
+            message << e.what();
         }
+    }
+    if(utils::Log message{})
+    {
+        status.print(message);
     }
     return 0;
 }
