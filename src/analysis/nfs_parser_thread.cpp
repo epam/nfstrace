@@ -198,7 +198,7 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
         switch(version)
         {
         case NFS_V4:
-            LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), NFSProcedure4Titles[procedure], procedure);
+            LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), NFS4ProcedureTitles[procedure], procedure);
         break;
         case NFS_V3:
             LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), NFSProcedureTitles[procedure], procedure);
@@ -210,7 +210,7 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
         switch(version)
         {
         case NFS_V4:
-            LOG("Some data of NFS operation %s %s(%u) was not parsed: %s", session->str().c_str(), NFSProcedure4Titles[procedure], procedure, e.what());
+            LOG("Some data of NFS operation %s %s(%u) was not parsed: %s", session->str().c_str(), NFS4ProcedureTitles[procedure], procedure, e.what());
         break;
         case NFS_V3:
             LOG("Some data of NFS operation %s %s(%u) was not parsed: %s", session->str().c_str(), NFSProcedureTitles[procedure], procedure, e.what());

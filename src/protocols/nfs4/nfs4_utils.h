@@ -45,9 +45,18 @@ using Validator = rpc::RPCProgramValidator
                     ProcEnumNFS4::COMPOUND    // NFSPROC4RPCGEN_COMPOUND (1)
                 >;
 
-static const char* const NFSProcedure4Titles[ProcEnumNFS4::count] =
+static const char* const NFS4ProcedureTitles[ProcEnumNFS4::count] =
 {
-  "NULL",       "COMPOUND"
+"NULL",           "COMPOUND", "ACCESS",            "CLOSE",
+"COMMIT",         "CREATE",   "DELEGPURGE",        "DELEGRETURN",
+"GETATTR",        "GETFH",    "LINK",              "LOCK",
+"LOCKT",          "LOCKU",    "LOOKUP",            "LOOKUPP",
+"NVERIFY",        "OPEN",     "OPENATTR",          "OPEN_CONFIRM",
+"OPEN_DOWNGRADE", "PUTFH",    "PUTPUBFH",          "PUTROOTFH",
+"READ",           "READDIR",  "READLINK",          "REMOVE",
+"RENAME",         "RENEW",    "RESTOREFH",         "SAVEFH",
+"SECINFO",        "SETATTR",  "SETCLIENTID",       "SETCLIENTID_CONFIRM",
+"VERIFY",         "WRITE",    "RELEASE_LOCKOWNER", "ILLEGAL" 
 };
 
 // Procedure 0: NULL - Do nothing
@@ -71,6 +80,11 @@ inline auto proc_t_of(rpcgen::COMPOUND4res&)->decltype(&rpcgen::xdr_COMPOUND4res
 {
     return &rpcgen::xdr_COMPOUND4res;
 }
+
+extern"C"
+void print_nfs4_procedures(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc);
+
+std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc);
 
 } // namespace NFS4
 } // namespace protocols

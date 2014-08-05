@@ -2490,9 +2490,9 @@ xdr_nfs_resop4 (XDR *xdrs, nfs_resop4 *objp)
              return FALSE;
         break;
     case OP_GETATTR:
-         //if (!xdr_GETATTR4res (xdrs, &objp->nfs_resop4_u.opgetattr))
-        //   return FALSE;
-        break;
+         if (!xdr_GETATTR4res (xdrs, &objp->nfs_resop4_u.opgetattr))
+             return FALSE;
+         break;
     case OP_GETFH:
          if (!xdr_GETFH4res (xdrs, &objp->nfs_resop4_u.opgetfh))
              return FALSE;

@@ -32,6 +32,17 @@ namespace protocols
 namespace NFS4
 {
 
+std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc)
+{
+    print_nfs4_procedures(out, proc);
+    return out;
+}
+
+void print_nfs4_procedures(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc)
+{
+    out << NFS4ProcedureTitles[proc];
+}
+
 std::ostream& operator<<(std::ostream& out, const nfs_ftype4& obj)
 {
     switch(obj)
