@@ -29,7 +29,7 @@ namespace analysis
 {
 
 Plugin::Plugin(const std::string& path)
-    : DynamicLoad{path.c_str()}
+    : DynamicLoad{path}
     , usage  {nullptr}
     , create {nullptr}
     , destroy{nullptr}

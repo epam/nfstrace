@@ -408,7 +408,7 @@ public:
     void push(PacketInfo& info)
     {
         assert(info.dlen != 0);
-        collection.reset();//full reset of collection (fix for incorrect size of dump collection initialized)
+        collection.prestart();//full reset of collection (fix for incorrect size of dump collection initialized)
         
         while(info.dlen) // loop over data in packet
         {
