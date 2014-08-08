@@ -41,12 +41,12 @@ public:
     };
 
 protected:
-    DynamicLoad(const char* file)
+    DynamicLoad(const std::string& file)
     {
-        handle = dlopen(file, RTLD_LAZY);
+        handle = dlopen(file.c_str(), RTLD_LAZY);
         if(handle == NULL)
         {
-            throw DLException(std::string("Loading dynamic module: ") + file + " failed with error:" + dlerror());
+            throw DLException(std::string("Loading dynamic module: ") + file.c_str() + " failed with error:" + dlerror());
         }
     }
     ~DynamicLoad()
@@ -55,17 +55,17 @@ protected:
     }
 
     template<typename SymbolPtr>
-    inline void load_address_of(const char* name, SymbolPtr& address)
+    inline void load_address_of(const std::string& name, SymbolPtr& address)
     {
         static_assert(sizeof(void*) == sizeof(SymbolPtr), "object pointer and function pointer sizes must be equal");
 
         // suppression warning: ISO C++ forbids casting between pointer-to-function and pointer-to-object
         using hook_dlsym_t = SymbolPtr (*)(void *, const char *);
 
-        address = reinterpret_cast<hook_dlsym_t>(dlsym)(handle, name);
+        address = reinterpret_cast<hook_dlsym_t>(dlsym)(handle, name.c_str());
         if(address == NULL)
         {
-            throw DLException(std::string("Loading symbol ") + name + " failed with error:" + dlerror());
+            throw DLException(std::string("Loading symbol ") + name.c_str() + " failed with error:" + dlerror());
         }
     }
 
