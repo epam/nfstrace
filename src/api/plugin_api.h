@@ -42,8 +42,8 @@ IAnalyzer*  create (const char*    opts); // create and return an instance of an
 void        destroy(IAnalyzer* instance); // destroy created instance of an Analyzer
 
 // These calls implemented by nfstrace
-void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);
-void print_nfs4_procedures(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc);
+const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
+const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc);
 void print_session(std::ostream& out, const Session& session);
 void print_nfs_fh3(std::ostream& out, const FH& fh);
 }
@@ -54,16 +54,14 @@ inline std::ostream& operator<<(std::ostream& out, const Session& session)
     return out;
 }
 
-inline std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc)
+inline std::ostream& operator<<(std::ostream& out, const ProcEnumNFS3::NFSProcedure proc)
 {
-    print_nfs3_procedures(out, proc);
-    return out;
+    return out << print_nfs3_procedures(proc);
 }
 
 inline std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc)
 {
-    print_nfs4_procedures(out, proc);
-    return out;
+    return out << print_nfs4_procedures(proc);
 }
 //------------------------------------------------------------------------------
 #endif //PLUGIN_API_H

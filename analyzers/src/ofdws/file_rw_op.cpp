@@ -32,9 +32,9 @@ FileRWOp::~FileRWOp()
         delete [] i->second;
 }
 
-void FileRWOp::calculate(ProcEnum::NFSProcedure op, uint64_t o, uint32_t c, uint32_t)
+void FileRWOp::calculate(ProcEnumNFS3::NFSProcedure op, uint64_t o, uint32_t c, uint32_t)
 {
-    if(op == ProcEnum::READ)
+    if(op == ProcEnumNFS3::READ)
         read_total += c;
     else 
         write_total += c;
@@ -69,7 +69,7 @@ void FileRWOp::calculate(ProcEnum::NFSProcedure op, uint64_t o, uint32_t c, uint
             if(!end)
                 end = bucket_size;
         }
-        if(op == ProcEnum::READ)
+        if(op == ProcEnumNFS3::READ)
             for(uint64_t i = start; i < end; ++i)
                 bucket[i].inc_read_freq();
         else

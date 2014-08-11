@@ -36,7 +36,7 @@ class OFWSAnalyzer : public IAnalyzer
             std::memset(counters, 0, sizeof(counters));
         }
         inline ~OpCounter() {}
-        inline void inc(ProcEnum::NFSProcedure op, uint32_t size = 1)
+        inline void inc(ProcEnumNFS3::NFSProcedure op, uint32_t size = 1)
         {
             total += size;
             counters[op] += size;
@@ -47,7 +47,7 @@ class OFWSAnalyzer : public IAnalyzer
         OpCounter(const OpCounter&);
         void operator=(const OpCounter&);
 
-        uint32_t counters[ProcEnum::count];
+        uint32_t counters[ProcEnumNFS3::count];
         uint64_t total;
     };
 

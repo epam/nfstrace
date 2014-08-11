@@ -167,55 +167,59 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
         case NFS_V3:
             switch(procedure)
             {
-            case ProcEnum::NFS_NULL:    return analyzers(&IAnalyzer::INFSv3rpcgen::null,       NFSPROC3RPCGEN_NULL       {c, r, s});
-            case ProcEnum::GETATTR:     return analyzers(&IAnalyzer::INFSv3rpcgen::getattr3,   NFSPROC3RPCGEN_GETATTR    {c, r, s});
-            case ProcEnum::SETATTR:     return analyzers(&IAnalyzer::INFSv3rpcgen::setattr3,   NFSPROC3RPCGEN_SETATTR    {c, r, s});
-            case ProcEnum::LOOKUP:      return analyzers(&IAnalyzer::INFSv3rpcgen::lookup3,    NFSPROC3RPCGEN_LOOKUP     {c, r, s});
-            case ProcEnum::ACCESS:      return analyzers(&IAnalyzer::INFSv3rpcgen::access3,    NFSPROC3RPCGEN_ACCESS     {c, r, s});
-            case ProcEnum::READLINK:    return analyzers(&IAnalyzer::INFSv3rpcgen::readlink3,  NFSPROC3RPCGEN_READLINK   {c, r, s});
-            case ProcEnum::READ:        return analyzers(&IAnalyzer::INFSv3rpcgen::read3,      NFSPROC3RPCGEN_READ       {c, r, s});
-            case ProcEnum::WRITE:       return analyzers(&IAnalyzer::INFSv3rpcgen::write3,     NFSPROC3RPCGEN_WRITE      {c, r, s});
-            case ProcEnum::CREATE:      return analyzers(&IAnalyzer::INFSv3rpcgen::create3,    NFSPROC3RPCGEN_CREATE     {c, r, s});
-            case ProcEnum::MKDIR:       return analyzers(&IAnalyzer::INFSv3rpcgen::mkdir3,     NFSPROC3RPCGEN_MKDIR      {c, r, s});
-            case ProcEnum::SYMLINK:     return analyzers(&IAnalyzer::INFSv3rpcgen::symlink3,   NFSPROC3RPCGEN_SYMLINK    {c, r, s});
-            case ProcEnum::MKNOD:       return analyzers(&IAnalyzer::INFSv3rpcgen::mknod3,     NFSPROC3RPCGEN_MKNOD      {c, r, s});
-            case ProcEnum::REMOVE:      return analyzers(&IAnalyzer::INFSv3rpcgen::remove3,    NFSPROC3RPCGEN_REMOVE     {c, r, s});
-            case ProcEnum::RMDIR:       return analyzers(&IAnalyzer::INFSv3rpcgen::rmdir3,     NFSPROC3RPCGEN_RMDIR      {c, r, s});
-            case ProcEnum::RENAME:      return analyzers(&IAnalyzer::INFSv3rpcgen::rename3,    NFSPROC3RPCGEN_RENAME     {c, r, s});
-            case ProcEnum::LINK:        return analyzers(&IAnalyzer::INFSv3rpcgen::link3,      NFSPROC3RPCGEN_LINK       {c, r, s});
-            case ProcEnum::READDIR:     return analyzers(&IAnalyzer::INFSv3rpcgen::readdir3,   NFSPROC3RPCGEN_READDIR    {c, r, s});
-            case ProcEnum::READDIRPLUS: return analyzers(&IAnalyzer::INFSv3rpcgen::readdirplus3, NFSPROC3RPCGEN_READDIRPLUS{c, r, s});
-            case ProcEnum::FSSTAT:      return analyzers(&IAnalyzer::INFSv3rpcgen::fsstat3,    NFSPROC3RPCGEN_FSSTAT     {c, r, s});
-            case ProcEnum::FSINFO:      return analyzers(&IAnalyzer::INFSv3rpcgen::fsinfo3,    NFSPROC3RPCGEN_FSINFO     {c, r, s});
-            case ProcEnum::PATHCONF:    return analyzers(&IAnalyzer::INFSv3rpcgen::pathconf3,  NFSPROC3RPCGEN_PATHCONF   {c, r, s});
-            case ProcEnum::COMMIT:      return analyzers(&IAnalyzer::INFSv3rpcgen::commit3,    NFSPROC3RPCGEN_COMMIT     {c, r, s});
+            case ProcEnumNFS3::NFS_NULL:    return analyzers(&IAnalyzer::INFSv3rpcgen::null,       NFSPROC3RPCGEN_NULL       {c, r, s});
+            case ProcEnumNFS3::GETATTR:     return analyzers(&IAnalyzer::INFSv3rpcgen::getattr3,   NFSPROC3RPCGEN_GETATTR    {c, r, s});
+            case ProcEnumNFS3::SETATTR:     return analyzers(&IAnalyzer::INFSv3rpcgen::setattr3,   NFSPROC3RPCGEN_SETATTR    {c, r, s});
+            case ProcEnumNFS3::LOOKUP:      return analyzers(&IAnalyzer::INFSv3rpcgen::lookup3,    NFSPROC3RPCGEN_LOOKUP     {c, r, s});
+            case ProcEnumNFS3::ACCESS:      return analyzers(&IAnalyzer::INFSv3rpcgen::access3,    NFSPROC3RPCGEN_ACCESS     {c, r, s});
+            case ProcEnumNFS3::READLINK:    return analyzers(&IAnalyzer::INFSv3rpcgen::readlink3,  NFSPROC3RPCGEN_READLINK   {c, r, s});
+            case ProcEnumNFS3::READ:        return analyzers(&IAnalyzer::INFSv3rpcgen::read3,      NFSPROC3RPCGEN_READ       {c, r, s});
+            case ProcEnumNFS3::WRITE:       return analyzers(&IAnalyzer::INFSv3rpcgen::write3,     NFSPROC3RPCGEN_WRITE      {c, r, s});
+            case ProcEnumNFS3::CREATE:      return analyzers(&IAnalyzer::INFSv3rpcgen::create3,    NFSPROC3RPCGEN_CREATE     {c, r, s});
+            case ProcEnumNFS3::MKDIR:       return analyzers(&IAnalyzer::INFSv3rpcgen::mkdir3,     NFSPROC3RPCGEN_MKDIR      {c, r, s});
+            case ProcEnumNFS3::SYMLINK:     return analyzers(&IAnalyzer::INFSv3rpcgen::symlink3,   NFSPROC3RPCGEN_SYMLINK    {c, r, s});
+            case ProcEnumNFS3::MKNOD:       return analyzers(&IAnalyzer::INFSv3rpcgen::mknod3,     NFSPROC3RPCGEN_MKNOD      {c, r, s});
+            case ProcEnumNFS3::REMOVE:      return analyzers(&IAnalyzer::INFSv3rpcgen::remove3,    NFSPROC3RPCGEN_REMOVE     {c, r, s});
+            case ProcEnumNFS3::RMDIR:       return analyzers(&IAnalyzer::INFSv3rpcgen::rmdir3,     NFSPROC3RPCGEN_RMDIR      {c, r, s});
+            case ProcEnumNFS3::RENAME:      return analyzers(&IAnalyzer::INFSv3rpcgen::rename3,    NFSPROC3RPCGEN_RENAME     {c, r, s});
+            case ProcEnumNFS3::LINK:        return analyzers(&IAnalyzer::INFSv3rpcgen::link3,      NFSPROC3RPCGEN_LINK       {c, r, s});
+            case ProcEnumNFS3::READDIR:     return analyzers(&IAnalyzer::INFSv3rpcgen::readdir3,   NFSPROC3RPCGEN_READDIR    {c, r, s});
+            case ProcEnumNFS3::READDIRPLUS: return analyzers(&IAnalyzer::INFSv3rpcgen::readdirplus3, NFSPROC3RPCGEN_READDIRPLUS{c, r, s});
+            case ProcEnumNFS3::FSSTAT:      return analyzers(&IAnalyzer::INFSv3rpcgen::fsstat3,    NFSPROC3RPCGEN_FSSTAT     {c, r, s});
+            case ProcEnumNFS3::FSINFO:      return analyzers(&IAnalyzer::INFSv3rpcgen::fsinfo3,    NFSPROC3RPCGEN_FSINFO     {c, r, s});
+            case ProcEnumNFS3::PATHCONF:    return analyzers(&IAnalyzer::INFSv3rpcgen::pathconf3,  NFSPROC3RPCGEN_PATHCONF   {c, r, s});
+            case ProcEnumNFS3::COMMIT:      return analyzers(&IAnalyzer::INFSv3rpcgen::commit3,    NFSPROC3RPCGEN_COMMIT     {c, r, s});
             }
        break;
        }
     }
     catch(XDRError& exception)
     {
+        char* procedure_name {};
         switch(version)
         {
         case NFS_V4:
-            LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), NFS4ProcedureTitles[procedure], procedure);
+            procedure_name = const_cast<char*>(print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(procedure)));
         break;
         case NFS_V3:
-            LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), NFSProcedureTitles[procedure], procedure);
+            procedure_name = const_cast<char*>(print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(procedure)));
         break;
         }
+        LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), procedure_name, procedure);
     }
     catch(XDRDecoderError& e)
     {
+        char* procedure_name {};
         switch(version)
         {
         case NFS_V4:
-            LOG("Some data of NFS operation %s %s(%u) was not parsed: %s", session->str().c_str(), NFS4ProcedureTitles[procedure], procedure, e.what());
+            procedure_name = const_cast<char*>(print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(procedure)));
         break;
         case NFS_V3:
-            LOG("Some data of NFS operation %s %s(%u) was not parsed: %s", session->str().c_str(), NFSProcedureTitles[procedure], procedure, e.what());
+            procedure_name = const_cast<char*>(print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(procedure)));
         break;
         }
+        LOG("Some data of NFS operation %s %s(%u) was not parsed: %s", session->str().c_str(), procedure_name, procedure, e.what());
     }
 }
 
