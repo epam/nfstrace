@@ -226,7 +226,6 @@ public:
                     fragments = Packet::create(info, fragments);
                 }
             }
-            reader.reset();
         }
 
         bool check_fragments(const uint32_t acknowledged)
@@ -317,6 +316,10 @@ public:
                     sequence = lowest_seq;
                     return true;
                 }
+            }
+            else
+            {
+                reader.reset();
             }
 
             return false;
