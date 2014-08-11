@@ -226,6 +226,7 @@ public:
                     fragments = Packet::create(info, fragments);
                 }
             }
+            reader.reset();
         }
 
         bool check_fragments(const uint32_t acknowledged)
@@ -408,7 +409,6 @@ public:
     void push(PacketInfo& info)
     {
         assert(info.dlen != 0);
-        collection.prestart();//full reset of collection (fix for incorrect size of dump collection initialized)
         
         while(info.dlen) // loop over data in packet
         {
@@ -471,7 +471,12 @@ public:
 
         if(collection) // collection is allocated
         {
-            const uint32_t tocopy = max_header-collection.size();
+            if(max_header <= collection.size()) //check for incorrect collection size
+            {
+                info.dlen = 0;//if size incorrect - we lose this packet but other will be captured OK
+                return;
+            }
+            const uint32_t tocopy = max_header - collection.size();
 
             if(info.dlen < tocopy)
             {
@@ -517,16 +522,18 @@ public:
         {
             assert(msg_len != 0);   // message is found
 
+
             const uint32_t written = collection.size();
             if(written != 0) // a message was partially written to collection
             {
                 assert( (msg_len - written) <  msg_len );
-                msg_len -= written;
+                    msg_len -= written;
                 if(hdr_len != 0) // we want to collect header of this RPC message
                 {
-                assert( (hdr_len - written) <  hdr_len );
+                    assert( (hdr_len - written) <  hdr_len );
                     hdr_len -= written;
                 }
+
             }
         }
         else    // unknown data in packet payload
