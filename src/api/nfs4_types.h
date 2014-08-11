@@ -71,9 +71,10 @@ struct ProcEnumNFS4
         VERIFY              = 37,
         WRITE               = 38,
         RELEASE_LOCKOWNER   = 39,
+        GET_DIR_DELEGATION  = 40,
         ILLEGAL             = 10044
     };
-    static const int32_t count = 40;
+    static const int32_t count = 41;
 };
 
 } // namespace API

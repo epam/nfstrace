@@ -177,6 +177,14 @@ public:
             const struct rpcgen::COMMIT3res* res) override final;
 */
 
+    void null(const struct RPCProcedure*      proc,
+              const struct rpcgen::NULL4args* args,
+              const struct rpcgen::NULL4res*  res) override final;
+
+    void compound4(const struct RPCProcedure*          proc,
+                   const struct rpcgen::COMPOUND4args* args,
+                   const struct rpcgen::COMPOUND4res*  res) override final;
+
     void flush_statistics() override final;
 
 private:

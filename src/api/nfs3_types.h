@@ -48,7 +48,7 @@ typedef uint64_t    size3;
 typedef uint64_t    offset3;
 typedef uint32_t    count3;
 
-struct ProcEnum
+struct ProcEnumNFS3
 {
     enum NFSProcedure
     {

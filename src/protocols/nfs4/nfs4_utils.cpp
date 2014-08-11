@@ -34,13 +34,30 @@ namespace NFS4
 
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc)
 {
-    print_nfs4_procedures(out, proc);
-    return out;
+    return out << print_nfs4_procedures(proc);
 }
 
-void print_nfs4_procedures(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc)
+const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc)
 {
-    out << NFS4ProcedureTitles[proc];
+    uint32_t i = proc;
+    if(proc == ProcEnumNFS4::ILLEGAL) i = ProcEnumNFS4::count;
+    else if(i>1) i++;
+    static const char* const NFS4ProcedureTitles[ProcEnumNFS4::count] =
+    {
+    "NULL",           "COMPOUND", "ACCESS",            "CLOSE",
+    "COMMIT",         "CREATE",   "DELEGPURGE",        "DELEGRETURN",
+    "GETATTR",        "GETFH",    "LINK",              "LOCK",
+    "LOCKT",          "LOCKU",    "LOOKUP",            "LOOKUPP",
+    "NVERIFY",        "OPEN",     "OPENATTR",          "OPEN_CONFIRM",
+    "OPEN_DOWNGRADE", "PUTFH",    "PUTPUBFH",          "PUTROOTFH",
+    "READ",           "READDIR",  "READLINK",          "REMOVE",
+    "RENAME",         "RENEW",    "RESTOREFH",         "SAVEFH",
+    "SECINFO",        "SETATTR",  "SETCLIENTID",       "SETCLIENTID_CONFIRM",
+    "VERIFY",         "WRITE",    "RELEASE_LOCKOWNER", "GET_DIR_DELEGATION", 
+    "ILLEGAL" 
+    };
+
+    return NFS4ProcedureTitles[i];
 }
 
 std::ostream& operator<<(std::ostream& out, const nfs_ftype4& obj)

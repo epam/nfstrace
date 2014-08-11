@@ -58,7 +58,7 @@ public:
     inline FileRWOp() : read_total(0), write_total(0) {}
     ~FileRWOp();
 
-    void calculate(ProcEnum::NFSProcedure op, uint64_t offset, uint32_t count, uint32_t time = 0);
+    void calculate(ProcEnumNFS3::NFSProcedure op, uint64_t offset, uint32_t count, uint32_t time = 0);
 
     inline uint64_t get_read_total()   { return read_total;  }
     inline uint64_t get_write_total()  { return write_total; }

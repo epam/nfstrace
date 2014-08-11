@@ -43,21 +43,11 @@ namespace NFS3
 
 using Validator = rpc::RPCProgramValidator
                 <
-                    100003,             // SunRPC/NFS program
-                    3,                  // v3
-                    ProcEnum::NFS_NULL, // NFSPROC3_NULL
-                    ProcEnum::COMMIT    // NFSPROC3_COMMIT
+                    100003,                 // SunRPC/NFS program
+                    3,                      // v3
+                    ProcEnumNFS3::NFS_NULL, // NFSPROC3_NULL
+                    ProcEnumNFS3::COMMIT    // NFSPROC3_COMMIT
                 >;
-
-static const char* const NFSProcedureTitles[ProcEnum::count] =
-{
-  "NULL",       "GETATTR",      "SETATTR",  "LOOKUP",
-  "ACCESS",     "READLINK",     "READ",     "WRITE",
-  "CREATE",     "MKDIR",        "SYMLINK",  "MKNOD",
-  "REMOVE",     "RMDIR",        "RENAME",   "LINK",
-  "READDIR",    "READDIRPLUS",  "FSSTAT",   "FSINFO",
-  "PATHCONF",   "COMMIT"
-};
 
 inline XDRReader& operator>>(XDRReader& in, mode3& obj)
 {
@@ -1025,9 +1015,9 @@ inline auto proc_t_of(rpcgen::COMMIT3res&)->decltype(&rpcgen::xdr_COMMIT3res)
 
 
 extern"C"
-void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);
+const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
 
-std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc);
+std::ostream& operator<<(std::ostream& out, const ProcEnumNFS3::NFSProcedure proc);
 std::ostream& operator<<(std::ostream& out, const mode3 obj);
 std::ostream& operator<<(std::ostream& out, const nfsstat3& obj);
 std::ostream& operator<<(std::ostream& out, const ftype3& obj);

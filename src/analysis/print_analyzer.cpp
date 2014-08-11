@@ -83,70 +83,108 @@ void print_nfs_fh3(std::ostream& out, const FH& fh)
 
 bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 {
-// TODO: fix
     bool result = false;
     NST::utils::operator<<(out, *(proc->session));
-/*
+
+    auto& call = proc->rpc_call;
+    const int nfs_version = call.ru.RM_cmb.cb_vers;
     if(out_all())
     {
-        auto& call = proc->call;
-        out << " XID: "         << call.xid;
-        out << " RPC version: " << call.rpcvers;
-        out << " RPC program: " << call.prog;
-        out << " version: "     << call.vers;
+        out << " XID: "         << call.rm_xid;
+        out << " RPC version: " << call.ru.RM_cmb.cb_rpcvers;
+        out << " RPC program: " << call.ru.RM_cmb.cb_prog;
+        out << " version: "     << nfs_version;
+    }
+    switch(nfs_version)
+    {
+    case NFS_V3:
+        out << ' ' << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(call.ru.RM_cmb.cb_proc));
+        break;
+    case NFS_V4:
+        out << ' ' << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(call.ru.RM_cmb.cb_proc));
+        break;
     }
 
-    out << ' ' << ProcEnum::NFSProcedure(proc->call.proc);
-
     // check procedure reply
-    auto& reply = proc->reply;
-    if(reply.stat == ReplyStat::MSG_ACCEPTED)
+    auto& reply = proc->rpc_reply;
+    if(reply.ru.RM_rmb.rp_stat == reply_stat::MSG_ACCEPTED)
     {
-        switch(reply.u.accepted.stat)
+        switch(reply.ru.RM_rmb.ru.RP_ar.ar_stat)
         {
-            case AcceptStat::SUCCESS:
+            case accept_stat::SUCCESS:
                 result = true;    // Ok, reply is correct
                 break;
-            case AcceptStat::PROG_MISMATCH:
+            case accept_stat::PROG_MISMATCH:
                 out << " Program mismatch: "
-                    << " low: " << reply.u.accepted.mismatch_info.low
-                    << " high: " << reply.u.accepted.mismatch_info.high;
+                    << " low: "  << reply.ru.RM_rmb.ru.RP_ar.ru.AR_versions.low
+                    << " high: " << reply.ru.RM_rmb.ru.RP_ar.ru.AR_versions.high;
                 break;
-            case AcceptStat::PROG_UNAVAIL:
+            case accept_stat::PROG_UNAVAIL:
                 out << " Program unavailable";
                 break;
-            case AcceptStat::PROC_UNAVAIL:
+            case accept_stat::PROC_UNAVAIL:
                 out << " Procedure unavailable";
                 break;
-            case AcceptStat::GARBAGE_ARGS:
+            case accept_stat::GARBAGE_ARGS:
                 out << " Garbage arguments";
                 break;
-            case AcceptStat::SYSTEM_ERR:
+            case accept_stat::SYSTEM_ERR:
                 out << " System error";
                 break;
         }
     }
-    else if(reply.stat == ReplyStat::MSG_DENIED)
+    else if(reply.ru.RM_rmb.rp_stat == reply_stat::MSG_DENIED)
     {
         out << " RPC Call rejected: ";
-        switch(reply.u.rejected.stat)
+        switch(reply.ru.RM_rmb.ru.RP_dr.rj_stat)
         {
-            case RejectStat::RPC_MISMATCH:
+            case reject_stat::RPC_MISMATCH:
                 out << "RPC version number mismatch, "
-                    << " low: " << reply.u.rejected.u.mismatch_info.low
-                    << " high: " << reply.u.rejected.u.mismatch_info.high;
+                    << " low: "  << reply.ru.RM_rmb.ru.RP_dr.ru.RJ_versions.low
+                    << " high: " << reply.ru.RM_rmb.ru.RP_dr.ru.RJ_versions.high;
                 break;
-            case RejectStat::AUTH_ERROR:
+            case reject_stat::AUTH_ERROR:
             {
-                auto& stat = reply.u.rejected.u.auth_stat;
-                out << " Authentication error: flavor: " << stat.flavor
-                    << " opaque: " << std::string{(char*)stat.body.ptr, stat.body.len};
+                out << " Authentication check: ";
+                switch(reply.ru.RM_rmb.ru.RP_dr.ru.RJ_why)
+                {
+                case auth_stat::AUTH_OK:
+                    out << "OK";
+                    break;
+                case auth_stat::AUTH_BADCRED:
+                    out << " bogus credentials (seal broken)"
+                        << " (failed at remote end)";
+                    break;
+                case auth_stat::AUTH_REJECTEDCRED:
+                    out << " rejected credentials (client should begin new session)"
+                        << " (failed at remote end)";
+                    break;
+                case auth_stat::AUTH_BADVERF:
+                    out << " bogus verifier (seal broken)"
+                        << " (failed at remote end)";
+                    break;
+                case auth_stat::AUTH_REJECTEDVERF:
+                    out << " verifier expired or was replayed"
+                        << " (failed at remote end)";
+                    break;
+                case auth_stat::AUTH_TOOWEAK:
+                    out << " too weak (rejected due to security reasons)"
+                        << " (failed at remote end)";
+                    break;
+                case auth_stat::AUTH_INVALIDRESP:
+                    out << " bogus response verifier"
+                        << " (failed locally)";
+                    break;
+                case auth_stat::AUTH_FAILED:
+                    out << " some unknown reason"
+                        << " (failed locally)";
+                    break;
+                }
                 break;
             }
         }
     }
-*/
-    result = true;    // TODO: rm
+
     out << '\n'; // end line of RPC procedure information
     return result;
 }
@@ -167,9 +205,9 @@ void PrintAnalyzer::null(const struct RPCProcedure* proc,
     out << "\tCALL  []\n\tREPLY []\n";
 }
 
-void PrintAnalyzer::getattr3(const RPCProcedure* proc,
+void PrintAnalyzer::getattr3(const RPCProcedure*        proc,
                              const struct GETATTR3args* args,
-                             const struct GETATTR3res* res)
+                             const struct GETATTR3res*  res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -191,9 +229,9 @@ void PrintAnalyzer::getattr3(const RPCProcedure* proc,
     }
 }
 
-void PrintAnalyzer::setattr3(const RPCProcedure* proc,
+void PrintAnalyzer::setattr3(const RPCProcedure*        proc,
                              const struct SETATTR3args* args,
-                             const struct SETATTR3res* res)
+                             const struct SETATTR3res*  res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -224,9 +262,9 @@ void PrintAnalyzer::setattr3(const RPCProcedure* proc,
     }
 }
 
-void PrintAnalyzer::lookup3(const RPCProcedure* proc,
+void PrintAnalyzer::lookup3(const RPCProcedure*       proc,
                             const struct LOOKUP3args* args,
-                            const struct LOOKUP3res* res)
+                            const struct LOOKUP3res*  res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -258,8 +296,8 @@ void PrintAnalyzer::lookup3(const RPCProcedure* proc,
 }
 
 void PrintAnalyzer::access3(const struct RPCProcedure* proc,
-                            const struct ACCESS3args* args,
-                            const struct ACCESS3res* res)
+                            const struct ACCESS3args*  args,
+                            const struct ACCESS3res*   res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -304,9 +342,9 @@ void PrintAnalyzer::access3(const struct RPCProcedure* proc,
     }
 }
 
-void PrintAnalyzer::readlink3(const struct RPCProcedure* proc,
+void PrintAnalyzer::readlink3(const struct RPCProcedure*  proc,
                               const struct READLINK3args* args,
-                              const struct READLINK3res* res)
+                              const struct READLINK3res*  res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -337,8 +375,8 @@ void PrintAnalyzer::readlink3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::read3(const struct RPCProcedure* proc,
-                          const struct READ3args* args,
-                          const struct READ3res* res)
+                          const struct READ3args*    args,
+                          const struct READ3res*     res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -373,8 +411,8 @@ void PrintAnalyzer::read3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::write3(const struct RPCProcedure* proc,
-                           const struct WRITE3args* args,
-                           const struct WRITE3res* res)
+                           const struct WRITE3args*   args,
+                           const struct WRITE3res*    res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -414,8 +452,8 @@ void PrintAnalyzer::write3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::create3(const struct RPCProcedure* proc,
-                            const struct CREATE3args* args,
-                            const struct CREATE3res* res)
+                            const struct CREATE3args*  args,
+                            const struct CREATE3res*   res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -448,8 +486,8 @@ void PrintAnalyzer::create3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::mkdir3(const struct RPCProcedure* proc,
-                           const struct MKDIR3args* args,
-                           const struct MKDIR3res* res)
+                           const struct MKDIR3args*   args,
+                           const struct MKDIR3res*    res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -483,7 +521,7 @@ void PrintAnalyzer::mkdir3(const struct RPCProcedure* proc,
 
 void PrintAnalyzer::symlink3(const struct RPCProcedure* proc,
                              const struct SYMLINK3args* args,
-                             const struct SYMLINK3res* res)
+                             const struct SYMLINK3res*  res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -516,8 +554,8 @@ void PrintAnalyzer::symlink3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::mknod3(const struct RPCProcedure* proc,
-                           const struct MKNOD3args* args,
-                           const struct MKNOD3res* res)
+                           const struct MKNOD3args*   args,
+                           const struct MKNOD3res*    res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -550,8 +588,8 @@ void PrintAnalyzer::mknod3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::remove3(const struct RPCProcedure* proc,
-                            const struct REMOVE3args* args,
-                            const struct REMOVE3res* res)
+                            const struct REMOVE3args*  args,
+                            const struct REMOVE3res*   res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -581,8 +619,8 @@ void PrintAnalyzer::remove3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::rmdir3(const struct RPCProcedure* proc,
-                           const struct RMDIR3args* args,
-                           const struct RMDIR3res* res)
+                           const struct RMDIR3args*   args,
+                           const struct RMDIR3res*    res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -612,8 +650,8 @@ void PrintAnalyzer::rmdir3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::rename3(const struct RPCProcedure* proc,
-                            const struct RENAME3args* args,
-                            const struct RENAME3res* res)
+                            const struct RENAME3args*  args,
+                            const struct RENAME3res*   res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -646,8 +684,8 @@ void PrintAnalyzer::rename3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::link3(const struct RPCProcedure* proc,
-                          const struct LINK3args* args,
-                          const struct LINK3res* res)
+                          const struct LINK3args*    args,
+                          const struct LINK3res*     res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -715,9 +753,9 @@ void PrintAnalyzer::readdir3(const struct RPCProcedure* proc,
     }
 }
 
-void PrintAnalyzer::readdirplus3(const struct RPCProcedure* proc,
+void PrintAnalyzer::readdirplus3(const struct RPCProcedure*     proc,
                                  const struct READDIRPLUS3args* args,
-                                 const struct READDIRPLUS3res* res)
+                                 const struct READDIRPLUS3res*  res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -753,8 +791,8 @@ void PrintAnalyzer::readdirplus3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::fsstat3(const struct RPCProcedure* proc,
-                            const struct FSSTAT3args* args,
-                            const struct FSSTAT3res* res)
+                            const struct FSSTAT3args*  args,
+                            const struct FSSTAT3res*   res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -791,8 +829,8 @@ void PrintAnalyzer::fsstat3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::fsinfo3(const struct RPCProcedure* proc,
-                            const struct FSINFO3args* args,
-                            const struct FSINFO3res* res)
+                            const struct FSINFO3args*  args,
+                            const struct FSINFO3res*   res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -835,9 +873,9 @@ void PrintAnalyzer::fsinfo3(const struct RPCProcedure* proc,
     }
 }
 
-void PrintAnalyzer::pathconf3(const struct RPCProcedure* proc,
+void PrintAnalyzer::pathconf3(const struct RPCProcedure*  proc,
                               const struct PATHCONF3args* args,
-                              const struct PATHCONF3res* res)
+                              const struct PATHCONF3res*  res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -873,8 +911,8 @@ void PrintAnalyzer::pathconf3(const struct RPCProcedure* proc,
 }
 
 void PrintAnalyzer::commit3(const struct RPCProcedure* proc,
-                            const struct COMMIT3args* args,
-                            const struct COMMIT3res* res)
+                            const struct COMMIT3args*  args,
+                            const struct COMMIT3res*   res)
 {
     if(!print_procedure(out, proc)) return;
 
@@ -906,6 +944,32 @@ void PrintAnalyzer::commit3(const struct RPCProcedure* proc,
     }
 }
 
+void PrintAnalyzer::null(const struct RPCProcedure* proc,
+                         const struct rpcgen::NULL4args*,
+                         const struct rpcgen::NULL4res*)
+{
+    if(!print_procedure(out, proc)) return;
+
+    out << "\tCALL  []\n\tREPLY []\n";
+}
+
+void PrintAnalyzer::compound4(const struct RPCProcedure*          proc,
+                              const struct rpcgen::COMPOUND4args* args,
+                              const struct rpcgen::COMPOUND4res*  res)
+{
+    if(!print_procedure(out, proc)) return;
+
+    if(args)
+    {
+        out << "\tCALL  [";
+        out << " ]\n";
+    }
+    if(res)
+    {
+        out << "\tREPLY [";
+        out << " ]\n";
+    }
+}
 
 void PrintAnalyzer::flush_statistics()
 {

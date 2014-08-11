@@ -87,11 +87,11 @@ public:
                     if (NFS3::Validator::check(call))
                     {
                         uint32_t proc = call->proc();
-                        if (API::ProcEnum::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
+                        if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
                             hdr_len = (nfs3_rw_hdr_max < info.dlen ? nfs3_rw_hdr_max : info.dlen);
                         else
                         {
-                            if (API::ProcEnum::READ == proc)
+                            if (API::ProcEnumNFS3::READ == proc)
                                 nfs3_read_match.insert(call->xid());
                             hdr_len = info.dlen;
                         }
@@ -605,11 +605,11 @@ public:
                     if(NFS3::Validator::check(call))
                     {
                         uint32_t proc = call->proc();
-                        if (API::ProcEnum::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
+                        if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
                             hdr_len = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
                         else
                         {
-                            if (API::ProcEnum::READ == proc)
+                            if (API::ProcEnumNFS3::READ == proc)
                                 nfs3_read_match.insert(call->xid());
                             hdr_len = msg_len;
                         }

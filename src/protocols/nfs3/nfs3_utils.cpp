@@ -42,15 +42,24 @@ std::ostream& operator <<(std::ostream& out, const Opaque& opaque)
     return out << std::dec;
 }
 
-std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc)
+std::ostream& operator<<(std::ostream& out, const ProcEnumNFS3::NFSProcedure proc)
 {
-    print_nfs3_procedures(out, proc);
-    return out;
+    return out << print_nfs3_procedures(proc);
 }
 
-void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc)
+const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc)
 {
-    out << NFSProcedureTitles[proc];
+    static const char* const NFS3ProcedureTitles[ProcEnumNFS3::count] =
+    {
+        "NULL",       "GETATTR",      "SETATTR",  "LOOKUP",
+        "ACCESS",     "READLINK",     "READ",     "WRITE",
+        "CREATE",     "MKDIR",        "SYMLINK",  "MKNOD",
+        "REMOVE",     "RMDIR",        "RENAME",   "LINK",
+        "READDIR",    "READDIRPLUS",  "FSSTAT",   "FSINFO",
+        "PATHCONF",   "COMMIT"
+    };
+
+    return NFS3ProcedureTitles[proc];
 }
 
 std::ostream& operator<<(std::ostream& out, const mode3 m)
