@@ -108,10 +108,6 @@ public:
             ptr->dlen += len;
         }
 
-        inline void prestart() //for difference initialization
-        {
-        }
-
         // TODO: workaround
         // we should remove RM(uin32_t) from collected data
         inline void skip_first(const uint32_t len)

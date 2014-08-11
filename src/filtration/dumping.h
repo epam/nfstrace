@@ -100,11 +100,6 @@ public:
             payload_len += len;
         }
 
-        inline void prestart() //for difference initialization
-        {
-            reset();
-        }
-
         inline void skip_first(const uint32_t /*len*/)
         {
         }
