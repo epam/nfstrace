@@ -524,19 +524,18 @@ public:
         if(rm->fragment_len() > 0 && validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
         {
             assert(msg_len != 0);   // message is found
-
-
             const uint32_t written = collection.size();
+
             if(written != 0) // a message was partially written to collection
             {
                 assert( (msg_len - written) <  msg_len );
-                    msg_len -= written;
+                msg_len -= written;
+                
                 if(hdr_len != 0) // we want to collect header of this RPC message
                 {
                     assert( (hdr_len - written) <  hdr_len );
                     hdr_len -= written;
                 }
-
             }
         }
         else    // unknown data in packet payload
