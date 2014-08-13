@@ -962,12 +962,28 @@ void PrintAnalyzer::compound4(const struct RPCProcedure*          proc,
     if(args)
     {
         out << "\tCALL  [";
-        out << " ]\n";
+        out << " operations: " << args->argarray.argarray_len << " ( ";
+        rpcgen::nfs_argop4* current_el = args->argarray.argarray_val;
+        for(u_int i=0; i<(args->argarray.argarray_len); i++, current_el++)
+        {
+            u_int nfs_oper = current_el->argop;
+            if(nfs_oper == ProcEnumNFS4::NFSProcedure::ILLEGAL) nfs_oper = 2;
+            out << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(nfs_oper)) << "(" << current_el->argop << ") ";
+        }
+        out << ") ]\n";
     }
     if(res)
     {
         out << "\tREPLY [";
-        out << " ]\n";
+        out << " operations: " << res->resarray.resarray_len << " ( ";
+        rpcgen::nfs_resop4* current_el = res->resarray.resarray_val;
+        for(u_int i=0; i<(res->resarray.resarray_len); i++, current_el++)
+        {
+            u_int nfs_oper = current_el->resop;
+            if(nfs_oper == ProcEnumNFS4::NFSProcedure::ILLEGAL) nfs_oper = 2;
+            out << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(nfs_oper)) << "(" << current_el->resop << ") ";
+        }
+        out << ") ]\n";
     }
 }
 

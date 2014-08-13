@@ -45,7 +45,7 @@ class TwoPassVariance
     typedef std::list<timeval>::const_iterator ConstIterator;
 
 public:
-    TwoPassVariance() : count(0) {}
+    TwoPassVariance() : count{0} {}
     ~TwoPassVariance() {}
 
     void add(const timeval& t)
@@ -60,7 +60,7 @@ public:
     {
         if(count == 0) return T();
 
-        ConstIterator i = latencies.begin();
+        ConstIterator   i = latencies.begin();
         ConstIterator end = latencies.end();
 
         timeval res;
@@ -79,7 +79,7 @@ public:
         const T avg = get_avg();
         T st_dev = T();
 
-        ConstIterator i = latencies.begin();
+        ConstIterator   i = latencies.begin();
         ConstIterator end = latencies.end();
         for(T delta; i != end; ++i)
         {
@@ -91,8 +91,8 @@ public:
     }
 
 private:
-    TwoPassVariance(const TwoPassVariance&);    //Undefined
-    void operator=(const TwoPassVariance&);     //Undefined
+    TwoPassVariance(const TwoPassVariance&); //Undefined
+    void operator=(const TwoPassVariance&);  //Undefined
 
     uint32_t count;
     std::list<timeval> latencies;
@@ -102,7 +102,10 @@ template <typename T>
 class OnlineVariance
 {
 public:
-    OnlineVariance() : count(0), st_dev(), avg(), m2() {}
+    OnlineVariance() : count{0},
+                       st_dev{},
+                          avg{},
+                           m2{} {}
     ~OnlineVariance() {}
 
     void add(const timeval& t)
@@ -124,8 +127,8 @@ public:
     }
 
 private:
-    OnlineVariance(const OnlineVariance&);    //Undefined
-    void operator=(const OnlineVariance&);    //Undefined
+    OnlineVariance(const OnlineVariance&); //Undefined
+    void operator=(const OnlineVariance&); //Undefined
 
     uint32_t count;
     T st_dev;
@@ -155,8 +158,8 @@ public:
     const timeval& get_max()    const { return max; }
 
 private:
-    Latencies(const Latencies&);       // Undefined
-    void operator=(const Latencies&);  // Undefined
+    Latencies(const Latencies&);      // Undefined
+    void operator=(const Latencies&); // Undefined
 
     void set_range(const timeval& t)
     {
@@ -181,7 +184,7 @@ template
 class BreakdownCounter
 {
 public:
-    BreakdownCounter() {}
+     BreakdownCounter() {}
     ~BreakdownCounter() {}
     const Latencies<T, Algorithm>& operator[](uint32_t index) const
     {
@@ -193,10 +196,10 @@ public:
     }
 
 private:
-    BreakdownCounter(const BreakdownCounter& breakdown);  //Undefined
-    void operator=(const BreakdownCounter&);       //Undefined
+    BreakdownCounter(const BreakdownCounter& breakdown); //Undefined
+    void operator=  (const BreakdownCounter&);           //Undefined
 
-    Latencies<T, Algorithm> latencies[ProcEnumNFS3::count];
+    Latencies<T, Algorithm> latencies[ProcEnumNFS4::count];
 };
 
 template
@@ -240,10 +243,14 @@ class BreakdownAnalyzer : public IAnalyzer
     typedef std::unordered_map<Session, Breakdown*, Hash, Pred> PerOpStat;
     typedef typename PerOpStat::value_type Pair;
 public:
-    BreakdownAnalyzer(std::ostream& o = std::cout) : nfs3_total{0}, nfs3_ops_count(22, 0), nfs4_total{0}, nfs4_ops_count(41,0), out(o) { }
+    BreakdownAnalyzer(std::ostream& o = std::cout) : nfs3_total{0},
+                                                     nfs3_ops_count(ProcEnumNFS3::count, 0),
+                                                     nfs4_total{0},
+                                                     nfs4_ops_count(ProcEnumNFS4::count, 0),
+                                                     out(o) { }
     virtual ~BreakdownAnalyzer()
     {
-        typename PerOpStat::iterator i   = nfs3_per_op_stat.begin();
+        typename PerOpStat::iterator   i = nfs3_per_op_stat.begin();
         typename PerOpStat::iterator end = nfs3_per_op_stat.end();
         for(; i != end;)
         {
@@ -258,148 +265,80 @@ public:
             i = nfs4_per_op_stat.erase(i);
         }
     }
-/*
-    virtual void null(const struct RPCProcedure* proc,
-            const struct NULLargs*,
-            const struct NULLres*) { account(proc); } 
-    virtual void getattr3(const struct RPCProcedure* proc,
-            const struct GETATTR3args*,
-            const struct GETATTR3res*) { account(proc); }
-    virtual void setattr3(const struct RPCProcedure* proc,
-            const struct SETATTR3args*,
-            const struct SETATTR3res*) { account(proc); }
-    virtual void lookup3(const struct RPCProcedure* proc,
-            const struct LOOKUP3args*,
-            const struct LOOKUP3res*) { account(proc); }
-    virtual void access3(const struct RPCProcedure* proc,
-            const struct ACCESS3args*,
-            const struct ACCESS3res*) { account(proc); }
-    virtual void readlink3(const struct RPCProcedure* proc,
-            const struct READLINK3args*,
-            const struct READLINK3res*) { account(proc); }
-    virtual void read3(const struct RPCProcedure* proc,
-            const struct READ3args*,
-            const struct READ3res*) { account(proc); }
-    virtual void write3(const struct RPCProcedure* proc,
-            const struct WRITE3args*,
-            const struct WRITE3res*) { account(proc); }
-    virtual void create3(const struct RPCProcedure* proc,
-            const struct CREATE3args*,
-            const struct CREATE3res*) { account(proc); }
-    virtual void mkdir3(const struct RPCProcedure* proc,
-            const struct MKDIR3args*,
-            const struct MKDIR3res*) { account(proc); }
-    virtual void symlink3(const struct RPCProcedure* proc,
-            const struct SYMLINK3args*,
-            const struct SYMLINK3res*) { account(proc); }
-    virtual void mknod3(const struct RPCProcedure* proc,
-            const struct MKNOD3args*,
-            const struct MKNOD3res*) { account(proc); }
-    virtual void remove3(const struct RPCProcedure* proc,
-            const struct REMOVE3args*,
-            const struct REMOVE3res*) { account(proc); }
-    virtual void rmdir3(const struct RPCProcedure* proc,
-            const struct RMDIR3args*,
-            const struct RMDIR3res*) { account(proc); }
-    virtual void rename3(const struct RPCProcedure* proc,
-            const struct RENAME3args*,
-            const struct RENAME3res*) { account(proc); }
-    virtual void link3(const struct RPCProcedure* proc,
-            const struct LINK3args*,
-            const struct LINK3res*) { account(proc); }
-    virtual void readdir3(const struct RPCProcedure* proc,
-            const struct READDIR3args*,
-            const struct READDIR3res*) { account(proc); }
-    virtual void readdirplus3(const struct RPCProcedure* proc,
-            const struct READDIRPLUS3args*,
-            const struct READDIRPLUS3res*) { account(proc); }
-    virtual void fsstat3(const struct RPCProcedure* proc,
-            const struct FSSTAT3args*,
-            const struct FSSTAT3res*) { account(proc); }
-    virtual void fsinfo3(const struct RPCProcedure* proc,
-            const struct FSINFO3args*,
-            const struct FSINFO3res*) { account(proc); }
-    virtual void pathconf3(const struct RPCProcedure* proc,
-            const struct PATHCONF3args*,
-            const struct PATHCONF3res*) { account(proc); }
-    virtual void commit3(const struct RPCProcedure* proc,
-            const struct COMMIT3args*,
-            const struct COMMIT3res*) { account(proc); }
-*/
 
-     void null(const struct RPCProcedure* proc,
-            const struct rpcgen::NULL3args*,
-            const struct rpcgen::NULL3res*) override final { account(proc); } 
-     void getattr3(const struct RPCProcedure* proc,
-            const struct rpcgen::GETATTR3args*,
-            const struct rpcgen::GETATTR3res*) override final { account(proc); }
-     void setattr3(const struct RPCProcedure* proc,
-            const struct rpcgen::SETATTR3args*,
-            const struct rpcgen::SETATTR3res*) override final { account(proc); }
-     void lookup3(const struct RPCProcedure* proc,
-            const struct rpcgen::LOOKUP3args*,
-            const struct rpcgen::LOOKUP3res*) override final { account(proc); }
-     void access3(const struct RPCProcedure* proc,
-            const struct rpcgen::ACCESS3args*,
-            const struct rpcgen::ACCESS3res*) override final { account(proc); }
-     void readlink3(const struct RPCProcedure* proc,
-            const struct rpcgen::READLINK3args*,
-            const struct rpcgen::READLINK3res*) override final { account(proc); }
-     void read3(const struct RPCProcedure* proc,
-            const struct rpcgen::READ3args*,
-            const struct rpcgen::READ3res*) override final { account(proc); }
-     void write3(const struct RPCProcedure* proc,
-            const struct rpcgen::WRITE3args*,
-            const struct rpcgen::WRITE3res*) override final { account(proc); }
-     void create3(const struct RPCProcedure* proc,
-            const struct rpcgen::CREATE3args*,
-            const struct rpcgen::CREATE3res*) override final { account(proc); }
-     void mkdir3(const struct RPCProcedure* proc,
-            const struct rpcgen::MKDIR3args*,
-            const struct rpcgen::MKDIR3res*) override final { account(proc); }
-     void symlink3(const struct RPCProcedure* proc,
-            const struct rpcgen::SYMLINK3args*,
-            const struct rpcgen::SYMLINK3res*) override final { account(proc); }
-     void mknod3(const struct RPCProcedure* proc,
-            const struct rpcgen::MKNOD3args*,
-            const struct rpcgen::MKNOD3res*) override final { account(proc); }
-     void remove3(const struct RPCProcedure* proc,
-            const struct rpcgen::REMOVE3args*,
-            const struct rpcgen::REMOVE3res*) override final { account(proc); }
-     void rmdir3(const struct RPCProcedure* proc,
-            const struct rpcgen::RMDIR3args*,
-            const struct rpcgen::RMDIR3res*) override final { account(proc); }
-     void rename3(const struct RPCProcedure* proc,
-            const struct rpcgen::RENAME3args*,
-            const struct rpcgen::RENAME3res*) override final { account(proc); }
-     void link3(const struct RPCProcedure* proc,
-            const struct rpcgen::LINK3args*,
-            const struct rpcgen::LINK3res*) override final { account(proc); }
-     void readdir3(const struct RPCProcedure* proc,
-            const struct rpcgen::READDIR3args*,
-            const struct rpcgen::READDIR3res*) override final { account(proc); }
-     void readdirplus3(const struct RPCProcedure* proc,
-            const struct rpcgen::READDIRPLUS3args*,
-            const struct rpcgen::READDIRPLUS3res*) override final { account(proc); }
-     void fsstat3(const struct RPCProcedure* proc,
-            const struct rpcgen::FSSTAT3args*,
-            const struct rpcgen::FSSTAT3res*) override final { account(proc); }
-     void fsinfo3(const struct RPCProcedure* proc,
-            const struct rpcgen::FSINFO3args*,
-            const struct rpcgen::FSINFO3res*) override final { account(proc); }
-     void pathconf3(const struct RPCProcedure* proc,
-            const struct rpcgen::PATHCONF3args*,
-            const struct rpcgen::PATHCONF3res*) override final { account(proc); }
-     void commit3(const struct RPCProcedure* proc,
-            const struct rpcgen::COMMIT3args*,
-            const struct rpcgen::COMMIT3res*) override final { account(proc); }
+    void null(const struct RPCProcedure* proc,
+              const struct rpcgen::NULL3args*,
+              const struct rpcgen::NULL3res*) override final { account(proc); } 
+    void getattr3(const struct RPCProcedure* proc,
+                  const struct rpcgen::GETATTR3args*,
+                  const struct rpcgen::GETATTR3res*) override final { account(proc); }
+    void setattr3(const struct RPCProcedure* proc,
+                  const struct rpcgen::SETATTR3args*,
+                  const struct rpcgen::SETATTR3res*) override final { account(proc); }
+    void lookup3(const struct RPCProcedure* proc,
+                 const struct rpcgen::LOOKUP3args*,
+                 const struct rpcgen::LOOKUP3res*) override final { account(proc); }
+    void access3(const struct RPCProcedure* proc,
+                 const struct rpcgen::ACCESS3args*,
+                 const struct rpcgen::ACCESS3res*) override final { account(proc); }
+    void readlink3(const struct RPCProcedure* proc,
+                   const struct rpcgen::READLINK3args*,
+                   const struct rpcgen::READLINK3res*) override final { account(proc); }
+    void read3(const struct RPCProcedure* proc,
+               const struct rpcgen::READ3args*,
+               const struct rpcgen::READ3res*) override final { account(proc); }
+    void write3(const struct RPCProcedure* proc,
+                const struct rpcgen::WRITE3args*,
+                const struct rpcgen::WRITE3res*) override final { account(proc); }
+    void create3(const struct RPCProcedure* proc,
+                 const struct rpcgen::CREATE3args*,
+                 const struct rpcgen::CREATE3res*) override final { account(proc); }
+    void mkdir3(const struct RPCProcedure* proc,
+                const struct rpcgen::MKDIR3args*,
+                const struct rpcgen::MKDIR3res*) override final { account(proc); }
+    void symlink3(const struct RPCProcedure* proc,
+                 const struct rpcgen::SYMLINK3args*,
+                 const struct rpcgen::SYMLINK3res*) override final { account(proc); }
+    void mknod3(const struct RPCProcedure* proc,
+                const struct rpcgen::MKNOD3args*,
+                const struct rpcgen::MKNOD3res*) override final { account(proc); }
+    void remove3(const struct RPCProcedure* proc,
+                 const struct rpcgen::REMOVE3args*,
+                 const struct rpcgen::REMOVE3res*) override final { account(proc); }
+    void rmdir3(const struct RPCProcedure* proc,
+                const struct rpcgen::RMDIR3args*,
+                const struct rpcgen::RMDIR3res*) override final { account(proc); }
+    void rename3(const struct RPCProcedure* proc,
+                 const struct rpcgen::RENAME3args*,
+                 const struct rpcgen::RENAME3res*) override final { account(proc); }
+    void link3(const struct RPCProcedure* proc,
+               const struct rpcgen::LINK3args*,
+               const struct rpcgen::LINK3res*) override final { account(proc); }
+    void readdir3(const struct RPCProcedure* proc,
+                  const struct rpcgen::READDIR3args*,
+                  const struct rpcgen::READDIR3res*) override final { account(proc); }
+    void readdirplus3(const struct RPCProcedure* proc,
+                      const struct rpcgen::READDIRPLUS3args*,
+                      const struct rpcgen::READDIRPLUS3res*) override final { account(proc); }
+    void fsstat3(const struct RPCProcedure* proc,
+                 const struct rpcgen::FSSTAT3args*,
+                 const struct rpcgen::FSSTAT3res*) override final { account(proc); }
+    void fsinfo3(const struct RPCProcedure* proc,
+                 const struct rpcgen::FSINFO3args*,
+                 const struct rpcgen::FSINFO3res*) override final { account(proc); }
+    void pathconf3(const struct RPCProcedure* proc,
+                   const struct rpcgen::PATHCONF3args*,
+                   const struct rpcgen::PATHCONF3res*) override final { account(proc); }
+    void commit3(const struct RPCProcedure* proc,
+                 const struct rpcgen::COMMIT3args*,
+                 const struct rpcgen::COMMIT3res*) override final { account(proc); }
 
-     void null(const struct RPCProcedure* proc,
-            const struct rpcgen::NULL4args*,
-            const struct rpcgen::NULL4res*) override final { account(proc); }
-     void compound4(const struct RPCProcedure*  proc,
-            const struct rpcgen::COMPOUND4args* args,
-            const struct rpcgen::COMPOUND4res*  res) override final { account(proc, args, res); }
+    void null(const struct RPCProcedure* proc,
+              const struct rpcgen::NULL4args*,
+              const struct rpcgen::NULL4res*) override final { account(proc); }
+    void compound4(const struct RPCProcedure*  proc,
+                   const struct rpcgen::COMPOUND4args*,
+                   const struct rpcgen::COMPOUND4res*  res) override final { account(proc, res); }
 
     virtual void flush_statistics()
     {
@@ -440,7 +379,7 @@ public:
                  }
                  session.str("");
                  session << it.first;
-                 print_per_session(current, session.str(), s_total,NFS_V3);
+                 print_per_session(current, session.str(), s_total, NFS_V3);
                  std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
                  store_per_session(file, current, session.str(), s_total, NFS_V3);
              }
@@ -490,32 +429,21 @@ public:
  
     }
 
-    void store_per_session(std::ostream& file, const Breakdown& breakdown, const std::string& session, uint64_t s_total, unsigned int nfs_version) const
+    void store_per_session(std::ostream& file, const Breakdown& breakdown, const std::string& session, uint64_t s_total, unsigned int nfs_vers) const
     {
         file << "Session: " << session << std::endl;
 
         unsigned int op_count {0};
-        switch(nfs_version)
-        {
-        case NFS_V3:
-            op_count = ProcEnumNFS3::count;
-        break;
-        case NFS_V4:        
-            op_count = ProcEnumNFS4::count;
-        break;
-        }
+
+        if(nfs_vers == NFS_V3) op_count = ProcEnumNFS3::count;
+        if(nfs_vers == NFS_V4) op_count = ProcEnumNFS4::count;
 
         for(int i = 0; i < op_count; ++i)
         {
-            switch(nfs_version)
-            {
-            case NFS_V3:
-                file << static_cast<ProcEnumNFS3::NFSProcedure>(i) << ' ';
-            break;
-            case NFS_V4:        
+            if(nfs_vers == NFS_V3)
                 file << static_cast<ProcEnumNFS4::NFSProcedure>(i) << ' ';
-            break;
-            }
+            if(nfs_vers == NFS_V4)
+                file << static_cast<ProcEnumNFS3::NFSProcedure>(i) << ' ';
             file << breakdown[i].get_count() << ' ';
             file << ((T)(breakdown[i].get_count()) / s_total) * 100 << ' ';
             file << to_sec<T>(breakdown[i].get_min()) << ' ';
@@ -525,34 +453,23 @@ public:
         }
     }
 
-    void print_per_session(const Breakdown& breakdown, const std::string& session, uint64_t s_total, unsigned int nfs_version) const
+    void print_per_session(const Breakdown& breakdown, const std::string& session, uint64_t s_total, unsigned int nfs_vers) const
     {
         out << "Session: " << session << std::endl;
 
         unsigned int op_count {0};
-        switch(nfs_version)
-        {
-        case NFS_V3:
-            op_count = ProcEnumNFS3::count;
-        break;
-        case NFS_V4:        
-            op_count = ProcEnumNFS4::count;
-        break;
-        }
+
+        if(nfs_vers == NFS_V3) op_count = ProcEnumNFS3::count;
+        if(nfs_vers == NFS_V4) op_count = ProcEnumNFS4::count;
 
         out << "Total: " << s_total << ". Per operation:" << std::endl;
         for(int i = 0; i < op_count; ++i)
         {
             out.width(22);
-            switch(nfs_version)
-            {
-            case NFS_V3:
+            if(nfs_vers == NFS_V3)
                 out << std::left << static_cast<ProcEnumNFS3::NFSProcedure>(i);
-            break;
-            case NFS_V4:        
+            if(nfs_vers == NFS_V4)
                 out << std::left << static_cast<ProcEnumNFS4::NFSProcedure>(i);
-            break;
-            }
             out.width(6);
             out << " Count:";
             out.width(5);
@@ -577,58 +494,48 @@ public:
     }
 
 private:
-    void account(const struct RPCProcedure* proc, const struct rpcgen::COMPOUND4args* args = nullptr, const struct rpcgen::COMPOUND4res* res = nullptr)
+    void account(const struct RPCProcedure* proc, const struct rpcgen::COMPOUND4res* res = nullptr)
     {
         typename PerOpStat::const_iterator i;
         const u_int nfs_proc = proc->rpc_call.ru.RM_cmb.cb_proc;
         const u_int nfs_vers = proc->rpc_call.ru.RM_cmb.cb_vers;
-        switch(nfs_vers)
+        timeval latency{0,0};
+
+        // diff between 'reply' and 'call' timestamps
+        timersub(proc->rtimestamp, proc->ctimestamp, &latency);
+
+        if(nfs_vers == NFS_V4)
         {
-        case NFS_V4:
             ++nfs4_total;
             ++nfs4_ops_count[nfs_proc];
-
-            if(args)
-            {
-/*
-                u_int array_size = args->argarray.argarray_len;
-                nfs4_total += array_size;
-                const u_int array_element_size = sizeof(rpcgen::nfs_argop4);
-
-                rpcgen::nfs_argop4* current_element = args->argarray.argarray_val;
-                for(int i=0;i<array_size;++i)
-                {
-                    u_int nfs_oper = current_element->argop;
-                    std::cout << "nfs_op: " << nfs_oper << "\t";
-                    if(nfs_oper == ProcEnumNFS4::NFSProcedure::ILLEGAL) nfs_oper = ProcEnumNFS4::count;
-                    ++nfs4_ops_count[nfs_oper];
-                    current_element += array_element_size;
-                }
-*/
-            }
-            if(res)
-            {
-/*
-                u_int array_size = res->resarray.resarray_len;
-                nfs4_total += array_size;
-                for(int i=0;i<array_size;i++)
-                {
-                }
-*/
-            }
 
             i = nfs4_per_op_stat.find(*(proc->session));
             if(i == nfs4_per_op_stat.end())
             {
                 std::pair<typename PerOpStat::iterator, bool> session_res = nfs4_per_op_stat.insert(Pair(*(proc->session), reinterpret_cast<Breakdown*>(new Breakdown)));
-                if(session_res.second == false)
-                {
-                    return;
-                }
+                if(session_res.second == false) return;
                 i = session_res.first;
             }
-            break;
-        case NFS_V3:
+
+            if(res)
+            {
+                nfs4_total += res->resarray.resarray_len;
+
+                rpcgen::nfs_resop4* current_el = res->resarray.resarray_val;
+                for(int j=0; j<(res->resarray.resarray_len); j++, current_el++)
+                {
+                    u_int nfs_oper = current_el->resop;
+                    if(nfs_oper == ProcEnumNFS4::NFSProcedure::ILLEGAL) nfs_oper = 2;
+                    ++nfs4_ops_count[nfs_oper];
+
+                    Latencies<T, Algorithm>& lat_oper = (*i->second)[nfs_oper];
+                    lat_oper.add(latency);
+                }
+            }
+        }
+
+        if(nfs_vers == NFS_V3)
+        {
             ++nfs3_total;
             ++nfs3_ops_count[nfs_proc];
 
@@ -636,20 +543,14 @@ private:
             if(i == nfs3_per_op_stat.end())
             {
                 std::pair<typename PerOpStat::iterator, bool> session_res = nfs3_per_op_stat.insert(Pair(*(proc->session), reinterpret_cast<Breakdown*>(new Breakdown)));
-                if(session_res.second == false)
-                {
-                    return;
-                }
+                if(session_res.second == false) return;
                 i = session_res.first;
             }
-            break;
         }
 
-        timeval latency;
-        timersub(proc->rtimestamp, proc->ctimestamp, &latency); // diff between 'reply' and 'call' timestamps
+        Latencies<T, Algorithm>& lat_proc = (*i->second)[nfs_proc];
+        lat_proc.add(latency);
 
-        Latencies<T, Algorithm>& lat = (*i->second)[nfs_proc];
-        lat.add(latency);
     }
     uint64_t nfs3_total;
     std::vector<int> nfs3_ops_count;
@@ -680,7 +581,7 @@ IAnalyzer* create(const char* optarg)
     const char* token[] = {
         "ACC",
         "MEM",
-        NULL
+         NULL
     };
 
     char* value = NULL;
