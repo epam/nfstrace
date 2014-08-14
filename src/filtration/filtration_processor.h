@@ -468,9 +468,9 @@ public:
         static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
         const RecordMark* rm;
 
-        if(collection) // collection is allocated
+        if(collection && (collection.size() > 0)) // collection is allocated and partially filled.
         {
-            const uint32_t tocopy = max_header-collection.size();
+            const uint32_t tocopy = max_header - collection.size();
 
             if(info.dlen < tocopy)
             {
@@ -515,7 +515,6 @@ public:
         if(rm->fragment_len() > 0 && validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
         {
             assert(msg_len != 0);   // message is found
-
             const uint32_t written = collection.size();
             if(written != 0) // a message was partially written to collection
             {
@@ -523,7 +522,7 @@ public:
                 msg_len -= written;
                 if(hdr_len != 0) // we want to collect header of this RPC message
                 {
-                assert( (hdr_len - written) <  hdr_len );
+                    assert((hdr_len - written) <  hdr_len);
                     hdr_len -= written;
                 }
             }
@@ -549,7 +548,6 @@ public:
                 if(RPCValidator::check(call))
                 {
                     msg_len = len;   // length of current RPC message
-
                     if(NFS3::Validator::check(call))
                     {
                         hdr_len = std::min(msg_len, max_hdr);
@@ -592,7 +590,6 @@ public:
             }
             break;
         }
-
         return false;
     }
 
