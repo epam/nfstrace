@@ -522,7 +522,7 @@ public:
                 msg_len -= written;
                 if(hdr_len != 0) // we want to collect header of this RPC message
                 {
-                    assert( (hdr_len - written) <  hdr_len );
+                    assert((hdr_len - written) <  hdr_len);
                     hdr_len -= written;
                 }
             }
