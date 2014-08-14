@@ -408,7 +408,7 @@ public:
     void push(PacketInfo& info)
     {
         assert(info.dlen != 0);
-        
+
         while(info.dlen) // loop over data in packet
         {
             if(msg_len != 0)    // we are on-stream and we are looking to some message
