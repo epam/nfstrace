@@ -468,7 +468,7 @@ public:
         static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
         const RecordMark* rm;
 
-        if(collection && (collection.size() > 0)) // collection is allocated and filled by data
+        if(collection && (collection.size() > 0)) // collection is allocated and partially filled.
         {
             const uint32_t tocopy = max_header - collection.size();
 
