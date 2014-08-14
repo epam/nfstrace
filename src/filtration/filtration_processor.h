@@ -317,10 +317,6 @@ public:
                     return true;
                 }
             }
-            else
-            {
-                reader.reset();
-            }
 
             return false;
         }
@@ -472,13 +468,8 @@ public:
         static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
         const RecordMark* rm;
 
-        if(collection) // collection is allocated
+        if(collection && (collection.size() > 0)) // collection is allocated
         {
-            if(max_header <= collection.size()) //check for incorrect collection size
-            {
-                info.dlen = 0;//if size incorrect - we lose this packet but other will be captured OK
-                return;
-            }
             const uint32_t tocopy = max_header - collection.size();
 
             if(info.dlen < tocopy)
@@ -524,8 +515,8 @@ public:
         if(rm->fragment_len() > 0 && validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
         {
             assert(msg_len != 0);   // message is found
-            const uint32_t written = collection.size();
 
+            const uint32_t written = collection.size();
             if(written != 0) // a message was partially written to collection
             {
                 assert( (msg_len - written) <  msg_len );
