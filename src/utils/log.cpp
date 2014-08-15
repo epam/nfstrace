@@ -27,6 +27,12 @@
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
+#include "out.h"
+
+#ifndef LOG_PATH
+#define LOG_PATH "/tmp/nfstrace"
+#endif
 
 #include "utils/log.h"
 //------------------------------------------------------------------------------
@@ -47,6 +53,13 @@ namespace utils
 static FILE* log_file = nullptr;
 static bool  own_file = false;
 
+std::string get_pid()
+{
+    char buff[8]={"\0"};
+    sprintf(buff,"%d",getpid());
+    return std::string(buff);
+}
+
 Log::Global::Global(const std::string& path)
 {
     if(log_file != nullptr)
@@ -61,18 +74,43 @@ Log::Global::Global(const std::string& path)
         return;
     }
 
-    FILE* file = fopen(path.c_str(), "w");
+    struct stat s;
+    if (stat(LOG_PATH, &s))//check destination folder exists
+    {
+        if(mkdir(LOG_PATH,ALLPERMS))//create directory fot nfs logs
+        {
+            throw std::runtime_error{"Logger can not create log directory: " + std::string(LOG_PATH)};
+        }
+        if(utils::Out message{})
+        {
+            message << "Add log folder: " << std::string(LOG_PATH);
+        }
+    }
+
+    std::string tmp(std::string(LOG_PATH) + "/" + path + ".log");
+    FILE* file = fopen(tmp.c_str(), "w");
     if(file == NULL)
     {
         throw std::runtime_error{"Logger can not open file for write: " + path};
     }
 
-    chmod(path.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
+    chmod(tmp.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
 
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
     {
         fclose(file);
-        throw std::runtime_error{"File: " + path + " opened in another thread"};
+        tmp = std::string(LOG_PATH) + "/" + path + "-" + get_pid() + ".log";
+        file = fopen(tmp.c_str(), "w");
+        if(file == NULL)
+        {
+            throw std::runtime_error{"Logger can not open file for write: " + path};
+        }
+        chmod(tmp.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
+        if(flock(fileno(file), LOCK_EX | LOCK_NB))
+        {
+            fclose(file);
+            throw std::runtime_error{"Can't lock log file: " + tmp};
+        }
     }
 
     log_file = file;

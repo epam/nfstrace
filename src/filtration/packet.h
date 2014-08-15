@@ -286,6 +286,29 @@ struct PacketInfo
 
     // Packet transmission direction, set after match packet to session
     Direction                  direction;
+
+    struct Dumped//marker of dumped packet
+    {
+    public:
+        inline Dumped() : dumped{false} {}
+        inline Dumped(const Dumped& in) : dumped{in.dumped} {}
+        ~Dumped(){}
+        inline operator bool() const { return dumped; }
+
+        inline void set() const { dumped = true; }
+        inline void reset() const { dumped = false; }
+
+    private:
+        inline Dumped& operator=(const Dumped& in)
+        {
+            if(this == &in) return *this;
+            this->dumped = in.dumped;
+            return *this;
+        }
+
+        mutable bool dumped;
+
+    } IsDumped;
 };
 
 // PCAP packet in dynamic allocated memory
@@ -326,6 +349,8 @@ struct Packet: public PacketInfo
         fragment->data  = packet + (info.data - info.packet);
         fragment->dlen  = info.dlen;
         fragment->direction = info.direction;
+
+        fragment->IsDumped.reset();
 
         fragment->next  = next;
 

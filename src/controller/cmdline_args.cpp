@@ -21,9 +21,12 @@
 //------------------------------------------------------------------------------
 #include "controller/cmdline_args.h"
 //------------------------------------------------------------------------------
-#define LIVE "live"
-#define DUMP "dump"
-#define STAT "stat"
+
+#define LIVE  "live"
+#define DUMP  "dump"
+#define STAT  "stat"
+#define DRAIN "drain"
+
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -32,14 +35,15 @@ namespace controller
 namespace cmdline
 {
 
-const char* const Args::profiling_mode = LIVE;
-const char* const Args::dumping_mode   = DUMP;
-const char* const Args::analysis_mode  = STAT;
+const char* const Args::profiling_mode    = LIVE;
+const char* const Args::dumping_mode      = DUMP;
+const char* const Args::analysis_mode     = STAT;
+const char* const Args::draining_mode     = DRAIN;
 
 // This array will be indexed via elements of Args::Names enumeration. Keep it in the same order.
 Opt Args::options[Args::num] =
 {
-    {'m', "mode",       Opt::REQ, LIVE,                  "set runing mode",                                          LIVE "|" DUMP "|" STAT,   nullptr, false},
+    {'m', "mode",       Opt::REQ, LIVE,                  "set runing mode",                                DRAIN "|" LIVE "|" DUMP "|" STAT,   nullptr, false},
     {'i', "interface",  Opt::REQ, "PCAP-DEFAULT",        "listen interface, it is required for " LIVE " and " DUMP " modes", "INTERFACE",      nullptr, false},
     {'f', "filtration", Opt::REQ, "port 2049",           "a packet filtration in libpcap BPF syntax",                        "BPF",            nullptr, false},
     {'s', "snaplen",    Opt::REQ, "65535",               "max length of raw captured packet. May be used ONLY FOR UDP",      "0..65535",       nullptr, false},
