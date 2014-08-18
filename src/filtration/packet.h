@@ -50,6 +50,22 @@ struct PacketInfo
 {
     using Direction = NST::utils::Session::Direction;
 
+    class Dumped // marker of dumped packet
+    {
+        friend class Dumping;
+        friend class Packet;
+
+    public:
+        Dumped() : flag{false}{};
+        Dumped(const Dumped& in)     = delete;
+        ~Dumped(){};
+
+    private:
+        inline operator bool() const { return flag; }
+        inline void operator=(const bool stat) { flag = stat; }
+        bool flag;
+    };
+
     inline PacketInfo(const pcap_pkthdr* h, const uint8_t* p, const uint32_t datalink)
     : header   {h}
     , packet   {p}
@@ -285,22 +301,7 @@ struct PacketInfo
     // Packet transmission direction, set after match packet to session
     Direction                  direction;
 
-    struct Dumped // marker of dumped packet
-    {
-    private:
-        friend class Dumping;
-        friend class Packet;
-
-    public:
-        Dumped() : dumped{false}{};
-        Dumped(const Dumped& in)     = delete;
-        ~Dumped(){};
-
-    private:
-        inline operator bool() const { return dumped; }
-        inline void operator=(const bool in) const { dumped = in; }
-        mutable bool dumped;
-    } IsDumped;
+    mutable Dumped dumped;                 // flag for dumped packet
 };
 
 // PCAP packet in dynamic allocated memory
@@ -341,7 +342,7 @@ struct Packet: public PacketInfo
         fragment->data  = packet + (info.data - info.packet);
         fragment->dlen  = info.dlen;
         fragment->direction = info.direction;
-        fragment->IsDumped = false;
+        fragment->dumped = false;
 
         fragment->next  = next;
 
