@@ -84,12 +84,12 @@ public:
 
         inline void push(const PacketInfo& info, const uint32_t len)
         {
-            if(!info.IsDumped)  // if this packet not dumped yet
+            if(!info.dumped)  // if this packet not dumped yet
             {
                 last = info.header->ts;
                 // direct dumping without waiting completeness of analysis and complete() call
                 dumper->dump(info.header, info.packet);
-                info.IsDumped = true;  // set marker of damped packet
+                info.dumped = true;  // set marker of damped packet
             }
             else
             {
