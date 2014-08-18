@@ -29,11 +29,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "out.h"
-
-#ifndef LOG_PATH
-#define LOG_PATH "/tmp/nfstrace"
-#endif
-
 #include "utils/log.h"
 //------------------------------------------------------------------------------
 /*  http://www.unix.org/whitepapers/reentrant.html
@@ -52,6 +47,7 @@ namespace utils
 
 static FILE* log_file = nullptr;
 static bool  own_file = false;
+const static std::string LOG_PATH("/tmp/nfstracer");
 
 std::string get_pid()
 {
@@ -75,47 +71,34 @@ Log::Global::Global(const std::string& path)
     }
 
     struct stat s;
-    if (stat(LOG_PATH, &s))//check destination folder exists
+    if (stat(LOG_PATH.c_str(), &s)) // check destination folder exists
     {
-        if(mkdir(LOG_PATH,ALLPERMS))//create directory fot nfs logs
+        if(mkdir(LOG_PATH.c_str(),ALLPERMS))//create directory fot nfs logs
         {
-            throw std::runtime_error{"Logger can not create log directory: " + std::string(LOG_PATH)};
+            throw std::runtime_error{"Logger can not create log directory: " + LOG_PATH};
         }
         if(utils::Out message{})
         {
-            message << "Add log folder: " << std::string(LOG_PATH);
+            message << "Add log folder: " << LOG_PATH;
         }
     }
 
-    std::string tmp(std::string(LOG_PATH) + "/" + path + ".log");
-    FILE* file = fopen(tmp.c_str(), "w");
-    if(file == NULL)
+    std::string tmp(LOG_PATH + "/" + path + ".log");
+    FILE* file = this->verifyFile(tmp);
+    if(file == nullptr)
     {
-        throw std::runtime_error{"Logger can not open file for write: " + path};
-    }
-
-    chmod(tmp.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
-
-    if(flock(fileno(file), LOCK_EX | LOCK_NB))
-    {
-        fclose(file);
-        tmp = std::string(LOG_PATH) + "/" + path + "-" + get_pid() + ".log";
-        file = fopen(tmp.c_str(), "w");
-        if(file == NULL)
+        tmp = LOG_PATH + "/" + path + "-" + get_pid() + ".log";
+        file = this->verifyFile(tmp);
+        if(file == nullptr)
         {
             throw std::runtime_error{"Logger can not open file for write: " + path};
-        }
-        chmod(tmp.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
-        if(flock(fileno(file), LOCK_EX | LOCK_NB))
-        {
-            fclose(file);
-            throw std::runtime_error{"Can't lock log file: " + tmp};
         }
     }
 
     log_file = file;
     own_file = true;
 }
+
 Log::Global::~Global()
 {
     if(own_file)
@@ -123,6 +106,22 @@ Log::Global::~Global()
         flock(fileno(log_file), LOCK_UN);
         fclose(log_file);
     }
+}
+
+FILE* Log::Global::verifyFile(const std::string& file_name)
+{
+    FILE* file = fopen(file_name.c_str(), "w");
+    if(file == nullptr)
+    {
+        return nullptr;
+    }
+    chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
+    if(flock(fileno(file), LOCK_EX | LOCK_NB))
+    {
+        fclose(file);
+        return nullptr;
+    }
+    return file;
 }
 
 Log::Log()
@@ -133,6 +132,7 @@ Log::Log()
     std::ostream::init(static_cast<std::stringbuf*>(this));
     std::ostream::put('\n');
 }
+
 Log::~Log()
 {
     size_t len = pptr() - pbase();

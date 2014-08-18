@@ -76,7 +76,6 @@ struct PacketInfo
     void  operator delete  (void*) = delete;   // only on stack
     void  operator delete[](void*) = delete;   // only on stack
 
-
     inline void check_eth()
     {
         if(dlen < sizeof(EthernetHeader)) return;
@@ -287,27 +286,16 @@ struct PacketInfo
     // Packet transmission direction, set after match packet to session
     Direction                  direction;
 
-    struct Dumped//marker of dumped packet
+    struct Dumped // marker of dumped packet
     {
-    public:
-        inline Dumped() : dumped{false} {}
-        inline Dumped(const Dumped& in) : dumped{in.dumped} {}
-        ~Dumped(){}
+        Dumped() : dumped{false}{};
+        Dumped(const Dumped& in)     = delete;
+        ~Dumped(){};
         inline operator bool() const { return dumped; }
-
-        inline void set() const { dumped = true; }
-        inline void reset() const { dumped = false; }
+        inline void operator=(const bool in) const { dumped = in; }
 
     private:
-        inline Dumped& operator=(const Dumped& in)
-        {
-            if(this == &in) return *this;
-            this->dumped = in.dumped;
-            return *this;
-        }
-
         mutable bool dumped;
-
     } IsDumped;
 };
 
@@ -349,8 +337,7 @@ struct Packet: public PacketInfo
         fragment->data  = packet + (info.data - info.packet);
         fragment->dlen  = info.dlen;
         fragment->direction = info.direction;
-
-        fragment->IsDumped.reset();
+        fragment->IsDumped = false;
 
         fragment->next  = next;
 
