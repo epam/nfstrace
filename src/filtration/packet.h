@@ -45,7 +45,6 @@ using namespace NST::protocols::ip;
 using namespace NST::protocols::tcp;
 using namespace NST::protocols::udp;
 
-
 // Structure of pointers to captured pcap packet's headers. WITHOUT data.
 struct PacketInfo
 {
@@ -288,13 +287,18 @@ struct PacketInfo
 
     struct Dumped // marker of dumped packet
     {
+    private:
+        friend class Dumping;
+        friend class Packet;
+
+    public:
         Dumped() : dumped{false}{};
         Dumped(const Dumped& in)     = delete;
         ~Dumped(){};
-        inline operator bool() const { return dumped; }
-        inline void operator=(const bool in) const { dumped = in; }
 
     private:
+        inline operator bool() const { return dumped; }
+        inline void operator=(const bool in) const { dumped = in; }
         mutable bool dumped;
     } IsDumped;
 };
