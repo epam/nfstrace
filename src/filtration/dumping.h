@@ -89,7 +89,7 @@ public:
                 last = info.header->ts;
                 // direct dumping without waiting completeness of analysis and complete() call
                 dumper->dump(info.header, info.packet);
-                info.IsDumped.set();//set marker of damped packet
+                info.IsDumped = true;//set marker of damped packet
             }
             else
             {
