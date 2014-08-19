@@ -20,17 +20,13 @@
 */
 //------------------------------------------------------------------------------
 #include <cstdarg>
-#include <cstdio>
-#include <iostream>
-#include <stdexcept>
-#include <unistd.h>
+#include <cerrno>
 #include <system_error>
-#include <errno.h>
-#include <cstring>
 
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "utils/log.h"
 #include "utils/out.h"
@@ -60,13 +56,15 @@ static FILE* try_open(const std::string& file_name)
     FILE* file = fopen(file_name.c_str(), "w");
     if(file == nullptr)
     {
-        throw std::runtime_error("File " + file_name + " open error. Error code: " + std::string(strerror(errno)));
+        throw std::system_error(errno, std::system_category(),
+                               "Error in open file.");
     }
     chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
     {
         fclose(file);
-        throw std::runtime_error("File " + file_name + " lock error. Error code: " + std::string(strerror(errno)));
+        throw std::system_error(errno, std::system_category(),
+                               "Log file alredy locked");
     }
     return file;
 }
@@ -78,7 +76,8 @@ Log::Global::Global(const std::string& path)
     const std::string log_path{"/tmp/nfstrace"};
     if(log_file != nullptr)
     {
-        throw std::runtime_error{"Global Logger already have been created"};
+        throw std::system_error{errno, std::system_category(),
+            "Empty programm name."};
     }
 
     // default is stderr
@@ -93,7 +92,8 @@ Log::Global::Global(const std::string& path)
     {
         if(mkdir(log_path.c_str(), ALLPERMS)) // create directory for nfs logs
         {
-            throw std::runtime_error{"Logger can not create log directory: " + log_path + ". Error code: " + std::string(strerror(errno))};
+            throw std::system_error{errno, std::system_category(),
+                "Can't create log directory."};
         }
     }
     std::string tmp{log_path + "/" + path + ".log"};
@@ -102,7 +102,7 @@ Log::Global::Global(const std::string& path)
     {
         file = try_open(tmp);
     }
-    catch(std::runtime_error& err)
+    catch(std::system_error& err)
     {
         tmp = log_path + "/" + path + "-" + std::to_string(getpid()) + ".log";
         file = try_open(tmp);
