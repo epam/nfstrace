@@ -50,6 +50,7 @@ namespace NST
 {
 namespace utils
 {
+
 class Log : private std::stringbuf, public std::ostream
 {
 public:
