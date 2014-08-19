@@ -23,7 +23,6 @@
 #include <cstdio>
 #include <cerrno>
 #include <iostream>
-#include <string>
 #include <system_error>
 
 #include <sys/file.h>
@@ -53,6 +52,13 @@ static bool  own_file = false;
 
 namespace // unnanmed
 {
+
+static std::string get_pid()
+{
+    char buff[8]={"\0"};
+    sprintf(buff,"%d",getpid());
+    return std::string(buff);
+}
 
 static FILE* try_open(const std::string& file_name)
 {
@@ -107,7 +113,7 @@ Log::Global::Global(const std::string& path)
     }
     catch(std::system_error& err)
     {
-        tmp = log_path + "/" + path + "-" + std::to_string(getpid()) + ".log";
+        tmp = log_path + "/" + path + "-" + get_pid() + ".log";
         file = try_open(tmp);
     }
     if(utils::Out message{})
