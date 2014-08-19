@@ -20,7 +20,9 @@
 */
 //------------------------------------------------------------------------------
 #include <cstdarg>
+#include <cstdio>
 #include <cerrno>
+#include <iostream>
 #include <system_error>
 
 #include <sys/file.h>
