@@ -79,12 +79,14 @@ file (WRITE ${check_pcapbz2}
 "exit $?"
 )
 
+# script for processing of cmpress .pcap.bz by DRAIN mode and precessing result with STAT mode and verification result by diff with default
 set (check_drain ${CMAKE_BINARY_DIR}/check-compressed-drane.sh)
 file (WRITE ${check_drain}
 "bzcat \"$1\" | ./${PROJECT_NAME} --mode=drain -I - -O - -v 0 | ./${PROJECT_NAME} --mode=stat -a ./analyzers/libbreakdown.so -I - -v 0 >\"$2\"\n"
 "diff -uN \"$3\" \"$2\"\n"
 "exit $?"
 )
+
 # add test for each .pcap.bz2 trace
 file (GLOB traces "traces/*.pcap.bz2")
 foreach (trace ${traces})
@@ -95,6 +97,5 @@ foreach (trace ${traces})
     add_test (NAME  Stat:${name}
               COMMAND sh ${check_pcapbz2} ${trace} ${result} ${reference} )
     add_test (NAME Drain:${name}
-              COMMAND sh ${check_drain} ${trace} ${result} ${reference} )
+              COMMAND sh ${check_drain}   ${trace} ${result} ${reference} )
 endforeach ()
-
