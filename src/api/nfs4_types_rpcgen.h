@@ -1709,8 +1709,8 @@ extern bool_t xdr_nfs_client_id4 (XDR *, nfs_client_id4*);
 extern bool_t xdr_open_owner4 (XDR *, open_owner4*);
 extern bool_t xdr_lock_owner4 (XDR *, lock_owner4*);
 extern bool_t xdr_nfs_lock_type4 (XDR *, nfs_lock_type4*);
-extern bool_t xdr_NULL4args (XDR *, NULL4args*); // handmade for compatibility
-extern bool_t xdr_NULL4res (XDR *, NULL4res*); // handmade for compatibility
+extern bool_t xdr_NULL4args (XDR *, NULL4args*); // for compatibility
+extern bool_t xdr_NULL4res (XDR *, NULL4res*);   // for compatibility
 extern bool_t xdr_ACCESS4args (XDR *, ACCESS4args*);
 extern bool_t xdr_ACCESS4resok (XDR *, ACCESS4resok*);
 extern bool_t xdr_ACCESS4res (XDR *, ACCESS4res*);

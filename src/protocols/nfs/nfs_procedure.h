@@ -65,7 +65,7 @@ public:
         {
             xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
             xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call);
-            //throw xdr::XDRDecoderError{"XDRDecoder: cann't read call arguments"};
+            throw xdr::XDRDecoderError{"XDRDecoder: cann't read call arguments"};
         }
 
         rpc_reply.ru.RM_rmb.ru.RP_ar.ru.AR_results.proc = &r.return_true;
@@ -105,10 +105,10 @@ public:
 
     inline ~NFSProcedure()
     {
-        if(pres) xdr_free((xdrproc_t)proc_t_of(res), (char*)&res);
-                 xdr_free((xdrproc_t)xdr_replymsg, (char*)&rpc_reply);
-                 xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
-                 xdr_free((xdrproc_t)xdr_callmsg, (char*)&rpc_call);
+        if(pres) xdr_free((xdrproc_t)proc_t_of(res), (char*)&res      );
+                 xdr_free((xdrproc_t)xdr_replymsg,   (char*)&rpc_reply);
+                 xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg      );
+                 xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call );
     }
 
     // pointers to procedure specific argument and result

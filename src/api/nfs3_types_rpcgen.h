@@ -29,7 +29,7 @@ namespace rpcgen
 
 extern "C" {
 
-/* delete
+/* conflicts
 #define NFS3_FHSIZE 64
 #define NFS3_COOKIEVERFSIZE 8
 #define NFS3_CREATEVERFSIZE 8
@@ -263,12 +263,12 @@ struct diropargs3 {
 };
 typedef struct diropargs3 diropargs3;
 
-// handmade for compatibility
+// for compatibility
 struct NULL3args
 {
 };
 
-// handmade for compatibility
+// for compatibility
 struct NULL3res
 {
 };
@@ -350,7 +350,7 @@ struct LOOKUP3res {
     } LOOKUP3res_u;
 };
 typedef struct LOOKUP3res LOOKUP3res;
-/* conflict with handmade enum
+/* conflicts with handmade enum
 #define ACCESS3_READ 0x0001
 #define ACCESS3_LOOKUP 0x0002
 #define ACCESS3_MODIFY 0x0004
@@ -1002,8 +1002,8 @@ extern  bool_t xdr_set_atime (XDR *, set_atime*);
 extern  bool_t xdr_set_mtime (XDR *, set_mtime*);
 extern  bool_t xdr_sattr3 (XDR *, sattr3*);
 extern  bool_t xdr_diropargs3 (XDR *, diropargs3*);
-extern  bool_t xdr_NULL3args (XDR *, NULL3args*); // handmade for compatibility
-extern  bool_t xdr_NULL3res (XDR *, NULL3res*); // handmade for compatibility
+extern  bool_t xdr_NULL3args (XDR *, NULL3args*); // for compatibility
+extern  bool_t xdr_NULL3res (XDR *, NULL3res*);   // for compatibility
 extern  bool_t xdr_GETATTR3args (XDR *, GETATTR3args*);
 extern  bool_t xdr_GETATTR3resok (XDR *, GETATTR3resok*);
 extern  bool_t xdr_GETATTR3res (XDR *, GETATTR3res*);

@@ -73,6 +73,8 @@ struct ProcEnumNFS4
         RELEASE_LOCKOWNER   = 39,
         GET_DIR_DELEGATION  = 40,
         ILLEGAL             = 10044
+        // Pleause, keep in mind that in all cases we suppose that NFSv4
+        // operation ILLEGAL(10044) has the second position in ProcEnumNFS4
     };
     static const int32_t count = 41;
 };

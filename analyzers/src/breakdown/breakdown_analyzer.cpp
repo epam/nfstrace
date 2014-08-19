@@ -91,8 +91,8 @@ public:
     }
 
 private:
-    TwoPassVariance(const TwoPassVariance&); //Undefined
-    void operator=(const TwoPassVariance&);  //Undefined
+    TwoPassVariance(const TwoPassVariance&) = delete;
+    void operator=(const TwoPassVariance&)  = delete;
 
     uint32_t count;
     std::list<timeval> latencies;
@@ -127,8 +127,8 @@ public:
     }
 
 private:
-    OnlineVariance(const OnlineVariance&); //Undefined
-    void operator=(const OnlineVariance&); //Undefined
+    OnlineVariance(const OnlineVariance&) = delete;
+    void operator=(const OnlineVariance&) = delete;
 
     uint32_t count;
     T st_dev;
@@ -158,8 +158,8 @@ public:
     const timeval& get_max()    const { return max; }
 
 private:
-    Latencies(const Latencies&);      // Undefined
-    void operator=(const Latencies&); // Undefined
+    Latencies     (const Latencies&) = delete;
+    void operator=(const Latencies&) = delete;
 
     void set_range(const timeval& t)
     {
@@ -196,8 +196,8 @@ public:
     }
 
 private:
-    BreakdownCounter(const BreakdownCounter& breakdown); //Undefined
-    void operator=  (const BreakdownCounter&);           //Undefined
+    BreakdownCounter(const BreakdownCounter&) = delete;
+    void operator=  (const BreakdownCounter&) = delete;
 
     Latencies<T, Algorithm> latencies[ProcEnumNFS4::count];
 };
@@ -250,19 +250,14 @@ public:
                                                      out(o) { }
     virtual ~BreakdownAnalyzer()
     {
-        typename PerOpStat::iterator   i = nfs3_per_op_stat.begin();
-        typename PerOpStat::iterator end = nfs3_per_op_stat.end();
-        for(; i != end;)
+        for(auto& i: nfs3_per_op_stat)
         {
-            delete i->second;
-            i = nfs3_per_op_stat.erase(i);
+            delete i.second;
         }
-        i   = nfs4_per_op_stat.begin();
-        end = nfs4_per_op_stat.end();
-        for(; i != end;)
+
+        for(auto& i: nfs4_per_op_stat)
         {
-            delete i->second;
-            i = nfs4_per_op_stat.erase(i);
+            delete i.second;
         }
     }
 
@@ -512,7 +507,7 @@ private:
             i = nfs4_per_op_stat.find(*(proc->session));
             if(i == nfs4_per_op_stat.end())
             {
-                std::pair<typename PerOpStat::iterator, bool> session_res = nfs4_per_op_stat.insert(Pair(*(proc->session), reinterpret_cast<Breakdown*>(new Breakdown)));
+                std::pair<typename PerOpStat::iterator, bool> session_res = nfs4_per_op_stat.insert(Pair(*(proc->session), new Breakdown));
                 if(session_res.second == false) return;
                 i = session_res.first;
             }
@@ -524,6 +519,8 @@ private:
                 rpcgen::nfs_resop4* current_el = res->resarray.resarray_val;
                 for(int j=0; j<(res->resarray.resarray_len); j++, current_el++)
                 {
+                    // In all cases we suppose, that NFSv4 operation ILLEGAL(10044)
+                    // has the second position in ProcEnumNFS4
                     u_int nfs_oper = current_el->resop;
                     if(nfs_oper == ProcEnumNFS4::NFSProcedure::ILLEGAL) nfs_oper = 2;
                     ++nfs4_ops_count[nfs_oper];
@@ -542,7 +539,7 @@ private:
             i = nfs3_per_op_stat.find(*(proc->session));
             if(i == nfs3_per_op_stat.end())
             {
-                std::pair<typename PerOpStat::iterator, bool> session_res = nfs3_per_op_stat.insert(Pair(*(proc->session), reinterpret_cast<Breakdown*>(new Breakdown)));
+                std::pair<typename PerOpStat::iterator, bool> session_res = nfs3_per_op_stat.insert(Pair(*(proc->session), new Breakdown));
                 if(session_res.second == false) return;
                 i = session_res.first;
             }
