@@ -30,6 +30,7 @@
 #include <unistd.h>
 
 #include "utils/log.h"
+#include "utils/out.h"
 //------------------------------------------------------------------------------
 /*  http://www.unix.org/whitepapers/reentrant.html
     The POSIX.1 and C-language functions that operate on character streams
