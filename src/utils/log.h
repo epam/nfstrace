@@ -50,7 +50,6 @@ namespace NST
 {
 namespace utils
 {
-
 class Log : private std::stringbuf, public std::ostream
 {
 public:
@@ -62,8 +61,6 @@ public:
         ~Global();
         Global(const Global&)            = delete;
         Global& operator=(const Global&) = delete;
-    private:
-        FILE* verifyFile(const std::string& file_name);
     };
 
     Log();
