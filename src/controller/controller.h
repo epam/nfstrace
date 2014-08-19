@@ -72,10 +72,10 @@ public:
 
 private:
 
-    // initializer for global logger
-    utils::Log::Global glog;
     // initializer for global outptut
     utils::Out::Global gout;
+    // initializer for global logger
+    utils::Log::Global glog;
 
     // storage for exceptions
     RunningStatus status;

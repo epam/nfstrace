@@ -132,6 +132,24 @@ void FiltrationManager::add_online_dumping(const Parameters& params)
     threads.emplace_back(create_thread(reader, writer, status));
 }
 
+//capture data from input file or cin to destination file
+void FiltrationManager::add_offline_dumping (const Parameters& params)
+{
+    std::unique_ptr<FileReader> reader { new FileReader{params.input_file()} };
+
+    auto& dumping_params = params.dumping_params();
+    if(utils::Out message{}) // print parameters to user
+    {
+        message << *reader.get();
+    }
+    std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),
+                                                         dumping_params
+                                                       }
+                                          };
+
+    threads.emplace_back(create_thread(reader, writer, status));
+}
+
 // capture from network interface and pass to queue - OnlineAnalysis(Profiling)
 void FiltrationManager::add_online_analysis(const Parameters& params,
                                             FilteredDataQueue& queue)
@@ -147,9 +165,8 @@ void FiltrationManager::add_offline_analysis(const std::string& ifile,
                                              FilteredDataQueue& queue)
 {
     std::unique_ptr<FileReader> reader { new FileReader{ifile} };
-
+    if(utils::Out message{}) // print parameters to user
     {
-        utils::Out message; // print parameters to user
         message << *reader.get();
     }
     std::unique_ptr<Queueing>   writer { new Queueing{queue}   };
