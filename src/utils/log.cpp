@@ -56,15 +56,15 @@ static FILE* try_open(const std::string& file_name)
     FILE* file = fopen(file_name.c_str(), "w");
     if(file == nullptr)
     {
-        throw std::system_error(errno, std::system_category(),
-                               "Error in opening file.");
+        throw std::system_error{errno, std::system_category(),
+                               "Error in opening file."};
     }
     chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
     {
         fclose(file);
-        throw std::system_error(errno, std::system_category(),
-                               "Log file already locked");
+        throw std::system_error{errno, std::system_category(),
+                               "Log file already locked"};
     }
     return file;
 }
