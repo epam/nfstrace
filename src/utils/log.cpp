@@ -51,12 +51,6 @@ static bool  own_file = false;
 
 namespace // unnanmed
 {
-//static std::string get_pid()
-//{
-//    char buff[8] = {"\0"};
-//    sprintf(buff,"%d",getpid());
-//    return std::string{buff};
-//}
 
 static FILE* try_open(const std::string& file_name)
 {
@@ -78,7 +72,7 @@ static FILE* try_open(const std::string& file_name)
 
 Log::Global::Global(const std::string& path)
 {
-    const std::string LOG_PATH{"/tmp/nfstrace"};
+    const std::string log_path{"/tmp/nfstrace"};
     if(log_file != nullptr)
     {
         throw std::runtime_error{"Global Logger already have been created"};
@@ -92,18 +86,18 @@ Log::Global::Global(const std::string& path)
     }
 
     struct stat s;
-    if (stat(LOG_PATH.c_str(), &s)) // check destination folder exists
+    if (stat(log_path.c_str(), &s)) // check destination folder exists
     {
-        if(mkdir(LOG_PATH.c_str(), ALLPERMS)) // create directory for nfs logs
+        if(mkdir(log_path.c_str(), ALLPERMS)) // create directory for nfs logs
         {
-            throw std::runtime_error{"Logger can not create log directory: " + LOG_PATH};
+            throw std::runtime_error{"Logger can not create log directory: " + log_path};
         }
     }
-    std::string tmp{LOG_PATH + "/" + path + ".log"};
+    std::string tmp{log_path + "/" + path + ".log"};
     FILE* file = try_open(tmp);
     if(file == nullptr)
     {
-        tmp = LOG_PATH + "/" + path + "-" + std::to_string(getpid()) + ".log";
+        tmp = log_path + "/" + path + "-" + std::to_string(getpid()) + ".log";
         file = try_open(tmp);
         if(file == nullptr)
         {
@@ -112,7 +106,7 @@ Log::Global::Global(const std::string& path)
     }
     if(utils::Out message{})
     {
-        message << "Log folder: " << LOG_PATH;
+        message << "Log folder: " << log_path;
     }
 
     log_file = file;
