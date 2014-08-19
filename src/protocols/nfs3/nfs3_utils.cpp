@@ -19,8 +19,6 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <cassert>
-
 #include "protocols/nfs3/nfs3_utils.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::xdr;

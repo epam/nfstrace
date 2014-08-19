@@ -26,7 +26,6 @@
 //------------------------------------------------------------------------------
 #include "nfs3_types.h"
 #include "nfs3_types_rpcgen.h"
-#include "nfs4_types.h"
 #include "nfs4_types_rpcgen.h"
 #include "rpc_procedure.h"
 //------------------------------------------------------------------------------
