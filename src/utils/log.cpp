@@ -64,7 +64,7 @@ static FILE* try_open(const std::string& file_name)
     {
         fclose(file);
         throw std::system_error(errno, std::system_category(),
-                               "Log file alredy locked");
+                               "Log file already locked");
     }
     return file;
 }
@@ -77,7 +77,7 @@ Log::Global::Global(const std::string& path)
     if(log_file != nullptr)
     {
         throw std::system_error{errno, std::system_category(),
-            "Empty programm name."};
+            "Empty program name."};
     }
 
     // default is stderr
