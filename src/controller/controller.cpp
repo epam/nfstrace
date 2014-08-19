@@ -58,8 +58,8 @@ Controller::Running::~Running()
 }
 
 Controller::Controller(const Parameters& params) try
-    : glog       {params.program_name()}
-    , gout       {utils::Out::Level(params.verbose_level())}
+    : gout       {utils::Out::Level(params.verbose_level())}
+    , glog       {params.program_name()}
     , signals    {status}
     , analysis   {}
     , filtration {new FiltrationManager{status}}
