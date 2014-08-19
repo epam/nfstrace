@@ -23,11 +23,14 @@
 #include <cstdio>
 #include <iostream>
 #include <stdexcept>
+#include <unistd.h>
+#include <system_error>
+#include <errno.h>
+#include <cstring>
 
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 
 #include "utils/log.h"
 #include "utils/out.h"
@@ -57,13 +60,13 @@ static FILE* try_open(const std::string& file_name)
     FILE* file = fopen(file_name.c_str(), "w");
     if(file == nullptr)
     {
-        return nullptr;
+        throw std::runtime_error("File " + file_name + " open error. Error code: " + std::string(strerror(errno)));
     }
     chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
     {
         fclose(file);
-        return nullptr;
+        throw std::runtime_error("File " + file_name + " lock error. Error code: " + std::string(strerror(errno)));
     }
     return file;
 }
@@ -86,23 +89,23 @@ Log::Global::Global(const std::string& path)
     }
 
     struct stat s;
-    if (stat(log_path.c_str(), &s)) // check destination folder exists
+    if (stat(log_path.c_str(), &s))           // check destination folder exists
     {
         if(mkdir(log_path.c_str(), ALLPERMS)) // create directory for nfs logs
         {
-            throw std::runtime_error{"Logger can not create log directory: " + log_path};
+            throw std::runtime_error{"Logger can not create log directory: " + log_path + ". Error code: " + std::string(strerror(errno))};
         }
     }
     std::string tmp{log_path + "/" + path + ".log"};
-    FILE* file = try_open(tmp);
-    if(file == nullptr)
+    FILE* file=nullptr;
+    try
+    {
+        file = try_open(tmp);
+    }
+    catch(std::runtime_error& err)
     {
         tmp = log_path + "/" + path + "-" + std::to_string(getpid()) + ".log";
         file = try_open(tmp);
-        if(file == nullptr)
-        {
-            throw std::runtime_error{"Logger can not open file for write: " + path};
-        }
     }
     if(utils::Out message{})
     {
