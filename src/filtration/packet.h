@@ -53,7 +53,7 @@ struct PacketInfo
     class Dumped // marker of dumped packet
     {
         friend class Dumping;
-        friend class Packet;
+        friend struct Packet;
 
     public:
         Dumped() : flag{false}{};
