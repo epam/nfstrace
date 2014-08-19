@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <cerrno>
 #include <iostream>
+#include <string>
 #include <system_error>
 
 #include <sys/file.h>
