@@ -57,7 +57,7 @@ static FILE* try_open(const std::string& file_name)
     if(file == nullptr)
     {
         throw std::system_error(errno, std::system_category(),
-                               "Error in open file.");
+                               "Error in opening file.");
     }
     chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
