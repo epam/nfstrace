@@ -58,8 +58,8 @@ Controller::Running::~Running()
 }
 
 Controller::Controller(const Parameters& params) try
-    : glog       {params.program_name() + ".log"}
-    , gout       {utils::Out::Level(params.verbose_level())}
+    : gout       {utils::Out::Level(params.verbose_level())}
+    , glog       {params.program_name()}
     , signals    {status}
     , analysis   {}
     , filtration {new FiltrationManager{status}}
@@ -84,6 +84,11 @@ Controller::Controller(const Parameters& params) try
 
             filtration->add_offline_analysis(params.input_file(),
                                              analysis->get_queue());
+        }
+        break;
+        case RunningMode::Draining:
+        {
+            filtration->add_offline_dumping(params);
         }
         break;
     }
@@ -130,10 +135,10 @@ void droproot(const std::string& dropuser)
     {
         if(utils::Out message{})
         {
-            message << "Note: It's potentionally unsafe to run this program as root "
+            message << "Note: It's potentially unsafe to run this program as root "
                     << "without dropping root privileges.\n"
                     << "Note: Use -Z=username option for dropping root privileges "
-                    << "when you run this program as user with root priviliges.";
+                    << "when you run this program as user with root privileges.";
         }
         return;
     }

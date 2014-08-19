@@ -189,7 +189,10 @@ RunningMode Parameters::running_mode() const
     {
         return RunningMode::Analysis;
     }
-
+    else if(mode.is(CLI::draining_mode))
+    {
+        return RunningMode::Draining;
+    }
     throw cmdline::CLIError{std::string{"Unknown mode: "} + mode.to_cstr()};
 }
 

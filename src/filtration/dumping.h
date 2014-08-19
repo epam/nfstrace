@@ -26,8 +26,6 @@
 #include <memory>
 #include <string>
 
-#include <sys/time.h>
-
 #include "filtration/packet.h"
 #include "filtration/pcap/handle.h"
 #include "filtration/pcap/packet_dumper.h"
@@ -50,13 +48,11 @@ public:
         : dumper {nullptr}
         {
             reset();
-            timerclear(&last);
         }
         inline Collection(Dumping* d, utils::NetworkSession* /*unused*/)
         : dumper {d}
         {
             reset();
-            timerclear(&last);
         }
         inline ~Collection()
         {
@@ -84,15 +80,15 @@ public:
 
         inline void push(const PacketInfo& info, const uint32_t len)
         {
-            if(timercmp(&last, &info.header->ts, !=)) // timestamps aren't equal
+            if(info.dumped)  // if this packet not dumped yet
             {
-                last = info.header->ts;
-                // direct dumping without waiting completeness of analysis and complete() call
-                dumper->dump(info.header, info.packet);
+                TRACE("The packet was collected before");
             }
             else
             {
-                TRACE("The packet was collected before");
+                // direct dumping without waiting completeness of analysis and complete() call
+                dumper->dump(info.header, info.packet);
+                info.dumped = true;  // set marker of damped packet
             }
 
             // copy payload
@@ -118,7 +114,6 @@ public:
         Dumping* dumper;
         uint8_t payload[4096];
         uint32_t payload_len;
-        struct  timeval last;   // use timestamp as unique ID of last packet
     };
 
     struct Params
