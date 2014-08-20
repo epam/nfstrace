@@ -2,12 +2,16 @@ cmake_minimum_required (VERSION 2.8.10)
 project (nfstrace)
 
 # check compiler and packages ==================================================
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")   # require at least gcc 4.8
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
-        message (FATAL_ERROR "GCC version must be at least 4.8!")
+        message (FATAL_ERROR "GCC version must be at least 4.8")
+    endif ()
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.3)
+        message (FATAL_ERROR "Clang version must be at least 3.3")
     endif ()
 else ()
-    message (WARNING "Compilation has only been tested with GCC 4.8")
+    message (WARNING "Compilation by ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} isn't tested")
 endif ()
 
 find_package(Threads REQUIRED) # POSIX Threads
@@ -20,7 +24,7 @@ set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
 set (NST_V_MAJOR "0")
 set (NST_V_MINOR "2")
-set (NST_V_PATCH "0")
+set (NST_V_PATCH "2")
 set (NST_VERSION "${NST_V_MAJOR}.${NST_V_MINOR}.${NST_V_PATCH}")
 set (NST_VERSION_FULL "${PROJECT_NAME} ${NST_VERSION} (${CMAKE_BUILD_TYPE})")
 
@@ -94,8 +98,8 @@ foreach (trace ${traces})
     get_filename_component (path ${trace} PATH)
     set (result ${CMAKE_BINARY_DIR}/Testing/Temporary/${name}.res)
     set (reference ${path}/references/${name}.ref)
-    add_test (NAME  Stat:${name}
+    add_test (NAME  stat:${name}
               COMMAND sh ${check_pcapbz2} ${trace} ${result} ${reference} )
-    add_test (NAME Drain:${name}
+    add_test (NAME drain:${name}
               COMMAND sh ${check_drain}   ${trace} ${result} ${reference} )
 endforeach ()
