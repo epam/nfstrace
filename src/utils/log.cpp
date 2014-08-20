@@ -55,8 +55,8 @@ namespace // unnanmed
 
 static std::string get_pid()
 {
-    char buff[8]={"\0"};
-    sprintf(buff,"%d",getpid());
+    char buff[8]={'\0'};
+    sprintf(buff,"%ld",(long)getpid());
     return std::string(buff);
 }
 
