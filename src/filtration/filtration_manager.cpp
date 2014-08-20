@@ -135,9 +135,18 @@ void FiltrationManager::add_online_dumping(const Parameters& params)
 //capture data from input file or cin to destination file
 void FiltrationManager::add_offline_dumping (const Parameters& params)
 {
-    std::unique_ptr<FileReader> reader { new FileReader{params.input_file()} };
-
     auto& dumping_params = params.dumping_params();
+    auto& ofile = dumping_params.output_file;
+    auto  ifile = params.input_file();
+    if(ofile.compare("-"))
+    {
+        if(!(ifile).compare(ofile))
+        {
+            throw std::runtime_error("Input and output files are equal. Use the -I and -O options to setup them explicitly.");
+        }
+    }
+    std::unique_ptr<FileReader> reader { new FileReader{ifile} };
+
     if(utils::Out message{}) // print parameters to user
     {
         message << *reader.get();
