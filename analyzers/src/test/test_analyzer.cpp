@@ -199,8 +199,7 @@ private:
     std::string options;
 };
 
-extern "C"
-{
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
 
 const char* usage()
 {
@@ -216,7 +215,4 @@ void destroy(IAnalyzer* instance)
 {
     delete instance;
 }
-
-}
-//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------

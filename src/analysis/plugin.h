@@ -42,9 +42,10 @@ protected:
     Plugin(const Plugin&)            = delete;
     Plugin& operator=(const Plugin&) = delete;
 
-    plugin_usage_func   usage;
-    plugin_create_func  create;
-    plugin_destroy_func destroy;
+    plugin_get_entry_points_func get_entry_points;
+    plugin_usage_func            usage;
+    plugin_create_func           create;
+    plugin_destroy_func          destroy;
 };
 
 class PluginInstance : private Plugin
