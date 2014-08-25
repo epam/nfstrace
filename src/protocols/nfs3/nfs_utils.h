@@ -19,6 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
+//------------------------------------------------------------------------------
 #ifndef NFS_UTILS_H
 #define NFS_UTILS_H
 //------------------------------------------------------------------------------
@@ -782,6 +784,7 @@ inline XDRReader& operator>>(XDRReader& in, COMMIT3res& o)
 }
 
 extern"C"
+NST_PUBLIC
 void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);
 
 std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc);

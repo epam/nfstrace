@@ -19,6 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
+//------------------------------------------------------------------------------
 #ifndef SESSIONS_H
 #define SESSIONS_H
 //------------------------------------------------------------------------------
@@ -62,6 +64,7 @@ private:
 };
 
 extern "C"
+NST_PUBLIC
 void print_session(std::ostream& out, const Session& session);
 
 std::ostream& operator<<(std::ostream& out, const Session& session);

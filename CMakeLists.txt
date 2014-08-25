@@ -19,8 +19,7 @@ find_package(Threads REQUIRED) # POSIX Threads
 #find_package(PCAP REQUIRED) # libpcap
 
 # build application ============================================================
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC")
-set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC -fvisibility=hidden")
 
 set (NST_V_MAJOR "0")
 set (NST_V_MINOR "2")
@@ -35,6 +34,8 @@ set  (LIBS  ${CMAKE_DL_LIBS}            # libdl with dlopen()
             pcap                        # libpcap
             )
 
+configure_file(src/api/plugin_api.h.in
+               ${PROJECT_SOURCE_DIR}/src/api/plugin_api.h)
 configure_file(src/controller/build_info.h.in
                ${PROJECT_SOURCE_DIR}/src/controller/build_info.h)
 

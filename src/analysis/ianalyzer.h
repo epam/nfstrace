@@ -33,10 +33,10 @@ namespace analysis
 using IAnalyzer = NST::API::IAnalyzer;
 
 // functions exported from pluggable analysis module
-using plugin_usage_func   = decltype(&usage);   // return description of expected opts for plugin_create_func()
-using plugin_create_func  = decltype(&create);  // create and return an instance of module
-using plugin_destroy_func = decltype(&destroy); // destroy an instance of module
-
+using plugin_get_entry_points_func = decltype(&get_entry_points);
+using plugin_usage_func            = decltype(&usage);   // return description of expected opts for plugin_create_func()
+using plugin_create_func           = decltype(&create);  // create and return an instance of module
+using plugin_destroy_func          = decltype(&destroy); // destroy an instance of module
 } // namespace analysis
 } // namespace NST
 //------------------------------------------------------------------------------

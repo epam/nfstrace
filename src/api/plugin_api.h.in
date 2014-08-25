@@ -23,6 +23,14 @@
 #ifndef PLUGIN_API_H
 #define PLUGIN_API_H
 //------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
+#define NST_PLUGIN_ENTRY_POINTS(U, C, D) \
+const plugin_entry_points* get_entry_points() \
+{ \
+    static const plugin_entry_points entry_points {NST_PLUGIN_API_VERSION, sizeof(plugin_entry_points), U, C, D }; \
+    return &entry_points; \
+}
+//------------------------------------------------------------------------------
 #include <iostream>
 
 #include "fh.h"
@@ -31,9 +39,11 @@
 //------------------------------------------------------------------------------
 using namespace NST::API;
 //------------------------------------------------------------------------------
+struct plugin_entry_points;
 extern "C"
 {
 // THESE CALLS MUST BE IMPLEMENTED BY Pluggable Analysis Module
+NST_PUBLIC const plugin_entry_points* get_entry_points(); // return ptr's for plugin functions 
 const char* usage  ();    // return description of expected opts for create(opts)
 IAnalyzer*  create (const char*    opts); // create and return an instance of an Analyzer
 void        destroy(IAnalyzer* instance); // destroy created instance of an Analyzer
@@ -55,6 +65,19 @@ inline std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure 
     print_nfs3_procedures(out, proc);
     return out;
 }
+
+constexpr uint32_t NST_PLUGIN_API_VERSION =
+    @NST_V_MAJOR@ * 1000 + @NST_V_MINOR@ * 100 + @NST_V_PATCH@;
+
+struct plugin_entry_points
+{
+    const uint32_t vers;
+    const size_t   size;
+    const char*    (*usage)();
+    IAnalyzer*     (*create)(const char*);
+    void           (*destroy)(IAnalyzer*);
+};
+
 //------------------------------------------------------------------------------
 #endif //PLUGIN_API_H
 //------------------------------------------------------------------------------

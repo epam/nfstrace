@@ -332,8 +332,7 @@ OFWSAnalyzer::Iterator OFWSAnalyzer::find_or_create_op_counter(const nfs_fh3& ke
     return i;
 }
 
-extern "C"
-{
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
 
 const char* usage()
 {
@@ -348,7 +347,5 @@ IAnalyzer* create(const char* /*opts*/)
 void destroy(IAnalyzer* instance)
 {
     delete instance;
-}
-
 }
 //------------------------------------------------------------------------------

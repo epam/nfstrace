@@ -164,8 +164,7 @@ OFDWSAnalyzer::Iterator OFDWSAnalyzer::get_file_rw_op(const nfs_fh3& key)
     return i;
 }
 
-extern "C"
-{
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
 
 const char* usage()
 {
@@ -220,7 +219,5 @@ IAnalyzer* create(const char* optarg)
 void destroy(IAnalyzer* instance)
 {
     delete instance;
-}
-
 }
 //------------------------------------------------------------------------------
