@@ -25,6 +25,8 @@
 #include "utils/out.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis
@@ -76,6 +78,7 @@ std::ostream& print_nfs_fh3(std::ostream& out, const nfs_fh3& fh)
 }
 
 extern "C"
+NST_PUBLIC
 void print_nfs_fh3(std::ostream& out, const FH& fh)
 {
     print_nfs_fh3(out, fh.data, fh.len);

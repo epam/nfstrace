@@ -30,6 +30,8 @@
 #include "protocols/xdr/xdr_reader.h"
 #include "protocols/rpc/rpc_header.h"
 //------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace protocols
@@ -782,6 +784,7 @@ inline XDRReader& operator>>(XDRReader& in, COMMIT3res& o)
 }
 
 extern"C"
+NST_PUBLIC
 void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);
 
 std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc);

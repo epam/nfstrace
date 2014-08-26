@@ -301,7 +301,7 @@ void OFWSAnalyzer::flush_statistics()
     out << "FileHandle" << ",NFS Ops";
     for(int32_t j = 0; j < ProcEnum::count; ++j)
     {
-        out << ',' << static_cast<ProcEnum::NFSProcedure>(j);
+        print_nfs3_procedures(out << ',', static_cast<ProcEnum::NFSProcedure>(j));
     }
     out << '\n';
 
@@ -350,5 +350,7 @@ void destroy(IAnalyzer* instance)
     delete instance;
 }
 
-}
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
+
+}//extern "C"
 //------------------------------------------------------------------------------
