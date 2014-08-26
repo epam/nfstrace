@@ -31,6 +31,7 @@
 //------------------------------------------------------------------------------
 #define NST_PUBLIC __attribute__ ((visibility("default")))
 #define NST_PLUGIN_ENTRY_POINTS(U, C, D) \
+__attribute__ ((visibility("default"))) \
 const plugin_entry_points* get_entry_points() \
 { \
     static const plugin_entry_points entry_points {NST_PLUGIN_API_VERSION, sizeof(plugin_entry_points), U, C, D }; \
@@ -40,24 +41,18 @@ const plugin_entry_points* get_entry_points() \
 using namespace NST::API;
 //------------------------------------------------------------------------------
 struct plugin_entry_points;
+
 extern "C"
 {
-// THESE CALLS MUST BE IMPLEMENTED BY Pluggable Analysis Module
-NST_PUBLIC
-const plugin_entry_points* get_entry_points(); // return ptr's for plugin functions 
-const char* usage  ();    // return description of expected opts for create(opts)
-IAnalyzer*  create (const char*    opts); // create and return an instance of an Analyzer
-void        destroy(IAnalyzer* instance); // destroy created instance of an Analyzer
-
 // These calls implemented by nfstrace
 void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);
 void print_session(std::ostream& out, const Session& session);
 }
 
-using plugin_get_entry_points_func = decltype(&get_entry_points);
-using plugin_usage_func            = decltype(&usage);
-using plugin_create_func           = decltype(&create);
-using plugin_destroy_func          = decltype(&destroy);
+using plugin_usage_func   = const char* (*)();
+using plugin_create_func  = IAnalyzer*  (*)(const char*);
+using plugin_destroy_func = void        (*)(IAnalyzer*);
+using plugin_get_entry_points_func = const plugin_entry_points* (*)();
 
 struct plugin_entry_points
 {
