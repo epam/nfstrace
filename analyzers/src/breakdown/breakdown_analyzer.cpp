@@ -444,7 +444,8 @@ private:
     std::ostream& out;
 };
 
-NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
+extern "C"
+{
 
 const char* usage()
 {
@@ -491,4 +492,8 @@ void destroy(IAnalyzer* instance)
 {
     delete instance;
 }
+
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
+
+}//extern "C"
 //------------------------------------------------------------------------------
