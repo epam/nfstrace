@@ -33,14 +33,12 @@
 #include "utils/log.h"
 #include "utils/out.h"
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
-//------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
 
-class NST_PUBLIC ControllerError : public std::runtime_error
+class ControllerError : public std::runtime_error
 {
 public:
     explicit ControllerError(const std::string& msg) : std::runtime_error{msg} { }

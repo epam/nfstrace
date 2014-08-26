@@ -42,6 +42,7 @@ Plugin::Plugin(const std::string& path)
     {
         switch(entry_points->vers)
         {
+        case NST_PLUGIN_API_VERSION:
         default:
         usage   = entry_points->usage;
         create  = entry_points->create;
