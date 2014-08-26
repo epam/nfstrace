@@ -36,13 +36,13 @@ Plugin::Plugin(const std::string& path)
     , destroy{nullptr}
 {
     load_address_of("get_entry_points", get_entry_points);
-    const plugin_entry_points* const entry_points = get_entry_points();
+    const auto& entry_points = get_entry_points();
 
     if(entry_points)
     {
         switch(entry_points->vers)
         {
-        case 202:
+        default:
         usage   = entry_points->usage;
         create  = entry_points->create;
         destroy = entry_points->destroy;

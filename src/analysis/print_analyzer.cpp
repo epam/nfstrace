@@ -19,12 +19,13 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
 #include "analysis/print_analyzer.h"
 #include "protocols/nfs3/nfs_utils.h"
 #include "protocols/rpc/rpc_utils.h"
 #include "utils/out.h"
 #include "utils/sessions.h"
+//------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -77,7 +78,8 @@ std::ostream& print_nfs_fh3(std::ostream& out, const nfs_fh3& fh)
 }
 
 extern "C"
-NST_PUBLIC void print_nfs_fh3(std::ostream& out, const FH& fh)
+NST_PUBLIC
+void print_nfs_fh3(std::ostream& out, const FH& fh)
 {
     print_nfs_fh3(out, fh.data, fh.len);
 }

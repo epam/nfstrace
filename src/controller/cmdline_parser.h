@@ -31,6 +31,8 @@
 
 #include <getopt.h>
 //------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
@@ -38,7 +40,7 @@ namespace controller
 namespace cmdline
 {
 
-class CLIError : public std::runtime_error
+class NST_PUBLIC CLIError : public std::runtime_error
 {
 public:
     explicit CLIError(const std::string& msg) : std::runtime_error{msg} { }
