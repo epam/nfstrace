@@ -19,7 +19,7 @@ find_package(Threads REQUIRED) # POSIX Threads
 #find_package(PCAP REQUIRED) # libpcap
 
 # build application ============================================================
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC -fvisibility=hidden")
 set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
 set (NST_V_MAJOR "0")
@@ -35,6 +35,8 @@ set  (LIBS  ${CMAKE_DL_LIBS}            # libdl with dlopen()
             pcap                        # libpcap
             )
 
+configure_file(src/api/plugin_api.h.in
+               ${PROJECT_SOURCE_DIR}/src/api/plugin_api.h)
 configure_file(src/controller/build_info.h.in
                ${PROJECT_SOURCE_DIR}/src/controller/build_info.h)
 
@@ -42,11 +44,11 @@ add_executable        (${PROJECT_NAME} ${SRCS})
 target_link_libraries (${PROJECT_NAME} ${LIBS})
 
 # build analyzers ==============================================================
-add_library (breakdown    SHARED analyzers/src/breakdown/breakdown_analyzer.cpp)
-add_library (ofws         SHARED analyzers/src/ofws/ofws_analyzer.cpp)
-add_library (ofdws        SHARED analyzers/src/ofdws/ofdws_analyzer.cpp
+add_library (breakdown    MODULE analyzers/src/breakdown/breakdown_analyzer.cpp)
+add_library (ofws         MODULE analyzers/src/ofws/ofws_analyzer.cpp)
+add_library (ofdws        MODULE analyzers/src/ofdws/ofdws_analyzer.cpp
                                  analyzers/src/ofdws/file_rw_op.cpp)
-add_library (testanalyzer SHARED analyzers/src/test/test_analyzer.cpp)
+add_library (testanalyzer MODULE analyzers/src/test/test_analyzer.cpp)
 set_target_properties (breakdown ofws ofdws testanalyzer
                        PROPERTIES LIBRARY_OUTPUT_DIRECTORY "analyzers")
 

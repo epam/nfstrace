@@ -26,35 +26,46 @@
 #include <iostream>
 
 #include "fh.h"
-#include "ianalyzer_type.h"
+#include "ianalyzer.h"
 #include "nfs3_types.h"
+//------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
+#define NST_PLUGIN_ENTRY_POINTS(U, C, D) \
+__attribute__ ((visibility("default"))) \
+const plugin_entry_points* get_entry_points() \
+{ \
+    static const plugin_entry_points entry_points {NST_PLUGIN_API_VERSION, sizeof(plugin_entry_points), U, C, D }; \
+    return &entry_points; \
+}
 //------------------------------------------------------------------------------
 using namespace NST::API;
 //------------------------------------------------------------------------------
+struct plugin_entry_points;
+
 extern "C"
 {
-// THESE CALLS MUST BE IMPLEMENTED BY Pluggable Analysis Module
-const char* usage  ();    // return description of expected opts for create(opts)
-IAnalyzer*  create (const char*    opts); // create and return an instance of an Analyzer
-void        destroy(IAnalyzer* instance); // destroy created instance of an Analyzer
-
 // These calls implemented by nfstrace
 void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);
 void print_session(std::ostream& out, const Session& session);
-void print_nfs_fh3(std::ostream& out, const FH& fh);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const Session& session)
-{
-    print_session(out, session);
-    return out;
-}
+using plugin_usage_func   = const char* (*)();
+using plugin_create_func  = IAnalyzer*  (*)(const char*);
+using plugin_destroy_func = void        (*)(IAnalyzer*);
+using plugin_get_entry_points_func = const plugin_entry_points* (*)();
 
-inline std::ostream& operator<<(std::ostream& out, const ProcEnum::NFSProcedure proc)
+struct plugin_entry_points
 {
-    print_nfs3_procedures(out, proc);
-    return out;
-}
+    const uint32_t      vers;
+    const size_t        size;
+    plugin_usage_func   usage;
+    plugin_create_func  create;
+    plugin_destroy_func destroy;
+};
+
+constexpr uint32_t NST_PLUGIN_API_VERSION =
+    @NST_V_MAJOR@ * 1000 + @NST_V_MINOR@ * 100 + @NST_V_PATCH@;
+
 //------------------------------------------------------------------------------
 #endif //PLUGIN_API_H
 //------------------------------------------------------------------------------

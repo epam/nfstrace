@@ -326,7 +326,7 @@ public:
         for(int i = 0; i < ProcEnum::count; ++i)
         {
             out.width(12);
-            out << std::left << static_cast<ProcEnum::NFSProcedure>(i);
+            print_nfs3_procedures(out << std::left, static_cast<ProcEnum::NFSProcedure>(i));
             out.width(5);
             out << std::right << ops_count[i];
             out.width(7);
@@ -357,7 +357,7 @@ public:
                     s_total += current[i].get_count();
                 }
                 session.str("");
-                session << it.first;
+                print_session(session, it.first);
                 print_per_session(current, session.str(), s_total);
                 std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
                 store_per_session(file, current, session.str(), s_total);
@@ -371,7 +371,8 @@ public:
 
         for(int i = 0; i < ProcEnum::count; ++i)
         {
-            file << static_cast<ProcEnum::NFSProcedure>(i) << ' ';
+            print_nfs3_procedures(file, static_cast<ProcEnum::NFSProcedure>(i));
+            file << ' ';
             file << breakdown[i].get_count() << ' ';
             file << ((T)(breakdown[i].get_count()) / s_total) * 100 << ' ';
             file << to_sec<T>(breakdown[i].get_min()) << ' ';
@@ -389,7 +390,7 @@ public:
         for(int i = 0; i < ProcEnum::count; ++i)
         {
             out.width(14);
-            out << std::left << static_cast<ProcEnum::NFSProcedure>(i);
+            print_nfs3_procedures(out << std::left, static_cast<ProcEnum::NFSProcedure>(i));
             out.width(6);
             out << " Count:";
             out.width(5);
@@ -492,5 +493,7 @@ void destroy(IAnalyzer* instance)
     delete instance;
 }
 
-}
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
+
+}//extern "C"
 //------------------------------------------------------------------------------

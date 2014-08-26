@@ -222,5 +222,7 @@ void destroy(IAnalyzer* instance)
     delete instance;
 }
 
-}
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
+
+}//extern "C"
 //------------------------------------------------------------------------------
