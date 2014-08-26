@@ -43,11 +43,11 @@ add_executable        (${PROJECT_NAME} ${SRCS})
 target_link_libraries (${PROJECT_NAME} ${LIBS})
 
 # build analyzers ==============================================================
-add_library (breakdown    SHARED analyzers/src/breakdown/breakdown_analyzer.cpp)
-add_library (ofws         SHARED analyzers/src/ofws/ofws_analyzer.cpp)
-add_library (ofdws        SHARED analyzers/src/ofdws/ofdws_analyzer.cpp
+add_library (breakdown    MODULE analyzers/src/breakdown/breakdown_analyzer.cpp)
+add_library (ofws         MODULE analyzers/src/ofws/ofws_analyzer.cpp)
+add_library (ofdws        MODULE analyzers/src/ofdws/ofdws_analyzer.cpp
                                  analyzers/src/ofdws/file_rw_op.cpp)
-add_library (testanalyzer SHARED analyzers/src/test/test_analyzer.cpp)
+add_library (testanalyzer MODULE analyzers/src/test/test_analyzer.cpp)
 set_target_properties (breakdown ofws ofdws testanalyzer
                        PROPERTIES LIBRARY_OUTPUT_DIRECTORY "analyzers")
 
