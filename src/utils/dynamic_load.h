@@ -26,8 +26,6 @@
 
 #include <dlfcn.h>
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
-//------------------------------------------------------------------------------
 namespace NST
 {
 namespace utils
@@ -36,7 +34,7 @@ namespace utils
 class DynamicLoad
 {
 public:
-    class NST_PUBLIC DLException : public std::runtime_error
+    class DLException : public std::runtime_error
     {
     public:
         explicit DLException(const std::string& msg) : std::runtime_error(msg) { }

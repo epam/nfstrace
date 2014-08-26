@@ -25,8 +25,6 @@
 #include <stdexcept>
 #include <string>
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
-//------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
@@ -34,7 +32,7 @@ namespace filtration
 namespace pcap
 {
 
-class NST_PUBLIC PcapError : public std::runtime_error
+class PcapError : public std::runtime_error
 {
 public:
     explicit PcapError(const char* func, const char* errbuf)
