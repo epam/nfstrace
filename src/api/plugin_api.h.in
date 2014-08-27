@@ -20,6 +20,13 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#define NST_PLUGIN_ENTRY_POINTS (U, C, D) \
+plugin_entry_points* get_nfstrace_plugin_entry_points() \
+{ \
+    static const plugin_entry_points entry_points {NST_PLUGIN_API_VERSION, sizeof(plugin_entry_points), U,C,D }; \
+    return &entry_points; \
+}
+#define NST_PUBLIC __attribute__ ((visibility("default")))
 #ifndef PLUGIN_API_H
 #define PLUGIN_API_H
 //------------------------------------------------------------------------------
@@ -37,9 +44,10 @@ using namespace NST::API;
 extern "C"
 {
 // THESE CALLS MUST BE IMPLEMENTED BY Pluggable Analysis Module
-const char* usage  ();    // return description of expected opts for create(opts)
-IAnalyzer*  create (const char*    opts); // create and return an instance of an Analyzer
-void        destroy(IAnalyzer* instance); // destroy created instance of an Analyzer
+constexpr unsigned int NST_API_VERSION = @NST_V_MAJOR@ * 1000 + @NST_V_MINOR@ * 100 + @NST_V_PATCH@;
+NST_PUBLIC const char* usage  ();    // return description of expected opts for create(opts)
+NST_PUBLIC IAnalyzer*  create (const char*    opts); // create and return an instance of an Analyzer
+NST_PUBLIC void        destroy(IAnalyzer* instance); // destroy created instance of an Analyzer
 
 // These calls implemented by nfstrace
 const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);

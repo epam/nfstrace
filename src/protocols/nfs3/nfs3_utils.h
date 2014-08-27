@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
+// Author: Dzianis Huznou (Alexey Costroma)
 // Description: Helpers for parsing NFS structures.
-// Copyright (c) 2013 EPAM Systems
+// Copyright (c) 2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,6 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
 #ifndef NFS3_UTILS_H
 #define NFS3_UTILS_H
 //------------------------------------------------------------------------------
@@ -26,6 +27,7 @@
 #include <ostream>
 
 #include "api/nfs3_types.h"
+#include "api/nfs3_types_rpcgen.h"
 
 #include "protocols/xdr/xdr_decoder.h"
 #include "protocols/xdr/xdr_reader.h"
@@ -1013,8 +1015,8 @@ inline auto proc_t_of(rpcgen::COMMIT3res&)->decltype(&rpcgen::xdr_COMMIT3res)
     return &rpcgen::xdr_COMMIT3res;
 }
 
-
-extern"C"
+extern "C"
+NST_PUBLIC
 const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
 
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS3::NFSProcedure proc);
@@ -1038,6 +1040,38 @@ std::ostream& operator<<(std::ostream& out, const createhow3& obj);
 std::ostream& operator<<(std::ostream& out, const symlinkdata3& obj);
 std::ostream& operator<<(std::ostream& out, const devicedata3& obj);
 std::ostream& operator<<(std::ostream& out, const mknoddata3& obj);
+
+std::ostream& operator<<(std::ostream& out, const rpcgen::nfsstat3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::ftype3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::specdata3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_fh3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::fattr3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::post_op_attr& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::wcc_attr& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::pre_op_attr& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::wcc_data& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::post_op_fh3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::time_how& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::set_mode3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::set_uid3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::set_gid3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::set_size3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::set_atime& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::set_mtime& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::sattr3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::diropargs3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::sattrguard3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::stable_how& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::createmode3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::createhow3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::symlinkdata3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::devicedata3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::mknoddata3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::entry3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::dirlist3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::entryplus3& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::dirlistplus3& obj);
 
 } // namespace NFS3
 } // namespace protocols

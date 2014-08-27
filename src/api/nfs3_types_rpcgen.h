@@ -29,12 +29,6 @@ namespace rpcgen
 
 extern "C" {
 
-/* conflicts
-#define NFS3_FHSIZE 64
-#define NFS3_COOKIEVERFSIZE 8
-#define NFS3_CREATEVERFSIZE 8
-#define NFS3_WRITEVERFSIZE 8
-*/
 const uint32_t NFS3_FHSIZE = 64;
 const uint32_t NFS3_COOKIEVERFSIZE = 8;
 const uint32_t NFS3_CREATEVERFSIZE = 8;
@@ -350,14 +344,7 @@ struct LOOKUP3res {
     } LOOKUP3res_u;
 };
 typedef struct LOOKUP3res LOOKUP3res;
-/* conflicts with handmade enum
-#define ACCESS3_READ 0x0001
-#define ACCESS3_LOOKUP 0x0002
-#define ACCESS3_MODIFY 0x0004
-#define ACCESS3_EXTEND 0x0008
-#define ACCESS3_DELETE 0x0010
-#define ACCESS3_EXECUTE 0x0020
-*/
+
 enum
 {
     ACCESS3_READ    = 0x001,
@@ -858,12 +845,7 @@ struct FSSTAT3res {
     } FSSTAT3res_u;
 };
 typedef struct FSSTAT3res FSSTAT3res;
-/* delete
-#define FSF3_LINK 0x0001
-#define FSF3_SYMLINK 0x0002
-#define FSF3_HOMOGENEOUS 0x0008
-#define FSF3_CANSETTIME 0x0010
-*/
+
 enum
 {
     FSF3_LINK        = 0x0001,

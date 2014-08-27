@@ -19,6 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
 #ifndef NFS4_UTILS_H
 #define NFS4_UTILS_H
 //------------------------------------------------------------------------------
@@ -67,11 +68,15 @@ inline auto proc_t_of(rpcgen::COMPOUND4res&)->decltype(&rpcgen::xdr_COMPOUND4res
     return &rpcgen::xdr_COMPOUND4res;
 }
 
+
 extern"C"
+NST_PUBLIC
 const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc);
+
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc);
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_ftype4& obj);
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfsstat4& obj);
+std::ostream& operator<<(std::ostream& out, const rpcgen::verifier4& obj);
 std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj);
 std::ostream& operator<<(std::ostream& out, const rpcgen::utf8string& obj);
 std::ostream& operator<<(std::ostream& out, const rpcgen::pathname4& obj);
