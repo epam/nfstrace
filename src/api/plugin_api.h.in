@@ -30,18 +30,17 @@
 #include "nfs3_types.h"
 //------------------------------------------------------------------------------
 #define NST_PUBLIC __attribute__ ((visibility("default")))
-#define NST_PLUGIN_ENTRY_POINTS(U, C, D) \
-__attribute__ ((visibility("default"))) \
-const plugin_entry_points* get_entry_points() \
-{ \
-    static const plugin_entry_points entry_points {NST_PLUGIN_API_VERSION, sizeof(plugin_entry_points), U, C, D }; \
-    return &entry_points; \
+#define NST_PLUGIN_ENTRY_POINTS(U, C, D)            \
+NST_PUBLIC                                          \
+const plugin_entry_points* nst_get_entry_points()   \
+{                                                   \
+    static const plugin_entry_points entry_points   \
+    {NST_PLUGIN_API_VERSION, sizeof(plugin_entry_points), U, C, D }; \
+    return &entry_points;                           \
 }
 //------------------------------------------------------------------------------
 using namespace NST::API;
 //------------------------------------------------------------------------------
-struct plugin_entry_points;
-
 extern "C"
 {
 // These calls implemented by nfstrace
@@ -49,10 +48,11 @@ void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc)
 void print_session(std::ostream& out, const Session& session);
 }
 
-using plugin_usage_func   = const char* (*)();
-using plugin_create_func  = IAnalyzer*  (*)(const char*);
-using plugin_destroy_func = void        (*)(IAnalyzer*);
-using plugin_get_entry_points_func = const plugin_entry_points* (*)();
+// These functions must be implemented by pluggable analysis module
+// Pointers to these functions must be passed to NST_PLUGIN_ENTRY_POINTS() macro
+using plugin_usage_func   = const char* (*)();            // return description of options for create(opts)
+using plugin_create_func  = IAnalyzer*  (*)(const char*); // create an instance of an Analyzer
+using plugin_destroy_func = void        (*)(IAnalyzer*);  // destroy instance of an Analyzer
 
 struct plugin_entry_points
 {
@@ -63,8 +63,12 @@ struct plugin_entry_points
     plugin_destroy_func destroy;
 };
 
-constexpr uint32_t NST_PLUGIN_API_VERSION =
-    @NST_V_MAJOR@ * 1000 + @NST_V_MINOR@ * 100 + @NST_V_PATCH@;
+// The NST_PLUGIN_ENTRY_POINTS macro defines this function
+using plugin_get_entry_points_func = const plugin_entry_points* (*)();
+
+constexpr uint32_t NST_PLUGIN_API_VERSION = @NST_V_MAJOR@ * 1000
+                                          + @NST_V_MINOR@ * 100
+                                          + @NST_V_PATCH@;
 
 //------------------------------------------------------------------------------
 #endif //PLUGIN_API_H

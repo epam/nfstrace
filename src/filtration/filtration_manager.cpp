@@ -140,9 +140,9 @@ void FiltrationManager::add_offline_dumping (const Parameters& params)
     auto  ifile = params.input_file();
     if(ofile.compare("-"))
     {
-        if(!(ifile).compare(ofile))
+        if(!ifile.compare(ofile))
         {
-            throw std::runtime_error("Input and output files are equal. Use the -I and -O options to setup them explicitly.");
+            throw std::runtime_error{"Input and output files are equal. Use the -I and -O options to setup them explicitly."};
         }
     }
     std::unique_ptr<FileReader> reader { new FileReader{ifile} };

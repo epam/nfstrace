@@ -77,6 +77,7 @@ struct PacketInfo
     , data     {packet}
     , dlen     {header->caplen}
     , direction{Direction::Unknown}
+    , dumped   {}
     {
         switch(datalink)
         {
@@ -301,7 +302,7 @@ struct PacketInfo
     // Packet transmission direction, set after match packet to session
     Direction                  direction;
 
-    mutable Dumped dumped;                 // flag for dumped packet
+    mutable Dumped                dumped;  // flag for dumped packet
 };
 
 // PCAP packet in dynamic allocated memory
