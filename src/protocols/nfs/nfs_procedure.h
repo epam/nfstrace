@@ -63,7 +63,7 @@ public:
         // fill call arguments
         if(!proc_t_of(arg)(c.xdr(),&arg))
         {
-            xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
+            xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg     );
             xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call);
             throw xdr::XDRDecoderError{"XDRDecoder: cann't read call arguments"};
         }
@@ -74,8 +74,8 @@ public:
         if(!xdr_replymsg (r.xdr(), &rpc_reply))
         {
             xdr_free((xdrproc_t)xdr_replymsg,  (char*)&rpc_reply);
-            xdr_free((xdrproc_t)proc_t_of(arg),(char*)&arg);
-            xdr_free((xdrproc_t)xdr_callmsg,   (char*)&rpc_call);
+            xdr_free((xdrproc_t)proc_t_of(arg),(char*)&arg      );
+            xdr_free((xdrproc_t)xdr_callmsg,   (char*)&rpc_call );
             throw xdr::XDRDecoderError{"XDRDecoder: cann't read reply data"};
         }
   
@@ -85,10 +85,10 @@ public:
             // fill reply results
             if(!proc_t_of(res)(r.xdr(),&res))
             {
-                xdr_free((xdrproc_t)proc_t_of(res), (char*)&res);
+                xdr_free((xdrproc_t)proc_t_of(res), (char*)&res      );
                 xdr_free((xdrproc_t)xdr_replymsg,   (char*)&rpc_reply);
-                xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
-                xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call);
+                xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg      );
+                xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call );
                 throw xdr::XDRDecoderError{"XDRDecoder: cann't read reply results"};
             }
         }

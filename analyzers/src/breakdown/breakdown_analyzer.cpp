@@ -151,9 +151,9 @@ public:
     }
 
     void add(const timeval& t)        { algorithm.add(t); set_range(t); }
-    uint64_t       get_count()  const { return algorithm.get_count(); }
-    long double    get_avg()    const { return algorithm.get_avg(); }
-    long double    get_st_dev() const { return algorithm.get_st_dev(); }
+    uint64_t       get_count()  const { return algorithm.get_count();   }
+    long double    get_avg()    const { return algorithm.get_avg();     }
+    long double    get_st_dev() const { return algorithm.get_st_dev();  }
     const timeval& get_min()    const { return min; }
     const timeval& get_max()    const { return max; }
 

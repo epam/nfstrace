@@ -43,6 +43,7 @@ NFSParserThread::NFSParserThread(FilteredDataQueue& q, Analyzers& a, RunningStat
 , running  {ATOMIC_FLAG_INIT} // false
 {
 }
+
 NFSParserThread::~NFSParserThread()
 {
     if (parsing.joinable()) stop();
