@@ -38,8 +38,6 @@ struct RPCProcedure
     struct rpc_msg rpc_call;
     struct rpc_msg rpc_reply;
 
-    struct RPCCall  call;
-    struct RPCReply reply;
     const struct Session* session;
     const struct timeval* ctimestamp;
     const struct timeval* rtimestamp;

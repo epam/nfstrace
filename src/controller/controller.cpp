@@ -34,9 +34,32 @@ namespace NST
 namespace controller
 {
 
+Controller::Running::Running(Controller& i)
+    : controller(i)
+{
+    controller.filtration->start();
+    if(controller.analysis)
+    {
+        controller.analysis->start();
+    }
+    if(utils::Out message{})
+    {
+        message << "Processing packets. Press CTRL-C to quit and view results.";
+    }
+}
+
+Controller::Running::~Running()
+{
+    controller.filtration->stop();
+    if(controller.analysis)
+    {
+        controller.analysis->stop();
+    }
+}
+
 Controller::Controller(const Parameters& params) try
-    : glog       {params.program_name() + ".log"}
-    , gout       {utils::Out::Level(params.verbose_level())}
+    : gout       {utils::Out::Level(params.verbose_level())}
+    , glog       {params.program_name()}
     , signals    {status}
     , analysis   {}
     , filtration {new FiltrationManager{status}}
@@ -63,6 +86,11 @@ Controller::Controller(const Parameters& params) try
                                              analysis->get_queue());
         }
         break;
+        case RunningMode::Draining:
+        {
+            filtration->add_offline_dumping(params);
+        }
+        break;
     }
     droproot(params.dropuser());
 }
@@ -70,55 +98,34 @@ catch(const filtration::pcap::PcapError& e)
 {
     if(utils::Out message{})
     {
-    message << "Note: This operation may require that you have "
+        message << "Note: This operation may require that you have "
                "special privileges.";
     }
-    throw;    
+    throw;
 }
 
 Controller::~Controller()
 {
 }
 
-int Controller::run()
+int Controller::run()  //Start and stop of Filtration and Analysis are in Controller::Running class
 {
-    // Start modules to processing
-    filtration->start();
-    if(analysis)
-    {
-        analysis->start();
-    }
-
-    if(utils::Out message{})
-    {
-        message << "Processing packets. Press CTRL-C to quit and view results.";
-    }
-
-    // Waiting some exception or user-signal for handling
-    // TODO: add code for recovery processing
     try
     {
-        while(true)
-        {
-            status.wait_and_rethrow_exception();
-        }
+        Running running{*this};
+        status.wait_and_rethrow_exception();
     }
-    catch(...)
+    catch(ProcessingDone& e)
     {
-        filtration->stop();
-        if(analysis)
+        if(utils::Out message{})
         {
-            analysis->stop();
+            message << e.what();
         }
-
-        if(utils::Log message{})
-        {
-            status.print(message);
-        }
-
-        throw;
     }
-
+    if(utils::Log message{})
+    {
+        status.print(message);
+    }
     return 0;
 }
 
@@ -128,10 +135,10 @@ void droproot(const std::string& dropuser)
     {
         if(utils::Out message{})
         {
-            message << "Note: It's potentionally unsafe to run this program as root "
+            message << "Note: It's potentially unsafe to run this program as root "
                     << "without dropping root privileges.\n"
                     << "Note: Use -Z=username option for dropping root privileges "
-                    << "when you run this program as user with root priviliges.";
+                    << "when you run this program as user with root privileges.";
         }
         return;
     }
@@ -155,7 +162,7 @@ void droproot(const std::string& dropuser)
     {
         utils::Out message;
         message << "Cann't drop root privileges!";
-        throw;    
+        throw;
     }
 }
 

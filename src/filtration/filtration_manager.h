@@ -41,12 +41,13 @@ class FiltrationManager
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
 
 public:
-    FiltrationManager(RunningStatus& s);
+    FiltrationManager(RunningStatus&);
     ~FiltrationManager();
     FiltrationManager(const FiltrationManager&)            = delete;
     FiltrationManager& operator=(const FiltrationManager&) = delete;
 
     void add_online_dumping  (const Parameters& params);  // dump to file
+    void add_offline_dumping (const Parameters& params);  // dump to file from input file
     void add_online_analysis (const Parameters& params, FilteredDataQueue& queue);    // capture to queue
     void add_offline_analysis(const std::string& ifile, FilteredDataQueue& queue);    // read file to queue
 

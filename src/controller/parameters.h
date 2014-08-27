@@ -37,7 +37,8 @@ enum class RunningMode
 {
     Profiling,
     Dumping,
-    Analysis
+    Analysis,
+    Draining
 };
 
 struct AParams

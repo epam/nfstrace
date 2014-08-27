@@ -25,7 +25,7 @@
 //------------------------------------------------------------------------------
 #include <ostream>
 
-#include "api/nfs4_types.h"
+#include "api/nfs_types.h"
 #include "api/nfs4_types_rpcgen.h"
 
 #include "protocols/rpc/rpc_header.h"
@@ -67,7 +67,6 @@ inline auto proc_t_of(rpcgen::COMPOUND4res&)->decltype(&rpcgen::xdr_COMPOUND4res
 {
     return &rpcgen::xdr_COMPOUND4res;
 }
-
 
 extern"C"
 NST_PUBLIC

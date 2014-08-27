@@ -25,8 +25,8 @@
 #include <memory>
 #include <vector>
 
-#include "analysis/ianalyzer.h"
 #include "analysis/plugin.h"
+#include "api/plugin_api.h"
 #include "controller/parameters.h"
 //------------------------------------------------------------------------------
 namespace NST

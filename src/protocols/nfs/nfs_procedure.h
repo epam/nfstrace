@@ -50,8 +50,8 @@ public:
     {
         memset(&rpc_call, 0,sizeof(rpc_call ));
         memset(&rpc_reply,0,sizeof(rpc_reply));
-        memset(&arg,      0,sizeof(arg));
-        memset(&res,      0,sizeof(res));
+        memset(&arg,      0,sizeof(arg      ));
+        memset(&res,      0,sizeof(res      ));
 
         // fill call
         if(!xdr_callmsg(c.xdr(), &rpc_call))
@@ -120,7 +120,6 @@ private:
     ArgType arg;
     ResType res;
 };
-
 
 namespace NFS3
 {

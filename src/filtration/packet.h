@@ -45,11 +45,26 @@ using namespace NST::protocols::ip;
 using namespace NST::protocols::tcp;
 using namespace NST::protocols::udp;
 
-
 // Structure of pointers to captured pcap packet's headers. WITHOUT data.
 struct PacketInfo
 {
     using Direction = NST::utils::Session::Direction;
+
+    class Dumped // marker of dumped packet
+    {
+        friend class Dumping;
+        friend struct Packet;
+
+    public:
+        Dumped() : flag{false}{};
+        Dumped(const Dumped& in)     = delete;
+        ~Dumped(){};
+
+    private:
+        inline operator bool() const { return flag; }
+        inline void operator=(const bool stat) { flag = stat; }
+        bool flag;
+    };
 
     inline PacketInfo(const pcap_pkthdr* h, const uint8_t* p, const uint32_t datalink)
     : header   {h}
@@ -62,6 +77,7 @@ struct PacketInfo
     , data     {packet}
     , dlen     {header->caplen}
     , direction{Direction::Unknown}
+    , dumped   {}
     {
         switch(datalink)
         {
@@ -75,7 +91,6 @@ struct PacketInfo
     void* operator new[] (size_t ) = delete;   // only on stack
     void  operator delete  (void*) = delete;   // only on stack
     void  operator delete[](void*) = delete;   // only on stack
-
 
     inline void check_eth()
     {
@@ -286,6 +301,8 @@ struct PacketInfo
 
     // Packet transmission direction, set after match packet to session
     Direction                  direction;
+
+    mutable Dumped                dumped;  // flag for dumped packet
 };
 
 // PCAP packet in dynamic allocated memory
@@ -326,6 +343,7 @@ struct Packet: public PacketInfo
         fragment->data  = packet + (info.data - info.packet);
         fragment->dlen  = info.dlen;
         fragment->direction = info.direction;
+        fragment->dumped = false;
 
         fragment->next  = next;
 

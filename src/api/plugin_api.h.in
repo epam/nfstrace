@@ -20,57 +20,58 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#define NST_PLUGIN_ENTRY_POINTS (U, C, D) \
-plugin_entry_points* get_nfstrace_plugin_entry_points() \
-{ \
-    static const plugin_entry_points entry_points {NST_PLUGIN_API_VERSION, sizeof(plugin_entry_points), U,C,D }; \
-    return &entry_points; \
-}
-#define NST_PUBLIC __attribute__ ((visibility("default")))
 #ifndef PLUGIN_API_H
 #define PLUGIN_API_H
 //------------------------------------------------------------------------------
 #include <iostream>
 
-#include "fh.h"
 #include "ianalyzer_type.h"
-#include "nfs3_types.h"
-#include "nfs4_types.h"
+#include "nfs_types.h"
 #include "nfs3_types_rpcgen.h"
 #include "nfs4_types_rpcgen.h"
+//------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
+#define NST_PLUGIN_ENTRY_POINTS(U, C, D)            \
+NST_PUBLIC                                          \
+const plugin_entry_points* nst_get_entry_points()   \
+{                                                   \
+    static const plugin_entry_points entry_points   \
+    {NST_PLUGIN_API_VERSION, sizeof(plugin_entry_points), U, C, D }; \
+    return &entry_points;                           \
+}
 //------------------------------------------------------------------------------
 using namespace NST::API;
 //------------------------------------------------------------------------------
 extern "C"
 {
-// THESE CALLS MUST BE IMPLEMENTED BY Pluggable Analysis Module
-constexpr unsigned int NST_API_VERSION = @NST_V_MAJOR@ * 1000 + @NST_V_MINOR@ * 100 + @NST_V_PATCH@;
-NST_PUBLIC const char* usage  ();    // return description of expected opts for create(opts)
-NST_PUBLIC IAnalyzer*  create (const char*    opts); // create and return an instance of an Analyzer
-NST_PUBLIC void        destroy(IAnalyzer* instance); // destroy created instance of an Analyzer
-
 // These calls implemented by nfstrace
 const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
 const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc);
 void print_session(std::ostream& out, const Session& session);
-void print_nfs_fh3(std::ostream& out, const FH& fh);
 }
 
-inline std::ostream& operator<<(std::ostream& out, const Session& session)
-{
-    print_session(out, session);
-    return out;
-}
+// These functions must be implemented by pluggable analysis module
+// Pointers to these functions must be passed to NST_PLUGIN_ENTRY_POINTS() macro
+using plugin_usage_func   = const char* (*)();            // return description of options for create(opts)
+using plugin_create_func  = IAnalyzer*  (*)(const char*); // create an instance of an Analyzer
+using plugin_destroy_func = void        (*)(IAnalyzer*);  // destroy instance of an Analyzer
 
-inline std::ostream& operator<<(std::ostream& out, const ProcEnumNFS3::NFSProcedure proc)
+struct plugin_entry_points
 {
-    return out << print_nfs3_procedures(proc);
-}
+    const uint32_t      vers;
+    const size_t        size;
+    plugin_usage_func   usage;
+    plugin_create_func  create;
+    plugin_destroy_func destroy;
+};
 
-inline std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc)
-{
-    return out << print_nfs4_procedures(proc);
-}
+// The NST_PLUGIN_ENTRY_POINTS macro defines this function
+using plugin_get_entry_points_func = const plugin_entry_points* (*)();
+
+constexpr uint32_t NST_PLUGIN_API_VERSION = @NST_V_MAJOR@ * 1000
+                                          + @NST_V_MINOR@ * 100
+                                          + @NST_V_PATCH@;
+
 //------------------------------------------------------------------------------
 #endif //PLUGIN_API_H
 //------------------------------------------------------------------------------

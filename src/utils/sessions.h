@@ -19,7 +19,6 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
 #ifndef SESSIONS_H
 #define SESSIONS_H
 //------------------------------------------------------------------------------
@@ -28,6 +27,8 @@
 #include <ostream>
 
 #include "api/session.h"
+//------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {

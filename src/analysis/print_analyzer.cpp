@@ -44,7 +44,7 @@ inline bool out_all()
 
     return Out::Global::get_level() == Out::Level::All;
 }
-
+/*
 // Special helper for print-out short representation of NFS FH
 std::ostream& print_nfs_fh3(std::ostream& out, const uint8_t* data, const uint32_t size)
 {
@@ -82,7 +82,7 @@ void print_nfs_fh3(std::ostream& out, const FH& fh)
 {
     print_nfs_fh3(out, fh.data, fh.len);
 }
-
+*/
 bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 {
     bool result = false;
@@ -196,7 +196,7 @@ bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 // 1st line - PRC information: src and dst hosts, status of RPC procedure
 // 2nd line - <tabulation>related RPC procedure-specific arguments
 // 3rd line - <tabulation>related RPC procedure-specific results
-
+/*
 void PrintAnalyzer::null(const struct RPCProcedure* proc,
                          const struct NULLargs*,
                          const struct NULLres*)
@@ -942,7 +942,7 @@ void PrintAnalyzer::commit3(const struct RPCProcedure* proc,
         out << " ]\n";
     }
 }
-
+*/
 // Print NFSv3 procedures (rpcgen)
 // 1st line - PRC information: src and dst hosts, status of RPC procedure
 // 2nd line - <tabulation>related RPC procedure-specific arguments

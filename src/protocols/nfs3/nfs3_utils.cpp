@@ -30,6 +30,21 @@ namespace protocols
 namespace NFS3
 {
 
+const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc)
+{
+    static const char* const NFS3ProcedureTitles[ProcEnumNFS3::count] =
+    {
+        "NULL",       "GETATTR",      "SETATTR",  "LOOKUP",
+        "ACCESS",     "READLINK",     "READ",     "WRITE",
+        "CREATE",     "MKDIR",        "SYMLINK",  "MKNOD",
+        "REMOVE",     "RMDIR",        "RENAME",   "LINK",
+        "READDIR",    "READDIRPLUS",  "FSSTAT",   "FSINFO",
+        "PATHCONF",   "COMMIT"
+    };
+
+    return NFS3ProcedureTitles[proc];
+}
+/*
 std::ostream& operator <<(std::ostream& out, const Opaque& opaque)
 {
     out << std::hex;
@@ -45,21 +60,12 @@ std::ostream& operator<<(std::ostream& out, const ProcEnumNFS3::NFSProcedure pro
     return out << print_nfs3_procedures(proc);
 }
 
-const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc)
+std::ostream& operator<<(std::ostream& out, const nfs_fh3& obj)
 {
-    static const char* const NFS3ProcedureTitles[ProcEnumNFS3::count] =
-    {
-        "NULL",       "GETATTR",      "SETATTR",  "LOOKUP",
-        "ACCESS",     "READLINK",     "READ",     "WRITE",
-        "CREATE",     "MKDIR",        "SYMLINK",  "MKNOD",
-        "REMOVE",     "RMDIR",        "RENAME",   "LINK",
-        "READDIR",    "READDIRPLUS",  "FSSTAT",   "FSINFO",
-        "PATHCONF",   "COMMIT"
-    };
-
-    return NFS3ProcedureTitles[proc];
+    return out << obj.data;
 }
-
+*/
+/*
 std::ostream& operator<<(std::ostream& out, const mode3 m)
 {
     if(m & mode3::USER_ID_EXEC)      out << "USER_ID_EXEC ";
@@ -132,11 +138,6 @@ std::ostream& operator<<(std::ostream& out, const ftype3& obj)
 std::ostream& operator<<(std::ostream& out, const specdata3& obj)
 {
     return out << " specdata1: " << obj.specdata1 << " specdata2: " << obj.specdata2;
-}
-
-std::ostream& operator<<(std::ostream& out, const nfs_fh3& obj)
-{
-    return out << obj.data;
 }
 
 std::ostream& operator<<(std::ostream& out, const nfstime3& obj)
@@ -346,6 +347,7 @@ std::ostream& operator<<(std::ostream& out, const mknoddata3& obj)
     }
     return out;
 }
+*/
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfsstat3& obj)
 {

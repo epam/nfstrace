@@ -42,7 +42,7 @@ public:
         explicit Signal(int sig);
     };
 
-    SignalHandler(RunningStatus& s);
+    SignalHandler(RunningStatus&);
     SignalHandler(const SignalHandler&)            = delete;
     SignalHandler& operator=(const SignalHandler&) = delete;
     ~SignalHandler();

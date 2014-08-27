@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Base analysis, which implement restoring rpc/nfs structures from plain rpc header.
-// Copyright (c) 2013 EPAM Systems
+// Author: Mikhail Litvinets
+// Description: Contains program version and build information.
+// Copyright (c) 2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,26 +19,21 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef IANALYZER_H
-#define IANALYZER_H
-//------------------------------------------------------------------------------
-#include "api/plugin_api.h"
+#ifndef BUILD_INFO_H
+#define BUILD_INFO_H
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace analysis
-{
 
-// type of pluggable analysis module
-using IAnalyzer = NST::API::IAnalyzer;
+constexpr unsigned int NST_VERSION =
+    @NST_V_MAJOR@ * 1000 + @NST_V_MINOR@ * 100 + @NST_V_PATCH@;
 
-// functions exported from pluggable analysis module
-using plugin_usage_func   = decltype(&usage);   // return description of expected opts for plugin_create_func()
-using plugin_create_func  = decltype(&create);  // create and return an instance of module
-using plugin_destroy_func = decltype(&destroy); // destroy an instance of module
+constexpr char PROGRAM_BUILD_INFO[]=
+    "@NST_VERSION_FULL@\n"
+    "built on @CMAKE_SYSTEM@\n"
+    "by C++ compiler @CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VERSION@";
 
-} // namespace analysis
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//IANALYZER_H
+#endif//BUILD_INFO_H
 //------------------------------------------------------------------------------
