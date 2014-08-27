@@ -25,6 +25,7 @@
 #include "controller/cmdline_args.h"
 #include "controller/cmdline_parser.h"
 #include "controller/parameters.h"
+#include "controller/build_info.h"
 #include "filtration/pcap/network_interfaces.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -34,23 +35,6 @@ namespace controller
 
 namespace // implementation
 {
-
-static const char program_build_information[]=
-// the NST_BUILD_VERSION, NST_BUILD_PLATFORM and NST_BUILD_COMPILER macros
-// should be defined by compilation options
-#if defined(NST_BUILD_VERSION)  \
-and defined(NST_BUILD_PLATFORM) \
-and defined(NST_BUILD_COMPILER)
-    #define STR(x) DO_STR(x)
-    #define DO_STR(x) #x
-        STR(NST_BUILD_VERSION) "\n"
-       "built on " STR(NST_BUILD_PLATFORM) "\n"
-       "by C++ compiler " STR(NST_BUILD_COMPILER);
-    #undef DO_STR
-    #undef STR
-#else
-    "build information is unknown";
-#endif
 
 static const class ParametersImpl* impl = nullptr;
 
@@ -66,7 +50,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
         parse(argc, argv);
         if(get(CLI::HELP).to_bool())
         {
-            std::cout << program_build_information << std::endl;
+            std::cout << PROGRAM_BUILD_INFO << std::endl;
             print_usage(std::cout, argv[0]);
 
             for(const auto& a : analysis_modules)
@@ -205,7 +189,10 @@ RunningMode Parameters::running_mode() const
     {
         return RunningMode::Analysis;
     }
-
+    else if(mode.is(CLI::draining_mode))
+    {
+        return RunningMode::Draining;
+    }
     throw cmdline::CLIError{std::string{"Unknown mode: "} + mode.to_cstr()};
 }
 

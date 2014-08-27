@@ -21,9 +21,10 @@
 //------------------------------------------------------------------------------
 #include "controller/cmdline_args.h"
 //------------------------------------------------------------------------------
-#define LIVE "live"
-#define DUMP "dump"
-#define STAT "stat"
+#define LIVE  "live"
+#define DUMP  "dump"
+#define STAT  "stat"
+#define DRAIN "drain"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -32,14 +33,15 @@ namespace controller
 namespace cmdline
 {
 
-const char* const Args::profiling_mode = LIVE;
-const char* const Args::dumping_mode   = DUMP;
-const char* const Args::analysis_mode  = STAT;
+const char* const Args::profiling_mode    = LIVE;
+const char* const Args::dumping_mode      = DUMP;
+const char* const Args::analysis_mode     = STAT;
+const char* const Args::draining_mode     = DRAIN;
 
 // This array will be indexed via elements of Args::Names enumeration. Keep it in the same order.
 Opt Args::options[Args::num] =
 {
-    {'m', "mode",       Opt::REQ, LIVE,                  "set runing mode",                                          LIVE "|" DUMP "|" STAT,   nullptr, false},
+    {'m', "mode",       Opt::REQ, LIVE,                  "set running mode",                               DRAIN "|" LIVE "|" DUMP "|" STAT,   nullptr, false},
     {'i', "interface",  Opt::REQ, "PCAP-DEFAULT",        "listen interface, it is required for " LIVE " and " DUMP " modes", "INTERFACE",      nullptr, false},
     {'f', "filtration", Opt::REQ, "port 2049",           "a packet filtration in libpcap BPF syntax",                        "BPF",            nullptr, false},
     {'s', "snaplen",    Opt::REQ, "65535",               "max length of raw captured packet. May be used ONLY FOR UDP",      "0..65535",       nullptr, false},
@@ -53,7 +55,7 @@ Opt Args::options[Args::num] =
     {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file",         "\"shell command\"",  nullptr, false},
     {'D', "dump-size",  Opt::REQ, "0",                   "size of dumping file portion, 0 = no limit",               "MBytes", nullptr, false},
     {'L', "list",       Opt::NOA, "false",               "list all available network interfaces",                     nullptr, nullptr, false},
-    {'M', "NFSv3-RW-limit", Opt::REQ, "512",                 "RPC NFSv3 WRITE call and READ reply messages will be truncated to this limit in bytes before passing to Analysis",     "1..4000", nullptr, false},
+    {'M', "msg-header", Opt::REQ, "512",                 "RPC message will be truncated to this limit in bytes before passing to Analysis",     "1..4000", nullptr, false},
     {'Q', "qcapacity",  Opt::REQ, "4096",                "initial queue capacity of RPC messages",                                             "1..65535", nullptr, false},
     {'T', "trace",      Opt::NOA, "false",               "print collected NFSv3 procedures, true if no modules were passed(by -a)",               nullptr, nullptr, false},
     {'Z', "droproot",   Opt::REQ, "",                    "drops root privileges, after opening the capture device, but before reading from it","username", nullptr, false},

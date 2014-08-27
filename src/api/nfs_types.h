@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Alexey Costroma
-// Copyright (c) 2014 EPAM Systems
+// Author: Dzianis Huznou
+// Description: All RFC1813 declared structures.
+// Copyright (c) 2013 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -18,15 +19,43 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef NFS4_TYPES_H
-#define NFS4_TYPES_H
-//------------------------------------------------------------------------------
-#include "xdr_types.h"
+#ifndef NFS_TYPES_H
+#define NFS_TYPES_H
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace API
 {
+
+struct ProcEnumNFS3
+{
+    enum NFSProcedure
+    {
+        NFS_NULL    = 0,
+        GETATTR     = 1,
+        SETATTR     = 2,
+        LOOKUP      = 3,
+        ACCESS      = 4,
+        READLINK    = 5,
+        READ        = 6,
+        WRITE       = 7,
+        CREATE      = 8,
+        MKDIR       = 9,
+        SYMLINK     = 10,
+        MKNOD       = 11,
+        REMOVE      = 12,
+        RMDIR       = 13,
+        RENAME      = 14,
+        LINK        = 15,
+        READDIR     = 16,
+        READDIRPLUS = 17,
+        FSSTAT      = 18,
+        FSINFO      = 19,
+        PATHCONF    = 20,
+        COMMIT      = 21
+    };
+    static const int32_t count = 22;
+};
 
 struct ProcEnumNFS4
 {
@@ -82,5 +111,5 @@ struct ProcEnumNFS4
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS4_TYPES_H
+#endif//NFS_TYPES_H
 //------------------------------------------------------------------------------

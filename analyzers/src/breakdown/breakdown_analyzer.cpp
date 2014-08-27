@@ -342,7 +342,7 @@ public:
          for(int i = 0; i < ProcEnumNFS3::count; ++i)
          {
               out.width(12);
-              out << std::left << static_cast<ProcEnumNFS3::NFSProcedure>(i);
+              out << std::left << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
               out.width(5);
               out << std::right << nfs3_ops_count[i];
               out.width(7);
@@ -373,7 +373,7 @@ public:
                      s_total += current[i].get_count();
                  }
                  session.str("");
-                 session << it.first;
+                 print_session(session, it.first);
                  print_per_session(current, session.str(), s_total, NFS_V3);
                  std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
                  store_per_session(file, current, session.str(), s_total, NFS_V3);
@@ -384,7 +384,7 @@ public:
         for(int i = 0; i < ProcEnumNFS4::count; ++i)
         {
             out.width(22);
-            out << std::left << static_cast<ProcEnumNFS4::NFSProcedure>(i);
+            out << std::left << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i));
             out.width(5);
             out << std::right << nfs4_ops_count[i];
             out.width(7);
@@ -415,7 +415,7 @@ public:
                     s_total += current[i].get_count();
                 }
                 session.str("");
-                session << it.first;
+                print_session(session, it.first);
                 print_per_session(current, session.str(), s_total, NFS_V4);
                 std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
                 store_per_session(file, current, session.str(), s_total, NFS_V4);
@@ -436,9 +436,9 @@ public:
         for(int i = 0; i < op_count; ++i)
         {
             if(nfs_vers == NFS_V3)
-                file << static_cast<ProcEnumNFS4::NFSProcedure>(i) << ' ';
+                file << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i)) << ' ';
             if(nfs_vers == NFS_V4)
-                file << static_cast<ProcEnumNFS3::NFSProcedure>(i) << ' ';
+                file << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i)) << ' ';
             file << breakdown[i].get_count() << ' ';
             file << ((T)(breakdown[i].get_count()) / s_total) * 100 << ' ';
             file << to_sec<T>(breakdown[i].get_min()) << ' ';
@@ -462,9 +462,9 @@ public:
         {
             out.width(22);
             if(nfs_vers == NFS_V3)
-                out << std::left << static_cast<ProcEnumNFS3::NFSProcedure>(i);
+                out << std::left << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
             if(nfs_vers == NFS_V4)
-                out << std::left << static_cast<ProcEnumNFS4::NFSProcedure>(i);
+                out << std::left << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i));
             out.width(6);
             out << " Count:";
             out.width(5);
@@ -609,5 +609,7 @@ void destroy(IAnalyzer* instance)
     delete instance;
 }
 
-}
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
+
+}//extern "C"
 //------------------------------------------------------------------------------

@@ -37,7 +37,7 @@ namespace NST
 namespace controller
 {
 
-SignalHandler::Signal::Signal(int sig) : std::runtime_error(::strsignal(sig))
+SignalHandler::Signal::Signal(int sig) : std::runtime_error{::strsignal(sig)}
 {
 }
 
@@ -52,24 +52,28 @@ static void handle_signals(const sigset_t    waitmask,
         const int err = ::sigwait(&waitmask, &signo);
         if(err != 0)
         {
-            status.push(std::system_error(err, std::system_category(),
-                                          "error in SignalHandler sigwait"));
+            status.push(std::system_error{err, std::system_category(),
+                                          "error in SignalHandler sigwait"});
             return;
         }
 
         if(signo == SIGCHLD)
         {
             // wait childern(compression in dumping mode may call fork())
-            const pid_t pid = ::wait(NULL);
+            const pid_t pid{::wait(NULL)};
             if(pid == -1 && errno != ECHILD)
             {
-                status.push(std::system_error(errno, std::system_category(),
-                                              "error in SignalHandler wait"));
+                status.push(std::system_error{errno, std::system_category(),
+                                              "error in SignalHandler wait"});
             }
+        }
+        else if(signo == SIGINT)
+        {
+            status.push(ProcessingDone{"Interrupted by user."});
         }
         else
         {
-            status.push(SignalHandler::Signal(signo));
+            status.push(SignalHandler::Signal{signo});
         }
     }
 }

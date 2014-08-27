@@ -21,14 +21,17 @@
 //------------------------------------------------------------------------------
 #include <cstdarg>
 #include <cstdio>
+#include <cerrno>
 #include <iostream>
-#include <stdexcept>
+#include <system_error>
 
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "utils/log.h"
+#include "utils/out.h"
 //------------------------------------------------------------------------------
 /*  http://www.unix.org/whitepapers/reentrant.html
     The POSIX.1 and C-language functions that operate on character streams
@@ -47,11 +50,43 @@ namespace utils
 static FILE* log_file = nullptr;
 static bool  own_file = false;
 
+namespace // unnanmed
+{
+
+static std::string get_pid()
+{
+    char buff[8]={'\0'};
+    sprintf(buff,"%ld",(long)getpid());
+    return std::string{buff};
+}
+
+static FILE* try_open(const std::string& file_name)
+{
+    FILE* file = fopen(file_name.c_str(), "w");
+    if(file == nullptr)
+    {
+        throw std::system_error{errno, std::system_category(),
+                                       "Error in opening file."};
+    }
+    chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+    if(flock(fileno(file), LOCK_EX | LOCK_NB))
+    {
+        fclose(file);
+        throw std::system_error{errno, std::system_category(),
+                                       "Log file already locked"};
+    }
+    return file;
+}
+
+} // unnamed unnamed
+
 Log::Global::Global(const std::string& path)
 {
+    const std::string log_path{"/tmp/nfstrace"};
     if(log_file != nullptr)
     {
-        throw std::runtime_error{"Global Logger already have been created"};
+        throw std::system_error{errno, std::system_category(),
+                                       "Empty program name."};
     }
 
     // default is stderr
@@ -61,23 +96,35 @@ Log::Global::Global(const std::string& path)
         return;
     }
 
-    FILE* file = fopen(path.c_str(), "w");
-    if(file == NULL)
+    struct stat s;
+    if (stat(log_path.c_str(), &s))           // check destination folder exists
     {
-        throw std::runtime_error{"Logger can not open file for write: " + path};
+        if(mkdir(log_path.c_str(), ALLPERMS)) // create directory for nfs logs
+        {
+            throw std::system_error{errno, std::system_category(),
+                "Can't create log directory."};
+        }
     }
-
-    chmod(path.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH); //0666
-
-    if(flock(fileno(file), LOCK_EX | LOCK_NB))
+    std::string tmp{log_path + "/" + path + ".log"};
+    FILE* file=nullptr;
+    try
     {
-        fclose(file);
-        throw std::runtime_error{"File: " + path + " opened in another thread"};
+        file = try_open(tmp);
+    }
+    catch(std::system_error& err)
+    {
+        tmp = log_path + "/" + path + "-" + get_pid() + ".log";
+        file = try_open(tmp);
+    }
+    if(utils::Out message{})
+    {
+        message << "Log folder: " << log_path;
     }
 
     log_file = file;
     own_file = true;
 }
+
 Log::Global::~Global()
 {
     if(own_file)
@@ -95,6 +142,7 @@ Log::Log()
     std::ostream::init(static_cast<std::stringbuf*>(this));
     std::ostream::put('\n');
 }
+
 Log::~Log()
 {
     size_t len = pptr() - pbase();

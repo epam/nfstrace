@@ -63,6 +63,7 @@ struct Args
     static const char* const profiling_mode;
     static const char* const dumping_mode;
     static const char* const analysis_mode;
+    static const char* const draining_mode;
 
 private:
     static Opt options[num];

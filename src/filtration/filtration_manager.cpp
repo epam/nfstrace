@@ -115,21 +115,52 @@ static auto create_capture_reader(const Parameters& params)
 } // unnamed namespace
 
 // capture from network interface and dump to file  - OnlineDumping(Dumping)
-void FiltrationManager::add_online_dumping(const Parameters& )// params)
+void FiltrationManager::add_online_dumping(const Parameters&)// params)
 {
-    // std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
+/*
+    std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
 
-    // auto& dumping_params = params.dumping_params();
-    // if(utils::Out message{}) // print parameters to user
-    // {
-    //     message << dumping_params;
-    // }
-    // std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),
-    //                                                      dumping_params
-    //                                                    }
-    //                                       };
+    auto& dumping_params = params.dumping_params();
+    if(utils::Out message{}) // print parameters to user
+    {
+        message << dumping_params;
+    }
+    std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),
+                                                         dumping_params
+                                                       }
+                                          };
 
-    // threads.emplace_back(create_thread(reader, writer, status));
+    threads.emplace_back(create_thread(reader, writer, status));
+*/
+}
+
+//capture data from input file or cin to destination file
+void FiltrationManager::add_offline_dumping (const Parameters&)// params)
+{
+/*
+    auto& dumping_params = params.dumping_params();
+    auto& ofile = dumping_params.output_file;
+    auto  ifile = params.input_file();
+    if(ofile.compare("-"))
+    {
+        if(!ifile.compare(ofile))
+        {
+            throw std::runtime_error{"Input and output files are equal. Use the -I and -O options to setup them explicitly."};
+        }
+    }
+    std::unique_ptr<FileReader> reader { new FileReader{ifile} };
+
+    if(utils::Out message{}) // print parameters to user
+    {
+        message << *reader.get();
+    }
+    std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),
+                                                         dumping_params
+                                                       }
+                                          };
+
+    threads.emplace_back(create_thread(reader, writer, status));
+*/
 }
 
 // capture from network interface and pass to queue - OnlineAnalysis(Profiling)
@@ -147,9 +178,8 @@ void FiltrationManager::add_offline_analysis(const std::string& ifile,
                                              FilteredDataQueue& queue)
 {
     std::unique_ptr<FileReader> reader { new FileReader{ifile} };
-
+    if(utils::Out message{}) // print parameters to user
     {
-        utils::Out message; // print parameters to user
         message << *reader.get();
     }
     std::unique_ptr<Queueing>   writer { new Queueing{queue}   };

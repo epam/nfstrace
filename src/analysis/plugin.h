@@ -24,8 +24,8 @@
 //------------------------------------------------------------------------------
 #include <string>
 
+#include "api/plugin_api.h"
 #include "utils/dynamic_load.h"
-#include "analysis/ianalyzer.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
