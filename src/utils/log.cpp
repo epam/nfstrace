@@ -57,7 +57,7 @@ static std::string get_pid()
 {
     char buff[8]={'\0'};
     sprintf(buff,"%ld",(long)getpid());
-    return std::string(buff);
+    return std::string{buff};
 }
 
 static FILE* try_open(const std::string& file_name)
@@ -66,14 +66,14 @@ static FILE* try_open(const std::string& file_name)
     if(file == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
-                               "Error in opening file."};
+                                       "Error in opening file."};
     }
     chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
     {
         fclose(file);
         throw std::system_error{errno, std::system_category(),
-                               "Log file already locked"};
+                                       "Log file already locked"};
     }
     return file;
 }
@@ -86,7 +86,7 @@ Log::Global::Global(const std::string& path)
     if(log_file != nullptr)
     {
         throw std::system_error{errno, std::system_category(),
-            "Empty program name."};
+                                       "Empty program name."};
     }
 
     // default is stderr

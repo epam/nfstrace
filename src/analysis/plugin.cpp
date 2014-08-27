@@ -30,45 +30,45 @@ namespace analysis
 
 Plugin::Plugin(const std::string& path)
     : DynamicLoad{path}
-    , get_entry_points {nullptr}
     , usage  {nullptr}
     , create {nullptr}
     , destroy{nullptr}
 {
-    load_address_of("get_entry_points", get_entry_points);
-    const auto& entry_points = get_entry_points();
+    plugin_get_entry_points_func nst_get_entry_points{nullptr};
 
-    if(entry_points)
+    load_address_of("nst_get_entry_points", nst_get_entry_points);
+    const auto& entry_points = nst_get_entry_points();
+
+    if(!entry_points)
     {
-        switch(entry_points->vers)
-        {
-        case NST_PLUGIN_API_VERSION:
-        default:
+        throw std::runtime_error{path + ": can not load plugin entry points!"};
+    }
+
+    switch(entry_points->vers)
+    {
+    case NST_PLUGIN_API_VERSION:
+    default:
         usage   = entry_points->usage;
         create  = entry_points->create;
         destroy = entry_points->destroy;
-        break;
-        }
-
-        if(!usage  || !create || !destroy)
-        throw std::runtime_error(path + ": can not load entry point for some plugin function(s)");
     }
-    else
+
+    if(!usage  || !create || !destroy)
     {
-        throw std::runtime_error(path + ": can not load plugin entry points!");
+        throw std::runtime_error{path + ": can not load entry point for some plugin function(s)"};
     }
 }
 
 const std::string Plugin::usage_of(const std::string& path)
 {
-    Plugin instance(path);
+    Plugin instance{path};
     return instance.usage();
 }
 
 PluginInstance::PluginInstance(const std::string& path, const std::string& args) : Plugin{path}
 {
     analysis = create(args.c_str());
-    if(!analysis) throw std::runtime_error(path + ": create call returns NULL-pointer");
+    if(!analysis) throw std::runtime_error{path + ": create call returns NULL-pointer"};
 }
 
 PluginInstance::~PluginInstance()
