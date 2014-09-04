@@ -41,9 +41,9 @@ public:
     };
 
 protected:
-    DynamicLoad(const char* file)
+    DynamicLoad(const std::string& file)
     {
-        handle = dlopen(file, RTLD_LAZY);
+        handle = dlopen(file.c_str(), RTLD_LAZY);
         if(handle == NULL)
         {
             throw DLException(std::string("Loading dynamic module: ") + file + " failed with error:" + dlerror());

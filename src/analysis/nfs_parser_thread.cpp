@@ -200,10 +200,10 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
         switch(version)
         {
         case NFS_V4:
-            procedure_name = const_cast<char*>(print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(procedure)));
+            procedure_name = const_cast<char*>(NST::protocols::NFS4::print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(procedure)));
         break;
         case NFS_V3:
-            procedure_name = const_cast<char*>(print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(procedure)));
+            procedure_name = const_cast<char*>(NST::protocols::NFS3::print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(procedure)));
         break;
         }
         LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), procedure_name, procedure);
@@ -214,10 +214,10 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
         switch(version)
         {
         case NFS_V4:
-            procedure_name = const_cast<char*>(print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(procedure)));
+            procedure_name = const_cast<char*>(NST::protocols::NFS4::print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(procedure)));
         break;
         case NFS_V3:
-            procedure_name = const_cast<char*>(print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(procedure)));
+            procedure_name = const_cast<char*>(NST::protocols::NFS3::print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(procedure)));
         break;
         }
         LOG("Some data of NFS operation %s %s(%u) was not parsed: %s", session->str().c_str(), procedure_name, procedure, e.what());
