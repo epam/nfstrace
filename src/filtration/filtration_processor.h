@@ -506,7 +506,7 @@ public:
     {
         static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
 
-        if(collection) // collection is allocated
+        if(collection && (collection.data_size() > 0)) // collection is allocated
         {
             assert(collection.capacity() >= max_header);
             const uint32_t tocopy = max_header - collection.data_size();
@@ -713,7 +713,7 @@ public:
         bool done = reader->loop(this, callback);
         if(done)
         {
-            throw std::runtime_error("Filtration is done");
+            throw controller::ProcessingDone("Filtration is done");
         }
     }
 

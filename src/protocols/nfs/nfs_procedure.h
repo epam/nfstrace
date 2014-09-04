@@ -68,7 +68,7 @@ public:
             throw xdr::XDRDecoderError{"XDRDecoder: cann't read call arguments"};
         }
 
-        rpc_reply.ru.RM_rmb.ru.RP_ar.ru.AR_results.proc = &r.return_true;
+        rpc_reply.ru.RM_rmb.ru.RP_ar.ru.AR_results.proc = r.return_true;
 
         // fill reply
         if(!xdr_replymsg (r.xdr(), &rpc_reply))

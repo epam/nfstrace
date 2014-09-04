@@ -60,7 +60,11 @@ public:
 
     inline const FilteredData& data() const { return *ptr; }
 
-    inline static bool_t return_true(XDR*,void*,...) { return 1; };
+    #ifndef __FreeBSD__
+    inline static bool_t return_true(XDR*, void*, ...) { return 1; };
+    #else
+    inline static bool_t return_true(XDR*, ...) { return 1; };
+    #endif
 
 private:
     XDR txdr;

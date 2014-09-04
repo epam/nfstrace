@@ -83,8 +83,9 @@ public:
                     LOG("free elements of the Queue are exhausted");
                 }
             }
-            else {
-                assert(nullptr == ptr);
+            else
+            {
+                assert(nullptr != ptr);
             }
         }
 

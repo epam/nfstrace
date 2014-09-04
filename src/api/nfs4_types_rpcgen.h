@@ -29,8 +29,9 @@ namespace rpcgen
 {
 
 extern "C" {
-
+#ifndef RPCSEC_GSS
 const uint32_t RPCSEC_GSS         {6};
+#endif
 const uint32_t NFS4_FHSIZE        {128};
 const uint32_t NFS4_VERIFIER_SIZE {8};
 const uint32_t NFS4_OPAQUE_LIMIT  {1024};

@@ -132,8 +132,31 @@ public:
     {
         const uint32_t proc = call->proc();
 
-        return          proc <= MaxProc &&
+            return      proc <= MaxProc &&
                         proc >= MinProc &&
+                call->prog() == Program &&
+                call->vers() == Version ;
+    }
+private:
+    RPCProgramValidator() = delete;
+};
+
+//This template specialization for remove warning to compare unsigned with zero
+template
+<
+    uint32_t Program,
+    uint32_t Version,
+    uint32_t MaxProc
+>
+class RPCProgramValidator<Program, Version, 0, MaxProc>
+{
+public:
+    static inline bool check(const CallHeader*const call)
+    {
+        const uint32_t proc = call->proc();
+
+        // do not compare uint32_t with 0 (MinProc)
+        return          proc <= MaxProc &&
                 call->prog() == Program &&
                 call->vers() == Version ;
     }

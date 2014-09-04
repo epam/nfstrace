@@ -339,7 +339,7 @@ public:
     {
          out << "###  Breakdown analyzer  ###" << std::endl;
          out << "NFSv3 total calls: " << nfs3_total << ". Per operation:" << std::endl;
-         for(int i = 0; i < ProcEnumNFS3::count; ++i)
+         for(int i = 0; i < ProcEnumNFS3::count ; ++i)
          {
               out.width(12);
               out << std::left << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
@@ -348,7 +348,9 @@ public:
               out.width(7);
               out.precision(2);
               if(nfs3_total)
-                  out << std::fixed << (double(nfs3_ops_count[i]) / nfs3_total) * 100;
+              {
+                  out << std::fixed << (double(nfs3_ops_count[i]) / nfs3_total) * 100;;
+              }
               else
                   out << 0;
               out << "%" << std::endl;
@@ -433,7 +435,7 @@ public:
         if(nfs_vers == NFS_V3) op_count = ProcEnumNFS3::count;
         if(nfs_vers == NFS_V4) op_count = ProcEnumNFS4::count;
 
-        for(int i = 0; i < op_count; ++i)
+        for(unsigned i = 0; i < op_count; ++i)
         {
             if(nfs_vers == NFS_V3)
                 file << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i)) << ' ';
@@ -458,7 +460,7 @@ public:
         if(nfs_vers == NFS_V4) op_count = ProcEnumNFS4::count;
 
         out << "Total: " << s_total << ". Per operation:" << std::endl;
-        for(int i = 0; i < op_count; ++i)
+        for(unsigned i = 0; i < op_count; ++i)
         {
             out.width(22);
             if(nfs_vers == NFS_V3)
@@ -517,7 +519,7 @@ private:
                 nfs4_total += res->resarray.resarray_len;
 
                 rpcgen::nfs_resop4* current_el = res->resarray.resarray_val;
-                for(int j=0; j<(res->resarray.resarray_len); j++, current_el++)
+                for(unsigned j=0; j<(res->resarray.resarray_len); j++, current_el++)
                 {
                     // In all cases we suppose, that NFSv4 operation ILLEGAL(10044)
                     // has the second position in ProcEnumNFS4
