@@ -38,157 +38,170 @@ public:
     }
 
     virtual void null(const struct RPCProcedure* /*proc*/,
-                      const struct NULLargs* /*args*/,
-                      const struct NULLres* /*res*/)
+                      const struct rpcgen::NULL3args* /*args*/,
+                      const struct rpcgen::NULL3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::null()" << std::endl;
     }
 
     virtual void getattr3(const struct RPCProcedure* /*proc*/,
-                          const struct GETATTR3args* /*args*/,
-                          const struct GETATTR3res* /*res*/)
+                          const struct rpcgen::GETATTR3args* /*args*/,
+                          const struct rpcgen::GETATTR3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::getattr3()" << std::endl;
     }
 
     virtual void setattr3(const struct RPCProcedure* /*proc*/,
-                          const struct SETATTR3args* /*args*/,
-                          const struct SETATTR3res* /*res*/)
+                          const struct rpcgen::SETATTR3args* /*args*/,
+                          const struct rpcgen::SETATTR3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::setattr3()" << std::endl;
     }
 
     virtual void lookup3(const struct RPCProcedure* /*proc*/,
-                         const struct LOOKUP3args* /*args*/,
-                         const struct LOOKUP3res* /*res*/)
+                         const struct rpcgen::LOOKUP3args* /*args*/,
+                         const struct rpcgen::LOOKUP3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::lookup3()" << std::endl;
     }
 
     virtual void access3(const struct RPCProcedure* /*proc*/,
-                         const struct ACCESS3args* /*args*/,
-                         const struct ACCESS3res* /*res*/)
+                         const struct rpcgen::ACCESS3args* /*args*/,
+                         const struct rpcgen::ACCESS3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::access3()" << std::endl;
     }
 
     virtual void readlink3(const struct RPCProcedure* /*proc*/,
-                           const struct READLINK3args* /*args*/,
-                           const struct READLINK3res* /*res*/)
+                           const struct rpcgen::READLINK3args* /*args*/,
+                           const struct rpcgen::READLINK3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::readlink3()" << std::endl;
     }
 
     virtual void read3(const struct RPCProcedure* /*proc*/,
-                       const struct READ3args* /*args*/,
-                       const struct READ3res* /*res*/)
+                       const struct rpcgen::READ3args* /*args*/,
+                       const struct rpcgen::READ3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::read3()" << std::endl;
     }
 
     virtual void write3(const struct RPCProcedure* /*proc*/,
-                        const struct WRITE3args* /*args*/,
-                        const struct WRITE3res* /*res*/)
+                        const struct rpcgen::WRITE3args* /*args*/,
+                        const struct rpcgen::WRITE3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::write3()" << std::endl;
     }
 
     virtual void create3(const struct RPCProcedure* /*proc*/,
-                         const struct CREATE3args* /*args*/,
-                         const struct CREATE3res* /*res*/)
+                         const struct rpcgen::CREATE3args* /*args*/,
+                         const struct rpcgen::CREATE3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::create3()" << std::endl;
     }
 
     virtual void mkdir3(const struct RPCProcedure* /*proc*/,
-                        const struct MKDIR3args* /*args*/,
-                        const struct MKDIR3res* /*res*/)
+                        const struct rpcgen::MKDIR3args* /*args*/,
+                        const struct rpcgen::MKDIR3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::mkdir3()" << std::endl;
     }
 
     virtual void symlink3(const struct RPCProcedure* /*proc*/,
-                          const struct SYMLINK3args* /*args*/,
-                          const struct SYMLINK3res* /*res*/)
+                          const struct rpcgen::SYMLINK3args* /*args*/,
+                          const struct rpcgen::SYMLINK3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::symlink3()" << std::endl;
     }
 
     virtual void mknod3(const struct RPCProcedure* /*proc*/,
-                        const struct MKNOD3args* /*args*/,
-                        const struct MKNOD3res* /*res*/)
+                        const struct rpcgen::MKNOD3args* /*args*/,
+                        const struct rpcgen::MKNOD3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::mknod3()" << std::endl;
     }
 
     virtual void remove3(const struct RPCProcedure* /*proc*/,
-                         const struct REMOVE3args* /*args*/,
-                         const struct REMOVE3res* /*res*/)
+                         const struct rpcgen::REMOVE3args* /*args*/,
+                         const struct rpcgen::REMOVE3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::remove3()" << std::endl;
     }
 
     virtual void rmdir3(const struct RPCProcedure* /*proc*/,
-                        const struct RMDIR3args* /*args*/,
-                        const struct RMDIR3res* /*res*/)
+                        const struct rpcgen::RMDIR3args* /*args*/,
+                        const struct rpcgen::RMDIR3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::rmdir3()" << std::endl;
     }
 
     virtual void rename3(const struct RPCProcedure* /*proc*/,
-                         const struct RENAME3args* /*args*/,
-                         const struct RENAME3res* /*res*/)
+                         const struct rpcgen::RENAME3args* /*args*/,
+                         const struct rpcgen::RENAME3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::rename3()" << std::endl;
     }
 
     virtual void link3(const struct RPCProcedure* /*proc*/,
-                       const struct LINK3args* /*args*/,
-                       const struct LINK3res* /*res*/)
+                       const struct rpcgen::LINK3args* /*args*/,
+                       const struct rpcgen::LINK3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::link3()" << std::endl;
     }
 
     virtual void readdir3(const struct RPCProcedure* /*proc*/,
-                          const struct READDIR3args* /*args*/,
-                          const struct READDIR3res* /*res*/)
+                          const struct rpcgen::READDIR3args* /*args*/,
+                          const struct rpcgen::READDIR3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::readdir3()" << std::endl;
     }
 
     virtual void readdirplus3(const struct RPCProcedure* /*proc*/,
-                              const struct READDIRPLUS3args* /*args*/,
-                              const struct READDIRPLUS3res* /*res*/)
+                              const struct rpcgen::READDIRPLUS3args* /*args*/,
+                              const struct rpcgen::READDIRPLUS3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::readdirplus3()" << std::endl;
     }
 
     virtual void fsstat3(const struct RPCProcedure* /*proc*/,
-                         const struct FSSTAT3args* /*args*/,
-                         const struct FSSTAT3res* /*res*/)
+                         const struct rpcgen::FSSTAT3args* /*args*/,
+                         const struct rpcgen::FSSTAT3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::fsstat3()" << std::endl;
     }
 
     virtual void fsinfo3(const struct RPCProcedure* /*proc*/,
-                         const struct FSINFO3args* /*args*/,
-                         const struct FSINFO3res* /*res*/)
+                         const struct rpcgen::FSINFO3args* /*args*/,
+                         const struct rpcgen::FSINFO3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::fsinfo3()" << std::endl;
     }
 
     virtual void pathconf3(const struct RPCProcedure* /*proc*/,
-                           const struct PATHCONF3args* /*args*/,
-                           const struct PATHCONF3res* /*res*/)
+                           const struct rpcgen::PATHCONF3args* /*args*/,
+                           const struct rpcgen::PATHCONF3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::pathconf3()" << std::endl;
     }
 
     virtual void commit3(const struct RPCProcedure* /*proc*/,
-                         const struct COMMIT3args* /*args*/,
-                         const struct COMMIT3res* /*res*/)
+                         const struct rpcgen::COMMIT3args* /*args*/,
+                         const struct rpcgen::COMMIT3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::commit3()" << std::endl;
+    }
+
+    void null(const struct RPCProcedure* /*proc*/,
+              const struct rpcgen::NULL4args* /*args*/,
+              const struct rpcgen::NULL4res* /*res*/) override final
+    {
+        std::cout << "TestAnalyzer::null()" << std::endl;
+    }
+    virtual void compound4(const struct RPCProcedure* /*proc*/,
+                           const struct rpcgen::COMPOUND4args* /*args*/,
+                           const struct rpcgen::COMPOUND4res* /*res*/) override final
+    {
+        std::cout << "TestAnalyzer::compound4()" << std::endl;
     }
 
     virtual void flush_statistics()

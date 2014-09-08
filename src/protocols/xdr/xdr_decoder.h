@@ -47,7 +47,8 @@ public:
 class XDRDecoder
 {
 public:
-    XDRDecoder(FilteredDataQueue::Ptr&& p) : ptr{std::move(p)}
+    XDRDecoder(FilteredDataQueue::Ptr&& p)
+    : ptr{std::move(p)}
     {
         xdrmem_create(&txdr, (char*)ptr->data, ptr->dlen, XDR_DECODE);
     }
@@ -60,11 +61,8 @@ public:
 
     inline const FilteredData& data() const { return *ptr; }
 
-    #ifndef __FreeBSD__
-    inline static bool_t return_true(XDR*, void*, ...) { return 1; };
-    #else
-    inline static bool_t return_true(XDR*, ...) { return 1; };
-    #endif
+    inline static bool_t return_true(XDR*, void*, ...) { return 1; }
+    inline static bool_t return_true(XDR*, ...) { return 1; }
 
 private:
     XDR txdr;
