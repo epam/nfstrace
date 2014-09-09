@@ -19,7 +19,7 @@ find_package(Threads REQUIRED) # POSIX Threads
 #find_package(PCAP REQUIRED) # libpcap
 
 # build application ============================================================
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC -fvisibility=hidden")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -pedantic -Wall -Werror -Wextra -fPIC -fvisibility=hidden")
 set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
 set (NST_V_MAJOR "0")

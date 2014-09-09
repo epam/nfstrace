@@ -74,7 +74,6 @@ public:
     void collect(PacketInfo& info)
     {
         // TODO: this code must be generalized with RPCFiltrator class
-    
         uint32_t hdr_len = 0;
         auto msg = reinterpret_cast<const MessageHeader*const>(info.data);
         switch(msg->type())
@@ -613,7 +612,7 @@ public:
                                 nfs3_read_match.insert(call->xid());
                             hdr_len = msg_len;
                         }
-                        TRACE("%p| MATCH RPC Call  xid:%u len: %u procedure: %u", this, call->xid(), msg_len, call->proc());
+                        //TRACE("%p| MATCH RPC Call  xid:%u len: %u procedure: %u", this, call->xid(), msg_len, call->proc());
                     }
                     else if (NFS4::Validator::check(call))
                     {
@@ -647,7 +646,7 @@ public:
                     }
                     else
                         hdr_len = msg_len; // length of current RPC message
-                    TRACE("%p| MATCH RPC Reply xid:%u len: %u", this, reply->xid(), msg_len);
+                    //TRACE("%p| MATCH RPC Reply xid:%u len: %u", this, reply->xid(), msg_len);
                     return true;
                 }
                 else // isn't RPC reply, stream is corrupt
