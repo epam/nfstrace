@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 #include <iomanip>
 
+#include "protocols/nfs/nfs_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
 //------------------------------------------------------------------------------
 using namespace rpcgen;
@@ -31,6 +32,8 @@ namespace protocols
 {
 namespace NFS4
 {
+
+using namespace NST::protocols::NFS;  // NFS helpers
 
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc)
 {
@@ -152,39 +155,58 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::nfsstat4& obj)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::verifier4& obj)
-{
-    out << std::hex << std::setfill('0') << std::setw(2);
-
-    for(uint32_t i = 0; i < NFS4_VERIFIER_SIZE; i++)
-    {
-        out << std::setw(2) << (uint32_t) (obj[i]);
-    }
-    return out << std::dec << std::setfill(' ');
-}
-
 std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj)
 {
-    if(obj.bitmap4_len) return out << *obj.bitmap4_val;
-    else                return out << "void";
+    if(obj.bitmap4_len)
+    {
+        out << "mask: "; print_hex(out,obj.bitmap4_val, obj.bitmap4_len);
+        const size_t nbits = obj.bitmap4_len*32;
+
+        static const uint32_t fattr4_attributes_count = 56;
+        static const char* const FATTR4Attributes[fattr4_attributes_count] =
+        {
+            "SUPPORTED_ATTRS", "TYPE",           "FH_EXPIRE_TYPE",  "CHANGE",
+            "SIZE",            "LINK_SUPPORT",   "SYMLINK_SUPPORT", "NAMED_ATTR",
+            "FSID",            "UNIQUE_HANDLES", "LEASE_TIME",      "RDATTR_ERROR",
+            "ACL",             "ACLSUPPORT",     "ARCHIVE",         "CANSETTIME",
+            "CASE_INSENSITIVE","CASE_PRESERVING","CHOWN_RESTRICTED","FILEHANDLE",
+            "FILEID",          "FILES_AVAIL",    "FILES_FREE",      "FILES_TOTAL",
+            "FS_LOCATIONS",    "HIDDEN",         "HOMOGENEOUS",     "MAXFILESIZE",
+            "MAXLINK",         "MAXNAME",        "MAXREAD",         "MAXWRITE",
+            "MIMETYPE",        "MODE",           "NO_TRUNC",        "NUMLINKS",
+            "OWNER",           "OWNER_GROUP",    "QUOTA_AVAIL_HARD","QUOTA_AVAIL_SOFT",
+            "QUOTA_USED",      "RAWDEV",         "SPACE_AVAIL",     "SPACE_FREE",
+            "SPACE_TOTAL",     "SPACE_USED",     "SYSTEM",          "TIME_ACCESS",
+            "TIME_ACCESS_SET", "TIME_BACKUP",    "TIME_CREATE",     "TIME_DELTA",
+            "TIME_METADATA",   "TIME_MODIFY",    "TIME_MODIFY_SET", "MOUNTED_ON_FILEID",
+        };
+        for(size_t i=0; i<nbits; i++)
+        {
+            const int bit = (obj.bitmap4_val[i / 32] >> (i % 32)) & 0x1;
+            if(bit) out << ' ' << FATTR4Attributes[i];
+        }
+    }
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::utf8string& obj)
 {
-    if(obj.utf8string_len) return out << *obj.utf8string_val;
-    else                   return out << "void";
+    return print_hex(out, obj.utf8string_val, obj.utf8string_len);
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::pathname4& obj)
 {
-    if(obj.pathname4_len) return out << *obj.pathname4_val;
-    else                  return out << "void";
+    rpcgen::component4 *current_el = obj.pathname4_val;
+    for(size_t i=0;i<obj.pathname4_len;i++,current_el++)
+    {
+        out << current_el->utf8string_val + ' ';
+    }
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::sec_oid4& obj)
 {
-    if(obj.sec_oid4_len) return out << *obj.sec_oid4_val;
-    else                 return out << "void";
+    return print_hex(out, obj.sec_oid4_val, obj.sec_oid4_len);
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime4& obj)
@@ -210,8 +232,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::settime4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_fh4& obj)
 {
-    if(obj.nfs_fh4_len) return out << *obj.nfs_fh4_val;
-    else                return out << "void";
+    return print_hex(out, obj.nfs_fh4_val, obj.nfs_fh4_len);
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::fsid4& obj)
@@ -222,18 +243,27 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::fsid4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::fs_location4& obj)
 {
-    out <<  "root path: " << obj.rootpath
-        << " locations: ";
-    if(obj.server.server_len) return out << *obj.server.server_val;
-    else                      return out << "void";
+    out <<  "root path: " << obj.rootpath;
+    rpcgen::utf8str_cis *current_el = obj.server.server_val;
+    for(size_t i=0;i<obj.server.server_len;i++,current_el++)
+    {
+        out << current_el->utf8string_val + ' ';
+    }
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::fs_locations4& obj)
 {
-    out <<  "root: " << obj.fs_root
-        << " locations: ";
-    if(obj.locations.locations_len) return out << *obj.locations.locations_val;
-    else                            return out << "void";
+    out <<  "root: " << obj.fs_root;
+    if(obj.locations.locations_len)
+    {
+        rpcgen::fs_location4* current_el = obj.locations.locations_val;
+        for(u_int i=0; i<obj.locations.locations_len; i++, current_el++)
+        {
+           out << current_el;
+        }
+    }
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfsace4& obj)
@@ -256,23 +286,19 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::fattr4_acl& obj)
     else                   return out << "void";
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::attrlist4& obj)
-{
-    if(obj.attrlist4_len) return out << *obj.attrlist4_val;
-    else                  return out << "void";
-}
-
 std::ostream& operator<<(std::ostream& out, const rpcgen::fattr4& obj)
 {
-    return out <<  "mask: " << obj.attrmask
-               << " val: "  << obj.attr_vals;
+    return out << obj.attrmask;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::change_info4& obj)
 {
-    return out <<  "atomic: " << obj.atomic
-               << " before: " << obj.before
-               << " after: "  << obj.after;
+    out <<  " atomic: ";
+    if(obj.atomic) out << "YES";
+    else           out << "NO";
+
+    return out << " change id before: " << obj.before
+               << " change id after: "  << obj.after;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::clientaddr4& obj)
@@ -289,7 +315,9 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::cb_client4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::stateid4& obj)
 {
-    return out << obj.seqid << " other: " << obj.other;
+    out << " seqid: 0x" << std::hex << obj.seqid << " data: ";
+    print_hex(out, obj.other, 12);
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_client_id4& obj)
@@ -301,16 +329,16 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_client_id4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::open_owner4& obj)
 {
-    out <<  "client id: " <<  obj.clientid;
-    if(obj.owner.owner_len) return out << " " <<  *obj.owner.owner_val;
-    else                    return out << " void";
+    out <<  "client id: 0x" << std::hex << obj.clientid << " owner: ";
+    print_hex(out, obj.owner.owner_val, obj.owner.owner_len);
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::lock_owner4& obj)
 {
-    out <<  "client id: " <<  obj.clientid;
-    if(obj.owner.owner_len) return out << " " << *obj.owner.owner_val;
-    else                    return out << " void";
+    out <<  "client id: 0x" << std::hex << obj.clientid << " owner: ";
+    print_hex(out, obj.owner.owner_val, obj.owner.owner_len);
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_lock_type4& obj)
@@ -342,10 +370,10 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::dir_delegation_status4
 {
     switch(obj)
     {
-    case dir_delegation_status4::NFS4_DIR_DELEGATION_NONE:    return out << "none";
-    case dir_delegation_status4::NFS4_DIR_DELEGATION_READ:    return out << "read";
-    case dir_delegation_status4::NFS4_DIR_DELEGATION_DENIED:  return out << "denied";
-    case dir_delegation_status4::NFS4_DIR_DELEGATION_UNAVAIL: return out << "unavailable";
+    case dir_delegation_status4::NFS4_DIR_DELEGATION_NONE:    return out << "NONE";
+    case dir_delegation_status4::NFS4_DIR_DELEGATION_READ:    return out << "READ";
+    case dir_delegation_status4::NFS4_DIR_DELEGATION_DENIED:  return out << "DENIED";
+    case dir_delegation_status4::NFS4_DIR_DELEGATION_UNAVAIL: return out << "UNAVAILABLE";
     }
     return out;
 }
@@ -377,9 +405,9 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::createmode4& obj)
 {
     switch(obj)
     {
-    case rpcgen::createmode4::UNCHECKED4: return out << "unchecked";
-    case rpcgen::createmode4::GUARDED4:   return out << "guarded";
-    case rpcgen::createmode4::EXCLUSIVE4: return out << "exclusive";
+    case rpcgen::createmode4::UNCHECKED4: return out << "UNCHECKED";
+    case rpcgen::createmode4::GUARDED4:   return out << "GUARDED";
+    case rpcgen::createmode4::EXCLUSIVE4: return out << "EXCLUSIVE";
     }
     return out;
 }
@@ -388,8 +416,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::opentype4& obj)
 {
     switch(obj)
     {
-    case rpcgen::opentype4::OPEN4_NOCREATE: return out << "no create";
-    case rpcgen::opentype4::OPEN4_CREATE:   return out << "create";
+    case rpcgen::opentype4::OPEN4_NOCREATE: return out << "NO CREATE";
+    case rpcgen::opentype4::OPEN4_CREATE:   return out << "CREATE";
     }
     return out;
 }
@@ -398,8 +426,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::limit_by4& obj)
 {
     switch(obj)
     {
-    case rpcgen::limit_by4::NFS_LIMIT_SIZE:   return out << "size";
-    case rpcgen::limit_by4::NFS_LIMIT_BLOCKS: return out << "blocks";
+    case rpcgen::limit_by4::NFS_LIMIT_SIZE:   return out << "SIZE";
+    case rpcgen::limit_by4::NFS_LIMIT_BLOCKS: return out << "BLOCKS";
     }
     return out;
 }
@@ -408,9 +436,9 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::open_delegation_type4&
 {
     switch(obj)
     {
-    case rpcgen::open_delegation_type4::OPEN_DELEGATE_NONE:  return out << "none";
-    case rpcgen::open_delegation_type4::OPEN_DELEGATE_READ:  return out << "read";
-    case rpcgen::open_delegation_type4::OPEN_DELEGATE_WRITE: return out << "write";
+    case rpcgen::open_delegation_type4::OPEN_DELEGATE_NONE:  return out << "NONE";
+    case rpcgen::open_delegation_type4::OPEN_DELEGATE_READ:  return out << "READ";
+    case rpcgen::open_delegation_type4::OPEN_DELEGATE_WRITE: return out << "WRITE";
     }
     return out;
 }
@@ -420,10 +448,10 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::open_claim_type4& obj)
 {
     switch(obj)
     {
-    case rpcgen::open_claim_type4::CLAIM_NULL:          return out << "null";
-    case rpcgen::open_claim_type4::CLAIM_PREVIOUS:      return out << "previous";
-    case rpcgen::open_claim_type4::CLAIM_DELEGATE_CUR:  return out << "delegate current";
-    case rpcgen::open_claim_type4::CLAIM_DELEGATE_PREV: return out << "delegate previous";
+    case rpcgen::open_claim_type4::CLAIM_NULL:          return out << "NULL";
+    case rpcgen::open_claim_type4::CLAIM_PREVIOUS:      return out << "PREVIOUS";
+    case rpcgen::open_claim_type4::CLAIM_DELEGATE_CUR:  return out << "DELEGATE CURRENT";
+    case rpcgen::open_claim_type4::CLAIM_DELEGATE_PREV: return out << "DELEGATE PREVIOUS";
     }
     return out;
 }
@@ -432,9 +460,9 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::rpc_gss_svc_t& obj)
 {
     switch(obj)
     {
-    case rpcgen::rpc_gss_svc_t::RPC_GSS_SVC_NONE:      return out << "none";
-    case rpcgen::rpc_gss_svc_t::RPC_GSS_SVC_INTEGRITY: return out << "integrity";
-    case rpcgen::rpc_gss_svc_t::RPC_GSS_SVC_PRIVACY:   return out << "privacy";
+    case rpcgen::rpc_gss_svc_t::RPC_GSS_SVC_NONE:      return out << "NONE";
+    case rpcgen::rpc_gss_svc_t::RPC_GSS_SVC_INTEGRITY: return out << "INTEGRITY";
+    case rpcgen::rpc_gss_svc_t::RPC_GSS_SVC_PRIVACY:   return out << "PRIVACY";
     }
     return out;
 }
@@ -443,23 +471,24 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::stable_how4& obj)
 {
     switch(obj)
     {
-    case rpcgen::stable_how4::UNSTABLE4:  return out << "unstable";
-    case rpcgen::stable_how4::DATA_SYNC4: return out << "data sync";
-    case rpcgen::stable_how4::FILE_SYNC4: return out << "file sync";
+    case rpcgen::stable_how4::UNSTABLE4:  return out << "UNSTABLE";
+    case rpcgen::stable_how4::DATA_SYNC4: return out << "DATA SYNC";
+    case rpcgen::stable_how4::FILE_SYNC4: return out << "FILE SYNC";
     }
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::createhow4& obj)
 {
-    out <<  "mode: "       << obj.mode;
+    out <<  " mode: " << obj.mode;
     switch(obj.mode)
     {
     case rpcgen::createmode4::UNCHECKED4:
     case rpcgen::createmode4::GUARDED4:
         return out << " attributes: " << obj.createhow4_u.createattrs;
     case rpcgen::createmode4::EXCLUSIVE4:
-        return out << " verifier: "   << obj.createhow4_u.createverf;
+        out << " verifier: ";
+        print_hex(out, obj.createhow4_u.createverf, NFS4_VERIFIER_SIZE);
     default: break;
     }
     return out;
@@ -469,8 +498,9 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::openflag4& obj)
 {
     out <<  "open type: " << obj.opentype;
     if(obj.opentype == rpcgen::opentype4::OPEN4_CREATE)
-         return out << " how: " << obj.openflag4_u.how;
-    else return out;
+        return out << obj.openflag4_u.how;
+    else
+        return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_modified_limit4& obj)
@@ -505,7 +535,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::open_claim4& obj)
     switch(obj.claim)
     {
     case rpcgen::open_claim_type4::CLAIM_NULL:
-                                    return out << " file: " << obj.open_claim4_u.file;
+                                    return out << " file: " << obj.open_claim4_u.file.utf8string_val;
     case rpcgen::open_claim_type4::CLAIM_PREVIOUS:
                            return out << " delegate type: " << obj.open_claim4_u.delegate_type;
     case rpcgen::open_claim_type4::CLAIM_DELEGATE_CUR:
@@ -534,15 +564,16 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::open_write_delegation4
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::open_delegation4& obj)
 {
-    out <<  "type: "  << obj.delegation_type;
+    out <<  "delegation type: "  << obj.delegation_type;
     switch(obj.delegation_type)
     {
     case rpcgen::open_delegation_type4::OPEN_DELEGATE_NONE:
-        return out << " none";
+        break;
     case rpcgen::open_delegation_type4::OPEN_DELEGATE_READ:
-        return out << " read: "  << obj.open_delegation4_u.read;
+        return out << ": "  << obj.open_delegation4_u.read;
     case rpcgen::open_delegation_type4::OPEN_DELEGATE_WRITE:
-        return out << " write: " << obj.open_delegation4_u.write;
+        return out << ": " << obj.open_delegation4_u.write;
+    default: break;
     }
     return out;
 }

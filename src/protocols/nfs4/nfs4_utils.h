@@ -27,7 +27,7 @@
 
 #include "api/nfs_types.h"
 #include "api/nfs4_types_rpcgen.h"
-
+#include "protocols/nfs/nfs_utils.h"
 #include "protocols/rpc/rpc_header.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -36,6 +36,8 @@ namespace protocols
 {
 namespace NFS4
 {
+const uint32_t NFS4_VERIFIER_SIZE {8};
+
 using ProcEnumNFS4 = API::ProcEnumNFS4;
 
 using Validator = rpc::RPCProgramValidator
@@ -75,7 +77,6 @@ const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc);
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc);
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_ftype4& obj);
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfsstat4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::verifier4& obj);
 std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj);
 std::ostream& operator<<(std::ostream& out, const rpcgen::utf8string& obj);
 std::ostream& operator<<(std::ostream& out, const rpcgen::pathname4& obj);
