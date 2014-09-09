@@ -24,6 +24,8 @@
 //------------------------------------------------------------------------------
 #include <ostream>
 #include <cstring>
+
+#include "api/nfs3_types_rpcgen.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -32,6 +34,7 @@ namespace protocols
 namespace NFS
 {
 
+std::ostream& print_access3(std::ostream& out, const rpcgen::uint32 val);
 std::ostream& print_hex(std::ostream& out, const uint32_t* const val, const size_t len);
 std::ostream& print_hex(std::ostream& out, const char* const val, const size_t len);
 std::ostream& operator<<(std::ostream& out, const char* obj);
