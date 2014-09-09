@@ -36,7 +36,6 @@ namespace protocols
 {
 namespace NFS4
 {
-const uint32_t NFS4_VERIFIER_SIZE {8};
 
 using ProcEnumNFS4 = API::ProcEnumNFS4;
 

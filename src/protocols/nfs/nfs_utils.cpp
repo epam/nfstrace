@@ -67,6 +67,18 @@ std::ostream& print_hex(std::ostream& out, const char* const val, const size_t l
     }
 }
 
+std::ostream& print_access3(std::ostream& out, const rpcgen::uint32 val)
+{
+    if (val & rpcgen::ACCESS3_READ)    out << "READ ";
+    if (val & rpcgen::ACCESS3_LOOKUP)  out << "LOOKUP ";
+    if (val & rpcgen::ACCESS3_MODIFY)  out << "MODIFY ";
+    if (val & rpcgen::ACCESS3_EXTEND)  out << "EXTEND ";
+    if (val & rpcgen::ACCESS3_DELETE)  out << "DELETE ";
+    if (val & rpcgen::ACCESS3_EXECUTE) out << "EXECUTE ";
+
+    return out;
+}
+
 std::ostream& operator<<(std::ostream& out, const char* obj)
 {
     if(strlen(obj)>0)
