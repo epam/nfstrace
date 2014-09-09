@@ -199,10 +199,6 @@ bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
                     out << " some unknown reason"
                         << " (failed locally)";
                     break;
-                default:
-                    out << " some unknown reason"
-                        << " (failed locally)";
-                    break;
                 }
                 break;
             }
