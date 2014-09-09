@@ -48,12 +48,12 @@ public:
 
 private:
     enum: uint32_t {
-        CACHE_SIZE = 4000 
+        CACHE_SIZE = 4000
     };
     uint8_t     cache[CACHE_SIZE];
     uint8_t*    memory{nullptr};
     uint32_t    memsize{0};
-    
+
 public:
     // disable copying
     FilteredData(const FilteredData&)            = delete;
@@ -104,7 +104,7 @@ public:
         }
     }
 
-    // Reset data. Release free memory if allocated 
+    // Reset data. Release free memory if allocated
     inline void reset()
     {
         if (nullptr != memory)

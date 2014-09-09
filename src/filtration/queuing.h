@@ -119,8 +119,8 @@ public:
             assert(nullptr != ptr);
 
             uint8_t* offset_ptr = ptr->data + ptr->dlen;
-            const uint32_t avail = ptr->capacity() - ptr->dlen; 
-            if(len > avail) // inappropriate case. Must be one resize when get entire message size 
+            const uint32_t avail = ptr->capacity() - ptr->dlen;
+            if(len > avail) // inappropriate case. Must be one resize when get entire message size
             {
                 assert(avail >= len);
                 //LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, avail, len);
@@ -154,10 +154,10 @@ public:
             ptr = nullptr;
         }
 
-        inline uint32_t data_size() const { return ptr->dlen; }
-        inline uint32_t capacity() const { return ptr->capacity(); }
-        inline const uint8_t* data() const { return ptr->data; }
-        inline operator bool() const { return ptr != nullptr; }
+        inline uint32_t data_size()  const { return ptr->dlen;       }
+        inline uint32_t capacity()   const { return ptr->capacity(); }
+        inline const uint8_t* data() const { return ptr->data;       }
+        inline operator bool()       const { return ptr != nullptr;  }
 
     private:
         Queue* queue;

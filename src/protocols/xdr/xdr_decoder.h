@@ -62,7 +62,7 @@ public:
     inline const FilteredData& data() const { return *ptr; }
 
     inline static bool_t return_true(XDR*, void*, ...) { return 1; }
-    inline static bool_t return_true(XDR*, ...) { return 1; }
+    inline static bool_t return_true(XDR*, ...)        { return 1; }
 
 private:
     XDR txdr;

@@ -263,7 +263,7 @@ public:
 
     void null(const struct RPCProcedure* proc,
               const struct rpcgen::NULL3args*,
-              const struct rpcgen::NULL3res*) override final { account(proc); } 
+              const struct rpcgen::NULL3res*) override final { account(proc); }
     void getattr3(const struct RPCProcedure* proc,
                   const struct rpcgen::GETATTR3args*,
                   const struct rpcgen::GETATTR3res*) override final { account(proc); }
@@ -397,7 +397,7 @@ public:
                 out << 0;
             out << "%" << std::endl;
         }
-         
+
         if(nfs4_per_op_stat.size())  // is not empty?
         {
             out << "Per connection info: " << std::endl;
@@ -423,7 +423,6 @@ public:
                 store_per_session(file, current, session.str(), s_total, NFS_V4);
             }
         }
- 
     }
 
     void store_per_session(std::ostream& file, const Breakdown& breakdown, const std::string& session, uint64_t s_total, unsigned int nfs_vers) const
