@@ -159,7 +159,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj)
 {
     if(obj.bitmap4_len)
     {
-        out << "mask: "; print_hex(out,obj.bitmap4_val, obj.bitmap4_len);
+        out << "mask: "; print_hex(out, obj.bitmap4_val, obj.bitmap4_len);
         const size_t nbits = obj.bitmap4_len*32;
 
         static const uint32_t fattr4_attributes_count = 56;
@@ -191,7 +191,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::utf8string& obj)
 {
-    return print_hex(out, obj.utf8string_val, obj.utf8string_len);
+    return NFS::print_hex(out, obj.utf8string_val, obj.utf8string_len);
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::pathname4& obj)
@@ -206,7 +206,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::pathname4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::sec_oid4& obj)
 {
-    return print_hex(out, obj.sec_oid4_val, obj.sec_oid4_len);
+    return NFS::print_hex(out, obj.sec_oid4_val, obj.sec_oid4_len);
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime4& obj)
@@ -535,7 +535,10 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::open_claim4& obj)
     switch(obj.claim)
     {
     case rpcgen::open_claim_type4::CLAIM_NULL:
-                                    return out << " file: " << obj.open_claim4_u.file.utf8string_val;
+        out << " file: ";
+        out.write(obj.open_claim4_u.file.utf8string_val,obj.open_claim4_u.file.utf8string_len);
+        return out << "\0";
+//                                    return out << " file: " << obj.open_claim4_u.file;
     case rpcgen::open_claim_type4::CLAIM_PREVIOUS:
                            return out << " delegate type: " << obj.open_claim4_u.delegate_type;
     case rpcgen::open_claim_type4::CLAIM_DELEGATE_CUR:
