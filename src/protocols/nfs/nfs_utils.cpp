@@ -30,16 +30,16 @@ namespace protocols
 namespace NFS
 {
 
-std::ostream& print_hex(std::ostream& out, const uint32_t* const val, const size_t len)
+std::ostream& print_hex(std::ostream& out, const uint32_t* val, const uint32_t len)
 {
     if(len)
     {
-        out << std::hex << std::setfill('0') << "0x";
+        out << std::hex << std::setfill('0') << std::setw(2) << "0x";
         for(uint32_t i = 0; i < len; i++)
         {
-            out << std::setw(2) << val[i];
+            out << val[i];
         }
-        return out << std::dec << std::setfill(' ');
+        return out << std::dec << std::setfill(' ') << std::setw(1) << "\0";
     }
     else
     {
@@ -47,19 +47,19 @@ std::ostream& print_hex(std::ostream& out, const uint32_t* const val, const size
     }
 }
 
-std::ostream& print_hex(std::ostream& out, const char* const val, const size_t len)
+std::ostream& print_hex(std::ostream& out, const char* const val, const uint32_t len)
 {
     if(len)
     {
-        out << std::hex << std::setfill('0') << "0x";
+        out << std::hex << std::setfill('0') << std::setw(2) << "0x";
         for(uint32_t i = 0; i < len; i++)
         {
             if(static_cast<int32_t>(val[i])<0)
-                out << std::setw(2) << ((static_cast<int32_t>(val[i])) - 0xFFFFFF00);
+                out << ((static_cast<int32_t>(val[i])) & 0xFF);
             else
-                out << std::setw(2) <<   static_cast<int32_t>(val[i]);
+                out << static_cast<int32_t>(val[i]);
         }
-        return out << std::dec << std::setfill(' ');
+        return out << std::dec << std::setfill(' ') << std::setw(1) << "\0";
     }
     else
     {
@@ -76,18 +76,6 @@ std::ostream& print_access3(std::ostream& out, const rpcgen::uint32 val)
     if (val & rpcgen::ACCESS3_DELETE)  out << "DELETE ";
     if (val & rpcgen::ACCESS3_EXECUTE) out << "EXECUTE ";
 
-    return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const char* obj)
-{
-    if(strlen(obj)>0)
-    {
-        for(u_int i=0;i<strlen(obj);i++)
-        {
-            out << obj[i];
-        }
-    }
     return out;
 }
 

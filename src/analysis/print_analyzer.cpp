@@ -229,7 +229,7 @@ void PrintAnalyzer::getattr3(const struct RPCProcedure*         proc,
 {
     if(!print_procedure(out, proc)) return;
 
-    if(args) out << "\tCALL [ "
+    if(args) out << "\tCALL  ["
                  << " object: " << args->object
                  << " ]\n";
     if(res)
@@ -247,7 +247,7 @@ void PrintAnalyzer::setattr3(const struct RPCProcedure*         proc,
 {
     if(!print_procedure(out, proc)) return;
 
-    if(args) out << "\tCALL [ "
+    if(args) out << "\tCALL  ["
                  << " object: "         << args->object
                  << " new attributes: " << args->new_attributes
                  << " guard: "          << args->guard
@@ -272,7 +272,7 @@ void PrintAnalyzer::lookup3(const struct RPCProcedure*        proc,
 {
     if(!print_procedure(out, proc)) return;
 
-    if(args) out << "\tCALL [ "
+    if(args) out << "\tCALL  ["
                  << " what: " << args->what
                  << " ]\n";
     if(res)
@@ -299,7 +299,7 @@ void PrintAnalyzer::access3(const struct RPCProcedure*        proc,
 
     if(args)
     {
-        out << "\tCALL [ "
+        out << "\tCALL  ["
                  << " object: "; print_nfs_fh(out, args->object.data.data_val, args->object.data.data_len);
         out << " access: "; print_access3(out, args->access);
         out << " ]\n";
@@ -330,7 +330,7 @@ void PrintAnalyzer::readlink3(const struct RPCProcedure*          proc,
 {
     if(!print_procedure(out, proc)) return;
 
-    if(args) out << "\tCALL [ "
+    if(args) out << "\tCALL  ["
                  << " symlink: " << args->symlink
                  << " ]\n";
     if(res)
@@ -354,7 +354,7 @@ void PrintAnalyzer::read3(const struct RPCProcedure*      proc,
 {
     if(!print_procedure(out, proc)) return;
 
-    if(args) out << "\tCALL [ "
+    if(args) out << "\tCALL  ["
                  << " file: "   << args->file
                  << " offset: " << args->offset
                  << " count: "  << args->count
@@ -389,7 +389,7 @@ void PrintAnalyzer::write3(const struct RPCProcedure*       proc,
 
     if(args)
     {
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " file: "   << args->file
             << " offset: " << args->offset
             << " count: "  << args->count
@@ -427,7 +427,7 @@ void PrintAnalyzer::create3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " where: " << args->where
             << " how: "   << args->how
             << " ]\n";
@@ -454,7 +454,7 @@ void PrintAnalyzer::mkdir3(const struct RPCProcedure*       proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " where: "      << args->where
             << " attributes: " << args->attributes
             << " ]\n";
@@ -481,7 +481,7 @@ void PrintAnalyzer::symlink3(const struct RPCProcedure*         proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " where: "   << args->where
             << " symlink: " << args->symlink
             << " ]\n";
@@ -509,7 +509,7 @@ void PrintAnalyzer::mknod3(const struct RPCProcedure*       proc,
 
     if(args)
     {
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " where: " << args->where
             << " what: "  << args->what
             << " ]\n";
@@ -537,7 +537,7 @@ void PrintAnalyzer::remove3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " object: " << args->object
             << " ]\n";
     if(res)
@@ -562,7 +562,7 @@ void PrintAnalyzer::rmdir3(const struct RPCProcedure*       proc,
 
     if(args)
     {
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " object: " << args->object
             << " ]\n";
     }
@@ -587,7 +587,7 @@ void PrintAnalyzer::rename3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " from: " << args->from
             << " to: "   << args->to
             << " ]\n";
@@ -614,7 +614,7 @@ void PrintAnalyzer::link3(const struct RPCProcedure*      proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " file: " << args->file
             << " link: " << args->link
             << " ]\n";
@@ -641,7 +641,7 @@ void PrintAnalyzer::readdir3(const struct RPCProcedure*         proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " dir: "        << args->dir
             << " cookie: "     << args->cookie
             << " cookieverf: " << args->cookieverf
@@ -670,7 +670,7 @@ void PrintAnalyzer::readdirplus3(const struct RPCProcedure*             proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " dir: "        << args->dir
             << " cookie: "     << args->cookie
             << " cookieverf: " << args->cookieverf
@@ -700,7 +700,7 @@ void PrintAnalyzer::fsstat3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " fsroot: " << args->fsroot
             << " ]\n";
     if(res)
@@ -731,7 +731,7 @@ void PrintAnalyzer::fsinfo3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " fsroot: " << args->fsroot
             << " ]\n";
     if(res)
@@ -765,7 +765,7 @@ void PrintAnalyzer::pathconf3(const struct RPCProcedure*          proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " object: " << args->object
             << " ]\n";
     if(res)
@@ -795,7 +795,7 @@ void PrintAnalyzer::commit3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " file: "   << args->file
             << " offset: " << args->offset
             << " count: "  << args->count
@@ -846,7 +846,7 @@ void PrintAnalyzer::compound4(const struct RPCProcedure*          proc,
     if(args)
     {
         array_len = &args->argarray.argarray_len;
-        out << "\tCALL [ "
+        out << "\tCALL  ["
             << " operations: " << *array_len
             << " tag: " << args->tag
             << " minor version: " << args->minorversion;

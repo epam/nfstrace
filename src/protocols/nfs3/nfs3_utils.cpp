@@ -111,7 +111,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_fh3& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime3& obj)
 {
-    return out << "seconds: " << obj.seconds << " nseconds: " << obj.nseconds;
+    return out << "seconds: " << obj.seconds << " nseconds: " << obj.nseconds << " ";
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::fattr3& obj)
