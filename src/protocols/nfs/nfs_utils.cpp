@@ -30,16 +30,16 @@ namespace protocols
 namespace NFS
 {
 
-std::ostream& print_hex(std::ostream& out, const uint32_t* val, const uint32_t len)
+std::ostream& print_hex(std::ostream& out, const uint32_t* const val, const uint32_t len)
 {
     if(len)
     {
-        out << std::hex << std::setfill('0') << std::setw(2) << "0x";
+        out << std::hex << std::setfill('0') << "0x";
         for(uint32_t i = 0; i < len; i++)
         {
-            out << val[i];
+            out << std::setw(2) << val[i];
         }
-        return out << std::dec << std::setfill(' ') << std::setw(1) << "\0";
+        return out << std::dec << std::setfill(' ');
     }
     else
     {
@@ -51,15 +51,12 @@ std::ostream& print_hex(std::ostream& out, const char* const val, const uint32_t
 {
     if(len)
     {
-        out << std::hex << std::setfill('0') << std::setw(2) << "0x";
+        out << std::hex << std::setfill('0') << "0x" ;
         for(uint32_t i = 0; i < len; i++)
         {
-            if(static_cast<int32_t>(val[i])<0)
-                out << ((static_cast<int32_t>(val[i])) & 0xFF);
-            else
-                out << static_cast<int32_t>(val[i]);
+                out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
         }
-        return out << std::dec << std::setfill(' ') << std::setw(1) << "\0";
+        return out << std::dec << std::setfill(' ');
     }
     else
     {

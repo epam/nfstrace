@@ -191,7 +191,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::utf8string& obj)
 {
-    return NFS::print_hex(out, obj.utf8string_val, obj.utf8string_len);
+    return print_hex(out, obj.utf8string_val, obj.utf8string_len);
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::pathname4& obj)
@@ -206,7 +206,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::pathname4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::sec_oid4& obj)
 {
-    return NFS::print_hex(out, obj.sec_oid4_val, obj.sec_oid4_len);
+    return print_hex(out, obj.sec_oid4_val, obj.sec_oid4_len);
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime4& obj)
@@ -536,9 +536,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::open_claim4& obj)
     {
     case rpcgen::open_claim_type4::CLAIM_NULL:
         out << " file: ";
-        out.write(obj.open_claim4_u.file.utf8string_val,obj.open_claim4_u.file.utf8string_len);
-        return out << "\0";
-//                                    return out << " file: " << obj.open_claim4_u.file;
+        return out.write(obj.open_claim4_u.file.utf8string_val, obj.open_claim4_u.file.utf8string_len);
     case rpcgen::open_claim_type4::CLAIM_PREVIOUS:
                            return out << " delegate type: " << obj.open_claim4_u.delegate_type;
     case rpcgen::open_claim_type4::CLAIM_DELEGATE_CUR:
