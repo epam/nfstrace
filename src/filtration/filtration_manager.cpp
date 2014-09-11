@@ -19,6 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include "sys/stat.h"
+
 #include "filtration/dumping.h"
 #include "filtration/filtration_manager.h"
 #include "filtration/filtration_processor.h"
@@ -138,12 +140,20 @@ void FiltrationManager::add_offline_dumping (const Parameters& params)
     auto& dumping_params = params.dumping_params();
     auto& ofile = dumping_params.output_file;
     auto  ifile = params.input_file();
+
     if(ofile.compare("-"))
     {
-        if(!ifile.compare(ofile))
+        struct stat ifile_stat;
+        struct stat ofile_stat;
+
+        if(!stat(ofile.c_str(), &ifile_stat) && !stat(ofile.c_str(), &ofile_stat))
         {
-            throw std::runtime_error{"Input and output files are equal. Use the -I and -O options to setup them explicitly."};
+            if(ifile_stat.st_ino == ofile_stat.st_ino) //compre inodes of input and output files
+            {
+                throw std::runtime_error{"Input and output files are equal. Use the -I and -O options to setup them explicitly."};
+            }
         }
+
     }
     std::unique_ptr<FileReader> reader { new FileReader{ifile} };
 

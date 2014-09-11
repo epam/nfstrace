@@ -57,28 +57,19 @@ std::ostream& print_nfs_fh(std::ostream& out, const char* const val, const uint3
         {
             for(uint32_t i = 0; i < len; i++)
             {
-                if(static_cast<int32_t>(val[i])<0)
-                    out << std::setw(2) << ((static_cast<int32_t>(val[i])) - 0xFFFFFF00);
-                else
-                    out << std::setw(2) << static_cast<int32_t>(val[i]);
+                out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
             }
         }
         else // truncate binary data to: 00112233...CCDDEEFF
         {
             for(uint32_t i = 0; i < 4; i++)
             {
-                if(static_cast<int32_t>(val[i])<0)
-                    out << std::setw(2) << ((static_cast<int32_t>(val[i])) - 0xFFFFFF00);
-                else
-                    out << std::setw(2) << static_cast<int32_t>(val[i]);
+                out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
             }
             out << "...";
             for(uint32_t i = len-4; i < len; i++)
             {
-                if(static_cast<int32_t>(val[i])<0)
-                    out << std::setw(2) << ((static_cast<int32_t>(val[i])) - 0xFFFFFF00);
-                else
-                    out << std::setw(2) << static_cast<int32_t>(val[i]);
+                out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
             }
         }
         return out << std::dec << std::setfill(' ');
