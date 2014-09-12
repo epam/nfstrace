@@ -19,7 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "sys/stat.h"
+#include <sys/stat.h>
 
 #include "filtration/dumping.h"
 #include "filtration/filtration_manager.h"

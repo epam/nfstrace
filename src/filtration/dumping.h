@@ -41,6 +41,9 @@ namespace filtration
 
 class Dumping
 {
+private:
+    const static int buffer_default_size = 4096;
+
 public:
 
     class Collection
@@ -48,21 +51,22 @@ public:
     public:
         inline Collection()
         : dumper      {nullptr}
-        , buff_size   {4096}
-        , payload     {new uint8_t[buff_size]}
+        , buff_size   {buffer_default_size}
+        , payload     {payload_default}
         , payload_len {0}
         {
         }
         inline Collection(Dumping* d, utils::NetworkSession* /*unused*/)
         : dumper      {d}
-        , buff_size   {4096}
-        , payload     {new uint8_t[buff_size]}
+        , buff_size   {buffer_default_size}
+        , payload     {payload_default}
         , payload_len {0}
         {
         }
         inline ~Collection()
         {
-            delete[] payload;
+            if(payload != payload_default)
+                delete[] payload;
         }
         Collection(Collection&&)                 = delete;
         Collection(const Collection&)            = delete;
@@ -87,10 +91,12 @@ public:
 
         inline void resize(uint32_t amount)
         {
-            reset();
-            delete[] payload;
             buff_size = amount;
-            payload = new uint8_t[amount];
+            uint8_t* buff = new uint8_t[amount];
+            memcpy(buff, payload, payload_len);
+            if(payload != payload_default)
+                delete[] payload;
+            payload = buff;
         }
 
         inline void push(const PacketInfo& info, const uint32_t len)
@@ -105,7 +111,10 @@ public:
                 dumper->dump(info.header, info.packet);
                 info.dumped = true;  // set marker of damped packet
             }
-
+            if((payload_len + len) > capacity())
+            {
+                resize(payload_len + len);
+            }
             // copy payload
             memcpy(payload+payload_len, info.data, len);
             payload_len += len;
@@ -130,6 +139,7 @@ public:
         Dumping* dumper;
         uint32_t buff_size;
         uint8_t* payload;
+        uint8_t payload_default[buffer_default_size];
         uint32_t payload_len;
     };
 

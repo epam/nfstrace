@@ -349,7 +349,7 @@ public:
               out.precision(2);
               if(nfs3_total)
               {
-                  out << std::fixed << (double(nfs3_ops_count[i]) / nfs3_total) * 100;;
+                  out << std::fixed << (double(nfs3_ops_count[i]) / nfs3_total) * 100;
               }
               else
                   out << 0;
