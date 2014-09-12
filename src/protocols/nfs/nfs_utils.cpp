@@ -34,7 +34,7 @@ std::ostream& print_hex(std::ostream& out, const uint32_t* const val, const uint
 {
     if(len)
     {
-        out << std::hex << std::setfill('0') << "0x";
+        out << std::hex << std::setfill('0');
         for(uint32_t i = 0; i < len; i++)
         {
             out << std::setw(2) << val[i];
@@ -51,7 +51,7 @@ std::ostream& print_hex(std::ostream& out, const char* const val, const uint32_t
 {
     if(len)
     {
-        out << std::hex << std::setfill('0') << "0x" ;
+        out << std::hex << std::setfill('0');
         for(uint32_t i = 0; i < len; i++)
         {
                 out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
@@ -62,18 +62,6 @@ std::ostream& print_hex(std::ostream& out, const char* const val, const uint32_t
     {
         return out << "void";
     }
-}
-
-std::ostream& print_access3(std::ostream& out, const rpcgen::uint32 val)
-{
-    if (val & rpcgen::ACCESS3_READ)    out << "READ ";
-    if (val & rpcgen::ACCESS3_LOOKUP)  out << "LOOKUP ";
-    if (val & rpcgen::ACCESS3_MODIFY)  out << "MODIFY ";
-    if (val & rpcgen::ACCESS3_EXTEND)  out << "EXTEND ";
-    if (val & rpcgen::ACCESS3_DELETE)  out << "DELETE ";
-    if (val & rpcgen::ACCESS3_EXECUTE) out << "EXECUTE ";
-
-    return out;
 }
 
 } // namespace NFS

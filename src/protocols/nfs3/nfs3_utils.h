@@ -299,6 +299,8 @@ const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
 
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS3::NFSProcedure proc);
 
+void print_mode3(std::ostream& out, const rpcgen::uint32 val);
+void print_access3(std::ostream& out, const rpcgen::uint32 val);
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfsstat3& obj);
 std::ostream& operator<<(std::ostream& out, const rpcgen::ftype3& obj);
 std::ostream& operator<<(std::ostream& out, const rpcgen::specdata3& obj);
