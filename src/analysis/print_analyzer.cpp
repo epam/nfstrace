@@ -80,18 +80,6 @@ std::ostream& print_nfs_fh(std::ostream& out, const char* const val, const uint3
     }
 }
 
-std::ostream& print_access3(std::ostream& out, const rpcgen::uint32 val)
-{
-    if (val & rpcgen::ACCESS3_READ)    out << "READ ";
-    if (val & rpcgen::ACCESS3_LOOKUP)  out << "LOOKUP ";
-    if (val & rpcgen::ACCESS3_MODIFY)  out << "MODIFY ";
-    if (val & rpcgen::ACCESS3_EXTEND)  out << "EXTEND ";
-    if (val & rpcgen::ACCESS3_DELETE)  out << "DELETE ";
-    if (val & rpcgen::ACCESS3_EXECUTE) out << "EXECUTE ";
-
-    return out;
-}
-
 bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 {
     bool result = false;
@@ -225,9 +213,9 @@ void PrintAnalyzer::getattr3(const struct RPCProcedure*         proc,
                  << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all() && res->status == rpcgen::nfsstat3::NFS3_OK)
-            out << " attributes: " << res->GETATTR3res_u.resok.obj_attributes;
+            out << " obj attributes: " << res->GETATTR3res_u.resok.obj_attributes;
         out << " ]\n";
     }
 }
@@ -245,7 +233,7 @@ void PrintAnalyzer::setattr3(const struct RPCProcedure*         proc,
                  << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -268,7 +256,7 @@ void PrintAnalyzer::lookup3(const struct RPCProcedure*        proc,
                  << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -291,14 +279,16 @@ void PrintAnalyzer::access3(const struct RPCProcedure*        proc,
     if(args)
     {
         out << "\tCALL  ["
-                 << " object: "; print_nfs_fh(out, args->object.data.data_val, args->object.data.data_len);
-        out << " access: "; print_access3(out, args->access);
+                 << " object: ";
+        print_nfs_fh(out, args->object.data.data_val, args->object.data.data_len);
+        out << " access: ";
+        print_access3(out, args->access);
         out << " ]\n";
     }
 
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -326,7 +316,7 @@ void PrintAnalyzer::readlink3(const struct RPCProcedure*          proc,
                  << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -352,7 +342,7 @@ void PrintAnalyzer::read3(const struct RPCProcedure*      proc,
                  << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -360,8 +350,6 @@ void PrintAnalyzer::read3(const struct RPCProcedure*      proc,
                 out << " file attributes: " << res->READ3res_u.resok.file_attributes
                     << " count: "           << res->READ3res_u.resok.count
                     << " eof: "             << res->READ3res_u.resok.eof;
-                if(res->READ3res_u.resok.data.data_len)
-                    out << " data: " << *res->READ3res_u.resok.data.data_val;
             }
             else
             {
@@ -385,13 +373,11 @@ void PrintAnalyzer::write3(const struct RPCProcedure*       proc,
             << " offset: " << args->offset
             << " count: "  << args->count
             << " stable: " << args->stable;
-        if(args->data.data_len)
-            out << " data: " << args->data.data_val;
         out << " ]\n";
     }
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -424,7 +410,7 @@ void PrintAnalyzer::create3(const struct RPCProcedure*        proc,
             << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -451,7 +437,7 @@ void PrintAnalyzer::mkdir3(const struct RPCProcedure*       proc,
             << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -478,7 +464,7 @@ void PrintAnalyzer::symlink3(const struct RPCProcedure*         proc,
             << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -507,7 +493,7 @@ void PrintAnalyzer::mknod3(const struct RPCProcedure*       proc,
     }
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -533,7 +519,7 @@ void PrintAnalyzer::remove3(const struct RPCProcedure*        proc,
             << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -559,7 +545,7 @@ void PrintAnalyzer::rmdir3(const struct RPCProcedure*       proc,
     }
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -584,7 +570,7 @@ void PrintAnalyzer::rename3(const struct RPCProcedure*        proc,
             << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -611,7 +597,7 @@ void PrintAnalyzer::link3(const struct RPCProcedure*      proc,
             << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -632,23 +618,31 @@ void PrintAnalyzer::readdir3(const struct RPCProcedure*         proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
+    {
         out << "\tCALL  ["
             << " dir: "        << args->dir
             << " cookie: "     << args->cookie
-            << " cookieverf: " << args->cookieverf
-            << " count: "      << args->count
+            << " cookieverf: ";
+        print_hex(out, args->cookieverf, rpcgen::NFS3_COOKIEVERFSIZE);
+        out << " count: "      << args->count
             << " ]\n";
+    }
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
+            {
                 out << " dir attributes: " << res->READDIR3res_u.resok.dir_attributes
-                    << " cookieverf: "     << res->READDIR3res_u.resok.cookieverf
-                    << " reply: "          << res->READDIR3res_u.resok.reply;
+                    << " cookieverf: ";
+                print_hex(out, res->READDIR3res_u.resok.cookieverf, rpcgen::NFS3_COOKIEVERFSIZE);
+                out << " reply: "          << res->READDIR3res_u.resok.reply;
+            }
             else
+            {
                 out << " dir attributes: " << res->READDIR3res_u.resfail.dir_attributes;
+            }
         }
         out << " ]\n";
     }
@@ -661,24 +655,32 @@ void PrintAnalyzer::readdirplus3(const struct RPCProcedure*             proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
+    {
         out << "\tCALL  ["
             << " dir: "        << args->dir
             << " cookie: "     << args->cookie
-            << " cookieverf: " << args->cookieverf
-            << " dir count: "  << args->dircount
+            << " cookieverf: ";
+        print_hex(out, args->cookieverf, rpcgen::NFS3_COOKIEVERFSIZE);
+        out << " dir count: "  << args->dircount
             << " max count: "  << args->maxcount
             << " ]\n";
+    }
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
+            {
                 out << " dir attributes: " << res->READDIRPLUS3res_u.resok.dir_attributes
-                    << " cookieverf: "     << res->READDIRPLUS3res_u.resok.cookieverf
-                    << " reply: "          << res->READDIRPLUS3res_u.resok.reply;
+                    << " cookieverf: ";
+                print_hex(out, res->READDIRPLUS3res_u.resok.cookieverf, rpcgen::NFS3_COOKIEVERFSIZE);
+                out << " reply: "          << res->READDIRPLUS3res_u.resok.reply;
+            }
             else
+            {
                 out << " dir attributes: " << res->READDIRPLUS3res_u.resfail.dir_attributes;
+            }
         }
         out << " ]\n";
     }
@@ -696,7 +698,7 @@ void PrintAnalyzer::fsstat3(const struct RPCProcedure*        proc,
             << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -727,7 +729,7 @@ void PrintAnalyzer::fsinfo3(const struct RPCProcedure*        proc,
             << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -741,7 +743,11 @@ void PrintAnalyzer::fsinfo3(const struct RPCProcedure*        proc,
                     << " dtpref: "         << res->FSINFO3res_u.resok.dtpref
                     << " max file size: "  << res->FSINFO3res_u.resok.maxfilesize
                     << " time delta: "     << res->FSINFO3res_u.resok.time_delta
-                    << " properties: "     << res->FSINFO3res_u.resok.properties;
+                    << " properties: "     << res->FSINFO3res_u.resok.properties
+                    << " LINK (filesystem supports hard links): "          << bool(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_LINK)
+                    << " SYMLINK (file system supports symbolic links): "  << bool(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_SYMLINK)
+                    << " HOMOGENEOUS (PATHCONF: is valid for all files): " << bool(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_HOMOGENEOUS)
+                    << " CANSETTIME (SETATTR can set time on server): "    << bool(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_CANSETTIME);
             else
                 out << " obj attributes: " << res->FSINFO3res_u.resfail.obj_attributes;
         }
@@ -761,7 +767,7 @@ void PrintAnalyzer::pathconf3(const struct RPCProcedure*          proc,
             << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
@@ -793,12 +799,13 @@ void PrintAnalyzer::commit3(const struct RPCProcedure*        proc,
             << " ]\n";
     if(res)
     {
-        out << "\tREPLY [ " << res->status;
+        out << "\tREPLY [ status: " << res->status;
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
             {
-                out << " file_wcc: " << res->COMMIT3res_u.resok.file_wcc;
+                out << " file_wcc: " << res->COMMIT3res_u.resok.file_wcc
+                    << " verf: ";
                 print_hex(out, res->COMMIT3res_u.resok.verf, rpcgen::NFS3_WRITEVERFSIZE);
             }
             else

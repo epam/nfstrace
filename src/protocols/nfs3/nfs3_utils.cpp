@@ -19,6 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <sys/stat.h>
+
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/nfs3/nfs3_utils.h"
 //------------------------------------------------------------------------------
@@ -45,6 +47,32 @@ const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc)
     };
 
     return NFS3ProcedureTitles[proc];
+}
+
+void print_mode3(std::ostream& out, const rpcgen::uint32 val)
+{
+    if (val & S_ISUID) out << "USER_ID_EXEC ";
+    if (val & S_ISGID) out << "GROUP_ID_EXEC ";
+    if (val & S_ISVTX) out << "SAVE_SWAPPED_TEXT ";
+    if (val & S_IRUSR) out << "OWNER_READ ";
+    if (val & S_IWUSR) out << "OWNER_WRITE ";
+    if (val & S_IXUSR) out << "OWNER_EXEC ";
+    if (val & S_IRGRP) out << "GROUP_READ ";
+    if (val & S_IWGRP) out << "GROUP_WRITE ";
+    if (val & S_IXGRP) out << "GROUP_EXEC ";
+    if (val & S_IROTH) out << "OTHER_READ ";
+    if (val & S_IWOTH) out << "OTHER_WRITE ";
+    if (val & S_IXOTH) out << "OTHER_EXEC";
+}
+
+void print_access3(std::ostream& out, const rpcgen::uint32 val)
+{
+    if (val & rpcgen::ACCESS3_READ)    out << "READ ";
+    if (val & rpcgen::ACCESS3_LOOKUP)  out << "LOOKUP ";
+    if (val & rpcgen::ACCESS3_MODIFY)  out << "MODIFY ";
+    if (val & rpcgen::ACCESS3_EXTEND)  out << "EXTEND ";
+    if (val & rpcgen::ACCESS3_DELETE)  out << "DELETE ";
+    if (val & rpcgen::ACCESS3_EXECUTE) out << "EXECUTE ";
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfsstat3& obj)
@@ -116,19 +144,23 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime3& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::fattr3& obj)
 {
-     return out << " type: "   << obj.type
-                << " mode: "   << obj.mode
-                << " nlink: "  << obj.nlink
-                << " uid: "    << obj.uid
-                << " gid: "    << obj.gid
-                << " size: "   << obj.size
-                << " used: "   << obj.used
-                << " rdev: "   << obj.rdev
-                << " fsid: "   << obj.fsid
-                << " fileid: " << obj.fileid
-                << " atime: "  << obj.atime
-                << " mtime: "  << obj.mtime
-                << " ctime: "  << obj.ctime;
+    out << " type: "   << obj.type
+        << " mode: ";
+
+    print_mode3(out,obj.mode);
+
+    out << " nlink: "  << obj.nlink
+        << " uid: "    << obj.uid
+        << " gid: "    << obj.gid
+        << " size: "   << obj.size
+        << " used: "   << obj.used
+        << " rdev: "   << obj.rdev
+        << " fsid: "   << obj.fsid
+        << " fileid: " << obj.fileid
+        << " atime: "  << obj.atime
+        << " mtime: "  << obj.mtime
+        << " ctime: "  << obj.ctime;
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::post_op_attr& obj)
@@ -212,18 +244,25 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::set_mtime& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::sattr3& obj)
 {
-    return out << " mode: "  << obj.mode
-               << " uid: "   << obj.uid
-               << " gid: "   << obj.gid
-               << " size: "  << obj.size
-               << " atime: " << obj.atime
-               << " mtime: " << obj.mtime;
+    if(obj.mode.set_it)
+    {
+        out << " mode: ";
+        print_mode3(out, obj.mode.set_mode3_u.mode);
+    }
+
+    if(obj.uid.set_it)   out << " uid: "   << obj.uid.set_uid3_u.uid;
+    if(obj.gid.set_it)   out << " gid: "   << obj.gid.set_gid3_u.gid;
+    if(obj.size.set_it)  out << " size: "  << obj.size.set_size3_u.size;
+    if(obj.atime.set_it == rpcgen::time_how::SET_TO_CLIENT_TIME) out << " atime: " << obj.atime.set_atime_u.atime;
+    if(obj.mtime.set_it == rpcgen::time_how::SET_TO_CLIENT_TIME) out << " atime: " << obj.mtime.set_mtime_u.mtime;
+
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::diropargs3& obj)
 {
     return out << " dir: "   << obj.dir
-               << " name: :" << obj.name;
+               << " name: " << obj.name;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::sattrguard3& obj)
@@ -259,7 +298,6 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::createhow3& obj)
     switch(obj.mode)
     {
     case rpcgen::createmode3::UNCHECKED:
-        return out << obj.mode;
     case rpcgen::createmode3::GUARDED:
         return out << obj.mode << " obj attributes: " << obj.createhow3_u.obj_attributes;
     case rpcgen::createmode3::EXCLUSIVE:
