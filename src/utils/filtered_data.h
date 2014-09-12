@@ -84,10 +84,11 @@ public:
 
         if (nullptr == memory)
         {
+            assert( dlen <= CACHE_SIZE);
             memory = new uint8_t[newsize];
             memsize = newsize;
             if (dlen > 0)
-                memcpy(memory, cache, dlen<=CACHE_SIZE?dlen:CACHE_SIZE);
+                memcpy(memory, cache, dlen);
             data = memory;
         }
         else // have some filled memory

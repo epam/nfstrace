@@ -160,7 +160,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj)
     if(obj.bitmap4_len)
     {
         out << "mask: "; print_hex(out, obj.bitmap4_val, obj.bitmap4_len);
-        const size_t nbits = obj.bitmap4_len*32;
+        const size_t nbits = obj.bitmap4_len << 5; // obj.bitmap4_len * 32
 
         static const uint32_t fattr4_attributes_count = 56;
         static const char* const FATTR4Attributes[fattr4_attributes_count] =
@@ -182,7 +182,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj)
         };
         for(size_t i=0; i<nbits; i++)
         {
-            const int bit = (obj.bitmap4_val[i / 32] >> (i % 32)) & 0x1;
+            const int bit = (obj.bitmap4_val[i / 32] >> (i % 32)) & 0x1; //obj.bitmap4_val[i >> 5] >> (i & 31)) & 0x1;
             if(bit) out << ' ' << FATTR4Attributes[i];
         }
     }
@@ -199,7 +199,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::pathname4& obj)
     rpcgen::component4 *current_el = obj.pathname4_val;
     for(size_t i=0;i<obj.pathname4_len;i++,current_el++)
     {
-        out << current_el->utf8string_val + ' ';
+        out.write(current_el->utf8string_val, current_el->utf8string_len);
+        out << ' ';
     }
     return out;
 }
@@ -247,7 +248,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::fs_location4& obj)
     rpcgen::utf8str_cis *current_el = obj.server.server_val;
     for(size_t i=0;i<obj.server.server_len;i++,current_el++)
     {
-        out << current_el->utf8string_val + ' ';
+        out.write(current_el->utf8string_val, current_el->utf8string_len);
+        out << ' ';
     }
     return out;
 }
