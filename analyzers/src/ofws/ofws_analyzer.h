@@ -32,6 +32,9 @@
 //------------------------------------------------------------------------------
 struct FH
 {
+    uint32_t len;
+    char data[rpcgen::NFS3_FHSIZE];
+
     struct FH_Eq
     {
         bool operator()(const FH& a, const FH& b) const;
@@ -55,8 +58,6 @@ struct FH
 
     friend std::ostream& operator<<(std::ostream& out, const FH& obj);
 
-    uint32_t len;
-    char data[rpcgen::NFS3_FHSIZE];
 
 private:
     static inline char to_char(uint8_t hex)
