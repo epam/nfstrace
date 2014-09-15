@@ -19,6 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
 #ifndef NFS_UTILS_H
 #define NFS_UTILS_H
 //------------------------------------------------------------------------------
@@ -26,6 +27,7 @@
 #include <cstring>
 
 #include "api/nfs3_types_rpcgen.h"
+#include "utils/out.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -34,8 +36,19 @@ namespace protocols
 namespace NFS
 {
 
-std::ostream& print_hex(std::ostream& out, const uint32_t* const val, const uint32_t len);
-std::ostream& print_hex(std::ostream& out, const char* const val, const uint32_t len);
+inline bool out_all()
+{
+    using Out = NST::utils::Out;
+
+    return Out::Global::get_level() == Out::Level::All;
+}
+
+void    print_hex(std::ostream& out, const uint32_t* const val, const uint32_t len);
+void    print_hex(std::ostream& out, const char* const val, const uint32_t len);
+
+extern "C"
+NST_PUBLIC
+void print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len);
 
 } // namespace NFS
 } // namespace protocols

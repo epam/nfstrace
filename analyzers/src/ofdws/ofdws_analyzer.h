@@ -29,6 +29,81 @@
 static const int32_t g_def_bl_size = 8; // [KB]
 static const int32_t g_def_bu_size = 16;
 
+struct FH
+{
+    struct FH_Eq
+    {
+        bool operator()(const FH& a, const FH& b) const;
+    };
+    struct FH_Hash
+    {
+        int operator()(const FH& fh) const;
+    };
+
+    inline FH(const rpcgen::nfs_fh3& obj)
+    {
+        len = obj.data.data_len;
+        memcpy(data, obj.data.data_val, len);
+    }
+    inline FH(const FH& obj)
+    {
+        len = obj.len;
+        memcpy(data, obj.data, len);
+    }
+    std::string to_string() const;
+
+    friend std::ostream& operator<<(std::ostream& out, const FH& obj);
+
+    uint32_t len;
+    char data[rpcgen::NFS3_FHSIZE];
+
+private:
+    static inline char to_char(uint8_t hex)
+    {
+        if(hex < 0xA)
+            return hex + '0';
+        else
+            return hex + 'a' - 0xA;
+    }
+};
+
+inline int FH::FH_Hash::operator()(const FH& fh) const
+{
+    int hash = 0;
+    for(uint32_t i = 0; i < fh.len; ++i)
+        hash += fh.data[i];
+    return hash;
+}
+
+inline bool FH::FH_Eq::operator()(const FH& a, const FH& b) const
+{
+    if(a.len != b.len)
+        return false;
+
+    for(uint32_t i = 0; i < a.len; ++i)
+        if(a.data[i] != b.data[i])
+            return false;
+    return true;
+}
+
+inline std::string FH::to_string() const
+{
+    std::string str;
+    str.reserve(rpcgen::NFS3_FHSIZE * 2 + 1); // One byte holds two symbols.
+    for(uint32_t i = 0; i < len; ++i)
+    {
+        str += to_char((data[i] >> 4) & 0xf);
+        str += to_char(data[i] & 0xf);
+    }
+    return str;
+}
+
+inline std::ostream& operator<<(std::ostream& out, const FH& fh)
+{
+    print_nfs_fh(out, fh.data, fh.len);
+    return out;
+}
+
 class OFDWSAnalyzer : public IAnalyzer
 {
     typedef std::unordered_map<FH, FileRWOp*, FH::FH_Hash, FH::FH_Eq> OFDWS;
@@ -49,17 +124,17 @@ public:
     OFDWSAnalyzer(int32_t bl_size, int32_t bu_size);
     virtual ~OFDWSAnalyzer();
 
-    virtual void read3(const struct RPCProcedure* proc,
-            const struct READ3args* args,
-            const struct READ3res* res);
-    virtual void write3(const struct RPCProcedure* proc,
-            const struct WRITE3args* args,
-            const struct WRITE3res* res);
+    void read3(const struct RPCProcedure* proc,
+            const struct rpcgen::READ3args* args,
+            const struct rpcgen::READ3res* res) override final;
+    void write3(const struct RPCProcedure* proc,
+            const struct rpcgen::WRITE3args* args,
+            const struct rpcgen::WRITE3res* res) override final;
 
     virtual void flush_statistics();
 
 private:
-    Iterator get_file_rw_op(const nfs_fh3& key);
+    Iterator get_file_rw_op(const rpcgen::nfs_fh3& key);
     void print_file_ranked(std::ostream& out) const;
     void print_data_usage(std::ostream& out) const;
     void print_rw_records(std::ostream& out, const FileRWOp& file_rw_op) const;

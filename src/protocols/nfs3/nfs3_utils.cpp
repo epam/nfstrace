@@ -148,7 +148,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::specdata3& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_fh3& obj)
 {
-    return NFS::print_hex(out, obj.data.data_val, obj.data.data_len);
+    NFS::print_nfs_fh(out, obj.data.data_val, obj.data.data_len);
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime3& obj)

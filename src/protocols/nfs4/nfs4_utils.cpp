@@ -191,7 +191,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::utf8string& obj)
 {
-    return print_hex(out, obj.utf8string_val, obj.utf8string_len);
+    print_hex(out, obj.utf8string_val, obj.utf8string_len);
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::pathname4& obj)
@@ -207,7 +208,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::pathname4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::sec_oid4& obj)
 {
-    return print_hex(out, obj.sec_oid4_val, obj.sec_oid4_len);
+    print_hex(out, obj.sec_oid4_val, obj.sec_oid4_len);
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime4& obj)
@@ -233,7 +235,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::settime4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_fh4& obj)
 {
-    return print_hex(out, obj.nfs_fh4_val, obj.nfs_fh4_len);
+    NFS::print_nfs_fh(out, obj.nfs_fh4_val, obj.nfs_fh4_len);
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::fsid4& obj)
