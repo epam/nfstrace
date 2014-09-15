@@ -41,28 +41,28 @@ OFDWSAnalyzer::~OFDWSAnalyzer()
 }
 
 void OFDWSAnalyzer::read3(const struct RPCProcedure*,
-                          const struct READ3args* args,
-                          const struct READ3res*  res)
+                          const struct rpcgen::READ3args* args,
+                          const struct rpcgen::READ3res*  res)
 {
-    if(res && res->status == nfsstat3::OK)
+    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
     {
-        read_total += res->resok.count;
+        read_total += res->READ3res_u.resok.count;
 
         Iterator i = get_file_rw_op(args->file);
-        i->second->calculate(ProcEnumNFS3::READ, args->offset, res->resok.count);
+        i->second->calculate(ProcEnumNFS3::READ, args->offset, res->READ3res_u.resok.count);
     }
 }
 
 void OFDWSAnalyzer::write3(const struct RPCProcedure*,
-                           const struct WRITE3args* args,
-                           const struct WRITE3res*  res)
+                           const struct rpcgen::WRITE3args* args,
+                           const struct rpcgen::WRITE3res*  res)
 {
-    if(res && res->status == nfsstat3::OK)
+    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
     {
-        write_total += res->resok.count;
+        write_total += res->WRITE3res_u.resok.count;
 
         Iterator i = get_file_rw_op(args->file);
-        i->second->calculate(ProcEnumNFS3::WRITE, args->offset, res->resok.count);
+        i->second->calculate(ProcEnumNFS3::WRITE, args->offset, res->WRITE3res_u.resok.count);
     }
 }
 
@@ -151,7 +151,7 @@ void OFDWSAnalyzer::print_file_ranked(std::ostream& out) const
         out << v[j-1]->first << ' ' << v[j-1]->second->get_read_total() << ' ' << v[j-1]->second->get_write_total() << '\n';
 }
 
-OFDWSAnalyzer::Iterator OFDWSAnalyzer::get_file_rw_op(const nfs_fh3& key)
+OFDWSAnalyzer::Iterator OFDWSAnalyzer::get_file_rw_op(const rpcgen::nfs_fh3& key)
 {
     Iterator i = ofdws_stat.find(key);
     if(i == ofdws_stat.end())
@@ -221,6 +221,8 @@ void destroy(IAnalyzer* instance)
 {
     delete instance;
 }
+
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
 
 }
 //------------------------------------------------------------------------------

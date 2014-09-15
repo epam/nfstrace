@@ -26,8 +26,6 @@
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/rpc/rpc_utils.h"
-#include "utils/out.h"
-#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -40,45 +38,6 @@ using namespace NST::protocols::NFS4; // NFSv4 helpers
 
 namespace
 {
-
-inline bool out_all()
-{
-    using Out = NST::utils::Out;
-
-    return Out::Global::get_level() == Out::Level::All;
-}
-
-std::ostream& print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len)
-{
-    if(len)
-    {
-        out << std::hex << std::setfill('0');
-        if(len <= 8 || out_all())
-        {
-            for(uint32_t i = 0; i < len; i++)
-            {
-                out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
-            }
-        }
-        else // truncate binary data to: 00112233...CCDDEEFF
-        {
-            for(uint32_t i = 0; i < 4; i++)
-            {
-                out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
-            }
-            out << "...";
-            for(uint32_t i = len-4; i < len; i++)
-            {
-                out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
-            }
-        }
-        return out << std::dec << std::setfill(' ');
-    }
-    else
-    {
-        return out << "void";
-    }
-}
 
 bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 {
