@@ -1,0 +1,162 @@
+.\"
+.\" nfstrace(8)
+.\" 
+.\" Author: Alexey Costroma 
+.\" 
+.\" Copyright (c) 2014 EPAM Systems
+.\" 
+.\" This file is part of Nfstrace.
+.\" 
+.\" Nfstrace is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, version 2 of the License.
+.\" 
+.\" Nfstrace is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\" 
+.\" You should have received a copy of the GNU General Public License
+.\" along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
+.\" 
+.TH nfstrace 8 "10 September 2014" "version 0.2.2"
+.\" --------------------- NAME -----------------------------------
+.SH NAME
+nfstrace \- NFS tracing/monitoring/capturing/statistic tool
+.\" --------------------- SYNOPSIS -------------------------------
+.SH SYNOPSIS
+.B nfstrace
+[OPTIONS]...
+.\" --------------------- DESCRIPTION ----------------------------
+.SH DESCRIPTION
+.TP
+This is \fBnfstrace\fR also known as NST (NAS Sizing Tool/NFS Statistic Tool).
+.TP
+It helps to determine NFS procedures in network traffic and performs packet’s capturing, filtration, dumping traces to .pcap file, compression by external tool, some kind of statistical analysis and provides API for custom analysis modules.
+.TP
+The \fBnfstrace\fR supports following protocols: Ethernet – IPv4 | IPv6 – UDP | TCP – SunRPC/NFSv3/NFSv4.
+.\" --------------------- OPTIONS --------------------------------
+.SH OPTIONS
+.TP
+\fB\-m, \-\-mode=\fRdrain|live|dump|stat
+.IP
+set running mode (\fIdefault:\fRlive)
+.TP
+\fB\-i, \-\-interface=\fRINTERFACE
+.IP
+listen interface, it is required for live and dump modes (default:PCAP-DEFAULT)
+.TP
+\fB\-f, \-\-filtration=\fRBPF
+.IP
+a packet filtration in libpcap BPF syntax (default:port 2049)
+.TP
+\fB\-s, \-\-snaplen=\fR0..65535
+.IP
+max length of raw captured packet. May be used ONLY FOR UDP (default:65536)
+.TP
+\fB\-t, \-\-timeout=\fRMilliseconds
+.IP
+set the read timeout that will be used on a capture (default:100)
+.TP
+\fB\-b, \-\-bsize=\fRMBytes
+.IP
+size of capturing kernel buffer (default:20)
+.TP
+\fB\-p, \-\-promisc\fR
+.IP
+put the interface into promiscuous mode (default:true)
+.TP
+\fB\-d, \-\-direction=\fRin|out|inout
+.IP
+set the direction for which packets will be captured (default:inout)
+.TP
+\fB\-a, \-\-analysis=\fRPATH#opt1,opt2=val,...
+.IP
+specify path to analysis module and set desired options (default:)
+.TP
+\fB\-I, \-\-ifile=\fRPATH
+.IP
+input file for stat mode, the '-' means stdin (default:PROGRAMNAME-BPF.pcap)
+.TP
+\fB\-O, \-\-ofile=\fRPATH
+.IP
+output file for dump mode, the '-' means stdout (default:PROGRAMNAME-BPF.pcap)
+.TP
+\fB\-C, \-\-command=\fR"shell command"
+.IP
+execute command for each dumped file (default:)
+.TP
+\fB\-D, \-\-dump-size=\fRMBytes
+.IP
+size of dumping file portion, 0 = no limit (default:0)
+.TP
+\fB\-L, \-\-list\fR
+.IP
+list all available network interfaces (default:false)
+.TP
+\fB\-M, \-\-msg-header=\fR1..4000
+.IP
+RPC message will be truncated to this limit in bytes before passing to Analysis (default:512)
+.TP
+\fB\-Q, \-\-qcapacity=\fR1..65535
+.IP
+initial queue capacity of RPC messages
+.BI (default:4096)
+.TP
+\fB\-T, \-\-trace\fR
+.IP
+print collected NFSv3 procedures, true if no modules were passed(by -a) (default:false)
+.TP
+\fB\-Z, \-\-droproot=\fRusername
+.IP
+drops root privileges, after opening the capture device, but before reading from it (default:)
+.TP
+\fB\-v, \-\-verbose=\fR0|1|2
+.IP
+level of print out additional information (default:1)
+.TP
+\fB\-h, \-\-help\fR
+.IP
+print this help message and usage for modules passed via -a options, then exit (default:false)
+.\" --------------------- EXAMPLES -------------------------------
+.SH EXAMPLES
+\fB1.\fR sudo nfstrace
+sudo nfstrace \-\-droproot user
+.TP
+sudo nfstrace \-\-interface enp0s25 \-\-droproot user
+.TP
+sudo nfstrace \-\-interface enp0s25 \-\-analysis libbreakdown.so \-\-trace \-\-verbose 2 \-\-droproot user
+.TP
+nfstrace \-\-mode=stat \-\-analysis libbreakdown.so \-\-bsize 20 \-\-qcapacity 4096 \-\-msg-header 512 \-\-ifile ./eth\-ipv4\-tcp\-nfsv3.pcap
+.TP
+sudo nfstrace \-i enp0s25 \-a libbreakdown.so \-T \-v 2 \-Z user
+.\" --------------------- FILES ----------------------------------
+.SH FILES
+.\" -------------------- SEE ALSO --------------------------------
+.SH SEE ALSO
+.BR rpc.nfsd (8).
+.BR nfs (5).
+.BR nfsstat (8).
+.BR nfswatch (8).
+.\" ---------------------- BUGS ----------------------------------
+.SH BUGS
+.P
+For security purposes it is highly recommended to use \fB--droproot\fR=username option.
+.P
+Any problems, bugs, questions, desirable enhancements, etc. should be sent
+to \fBPavel Karneliuk\fR <Pavel_Karneliuk@epam.com>
+.\" -------------------- AUTHORS ---------------------------------
+.SH AUTHORS
+Written by:
+.IP
+Vitali Adamenka <Vitali_Adamenka@epam.com>
+.IP
+Yauheni Azaranka <Yauheni_Azaranka@epam.com>
+.IP
+Alexey Costroma <Alexey_Costroma@epam.com>
+.IP
+Dzianis Huznou <Dzianis_Huznou@epam.com>
+.IP
+Pavel Karneliuk <Pavel_Karneliuk@epam.com>
+.IP
+Mikhail Litvinets <Mikhail_Litvinets@epam.com>
