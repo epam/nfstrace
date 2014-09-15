@@ -19,8 +19,6 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <sys/stat.h>
-
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/nfs3/nfs3_utils.h"
 //------------------------------------------------------------------------------
@@ -48,6 +46,22 @@ const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc)
 
     return NFS3ProcedureTitles[proc];
 }
+
+enum
+{
+    S_ISUID = 0x00800,
+    S_ISGID = 0x00400,
+    S_ISVTX = 0x00200, // Not defined in POSIX
+    S_IRUSR = 0x00100,
+    S_IWUSR = 0x00080,
+    S_IXUSR = 0x00040, // Search in directory
+    S_IRGRP = 0x00020,
+    S_IWGRP = 0x00010,
+    S_IXGRP = 0x00008, // Search in directory
+    S_IROTH = 0x00004,
+    S_IWOTH = 0x00002,
+    S_IXOTH = 0x00001  // Search in directory
+};
 
 void print_mode3(std::ostream& out, const rpcgen::uint32 val)
 {
