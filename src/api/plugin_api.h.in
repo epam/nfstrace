@@ -48,6 +48,7 @@ extern "C"
 const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
 const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc);
 void print_session(std::ostream& out, const Session& session);
+void print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len);
 }
 
 // These functions must be implemented by pluggable analysis module
