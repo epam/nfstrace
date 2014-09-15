@@ -22,6 +22,7 @@
 #ifndef OFDWS_ANALYZER_H
 #define OFDWS_ANALYZER_H
 //------------------------------------------------------------------------------
+#include <cstring>
 #include <unordered_map>
 
 #include "file_rw_op.h"
