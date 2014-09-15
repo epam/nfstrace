@@ -41,31 +41,31 @@ namespace filtration
 
 class Dumping
 {
-private:
-    const static int buffer_default_size = 4096;
-
 public:
 
     class Collection
     {
+    private:
+        const static int cache_size = 4096;
+
     public:
         inline Collection()
         : dumper      {nullptr}
-        , buff_size   {buffer_default_size}
-        , payload     {payload_default}
+        , buff_size   {cache_size}
+        , payload     {cache}
         , payload_len {0}
         {
         }
         inline Collection(Dumping* d, utils::NetworkSession* /*unused*/)
         : dumper      {d}
-        , buff_size   {buffer_default_size}
-        , payload     {payload_default}
+        , buff_size   {cache_size}
+        , payload     {cache}
         , payload_len {0}
         {
         }
         inline ~Collection()
         {
-            if(payload != payload_default)
+            if(payload != cache)
                 delete[] payload;
         }
         Collection(Collection&&)                 = delete;
@@ -94,7 +94,7 @@ public:
             buff_size = amount;
             uint8_t* buff = new uint8_t[amount];
             memcpy(buff, payload, payload_len);
-            if(payload != payload_default)
+            if(payload != cache)
                 delete[] payload;
             payload = buff;
         }
@@ -139,7 +139,7 @@ public:
         Dumping* dumper;
         uint32_t buff_size;
         uint8_t* payload;
-        uint8_t payload_default[buffer_default_size];
+        uint8_t cache[cache_size];
         uint32_t payload_len;
     };
 
