@@ -67,7 +67,7 @@ public:
 
         blocks = new Chunk*[limit];
         memset(blocks, 0, sizeof(Chunk*)*limit);
-        list = blocks[0] = new_block();
+        list = new_block();
     }
 
     inline void* allocate()
@@ -79,7 +79,7 @@ public:
                 increase_blocks_limit();
             }
 
-            list = blocks[allocated] = new_block();
+            list = new_block();
         }
 
         Chunk* c = list;
@@ -112,6 +112,7 @@ private:
             ((Chunk*) &ptr[i * chunk])->next = (Chunk*) &ptr[(i + 1) * chunk];
         }
         ((Chunk*) &ptr[(block - 1) * chunk])->next = nullptr;
+        blocks[allocated] = (Chunk*) ptr;
         ++allocated;
         nfree += block;
         return (Chunk*) ptr;
