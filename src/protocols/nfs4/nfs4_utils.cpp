@@ -162,8 +162,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj)
         out << "mask: "; print_hex(out, obj.bitmap4_val, obj.bitmap4_len);
         const size_t nbits = obj.bitmap4_len << 5; // obj.bitmap4_len * 32
 
-        static const uint32_t fattr4_attributes_count = 56;
-        static const char* const FATTR4Attributes[fattr4_attributes_count] =
+        static const char* const FATTR4Attributes[] =
         {
             "SUPPORTED_ATTRS", "TYPE",           "FH_EXPIRE_TYPE",  "CHANGE",
             "SIZE",            "LINK_SUPPORT",   "SYMLINK_SUPPORT", "NAMED_ATTR",
@@ -183,7 +182,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj)
         for(size_t i=0; i<nbits; i++)
         {
             const int bit = (obj.bitmap4_val[i >> 5] >> (i & 31)) & 0x1; //obj.bitmap4_val[i / 32] >> (i % 32)) & 0x1;
-            if(bit) out << ' ' << FATTR4Attributes[i];
+            if(bit !=0 && i < sizeof(FATTR4Attributes)/sizeof(FATTR4Attributes[0]))
+                out << ' ' << FATTR4Attributes[i];
         }
     }
     return out;
