@@ -346,10 +346,10 @@ public:
               out.width(5);
               out << std::right << nfs3_ops_count[i];
               out.width(7);
-              out.precision(2);
               if(nfs3_total)
               {
-                  out << std::fixed << (double(nfs3_ops_count[i]) / nfs3_total) * 100;
+                  out.precision(2);
+                  out << std::fixed << ((nfs3_ops_count[i] > 0) ? ((static_cast<float>(nfs3_ops_count[i]) / static_cast<float>(nfs3_total)) * 100.0f) : 0.0f);
               }
               else
                   out << 0;
@@ -390,9 +390,11 @@ public:
             out.width(5);
             out << std::right << nfs4_ops_count[i];
             out.width(7);
-            out.precision(2);
             if(nfs4_total)
-                out << std::fixed << (double(nfs4_ops_count[i]) / nfs4_total) * 100;
+            {
+                out.precision(2);
+                out << std::fixed << ((nfs4_ops_count[i]>0) ? ((static_cast<float>(nfs4_ops_count[i]) / static_cast<float>(nfs4_total)) * 100.0f) : 0.0f);
+            }
             else
                 out << 0;
             out << "%" << std::endl;

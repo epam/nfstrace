@@ -122,8 +122,6 @@ public:
             const uint32_t avail = ptr->capacity() - ptr->dlen;
             if(len > avail) // inappropriate case. Must be one resize when get entire message size
             {
-                assert(avail >= len);
-                //LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, avail, len);
                 ptr->resize(ptr->dlen + len); // [! unbound extension !]
                 offset_ptr = ptr->data + ptr->dlen; // update pointer
             }

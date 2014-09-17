@@ -47,9 +47,7 @@ public:
     uint8_t*    data{cache};  // pointer to data in memory. {Readonly. Always points to proper memory buffer}
 
 private:
-    enum: uint32_t {
-        CACHE_SIZE = 4000
-    };
+    const static int CACHE_SIZE = 4000;
     uint8_t     cache[CACHE_SIZE];
     uint8_t*    memory{nullptr};
     uint32_t    memsize{0};
@@ -81,22 +79,28 @@ public:
         {
             return;
         }
-
         if (nullptr == memory)
         {
-            assert( dlen <= CACHE_SIZE);
             memory = new uint8_t[newsize];
+            if (0 < dlen)
+            {
+                if(dlen <= CACHE_SIZE)
+                    memcpy(memory, cache, dlen);
+                else
+                    memcpy(memory, cache, CACHE_SIZE);
+            }
             memsize = newsize;
-            if (dlen > 0)
-                memcpy(memory, cache, dlen);
             data = memory;
         }
         else // have some filled memory
         {
             uint8_t* mem = new uint8_t[newsize];
-            if (0 != dlen)
+            if (0 < dlen)
             {
-                memcpy(mem, memory, dlen);
+                if(dlen <= capacity())
+                    memcpy(mem, memory, dlen);
+                else
+                    memcpy(mem, memory, capacity());
             }
             data = mem;
             delete[] memory;
@@ -110,10 +114,10 @@ public:
     {
         if (nullptr != memory)
         {
-            memsize = 0;
             delete[] memory;
             memory = nullptr;
         }
+        memsize = 0;
         dlen = 0;
         data = cache;
     }
