@@ -1,5 +1,5 @@
 ###  Breakdown analyzer  ###
-NFSv3 total calls: 11. Per operation:
+NFSv3 total procedures: 11. Per procedure:
 NULL            0   0.00%
 GETATTR         0   0.00%
 SETATTR         0   0.00%
@@ -24,7 +24,7 @@ PATHCONF        0   0.00%
 COMMIT          0   0.00%
 Per connection info: 
 Session: 10.6.136.186:912 --> 10.6.136.105:2049 [UDP]
-Total: 11. Per operation:
+Total procedures: 11. Per procedure:
 NULL                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 SETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
@@ -48,9 +48,10 @@ FSINFO                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 St
 PATHCONF               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 
-NFSv4 total calls: 0. Per operation:
+NFSv4 total procedures: 0. Per procedure:
 NULL                      0      0%
 COMPOUND                  0      0%
+NFS4 total operations: 0. Per operation:
 ILLEGAL                   0      0%
 ACCESS                    0      0%
 CLOSE                     0      0%
