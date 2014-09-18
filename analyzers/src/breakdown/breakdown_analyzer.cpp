@@ -22,6 +22,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
+#include <iomanip>
 #include <list>
 #include <fstream>
 #include <sstream>
@@ -348,8 +349,10 @@ public:
               out.width(7);
               if(nfs3_total)
               {
+                  out.setf(std::ios::fixed, std::ios::floatfield);
                   out.precision(2);
-                  out << std::fixed << ((nfs3_ops_count[i] > 0) ? ((static_cast<float>(nfs3_ops_count[i]) / static_cast<float>(nfs3_total)) * 100.0f) : 0.0f);
+                  out << (static_cast<double>(nfs3_ops_count[i]) / static_cast<double>(nfs3_total)) * 100.0;
+                  out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
               }
               else
                   out << 0;
@@ -392,8 +395,10 @@ public:
             out.width(7);
             if(nfs4_total)
             {
+                out.setf(std::ios::fixed, std::ios::floatfield);
                 out.precision(2);
-                out << std::fixed << ((nfs4_ops_count[i]>0) ? ((static_cast<float>(nfs4_ops_count[i]) / static_cast<float>(nfs4_total)) * 100.0f) : 0.0f);
+                out << (static_cast<double>(nfs4_ops_count[i]) / static_cast<double>(nfs4_total)) * 100.0;
+                out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
             }
             else
                 out << 0;
