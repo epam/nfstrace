@@ -1,5 +1,5 @@
 ###  Breakdown analyzer  ###
-NFSv3 total calls: 0. Per operation:
+NFSv3 total procedures: 0. Per procedure:
 NULL            0      0%
 GETATTR         0      0%
 SETATTR         0      0%
@@ -23,9 +23,10 @@ FSINFO          0      0%
 PATHCONF        0      0%
 COMMIT          0      0%
 
-NFSv4 total calls: 6426. Per operation:
+NFSv4 total procedures: 1607. Per procedure:
 NULL                      0   0.00%
-COMPOUND               1607  25.01%
+COMPOUND               1607 100.00%
+NFS4 total operations: 4819. Per operation:
 ILLEGAL                   0   0.00%
 ACCESS                    1   0.02%
 CLOSE                     1   0.02%
@@ -33,7 +34,7 @@ COMMIT                    1   0.02%
 CREATE                    0   0.00%
 DELEGPURGE                0   0.00%
 DELEGRETURN               0   0.00%
-GETATTR                1604  24.96%
+GETATTR                1604  33.28%
 GETFH                     1   0.02%
 LINK                      0   0.00%
 LOCK                      0   0.00%
@@ -46,7 +47,7 @@ OPEN                      1   0.02%
 OPENATTR                  0   0.00%
 OPEN_CONFIRM              1   0.02%
 OPEN_DOWNGRADE            0   0.00%
-PUTFH                  1607  25.01%
+PUTFH                  1607  33.35%
 PUTPUBFH                  0   0.00%
 PUTROOTFH                 0   0.00%
 READ                      0   0.00%
@@ -62,14 +63,15 @@ SETATTR                   1   0.02%
 SETCLIENTID               0   0.00%
 SETCLIENTID_CONFIRM       0   0.00%
 VERIFY                    0   0.00%
-WRITE                  1600  24.90%
+WRITE                  1600  33.20%
 RELEASE_LOCKOWNER         0   0.00%
 GET_DIR_DELEGATION        0   0.00%
 Per connection info: 
 Session: 10.6.137.47:903 --> 10.6.137.113:2049 [TCP]
-Total: 6426. Per operation:
+Total procedures: 1607. Per procedure:
 NULL                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-COMPOUND               Count: 1607 ( 25.01%) Min: 0.000 Max: 0.990 Avg: 0.006 StDev: 0.02459829
+COMPOUND               Count: 1607 (100.00%) Min: 0.000 Max: 0.990 Avg: 0.006 StDev: 0.02459829
+Total operations: 4819. Per operation:
 ILLEGAL                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 ACCESS                 Count:    1 (  0.02%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
 CLOSE                  Count:    1 (  0.02%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
@@ -77,7 +79,7 @@ COMMIT                 Count:    1 (  0.02%) Min: 0.990 Max: 0.990 Avg: 0.990 St
 CREATE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 DELEGPURGE             Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 DELEGRETURN            Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-GETATTR                Count: 1604 ( 24.96%) Min: 0.001 Max: 0.018 Avg: 0.005 StDev: 0.00080875
+GETATTR                Count: 1604 ( 33.28%) Min: 0.001 Max: 0.018 Avg: 0.005 StDev: 0.00080875
 GETFH                  Count:    1 (  0.02%) Min: 0.018 Max: 0.018 Avg: 0.018 StDev: 0.00000000
 LINK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 LOCK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
@@ -90,7 +92,7 @@ OPEN                   Count:    1 (  0.02%) Min: 0.018 Max: 0.018 Avg: 0.018 St
 OPENATTR               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 OPEN_CONFIRM           Count:    1 (  0.02%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
 OPEN_DOWNGRADE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-PUTFH                  Count: 1607 ( 25.01%) Min: 0.000 Max: 0.990 Avg: 0.006 StDev: 0.02459829
+PUTFH                  Count: 1607 ( 33.35%) Min: 0.000 Max: 0.990 Avg: 0.006 StDev: 0.02459829
 PUTPUBFH               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 PUTROOTFH              Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 READ                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
@@ -106,6 +108,6 @@ SETATTR                Count:    1 (  0.02%) Min: 0.016 Max: 0.016 Avg: 0.016 St
 SETCLIENTID            Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 SETCLIENTID_CONFIRM    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 VERIFY                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-WRITE                  Count: 1600 ( 24.90%) Min: 0.002 Max: 0.007 Avg: 0.005 StDev: 0.00067742
+WRITE                  Count: 1600 ( 33.20%) Min: 0.002 Max: 0.007 Avg: 0.005 StDev: 0.00067742
 RELEASE_LOCKOWNER      Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GET_DIR_DELEGATION     Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000

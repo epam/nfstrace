@@ -1,5 +1,5 @@
 ###  Breakdown analyzer  ###
-NFSv3 total calls: 413. Per operation:
+NFSv3 total procedures: 413. Per procedure:
 NULL            4   0.97%
 GETATTR         7   1.69%
 SETATTR         2   0.48%
@@ -24,7 +24,7 @@ PATHCONF        2   0.48%
 COMMIT          2   0.48%
 Per connection info: 
 Session: 10.6.136.107:9322 --> 10.6.137.24:2049 [TCP]
-Total: 46. Per operation:
+Total procedures: 46. Per procedure:
 NULL                   Count:    1 (  2.17%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR                Count:    4 (  8.70%) Min: 0.000 Max: 0.001 Avg: 0.000 StDev: 0.00006949
 SETATTR                Count:    1 (  2.17%) Min: 0.013 Max: 0.013 Avg: 0.013 StDev: 0.00000000
@@ -48,7 +48,7 @@ FSINFO                 Count:    2 (  4.35%) Min: 0.000 Max: 0.000 Avg: 0.000 St
 PATHCONF               Count:    1 (  2.17%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
 COMMIT                 Count:    1 (  2.17%) Min: 0.148 Max: 0.148 Avg: 0.148 StDev: 0.00000000
 Session: 10.6.136.107:9320 --> 10.6.137.24:2049 [TCP]
-Total: 1. Per operation:
+Total procedures: 1. Per procedure:
 NULL                   Count:    1 (100.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 GETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 SETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
@@ -72,7 +72,7 @@ FSINFO                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 St
 PATHCONF               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 Session: 10.6.136.107:9318 --> 10.6.136.214:2049 [TCP]
-Total: 365. Per operation:
+Total procedures: 365. Per procedure:
 NULL                   Count:    1 (  0.27%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
 GETATTR                Count:    3 (  0.82%) Min: 0.001 Max: 0.004 Avg: 0.002 StDev: 0.00186981
 SETATTR                Count:    1 (  0.27%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
@@ -96,7 +96,7 @@ FSINFO                 Count:    2 (  0.55%) Min: 0.001 Max: 0.001 Avg: 0.001 St
 PATHCONF               Count:    1 (  0.27%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
 COMMIT                 Count:    1 (  0.27%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
 Session: 10.6.136.107:9316 --> 10.6.136.214:2049 [TCP]
-Total: 1. Per operation:
+Total procedures: 1. Per procedure:
 NULL                   Count:    1 (100.00%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
 GETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 SETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
@@ -120,9 +120,10 @@ FSINFO                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 St
 PATHCONF               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 
-NFSv4 total calls: 0. Per operation:
+NFSv4 total procedures: 0. Per procedure:
 NULL                      0      0%
 COMPOUND                  0      0%
+NFS4 total operations: 0. Per operation:
 ILLEGAL                   0      0%
 ACCESS                    0      0%
 CLOSE                     0      0%
