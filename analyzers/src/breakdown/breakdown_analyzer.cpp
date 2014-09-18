@@ -43,7 +43,7 @@ T to_sec(const timeval& val)
 template <typename T>
 class TwoPassVariance
 {
-    typedef std::list<timeval>::const_iterator ConstIterator;
+    using ConstIterator = std::list<timeval>::const_iterator;
 
 public:
     TwoPassVariance() : count{0} {}
@@ -92,7 +92,6 @@ public:
     }
 
 private:
-    TwoPassVariance(const TwoPassVariance&) = delete;
     void operator=(const TwoPassVariance&)  = delete;
 
     uint32_t count;
@@ -128,7 +127,6 @@ public:
     }
 
 private:
-    OnlineVariance(const OnlineVariance&) = delete;
     void operator=(const OnlineVariance&) = delete;
 
     uint32_t count;
@@ -159,7 +157,6 @@ public:
     const timeval& get_max()    const { return max; }
 
 private:
-    Latencies     (const Latencies&) = delete;
     void operator=(const Latencies&) = delete;
 
     void set_range(const timeval& t)
@@ -197,7 +194,6 @@ public:
     }
 
 private:
-    BreakdownCounter(const BreakdownCounter&) = delete;
     void operator=  (const BreakdownCounter&) = delete;
 
     Latencies<T, Algorithm> latencies[ProcEnumNFS4::count];
@@ -240,27 +236,16 @@ class BreakdownAnalyzer : public IAnalyzer
         }
     };
 
-    typedef BreakdownCounter<T, Algorithm> Breakdown;
-    typedef std::unordered_map<Session, Breakdown*, Hash, Pred> PerOpStat;
-    typedef typename PerOpStat::value_type Pair;
+    using Breakdown = BreakdownCounter<T, Algorithm>;
+    using PerOpStat = std::unordered_map<Session, Breakdown, Hash, Pred>;
+    using Pair = typename PerOpStat::value_type;
 public:
     BreakdownAnalyzer(std::ostream& o = std::cout) : nfs3_total{0},
                                                      nfs3_ops_count(ProcEnumNFS3::count, 0),
                                                      nfs4_total{0},
                                                      nfs4_ops_count(ProcEnumNFS4::count, 0),
                                                      out(o) { }
-    virtual ~BreakdownAnalyzer()
-    {
-        for(auto& i: nfs3_per_op_stat)
-        {
-            delete i.second;
-        }
-
-        for(auto& i: nfs4_per_op_stat)
-        {
-            delete i.second;
-        }
-    }
+    virtual ~BreakdownAnalyzer() { }
 
     void null(const struct RPCProcedure* proc,
               const struct rpcgen::NULL3args*,
@@ -366,12 +351,12 @@ public:
             std::stringstream session;
 
             // sort statistics by sessions
-            typedef std::multimap<Session, Breakdown*, Less> Map;
+            using Map = std::multimap<Session, Breakdown, Less>;
             Map ordered(nfs3_per_op_stat.begin(), nfs3_per_op_stat.end());
 
              for(auto& it : ordered)
              {
-                 const Breakdown& current = *it.second;
+                 const Breakdown& current = it.second;
                  uint64_t s_total = 0;
                  for(int i = 0; i < ProcEnumNFS3::count; ++i)
                  {
@@ -412,12 +397,12 @@ public:
             std::stringstream session;
 
             // sort statistics by sessions
-            typedef std::multimap<Session, Breakdown*, Less> Map;
+            using Map = std::multimap<Session, Breakdown, Less>;
             Map ordered(nfs4_per_op_stat.begin(), nfs4_per_op_stat.end());
 
             for(auto& it : ordered)
             {
-                const Breakdown& current = *it.second;
+                const Breakdown& current = it.second;
                 uint64_t s_total = 0;
                 for(int i = 0; i < ProcEnumNFS4::count; ++i)
                 {
@@ -499,7 +484,7 @@ public:
 private:
     void account(const struct RPCProcedure* proc, const struct rpcgen::COMPOUND4res* res = nullptr)
     {
-        typename PerOpStat::const_iterator i;
+        typename PerOpStat::iterator i;
         const u_int nfs_proc = proc->rpc_call.ru.RM_cmb.cb_proc;
         const u_int nfs_vers = proc->rpc_call.ru.RM_cmb.cb_vers;
         timeval latency{0,0};
@@ -515,7 +500,8 @@ private:
             i = nfs4_per_op_stat.find(*(proc->session));
             if(i == nfs4_per_op_stat.end())
             {
-                std::pair<typename PerOpStat::iterator, bool> session_res = nfs4_per_op_stat.insert(Pair(*(proc->session), new Breakdown));
+                const Breakdown breakdown;
+                std::pair<typename PerOpStat::iterator, bool> session_res = nfs4_per_op_stat.emplace(Pair(*(proc->session), breakdown));
                 if(session_res.second == false) return;
                 i = session_res.first;
             }
@@ -533,8 +519,7 @@ private:
                     if(nfs_oper == ProcEnumNFS4::NFSProcedure::ILLEGAL) nfs_oper = 2;
                     ++nfs4_ops_count[nfs_oper];
 
-                    Latencies<T, Algorithm>& lat_oper = (*i->second)[nfs_oper];
-                    lat_oper.add(latency);
+                    (i->second)[nfs_oper].add(latency);
                 }
             }
         }
@@ -547,14 +532,14 @@ private:
             i = nfs3_per_op_stat.find(*(proc->session));
             if(i == nfs3_per_op_stat.end())
             {
-                std::pair<typename PerOpStat::iterator, bool> session_res = nfs3_per_op_stat.insert(Pair(*(proc->session), new Breakdown));
+                const Breakdown breakdown;
+                std::pair<typename PerOpStat::iterator, bool> session_res = nfs3_per_op_stat.emplace(Pair(*(proc->session), breakdown));
                 if(session_res.second == false) return;
                 i = session_res.first;
             }
         }
 
-        Latencies<T, Algorithm>& lat_proc = (*i->second)[nfs_proc];
-        lat_proc.add(latency);
+        (i->second)[nfs_proc].add(latency);
 
     }
     uint64_t nfs3_total;
