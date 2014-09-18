@@ -19,14 +19,71 @@
 .\" You should have received a copy of the GNU General Public License
 .\" along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 .\" 
-.TH nfstrace 8 "10 September 2014" "version 0.2.2"
+.TH nfstrace 8 "24 September 2014" "version 0.3"
 .\" --------------------- NAME -----------------------------------
 .SH NAME
-nfstrace \- NFS tracing/monitoring/capturing/statistic tool
+.B nfstrace
+\- NFS tracing/monitoring/capturing/statistic tool
 .\" --------------------- SYNOPSIS -------------------------------
 .SH SYNOPSIS
 .B nfstrace
-[OPTIONS]...
+[
+.B \-LpTh
+] [
+.B \-m
+.I drain|live|dump|stat
+] [
+.B \-i
+.I interface
+] [
+.B \-f
+.I bpf syntax
+] [
+.B \-s
+.I 0..65535
+]
+.br
+[
+.B \-t
+.I Milliseconds
+] [
+.B \-b
+.I MBytes 
+] [
+.B \-d
+.I in|out|inout
+] [
+.B \-a
+.I path#opt1,opt2=val,...
+]
+.br
+[
+.B \-I
+.I path
+] [
+.B \-O
+.I path
+] [
+.B \-C
+.I shell command
+] [
+.B \-D
+.I MBytes
+] [
+.B \-M
+.I 1..4000
+] [
+.B \-Q
+.I 1..65535
+]
+.br
+[
+.B \-Z
+.I username 
+] [
+.B \-v
+.I 0|1|2 
+]
 .\" --------------------- DESCRIPTION ----------------------------
 .SH DESCRIPTION
 .TP
@@ -37,87 +94,108 @@ It helps to determine NFS procedures in network traffic and performs packet’s 
 The \fBnfstrace\fR supports following protocols: Ethernet – IPv4 | IPv6 – UDP | TCP – SunRPC/NFSv3/NFSv4.
 .\" --------------------- OPTIONS --------------------------------
 .SH OPTIONS
+Nfstrace can usually be run without arguments and will obtain useful results. However, for those occasions when the defaults are not good enough, the following options are provided:
 .TP
 \fB\-m, \-\-mode=\fRdrain|live|dump|stat
 .IP
-set running mode (\fIdefault:\fRlive)
+Set running mode.
+.I (default:live)
 .TP
 \fB\-i, \-\-interface=\fRINTERFACE
 .IP
-listen interface, it is required for live and dump modes (default:PCAP-DEFAULT)
+Listen interface, it is required for live and dump modes.
+.I (default:PCAP-DEFAULT)
 .TP
 \fB\-f, \-\-filtration=\fRBPF
 .IP
-a packet filtration in libpcap BPF syntax (default:port 2049)
+A packet filtration in libpcap BPF syntax.
+.I (default:port 2049)
 .TP
 \fB\-s, \-\-snaplen=\fR0..65535
 .IP
-max length of raw captured packet. May be used ONLY FOR UDP (default:65536)
+Max length of raw captured packet. May be used ONLY FOR UDP.
+.I (default:65536)
 .TP
 \fB\-t, \-\-timeout=\fRMilliseconds
 .IP
-set the read timeout that will be used on a capture (default:100)
+Set the read timeout that will be used on a capture.
+.I (default:100)
 .TP
 \fB\-b, \-\-bsize=\fRMBytes
 .IP
-size of capturing kernel buffer (default:20)
+Size of capturing kernel buffer.
+.I (default:20)
 .TP
 \fB\-p, \-\-promisc\fR
 .IP
-put the interface into promiscuous mode (default:true)
+Put the interface into promiscuous mode.
+.I (default:true)
 .TP
 \fB\-d, \-\-direction=\fRin|out|inout
 .IP
-set the direction for which packets will be captured (default:inout)
+Set the direction for which packets will be captured.
+.I (default:inout)
 .TP
 \fB\-a, \-\-analysis=\fRPATH#opt1,opt2=val,...
 .IP
-specify path to analysis module and set desired options (default:)
+Specify path to analysis module and set desired options.
+.I (default:)
 .TP
 \fB\-I, \-\-ifile=\fRPATH
 .IP
-input file for stat mode, the '-' means stdin (default:PROGRAMNAME-BPF.pcap)
+Input file for stat mode, the '-' means stdin.
+.I (default:PROGRAMNAME-BPF.pcap)
 .TP
 \fB\-O, \-\-ofile=\fRPATH
 .IP
-output file for dump mode, the '-' means stdout (default:PROGRAMNAME-BPF.pcap)
+Output file for dump mode, the '-' means stdout.
+.I (default:PROGRAMNAME-BPF.pcap)
 .TP
 \fB\-C, \-\-command=\fR"shell command"
 .IP
-execute command for each dumped file (default:)
+Execute command for each dumped file.
+.I (default:)
 .TP
 \fB\-D, \-\-dump-size=\fRMBytes
 .IP
-size of dumping file portion, 0 = no limit (default:0)
+Size of dumping file portion, 0 = no limit.
+.I (default:0)
 .TP
 \fB\-L, \-\-list\fR
 .IP
-list all available network interfaces (default:false)
+List all available network interfaces.
+The -L flag will not be supported if nfstrace was built with an older version of libpcap that lacks the pcap_findalldevs() function.
+.I (default:false)
 .TP
 \fB\-M, \-\-msg-header=\fR1..4000
 .IP
-RPC message will be truncated to this limit in bytes before passing to Analysis (default:512)
+RPC message will be truncated to this limit in bytes before passing to Analysis.
+.I (default:512)
 .TP
 \fB\-Q, \-\-qcapacity=\fR1..65535
 .IP
-initial queue capacity of RPC messages
-.BI (default:4096)
+Initial queue capacity of RPC messages.
+.I (default:4096)
 .TP
 \fB\-T, \-\-trace\fR
 .IP
-print collected NFSv3 procedures, true if no modules were passed(by -a) (default:false)
+Print collected NFSv3 procedures, true if no modules were passed(by -a).
+.I (default:false)
 .TP
 \fB\-Z, \-\-droproot=\fRusername
 .IP
-drops root privileges, after opening the capture device, but before reading from it (default:)
+Drops root privileges, after opening the capture device, but before reading from it.
+.I (default:)
 .TP
 \fB\-v, \-\-verbose=\fR0|1|2
 .IP
-level of print out additional information (default:1)
+Level of print out additional information.
+.I (default:1)
 .TP
 \fB\-h, \-\-help\fR
 .IP
-print this help message and usage for modules passed via -a options, then exit (default:false)
+Print this help message and usage for modules passed via -a options, then exit.
+.I (default:false)
 .\" --------------------- EXAMPLES -------------------------------
 .SH EXAMPLES
 \fB1.\fR sudo nfstrace
@@ -134,10 +212,9 @@ sudo nfstrace \-i enp0s25 \-a libbreakdown.so \-T \-v 2 \-Z user
 .SH FILES
 .\" -------------------- SEE ALSO --------------------------------
 .SH SEE ALSO
-.BR rpc.nfsd (8).
-.BR nfs (5).
-.BR nfsstat (8).
-.BR nfswatch (8).
+.R bpf(4),
+.R pcap(3PCAP),
+.R nfsstat (8).
 .\" ---------------------- BUGS ----------------------------------
 .SH BUGS
 .P

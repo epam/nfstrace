@@ -243,6 +243,7 @@ public:
     BreakdownAnalyzer(std::ostream& o = std::cout) : nfs3_proc_total{0},
                                                      nfs3_proc_count(ProcEnumNFS3::count, 0),
                                                      nfs4_proc_total{0},
+                                                     nfs4_ops_total{0},
                                                      nfs4_proc_count(ProcEnumNFS4::count, 0),
                                                      out(o) { }
     virtual ~BreakdownAnalyzer() { }
