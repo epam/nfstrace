@@ -1,0 +1,262 @@
+.\"
+.\" nfstrace(8)
+.\" 
+.\" Author: Alexey Costroma 
+.\" 
+.\" Copyright (c) 2014 EPAM Systems
+.\" 
+.\" This file is part of Nfstrace.
+.\" 
+.\" Nfstrace is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, version 2 of the License.
+.\" 
+.\" Nfstrace is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\" 
+.\" You should have received a copy of the GNU General Public License
+.\" along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
+.\" 
+.TH nfstrace 8 "24 September 2014" "version 0.3"
+.\" --------------------- NAME -----------------------------------
+.SH NAME
+.B nfstrace
+\- NFS tracing/monitoring/capturing/statistic tool
+.\" --------------------- SYNOPSIS -------------------------------
+.SH SYNOPSIS
+.B nfstrace
+[
+.B \-LpTh
+] [
+.B \-m
+.I drain|live|dump|stat
+] [
+.B \-i
+.I interface
+] [
+.B \-f
+.I bpf syntax
+] [
+.B \-s
+.I 0..65535
+]
+.br
+[
+.B \-t
+.I Milliseconds
+] [
+.B \-b
+.I MBytes 
+] [
+.B \-d
+.I in|out|inout
+] [
+.B \-a
+.I path#opt1,opt2=val,...
+]
+.br
+[
+.B \-I
+.I path
+] [
+.B \-O
+.I path
+] [
+.B \-C
+.I shell command
+] [
+.B \-D
+.I MBytes
+] [
+.B \-M
+.I 1..4000
+] [
+.B \-Q
+.I 1..65535
+]
+.br
+[
+.B \-Z
+.I username 
+] [
+.B \-v
+.I 0|1|2 
+]
+.\" --------------------- DESCRIPTION ----------------------------
+.SH DESCRIPTION
+.TP
+This is \fBnfstrace\fR also known as NST (NAS Sizing Tool/NFS Statistic Tool).
+.P
+The nfstrace tool performs live Ethernet 1Gbps - 10Gbps packet’s capturing and helps to determine NFS procedures in raw network traffic. It performs packet’s capturing, filtration, dumping traces, compression, statistical analysis, visualization and provides API for custom analysis modules.
+.P
+The \fBnfstrace\fR supports following protocols: Ethernet – IPv4 | IPv6 – UDP | TCP – SunRPC/NFSv3/NFSv4.
+.P
+\fBHardware Interfaces\fR
+.P
+The \fBnfstrace\fR captures raw packets from an Ethernet interface via libpcap interface of Linux (LSF) or FreeBSD (BPF) implementations. Current implementation makes assumption, that libpcap delivers correct TCP and UDP packets. Assembling Ethernet frames to IP packets and IP packets defragmentation performs in the Kernel. The software have tested on direct linked workstations with 1Gbps integrated NICs (Ethernet 1000baseT/Full).
+.P
+The \fBnfstrace\fR demonstrates perfect performance even in live capturing/filtration/analysis mode.
+.\" --------------------- OPTIONS --------------------------------
+.SH OPTIONS
+Nfstrace can usually be run without arguments and will obtain useful results. However, for those occasions when the defaults are not good enough, the following options are provided:
+.TP
+\fB\-m, \-\-mode=\fRlive|dump|drain|stat
+.IP
+Set running mode.
+ (default:live)
+.IP
+\fBlive\fR
+(on-line analysis) Performs online capturing, filtration and live analysis detected NFS procedures by a pluggable analysis modules or print-out them to console (-T option).
+.IP
+\fBdump\fR
+(on-line dumping)
+Performs online traffic capturing, filtration and dumping packets to the specified output file.
+.IP
+\fBdrain\fR
+(off-line  dumping)
+perfoms reading from input pcap file, filtration and dumping packets to the specified output .pcap file. removing all packets which are not related to NFS procedures
+.IP
+\fBstat\fR
+(off-line analysis)
+performs offline filtration of any .pcap file with captured traces and perform analysis by pluggable modules or print out found NFS procedures to console (-T option)
+.TP
+\fB\-i, \-\-interface=\fRINTERFACE
+.IP
+Listen interface, it is required for live and dump modes.
+ (default:PCAP-DEFAULT)
+.TP
+\fB\-f, \-\-filtration=\fRBPF
+.IP
+A packet filtration in libpcap BPF syntax.
+ (default:port 2049)
+.TP
+\fB\-s, \-\-snaplen=\fR0..65535
+.IP
+Max length of raw captured packet. May be used ONLY FOR UDP.
+ (default:65536)
+.TP
+\fB\-t, \-\-timeout=\fRMilliseconds
+.IP
+Set the read timeout that will be used on a capture.
+ (default:100)
+.TP
+\fB\-b, \-\-bsize=\fRMBytes
+.IP
+Size of capturing kernel buffer.
+ (default:20)
+.TP
+\fB\-p, \-\-promisc\fR
+.IP
+Put the interface into promiscuous mode.
+ (default:true)
+.TP
+\fB\-d, \-\-direction=\fRin|out|inout
+.IP
+Set the direction for which packets will be captured.
+ (default:inout)
+.TP
+\fB\-a, \-\-analysis=\fRPATH#opt1,opt2=val,...
+.IP
+Specify path to analysis module and set desired options.
+ (default:)
+.TP
+\fB\-I, \-\-ifile=\fRPATH
+.IP
+Input file for stat mode, the '-' means stdin.
+ (default:PROGRAMNAME-BPF.pcap)
+.TP
+\fB\-O, \-\-ofile=\fRPATH
+.IP
+Output file for dump mode, the '-' means stdout.
+ (default:PROGRAMNAME-BPF.pcap)
+.TP
+\fB\-C, \-\-command=\fR"shell command"
+.IP
+Execute command for each dumped file.
+ (default:)
+.TP
+\fB\-D, \-\-dump-size=\fRMBytes
+.IP
+Size of dumping file portion, 0 = no limit.
+ (default:0)
+.TP
+\fB\-L, \-\-list\fR
+.IP
+List all available network interfaces.
+The -L flag will not be supported if nfstrace was built with an older version of libpcap that lacks the pcap_findalldevs() function.
+ (default:false)
+.TP
+\fB\-M, \-\-msg-header=\fR1..4000
+.IP
+RPC message will be truncated to this limit in bytes before passing to Analysis.
+ (default:512)
+.TP
+\fB\-Q, \-\-qcapacity=\fR1..65535
+.IP
+Initial queue capacity of RPC messages.
+ (default:4096)
+.TP
+\fB\-T, \-\-trace\fR
+.IP
+Print collected NFSv3 procedures, true if no modules were passed(by -a).
+ (default:false)
+.TP
+\fB\-Z, \-\-droproot=\fRusername
+.IP
+Drops root privileges, after opening the capture device, but before reading from it.
+ (default:)
+.TP
+\fB\-v, \-\-verbose=\fR0|1|2
+.IP
+Level of print out additional information.
+ (default:1)
+.TP
+\fB\-h, \-\-help\fR
+.IP
+Print this help message and usage for modules passed via -a options, then exit.
+ (default:false)
+.\" --------------------- EXAMPLES -------------------------------
+.SH EXAMPLES
+.TP
+Live capture NFS traffic over TCP or UDP to port 2049 from enp0s25 network interface, print out full information about filtered NFS procedures to console, analyze filtered packets by Operation Breakdown analyzer, dump packets with NFS traffic to dump.pcap file and drop root priveleges to user.
+.B sudo nfstrace \-\-mode=dump \-\-interface enp0s25 \-\-filtration="ip and port 2049" -\-analysis libbreakdown.so \-\-trace \-\-verbose 2 \-O dump.pcap \-\-droproot user
+.TP
+Off-line analysis of previously captured eth\-ipv4\-tcp\-nfsv4.pcap and analyze by Operation Breakdown analyzer
+.B nfstrace \-\-mode=stat \-\-analysis libbreakdown.so \-\-ifile ./eth\-ipv4\-tcp\-nfsv4.pcap \-\-trace \-\-verbose 2
+.TP
+Plot graphical representation of data collected by Operation Breakdown analyzer via gnuplot utility.
+.B bzcat ../traces/2sessions-tcp-wsize32k-tcp-wsize512k.pcap.bz2 | ./nfstrace -m stat -I - -a ./analyzers/libbreakdown.so ./analyzers/nst.sh -a ./analyzers/breakdown.plt -d . -p 'breakdown*.dat' -v
+.\" --------------------- FILES ----------------------------------
+.SH FILES
+\fB/usr/include/nfstrace/api/\fR nfstrace's API headers
+.P
+\fB/usr/lib/nfstrace/\fR nfstrace's Pluggable Analysis Modules (PAM)
+.\" -------------------- SEE ALSO --------------------------------
+.SH SEE ALSO
+.R bpf(4),
+.R pcap(3PCAP),
+.R nfsstat (8).
+.\" ---------------------- BUGS ----------------------------------
+.SH BUGS
+.P
+For security purposes it is highly recommended to use \fB--droproot\fR=username option.
+.P
+Any problems, bugs, questions, desirable enhancements, etc. should be sent
+to \fBPavel Karneliuk\fR <Pavel_Karneliuk@epam.com>
+.\" -------------------- AUTHORS ---------------------------------
+.SH AUTHORS
+Written by:
+.IP
+Vitali Adamenka <Vitali_Adamenka@epam.com>
+.IP
+Yauheni Azaranka <Yauheni_Azaranka@epam.com>
+.IP
+Alexey Costroma <Alexey_Costroma@epam.com>
+.IP
+Dzianis Huznou <Dzianis_Huznou@epam.com>
+.IP
+Pavel Karneliuk <Pavel_Karneliuk@epam.com>
+.IP
+Mikhail Litvinets <Mikhail_Litvinets@epam.com>
