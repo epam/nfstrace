@@ -87,40 +87,108 @@
 .\" --------------------- DESCRIPTION ----------------------------
 .SH DESCRIPTION
 .TP
+\fBIntroduction\fR
 This is \fBnfstrace\fR also known as NST (NAS Sizing Tool/NFS Statistic Tool).
-.P
+.IP
 The nfstrace tool performs live Ethernet 1Gbps - 10Gbps packet’s capturing and helps to determine NFS procedures in raw network traffic. It performs packet’s capturing, filtration, dumping traces, compression, statistical analysis, visualization and provides API for custom analysis modules.
-.P
+.IP
 The \fBnfstrace\fR supports following protocols: Ethernet – IPv4 | IPv6 – UDP | TCP – SunRPC/NFSv3/NFSv4.
-.P
+.TP
 \fBHardware Interfaces\fR
-.P
 The \fBnfstrace\fR captures raw packets from an Ethernet interface via libpcap interface of Linux (LSF) or FreeBSD (BPF) implementations. Current implementation makes assumption, that libpcap delivers correct TCP and UDP packets. Assembling Ethernet frames to IP packets and IP packets defragmentation performs in the Kernel. The software have tested on direct linked workstations with 1Gbps integrated NICs (Ethernet 1000baseT/Full).
-.P
 The \fBnfstrace\fR demonstrates perfect performance even in live capturing/filtration/analysis mode.
+.TP
+\fBRunning Modes\fR
+\fBLive\fR
+(on-line analysis)
+.br
+Performs online capturing, filtration and live analysis detected NFS procedures by a pluggable analysis modules or print-out them to console (-T option).
+.IP
+\fBDump\fR
+(on-line dumping)
+.br
+Performs online traffic capturing, filtration and dumping packets to the specified output file.
+.IP
+\fBDrain\fR
+(off-line  dumping)
+.br
+Perfoms reading from input pcap file, filtration and dumping packets to the specified output .pcap file. removing all packets which are not related to NFS procedures
+.IP
+\fBStat\fR
+(off-line analysis)
+.br
+Performs offline filtration of any .pcap file with captured traces and perform analysis by pluggable modules or print out found NFS procedures to console (-T option)
+.
+.TP
+\fBPackets Filtration by BPF\fR
+The nfstrace captures network traffic from NIC by libpcap. Libpcap provides portable interface to native Kernel API for capturing network traffic. All platforms implement low-level filtration of packets in Kernel-space by BPF. Default BPF filter in nfstrace is ‘port 2049’. It means that each packet, which delivered to user-space from the Kernel, satisfies following conditions: it has IPv4 or IPv6 header and it has TCP or UDP header with source or destination port number equals 2049(default NFS port). This filter is ‘heavy’ and IPv6 support is experimental. So, for faster filtration of IPv4-only traffic, use following BPF filter: ‘ip and port 2049’ (via -f option).
+.TP
+\fBPayload Filtration\fR
+Let see to following case: writing 1Gb file to a NFS storage:
+
+This action will be performed by some LOOKUP, READDIRPLUS, COMMIT, GETATTR, etc. and some (thousands?) WRITE procedures of NFSv3 protocol. The nfstrace must catch all of them. How many RPC/NFS procedures will be perform? It depends on wsize. Wsize is an option of NFS client, it defines the number of bytes that NFS uses during the writing files to an NFS server by one WRITE procedure. When wsize is 512 Kbytes a NFS client should (in general) perform 1Gb/512Kb WRITE procedures. So, for writing 1Gb file to a NFS storage, a NFS client (with wsize=512k) should perform 2000 WRITE procedures + some other procedures like GETATTR, etc.
+
+Each NFS procedure consists by two RPC messages: Call – request from client to server and Reply – reply from server with result of requested procedure. Both RPC messages may contain data useful for analysis. Both RPC messages may contain thousands of payload bytes useless for analysis. The nfstrace must capture headers of calls and replies, and then match pairs of them to complete NFS procedures.
+
+The ‘\-\-snaplen’ option set\-up the number of bytes of a packet for uprising from the Kernel to user-space. In case of TCP transport layer this options is useless because TCP connection is a bidirectional stream of data (instead of UDP that is form of interchange up to 64k datagrams). In case of NFS over TCP, the nfstrace must capture whole packets and copy them to user-space from the Kernel for DPI and performing NFS statistics analysis.
+
+Finally, the nfstrace must filtrate whole NFS traffic passed from the Kernel to user-space and detects RPC/NFS message headers (up to 4Kbytes) within gigabytes of network traffic.
+
+Detected headers are copied into internal buffers (or dumped to a .pcap file) for statistics analysis.
+
+The key principle of Filtration in the nfstrace is \fB\(dqDiscard payload ASAP\(dq\fR.
+The Filtration module works in separate thread that captures packets from network interface by libpcap. It matches a packet to a related session (TCP or UDP) and performs reassembling TCP flow from TCP segment of a packet. After that, a part of packet will be pass to RPCFiltrator.
+
+There are two RPCFiltrator in one TCP session. Both of them known state of current RPC message in related TCP flow. They can detect RPC messages and perform action on a packet – discard it or collect it for analysis.
+
+The ‘-b’ option of nfstrace set-up size of capturing buffer in the Kernel of operating system in megabytes. This option is very critical for capturing performance.
+The wsize and rsize of NFS connections are meaningful for filtration and analysis performance too.
+.TP
+\fBDump File Format\fR
+The nfstrace uses libpcap file format for input and output files. Filtered packets are saved in .pcap format too. Any external tool (like Wireshark) may be used to inspect filtered traces. Filtrated headers of RPC messages are passed from Filtration to Analysis modules in raw data buffers via Queue of Analysis module.
+.TP
+\fBAPI/Pluggable Analysis Modules\fR
+The API of nfstrace provides C++ headers with definition of IAnalyzer interface and couple of related types and NFS data structures and functions. An IAnalyzer interface is a set of NFS handlers that will be called by Analysis module for each NFS procedure. All definitions of types and constants, required for development analysis modules, are defined in files in nfstrace/api/ directory. They should be included by <nfstrace/api/plugin_api.h> header.
+.IP
+A pluggable analysis module should be a dynamically linked shared object and should export following C functions:
+.IP
+const char* usage ();
+.br
+IAnalyzer*  create (const char* opts);
+.br
+void        destroy (IAnalyzer* instance);
+.IP
+and should contain the following macro after declaration of these functions for proper usage:
+.IP
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
+.IP
+The \fBusage\fR() function must return C-string with description of module and required parameters for creation an instance of analyzer, this string will be shown in output of \(dq\-\-help\(dq option.
+.br
+The IAnalyzer* \fBcreate\fR(const char* opts) must create and return an instance of analyzer accordingly to passed options.
+.br
+The void \fBdestroy\fR(IAnalyzer* instance) must destroy previously created analyzer instance and performs required clean\-up (for instance \- close connection to a database).
+.IP
+All existing analyzers are implemented as pluggable analysis modules and may be attached to nfstrace via \-a option.
+.TP
+.B Operation Breakdown Analyzer (OB)
+The OB implemented as pluggable analysis module libbreakdown.so.
+
+The NFS procedure latency have calculate as difference between timestamp of come\-in last TCP or UDP packet of header of RPC/NFS reply-message and timestamp of come\-in last TCP or UDP packet of header of related NFS call\-message.
+
+Standard Deviation of latency may be calculate by two algorithms. Two-pass algorithm generates correct standard deviation value but requires a lot of memory for storage all latencies till final computation. One-pass algorithm is memory-efficient but it can accumulate computation error in case of large number of small latencies. OB implements both algorithms. They may be chosen by passing parameter while attaching OB analyzer to nfstrace.
+
+MEM means Knuth’s one-pass algorithm. ACC means stable two-pass algorithm. ACC is default.
+.TP
+\fBSecurity\fR
+For security purposes it is highly recommended to use \fB\-\-droproot\fR=username option.
 .\" --------------------- OPTIONS --------------------------------
 .SH OPTIONS
 Nfstrace can usually be run without arguments and will obtain useful results. However, for those occasions when the defaults are not good enough, the following options are provided:
 .TP
 \fB\-m, \-\-mode=\fRlive|dump|drain|stat
 .IP
-Set running mode.
+Set running mode. (see description above)
  (default:live)
-.IP
-\fBlive\fR
-(on-line analysis) Performs online capturing, filtration and live analysis detected NFS procedures by a pluggable analysis modules or print-out them to console (-T option).
-.IP
-\fBdump\fR
-(on-line dumping)
-Performs online traffic capturing, filtration and dumping packets to the specified output file.
-.IP
-\fBdrain\fR
-(off-line  dumping)
-perfoms reading from input pcap file, filtration and dumping packets to the specified output .pcap file. removing all packets which are not related to NFS procedures
-.IP
-\fBstat\fR
-(off-line analysis)
-performs offline filtration of any .pcap file with captured traces and perform analysis by pluggable modules or print out found NFS procedures to console (-T option)
 .TP
 \fB\-i, \-\-interface=\fRINTERFACE
 .IP
@@ -221,30 +289,399 @@ Print this help message and usage for modules passed via -a options, then exit.
 .SH EXAMPLES
 .TP
 Live capture NFS traffic over TCP or UDP to port 2049 from enp0s25 network interface, print out full information about filtered NFS procedures to console, analyze filtered packets by Operation Breakdown analyzer, dump packets with NFS traffic to dump.pcap file and drop root priveleges to user.
-.B sudo nfstrace \-\-mode=dump \-\-interface enp0s25 \-\-filtration="ip and port 2049" -\-analysis libbreakdown.so \-\-trace \-\-verbose 2 \-O dump.pcap \-\-droproot user
+.B $ sudo nfstrace \-\-mode=dump \-\-interface enp0s25 \-\-filtration=\(dqip and port 2049\(dq -\-analysis libbreakdown.so \-\-trace \-\-verbose 2 \-O dump.pcap \-\-droproot user
 .TP
-Off-line analysis of previously captured eth\-ipv4\-tcp\-nfsv4.pcap and analyze by Operation Breakdown analyzer
-.B nfstrace \-\-mode=stat \-\-analysis libbreakdown.so \-\-ifile ./eth\-ipv4\-tcp\-nfsv4.pcap \-\-trace \-\-verbose 2
+Off\-line analysis of previously captured eth\-ipv4\-tcp\-nfsv4.pcap and analyze by Operation Breakdown analyzer
+.B $ nfstrace \-\-mode=stat \-\-analysis libbreakdown.so \-\-ifile ./eth\-ipv4\-tcp\-nfsv4.pcap \-\-trace \-\-verbose 2
 .TP
 Plot graphical representation of data collected by Operation Breakdown analyzer via gnuplot utility.
-.B bzcat ../traces/2sessions-tcp-wsize32k-tcp-wsize512k.pcap.bz2 | ./nfstrace -m stat -I - -a ./analyzers/libbreakdown.so ./analyzers/nst.sh -a ./analyzers/breakdown.plt -d . -p 'breakdown*.dat' -v
+.B $ bzcat ../traces/2sessions-tcp-wsize32k-tcp-wsize512k.pcap.bz2 | ./nfstrace -m stat \-I \- \-a ./analyzers/libbreakdown.so ./analyzers/nst.sh \-a ./analyzers/breakdown.plt \-d . \-p 'breakdown*.dat' \-v
+.TP
+Compression:
+The compression and decompression performs by external tools. It is very similar to tcpdump \-z option:
+.IP
+.B $ sudo ./nfstrace --mode=dump -i eth0 -f \(dqip and port 2049\(dq \-O dump.pcap \-\-dump-size=10 \-C \(dqbzip2 \-f \-9\(dq
+.IP
+This command run nfstrace in dumping mode (\-\-mode=dump). Capturing from network interface requires super-user privileges, so \– sudo. In this mode, the application performs live capturing packets from network interface eth0 (\-i eth0) and filtration NFS procedures (calls + replies). Then it dumps filtered packets that contains RPC/NFS headers (or parts of these headers). Filtration in the Kernel performs by BPF filter (\-f \(dqip and port 2049\(dq). It means that we are interested in any TCP or UDP packets send to or from port 2049(default port for NFS servers) over IPv4. This command specifies the output file dump.pcap (-O dump.pcap). In case of the output file will be huge (tons of Mb) it will be divided to parts by 10Mb (\-\-dump-size=10).
+
+When the part’s dumping is compete, the dumping will be continued to another file (dump.pcap\-1, dump.pcap\-2, … dump.pcap\-N) and nfstrace spawns child process (by fork() & exec() calls) that executes command (passed by \-C \(dqbzip2 \-f \-9\(dq) \(dqbzip2 \-f \-9 dump.pcap\(dq over each dumped part.
+
+After dumping interruption via Control\-C(SIGINT) the application closes with flushing captured data and we get a set of compressed parts of filtered traffic:
+ 
+.B $ ls \-la
+.br
+total 1780
+.br
+drwxrwxr\-x  6 nst  nst    4096 Apr  3 13:46 .
+.br
+drwxrwxr-x 10 nst  nst    4096 Mar 27 13:49 ..
+.br
+\-rw\-r\-\-r\-\-  1 root root  79711 Apr  3 13:46 dump.pcap\-10.bz2
+.br
+\-rw\-r\-\-r\-\-  1 root root 128455 Apr  3 13:45 dump.pcap\-1.bz2
+.br
+\-rw\-r\-\-r\-\-  1 root root 129402 Apr  3 13:45 dump.pcap\-2.bz2
+.br
+\-rw\-r\-\-r\-\-  1 root root 132811 Apr  3 13:45 dump.pcap\-3.bz2
+.br
+\-rw\-r\-\-r\-\-  1 root root 127140 Apr  3 13:45 dump.pcap\-4.bz2
+.br
+\-rw\-r\-\-r\-\-  1 root root 130819 Apr  3 13:45 dump.pcap\-5.bz2
+.br
+\-rw\-r\-\-r\-\-  1 root root 135586 Apr  3 13:45 dump.pcap\-6.bz2
+.br
+\-rw\-r\-\-r\-\-  1 root root 130894 Apr  3 13:45 dump.pcap\-7.bz2
+.br
+\-rw\-r\-\-r\-\-  1 root root 129277 Apr  3 13:45 dump.pcap\-8.bz2
+.br
+\-rw\-r\-\-r\-\-  1 root root 129772 Apr  3 13:46 dump.pcap\-9.bz2
+.br
+\-rw\-r\-\-r\-\-  1 root root 127589 Apr  3 13:45 dump.pcap.bz2 
+.br
+
+These compressed parts have filtered data and may be join to one .pcap file by: 
+
+.B $ ls dump.pcap*.bz2 | sort \-n \-t \- \-k 2 | xargs bzcat > dump.pcap
+
+The ls and sort commands sort file names of parts right order and a pipe passes them to bzcat tool to decompressing parts to one huge file dump.pcap.
+dump.pcap file may be open in any external tool that know .pcap format, f.e. – Wireshark. Only the dump.pcap.bz2 has .pcap file header, other parts have only data and they are not be recognized as .pcap file by external tool.
+The compressed parts of dump can be decompressed by bzcat tool to stdin of nfsrace for offline analysis by an analyzer module or prints-out to console:
+ 
+.B $ ls dump.pcap*.bz2 | sort -n \-t \- \-k 2 | xargs bzcat | ./nfstrace \-\-mode=stat \-I \- \-T
+
+This command runs bzcat tool, which decompress parts, merges them to one stream and put in to a pipe. Nfstrace runs in statistic mode (\-\-mode=stat) for reading data from that pipe via stdin (\-I \-) and prints (by \-T) all detected NFS procedures (call+reply) to console:
+.br
+…
+.br
+10.6.137.109:876 \-\-> 10.6.137.113:2049 [UDP] WRITE
+.br
+        CALL  [ file: 10007010...9335c1f4 offset: 2024476672 count: 32768 stable: UNSTABLE ]
+.br
+        REPLY [ status: OK ]
+.br
+10.6.137.109:876 \-\-> 10.6.137.113:2049 [UDP] COMMIT
+.br
+        CALL  [ file: 10007010...9335c1f4 offset: 0 count: 0 ]
+.br
+        REPLY [ status: OK ]
+.br
+...
+.br
+The \-\-verbose=2 option enables whole output:
+.br
+...
+.br
+10.6.137.109:876 \-\-> 10.6.137.113:2049 [UDP] XID: 3875993544 RPC version: 2 RPC program: 100003 version: 3 WRITE
+.br
+        CALL  [ file: 10007010ad108000000000002b960d115ac704d6c92360d50abcf7f8921080009335c1f4 offset: 2024476672 count: 32768 stable: UNSTABLE data: skipped on filtration ]
+.br
+        REPLY [ status: OK file_wcc:  before:  void  after:  attributes:  type: REG mode: OWNER_READ OWNER_WRITE GROUP_READ GROUP_WRITE OTHER_READ  nlink: 1 uid: 1000 gid: 1000 size: 2097152000 used: 2097156096 rdev:  specdata1: 0 specdata2: 0 fsid: 16302950409496320814 fileid: 524585 atime: seconds: 1395737557 nseconds: 372964699 mtime: seconds: 1396521963 nseconds: 558634635 ctime: seconds: 1396521963 nseconds: 558634635 count: 32768 committed: UNSTABLE verf: 53314027000b8fb4 ]
+.br
+10.6.137.109:876 \-\-> 10.6.137.113:2049 [UDP] XID: 3892770760 RPC version: 2 RPC program: 100003 version: 3 COMMIT
+.br
+        CALL  [ file: 10007010ad108000000000002b960d115ac704d6c92360d50abcf7f8921080009335c1f4 offset: 0 count: 0 ]
+.br
+        REPLY [ status: OK file_wcc:  before:  void  after:  attributes:  type: REG mode: OWNER_READ OWNER_WRITE GROUP_READ GROUP_WRITE OTHER_READ  nlink: 1 uid: 1000 gid: 1000 size: 2097152000 used: 2097156096 rdev:  specdata1: 0 specdata2: 0 fsid: 16302950409496320814 fileid: 524585 atime: seconds: 1395737557 nseconds: 372964699 mtime: seconds: 1396521963 nseconds: 558634635 ctime: seconds: 1396521963 nseconds: 558634635 verf: 53314027000b8fb4 ]
+.br
+...
+.TP
+Operation Breakdown Analyzer
+
+bzcat tool extracts collected trace from compressed archive to pipe. This archive contains traces of packets of NFSv4 sessions over TCP protocol. 
+.IP
+.B $ bzcat ../traces/eth-ipv4-tcp-nfsv4.pcap.bz2 | ./nfstrace -m stat -I - -a analyzers/libbreakdown.so#ACC
+.IP
+Log folder: /tmp/nfstrace
+.br
+Loading module: 'analyzers/libbreakdown.so' with args: [ACC]
+.br
+Read packets from: -
+.br
+  datalink: EN10MB (Ethernet)
+.br
+  version: 2.4
+.br
+Note: It's potentially unsafe to run this program as root without dropping root privileges.
+.br
+Note: Use -Z=username option for dropping root privileges when you run this program as user with root privileges.
+.br
+Processing packets. Press CTRL-C to quit and view results.
+.br
+Detect session 10.6.137.47:903 --> 10.6.137.113:2049 [TCP]
+.br
+###  Breakdown analyzer  ###
+.br
+NFSv3 total procedures: 0. Per procedure:
+.br
+NULL            0      0%
+.br
+GETATTR         0      0%
+.br
+SETATTR         0      0%
+.br
+LOOKUP          0      0%
+.br
+ACCESS          0      0%
+.br
+READLINK        0      0%
+.br
+READ            0      0%
+.br
+WRITE           0      0%
+.br
+CREATE          0      0%
+.br
+MKDIR           0      0%
+.br
+SYMLINK         0      0%
+.br
+MKNOD           0      0%
+.br
+REMOVE          0      0%
+.br
+RMDIR           0      0%
+.br
+RENAME          0      0%
+.br
+LINK            0      0%
+.br
+READDIR         0      0%
+.br
+READDIRPLUS     0      0%
+.br
+FSSTAT          0      0%
+.br
+FSINFO          0      0%
+.br
+PATHCONF        0      0%
+.br
+COMMIT          0      0%
+.br
+
+NFSv4 total procedures: 1607. Per procedure:
+.br
+NULL                      0   0.00%
+.br
+COMPOUND               1607 100.00%
+.br
+NFS4 total operations: 4819. Per operation:
+.br
+ILLEGAL                   0   0.00%
+.br
+ACCESS                    1   0.02%
+.br
+CLOSE                     1   0.02%
+.br
+COMMIT                    1   0.02%
+.br
+CREATE                    0   0.00%
+.br
+DELEGPURGE                0   0.00%
+.br
+DELEGRETURN               0   0.00%
+.br
+GETATTR                1604  33.28%
+.br
+GETFH                     1   0.02%
+.br
+LINK                      0   0.00%
+.br
+LOCK                      0   0.00%
+.br
+LOCKT                     0   0.00%
+.br
+LOCKU                     0   0.00%
+.br
+LOOKUP                    1   0.02%
+.br
+LOOKUPP                   0   0.00%
+.br
+NVERIFY                   0   0.00%
+.br
+OPEN                      1   0.02%
+.br
+OPENATTR                  0   0.00%
+.br
+OPEN_CONFIRM              1   0.02%
+.br
+OPEN_DOWNGRADE            0   0.00%
+.br
+PUTFH                  1607  33.35%
+.br
+PUTPUBFH                  0   0.00%
+.br
+PUTROOTFH                 0   0.00%
+.br
+READ                      0   0.00%
+.br
+READDIR                   0   0.00%
+.br
+READLINK                  0   0.00%
+.br
+REMOVE                    0   0.00%
+.br
+RENAME                    0   0.00%
+.br
+RENEW                     0   0.00%
+.br
+RESTOREFH                 0   0.00%
+.br
+SAVEFH                    0   0.00%
+.br
+SECINFO                   0   0.00%
+.br
+SETATTR                   1   0.02%
+.br
+SETCLIENTID               0   0.00%
+.br
+SETCLIENTID_CONFIRM       0   0.00%
+.br
+VERIFY                    0   0.00%
+.br
+WRITE                  1600  33.20%
+.br
+RELEASE_LOCKOWNER         0   0.00%
+.br
+GET_DIR_DELEGATION        0   0.00%
+.br
+Per connection info: 
+.br
+Session: 10.6.137.47:903 --> 10.6.137.113:2049 [TCP]
+.br
+Total procedures: 1607. Per procedure:
+.br
+NULL                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+COMPOUND               Count: 1607 (100.00%) Min: 0.000 Max: 0.990 Avg: 0.006 StDev: 0.02459829
+.br
+Total operations: 4819. Per operation:
+.br
+ILLEGAL                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+ACCESS                 Count:    1 (  0.02%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
+.br
+CLOSE                  Count:    1 (  0.02%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
+.br
+COMMIT                 Count:    1 (  0.02%) Min: 0.990 Max: 0.990 Avg: 0.990 StDev: 0.00000000
+.br
+CREATE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+DELEGPURGE             Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+DELEGRETURN            Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+GETATTR                Count: 1604 ( 33.28%) Min: 0.001 Max: 0.018 Avg: 0.005 StDev: 0.00080875
+.br
+GETFH                  Count:    1 (  0.02%) Min: 0.018 Max: 0.018 Avg: 0.018 StDev: 0.00000000
+.br
+LINK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+LOCK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+LOCKT                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+LOCKU                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+LOOKUP                 Count:    1 (  0.02%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+LOOKUPP                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+NVERIFY                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+OPEN                   Count:    1 (  0.02%) Min: 0.018 Max: 0.018 Avg: 0.018 StDev: 0.00000000
+.br
+OPENATTR               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+OPEN_CONFIRM           Count:    1 (  0.02%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
+.br
+OPEN_DOWNGRADE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+PUTFH                  Count: 1607 ( 33.35%) Min: 0.000 Max: 0.990 Avg: 0.006 StDev: 0.02459829
+.br
+PUTPUBFH               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+PUTROOTFH              Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+READ                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+READDIR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+READLINK               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+REMOVE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+RENAME                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+RENEW                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+RESTOREFH              Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+SAVEFH                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+SECINFO                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+SETATTR                Count:    1 (  0.02%) Min: 0.016 Max: 0.016 Avg: 0.016 StDev: 0.00000000
+.br
+SETCLIENTID            Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+SETCLIENTID_CONFIRM    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+VERIFY                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+WRITE                  Count: 1600 ( 33.20%) Min: 0.002 Max: 0.007 Avg: 0.005 StDev: 0.00067742
+.br
+RELEASE_LOCKOWNER      Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+GET_DIR_DELEGATION     Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+.br
+Filtration is done
+.IP
+OB has two optional modules for demonstration visualization via gnuplot:
+.br
+-       breakdown.plt – gnuplot script for a histogram generation;
+.br
+-       nst.sh – “glue” for passing a .dat file to breakdown.plt and invocation gnuplot tool.
+.br
+
+.IP
+The example of invocation:
+.IP
+.B $ ../analyzers/nst.sh -a ../analyzers/breakdown.plt -d . -p 'breakdown_10.6.136.107:9322*.dat' -v gnuplot -e \(dqi_file='./breakdown_10.6.136.107:9322 --> 10.6.137.24:2049 [TCP].dat';o_file='./breakdown_10.6.136.107:9322 --> 10.6.137.24:2049 [TCP].dat.png'\(dq ../analyzers/breakdown.plt
 .\" --------------------- FILES ----------------------------------
 .SH FILES
-\fB/usr/include/nfstrace/api/\fR nfstrace's API headers
-.P
-\fB/usr/lib/nfstrace/\fR nfstrace's Pluggable Analysis Modules (PAM)
-.\" -------------------- SEE ALSO --------------------------------
-.SH SEE ALSO
-.R bpf(4),
-.R pcap(3PCAP),
-.R nfsstat (8).
+.TP
+API headers
+\fB/usr/include/nfstrace/api/\fR
+.TP
+Pluggable Analysis Modules (PAMs)
+\fB/usr/lib/nfstrace/\fR
 .\" ---------------------- BUGS ----------------------------------
 .SH BUGS
 .P
-For security purposes it is highly recommended to use \fB--droproot\fR=username option.
-.P
-Any problems, bugs, questions, desirable enhancements, etc. should be sent
-to \fBPavel Karneliuk\fR <Pavel_Karneliuk@epam.com>
+Any problems, bugs, questions, desirable enhancements, etc.
+.br
+should be sent to \fBPavel Karneliuk\fR <Pavel_Karneliuk@epam.com>
+.\" -------------------- COPYRIGHT -------------------------------
+.SH COPYRIGHT
+Copyright (c) 2013,2014 EPAM Systems
+
+Nfstrace is free software: you can redistribute it and/or modify
+.br
+it under the terms of the GNU General Public License as published by
+.br
+the Free Software Foundation, version 2 of the License.
+
+Nfstrace is distributed in the hope that it will be useful,
+.br
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+.br
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.br
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+.br
+along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 .\" -------------------- AUTHORS ---------------------------------
 .SH AUTHORS
 Written by:
@@ -260,3 +697,8 @@ Dzianis Huznou <Dzianis_Huznou@epam.com>
 Pavel Karneliuk <Pavel_Karneliuk@epam.com>
 .IP
 Mikhail Litvinets <Mikhail_Litvinets@epam.com>
+.\" -------------------- SEE ALSO --------------------------------
+.SH SEE ALSO
+.R bpf(4),
+.R pcap(3PCAP),
+.R nfsstat (8).
