@@ -576,7 +576,7 @@ extern "C"
 
 const char* usage()
 {
-    return "ACC - for accurate evaluation, MEM - for memory efficient evaluation(default). Options cannot be combined";
+    return "ACC - for accurate evaluation(default), MEM - for memory efficient evaluation. Options cannot be combined";
 }
 
 IAnalyzer* create(const char* optarg)
