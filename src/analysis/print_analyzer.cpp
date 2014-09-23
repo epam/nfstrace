@@ -982,7 +982,7 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::ACCESS4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::CLOSE4args* args)
 {
-    if(args) out <<  "seqid: 0x"       << std::hex << args->seqid << std::dec
+    if(args) out <<  "seqid: "       << std::hex << args->seqid << std::dec
                  << " open state id:" << args->open_stateid;
 }
 
@@ -1035,7 +1035,7 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::CREATE4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::DELEGPURGE4args* args)
 {
-    if(args) out << "client id: 0x" << std::hex << args->clientid << std::dec;
+    if(args) out << "client id: " << std::hex << args->clientid << std::dec;
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::DELEGPURGE4res*  res)
@@ -1138,7 +1138,7 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::LOCKT4res*  res)
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::LOCKU4args* args)
 {
     if(args) out <<  "lock type: "     << args->locktype
-                 << " seqid: 0x"       << std::hex << args->seqid << std::dec
+                 << " seqid: "       << std::hex << args->seqid << std::dec
                  << " lock state id: " << args->lock_stateid
                  << " offset: "        << args->offset
                  << " length: "        << args->length;
@@ -1179,7 +1179,7 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN4args* args)
     static const char* const open4_share_access[4] = {"",    "READ","WRITE","BOTH"};
     static const char* const open4_share_deny[4]   = {"NONE","READ","WRITE","BOTH"};
 
-    if(args) out <<  "seqid: 0x" << std::hex << args->seqid << std::dec
+    if(args) out <<  "seqid: " << std::hex << args->seqid << std::dec
                  << " share access: " << open4_share_access[args->share_access]
                  << " share deny: "   << open4_share_deny[args->share_deny] << ' '
                  <<  args->owner << ' '
@@ -1195,7 +1195,7 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN4res*  res)
         if(out_all() && res->status == rpcgen::nfsstat4::NFS4_OK)
             out << res->OPEN4res_u.resok4.stateid
                 << res->OPEN4res_u.resok4.cinfo
-                << " results flags: 0x" << std::hex << res->OPEN4res_u.resok4.rflags << ' '  << std::dec
+                << " results flags: " << std::hex << res->OPEN4res_u.resok4.rflags << ' '  << std::dec
                 << res->OPEN4res_u.resok4.attrset << ' '
                 << res->OPEN4res_u.resok4.delegation;
     }
@@ -1214,7 +1214,7 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPENATTR4res*  res)
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN_CONFIRM4args* args)
 {
     if(args) out << "open state id:" << args->open_stateid
-                 << " seqid: 0x"     << std::hex << args->seqid << std::dec;
+                 << " seqid: "     << std::hex << args->seqid << std::dec;
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN_CONFIRM4res*  res)
@@ -1230,7 +1230,7 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN_CONFIRM4res*  res)
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN_DOWNGRADE4args* args)
 {
     if(args) out << " open state id: " << args->open_stateid
-                 << " seqid: 0x"       << std::hex << args->seqid << std::dec
+                 << " seqid: "       << std::hex << args->seqid << std::dec
                  << " share access: "  << args->share_access
                  << " share deny: "    << args->share_deny;
 }
