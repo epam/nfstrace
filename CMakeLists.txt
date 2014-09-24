@@ -35,10 +35,9 @@ set  (LIBS  ${CMAKE_DL_LIBS}            # libdl with dlopen()
             pcap                        # libpcap
             )
 
-configure_file(src/api/plugin_api.h.in
-               ${PROJECT_SOURCE_DIR}/src/api/plugin_api.h)
-configure_file(src/controller/build_info.h.in
-               ${PROJECT_SOURCE_DIR}/src/controller/build_info.h)
+configure_file(docs/man/nfstrace.8.in          ${PROJECT_SOURCE_DIR}/docs/man/nfstrace.8)
+configure_file(src/api/plugin_api.h.in         ${PROJECT_SOURCE_DIR}/src/api/plugin_api.h)
+configure_file(src/controller/build_info.h.in  ${PROJECT_SOURCE_DIR}/src/controller/build_info.h)
 
 add_executable        (${PROJECT_NAME} ${SRCS})
 target_link_libraries (${PROJECT_NAME} ${LIBS})
