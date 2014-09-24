@@ -19,9 +19,10 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef RPC_PROCEDURE_TYPE_H
-#define RPC_PROCEDURE_TYPE_H
+#ifndef RPC_PROCEDURE_H
+#define RPC_PROCEDURE_H
 //------------------------------------------------------------------------------
+#include <rpc/rpc_msg.h>
 #include <sys/time.h>
 
 #include "rpc_types.h"
@@ -34,8 +35,9 @@ namespace API
 
 struct RPCProcedure
 {
-    struct RPCCall  call;
-    struct RPCReply reply;
+    struct rpc_msg rpc_call;
+    struct rpc_msg rpc_reply;
+
     const struct Session* session;
     const struct timeval* ctimestamp;
     const struct timeval* rtimestamp;
@@ -44,5 +46,5 @@ struct RPCProcedure
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//RPC_PROCEDURE_TYPE_H
+#endif//RPC_PROCEDURE_H
 //------------------------------------------------------------------------------

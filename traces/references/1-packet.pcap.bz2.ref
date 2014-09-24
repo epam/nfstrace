@@ -1,5 +1,5 @@
 ###  Breakdown analyzer  ###
-Total calls: 0. Per operation:
+NFSv3 total procedures: 0. Per procedure:
 NULL            0      0%
 GETATTR         0      0%
 SETATTR         0      0%
@@ -22,3 +22,47 @@ FSSTAT          0      0%
 FSINFO          0      0%
 PATHCONF        0      0%
 COMMIT          0      0%
+
+NFSv4 total procedures: 0. Per procedure:
+NULL                      0      0%
+COMPOUND                  0      0%
+NFS4 total operations: 0. Per operation:
+ILLEGAL                   0      0%
+ACCESS                    0      0%
+CLOSE                     0      0%
+COMMIT                    0      0%
+CREATE                    0      0%
+DELEGPURGE                0      0%
+DELEGRETURN               0      0%
+GETATTR                   0      0%
+GETFH                     0      0%
+LINK                      0      0%
+LOCK                      0      0%
+LOCKT                     0      0%
+LOCKU                     0      0%
+LOOKUP                    0      0%
+LOOKUPP                   0      0%
+NVERIFY                   0      0%
+OPEN                      0      0%
+OPENATTR                  0      0%
+OPEN_CONFIRM              0      0%
+OPEN_DOWNGRADE            0      0%
+PUTFH                     0      0%
+PUTPUBFH                  0      0%
+PUTROOTFH                 0      0%
+READ                      0      0%
+READDIR                   0      0%
+READLINK                  0      0%
+REMOVE                    0      0%
+RENAME                    0      0%
+RENEW                     0      0%
+RESTOREFH                 0      0%
+SAVEFH                    0      0%
+SECINFO                   0      0%
+SETATTR                   0      0%
+SETCLIENTID               0      0%
+SETCLIENTID_CONFIRM       0      0%
+VERIFY                    0      0%
+WRITE                     0      0%
+RELEASE_LOCKOWNER         0      0%
+GET_DIR_DELEGATION        0      0%

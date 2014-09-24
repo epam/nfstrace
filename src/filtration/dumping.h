@@ -26,6 +26,8 @@
 #include <memory>
 #include <string>
 
+#include <sys/time.h>
+
 #include "filtration/packet.h"
 #include "filtration/pcap/handle.h"
 #include "filtration/pcap/packet_dumper.h"
@@ -43,19 +45,28 @@ public:
 
     class Collection
     {
+    private:
+        const static int cache_size = 4096;
+
     public:
         inline Collection()
-        : dumper {nullptr}
+        : dumper      {nullptr}
+        , buff_size   {cache_size}
+        , payload     {cache}
+        , payload_len {0}
         {
-            reset();
         }
         inline Collection(Dumping* d, utils::NetworkSession* /*unused*/)
-        : dumper {d}
+        : dumper      {d}
+        , buff_size   {cache_size}
+        , payload     {cache}
+        , payload_len {0}
         {
-            reset();
         }
         inline ~Collection()
         {
+            if(payload != cache)
+                delete[] payload;
         }
         Collection(Collection&&)                 = delete;
         Collection(const Collection&)            = delete;
@@ -78,6 +89,16 @@ public:
             payload_len = 0;
         }
 
+        inline void resize(uint32_t amount)
+        {
+            buff_size = amount;
+            uint8_t* buff = new uint8_t[amount];
+            memcpy(buff, payload, payload_len);
+            if(payload != cache)
+                delete[] payload;
+            payload = buff;
+        }
+
         inline void push(const PacketInfo& info, const uint32_t len)
         {
             if(info.dumped)  // if this packet not dumped yet
@@ -90,7 +111,10 @@ public:
                 dumper->dump(info.header, info.packet);
                 info.dumped = true;  // set marker of damped packet
             }
-
+            if((payload_len + len) > capacity())
+            {
+                resize(payload_len + len);
+            }
             // copy payload
             memcpy(payload+payload_len, info.data, len);
             payload_len += len;
@@ -106,13 +130,16 @@ public:
             reset();
         }
 
-        inline       uint32_t size() const { return payload_len;       }
+        inline uint32_t data_size() const  { return payload_len; }
+        inline uint32_t capacity() const   { return buff_size; }
         inline const uint8_t* data() const { return payload;           }
         inline       operator bool() const { return dumper != nullptr; }
 
     private:
         Dumping* dumper;
-        uint8_t payload[4096];
+        uint32_t buff_size;
+        uint8_t* payload;
+        uint8_t cache[cache_size];
         uint32_t payload_len;
     };
 

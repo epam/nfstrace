@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Definition of XDR structures.
-// Copyright (c) 2013 EPAM Systems
+// Author: Alexey Costroma
+// Description: Helpers for parsing NFS structures.
+// Copyright (c) 2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,35 +19,40 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef XDR_TYPES_H
-#define XDR_TYPES_H
+#define NST_PUBLIC __attribute__ ((visibility("default")))
+#ifndef NFS_UTILS_H
+#define NFS_UTILS_H
 //------------------------------------------------------------------------------
-#include <cstdint>
-#include <cstddef>
+#include <ostream>
+#include <cstring>
+
+#include "api/nfs3_types_rpcgen.h"
+#include "utils/out.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace API
+namespace protocols
+{
+namespace NFS
 {
 
-struct Opaque
+inline bool out_all()
 {
-    inline void set(const uint8_t* p, uint32_t n)
-    {
-        ptr = p;
-        len = n;
-    }
+    using Out = NST::utils::Out;
 
-    inline uint8_t operator[](size_t i) const { return ptr[i]; }
-    inline const uint8_t* data() const { return ptr; }
-    inline uint32_t size() const { return len; }
+    return Out::Global::get_level() == Out::Level::All;
+}
 
-    const uint8_t* ptr;
-    uint32_t       len;
-};
+void    print_hex(std::ostream& out, const uint32_t* const val, const uint32_t len);
+void    print_hex(std::ostream& out, const char* const val, const uint32_t len);
 
-} // namespace API
+extern "C"
+NST_PUBLIC
+void print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len);
+
+} // namespace NFS
+} // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//XDR_TYPES_H
+#endif//NFS_UTILS_H
 //------------------------------------------------------------------------------
