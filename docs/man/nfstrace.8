@@ -124,11 +124,11 @@ Performs offline filtration of any .pcap file with captured traces and perform a
 The nfstrace captures network traffic from NIC by libpcap. Libpcap provides portable interface to native Kernel API for capturing network traffic. All platforms implement low-level filtration of packets in Kernel-space by BPF. Default BPF filter in nfstrace is ‘port 2049’. It means that each packet, which delivered to user-space from the Kernel, satisfies following conditions: it has IPv4 or IPv6 header and it has TCP or UDP header with source or destination port number equals 2049(default NFS port). This filter is ‘heavy’ and IPv6 support is experimental. So, for faster filtration of IPv4-only traffic, use following BPF filter: ‘ip and port 2049’ (via -f option).
 .TP
 \fBPayload Filtration\fR
-Let see to following case: writing 1Gb file to a NFS storage:
+Let see to following case: writing 1Gb file to a NFSv3 storage:
 
-This action will be performed by some LOOKUP, READDIRPLUS, COMMIT, GETATTR, etc. and some (thousands?) WRITE procedures of NFSv3 protocol. The nfstrace must catch all of them. How many RPC/NFS procedures will be perform? It depends on wsize. Wsize is an option of NFS client, it defines the number of bytes that NFS uses during the writing files to an NFS server by one WRITE procedure. When wsize is 512 Kbytes a NFS client should (in general) perform 1Gb/512Kb WRITE procedures. So, for writing 1Gb file to a NFS storage, a NFS client (with wsize=512k) should perform 2000 WRITE procedures + some other procedures like GETATTR, etc.
+This action will be performed by some LOOKUP, READDIRPLUS, COMMIT, GETATTR, etc. and some (thousands?) WRITE procedures of NFSv3 protocol. The nfstrace must catch all of them. How many RPC/NFSv3 procedures will be perform? It depends on wsize. Wsize is an option of NFS client, it defines the number of bytes that NFS uses during the writing files to an NFS server by one WRITE procedure. When wsize is 512 Kbytes a NFS client should (in general) perform 1Gb/512Kb WRITE procedures. So, for writing 1Gb file to a NFS storage, a NFS client (with wsize=512k) should perform 2000 WRITE procedures + some other procedures like GETATTR, etc.
 
-Each NFS procedure consists by two RPC messages: Call – request from client to server and Reply – reply from server with result of requested procedure. Both RPC messages may contain data useful for analysis. Both RPC messages may contain thousands of payload bytes useless for analysis. The nfstrace must capture headers of calls and replies, and then match pairs of them to complete NFS procedures.
+Each NFSv3 procedure consists by two RPC messages: Call – request from client to server and Reply – reply from server with result of requested procedure. Both RPC messages may contain data useful for analysis. Both RPC messages may contain thousands of payload bytes useless for analysis. The nfstrace must capture headers of calls and replies, and then match pairs of them to complete NFS procedures.
 
 The ‘\-\-snaplen’ option set\-up the number of bytes of a packet for uprising from the Kernel to user-space. In case of TCP transport layer this options is useless because TCP connection is a bidirectional stream of data (instead of UDP that is form of interchange up to 64k datagrams). In case of NFS over TCP, the nfstrace must capture whole packets and copy them to user-space from the Kernel for DPI and performing NFS statistics analysis.
 
@@ -137,7 +137,7 @@ Finally, the nfstrace must filtrate whole NFS traffic passed from the Kernel to 
 Detected headers are copied into internal buffers (or dumped to a .pcap file) for statistics analysis.
 
 The key principle of Filtration in the nfstrace is \fB\(dqDiscard payload ASAP\(dq\fR.
-The Filtration module works in separate thread that captures packets from network interface by libpcap. It matches a packet to a related session (TCP or UDP) and performs reassembling TCP flow from TCP segment of a packet. After that, a part of packet will be pass to RPCFiltrator.
+The Filtration module works in separate thread that captures packets from network interface by libpcap. It matches a packet to a related session (TCP or UDP) and performs reassembling TCP flow from TCP segment of a packet. After that, a part of packet will be pass to RPCFiltrator. In case of NFSv4, full packet will be pass to RPCFiltrator, because it consists of several NFSv4 operations.
 
 There are two RPCFiltrator in one TCP session. Both of them known state of current RPC message in related TCP flow. They can detect RPC messages and perform action on a packet – discard it or collect it for analysis.
 
@@ -178,6 +178,8 @@ The NFS procedure latency have calculate as difference between timestamp of come
 Standard Deviation of latency may be calculate by two algorithms. Two-pass algorithm generates correct standard deviation value but requires a lot of memory for storage all latencies till final computation. One-pass algorithm is memory-efficient but it can accumulate computation error in case of large number of small latencies. OB implements both algorithms. They may be chosen by passing parameter while attaching OB analyzer to nfstrace.
 
 MEM means Knuth’s one-pass algorithm. ACC means stable two-pass algorithm. ACC is default.
+
+.B (see examples)
 .TP
 \fBSecurity\fR
 For security purposes it is highly recommended to use \fB\-\-droproot\fR=username option.
@@ -635,10 +637,28 @@ RELEASE_LOCKOWNER      Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 St
 GET_DIR_DELEGATION     Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 .br
 Filtration is done
-.IP
-OB has two optional modules for demonstration visualization via gnuplot:
 .br
--       breakdown.plt – gnuplot script for a histogram generation;
+The OB produces .dat files for each detected NFS session:
+.IP
+.B $ ls -la
+.br
+total 109632
+.br
+drwxrwxr\-x  6 nst  nst       4096 Apr  3 14:08 .
+.br
+drwxrwxr\-x 10 nst  nst       4096 Mar 27 13:49 ..
+.br
+drwxrwxr\-x  3 nst  nst       4096 Apr  2 13:25 analyzers
+.br
+\-rw\-rw\-r\-\-  1 nst  nst       1.3K Sep 24 08:41 breakdown_10.6.137.47:903 \-\-> 10.6.137.113:2049 [TCP].dat
+.br
+
+.IP
+OB has three optional modules for demonstration visualization via gnuplot:
+.br
+-       breakdown_nfsv3.plt – gnuplot script for a histogram generation (NFSv3);
+.br
+-       breakdown_nfsv4.plt – gnuplot script for a histogram generation (NFSv4);
 .br
 -       nst.sh – “glue” for passing a .dat file to breakdown.plt and invocation gnuplot tool.
 .br
@@ -646,7 +666,7 @@ OB has two optional modules for demonstration visualization via gnuplot:
 .IP
 The example of invocation:
 .IP
-.B $ ../analyzers/nst.sh -a ../analyzers/breakdown.plt -d . -p 'breakdown_10.6.136.107:9322*.dat' -v gnuplot -e \(dqi_file='./breakdown_10.6.136.107:9322 --> 10.6.137.24:2049 [TCP].dat';o_file='./breakdown_10.6.136.107:9322 --> 10.6.137.24:2049 [TCP].dat.png'\(dq ../analyzers/breakdown.plt
+.B ../analyzers/nst.sh -a ../analyzers/breakdown_nfsv4.plt -d . -p 'breakdown_10.6.137.47:903*.dat' -v gnuplot -e "i_file='./breakdown_10.6.137.47:903 --> 10.6.137.113:2049 [TCP].dat';o_file='./breakdown_10.6.137.47:903 --> 10.6.137.113:2049 [TCP].dat.png'" ../analyzers/breakdown_nfsv4.plt
 .\" --------------------- FILES ----------------------------------
 .SH FILES
 .TP
