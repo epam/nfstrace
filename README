@@ -1,17 +1,16 @@
 README =========================================================================
 
-This is NFSTRACE also known as NST (NAS Sizing Tool/NFS Statistic Tool).
-It helps to determine NFS procedures in network traffic and performs packet’s
-capturing, filtration, dumping traces to .pcap file, compression by external
-tool, some kind of statistical analysis and provides API for custom
-analysis modules.
+This is NFSTRACE. It helps to determine NFS procedures in network traffic
+and performs packet’s capturing, filtration, dumping traces to .pcap file,
+compression by external tool, some kind of statistical analysis and provides
+API for custom analysis modules.
 
 Detailed technical description you can find in docs/NFSTRACE.Releasenotes.pdf
 or on the following page:
 https://docs.google.com/document/d/185ghjXQOhYllzZzmAi2VJg38lk2tnAchGvmgW0ua9Wo/edit?usp=sharing
 
 Problems, bugs, questions, desirable enhancements, etc. should be sent
-to Pavel Karneliuk (Pavel_Karneliuk@epam.com)
+to nfstrace@epam.com
 
 Original authors:
 Vitali  Adamenka        Vitali_Adamenka@epam.com
