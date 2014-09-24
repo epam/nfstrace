@@ -25,9 +25,10 @@
 //------------------------------------------------------------------------------
 #include <iostream>
 
-#include "fh.h"
-#include "ianalyzer.h"
-#include "nfs3_types.h"
+#include "ianalyzer_type.h"
+#include "nfs_types.h"
+#include "nfs3_types_rpcgen.h"
+#include "nfs4_types_rpcgen.h"
 //------------------------------------------------------------------------------
 #define NST_PUBLIC __attribute__ ((visibility("default")))
 #define NST_PLUGIN_ENTRY_POINTS(U, C, D)            \
@@ -44,8 +45,10 @@ using namespace NST::API;
 extern "C"
 {
 // These calls implemented by nfstrace
-void print_nfs3_procedures(std::ostream& out, const ProcEnum::NFSProcedure proc);
+const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
+const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc);
 void print_session(std::ostream& out, const Session& session);
+void print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len);
 }
 
 // These functions must be implemented by pluggable analysis module

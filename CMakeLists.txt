@@ -23,8 +23,8 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wex
 set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
 set (NST_V_MAJOR "0")
-set (NST_V_MINOR "2")
-set (NST_V_PATCH "2")
+set (NST_V_MINOR "3")
+set (NST_V_PATCH "0")
 set (NST_VERSION "${NST_V_MAJOR}.${NST_V_MINOR}.${NST_V_PATCH}")
 set (NST_VERSION_FULL "${PROJECT_NAME} ${NST_VERSION} (${CMAKE_BUILD_TYPE})")
 
@@ -58,11 +58,14 @@ add_subdirectory (tests)
 # installation of main application and plugins =================================
 install (TARGETS ${PROJECT_NAME} breakdown ofws ofdws
          RUNTIME DESTINATION bin
-         LIBRARY DESTINATION lib/nfstrace)
+         LIBRARY DESTINATION lib)
 
 # installation of api headers ==================================================
 file (GLOB headers "src/api/*.h")
 install (FILES ${headers} DESTINATION include/nfstrace/api)
+
+# installation of man page =====================================================
+install (FILES ${PROJECT_SOURCE_DIR}/docs/man/nfstrace.8 DESTINATION share/man/man8)
 
 # build packages ===============================================================
 set (CPACK_PACKAGE_VERSION ${NST_VERSION})

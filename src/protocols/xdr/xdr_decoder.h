@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Pavel Karneliuk
-// Description: Structs for sessions.
-// Copyright (c) 2013 EPAM Systems
+// Author: Alexey Costroma
+// Description: Reader for data presented in XDR format.
+// Copyright (c) 2014 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,58 +19,60 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef SESSIONS_H
-#define SESSIONS_H
+#ifndef XDR_DECODER_H
+#define XDR_DECODER_H
 //------------------------------------------------------------------------------
-#include <cstddef>
-#include <cstdint>
-#include <ostream>
-
-#include "api/session.h"
+#include <utility>
+#include <rpc/rpc.h>
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
+#include "utils/filtered_data.h"
+#include "api/nfs3_types_rpcgen.h"
+//------------------------------------------------------------------------------
+using NST::utils::FilteredData;
+using NST::utils::FilteredDataQueue;
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace utils
+namespace protocols
+{
+namespace xdr
 {
 
-using Session = NST::API::Session;
-
-// Network layer session
-struct NetworkSession : public Session
+class XDRDecoderError : public std::runtime_error
 {
 public:
-    NetworkSession()
-    : application {nullptr}
-    , direction   {Direction::Unknown}
+    explicit XDRDecoderError(const std::string& msg) : std::runtime_error{msg} { }
+};
+
+class XDRDecoder
+{
+public:
+    XDRDecoder(FilteredDataQueue::Ptr&& p)
+    : ptr{std::move(p)}
     {
+        xdrmem_create(&txdr, (char*)ptr->data, ptr->dlen, XDR_DECODE);
+    }
+    ~XDRDecoder()
+    {
+        xdr_destroy (&txdr);
     }
 
-    void*     application;  // pointer to application protocol implementation
-    Direction direction;
-};
+    inline XDR* xdr() { return &txdr; }
 
+    inline const FilteredData& data() const { return *ptr; }
 
-// Application layer session
-struct ApplicationSession : public Session
-{
-public:
-    ApplicationSession(const NetworkSession& s, Direction from_client);
+    inline static bool_t return_true(XDR*, void*, ...) { return 1; }
+    inline static bool_t return_true(XDR*, ...)        { return 1; }
 
-    const std::string& str() const { return session_str; }
 private:
-    std::string session_str;
+    XDR txdr;
+    FilteredDataQueue::Ptr ptr;
 };
 
-extern "C"
-NST_PUBLIC
-void print_session(std::ostream& out, const Session& session);
-
-std::ostream& operator<<(std::ostream& out, const Session& session);
-
-} // namespace utils
+} // namespace xdr
+} // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//SESSIONS_H
+#endif//XDR_DECODER_H
 //------------------------------------------------------------------------------
+

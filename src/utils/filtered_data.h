@@ -23,6 +23,7 @@
 #define FILTERED_DATA_H
 //------------------------------------------------------------------------------
 #include <cstdint>
+#include <cassert>
 
 #include <sys/time.h>
 
@@ -38,17 +39,88 @@ struct FilteredData
 {
     using Direction = NST::utils::Session::Direction;
 public:
-    NetworkSession* session;   // pointer to immutable session in Filtration
+    NetworkSession* session{nullptr};   // pointer to immutable session in Filtration
     struct timeval  timestamp; // timestamp of last collected packet
     Direction       direction; // direction of data transmission
 
-    uint32_t dlen;  // length of filtered data
-    uint8_t* data;  // pointer to data in memory
+    uint32_t    dlen{0};  // length of filtered data
+    uint8_t*    data{cache};  // pointer to data in memory. {Readonly. Always points to proper memory buffer}
 
-    uint8_t  memory[4000]; // raw filtrated data in network byte order
+private:
+    const static int CACHE_SIZE = 4000;
+    uint8_t     cache[CACHE_SIZE];
+    uint8_t*    memory{nullptr};
+    uint32_t    memsize{0};
 
+public:
+    // disable copying
     FilteredData(const FilteredData&)            = delete;
     FilteredData& operator=(const FilteredData&) = delete;
+
+    inline FilteredData(): data{cache} {}
+    inline ~FilteredData() {
+        delete[] memory;
+    }
+
+    inline uint32_t capacity() const
+    {
+        if (nullptr == memory)
+        {
+            assert(data == cache);
+            return CACHE_SIZE;
+        }
+        return memsize;
+    }
+
+    // Resize capacity with data safety
+    void resize(uint32_t newsize)
+    {
+        if (capacity() >= newsize) // not resize less
+        {
+            return;
+        }
+        if (nullptr == memory)
+        {
+            memory = new uint8_t[newsize];
+            if (0 < dlen)
+            {
+                if(dlen <= CACHE_SIZE)
+                    memcpy(memory, cache, dlen);
+                else
+                    memcpy(memory, cache, CACHE_SIZE);
+            }
+            memsize = newsize;
+            data = memory;
+        }
+        else // have some filled memory
+        {
+            uint8_t* mem = new uint8_t[newsize];
+            if (0 < dlen)
+            {
+                if(dlen <= capacity())
+                    memcpy(mem, memory, dlen);
+                else
+                    memcpy(mem, memory, capacity());
+            }
+            data = mem;
+            delete[] memory;
+            memory = mem;
+            memsize = newsize;
+        }
+    }
+
+    // Reset data. Release free memory if allocated
+    inline void reset()
+    {
+        if (nullptr != memory)
+        {
+            delete[] memory;
+            memory = nullptr;
+        }
+        memsize = 0;
+        dlen = 0;
+        data = cache;
+    }
 };
 
 using FilteredDataQueue = Queue<FilteredData>;

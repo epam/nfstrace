@@ -132,15 +132,16 @@ public:
     {
         const uint32_t proc = call->proc();
 
-        return          proc <= MaxProc &&
-                        proc >= MinProc &&
-                call->prog() == Program &&
-                call->vers() == Version ;
+        return      proc <= MaxProc &&
+                    proc >= MinProc &&
+            call->prog() == Program &&
+            call->vers() == Version ;
     }
 private:
     RPCProgramValidator() = delete;
 };
 
+//This template specialization for remove warning to compare unsigned with zero
 template
 <
     uint32_t Program,
@@ -155,9 +156,9 @@ public:
         const uint32_t proc = call->proc();
 
         // do not compare uint32_t with 0 (MinProc)
-        return          proc <= MaxProc &&
-                call->prog() == Program &&
-                call->vers() == Version ;
+        return      proc <= MaxProc &&
+            call->prog() == Program &&
+            call->vers() == Version ;
     }
 private:
     RPCProgramValidator() = delete;

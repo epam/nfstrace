@@ -72,17 +72,29 @@ public:
             session = s;
         }
 
-        inline void allocate()
+        void allocate()
         {
-            // we have a reference to queue, just do allocate and reset
-            ptr = queue->allocate();
-            if(ptr)
+            if (nullptr == ptr)
             {
-                reset();
+                // we have a reference to queue, just do allocate and reset
+                ptr = queue->allocate();
+                if (!ptr)
+                {
+                    LOG("free elements of the Queue are exhausted");
+                }
             }
             else
             {
-                LOG("free elements of the Queue are exhausted");
+                assert(nullptr != ptr);
+            }
+        }
+
+        void deallocate()
+        {
+            if(ptr)
+            {
+                queue->deallocate(ptr);
+                ptr = nullptr;
             }
         }
 
@@ -90,19 +102,28 @@ public:
         {
             if(ptr)
             {
-                ptr->dlen = 0;
-                ptr->data = ptr->memory;
+                ptr->reset();
             }
         }
 
+        inline void resize(uint32_t amount)
+        {
+            assert(nullptr != ptr);
+
+            ptr->resize(amount);
+        }
+
+        // Extend input element automatically
         inline void push(const PacketInfo& info, const uint32_t len)
         {
-            uint8_t* const offset_ptr = ptr->data + ptr->dlen;
-            const uint32_t capacity = sizeof(ptr->memory) - (offset_ptr - ptr->memory);
-            if(len > capacity)
+            assert(nullptr != ptr);
+
+            uint8_t* offset_ptr = ptr->data + ptr->dlen;
+            const uint32_t avail = ptr->capacity() - ptr->dlen;
+            if(len > avail) // inappropriate case. Must be one resize when get entire message size
             {
-                LOG("data in Collection is overrun collection size:%u, limit:%u, new chunk size:%u", ptr->dlen, capacity, len);
-                assert(capacity >= len);
+                ptr->resize(ptr->dlen + len); // [! unbound extension !]
+                offset_ptr = ptr->data + ptr->dlen; // update pointer
             }
             memcpy(offset_ptr, info.data, len);
             ptr->dlen += len;
@@ -119,6 +140,7 @@ public:
         void complete(const PacketInfo& info)
         {
             assert(ptr);
+            assert(nullptr != ptr->data);
             assert(ptr->dlen > 0);
             assert(info.direction != utils::Session::Direction::Unknown);
 
@@ -130,9 +152,10 @@ public:
             ptr = nullptr;
         }
 
-        inline uint32_t size() const { return ptr->dlen; }
-        inline uint8_t* data() const { return ptr->data; }
-        inline operator bool() const { return ptr != nullptr; }
+        inline uint32_t data_size()  const { return ptr->dlen;       }
+        inline uint32_t capacity()   const { return ptr->capacity(); }
+        inline const uint8_t* data() const { return ptr->data;       }
+        inline operator bool()       const { return ptr != nullptr;  }
 
     private:
         Queue* queue;

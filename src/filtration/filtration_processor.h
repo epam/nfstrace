@@ -28,6 +28,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <pcap/pcap.h>
 
@@ -38,7 +39,8 @@
 #include "filtration/packet.h"
 #include "filtration/sessions_hash.h"
 #include "protocols/rpc/rpc_header.h"
-#include "protocols/nfs3/nfs_utils.h"
+#include "protocols/nfs3/nfs3_utils.h"
+#include "protocols/nfs4/nfs4_utils.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -47,6 +49,14 @@ namespace filtration
 
 using namespace NST::protocols::rpc;
 
+/*
+ *  uint32_t: Message XID (Call or Reply)
+ */
+typedef std::unordered_set<uint32_t> MessageSet;
+typedef MessageSet::const_iterator  ConstIterator;
+typedef MessageSet::iterator        Iterator;
+typedef MessageSet::value_type      Pair;
+
 // Represents UDP datagrams interchange between node A and node B
 template <typename Writer>
 struct UDPSession : public utils::NetworkSession
@@ -54,7 +64,7 @@ struct UDPSession : public utils::NetworkSession
 public:
     UDPSession(Writer* w, uint32_t max_rpc_hdr)
     : collection{w, this}
-    , max_hdr{max_rpc_hdr}
+    , nfs3_rw_hdr_max{max_rpc_hdr}
     {
     }
     UDPSession(UDPSession&&)                 = delete;
@@ -71,9 +81,28 @@ public:
             case MsgType::CALL:
             {
                 auto call = static_cast<const CallHeader*const>(msg);
-                if(RPCValidator::check(call) && NFS3::Validator::check(call))
+                if(RPCValidator::check(call))
                 {
-                    hdr_len = std::min(info.dlen, max_hdr);
+                    if (NFS3::Validator::check(call))
+                    {
+                        uint32_t proc = call->proc();
+                        if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
+                            hdr_len = (nfs3_rw_hdr_max < info.dlen ? nfs3_rw_hdr_max : info.dlen);
+                        else
+                        {
+                            if (API::ProcEnumNFS3::READ == proc)
+                                nfs3_read_match.insert(call->xid());
+                            hdr_len = info.dlen;
+                        }
+                    }
+                    else if (NFS4::Validator::check(call))
+                    {
+                        hdr_len = info.dlen; // fully collect NFSv4 messages
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
                 else
                 {
@@ -86,7 +115,14 @@ public:
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
                 {
-                    hdr_len = std::min(info.dlen, max_hdr);
+                    // Truncate NFSv3 READ reply message to NFSv3-RW-limit
+                    //* Collect fully if reply received before matching call
+                    if (nfs3_read_match.erase(reply->xid()) > 0)
+                    {
+                        hdr_len = (nfs3_rw_hdr_max < info.dlen ? nfs3_rw_hdr_max : info.dlen);
+                    }
+                    else
+                        hdr_len = info.dlen;
                 }
                 else // isn't RPC reply, stream is corrupt
                 {
@@ -95,9 +131,7 @@ public:
             }
             break;
             default:
-            {
                 return;
-            }
         }
 
         collection.allocate();
@@ -108,7 +142,8 @@ public:
     }
 
     typename Writer::Collection collection;
-    uint32_t max_hdr;
+    uint32_t nfs3_rw_hdr_max;
+    MessageSet nfs3_read_match;
 };
 
 // Represents TCP conversation between node A and node B
@@ -352,6 +387,7 @@ public:
     Flow flows[2];
 };
 
+
 /*
     Stateful reader of Sun RPC messages 
     Reads data from PacketInfo passed via push() method
@@ -376,14 +412,14 @@ public:
     {
         msg_len = 0;
         hdr_len = 0;
-        collection.reset();     // skip collected data
+        collection.reset(); // data in external memory freed
     }
 
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {
         assert(w);
         collection.set(*w, session_ptr);
-        max_hdr = max_rpc_hdr;
+        nfs3_rw_hdr_max = max_rpc_hdr;
     }
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
@@ -410,6 +446,7 @@ public:
     void push(PacketInfo& info)
     {
         assert(info.dlen != 0);
+
         while(info.dlen) // loop over data in packet
         {
             if(msg_len != 0)    // we are on-stream and we are looking to some message
@@ -464,68 +501,84 @@ public:
         }
     }
 
-    inline void find_message(PacketInfo& info)
+    inline bool collect_header(PacketInfo& info)
     {
         static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
-        const RecordMark* rm;
 
-        if(collection && (collection.size() > 0)) // collection is allocated and partially filled.
+        if(collection && (collection.data_size() > 0)) // collection is allocated
         {
-            const uint32_t tocopy = max_header - collection.size();
+            assert(collection.capacity() >= max_header);
+            const uint32_t tocopy = max_header - collection.data_size();
 
             if(info.dlen < tocopy)
             {
                 collection.push(info, info.dlen);
                 //info.data += info.dlen;   optimization
                 info.dlen = 0;
-                return;
+
+                return false;
             }
             else // info.dlen >= tocopy
             {
-                collection.push(info, tocopy);
+                collection.push(info, tocopy); // collection.data_size <= max_header
                 info.dlen -= tocopy;
                 info.data += tocopy;
-
-                assert(max_header == collection.size());
-
-                rm = reinterpret_cast<const RecordMark*>(collection.data());
             }
         }
         else // collection is empty
         {
-            collection.allocate();   // allocate new collection from writer
+            collection.allocate(); // allocate new collection from writer 
 
-            if(info.dlen >= max_header)  // is data enougth to message validation?
+            if(info.dlen >= max_header) // is data enough to message validation?
             {
-                rm = reinterpret_cast<const RecordMark*>(info.data);
+                collection.push(info, max_header); // probability that message will be rejected / probability of valid message
+                info.data += max_header;
+                info.dlen -= max_header;
             }
-            else // push them into collection to validation after supplement by next data
+            else // (info.dlen < max_header)
             {
                 collection.push(info, info.dlen);
                 //info.data += info.dlen;   optimization
                 info.dlen = 0;
-                return;
+
+                return false;
             }
         }
 
-        assert(collection);     // collection must be initialized
-        assert(rm != NULL);     // RM must be initialized
+        return true;
+    }
+
+    // Find next message in packet info
+    inline void find_message(PacketInfo& info)
+    {
         assert(msg_len == 0);   // RPC Message still undetected
 
+        if (!collect_header(info))
+            return;
+
+        assert(collection);     // collection must be initialized
+        //assert(collection.data_size() == sizeof(RecordMark)+sizeof(CallHeader));
+
+        const RecordMark* rm = reinterpret_cast<const RecordMark*>(collection.data());
         //if(rm->is_last()); // TODO: handle sequence field of record mark
         if(rm->fragment_len() > 0 && validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
         {
             assert(msg_len != 0);   // message is found
-            const uint32_t written = collection.size();
-            if(written != 0) // a message was partially written to collection
+            assert(msg_len >= collection.data_size());
+            assert(hdr_len <= msg_len);
+
+            // hdr len is defined by that time
+            if (collection.capacity() < hdr_len)
+                collection.resize(hdr_len);
+
+            const uint32_t written = collection.data_size();
+            msg_len -= written; // substract how written (if written)
+            hdr_len -= std::min(hdr_len, written);
+            if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
+                                // Next find message call will finding next message
             {
-                assert( (msg_len - written) <  msg_len );
-                msg_len -= written;
-                if(hdr_len != 0) // we want to collect header of this RPC message
-                {
-                    assert((hdr_len - written) <  hdr_len);
-                    hdr_len -= written;
-                }
+                collection.skip_first(sizeof(RecordMark));
+                collection.complete(info);
             }
         }
         else    // unknown data in packet payload
@@ -533,8 +586,7 @@ public:
             assert(msg_len == 0);   // message is not found
             assert(hdr_len == 0);   // header should be skipped
             collection.reset();     // skip collected data
-            // skip data of current packet at all
-            //info.data = NULL; optimization
+            //[ Optimization ] skip data of current packet at all
             info.dlen = 0;
         }
     }
@@ -551,11 +603,24 @@ public:
                     msg_len = len;   // length of current RPC message
                     if(NFS3::Validator::check(call))
                     {
-                        hdr_len = std::min(msg_len, max_hdr);
-                        //TRACE("MATCH RPC Call xid:%u len: %u procedure: %u", call->xid(), msg_len, call->proc());
+                        uint32_t proc = call->proc();
+                        if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
+                            hdr_len = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
+                        else
+                        {
+                            if (API::ProcEnumNFS3::READ == proc)
+                                nfs3_read_match.insert(call->xid());
+                            hdr_len = msg_len;
+                        }
+                        //TRACE("%p| MATCH RPC Call  xid:%u len: %u procedure: %u", this, call->xid(), msg_len, call->proc());
+                    }
+                    else if (NFS4::Validator::check(call))
+                    {
+                        hdr_len = msg_len;  // fully collect of NFSv4 messages
                     }
                     else
                     {
+                        //* RPC call message must be read out ==> msg_len !=0
                         hdr_len = 0; // don't collect headers of unknown calls
                         //TRACE("Unknown RPC call of program: %u version: %u procedure: %u", call->prog(), call->vers(), call->proc());
                     }
@@ -572,9 +637,16 @@ public:
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
                 {
-                    msg_len = len;   // length of current RPC message
-                    hdr_len = std::min(msg_len, max_hdr);
-                    //TRACE("MATCH RPC Reply xid:%u len: %u", reply->xid(), msg_len);
+                    msg_len = len;
+                    // Truncate NFSv3 READ reply message to NFSv3-RW-limit
+                    //* Collect fully if reply received before matching call
+                    if (nfs3_read_match.erase(reply->xid()) > 0)
+                    {
+                        hdr_len = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
+                    }
+                    else
+                        hdr_len = msg_len; // length of current RPC message
+                    //TRACE("%p| MATCH RPC Reply xid:%u len: %u", this, reply->xid(), msg_len);
                     return true;
                 }
                 else // isn't RPC reply, stream is corrupt
@@ -591,15 +663,17 @@ public:
             }
             break;
         }
+
         return false;
     }
 
 private:
-    uint32_t    max_hdr;  // max length of RPC message that will be collected
+    uint32_t    nfs3_rw_hdr_max=512; // limit for NFSv3 to truncate WRITE call and READ reply messages
     uint32_t    msg_len;  // length of current RPC message + RM
-    uint32_t    hdr_len;  // min(max_hdr, msg_len) or 0 in case of unknown msg
+    uint32_t    hdr_len;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
 
     typename Writer::Collection collection;// storage for collection packet data
+    MessageSet nfs3_read_match;
 };
 
 template
@@ -627,7 +701,6 @@ public:
             throw std::runtime_error(std::string("Unsupported Data Link Layer: ") + Reader::datalink_description(datalink));
         }
     }
-    
     ~FiltrationProcessor()
     {
         utils::Out message;
@@ -639,7 +712,7 @@ public:
         bool done = reader->loop(this, callback);
         if(done)
         {
-            throw controller::ProcessingDone("Filtration is done.");
+            throw controller::ProcessingDone("Filtration is done");
         }
     }
 
