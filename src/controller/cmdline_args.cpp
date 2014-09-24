@@ -57,7 +57,7 @@ Opt Args::options[Args::num] =
     {'L', "list",       Opt::NOA, "false",               "list all available network interfaces",                     nullptr, nullptr, false},
     {'M', "msg-header", Opt::REQ, "512",                 "RPC message will be truncated to this limit in bytes before passing to Analysis",     "1..4000", nullptr, false},
     {'Q', "qcapacity",  Opt::REQ, "4096",                "initial queue capacity of RPC messages",                                             "1..65535", nullptr, false},
-    {'T', "trace",      Opt::NOA, "false",               "print collected NFSv3 procedures, true if no modules were passed(by -a)",               nullptr, nullptr, false},
+    {'T', "trace",      Opt::NOA, "false",               "print collected NFS procedures, true if no modules were passed(by -a)",               nullptr, nullptr, false},
     {'Z', "droproot",   Opt::REQ, "",                    "drops root privileges, after opening the capture device, but before reading from it","username", nullptr, false},
     {'v', "verbose",    Opt::REQ, "1",                   "level of print out additional information",                                            "0|1|2",  nullptr, false},
     {'h', "help",       Opt::NOA, "false",               "print this help message and usage for modules passed via -a options, then exit",        nullptr, nullptr, false}

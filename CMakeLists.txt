@@ -116,6 +116,12 @@ file (WRITE ${check_drain}
 "exit $?"
 )
 
+# script for check output symbols
+set (check_out ${CMAKE_BINARY_DIR}/check-out.sh)
+file (WRITE ${check_out}
+"bzcat \"$1\" | ./${PROJECT_NAME} --mode=stat -v 2 -T -a ./analyzers/libbreakdown.so -I - -O -  | grep --color='auto' -P -n '[^\\x00-\\x7F]' | wc -c | if [ $1 -gt 0 ]; then exit 1; else exit 0; fi "
+)
+
 # add test for each .pcap.bz2 trace
 file (GLOB traces "traces/*.pcap.bz2")
 foreach (trace ${traces})
@@ -127,6 +133,8 @@ foreach (trace ${traces})
               COMMAND sh ${check_pcapbz2} ${trace} ${result} ${reference} )
     add_test (NAME drain:${name}
               COMMAND sh ${check_drain}   ${trace} ${result} ${reference} )
+    add_test (NAME   out:${name}
+              COMMAND sh ${check_out} ${trace} )
 endforeach ()
 
 # coverage =====================================================================

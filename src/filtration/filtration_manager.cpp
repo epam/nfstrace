@@ -146,7 +146,7 @@ void FiltrationManager::add_offline_dumping (const Parameters& params)
         struct stat ifile_stat;
         struct stat ofile_stat;
 
-        if(!stat(ofile.c_str(), &ifile_stat) && !stat(ofile.c_str(), &ofile_stat))
+        if(!stat(ifile.c_str(), &ifile_stat) && !stat(ofile.c_str(), &ofile_stat))
         {
             if(ifile_stat.st_ino == ofile_stat.st_ino) //compre inodes of input and output files
             {

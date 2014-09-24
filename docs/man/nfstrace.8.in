@@ -90,12 +90,10 @@
 \fBIntroduction\fR
 The \fBnfstrace\fR tool performs live Ethernet 1Gbps \- 10Gbps packet’s capturing and helps to determine NFS procedures in raw network traffic. It performs packet’s capturing, filtration, dumping traces, compression, statistical analysis, visualization and provides API for custom analysis modules.
 .IP
-The \fBnfstrace\fR supports following protocols: Ethernet \[u2010] IPv4 \[ba] IPv6 \[u2010] UDP \[ba] TCP \[u2010] SunRPC/NFSv3/NFSv4.
+The \fBnfstrace\fR supports following protocols: Ethernet \[u2010] IPv4 \[ba] IPv6 \[u2010] UDP \[ba] TCP \[u2010] NFSv3 \[ba] NFSv4.
 .TP
 \fBHardware Interfaces\fR
 The \fBnfstrace\fR captures raw packets from an Ethernet interface via libpcap interface of Linux (LSF) or FreeBSD (BPF) implementations. Current implementation makes assumption, that libpcap delivers correct TCP and UDP packets. Assembling Ethernet frames to IP packets and IP packets defragmentation performs in the Kernel. The software have tested on direct linked workstations with 1Gbps integrated NICs (Ethernet 1000baseT/Full).
-
-The \fBnfstrace\fR demonstrates perfect performance even in live capturing/filtration/analysis mode.
 .TP
 \fBRunning Modes\fR
 \fBLive\fR
@@ -116,7 +114,7 @@ Perfoms reading from input pcap file, filtration and dumping packets to the spec
 \fBStat\fR
 (off-line analysis)
 .br
-Performs offline filtration of any .pcap file with captured traces and perform analysis by pluggable modules or print out found NFS procedures to console (-T option)
+Performs offline filtration of any .pcap file with captured traces and perform analysis by pluggable modules or print out found NFS procedures to console (-T option).
 .
 .TP
 \fBPackets Filtration by BPF\fR
@@ -182,7 +180,7 @@ MEM means Knuth’s one-pass algorithm. ACC means stable two-pass algorithm. ACC
 For security purposes it is highly recommended to use \fB\-\-droproot\fR=username option.
 .\" --------------------- OPTIONS --------------------------------
 .SH OPTIONS
-Nfstrace can usually be run without arguments and will obtain useful results. However, for those occasions when the defaults are not good enough, the following options are provided:
+Nfstrace can usually be run without arguments. In this case default arguments will be used. However, for those occasions when the defaults are not good enough, the following options are provided:
 .TP
 \fB\-m, \-\-mode=\fRlive|dump|drain|stat
 .IP
@@ -374,9 +372,9 @@ Yauheni Azaranka <Yauheni_Azaranka@epam.com>
 .IP
 Alexey Costroma <Alexey_Costroma@epam.com>
 .IP
-.B Dzianis Huznou <Dzianis_Huznou@epam.com>
+Dzianis Huznou <Dzianis_Huznou@epam.com>
 .IP
-.B Pavel Karneliuk <Pavel_Karneliuk@epam.com>
+Pavel Karneliuk <Pavel_Karneliuk@epam.com>
 .IP
 Mikhail Litvinets <Mikhail_Litvinets@epam.com>
 .\" -------------------- SEE ALSO --------------------------------
