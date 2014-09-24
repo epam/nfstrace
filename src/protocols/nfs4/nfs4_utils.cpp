@@ -191,7 +191,14 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::utf8string& obj)
 {
-    print_hex(out, obj.utf8string_val, obj.utf8string_len);
+    if(obj.utf8string_len)
+    {
+        out.write(obj.utf8string_val, obj.utf8string_len);
+    }
+    else
+    {
+        out << "void";
+    }
     return out;
 }
 
@@ -308,40 +315,44 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::change_info4& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::clientaddr4& obj)
 {
-    return out <<  "netid: " << *obj.r_netid
-               << " addr: "  << *obj.r_addr;
+    return out <<  "netid: " << obj.r_netid
+               << " addr: "  << obj.r_addr;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::cb_client4& obj)
 {
-    return out <<  "program: "  << obj.cb_program
+    return out <<  "program: "  << std::hex << obj.cb_program
                << " location: " << obj.cb_location;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::stateid4& obj)
 {
-    out << " seqid: 0x" << std::hex << obj.seqid << " data: ";
+    out << " seqid: " << std::hex << obj.seqid << " data: ";
     print_hex(out, obj.other, 12);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_client_id4& obj)
 {
-    out <<  "verifier: "  <<  obj.verifier;
-    if(obj.id.id_len) return out << " " << *obj.id.id_val;
-    else              return out << " void";
+    out <<  "verifier: ";
+    print_hex(out, obj.verifier, NFS4_VERIFIER_SIZE);
+    out << " client id: ";
+    if(obj.id.id_len) out.write(obj.id.id_val, obj.id.id_len);
+    else out << " void";
+
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::open_owner4& obj)
 {
-    out <<  "client id: 0x" << std::hex << obj.clientid << " owner: ";
+    out <<  "client id: " << std::hex << obj.clientid << " owner: ";
     print_hex(out, obj.owner.owner_val, obj.owner.owner_len);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::lock_owner4& obj)
 {
-    out <<  "client id: 0x" << std::hex << obj.clientid << " owner: ";
+    out <<  "client id: " << std::hex << obj.clientid << " owner: ";
     print_hex(out, obj.owner.owner_val, obj.owner.owner_len);
     return out;
 }
@@ -588,7 +599,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::entry4& obj)
 {
     out <<  "cookie: "     << obj.cookie
         << " name: "       << obj.name
-        << " attributes: " << obj.attrs;
+        << " attributes: " << obj.attrs << '\n';
     if(obj.nextentry) return out << " " << *obj.nextentry;
     else              return out;
 }
@@ -596,7 +607,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::entry4& obj)
 std::ostream& operator<<(std::ostream& out, const rpcgen::dirlist4& obj)
 {
     out <<  "eof: " << obj.eof;
-    if(obj.entries) return out << " entries: "
+    if(obj.entries) return out << " entries:\n"
                                << *obj.entries;
     else            return out;
 }

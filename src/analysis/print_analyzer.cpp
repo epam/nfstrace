@@ -1333,7 +1333,7 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::RENAME4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::RENEW4args* args)
 {
-    if(args) out << "client id: " << args->clientid;
+    if(args) out << "client id: " << std::hex << args->clientid << std::dec;
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::RENEW4res*  res)
@@ -1376,9 +1376,9 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETATTR4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETCLIENTID4args* args)
 {
-    if(args) out <<  "client: "         << args->client
+    if(args) out << args->client
                  << " callback: "       << args->callback
-                 << " callback ident: " << args->callback_ident;
+                 << " callback ident: " << std::hex << args->callback_ident << std::dec;
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETCLIENTID4res*  res)
@@ -1391,11 +1391,13 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETCLIENTID4res*  res)
             switch(res->status)
             {
             case rpcgen::nfsstat4::NFS4_OK:
-                out << " client id: " << res->SETCLIENTID4res_u.resok4.clientid
-                    << " set client if confirm: "
-                    << res->SETCLIENTID4res_u.resok4.setclientid_confirm;        break;
+                out << " client id: " << std::hex << res->SETCLIENTID4res_u.resok4.clientid << std::dec
+                    << " verifier: ";
+                print_hex(out, res->SETCLIENTID4res_u.resok4.setclientid_confirm, rpcgen::NFS4_VERIFIER_SIZE);
+            break;
             case rpcgen::nfsstat4::NFS4ERR_CLID_INUSE:
-                out << " client using: " << res->SETCLIENTID4res_u.client_using; break;
+                out << " client using: " << res->SETCLIENTID4res_u.client_using;
+            break;
             default: break;
             }
         }
@@ -1404,8 +1406,12 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETCLIENTID4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETCLIENTID_CONFIRM4args* args)
 {
-    if(args) out << " client id: "             << args->clientid
-                 << " set client if confirm: " << args->setclientid_confirm;
+    if(args)
+    {
+        out << " client id: " << std::hex << args->clientid << std::dec
+            << " verifier: ";
+        print_hex(out, args->setclientid_confirm, rpcgen::NFS4_VERIFIER_SIZE);
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETCLIENTID_CONFIRM4res*  res)

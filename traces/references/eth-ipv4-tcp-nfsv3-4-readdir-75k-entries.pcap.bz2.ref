@@ -1,0 +1,162 @@
+###  Breakdown analyzer  ###
+NFSv3 total procedures: 3892. Per procedure:
+NULL            2   0.05%
+GETATTR        25   0.64%
+SETATTR         0   0.00%
+LOOKUP          7   0.18%
+ACCESS          5   0.13%
+READLINK        0   0.00%
+READ            0   0.00%
+WRITE           0   0.00%
+CREATE          0   0.00%
+MKDIR           0   0.00%
+SYMLINK         0   0.00%
+MKNOD           0   0.00%
+REMOVE          0   0.00%
+RMDIR           0   0.00%
+RENAME          0   0.00%
+LINK            0   0.00%
+READDIR         0   0.00%
+READDIRPLUS  3850  98.92%
+FSSTAT          0   0.00%
+FSINFO          2   0.05%
+PATHCONF        1   0.03%
+COMMIT          0   0.00%
+Per connection info: 
+Session: 10.6.137.109:808 --> 10.6.137.113:2049 [TCP]
+Total procedures: 3891. Per procedure:
+NULL                   Count:    1 (  0.03%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR                Count:   25 (  0.64%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00003988
+SETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LOOKUP                 Count:    7 (  0.18%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00001024
+ACCESS                 Count:    5 (  0.13%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00003288
+READLINK               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+CREATE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKDIR                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS            Count: 3850 ( 98.95%) Min: 0.000 Max: 0.073 Avg: 0.000 StDev: 0.00233430
+FSSTAT                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO                 Count:    2 (  0.05%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000212
+PATHCONF               Count:    1 (  0.03%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+Session: 10.6.137.109:41167 --> 10.6.137.113:2049 [TCP]
+Total procedures: 1. Per procedure:
+NULL                   Count:    1 (100.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LOOKUP                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+ACCESS                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READLINK               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+CREATE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKDIR                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SYMLINK                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+MKNOD                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RMDIR                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LINK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIRPLUS            Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSSTAT                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+FSINFO                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PATHCONF               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+
+NFSv4 total procedures: 4679. Per procedure:
+NULL                      1   0.02%
+COMPOUND               4678  99.98%
+NFS4 total operations: 9369. Per operation:
+ILLEGAL                   0   0.00%
+ACCESS                    8   0.09%
+CLOSE                     0   0.00%
+COMMIT                    0   0.00%
+CREATE                    0   0.00%
+DELEGPURGE                0   0.00%
+DELEGRETURN               0   0.00%
+GETATTR                  48   0.51%
+GETFH                     5   0.05%
+LINK                      0   0.00%
+LOCK                      0   0.00%
+LOCKT                     0   0.00%
+LOCKU                     0   0.00%
+LOOKUP                   10   0.11%
+LOOKUPP                   0   0.00%
+NVERIFY                   0   0.00%
+OPEN                      1   0.01%
+OPENATTR                  0   0.00%
+OPEN_CONFIRM              0   0.00%
+OPEN_DOWNGRADE            0   0.00%
+PUTFH                  4673  49.88%
+PUTPUBFH                  0   0.00%
+PUTROOTFH                 1   0.01%
+READ                      0   0.00%
+READDIR                4619  49.30%
+READLINK                  0   0.00%
+REMOVE                    0   0.00%
+RENAME                    0   0.00%
+RENEW                     0   0.00%
+RESTOREFH                 0   0.00%
+SAVEFH                    0   0.00%
+SECINFO                   0   0.00%
+SETATTR                   0   0.00%
+SETCLIENTID               2   0.02%
+SETCLIENTID_CONFIRM       2   0.02%
+VERIFY                    0   0.00%
+WRITE                     0   0.00%
+RELEASE_LOCKOWNER         0   0.00%
+GET_DIR_DELEGATION        0   0.00%
+Per connection info: 
+Session: 10.6.137.109:887 --> 10.6.137.113:2049 [TCP]
+Total procedures: 4679. Per procedure:
+NULL                   Count:    1 (  0.02%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMPOUND               Count: 4678 ( 99.98%) Min: 0.000 Max: 0.012 Avg: 0.000 StDev: 0.00021920
+Total operations: 9369. Per operation:
+ILLEGAL                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+ACCESS                 Count:    8 (  0.09%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00020156
+CLOSE                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+COMMIT                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+CREATE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+DELEGPURGE             Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+DELEGRETURN            Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GETATTR                Count:   48 (  0.51%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00009870
+GETFH                  Count:    5 (  0.05%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000462
+LINK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LOCK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LOCKT                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LOCKU                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+LOOKUP                 Count:   10 (  0.11%) Min: 0.000 Max: 0.012 Avg: 0.001 StDev: 0.00389835
+LOOKUPP                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+NVERIFY                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+OPEN                   Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+OPENATTR               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+OPEN_CONFIRM           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+OPEN_DOWNGRADE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PUTFH                  Count: 4673 ( 49.88%) Min: 0.000 Max: 0.012 Avg: 0.000 StDev: 0.00021930
+PUTPUBFH               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+PUTROOTFH              Count:    1 (  0.01%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READ                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+READDIR                Count: 4619 ( 49.30%) Min: 0.000 Max: 0.007 Avg: 0.000 StDev: 0.00012698
+READLINK               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+REMOVE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENAME                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RENEW                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RESTOREFH              Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SAVEFH                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SECINFO                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+SETCLIENTID            Count:    2 (  0.02%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00004384
+SETCLIENTID_CONFIRM    Count:    2 (  0.02%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000283
+VERIFY                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+WRITE                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+RELEASE_LOCKOWNER      Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+GET_DIR_DELEGATION     Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000

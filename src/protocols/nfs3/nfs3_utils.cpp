@@ -356,7 +356,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::entry3& obj)
 {
     out << " file id: "   <<  obj.fileid
         << " name: "      <<  obj.name
-        << " cookie: "    <<  obj.cookie;
+        << " cookie: "    <<  obj.cookie << '\n';
     if(obj.nextentry) out << *obj.nextentry;
     return out;
 }
@@ -371,10 +371,10 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::dirlist3& obj)
 std::ostream& operator<<(std::ostream& out, const rpcgen::entryplus3& obj)
 {
     out << " file id: "         << obj.fileid
-        << " name:       "      << obj.name
+        << " name: "            << obj.name
         << " name attributes: " << obj.name_attributes
         << " name handle: "     << obj.name_handle
-        << " cookie: "          << obj.cookie;
+        << " cookie: "          << obj.cookie << '\n';
     if(obj.nextentry) out << *obj.nextentry;
     return out;
 }
