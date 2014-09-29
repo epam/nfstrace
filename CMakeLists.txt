@@ -116,7 +116,7 @@ find_program(GCOVR_PATH gcovr)
 
 if(GCOVR_PATH)
     add_custom_target(coverage
-        COMMAND ${GCOVR_PATH} --xml -r ${CMAKE_SOURCE_DIR} --object-directory ${CMAKE_BINARY_DIR} -o coverage.xml
-        WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
+        COMMAND ${GCOVR_PATH} --xml -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.xml
+        WORKING_DIRECTORY \"${CMAKE_PROJECT_DIR}\"
     )
 endif()
