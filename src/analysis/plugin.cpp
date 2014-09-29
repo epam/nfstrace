@@ -41,11 +41,13 @@ Plugin::Plugin(const std::string& path)
 
     if(!entry_points)
     {
-        throw std::runtime_error{path + ": can not load plugin entry points!"};
+        throw std::runtime_error{path + ": can't load plugin entry points!"};
     }
 
     switch(entry_points->vers)
     {
+    // case NST_PLUGIN_API_VERSION_2_0:
+    // Add 2.0 specific initialization here
     case NST_PLUGIN_API_VERSION:
     default:
         usage   = entry_points->usage;
@@ -55,7 +57,7 @@ Plugin::Plugin(const std::string& path)
 
     if(!usage  || !create || !destroy)
     {
-        throw std::runtime_error{path + ": can not load entry point for some plugin function(s)"};
+        throw std::runtime_error{path + ": can't load entry point for some plugin function(s)"};
     }
 }
 

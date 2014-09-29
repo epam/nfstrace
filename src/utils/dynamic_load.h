@@ -37,16 +37,16 @@ public:
     class DLException : public std::runtime_error
     {
     public:
-        explicit DLException(const std::string& msg) : std::runtime_error(msg) { }
+        explicit DLException(const std::string& msg) : std::runtime_error{msg} { }
     };
 
 protected:
-    DynamicLoad(const std::string& file)
+    explicit DynamicLoad(const std::string& file)
     {
         handle = dlopen(file.c_str(), RTLD_LAZY);
         if(handle == NULL)
         {
-            throw DLException(std::string("Loading dynamic module: ") + file + " failed with error:" + dlerror());
+            throw DLException{std::string{"Loading dynamic module: "} + file + " failed with error:" + dlerror()};
         }
     }
     ~DynamicLoad()
@@ -65,7 +65,7 @@ protected:
         address = reinterpret_cast<hook_dlsym_t>(dlsym)(handle, name.c_str());
         if(address == NULL)
         {
-            throw DLException(std::string("Loading symbol ") + name + " failed with error:" + dlerror());
+            throw DLException{std::string{"Loading symbol "} + name + " failed with error:" + dlerror()};
         }
     }
 

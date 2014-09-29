@@ -27,6 +27,7 @@
 #include <iostream>
 #include <list>
 #include <mutex>
+#include <type_traits>
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -36,7 +37,7 @@ namespace controller
 class ProcessingDone : public std::runtime_error
 {
 public:
-        explicit ProcessingDone(const std::string& in) : std::runtime_error{in} { }
+    explicit ProcessingDone(const std::string& in) : std::runtime_error{in} { }
 };
 
 class RunningStatus
@@ -49,6 +50,8 @@ public:
     template <typename ExceptionType>
     inline void push(const ExceptionType& e)
     {
+        static_assert(std::is_base_of<std::exception, ExceptionType>::value,
+                      "The ExceptionType should be inherited from std::exception");
         push(std::make_exception_ptr(e));
     }
 
@@ -72,8 +75,7 @@ public:
     void wait_and_rethrow_exception()
     {
         auto e = wait_exception();
-        if(e != nullptr)
-            std::rethrow_exception(e);
+        std::rethrow_exception(e);
     }
 
     void print(std::ostream& out)
@@ -88,9 +90,13 @@ public:
                     {
                         std::rethrow_exception(e);
                     }
-                    catch (const std::exception& e)
+                    catch(const std::exception& e)
                     {
                         out << '\t' << e.what() << std::endl;
+                    }
+                    catch(...)
+                    {
+                        out << '\t' << "Unknown exception" << std::endl;
                     }
                 }
             }
@@ -99,6 +105,7 @@ public:
 private:
     inline void push(std::exception_ptr e)
     {
+        if(e == nullptr) return;
         std::unique_lock<std::mutex> lock(mutex);
             fifo.emplace_front(e);
             condition.notify_one();
