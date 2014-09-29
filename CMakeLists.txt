@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8.10)
+cmake_minimum_required (VERSION 2.8.12)
 project (nfstrace)
 
 # check compiler and packages ==================================================
@@ -21,6 +21,8 @@ find_package(Threads REQUIRED) # POSIX Threads
 # build application ============================================================
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC -fvisibility=hidden")
 set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
+
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage -g -O0 -fprofile-arcs -ftest-coverage")
 
 set (NST_V_MAJOR "0")
 set (NST_V_MINOR "3")
@@ -107,3 +109,14 @@ foreach (trace ${traces})
     add_test (NAME drain:${name}
               COMMAND sh ${check_drain}   ${trace} ${result} ${reference} )
 endforeach ()
+
+# coverage =====================================================================
+
+find_program(GCOVR_PATH gcovr)
+
+if(GCOVR_PATH)
+    add_custom_target(coverage
+        COMMAND ${GCOVR_PATH} --xml -r ${CMAKE_SOURCE_DIR} --object-directory ${CMAKE_BINARY_DIR} -o coverage.xml
+        WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
+    )
+endif()
