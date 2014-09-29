@@ -71,10 +71,13 @@ install (FILES ${PROJECT_SOURCE_DIR}/docs/man/nfstrace.8 DESTINATION share/man/m
 # build packages ===============================================================
 set (CPACK_PACKAGE_VERSION ${NST_VERSION})
 set (CPACK_DEBIAN_PACKAGE_MAINTAINER "Pavel Karneliuk")
+set (CPACK_RPM_PACKAGE_SUMMARY "NFS tracing/monitoring/capturing/statistic tool")
+set (CPACK_RPM_PACKAGE_GROUP "Development/Tools/Other")
+set (CPACK_RPM_PACKAGE_LICENSE "GPLv2")
+set (CPACK_RPM_PACKAGE_VENDOR "EPAM Systems")
 set (CPACK_GENERATOR "RPM;DEB;TGZ")
 set (CPACK_PACKAGING_INSTALL_PREFIX "/")
-set (CPACK_RPM_SPEC_MORE_DEFINE "%define ignore \#")
-set (CPACK_RPM_USER_FILELIST "%ignore /bin" "%ignore /include" "%ignore /lib")
+set (CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST /bin /include /lib /share /share/man)
 set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), gcc(>= 4.8), libpcap-dev (>=1.3.0-1)")
 include (CPack)
 
