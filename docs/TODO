@@ -1,7 +1,8 @@
-This is TODO list of required enhancements and features. 
+This is TODO list of required enhancements and features.
 The '*'s mean a complexity of implementation.
 
 
+** Implement handlers for std::set_terminate() and signal(SIGSEGV). Use backtrace() function.
 ***** Implement multi-interface capturing and filtration
 ***** Add defragmentation IP packets(v4/v6)
 **** Improve performance of rpcgen-generated code. Exclude copying data to dynamically allocated arrays by standard rpcgen routines

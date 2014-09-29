@@ -19,15 +19,15 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <iostream>
 #include <exception>
+#include <iostream>
 
 #include "controller/controller.h"
 #include "controller/parameters.h"
 //------------------------------------------------------------------------------
 using namespace NST::controller;
 //------------------------------------------------------------------------------
-int main(int argc, char **argv) try
+int main(int argc, char* argv[]) try
 {
     Parameters params(argc, argv); // set and validate CLI options
 
@@ -47,7 +47,7 @@ catch(const std::exception& e)
 }
 catch(...)
 {
-    std::cerr << "Unknown error" << std::endl;
+    std::cerr << argv[0] << ": " << "Unknown exception" << std::endl;
     return -1;
 }
 //------------------------------------------------------------------------------

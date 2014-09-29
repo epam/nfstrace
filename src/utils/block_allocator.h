@@ -22,7 +22,6 @@
 #ifndef BLOCK_ALLOCATOR_H
 #define BLOCK_ALLOCATOR_H
 //------------------------------------------------------------------------------
-#include <cstdint>
 #include <cstring> // for memset()
 //------------------------------------------------------------------------------
 namespace NST
@@ -39,7 +38,7 @@ class BlockAllocator
     };
 public:
 
-    BlockAllocator()
+    BlockAllocator() noexcept
     : chunk{0}
     , block{0}
     , limit{0}
@@ -52,14 +51,14 @@ public:
 
     ~BlockAllocator()
     {
-        for(uint32_t i = 0; i<allocated; i++)
+        for(std::size_t i = 0; i<allocated; i++)
         {
             delete[] ((char*)blocks[i]);
         }
         delete[] blocks;
     }
 
-    void init_allocation(uint32_t chunk_size, uint32_t block_size, uint32_t block_limit)
+    void init_allocation(std::size_t chunk_size, std::size_t block_size, std::size_t block_limit)
     {
         chunk = chunk_size;
         block = block_size;
@@ -97,17 +96,16 @@ public:
     }
 
     // limits
-    inline unsigned int max_chunks() const { return block*limit;       }
-    inline unsigned int max_memory() const { return block*limit*chunk; }
-    inline unsigned int max_blocks() const { return limit;             }
-
-    inline unsigned int free_chunks() const { return nfree; } // TODO: should we lock spinlock?
+    inline std::size_t max_chunks() const { return block*limit;       }
+    inline std::size_t max_memory() const { return block*limit*chunk; }
+    inline std::size_t max_blocks() const { return limit;             }
+    inline std::size_t free_chunks()const { return nfree;             }
 
 private:
     Chunk* new_block()
     {
         char* ptr = new char[block*chunk];
-        for(uint32_t i = 0; i<block-1; ++i)
+        for(std::size_t i = 0; i<block-1; ++i)
         {
             ((Chunk*) &ptr[i * chunk])->next = (Chunk*) &ptr[(i + 1) * chunk];
         }
@@ -120,9 +118,10 @@ private:
 
     void increase_blocks_limit()
     {
-        limit *= 2; // increase soft limit by twice
+        const std::size_t new_limit = limit * 2; // increase soft limit by twice
 
-        Chunk** new_blocks = new Chunk*[limit];               // allocate new array of blocks pointers
+        Chunk** new_blocks = new Chunk*[new_limit]; // allocate new array of blocks pointers
+        limit = new_limit;
         memcpy(new_blocks, blocks, sizeof(Chunk*)*allocated); // copy pointers of existing blocks
         memset(&new_blocks[allocated], 0, sizeof(Chunk*)*(limit-allocated)); // fill pointers for new blocks by NULL
 
@@ -130,11 +129,11 @@ private:
         blocks = new_blocks;    // set new array
     }
 
-    uint32_t chunk;       // chunk size
-    uint32_t block;       // num chunks in block
-    uint32_t limit;       // max blocks, soft limit
-    uint32_t nfree;       // num of avaliable chunks
-    uint32_t allocated;   // num of allocated blocks, up to limit
+    std::size_t chunk;    // chunk size
+    std::size_t block;    // num chunks in block
+    std::size_t limit;    // max blocks, soft limit
+    std::size_t nfree;    // num of avaliable chunks
+    std::size_t allocated;// num of allocated blocks, up to limit
     Chunk** blocks;       // array of blocks
     Chunk* list;          // list of free chunks
 };

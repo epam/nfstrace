@@ -23,6 +23,7 @@
 #define QUEUE_H
 //------------------------------------------------------------------------------
 #include <memory>
+#include <type_traits>
 
 #include "utils/block_allocator.h"
 #include "utils/spinlock.h"
@@ -43,8 +44,8 @@ class Queue
 
     struct ElementDeleter
     {
-        inline explicit ElementDeleter() : queue{nullptr} {}
-        inline explicit ElementDeleter(Queue* q) : queue{q} { }
+        inline explicit ElementDeleter()         noexcept : queue{nullptr} {}
+        inline explicit ElementDeleter(Queue* q) noexcept : queue{q} {}
 
         inline void operator()(T* const pointer) const
         {
@@ -109,6 +110,9 @@ public:
 
     inline T* allocate()
     {
+        static_assert(std::is_nothrow_constructible<T>::value,
+                      "The construction of T must not to throw any exception");
+
         Spinlock::Lock lock{a_spinlock};
             Element* e = (Element*)allocator.allocate(); // may throw std::bad_alloc
             auto ptr = &(e->data);
