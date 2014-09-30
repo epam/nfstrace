@@ -77,7 +77,7 @@ set (CPACK_RPM_PACKAGE_LICENSE "GPLv2")
 set (CPACK_RPM_PACKAGE_VENDOR "EPAM Systems")
 set (CPACK_GENERATOR "RPM;DEB;TGZ")
 set (CPACK_PACKAGING_INSTALL_PREFIX "/")
-set (CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST /bin /include /lib /share /share/man)
+set (CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /bin /include /lib /share /share/man)
 set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), gcc(>= 4.8), libpcap-dev (>=1.3.0-1)")
 include (CPack)
 
@@ -114,12 +114,10 @@ foreach (trace ${traces})
 endforeach ()
 
 # coverage =====================================================================
-
 find_program(GCOVR_PATH gcovr)
 
 if(GCOVR_PATH)
     add_custom_target(coverage
-        COMMAND ${GCOVR_PATH} --xml -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.xml
-        WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
-    )
+                      COMMAND ${GCOVR_PATH} --xml -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.xml
+                      WORKING_DIRECTORY ${CMAKE_PROJECT_DIR})
 endif()
