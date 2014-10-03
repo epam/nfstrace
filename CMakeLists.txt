@@ -15,8 +15,17 @@ else ()
 endif ()
 
 find_package(Threads REQUIRED) # POSIX Threads
-#TODO: integrate FindPCAP.cmake
-#find_package(PCAP REQUIRED) # libpcap
+
+find_path(PCAP_ROOT_DIR
+          NAMES include/pcap.h)
+
+find_library(PCAP_LIBRARY
+             NAMES pcap
+             HINTS ${PCAP_ROOT_DIR}/lib)
+
+if ("${PCAP_LIBRARY}" STREQUAL "PCAP_LIBRARY-NOTFOUND")
+    message (FATAL_ERROR "Could NOT find PCAP")
+endif ()
 
 # build application ============================================================
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC -fvisibility=hidden")
@@ -34,7 +43,7 @@ include_directories (src)
 file (GLOB_RECURSE SRCS "src/*.cpp")
 set  (LIBS  ${CMAKE_DL_LIBS}            # libdl with dlopen()
             ${CMAKE_THREAD_LIBS_INIT}   # libpthread
-            pcap                        # libpcap
+            ${PCAP_LIBRARY}             # libpcap
             )
 
 configure_file(docs/man/nfstrace.8.in          ${PROJECT_SOURCE_DIR}/docs/man/nfstrace.8)
@@ -70,15 +79,20 @@ install (FILES ${PROJECT_SOURCE_DIR}/docs/man/nfstrace.8 DESTINATION share/man/m
 
 # build packages ===============================================================
 set (CPACK_PACKAGE_VERSION ${NST_VERSION})
-set (CPACK_DEBIAN_PACKAGE_MAINTAINER "Pavel Karneliuk")
-set (CPACK_RPM_PACKAGE_SUMMARY "NFS tracing/monitoring/capturing/statistic tool")
-set (CPACK_RPM_PACKAGE_GROUP "Development/Tools/Other")
-set (CPACK_RPM_PACKAGE_LICENSE "GPLv2")
-set (CPACK_RPM_PACKAGE_VENDOR "EPAM Systems")
 set (CPACK_GENERATOR "RPM;DEB;TGZ")
 set (CPACK_PACKAGING_INSTALL_PREFIX "/")
+set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "NFS tracing/monitoring/capturing/statistic tool")
+set (CPACK_PACKAGE_CONTACT "Nfstrace developers <nfstrace@epam.com>")
+
+set (CPACK_RPM_PACKAGE_GROUP "Applications/Internet")
+set (CPACK_RPM_PACKAGE_LICENSE "GPLv2")
+set (CPACK_RPM_PACKAGE_VENDOR "EPAM Systems")
 set (CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /bin /include /lib /share /share/man)
-set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), gcc(>= 4.8), libpcap-dev (>=1.3.0-1)")
+set (CPACK_RPM_PACKAGE_REQUIRES "glibc >= 2.3.1-6, libgcc >= 3.4.2-12, libpcap >= 1.3.0-1")
+
+set (CPACK_DEBIAN_PACKAGE_SECTION "admin")
+set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), libpcap (>=1.3.0-1)")
+
 include (CPack)
 
 # testing ======================================================================
