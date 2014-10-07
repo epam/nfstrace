@@ -39,6 +39,8 @@ set (NST_V_PATCH "0")
 set (NST_VERSION "${NST_V_MAJOR}.${NST_V_MINOR}.${NST_V_PATCH}")
 set (NST_VERSION_FULL "${PROJECT_NAME} ${NST_VERSION} (${CMAKE_BUILD_TYPE})")
 
+string(TIMESTAMP COMPILATION_DATE "%Y-%m-%d")
+
 include_directories (src)
 file (GLOB_RECURSE SRCS "src/*.cpp")
 set  (LIBS  ${CMAKE_DL_LIBS}            # libdl with dlopen()

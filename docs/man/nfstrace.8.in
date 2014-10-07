@@ -19,7 +19,7 @@
 .\" You should have received a copy of the GNU General Public License
 .\" along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 .\" 
-.TH nfstrace 8 "01 October 2014" "version @NST_VERSION@"
+.TH nfstrace 8 "@COMPILATION_DATE@" "version @NST_VERSION@"
 .\" --------------------- NAME -----------------------------------
 .SH NAME
 .B nfstrace
