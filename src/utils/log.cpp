@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <cerrno>
 #include <iostream>
+#include <stdexcept>
 #include <system_error>
 
 #include <sys/file.h>
@@ -47,7 +48,7 @@ namespace NST
 namespace utils
 {
 
-static FILE* log_file = nullptr;
+static FILE* log_file = ::stderr;
 static bool  own_file = false;
 
 namespace // unnanmed
@@ -78,26 +79,21 @@ static FILE* try_open(const std::string& file_name)
     return file;
 }
 
-} // unnamed unnamed
+} // namespace unnamed
 
 Log::Global::Global(const std::string& path)
 {
     const std::string log_path{"/tmp/nfstrace"};
-    if(log_file != nullptr)
+
+    if(log_file != ::stderr)
     {
-        throw std::system_error{errno, std::system_category(),
-                                       "Empty program name."};
+        throw std::runtime_error{"Global Logger already have been created"};
     }
 
-    // default is stderr
-    if(path.empty())
-    {
-        log_file = ::stderr;
-        return;
-    }
+    if(path.empty()) return;
 
     struct stat s;
-    if (stat(log_path.c_str(), &s))           // check destination folder exists
+    if(stat(log_path.c_str(), &s))            // check destination folder exists
     {
         if(mkdir(log_path.c_str(), ALLPERMS)) // create directory for nfs logs
         {
@@ -131,6 +127,8 @@ Log::Global::~Global()
     {
         flock(fileno(log_file), LOCK_UN);
         fclose(log_file);
+        own_file = false;
+        log_file = ::stderr;
     }
 }
 

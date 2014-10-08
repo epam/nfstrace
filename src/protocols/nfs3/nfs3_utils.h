@@ -30,7 +30,6 @@
 #include "api/nfs3_types_rpcgen.h"
 
 #include "protocols/xdr/xdr_decoder.h"
-#include "protocols/xdr/xdr_reader.h"
 #include "protocols/rpc/rpc_header.h"
 //------------------------------------------------------------------------------
 using namespace NST::API;

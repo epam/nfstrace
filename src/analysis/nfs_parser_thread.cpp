@@ -19,17 +19,12 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "api/nfs4_types_rpcgen.h"
 #include "analysis/nfs_parser_thread.h"
 #include "protocols/nfs/nfs_procedure.h"
-#include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/xdr/xdr_decoder.h"
 #include "utils/log.h"
 //------------------------------------------------------------------------------
-using namespace NST::protocols::NFS3;
-using namespace NST::protocols::NFS4;
-using namespace NST::protocols::rpc;
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -102,6 +97,8 @@ inline void NFSParserThread::process_queue()
 
 void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
 {
+    using namespace NST::protocols::rpc;
+
     // TODO: refactor and generalize this code
     if(ptr->dlen < sizeof(MessageHeader)) return;
     auto msg = reinterpret_cast<const MessageHeader*>(ptr->data);
@@ -140,6 +137,7 @@ void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
             }
         }
     }
+    break;
     }
 }
 
@@ -147,6 +145,10 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
                                              FilteredDataQueue::Ptr&& reply,
                                              RPCSession* session)
 {
+    using namespace NST::protocols::rpc;
+    using namespace NST::protocols::NFS3;
+    using namespace NST::protocols::NFS4;
+
     auto header = reinterpret_cast<const CallHeader*>(call->data);
     const uint32_t procedure = header->proc();
     const uint32_t version   = header->vers();
@@ -194,30 +196,16 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
        break;
        }
     }
-    catch(XDRError& exception)
-    {
-        char* procedure_name {};
-        switch(version)
-        {
-        case NFS_V4:
-            procedure_name = const_cast<char*>(NST::protocols::NFS4::print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(procedure)));
-        break;
-        case NFS_V3:
-            procedure_name = const_cast<char*>(NST::protocols::NFS3::print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(procedure)));
-        break;
-        }
-        LOG("The data of NFS operation %s %s(%u) is too short for parsing", session->str().c_str(), procedure_name, procedure);
-    }
     catch(XDRDecoderError& e)
     {
-        char* procedure_name {};
+        const char* procedure_name{"Unknown procedure"};
         switch(version)
         {
         case NFS_V4:
-            procedure_name = const_cast<char*>(NST::protocols::NFS4::print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(procedure)));
+            procedure_name = print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(procedure));
         break;
         case NFS_V3:
-            procedure_name = const_cast<char*>(NST::protocols::NFS3::print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(procedure)));
+            procedure_name = print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(procedure));
         break;
         }
         LOG("Some data of NFS operation %s %s(%u) was not parsed: %s", session->str().c_str(), procedure_name, procedure, e.what());

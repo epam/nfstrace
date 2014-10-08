@@ -37,8 +37,7 @@ class FileReader : public BaseReader
 {
 public:
     explicit FileReader(const std::string& file);
-    explicit FileReader(FILE* rb_stream);
-    ~FileReader();
+    ~FileReader() = default;
 
     inline FILE* get_file() { return pcap_file(handle); }
 

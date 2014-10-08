@@ -67,20 +67,19 @@ public:
     }
     inline FilteredDataQueue::Ptr get_nfs_call_data(const uint32_t xid)
     {
-        FilteredDataQueue::Ptr ptr;
-
         auto i = operations.find(xid);
         if(i != operations.end())
         {
-            ptr = std::move(i->second);
+            FilteredDataQueue::Ptr ptr{std::move(i->second)};
             operations.erase(i);
+            return ptr;
         }
         else
         {
             LOG("RPC Call XID:%u is not found for %s", xid, str().c_str());
         }
 
-        return ptr;
+        return FilteredDataQueue::Ptr{};
     }
 
     inline const Session* get_session() const { return this; }
