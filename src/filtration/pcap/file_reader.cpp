@@ -41,22 +41,6 @@ FileReader::FileReader(const std::string& file) : BaseReader{file}
     }
 }
 
-FileReader::FileReader(FILE* rb_stream) : BaseReader()
-{
-    char errbuf[PCAP_ERRBUF_SIZE];
-
-    // open pcap device for reading from existing FILE*
-    handle = pcap_fopen_offline(rb_stream, errbuf);
-    if(!handle)
-    {
-        throw PcapError("pcap_fopen_offline", errbuf);
-    }
-}
-
-FileReader::~FileReader()
-{
-}
-
 std::ostream& operator<<(std::ostream& out, FileReader& f)
 {
     out << "Read packets from: " << f.source << '\n';
@@ -65,8 +49,7 @@ std::ostream& operator<<(std::ostream& out, FileReader& f)
     out << "  version: " << f.major_version() << '.' << f.minor_version();
     if(f.is_swapped()) out << "\n  Note: file has data in swapped byte-order";
     return out;
-}   
-
+}
 
 } // namespace pcap
 } // namespace filtration

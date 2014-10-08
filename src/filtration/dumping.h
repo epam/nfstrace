@@ -29,7 +29,6 @@
 #include <sys/time.h>
 
 #include "filtration/packet.h"
-#include "filtration/pcap/handle.h"
 #include "filtration/pcap/packet_dumper.h"
 #include "utils/log.h"
 #include "utils/sessions.h"
@@ -150,7 +149,7 @@ public:
         uint32_t    size_limit {0};
     };
 
-    Dumping(const pcap::Handle& h, const Params& params);
+    Dumping(pcap_t*const h, const Params& params);
     ~Dumping();
     Dumping(const Dumping&)            = delete;
     Dumping& operator=(const Dumping&) = delete;
@@ -185,7 +184,7 @@ private:
     void exec_command() const;
 
     std::unique_ptr<pcap::PacketDumper> dumper;
-    const pcap::Handle& handle;
+    pcap_t* const       handle;
     std::string         base;
     std::string         name;
     std::string         command;
