@@ -1,25 +1,25 @@
 .\"
 .\" nfstrace(8)
-.\" 
-.\" Author: Alexey Costroma 
-.\" 
+.\"
+.\" Author: Alexey Costroma
+.\"
 .\" Copyright (c) 2014 EPAM Systems
-.\" 
+.\"
 .\" This file is part of Nfstrace.
-.\" 
+.\"
 .\" Nfstrace is free software: you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
 .\" the Free Software Foundation, version 2 of the License.
-.\" 
+.\"
 .\" Nfstrace is distributed in the hope that it will be useful,
 .\" but WITHOUT ANY WARRANTY; without even the implied warranty of
 .\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 .\" GNU General Public License for more details.
-.\" 
+.\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
-.\" 
-.TH nfstrace 8 "01 October 2014" "version @NST_VERSION@"
+.\"
+.TH nfstrace 8 "@COMPILATION_DATE@" "version @NST_VERSION@"
 .\" --------------------- NAME -----------------------------------
 .SH NAME
 .B nfstrace
@@ -48,7 +48,7 @@
 .I Milliseconds
 ] [
 .B \-b
-.I MBytes 
+.I MBytes
 ] [
 .B \-d
 .I in|out|inout
@@ -79,10 +79,10 @@
 .br
 [
 .B \-Z
-.I username 
+.I username
 ] [
 .B \-v
-.I 0|1|2 
+.I 0|1|2
 ]
 .\" --------------------- DESCRIPTION ----------------------------
 .SH DESCRIPTION
@@ -320,14 +320,14 @@ When the part’s dumping is compete, the dumping will be continued to another f
 After dumping interruption via Control\-C(SIGINT) the application closes with flushing captured data and we get a set of compressed parts of filtered traffic:
 dump.pcap.bz2, dump.pcap\-1.bz2, dump.pcap\-2.bz2 ... dump.pcap\-N.bz2.
 
-These compressed parts have filtered data and may be join to one .pcap file by: 
+These compressed parts have filtered data and may be join to one .pcap file by:
 
 .B $ ls dump.pcap*.bz2 | sort \-n \-t \- \-k 2 | xargs bzcat > dump.pcap
 
 The ls and sort commands sort file names of parts right order and a pipe passes them to bzcat tool to decompressing parts to one huge file dump.pcap.
 dump.pcap file may be open in any external tool that know .pcap format, f.e. \– Wireshark. Only the dump.pcap.bz2 has .pcap file header, other parts have only data and they are not be recognized as .pcap file by external tool.
 The compressed parts of dump can be decompressed by bzcat tool to stdin of nfsrace for offline analysis by an analyzer module or prints-out to console:
- 
+
 .B $ ls dump.pcap*.bz2 | sort -n \-t \- \-k 2 | xargs bzcat | ./nfstrace \-\-mode=stat \-I \- \-T
 .\" --------------------- FILES ----------------------------------
 .SH FILES
