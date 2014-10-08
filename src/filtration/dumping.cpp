@@ -32,8 +32,8 @@ namespace NST
 namespace filtration
 {
 
-Dumping::Dumping(const pcap::Handle& h, const Params& params)
-    : handle  (h)
+Dumping::Dumping(pcap_t*const h, const Params& params)
+    : handle  {h}
     , base    {params.output_file}
     , name    {params.output_file}
     , command {params.command}

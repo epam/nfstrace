@@ -98,8 +98,7 @@ catch(const filtration::pcap::PcapError& e)
 {
     if(utils::Out message{})
     {
-        message << "Note: This operation may require that you have "
-               "special privileges.";
+        message << "Note: This operation may require that you have special privileges.";
     }
     throw;
 }
@@ -108,7 +107,7 @@ Controller::~Controller()
 {
 }
 
-int Controller::run()  //Start and stop of Filtration and Analysis are in Controller::Running class
+int Controller::run()
 {
     try
     {
@@ -145,23 +144,28 @@ void droproot(const std::string& dropuser)
     try
     {
         struct passwd *pw = getpwnam(dropuser.c_str());//get user uid&gid
-        if (!pw) throw ControllerError{std::string{"Cann't find user: "} + dropuser};
-        int status {};
-        if ( 
+        if(!pw)
+        {
+            throw ControllerError{std::string{"The user is not found: "} + dropuser};
+        }
+        int status{0};
+        if( 
            (status = initgroups(pw->pw_name, pw->pw_gid)) ||
            (status = setgid(pw->pw_gid)) ||
-           (status = setuid(pw->pw_uid)) 
-           )
+           (status = setuid(pw->pw_uid))
+          )
         {
-            throw ControllerError{strerror(status)}; 
+            throw ControllerError{strerror(status)};
         }
         //check if we've really dropped privileges to non-root capable user
-        if (setuid(0) != -1) throw ControllerError{"Managed to regain root privileges"};
+        if(setuid(0) != -1) throw ControllerError{"Managed to regain root privileges"};
     }
     catch(const ControllerError& e)
     {
-        utils::Out message;
-        message << "Cann't drop root privileges!";
+        if(utils::Out message{})
+        {
+            message << "Superuser privileges can not be dropped.";
+        }
         throw;
     }
 }

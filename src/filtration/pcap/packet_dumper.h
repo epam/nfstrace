@@ -44,14 +44,6 @@ public:
             throw PcapError{"pcap_dump_open", pcap_geterr(handle)};
         }
     }
-    PacketDumper(pcap_t* handle, FILE* wb_stream)
-    : dumper{ pcap_dump_fopen(handle, wb_stream) }
-    {
-        if(NULL == dumper)
-        {
-            throw PcapError{"pcap_dump_fopen", pcap_geterr(handle)};
-        }
-    }
     PacketDumper(const PacketDumper&)            = delete;
     PacketDumper& operator=(const PacketDumper&) = delete;
     ~PacketDumper()

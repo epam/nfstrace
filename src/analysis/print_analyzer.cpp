@@ -25,7 +25,6 @@
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
-#include "protocols/rpc/rpc_utils.h"
 //------------------------------------------------------------------------------
 namespace NST
 {

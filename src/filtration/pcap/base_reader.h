@@ -27,7 +27,6 @@
 
 #include <pcap/pcap.h>
 
-#include "filtration/pcap/handle.h"
 #include "filtration/pcap/pcap_error.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -42,9 +41,19 @@ inline const char* library_version() { return pcap_lib_version(); }
 class BaseReader
 {
 protected:
-    BaseReader(const std::string& input) : source{input}{};
-    BaseReader()          = default;
-    virtual ~BaseReader() = default;
+    BaseReader(const std::string& input)
+    : handle{nullptr}
+    , source{input}
+    {
+    }
+
+    virtual ~BaseReader()
+    {
+        if(handle)
+        {
+            pcap_close(handle);
+        }
+    }
 
 public:
     bool loop(void* user, pcap_handler callback, int count=0)
@@ -55,8 +64,8 @@ public:
         return err == 0; // count is exhausted
     }
 
-    void                 break_loop() { pcap_breakloop(handle); }
-    inline const Handle& get_handle() const { return handle; }
+    inline void     break_loop() { pcap_breakloop(handle); }
+    inline pcap_t*& get_handle() { return handle;          }
 
     inline        int         datalink             () const { return pcap_datalink(handle); }
     inline static const char* datalink_name        (const int dlt) { return pcap_datalink_val_to_name(dlt);        }
@@ -65,7 +74,7 @@ public:
     virtual void print_statistic(std::ostream& out) const = 0;
 
 protected:
-    Handle handle;
+    pcap_t* handle;
     const std::string source;
 };
 

@@ -43,13 +43,13 @@ public:
     class Collection
     {
     public:
-        inline Collection()
+        inline Collection() noexcept
         : queue   {nullptr}
         , ptr     {nullptr}
         , session {nullptr}
         {
         }
-        inline Collection(Queueing* q, utils::NetworkSession* s)
+        inline Collection(Queueing* q, utils::NetworkSession* s) noexcept
         : queue   {&q->queue}
         , ptr     {nullptr}
         , session {s}
@@ -74,7 +74,7 @@ public:
 
         void allocate()
         {
-            if (nullptr == ptr)
+            if(nullptr == ptr)
             {
                 // we have a reference to queue, just do allocate and reset
                 ptr = queue->allocate();
@@ -82,10 +82,6 @@ public:
                 {
                     LOG("free elements of the Queue are exhausted");
                 }
-            }
-            else
-            {
-                assert(nullptr != ptr);
             }
         }
 
