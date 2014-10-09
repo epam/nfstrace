@@ -397,6 +397,12 @@ public:
 template<typename Writer>
 class RPCFiltrator
 {
+    enum collect_rpc
+    {
+        RPC_WAIT_NEXT,
+        RPC_OK,
+        RPC_SMALL
+    };
 public:
     RPCFiltrator()
     : collection{}
@@ -501,7 +507,7 @@ public:
         }
     }
 
-    inline bool collect_header(PacketInfo& info)
+    inline collect_rpc collect_header(PacketInfo& info)
     {
         static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
 
@@ -516,7 +522,7 @@ public:
                 //info.data += info.dlen;   optimization
                 info.dlen = 0;
 
-                return false;
+                return RPC_WAIT_NEXT;
             }
             else // info.dlen >= tocopy
             {
@@ -541,11 +547,11 @@ public:
                 //info.data += info.dlen;   optimization
                 info.dlen = 0;
 
-                return false;
+                return RPC_SMALL;
             }
         }
 
-        return true;
+        return RPC_OK;
     }
 
     // Find next message in packet info
@@ -553,14 +559,25 @@ public:
     {
         assert(msg_len == 0);   // RPC Message still undetected
 
-        if (!collect_header(info))
+        collect_rpc rez = collect_header(info);
+        if(rez == RPC_WAIT_NEXT)
             return;
 
         assert(collection);     // collection must be initialized
         //assert(collection.data_size() == sizeof(RecordMark)+sizeof(CallHeader));
-
         const RecordMark* rm = reinterpret_cast<const RecordMark*>(collection.data());
         //if(rm->is_last()); // TODO: handle sequence field of record mark
+
+        if(rez == RPC_SMALL)
+        {
+            if(collection.data_size() >= (sizeof(ReplyHeader) + sizeof(RecordMark)))
+            {
+                if((rm->fragment())->type() != MsgType::REPLY )
+                {
+                    return;
+                }
+            }else return;
+        }
         if(rm->fragment_len() > 0 && validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
         {
             assert(msg_len != 0);   // message is found
@@ -593,6 +610,9 @@ public:
 
     inline bool validate_header(const MessageHeader*const msg, const uint32_t len)
     {
+        if(len < sizeof(CallHeader)) // incorrect header
+            return false;
+
         switch(msg->type())
         {
             case MsgType::CALL:
