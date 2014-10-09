@@ -95,7 +95,7 @@ set (CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /bin /include /lib /share /sh
 set (CPACK_RPM_PACKAGE_REQUIRES "libpcap >= 1.3.0-1")
 
 set (CPACK_DEBIAN_PACKAGE_SECTION "admin")
-set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), libpcap (>=1.3.0-1)")
+set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), libpcap0.8 (>=1.3.0-1)")
 
 include (CPack)
 
