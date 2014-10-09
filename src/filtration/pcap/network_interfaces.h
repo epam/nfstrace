@@ -197,7 +197,7 @@ std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Address& a
         }
         default:
         {
-            out << "Unsupported address family(" << s_address->sa_family << ')';
+            out << "Unsupported address family(" << static_cast<uint32_t>(s_address->sa_family) << ')';
         }
         }
     }
