@@ -31,7 +31,9 @@ endif ()
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC -fvisibility=hidden")
 set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
-set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage -g -O0 -fprofile-arcs -ftest-coverage")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage -O0")
+endif ()
 
 set (NST_V_MAJOR "0")
 set (NST_V_MINOR "3")
@@ -90,10 +92,10 @@ set (CPACK_RPM_PACKAGE_GROUP "Applications/Internet")
 set (CPACK_RPM_PACKAGE_LICENSE "GPLv2")
 set (CPACK_RPM_PACKAGE_VENDOR "EPAM Systems")
 set (CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /bin /include /lib /share /share/man)
-set (CPACK_RPM_PACKAGE_REQUIRES "glibc >= 2.3.1-6, libgcc >= 3.4.2-12, libpcap >= 1.3.0-1")
+set (CPACK_RPM_PACKAGE_REQUIRES "libpcap >= 1.3.0-1")
 
 set (CPACK_DEBIAN_PACKAGE_SECTION "admin")
-set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), libpcap (>=1.3.0-1)")
+set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), libpcap0.8 (>=1.3.0-1)")
 
 include (CPack)
 
@@ -138,10 +140,12 @@ foreach (trace ${traces})
 endforeach ()
 
 # coverage =====================================================================
-find_program(GCOVR_PATH gcovr)
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    find_program(GCOVR_PATH gcovr)
 
-if(GCOVR_PATH)
-    add_custom_target(coverage
-                      COMMAND ${GCOVR_PATH} --xml -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.xml
-                      WORKING_DIRECTORY ${CMAKE_PROJECT_DIR})
-endif()
+    if(GCOVR_PATH)
+        add_custom_target(coverage
+                          COMMAND ${GCOVR_PATH} --xml -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.xml
+                          WORKING_DIRECTORY ${CMAKE_PROJECT_DIR})
+    endif ()
+endif ()
