@@ -253,6 +253,20 @@ const Parameters::CaptureParams Parameters::capture_params() const
                                  + impl->get(CLI::BSIZE).to_cstr()};
     }
 
+    // check max length of raw captured UDP packet
+    if(params.snaplen < 1 || params.snaplen > 65535)
+    {
+        throw cmdline::CLIError{std::string{"Invalid value of max length of raw captured UDP packet: "}
+                                 + impl->get(CLI::SNAPLEN).to_cstr()};
+    }
+
+    // check the read timeout that will be used on a capture
+    if(params.timeout_ms < 1)
+    {
+        throw cmdline::CLIError{std::string{"Invalid value of read timeout that will be used on a capture: "}
+                                 + impl->get(CLI::TIMEOUT).to_cstr()};
+    }
+
     // check and set capture direction
     const auto& direction = impl->get(CLI::DIRECTION);
     if(direction.is("in"))
