@@ -584,10 +584,6 @@ public:
             assert(msg_len >= collection.data_size());
             assert(hdr_len <= msg_len);
 
-            // hdr len is defined by that time
-            if (collection.capacity() < hdr_len)
-                collection.resize(hdr_len);
-
             const uint32_t written = collection.data_size();
             msg_len -= written; // substract how written (if written)
             hdr_len -= std::min(hdr_len, written);
