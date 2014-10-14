@@ -121,7 +121,7 @@ file (WRITE ${check_drain}
 # script for check output symbols
 set (check_out ${CMAKE_BINARY_DIR}/check-out.sh)
 file (WRITE ${check_out}
-"bzcat \"$1\" | ./${PROJECT_NAME} --mode=stat -v 2 -T -a ./analyzers/libbreakdown.so -I - -O -  | grep --color='auto' -P -n '[^\\x00-\\x7F]' | wc -c | if [ $1 -gt 0 ]; then exit 1; else exit 0; fi "
+"bzcat \"$1\" | ./${PROJECT_NAME} --mode=stat -v 2 -T -a ./analyzers/libbreakdown.so -I - -O -  | grep --color='auto' -P -n '[^\\x00-\\x7F]' | wc -c |  awk '{ if($1 != 0) exit 1 ; exit 0 }';"
 )
 
 # add test for each .pcap.bz2 trace
