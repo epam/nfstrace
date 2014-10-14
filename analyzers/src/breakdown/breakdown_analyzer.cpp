@@ -388,7 +388,7 @@ public:
                 out.setf(std::ios::fixed, std::ios::floatfield);
                 out.precision(2);
                 if(i>=ProcEnumNFS4::count_proc)
-                    out << (static_cast<double>(nfs4_proc_count[i]) / static_cast<double>(nfs4_ops_total)) * 100.0;
+                    out << (nfs4_ops_total ? ((static_cast<double>(nfs4_proc_count[i]) / static_cast<double>(nfs4_ops_total)) * 100.0): 0);
                 else
                     out << (static_cast<double>(nfs4_proc_count[i]) / static_cast<double>(nfs4_proc_total)) * 100.0;
                 out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
@@ -483,9 +483,9 @@ public:
             out << "(";
             out.width(6);
             if(nfs_vers == NFS_V4 && i>=ProcEnumNFS4::count_proc)
-                out << std::fixed << ((T)(breakdown[i].get_count()) / s_total_ops) * 100;
+                out << std::fixed << (s_total_ops ? (((T)(breakdown[i].get_count()) / s_total_ops) * 100) : 0 );
             else
-                out << std::fixed << ((T)(breakdown[i].get_count()) / s_total_proc) * 100;
+                out << std::fixed << (s_total_proc ? (((T)(breakdown[i].get_count()) / s_total_proc) * 100) : 0 );
             out << "%)";
             out << " Min: ";
             out.precision(3);

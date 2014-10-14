@@ -515,7 +515,6 @@ public:
                 collection.push(info, info.dlen);
                 //info.data += info.dlen;   optimization
                 info.dlen = 0;
-
                 return false;
             }
             else // info.dlen >= tocopy
@@ -529,14 +528,11 @@ public:
         {
 
             collection.allocate(); // allocate new collection from writer 
-
             if(info.dlen >= max_header) // is data enough to message validation?
             {
-
                 collection.push(info, max_header); // probability that message will be rejected / probability of valid message
                 info.data += max_header;
                 info.dlen -= max_header;
-                return true;
             }
             else // (info.dlen < max_header)
             {
@@ -545,7 +541,6 @@ public:
                 return (info.dlen < max_reply_header ? (info.dlen = 0, false):(info.dlen = 0, true) );
             }
         }
-
         return true;
     }
 
