@@ -44,7 +44,7 @@ Opt Args::options[Args::num] =
     {'m', "mode",       Opt::REQ, LIVE,                  "set running mode",                               DRAIN "|" LIVE "|" DUMP "|" STAT,   nullptr, false},
     {'i', "interface",  Opt::REQ, "PCAP-DEFAULT",        "listen interface, it is required for " LIVE " and " DUMP " modes", "INTERFACE",      nullptr, false},
     {'f', "filtration", Opt::REQ, "port 2049",           "a packet filtration in libpcap BPF syntax",                        "BPF",            nullptr, false},
-    {'s', "snaplen",    Opt::REQ, "65535",               "max length of raw captured packet. May be used ONLY FOR UDP",      "0..65535",       nullptr, false},
+    {'s', "snaplen",    Opt::REQ, "65535",               "max length of raw captured packet. May be used ONLY FOR UDP",      "1..65535",       nullptr, false},
     {'t', "timeout",    Opt::REQ, "100",                 "set the read timeout that will be used on a capture",              "Milliseconds",   nullptr, false},
     {'b', "bsize",      Opt::REQ, "20",                  "size of capturing kernel buffer",                                  "MBytes",         nullptr, false},
     {'p', "promisc",    Opt::REQ, "true",                "put the interface into promiscuous mode",                          nullptr,          nullptr, false},

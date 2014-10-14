@@ -397,12 +397,6 @@ public:
 template<typename Writer>
 class RPCFiltrator
 {
-    enum collect_rpc
-    {
-        RPC_WAIT_NEXT,
-        RPC_OK,
-        RPC_SMALL
-    };
 public:
     RPCFiltrator()
     : collection{}
@@ -452,12 +446,11 @@ public:
     void push(PacketInfo& info)
     {
         assert(info.dlen != 0);
-
         while(info.dlen) // loop over data in packet
         {
-            if(msg_len != 0)    // we are on-stream and we are looking to some message
+            if(msg_len)    // we are on-stream and we are looking to some message
             {
-                if(hdr_len == 0)    // message header is readout, discard the unused tail of message
+                if(!hdr_len)    // message header is readout, discard the unused tail of message
                 {
                     if(msg_len >= info.dlen) // discard whole new packet
                     {
@@ -500,29 +493,30 @@ public:
                     }
                 }
             }
-            else // msg_len == 0, no one mesasge is on reading, try to find next message
+            else // msg_len == 0, no one message is on reading, try to find next message
             {
                 find_message(info);
             }
         }
     }
 
-    inline collect_rpc collect_header(PacketInfo& info)
+    inline bool collect_header(PacketInfo& info)
     {
         static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
+        static const size_t max_reply_header = sizeof(RecordMark) + sizeof(ReplyHeader);
 
         if(collection && (collection.data_size() > 0)) // collection is allocated
         {
             assert(collection.capacity() >= max_header);
             const uint32_t tocopy = max_header - collection.data_size();
-
+            assert(tocopy != 0);
             if(info.dlen < tocopy)
             {
                 collection.push(info, info.dlen);
                 //info.data += info.dlen;   optimization
                 info.dlen = 0;
 
-                return RPC_WAIT_NEXT;
+                return false;
             }
             else // info.dlen >= tocopy
             {
@@ -533,25 +527,26 @@ public:
         }
         else // collection is empty
         {
+
             collection.allocate(); // allocate new collection from writer 
 
             if(info.dlen >= max_header) // is data enough to message validation?
             {
+
                 collection.push(info, max_header); // probability that message will be rejected / probability of valid message
                 info.data += max_header;
                 info.dlen -= max_header;
+                return true;
             }
             else // (info.dlen < max_header)
             {
                 collection.push(info, info.dlen);
                 //info.data += info.dlen;   optimization
-                info.dlen = 0;
-
-                return RPC_SMALL;
+                return (info.dlen < max_reply_header ? (info.dlen = 0, false):(info.dlen = 0, true) );
             }
         }
 
-        return RPC_OK;
+        return true;
     }
 
     // Find next message in packet info
@@ -559,56 +554,46 @@ public:
     {
         assert(msg_len == 0);   // RPC Message still undetected
 
-        collect_rpc rez = collect_header(info);
-        if(rez == RPC_WAIT_NEXT)
+        if (!collect_header(info))
             return;
 
         assert(collection);     // collection must be initialized
         //assert(collection.data_size() == sizeof(RecordMark)+sizeof(CallHeader));
+
         const RecordMark* rm = reinterpret_cast<const RecordMark*>(collection.data());
         //if(rm->is_last()); // TODO: handle sequence field of record mark
-
-        if(rez == RPC_SMALL)
+        if(rm->fragment_len())
         {
-            if(collection.data_size() >= (sizeof(ReplyHeader) + sizeof(RecordMark)))
+            if(collection.data_size() < (sizeof(CallHeader) + sizeof(RecordMark)) && (rm->fragment())->type() != MsgType::REPLY ) // if message not Reply, try collect the rest for Call
             {
-                if((rm->fragment())->type() != MsgType::REPLY )
+                return;
+            }
+            if(validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
+            {
+                assert(msg_len != 0);   // message is found
+                assert(msg_len >= collection.data_size());
+                assert(hdr_len <= msg_len);
+                const uint32_t written = collection.data_size();
+                msg_len -= written; // substract how written (if written)
+                hdr_len -= std::min(hdr_len, written);
+                if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
+                                    // Next find message call will finding next message
                 {
-                    return;
+                    collection.skip_first(sizeof(RecordMark));
+                    collection.complete(info);
                 }
-            }else return;
-        }
-        if(rm->fragment_len() > 0 && validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
-        {
-            assert(msg_len != 0);   // message is found
-            assert(msg_len >= collection.data_size());
-            assert(hdr_len <= msg_len);
-
-            const uint32_t written = collection.data_size();
-            msg_len -= written; // substract how written (if written)
-            hdr_len -= std::min(hdr_len, written);
-            if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
-                                // Next find message call will finding next message
-            {
-                collection.skip_first(sizeof(RecordMark));
-                collection.complete(info);
+                return;
             }
         }
-        else    // unknown data in packet payload
-        {
-            assert(msg_len == 0);   // message is not found
-            assert(hdr_len == 0);   // header should be skipped
-            collection.reset();     // skip collected data
-            //[ Optimization ] skip data of current packet at all
-            info.dlen = 0;
-        }
+        assert(msg_len == 0);   // message is not found
+        assert(hdr_len == 0);   // header should be skipped
+        collection.reset();     // skip collected data
+        //[ Optimization ] skip data of current packet at all
+        info.dlen = 0;
     }
 
     inline bool validate_header(const MessageHeader*const msg, const uint32_t len)
     {
-        if(len < sizeof(CallHeader)) // incorrect header
-            return false;
-
         switch(msg->type())
         {
             case MsgType::CALL:
