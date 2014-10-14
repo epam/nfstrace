@@ -137,7 +137,8 @@ struct PacketInfo
         }
 
         const uint32_t ihl = header->ihl();
-        if(dlen < ihl) return; // truncated packet
+        if(dlen < ihl)             return; // truncated packet
+        if((header->length()) < ihl) return; // incorrect packet
 
         data += ihl;
         dlen = (std::min((uint16_t)dlen, header->length())) - ihl;  // trunk data to length of IP packet
