@@ -40,7 +40,7 @@
 .I \(dqbpf syntax\(dq
 ] [
 .B \-s
-.I 0..65535
+.I 1..65535
 ]
 .br
 [
@@ -88,18 +88,18 @@
 .SH DESCRIPTION
 .TP
 \fBIntroduction\fR
-The \fBnfstrace\fR tool performs live Ethernet 1Gbps \- 10Gbps packet’s capturing and helps to determine NFS procedures in raw network traffic. It performs packet’s capturing, filtration, dumping traces, compression, statistical analysis, visualization and provides API for custom analysis modules.
+The \fBnfstrace\fR tool performs live Ethernet 1Gbps \- 10Gbps packets capturing and helps to determine NFS procedures in raw network traffic. It performs packets capturing, filtration, dumping traces, compression, statistic analysis, visualization and provides API for custom analysis modules.
 .IP
 The \fBnfstrace\fR supports following protocols: Ethernet \[u2010] IPv4 \[ba] IPv6 \[u2010] UDP \[ba] TCP \[u2010] NFSv3 \[ba] NFSv4.
 .TP
 \fBHardware Interfaces\fR
-The \fBnfstrace\fR captures raw packets from an Ethernet interface via libpcap interface of Linux (LSF) or FreeBSD (BPF) implementations. Current implementation makes assumption, that libpcap delivers correct TCP and UDP packets. Assembling Ethernet frames to IP packets and IP packets defragmentation performs in the Kernel. The software have tested on direct linked workstations with 1Gbps integrated NICs (Ethernet 1000baseT/Full).
+The \fBnfstrace\fR captures raw packets from an Ethernet interface via libpcap interface to Linux (LSF) or FreeBSD (BPF) implementations. Current implementation makes assumption that libpcap delivers correct TCP and UDP packets. Assembling of Ethernet frames to IP packets and IP packets defragmentation are performed in the Kernel. The software has been tested on direct linked workstations with integrated 1Gbps NICs (Ethernet 1000baseT/Full).
 .TP
 \fBRunning Modes\fR
 \fBLive\fR
 (on-line analysis)
 .br
-Performs online capturing, filtration and live analysis detected NFS procedures by a pluggable analysis modules or print-out them to console (-T option).
+Performs online capturing, filtration and live analysis of detected NFS procedures using a pluggable analysis modules or prints out them to stdout (-T option).
 .IP
 \fBDump\fR
 (on-line dumping)
@@ -109,45 +109,45 @@ Performs online traffic capturing, filtration and dumping packets to the specifi
 \fBDrain\fR
 (off-line  dumping)
 .br
-Perfoms reading from input pcap file, filtration and dumping packets to the specified output .pcap file. removing all packets which are not related to NFS procedures
+Performs reading from input pcap file, filtration and dumping packets to the specified output .pcap file and removing all packets which are not related to NFS procedures.
 .IP
 \fBStat\fR
 (off-line analysis)
 .br
-Performs offline filtration of any .pcap file with captured traces and perform analysis by pluggable modules or print out found NFS procedures to console (-T option).
+Performs offline filtration of any .pcap file with captured traces and performs analysis using pluggable modules or prints out found NFS procedures to stdout (-T option).
 .
 .TP
 \fBPackets Filtration by BPF\fR
-The nfstrace captures network traffic from NIC by libpcap. Libpcap provides portable interface to native Kernel API for capturing network traffic. All platforms implement low-level filtration of packets in Kernel-space by BPF. Default BPF filter in nfstrace is ‘port 2049’. It means that each packet, which delivered to user-space from the Kernel, satisfies following conditions: it has IPv4 or IPv6 header and it has TCP or UDP header with source or destination port number equals 2049(default NFS port). This filter is ‘heavy’ and IPv6 support is experimental. So, for faster filtration of IPv4-only traffic, use following BPF filter: ‘ip and port 2049’ (via -f option).
+The nfstrace captures network traffic from NIC using libpcap. Libpcap provides portable interface to native Kernel API for capturing network traffic. All platforms implement low-level filtration of packets in Kernel-space by BPF. Default BPF filter in nfstrace is ‘port 2049’. It means that each packet that delivered to user-space from the Kernel satisfies following conditions: it has IPv4 or IPv6 header and it has TCP or UDP header with source or destination port number equals to 2049 (default NFS port). This filter is ‘heavy’ and IPv6 support is experimental. So, for faster filtration of IPv4-only traffic, use the following BPF filter: ‘ip and port 2049’ (via -f option).
 .TP
 \fBPayload Filtration\fR
-Let see to following case: writing 1Gb file to a NFSv3 storage:
+Lets look at the following case: writing 1Gb file to NFSv3 storage:
 
-This action will be performed by some LOOKUP, READDIRPLUS, COMMIT, GETATTR, etc. and some (thousands?) WRITE procedures of NFSv3 protocol. The nfstrace must catch all of them. How many RPC/NFSv3 procedures will be perform? It depends on wsize. Wsize is an option of NFS client, it defines the number of bytes that NFS uses during the writing files to an NFS server by one WRITE procedure. When wsize is 512 Kbytes a NFS client should (in general) perform 1Gb/512Kb WRITE procedures. So, for writing 1Gb file to a NFS storage, a NFS client (with wsize=512k) should perform 2000 WRITE procedures + some other procedures like GETATTR, etc.
+This action will be performed using some set of LOOKUP, READDIRPLUS, COMMIT, GETATTR, etc. and some (thousands?) WRITE NFSv3 procedures. The nfstrace must catch all of them. Amount of RPC/NFSv3 procedures depends on wsize. Wsize is an option of NFS client, it defines the number of bytes that NFS uses during the writing of files to an NFS server by one WRITE procedure. When wsize is 512 Kbytes an NFS client should (in general) perform 1Gb/512Kb WRITE procedures. So in order to write 1Gb file to an NFS storage, an NFS client (with wsize=512k) has to perform 2000 WRITE procedures plus some other procedures like GETATTR, etc.
 
-Each NFSv3 procedure consists by two RPC messages: Call – request from client to server and Reply \– reply from server with result of requested procedure. Both RPC messages may contain data useful for analysis. Both RPC messages may contain thousands of payload bytes useless for analysis. The nfstrace must capture headers of calls and replies, and then match pairs of them to complete NFS procedures.
+Each NFSv3 procedure consists of two RPC messages: Call – request from client to server and Reply \– reply from server with result of requested procedure. Both RPC messages may contain data useful for analysis. Both RPC messages may contain thousands of payload bytes useless for analysis. The nfstrace captures headers of calls and replies, and then matches pairs of them to complete NFS procedures.
 
-The ‘\-\-snaplen’ option set\-up the number of bytes of a packet for uprising from the Kernel to user-space. In case of TCP transport layer this options is useless because TCP connection is a bidirectional stream of data (instead of UDP that is form of interchange up to 64k datagrams). In case of NFS over TCP, the nfstrace must capture whole packets and copy them to user-space from the Kernel for DPI and performing NFS statistics analysis.
+The ‘\-\-snaplen’ option sets up the number of bytes of a packet for uprising from the Kernel to user-space. In case of TCP transport layer this options is useless because TCP connection is a bidirectional stream of data (instead of UDP that is form of interchange up to 64k datagrams). In case of NFS over TCP, the nfstrace captures whole packets and copies them to user-space from the Kernel for DPI and performing NFS statistic analysis.
 
-Finally, the nfstrace must filtrate whole NFS traffic passed from the Kernel to user-space and detects RPC/NFS message headers (up to 4Kbytes) within gigabytes of network traffic.
+Finally, the nfstrace filtrates whole NFS traffic passed from the Kernel to user-space and detects RPC/NFS message headers (up to 4Kbytes) within gigabytes of network traffic.
 
-Detected headers are copied into internal buffers (or dumped to a .pcap file) for statistics analysis.
+Detected headers are copied into internal buffers (or dumped to a .pcap file) for statistic analysis.
 
 The key principle of Filtration in the nfstrace is \fB\(dqDiscard payload ASAP\(dq\fR.
-The Filtration module works in separate thread that captures packets from network interface by libpcap. It matches a packet to a related session (TCP or UDP) and performs reassembling TCP flow from TCP segment of a packet. After that, a part of packet will be pass to RPCFiltrator. In case of NFSv4, full packet will be pass to RPCFiltrator, because it consists of several NFSv4 operations.
+The Filtration module works in separate thread and captures packets from network interface using libpcap. It matches incoming to the session (TCP or UDP) and performs reassembling TCP flow from TCP segment of the packet. After that a part of packet will be passed to RPCFiltrator. In case of NFSv4, full packet will be passed to RPCFiltrator, because it consists of several NFSv4 operations.
 
-There are two RPCFiltrator in one TCP session. Both of them known state of current RPC message in related TCP flow. They can detect RPC messages and perform action on a packet – discard it or collect it for analysis.
+There are two RPCFiltrator in one TCP session. Both of them are known state of the current RPC message in related TCP flow. They can detect RPC messages and perform action on a packet – discard it or collect it for analysis.
 
-The ‘-b’ option of nfstrace set-up size of capturing buffer in the Kernel of operating system in megabytes. This option is very critical for capturing performance.
-The wsize and rsize of NFS connections are meaningful for filtration and analysis performance too.
+The ‘-b’ option of nfstrace sets up the size of capturing buffer in the operating system's kernel in megabytes. This option is very crucial for capturing performance.
+The wsize and rsize of NFS connections are important for filtration and performance analysis too.
 .TP
 \fBDump File Format\fR
-The nfstrace uses libpcap file format for input and output files. Filtered packets are saved in .pcap format too. Any external tool (like Wireshark) may be used to inspect filtered traces. Filtrated headers of RPC messages are passed from Filtration to Analysis modules in raw data buffers via Queue of Analysis module.
+The nfstrace uses libpcap file format for input and output files. Filtered packets are saved in .pcap format too. Any external tool (like Wireshark) can be used in order to inspect filtered traces. Filtered headers of RPC messages are passed from Filtration to Analysis modules in raw data buffers via Queue of Analysis module.
 .TP
 \fBAPI/Pluggable Analysis Modules\fR
-The API of nfstrace provides C++ headers with definition of IAnalyzer interface and couple of related types and NFS data structures and functions. An IAnalyzer interface is a set of NFS handlers that will be called by Analysis module for each NFS procedure. All definitions of types and constants, required for development analysis modules, are defined in files in nfstrace/api/ directory. They should be included by <nfstrace/api/plugin_api.h> header.
+The API of nfstrace provides C++ headers with definition of IAnalyzer interface, a couple of related types, NFS data structures and functions. An IAnalyzer interface is a set of NFS handlers that will be called by Analysis module for each NFS procedure. All definitions of types and constants required for development of analysis modules are defined in files lacated ot nfstrace/api/ directory. They will be included with <nfstrace/api/plugin_api.h> header.
 .IP
-A pluggable analysis module should be a dynamically linked shared object and should export following C functions:
+A pluggable analysis module must be a dynamically linked shared object and must export the following C functions:
 .IP
 const char* usage ();
 .br
@@ -155,24 +155,24 @@ IAnalyzer*  create (const char* opts);
 .br
 void        destroy (IAnalyzer* instance);
 .IP
-and should contain the following macro after declaration of these functions for proper usage:
+and must contain the following macro after declaration of these functions for proper usage:
 .IP
 NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
 .IP
-The \fBusage\fR() function must return C-string with description of module and required parameters for creation an instance of analyzer, this string will be shown in output of \(dq\-\-help\(dq option.
+The \fBusage\fR() function must return C-string with description of module and required parameters for creation of an instance of analyzer, this string will be shown in output of \(dq\-\-help\(dq option.
 .br
-The IAnalyzer* \fBcreate\fR(const char* opts) must create and return an instance of analyzer accordingly to passed options.
+The IAnalyzer* \fBcreate\fR(const char* opts) must create and return an instance of analyzer according to passed options.
 .br
 The void \fBdestroy\fR(IAnalyzer* instance) must destroy previously created analyzer instance and performs required clean\-up (for instance \- close connection to a database).
 .IP
-All existing analyzers are implemented as pluggable analysis modules and may be attached to nfstrace via \-a option.
+All existing analyzers are implemented as pluggable analysis modules and can be attached to nfstrace with \-a option.
 .TP
 .B Operation Breakdown Analyzer (OB)
-The OB implemented as pluggable analysis module libbreakdown.so.
+The OB is implemented as pluggable analysis module libbreakdown.so.
 
-The NFS procedure latency have calculate as difference between timestamp of come\-in last TCP or UDP packet of header of RPC/NFS reply-message and timestamp of come\-in last TCP or UDP packet of header of related NFS call\-message.
+The NFS procedure latency is calculated as difference between timestamp of come\-in last TCP or UDP packet of header of RPC/NFS reply-message and timestamp of come\-in last TCP or UDP packet of header of related NFS call\-message.
 
-Standard Deviation of latency may be calculate by two algorithms. Two-pass algorithm generates correct standard deviation value but requires a lot of memory for storage all latencies till final computation. One-pass algorithm is memory-efficient but it can accumulate computation error in case of large number of small latencies. OB implements both algorithms. They may be chosen by passing parameter while attaching OB analyzer to nfstrace.
+Standard Deviation of latency can be calculated using two algorithms. Two-pass algorithm generates correct standard deviation value but requires a lot of memory for storage of all latencies till final computation. One-pass algorithm is memory-efficient but it can accumulate computation error in case of large number of small latencies. OB implements both algorithms. They can be chosen by passing parameter while attaching OB analyzer to nfstrace.
 
 MEM means Knuth’s one-pass algorithm. ACC means stable two-pass algorithm. ACC is default.
 .TP
@@ -194,22 +194,22 @@ Listen interface, it is required for live and dump modes.
 .TP
 \fB\-f, \-\-filtration=\fR\(dqBPF\(dq
 .IP
-A packet filtration in libpcap BPF syntax.
+packet filter in libpcap BPF syntax.
  (default:port 2049)
 .TP
-\fB\-s, \-\-snaplen=\fR0..65535
+\fB\-s, \-\-snaplen=\fR1..65535
 .IP
-Max length of raw captured packet. May be used ONLY FOR UDP.
+Max length of raw captured packet. Can be used ONLY FOR UDP.
  (default:65536)
 .TP
 \fB\-t, \-\-timeout=\fRMilliseconds
 .IP
-Set the read timeout that will be used on a capture.
+Set the read timeout that will be used while capturing.
  (default:100)
 .TP
 \fB\-b, \-\-bsize=\fRMBytes
 .IP
-Size of capturing kernel buffer.
+Size of kernel capturing buffer.
  (default:20)
 .TP
 \fB\-p, \-\-promisc\fR
@@ -255,7 +255,7 @@ The -L flag will not be supported if nfstrace was built with an older version of
 .TP
 \fB\-M, \-\-msg-header=\fR1..4000
 .IP
-RPC message will be truncated to this limit in bytes before passing to Analysis.
+RPC message will be truncated to this limit specified in bytes before passing to Analysis.
  (default:512)
 .TP
 \fB\-Q, \-\-qcapacity=\fR1..65535
@@ -275,7 +275,7 @@ Drops root privileges, after opening the capture device, but before reading from
 .TP
 \fB\-v, \-\-verbose=\fR0|1|2
 .IP
-Level of print out additional information.
+Specify verbosity level.
  (default:1)
 .TP
 \fB\-h, \-\-help\fR
@@ -301,30 +301,30 @@ Live capture NFS traffic over TCP or UDP to port 2049 from enp0s25 network inter
 .B $ sudo nfstrace \-\-mode=live \-\-interface enp0s25 \-\-filtration=\(dqip and port 2049\(dq -\-analysis libbreakdown.so \-\-trace \-\-verbose 2 \-\-droproot user
 .TP
 .B Off\-line dumping (\-\-mode=drain)
-Perfoms reading traffic from input pcap file, filtration and dumping packets to the specified output .pcap file. removing all packets which are not related to NFS procedures.
+Perform reading traffic from input pcap file, filtration and dumping packets to the specified output .pcap file. removing all packets which are not related to NFS procedures.
 
 .B $ nfstrace \-\-mode=drain -I ./capture.pcap \-O nfsonly.pcap
 
 .TP
 .B Compression
-The compression and decompression performs by external tools. It is very similar to tcpdump \-z option:
+The compression and decompression are performed by external tools. It is very similar to tcpdump \-z option:
 .IP
 .B $ sudo ./nfstrace \-\-mode=dump \-i eth0 -f \(dqip and port 2049\(dq \-O dump.pcap \-\-dump-size=10 \-C \(dqbzip2 \-f \-9\(dq
 .IP
-This command run nfstrace in dumping mode (\-\-mode=dump). Capturing from network interface requires super-user privileges, so \– sudo. In this mode, the application performs live capturing packets from network interface eth0 (\-i eth0) and filtration NFS procedures (calls + replies). Then it dumps filtered packets that contains RPC/NFS headers (or parts of these headers). Filtration in the Kernel performs by BPF filter (\-f \(dqip and port 2049\(dq). It means that we are interested in any TCP or UDP packets send to or from port 2049(default port for NFS servers) over IPv4. This command specifies the output file dump.pcap (\-O dump.pcap). In case of the output file will be huge (tons of Mb) it will be divided to parts by 10Mb (\-\-dump-size=10).
+This command runs nfstrace in dumping mode (\-\-mode=dump). Capturing from network interface requires super-user privileges, so \– sudo is used. In this mode, the application performs live capturing of the packets that come from network interface eth0 (\-i eth0) and filtration of NFS procedures (calls + replies). Then it dumps filtered packets that contains RPC/NFS headers (or parts of these headers). Filtration in the Kernel is performed by BPF filter (\-f \(dqip and port 2049\(dq). It means that we are interested in any TCP or UDP packets that are sent to or from port 2049(default port for NFS servers) over IPv4. This command specifies the output file dump.pcap (\-O dump.pcap). In case of huge output (tons of Mb) it will be divided into parts of 10Mb (\-\-dump-size=10).
 
-When the part’s dumping is compete, the dumping will be continued to another file (dump.pcap\-1, dump.pcap\-2, … dump.pcap\-N) and nfstrace spawns child process (by fork() & exec() calls) that executes command (passed by \-C \(dqbzip2 \-f \-9\(dq) \(dqbzip2 \-f \-9 dump.pcap\(dq over each dumped part.
+When the part’s dumping is compete, the dumping will be continued for another file (dump.pcap\-1, dump.pcap\-2, … dump.pcap\-N) and nfstrace spawns child process (using fork() & exec() calls) that executes command (passed by \-C \(dqbzip2 \-f \-9\(dq) \(dqbzip2 \-f \-9 dump.pcap\(dq over each dumped part.
 
-After dumping interruption via Control\-C(SIGINT) the application closes with flushing captured data and we get a set of compressed parts of filtered traffic:
+After dumping interruption via Control\-C (SIGINT) the application exits and flushes captured data so we get the set of compressed parts of filtered traffic:
 dump.pcap.bz2, dump.pcap\-1.bz2, dump.pcap\-2.bz2 ... dump.pcap\-N.bz2.
 
-These compressed parts have filtered data and may be join to one .pcap file by:
+These compressed parts have filtered data and may be join to one .pcap file using the following command:
 
 .B $ ls dump.pcap*.bz2 | sort \-n \-t \- \-k 2 | xargs bzcat > dump.pcap
 
-The ls and sort commands sort file names of parts right order and a pipe passes them to bzcat tool to decompressing parts to one huge file dump.pcap.
-dump.pcap file may be open in any external tool that know .pcap format, f.e. \– Wireshark. Only the dump.pcap.bz2 has .pcap file header, other parts have only data and they are not be recognized as .pcap file by external tool.
-The compressed parts of dump can be decompressed by bzcat tool to stdin of nfsrace for offline analysis by an analyzer module or prints-out to console:
+ls feeds sort command and then sorted file names of parts in the right order are passed via pipe to bzcat tool for decompressing parts to one huge file dump.pcap.
+dump.pcap file can be opened in any external tool that knows .pcap format (e.g. Wireshark). Only the dump.pcap.bz2 has .pcap file header, other parts have only data and they will not be recognized as .pcap file by an external tool.
+The compressed parts of dump can be decompressed by bzcat tool to stdin of nfsrace for offline analysis by an analyzer module or printed out to terminal:
 
 .B $ ls dump.pcap*.bz2 | sort -n \-t \- \-k 2 | xargs bzcat | ./nfstrace \-\-mode=stat \-I \- \-T
 .\" --------------------- FILES ----------------------------------
