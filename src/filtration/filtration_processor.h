@@ -526,7 +526,6 @@ public:
         }
         else // collection is empty
         {
-
             collection.allocate(); // allocate new collection from writer 
             if(info.dlen >= max_header) // is data enough to message validation?
             {
@@ -553,7 +552,6 @@ public:
             return;
 
         assert(collection);     // collection must be initialized
-        //assert(collection.data_size() == sizeof(RecordMark)+sizeof(CallHeader));
 
         const RecordMark* rm = reinterpret_cast<const RecordMark*>(collection.data());
         //if(rm->is_last()); // TODO: handle sequence field of record mark
@@ -561,6 +559,15 @@ public:
         {
             if(collection.data_size() < (sizeof(CallHeader) + sizeof(RecordMark)) && (rm->fragment())->type() != MsgType::REPLY ) // if message not Reply, try collect the rest for Call
             {
+                return;
+            }
+            if(rm->fragment_len() < sizeof(ReplyHeader)) // incorrect fragment len, not valid rpc message
+            {
+                TRACE("Incorrect fragment len. Not valid rpc message.");
+                assert(msg_len == 0);   // message is not found
+                assert(hdr_len == 0);   // header should be skipped
+                collection.reset();     // skip collected data
+                info.dlen = 0;
                 return;
             }
             if(validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
