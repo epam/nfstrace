@@ -206,38 +206,17 @@ template
 >
 class BreakdownAnalyzer : public IAnalyzer
 {
-    struct Hash
-    {
-        std::size_t operator() (const Session& s) const
-        {
-            return s.port[0] + s.port[1] + s.ip.v4.addr[0] + s.ip.v4.addr[1];
-        }
-    };
-
-    struct Pred
-    {
-        bool operator() (const Session& a, const Session& b) const
-        {
-            return (a.port[0] == b.port[0]) &&
-                    (a.port[1] == b.port[1]) &&
-                    (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
-                    (a.ip.v4.addr[1] == b.ip.v4.addr[1]);
-        }
-    };
-    
     struct Less
     {
         bool operator() (const Session& a, const Session& b) const
         {
-            return (a.port[0] < b.port[0]) &&
-                    (a.port[1] < b.port[1]) &&
-                    (a.ip.v4.addr[0] < b.ip.v4.addr[0]) &&
-                    (a.ip.v4.addr[1] < b.ip.v4.addr[1]);
+            return ((a.port[0] < b.port[0]) && (a.port[1] <= b.port[1])) ||
+                   ((a.ip.v4.addr[0] < b.ip.v4.addr[0]) && (a.ip.v4.addr[1] <= b.ip.v4.addr[1]));
         }
     };
 
     using Breakdown = BreakdownCounter<T, Algorithm>;
-    using PerOpStat = std::unordered_map<Session, Breakdown, Hash, Pred>;
+    using PerOpStat = std::map<Session, Breakdown, Less>;
     using Pair = typename PerOpStat::value_type;
 public:
     BreakdownAnalyzer(std::ostream& o = std::cout) : nfs3_proc_total{0},
@@ -352,11 +331,7 @@ public:
 
             std::stringstream session;
 
-            // sort statistics by sessions
-            using Map = std::multimap<Session, Breakdown, Less>;
-            Map ordered(nfs3_per_proc_stat.begin(), nfs3_per_proc_stat.end());
-
-             for(auto& it : ordered)
+             for(auto& it : nfs3_per_proc_stat)
              {
                  const Breakdown& current = it.second;
                  uint64_t s_total_proc {0};
@@ -379,7 +354,7 @@ public:
         for(int i = 0; i < ProcEnumNFS4::count; ++i)
         {
             if(i == ProcEnumNFS4::count_proc)
-                out << "NFS4 total operations: "
+                out << "NFSv4 total operations: "
                     << nfs4_ops_total
                     << ". Per operation:"
                     << std::endl;
@@ -404,11 +379,7 @@ public:
 
             std::stringstream session;
 
-            // sort statistics by sessions
-            using Map = std::multimap<Session, Breakdown, Less>;
-            Map ordered(nfs4_per_proc_stat.begin(), nfs4_per_proc_stat.end());
-
-            for(auto& it : ordered)
+            for(auto& it : nfs4_per_proc_stat)
             {
                 const Breakdown& current = it.second;
                 uint64_t s_total_proc {0};
