@@ -39,15 +39,15 @@ struct FilteredData
 {
     using Direction = NST::utils::Session::Direction;
 public:
-    NetworkSession* session{nullptr};   // pointer to immutable session in Filtration
+    NetworkSession* session{nullptr}; // pointer to immutable session in Filtration
     struct timeval  timestamp; // timestamp of last collected packet
     Direction       direction; // direction of data transmission
 
-    uint32_t    dlen{0};  // length of filtered data
-    uint8_t*    data{cache};  // pointer to data in memory. {Readonly. Always points to proper memory buffer}
+    uint32_t    dlen{0};     // length of filtered data
+    uint8_t*    data{cache}; // pointer to data in memory. {Readonly. Always points to proper memory buffer}
 
 private:
-    const static int CACHE_SIZE = 4000;
+    const static int CACHE_SIZE {4000};
     uint8_t     cache[CACHE_SIZE];
     uint8_t*    memory{nullptr};
     uint32_t    memsize{0};
@@ -75,10 +75,8 @@ public:
     // Resize capacity with data safety
     void resize(uint32_t newsize)
     {
-        if (capacity() >= newsize) // not resize less
-        {
-            return;
-        }
+        if (capacity() >= newsize) return; // not resize less
+
         if (nullptr == memory)
         {
             memory = new uint8_t[newsize];
@@ -104,7 +102,7 @@ public:
             }
             data = mem;
             delete[] memory;
-            memory = mem;
+            memory  = mem;
             memsize = newsize;
         }
     }

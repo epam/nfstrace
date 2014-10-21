@@ -32,8 +32,8 @@
 //------------------------------------------------------------------------------
 struct FH
 {
-    uint32_t len;
-    char data[rpcgen::NFS3_FHSIZE];
+    uint32_t len {};
+    char data[rpcgen::NFS3_FHSIZE] {};
 
     struct FH_Eq
     {
@@ -111,7 +111,7 @@ class OFWSAnalyzer : public IAnalyzer
     class OpCounter
     {
     public:
-        inline OpCounter() : total(0)
+        inline OpCounter() : total{0}
         {
             std::memset(counters, 0, sizeof(counters));
         }

@@ -57,16 +57,18 @@ struct PacketInfo
 
     public:
         Dumped() : flag{false}{};
-        Dumped(const Dumped& in)     = delete;
+        Dumped(const Dumped& in) = delete;
         ~Dumped(){};
 
     private:
-        inline operator bool() const { return flag; }
+        inline      operator bool() const { return flag; }
         inline void operator=(const bool stat) { flag = stat; }
         bool flag;
     };
 
-    inline PacketInfo(const pcap_pkthdr* h, const uint8_t* p, const uint32_t datalink)
+    inline PacketInfo(const pcap_pkthdr* h,
+                          const uint8_t* p,
+                          const uint32_t datalink)
     : header   {h}
     , packet   {p}
     , eth      {nullptr}
@@ -335,18 +337,18 @@ struct Packet: public PacketInfo
         fragment->packet = packet;
 
         // fix pointers from PacketInfo to point to owned copy of packet data
-        fragment->eth   = info.eth  ? (const ethernet::EthernetHeader*) (packet + ( ((const uint8_t*)info.eth ) - info.packet)) : nullptr;
-        fragment->ipv4  = info.ipv4 ? (const ip::IPv4Header*)           (packet + ( ((const uint8_t*)info.ipv4) - info.packet)) : nullptr;
-        fragment->ipv6  = info.ipv6 ? (const ip::IPv6Header*)           (packet + ( ((const uint8_t*)info.ipv6) - info.packet)) : nullptr;
-        fragment->tcp   = info.tcp  ? (const tcp::TCPHeader*)           (packet + ( ((const uint8_t*)info.tcp ) - info.packet)) : nullptr;
-        fragment->udp   = info.udp  ? (const udp::UDPHeader*)           (packet + ( ((const uint8_t*)info.udp ) - info.packet)) : nullptr;
+        fragment->eth  = info.eth  ? (const ethernet::EthernetHeader*) (packet + ( ((const uint8_t*)info.eth ) - info.packet)) : nullptr;
+        fragment->ipv4 = info.ipv4 ? (const ip::IPv4Header*)           (packet + ( ((const uint8_t*)info.ipv4) - info.packet)) : nullptr;
+        fragment->ipv6 = info.ipv6 ? (const ip::IPv6Header*)           (packet + ( ((const uint8_t*)info.ipv6) - info.packet)) : nullptr;
+        fragment->tcp  = info.tcp  ? (const tcp::TCPHeader*)           (packet + ( ((const uint8_t*)info.tcp ) - info.packet)) : nullptr;
+        fragment->udp  = info.udp  ? (const udp::UDPHeader*)           (packet + ( ((const uint8_t*)info.udp ) - info.packet)) : nullptr;
 
-        fragment->data  = packet + (info.data - info.packet);
-        fragment->dlen  = info.dlen;
+        fragment->data      = packet + (info.data - info.packet);
+        fragment->dlen      = info.dlen;
         fragment->direction = info.direction;
-        fragment->dumped = false;
+        fragment->dumped    = false;
 
-        fragment->next  = next;
+        fragment->next = next;
 
         return fragment;
     }

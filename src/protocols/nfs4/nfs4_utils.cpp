@@ -527,7 +527,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_modified_limit4& o
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_space_limit4& obj)
 {
-    out <<  "limit by: "        << obj.limitby;
+    out <<  "limit by: " << obj.limitby;
     switch(obj.limitby)
     {
     case rpcgen::limit_by4::NFS_LIMIT_SIZE:
@@ -581,7 +581,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::open_write_delegation4
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::open_delegation4& obj)
 {
-    out <<  "delegation type: "  << obj.delegation_type;
+    out <<  "delegation type: " << obj.delegation_type;
     switch(obj.delegation_type)
     {
     case rpcgen::open_delegation_type4::OPEN_DELEGATE_NONE:
@@ -600,7 +600,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::entry4& obj)
     out <<  "cookie: "     << obj.cookie
         << " name: "       << obj.name
         << " attributes: " << obj.attrs << '\n';
-    if(obj.nextentry) return out << " " << *obj.nextentry;
+    if(obj.nextentry) return out << ' ' << *obj.nextentry;
     else              return out;
 }
 

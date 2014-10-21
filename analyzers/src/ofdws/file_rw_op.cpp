@@ -21,8 +21,8 @@
 //------------------------------------------------------------------------------
 #include "file_rw_op.h"
 //------------------------------------------------------------------------------
-uint32_t FileRWOp::block_size = 0;
-uint32_t FileRWOp::bucket_size = 0;
+uint32_t FileRWOp::block_size  {0};
+uint32_t FileRWOp::bucket_size {0};
 
 FileRWOp::~FileRWOp()
 {

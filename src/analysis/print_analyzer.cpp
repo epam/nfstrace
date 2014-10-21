@@ -47,10 +47,10 @@ bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
     const int nfs_version = call.ru.RM_cmb.cb_vers;
     if(out_all())
     {
-        out << " XID: "         << call.rm_xid;
-        out << " RPC version: " << call.ru.RM_cmb.cb_rpcvers;
-        out << " RPC program: " << call.ru.RM_cmb.cb_prog;
-        out << " version: "     << nfs_version;
+        out << " XID: "         << call.rm_xid
+            << " RPC version: " << call.ru.RM_cmb.cb_rpcvers
+            << " RPC program: " << call.ru.RM_cmb.cb_prog
+            << " version: "     << nfs_version;
     }
     switch(nfs_version)
     {
@@ -184,10 +184,9 @@ void PrintAnalyzer::setattr3(const struct RPCProcedure*         proc,
 {
     if(!print_procedure(out, proc)) return;
 
-    if(args) out << "\tCALL  ["
-                 << " object: "         << args->object
-                 << " new attributes: " << args->new_attributes
-                 << " guard: "          << args->guard
+    if(args) out << "\tCALL  [ object: " << args->object
+                 << " new attributes: "  << args->new_attributes
+                 << " guard: "           << args->guard
                  << " ]\n";
     if(res)
     {
@@ -209,9 +208,7 @@ void PrintAnalyzer::lookup3(const struct RPCProcedure*        proc,
 {
     if(!print_procedure(out, proc)) return;
 
-    if(args) out << "\tCALL  ["
-                 << " what: " << args->what
-                 << " ]\n";
+    if(args) out << "\tCALL  [ what: " << args->what << " ]\n";
     if(res)
     {
         out << "\tREPLY [ status: " << res->status;
@@ -236,8 +233,7 @@ void PrintAnalyzer::access3(const struct RPCProcedure*        proc,
 
     if(args)
     {
-        out << "\tCALL  ["
-                 << " object: ";
+        out << "\tCALL  [ object: ";
         print_nfs_fh(out, args->object.data.data_val, args->object.data.data_len);
         out << " access: ";
         print_access3(out, args->access);
@@ -269,9 +265,7 @@ void PrintAnalyzer::readlink3(const struct RPCProcedure*          proc,
 {
     if(!print_procedure(out, proc)) return;
 
-    if(args) out << "\tCALL  ["
-                 << " symlink: " << args->symlink
-                 << " ]\n";
+    if(args) out << "\tCALL  [ symlink: " << args->symlink << " ]\n";
     if(res)
     {
         out << "\tREPLY [ status: " << res->status;
@@ -293,8 +287,7 @@ void PrintAnalyzer::read3(const struct RPCProcedure*      proc,
 {
     if(!print_procedure(out, proc)) return;
 
-    if(args) out << "\tCALL  ["
-                 << " file: "   << args->file
+    if(args) out << "\tCALL  [ file: " << args->file
                  << " offset: " << args->offset
                  << " count: "  << args->count
                  << " ]\n";
@@ -326,12 +319,11 @@ void PrintAnalyzer::write3(const struct RPCProcedure*       proc,
 
     if(args)
     {
-        out << "\tCALL  ["
-            << " file: "   << args->file
+        out << "\tCALL  [ file: " << args->file
             << " offset: " << args->offset
             << " count: "  << args->count
-            << " stable: " << args->stable;
-        out << " ]\n";
+            << " stable: " << args->stable
+            << " ]\n";
     }
     if(res)
     {
@@ -362,9 +354,8 @@ void PrintAnalyzer::create3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL  ["
-            << " where: " << args->where
-            << " how: "   << args->how
+        out << "\tCALL  [ where: " << args->where
+            << " how: " << args->how
             << " ]\n";
     if(res)
     {
@@ -389,9 +380,8 @@ void PrintAnalyzer::mkdir3(const struct RPCProcedure*       proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL  ["
-            << " where: "      << args->where
-            << " attributes: " << args->attributes
+        out << "\tCALL  [ where: " << args->where
+            << " attributes: "     << args->attributes
             << " ]\n";
     if(res)
     {
@@ -416,9 +406,8 @@ void PrintAnalyzer::symlink3(const struct RPCProcedure*         proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL  ["
-            << " where: "   << args->where
-            << " symlink: " << args->symlink
+        out << "\tCALL  [ where: " << args->where
+            << " symlink: "        << args->symlink
             << " ]\n";
     if(res)
     {
@@ -444,9 +433,8 @@ void PrintAnalyzer::mknod3(const struct RPCProcedure*       proc,
 
     if(args)
     {
-        out << "\tCALL  ["
-            << " where: " << args->where
-            << " what: "  << args->what
+        out << "\tCALL  [ where: " << args->where
+            << " what: "           << args->what
             << " ]\n";
     }
     if(res)
@@ -472,9 +460,7 @@ void PrintAnalyzer::remove3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL  ["
-            << " object: " << args->object
-            << " ]\n";
+        out << "\tCALL  [ object: " << args->object << " ]\n";
     if(res)
     {
         out << "\tREPLY [ status: " << res->status;
@@ -497,9 +483,7 @@ void PrintAnalyzer::rmdir3(const struct RPCProcedure*       proc,
 
     if(args)
     {
-        out << "\tCALL  ["
-            << " object: " << args->object
-            << " ]\n";
+        out << "\tCALL  [ object: " << args->object << " ]\n";
     }
     if(res)
     {
@@ -522,9 +506,8 @@ void PrintAnalyzer::rename3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL  ["
-            << " from: " << args->from
-            << " to: "   << args->to
+        out << "\tCALL  [ from: " << args->from
+            << " to: "            << args->to
             << " ]\n";
     if(res)
     {
@@ -549,9 +532,8 @@ void PrintAnalyzer::link3(const struct RPCProcedure*      proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL  ["
-            << " file: " << args->file
-            << " link: " << args->link
+        out << "\tCALL  [ file: " << args->file
+            << " link: "          << args->link
             << " ]\n";
     if(res)
     {
@@ -577,12 +559,11 @@ void PrintAnalyzer::readdir3(const struct RPCProcedure*         proc,
 
     if(args)
     {
-        out << "\tCALL  ["
-            << " dir: "        << args->dir
-            << " cookie: "     << args->cookie
+        out << "\tCALL  [ dir: " << args->dir
+            << " cookie: "       << args->cookie
             << " cookieverf: ";
         print_hex(out, args->cookieverf, rpcgen::NFS3_COOKIEVERFSIZE);
-        out << " count: "      << args->count
+        out << " count: " << args->count
             << " ]\n";
     }
     if(res)
@@ -614,13 +595,12 @@ void PrintAnalyzer::readdirplus3(const struct RPCProcedure*             proc,
 
     if(args)
     {
-        out << "\tCALL  ["
-            << " dir: "        << args->dir
-            << " cookie: "     << args->cookie
+        out << "\tCALL  [ dir: " << args->dir
+            << " cookie: "       << args->cookie
             << " cookieverf: ";
         print_hex(out, args->cookieverf, rpcgen::NFS3_COOKIEVERFSIZE);
-        out << " dir count: "  << args->dircount
-            << " max count: "  << args->maxcount
+        out << " dir count: " << args->dircount
+            << " max count: " << args->maxcount
             << " ]\n";
     }
     if(res)
@@ -651,9 +631,7 @@ void PrintAnalyzer::fsstat3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL  ["
-            << " fsroot: " << args->fsroot
-            << " ]\n";
+        out << "\tCALL  [ fsroot: " << args->fsroot << " ]\n";
     if(res)
     {
         out << "\tREPLY [ status: " << res->status;
@@ -682,9 +660,7 @@ void PrintAnalyzer::fsinfo3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL  ["
-            << " fsroot: " << args->fsroot
-            << " ]\n";
+        out << "\tCALL  [ fsroot: " << args->fsroot << " ]\n";
     if(res)
     {
         out << "\tREPLY [ status: " << res->status;
@@ -702,10 +678,14 @@ void PrintAnalyzer::fsinfo3(const struct RPCProcedure*        proc,
                     << " max file size: "  << res->FSINFO3res_u.resok.maxfilesize
                     << " time delta: "     << res->FSINFO3res_u.resok.time_delta
                     << " properties: "     << res->FSINFO3res_u.resok.properties
-                    << " LINK (filesystem supports hard links): "          << bool(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_LINK)
-                    << " SYMLINK (file system supports symbolic links): "  << bool(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_SYMLINK)
-                    << " HOMOGENEOUS (PATHCONF: is valid for all files): " << bool(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_HOMOGENEOUS)
-                    << " CANSETTIME (SETATTR can set time on server): "    << bool(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_CANSETTIME);
+                    << " LINK (filesystem supports hard links): "
+                    << static_cast<bool>(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_LINK)
+                    << " SYMLINK (file system supports symbolic links): "
+                    << static_cast<bool>(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_SYMLINK)
+                    << " HOMOGENEOUS (PATHCONF: is valid for all files): "
+                    << static_cast<bool>(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_HOMOGENEOUS)
+                    << " CANSETTIME (SETATTR can set time on server): "
+                    << static_cast<bool>(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_CANSETTIME);
             else
                 out << " obj attributes: " << res->FSINFO3res_u.resfail.obj_attributes;
         }
@@ -720,9 +700,7 @@ void PrintAnalyzer::pathconf3(const struct RPCProcedure*          proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL  ["
-            << " object: " << args->object
-            << " ]\n";
+        out << "\tCALL  [ object: " << args->object << " ]\n";
     if(res)
     {
         out << "\tREPLY [ status: " << res->status;
@@ -750,10 +728,9 @@ void PrintAnalyzer::commit3(const struct RPCProcedure*        proc,
     if(!print_procedure(out, proc)) return;
 
     if(args)
-        out << "\tCALL  ["
-            << " file: "   << args->file
-            << " offset: " << args->offset
-            << " count: "  << args->count
+        out << "\tCALL  [ file: " << args->file
+            << " offset: "        << args->offset
+            << " count: "         << args->count
             << " ]\n";
     if(res)
     {
@@ -802,10 +779,9 @@ void PrintAnalyzer::compound4(const struct RPCProcedure*          proc,
     if(args)
     {
         array_len = &args->argarray.argarray_len;
-        out << "\tCALL  ["
-            << " operations: " << *array_len
-            << " tag: " << args->tag
-            << " minor version: " << args->minorversion;
+        out << "\tCALL  [ operations: " << *array_len
+            << " tag: "                 << args->tag
+            << " minor version: "       << args->minorversion;
         if(*array_len)
         {
             rpcgen::nfs_argop4* current_el = args->argarray.argarray_val;
@@ -821,8 +797,7 @@ void PrintAnalyzer::compound4(const struct RPCProcedure*          proc,
     if(res)
     {
         array_len = &res->resarray.resarray_len;
-        out << "\tREPLY [ "
-            << " operations: " << *array_len;
+        out << "\tREPLY [  operations: " << *array_len;
         if(*array_len)
         {
             rpcgen::nfs_resop4* current_el = res->resarray.resarray_val;
@@ -842,7 +817,7 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::nfs_argop4* op)
     if(op)
     {
     out << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(op->argop))
-        << "(" << op->argop << ") [ ";
+        << '(' << op->argop << ") [ ";
         switch(op->argop)
         {
         case rpcgen::OP_ACCESS:              return nfs4_operation(&op->nfs_argop4_u.opaccess);
@@ -884,9 +859,9 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::nfs_argop4* op)
         case rpcgen::OP_RELEASE_LOCKOWNER:   return nfs4_operation(&op->nfs_argop4_u.oprelease_lockowner);
         case rpcgen::OP_GET_DIR_DELEGATION:  return nfs4_operation(&op->nfs_argop4_u.opget_dir_delegation);
         case rpcgen::OP_ILLEGAL:             break; /* no such operation in call procedure */
-        }//switch
+        }
     out << " ]";
-    }//if
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::nfs_resop4* op)
@@ -894,7 +869,7 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::nfs_resop4* op)
     if(op)
     {
     out << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(op->resop))
-        << "(" << op->resop << ") [ ";
+        << '(' << op->resop << ") [ ";
         switch(op->resop)
         {
         case rpcgen::OP_ACCESS:              return nfs4_operation(&op->nfs_resop4_u.opaccess);
@@ -936,9 +911,9 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::nfs_resop4* op)
         case rpcgen::OP_RELEASE_LOCKOWNER:   return nfs4_operation(&op->nfs_resop4_u.oprelease_lockowner);
         case rpcgen::OP_GET_DIR_DELEGATION:  return nfs4_operation(&op->nfs_resop4_u.opget_dir_delegation);
         case rpcgen::OP_ILLEGAL:             return nfs4_operation(&op->nfs_resop4_u.opillegal);
-        }//switch
+        }
     out << " ]";
-    }//if
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::ACCESS4args* args)
@@ -1180,10 +1155,10 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN4args* args)
 
     if(args) out <<  "seqid: " << std::hex << args->seqid << std::dec
                  << " share access: " << open4_share_access[args->share_access]
-                 << " share deny: "   << open4_share_deny[args->share_deny] << ' '
-                 <<  args->owner << ' '
-                 <<  args->openhow << ' '
-                 <<  args->claim;
+                 << " share deny: "   << open4_share_deny[args->share_deny]
+                 << ' ' << args->owner
+                 << ' ' << args->openhow
+                 << ' ' << args->claim;
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN4res*  res)
@@ -1194,9 +1169,9 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN4res*  res)
         if(out_all() && res->status == rpcgen::nfsstat4::NFS4_OK)
             out << res->OPEN4res_u.resok4.stateid
                 << res->OPEN4res_u.resok4.cinfo
-                << " results flags: " << std::hex << res->OPEN4res_u.resok4.rflags << ' '  << std::dec
-                << res->OPEN4res_u.resok4.attrset << ' '
-                << res->OPEN4res_u.resok4.delegation;
+                << " results flags: " << std::hex << res->OPEN4res_u.resok4.rflags << std::dec
+                << ' ' << res->OPEN4res_u.resok4.attrset
+                << ' ' << res->OPEN4res_u.resok4.delegation;
     }
 }
 
@@ -1212,8 +1187,8 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPENATTR4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN_CONFIRM4args* args)
 {
-    if(args) out << "open state id:" << args->open_stateid
-                 << " seqid: "     << std::hex << args->seqid << std::dec;
+    if(args) out <<  "open state id:" << args->open_stateid
+                 << " seqid: "        << std::hex << args->seqid << std::dec;
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN_CONFIRM4res*  res)
@@ -1361,16 +1336,16 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::SECINFO4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETATTR4args* args)
 {
-    if(args) out <<  "state id:" << args->stateid << ' '
-                 <<  args->obj_attributes;
+    if(args) out << "state id:" << args->stateid
+                         << ' ' << args->obj_attributes;
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETATTR4res*  res)
 {
     if(res)
     {
-        out <<  "status: " << res->status << ' ';
-        if(out_all())  out << res->attrsset;
+        out <<  "status: " << res->status;
+        if(out_all()) out << ' ' << res->attrsset;
     }
 }
 

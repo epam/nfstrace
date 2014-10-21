@@ -101,15 +101,15 @@ Log::Global::Global(const std::string& path)
                 "Can't create log directory."};
         }
     }
-    std::string tmp{log_path + "/" + path + ".log"};
-    FILE* file=nullptr;
+    std::string tmp{log_path + '/' + path + ".log"};
+    FILE* file {nullptr};
     try
     {
         file = try_open(tmp);
     }
     catch(std::system_error& err)
     {
-        tmp = log_path + "/" + path + "-" + get_pid() + ".log";
+        tmp = log_path + '/' + path + '-' + get_pid() + ".log";
         file = try_open(tmp);
     }
     if(utils::Out message{})

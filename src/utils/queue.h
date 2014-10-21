@@ -144,7 +144,7 @@ public:
 
     inline Element* pop_list() // take out list of all queued elements
     {
-        Element* list = nullptr;
+        Element* list {nullptr};
         if(last)
         {
             Spinlock::Lock lock{q_spinlock};

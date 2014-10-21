@@ -45,8 +45,8 @@ struct udp_header
 
 struct UDPHeader : private udp_header
 {
-    inline in_port_t sport()    const { return udp_sport; }
-    inline in_port_t dport()    const { return udp_dport; }
+    inline in_port_t sport()   const { return udp_sport; }
+    inline in_port_t dport()   const { return udp_dport; }
     inline uint16_t length()   const { return ntohs(udp_len);   }
     inline uint16_t checksum() const { return ntohs(udp_sum);   }
 } __attribute__ ((__packed__));

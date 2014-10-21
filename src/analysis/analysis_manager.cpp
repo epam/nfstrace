@@ -27,8 +27,8 @@ namespace analysis
 {
 
 AnalysisManager::AnalysisManager(RunningStatus& status, const Parameters& params)
-                                 : analysiss{nullptr}
-                                 , queue{nullptr}
+                                 : analysiss    {nullptr}
+                                 , queue        {nullptr}
                                  , parser_thread{nullptr}
 {
     analysiss.reset(new Analyzers(params));

@@ -104,7 +104,7 @@ std::ostream& operator<<(std::ostream& out, const Dumping::Params& params)
 {
     out << "Dump packets to file: " << params.output_file << '\n'
         << "  file rotation size: " << params.size_limit << " bytes\n"
-        << "  file rotation command: [" << params.command << "]";
+        << "  file rotation command: [" << params.command << ']';
     return out;
 }
 
