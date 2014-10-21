@@ -206,38 +206,17 @@ template
 >
 class BreakdownAnalyzer : public IAnalyzer
 {
-    struct Hash
-    {
-        std::size_t operator() (const Session& s) const
-        {
-            return s.port[0] + s.port[1] + s.ip.v4.addr[0] + s.ip.v4.addr[1];
-        }
-    };
-
-    struct Pred
-    {
-        bool operator() (const Session& a, const Session& b) const
-        {
-            return (a.port[0] == b.port[0]) &&
-                    (a.port[1] == b.port[1]) &&
-                    (a.ip.v4.addr[0] == b.ip.v4.addr[0]) &&
-                    (a.ip.v4.addr[1] == b.ip.v4.addr[1]);
-        }
-    };
-    
     struct Less
     {
         bool operator() (const Session& a, const Session& b) const
         {
-            return (a.port[0] < b.port[0]) &&
-                    (a.port[1] < b.port[1]) &&
-                    (a.ip.v4.addr[0] < b.ip.v4.addr[0]) &&
-                    (a.ip.v4.addr[1] < b.ip.v4.addr[1]);
+            return ((a.port[0] < b.port[0]) && (a.port[1] <= b.port[1])) ||
+                   ((a.ip.v4.addr[0] < b.ip.v4.addr[0]) && (a.ip.v4.addr[1] <= b.ip.v4.addr[1]));
         }
     };
 
     using Breakdown = BreakdownCounter<T, Algorithm>;
-    using PerOpStat = std::unordered_map<Session, Breakdown, Hash, Pred>;
+    using PerOpStat = std::map<Session, Breakdown, Less>;
     using Pair = typename PerOpStat::value_type;
 public:
     BreakdownAnalyzer(std::ostream& o = std::cout) : nfs3_proc_total{0},
@@ -324,25 +303,26 @@ public:
 
     virtual void flush_statistics()
     {
-         out << "###  Breakdown analyzer  ###" << std::endl;
-         out << "NFSv3 total procedures: " << nfs3_proc_total << ". Per procedure:" << std::endl;
+         out << "###  Breakdown analyzer  ###"
+             << std::endl
+             << "NFSv3 total procedures: "
+             << nfs3_proc_total
+             << ". Per procedure:"
+             << std::endl;
          for(int i = 0; i < ProcEnumNFS3::count ; ++i)
          {
               out.width(12);
-              out << std::left << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
+              out << std::left
+                  << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
               out.width(5);
-              out << std::right << nfs3_proc_count[i];
+              out << std::right
+                  << nfs3_proc_count[i];
               out.width(7);
-              if(nfs3_proc_total)
-              {
-                  out.setf(std::ios::fixed, std::ios::floatfield);
-                  out.precision(2);
-                  out << (static_cast<double>(nfs3_proc_count[i]) / static_cast<double>(nfs3_proc_total)) * 100.0;
-                  out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
-              }
-              else
-                  out << 0;
-              out << "%" << std::endl;
+              out.setf(std::ios::fixed, std::ios::floatfield);
+              out.precision(2);
+              out << (nfs3_proc_total ? ((static_cast<double>(nfs3_proc_count[i]) / static_cast<double>(nfs3_proc_total)) * 100.0) : 0);
+              out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
+              out << '%' << std::endl;
          }
 
          if(nfs3_per_proc_stat.size())  // is not empty?
@@ -351,11 +331,7 @@ public:
 
             std::stringstream session;
 
-            // sort statistics by sessions
-            using Map = std::multimap<Session, Breakdown, Less>;
-            Map ordered(nfs3_per_proc_stat.begin(), nfs3_per_proc_stat.end());
-
-             for(auto& it : ordered)
+             for(auto& it : nfs3_per_proc_stat)
              {
                  const Breakdown& current = it.second;
                  uint64_t s_total_proc {0};
@@ -371,31 +347,30 @@ public:
              }
          }
 
-        out << "\nNFSv4 total procedures: " << nfs4_proc_total
-            << ". Per procedure:"           << std::endl;
+        out << "\nNFSv4 total procedures: "
+            << nfs4_proc_total
+            << ". Per procedure:"
+            << std::endl;
         for(int i = 0; i < ProcEnumNFS4::count; ++i)
         {
             if(i == ProcEnumNFS4::count_proc)
-                out << "NFS4 total operations: " << nfs4_ops_total
-                    << ". Per operation:"     << std::endl;
+                out << "NFSv4 total operations: "
+                    << nfs4_ops_total
+                    << ". Per operation:"
+                    << std::endl;
             out.width(22);
             out << std::left << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i));
             out.width(5);
             out << std::right << nfs4_proc_count[i];
             out.width(7);
-            if(nfs4_proc_total)
-            {
-                out.setf(std::ios::fixed, std::ios::floatfield);
-                out.precision(2);
-                if(i>=ProcEnumNFS4::count_proc)
-                    out << (nfs4_ops_total ? ((static_cast<double>(nfs4_proc_count[i]) / static_cast<double>(nfs4_ops_total)) * 100.0): 0);
-                else
-                    out << (static_cast<double>(nfs4_proc_count[i]) / static_cast<double>(nfs4_proc_total)) * 100.0;
-                out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
-            }
+            out.setf(std::ios::fixed, std::ios::floatfield);
+            out.precision(2);
+            if(i>=ProcEnumNFS4::count_proc)
+                out << (nfs4_ops_total ? ((static_cast<double>(nfs4_proc_count[i]) / static_cast<double>(nfs4_ops_total)) * 100.0) : 0);
             else
-                out << 0;
-            out << "%" << std::endl;
+                out << (nfs4_proc_total ? ((static_cast<double>(nfs4_proc_count[i]) / static_cast<double>(nfs4_proc_total)) * 100.0) : 0);
+            out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
+            out << '%' << std::endl;
         }
 
         if(nfs4_per_proc_stat.size())  // is not empty?
@@ -404,11 +379,7 @@ public:
 
             std::stringstream session;
 
-            // sort statistics by sessions
-            using Map = std::multimap<Session, Breakdown, Less>;
-            Map ordered(nfs4_per_proc_stat.begin(), nfs4_per_proc_stat.end());
-
-            for(auto& it : ordered)
+            for(auto& it : nfs4_per_proc_stat)
             {
                 const Breakdown& current = it.second;
                 uint64_t s_total_proc {0};
@@ -426,7 +397,12 @@ public:
         }
     }
 
-    void store_per_session(std::ostream& file, const Breakdown& breakdown, const std::string& session, uint64_t s_total_proc, uint64_t s_total_ops, unsigned int nfs_vers) const
+    void store_per_session(std::ostream& file,
+                           const Breakdown& breakdown,
+                           const std::string& session,
+                           uint64_t s_total_proc,
+                           uint64_t s_total_ops,
+                           unsigned int nfs_vers) const
     {
         file << "Session: " << session << std::endl;
 
@@ -438,22 +414,27 @@ public:
         for(unsigned i = 0; i < op_count; ++i)
         {
             if(nfs_vers == NFS_V3)
-                file << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i)) << ' ';
+                file << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
             if(nfs_vers == NFS_V4)
-                file << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i)) << ' ';
-            file << breakdown[i].get_count() << ' ';
+                file << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i));
+            file << ' ' << breakdown[i].get_count() << ' ';
             if(nfs_vers == NFS_V4 && i>=ProcEnumNFS4::count_proc)
-                file << ((T)(breakdown[i].get_count()) / s_total_ops) * 100 << ' ';
+                file << (s_total_ops ? (((T)(breakdown[i].get_count()) / s_total_ops) * 100) : 0);
             else
-                file << ((T)(breakdown[i].get_count()) / s_total_proc) * 100 << ' ';
-            file << to_sec<T>(breakdown[i].get_min()) << ' ';
-            file << to_sec<T>(breakdown[i].get_max()) << ' ';
-            file << breakdown[i].get_avg() << ' ';
-            file << breakdown[i].get_st_dev() << std::endl;
+                file << (s_total_proc ? (((T)(breakdown[i].get_count()) / s_total_proc) * 100) : 0);
+            file << ' ' << to_sec<T>(breakdown[i].get_min())
+                 << ' ' << to_sec<T>(breakdown[i].get_max())
+                 << ' ' << breakdown[i].get_avg()
+                 << ' ' << breakdown[i].get_st_dev()
+                 << std::endl;
         }
     }
 
-    void print_per_session(const Breakdown& breakdown, const std::string& session, uint64_t s_total_proc, uint64_t s_total_ops, unsigned int nfs_vers) const
+    void print_per_session(const Breakdown& breakdown,
+                           const std::string& session,
+                           uint64_t s_total_proc,
+                           uint64_t s_total_ops,
+                           unsigned int nfs_vers) const
     {
         out << "Session: " << session << std::endl;
 
@@ -467,41 +448,53 @@ public:
         for(unsigned i = 0; i < op_count; ++i)
         {
             if(nfs_vers == NFS_V4 && i == ProcEnumNFS4::count_proc)
-                out << "Total operations: " << s_total_ops
-                    << ". Per operation:"     << std::endl;
+                out << "Total operations: "
+                    << s_total_ops
+                    << ". Per operation:"
+                    << std::endl;
             out.width(22);
             if(nfs_vers == NFS_V3)
-                out << std::left << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
+                out << std::left
+                    << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
             if(nfs_vers == NFS_V4)
-                out << std::left << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i));
+                out << std::left
+                    << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i));
             out.width(6);
             out << " Count:";
             out.width(5);
-            out << std::right << breakdown[i].get_count();
-            out << " ";
+            out << std::right
+                << breakdown[i].get_count()
+                << ' ';
             out.precision(2);
-            out << "(";
+            out << '(';
             out.width(6);
             if(nfs_vers == NFS_V4 && i>=ProcEnumNFS4::count_proc)
-                out << std::fixed << (s_total_ops ? (((T)(breakdown[i].get_count()) / s_total_ops) * 100) : 0 );
+                out << std::fixed
+                    << (s_total_ops ? (((T)(breakdown[i].get_count()) / s_total_ops) * 100) : 0);
             else
-                out << std::fixed << (s_total_proc ? (((T)(breakdown[i].get_count()) / s_total_proc) * 100) : 0 );
-            out << "%)";
-            out << " Min: ";
+                out << std::fixed
+                    << (s_total_proc ? (((T)(breakdown[i].get_count()) / s_total_proc) * 100) : 0);
+            out << "%) Min: ";
             out.precision(3);
-            out << std::fixed << to_sec<T>(breakdown[i].get_min());
-            out << " Max: ";
-            out << std::fixed << to_sec<T>(breakdown[i].get_max());
-            out << " Avg: ";
-            out << std::fixed << breakdown[i].get_avg();
+            out << std::fixed
+                << to_sec<T>(breakdown[i].get_min())
+                << " Max: "
+                << std::fixed
+                << to_sec<T>(breakdown[i].get_max())
+                << " Avg: "
+                << std::fixed
+                << breakdown[i].get_avg();
             out.precision(8);
-            out << " StDev: ";
-            out << std::fixed << breakdown[i].get_st_dev() << std::endl;
+            out << " StDev: "
+                << std::fixed
+                << breakdown[i].get_st_dev()
+                << std::endl;
         }
     }
 
 private:
-    void account(const struct RPCProcedure* proc, const struct rpcgen::COMPOUND4res* res = nullptr)
+    void account(const struct RPCProcedure* proc,
+                 const struct rpcgen::COMPOUND4res* res = nullptr)
     {
         typename PerOpStat::iterator i;
         const u_int nfs_proc = proc->rpc_call.ru.RM_cmb.cb_proc;
