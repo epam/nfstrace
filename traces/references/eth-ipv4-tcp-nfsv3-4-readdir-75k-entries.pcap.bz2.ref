@@ -75,7 +75,7 @@ COMMIT                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 St
 NFSv4 total procedures: 4679. Per procedure:
 NULL                      1   0.02%
 COMPOUND               4678  99.98%
-NFS4 total operations: 9369. Per operation:
+NFSv4 total operations: 9369. Per operation:
 ILLEGAL                   0   0.00%
 ACCESS                    8   0.09%
 CLOSE                     0   0.00%
