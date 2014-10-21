@@ -26,7 +26,10 @@
 
 #include "ofdws_analyzer.h"
 //------------------------------------------------------------------------------
-OFDWSAnalyzer::OFDWSAnalyzer(int32_t bl_size, int32_t bu_size) : read_total(0), write_total(0), out(std::cout)
+OFDWSAnalyzer::OFDWSAnalyzer(int32_t bl_size,
+                             int32_t bu_size) : read_total{0},
+                                               write_total{0},
+                                                       out{std::cout}
 {
     FileRWOp::set_block_size(bl_size * 1024);
     FileRWOp::set_bucket_size(bu_size);
@@ -109,9 +112,9 @@ void OFDWSAnalyzer::print_rw_records(std::ostream& out, const FileRWOp& file_rw_
 
 void OFDWSAnalyzer::print_data_usage(std::ostream& out) const
 {
-    uint64_t once = 0;
-    uint64_t mult = 0; // mult = multiple
-    uint32_t used = 0;
+    uint64_t once {0};
+    uint64_t mult {0}; // mult = multiple
+    uint32_t used {0};
     ConstIterator i = ofdws_stat.begin();
     ConstIterator i_end = ofdws_stat.end();
     for(; i != i_end; ++i)
@@ -135,7 +138,7 @@ void OFDWSAnalyzer::print_data_usage(std::ostream& out) const
         }
     }
     out.precision(2);
-    out << std::fixed << float(once)/(once + mult) * 100 << "%" << std::endl;
+    out << std::fixed << float(once)/(once + mult) * 100 << '%' << std::endl;
 }
 
 void OFDWSAnalyzer::print_file_ranked(std::ostream& out) const
@@ -186,7 +189,7 @@ IAnalyzer* create(const char* optarg)
         NULL
     };
 
-    char* value = NULL;
+    char* value {NULL};
     int32_t bucket_size = g_def_bu_size;
     int32_t block_size = g_def_bl_size;
     while (*optarg != '\0')

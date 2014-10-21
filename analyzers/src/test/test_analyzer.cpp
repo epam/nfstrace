@@ -29,7 +29,7 @@ class TestAnalyzer : public IAnalyzer
 public:
     TestAnalyzer(const char* opts):options(opts)
     {
-        std::cout << "TestAnalyzer::TestAnalyzer(" << options << ")" << std::endl;
+        std::cout << "TestAnalyzer::TestAnalyzer(" << options << ')' << std::endl;
     }
 
     ~TestAnalyzer()

@@ -41,10 +41,10 @@ using ProcEnumNFS4 = API::ProcEnumNFS4;
 
 using Validator = rpc::RPCProgramValidator
                 <
-                    100003,                   // SunRPC/NFS program
-                    4,                        // v4
-                    ProcEnumNFS4::NFS_NULL,   // NFSPROC4RPCGEN_NULL     (0)
-                    ProcEnumNFS4::COMPOUND    // NFSPROC4RPCGEN_COMPOUND (1)
+                    100003,                 // SunRPC/NFS program
+                    4,                      // v4
+                    ProcEnumNFS4::NFS_NULL, // NFSPROC4RPCGEN_NULL     (0)
+                    ProcEnumNFS4::COMPOUND  // NFSPROC4RPCGEN_COMPOUND (1)
                 >;
 
 // Procedure 0: NULL - Do nothing

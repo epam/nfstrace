@@ -32,7 +32,7 @@ const unsigned int SayHello::BAD_COFFEE = 0xBADC0FFE;
 namespace hello
 {
 
-SayHello::SayHello() : text("Hello, World!"), value(0)
+SayHello::SayHello() : text{"Hello, World!"}, value{0}
 {
 }
 SayHello::~SayHello()

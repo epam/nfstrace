@@ -39,13 +39,13 @@ class BlockAllocator
 public:
 
     BlockAllocator() noexcept
-    : chunk{0}
-    , block{0}
-    , limit{0}
-    , nfree{0}
+    : chunk    {0}
+    , block    {0}
+    , limit    {0}
+    , nfree    {0}
     , allocated{0}
     , blocks{nullptr}
-    , list{nullptr}
+    , list  {nullptr}
     {
     }
 
@@ -58,7 +58,9 @@ public:
         delete[] blocks;
     }
 
-    void init_allocation(std::size_t chunk_size, std::size_t block_size, std::size_t block_limit)
+    void init_allocation(std::size_t chunk_size,
+                         std::size_t block_size,
+                         std::size_t block_limit)
     {
         chunk = chunk_size;
         block = block_size;

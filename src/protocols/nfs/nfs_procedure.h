@@ -38,8 +38,8 @@ using namespace NFS4;
 
 template
 <
-    typename ArgType,   // structure of RPC procedure parameters
-    typename ResType    // structure of RPC procedure results
+    typename ArgType, // structure of RPC procedure parameters
+    typename ResType  // structure of RPC procedure results
 >
 class NFSProcedure: public NST::API::RPCProcedure
 {

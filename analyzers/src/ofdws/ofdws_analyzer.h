@@ -27,12 +27,12 @@
 
 #include "file_rw_op.h"
 //------------------------------------------------------------------------------
-static const int32_t g_def_bl_size = 8; // [KB]
-static const int32_t g_def_bu_size = 16;
+static const int32_t g_def_bl_size {8}; // [KB]
+static const int32_t g_def_bu_size {16};
 
 struct FH
 {
-    uint32_t len;
+    uint32_t len {};
     char data[rpcgen::NFS3_FHSIZE];
 
     struct FH_Eq
@@ -123,7 +123,8 @@ class OFDWSAnalyzer : public IAnalyzer
     } const_iterator_comp;
 
 public:
-    OFDWSAnalyzer(int32_t bl_size, int32_t bu_size);
+    OFDWSAnalyzer(int32_t bl_size,
+                  int32_t bu_size);
     virtual ~OFDWSAnalyzer();
 
     void read3(const struct RPCProcedure* proc,
@@ -139,7 +140,8 @@ private:
     Iterator get_file_rw_op(const rpcgen::nfs_fh3& key);
     void print_file_ranked(std::ostream& out) const;
     void print_data_usage(std::ostream& out) const;
-    void print_rw_records(std::ostream& out, const FileRWOp& file_rw_op) const;
+    void print_rw_records(std::ostream& out,
+                        const FileRWOp& file_rw_op) const;
     void store_files_rw_records() const;
 
     OFDWS ofdws_stat;

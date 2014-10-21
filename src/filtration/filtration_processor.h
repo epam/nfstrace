@@ -53,9 +53,9 @@ using namespace NST::protocols::rpc;
  *  uint32_t: Message XID (Call or Reply)
  */
 typedef std::unordered_set<uint32_t> MessageSet;
-typedef MessageSet::const_iterator  ConstIterator;
-typedef MessageSet::iterator        Iterator;
-typedef MessageSet::value_type      Pair;
+typedef MessageSet::const_iterator   ConstIterator;
+typedef MessageSet::iterator         Iterator;
+typedef MessageSet::value_type       Pair;
 
 // Represents UDP datagrams interchange between node A and node B
 template <typename Writer>
@@ -74,7 +74,7 @@ public:
     void collect(PacketInfo& info)
     {
         // TODO: this code must be generalized with RPCFiltrator class
-        uint32_t hdr_len = 0;
+        uint32_t hdr_len {0};
         auto msg = reinterpret_cast<const MessageHeader*const>(info.data);
         switch(msg->type())
         {
@@ -164,7 +164,7 @@ public:
 
         friend class TCPSession<StreamReader>;
 
-        Flow() : fragments(NULL), sequence(0)
+        Flow() : fragments{NULL}, sequence{0}
         {
         }
         ~Flow()
@@ -270,7 +270,7 @@ public:
             Packet* current = fragments;
             if( current )
             {
-                Packet* prev = NULL;
+                Packet* prev {NULL};
                 uint32_t lowest_seq = current->tcp->seq();
                 while( current )
                 {
@@ -671,9 +671,9 @@ public:
     }
 
 private:
-    uint32_t    nfs3_rw_hdr_max=512; // limit for NFSv3 to truncate WRITE call and READ reply messages
-    uint32_t    msg_len;  // length of current RPC message + RM
-    uint32_t    hdr_len;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
+    uint32_t nfs3_rw_hdr_max {512}; // limit for NFSv3 to truncate WRITE call and READ reply messages
+    uint32_t msg_len;  // length of current RPC message + RM
+    uint32_t hdr_len;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
 
     typename Writer::Collection collection;// storage for collection packet data
     MessageSet nfs3_read_match;

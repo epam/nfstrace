@@ -33,7 +33,7 @@ public:
     class RWTime
     {
     public:
-        RWTime() : read_freq(0), write_freq(0) {}
+        RWTime() : read_freq{0}, write_freq{0} {}
 
         inline void inc_read_freq(uint32_t count = 1)  { read_freq += count; }
         inline void inc_write_freq(uint32_t count = 1) { write_freq += count; }
@@ -55,10 +55,13 @@ public:
     typedef BucketTable::value_type Pair;
     typedef std::pair<Iterator, bool> Inserted;
 
-    inline FileRWOp() : read_total(0), write_total(0) {}
+    inline FileRWOp() : read_total{0}, write_total{0} {}
     ~FileRWOp();
 
-    void calculate(ProcEnumNFS3::NFSProcedure op, uint64_t offset, uint32_t count, uint32_t time = 0);
+    void calculate(ProcEnumNFS3::NFSProcedure op,
+                                     uint64_t offset,
+                                     uint32_t count,
+                                     uint32_t time = 0);
 
     inline uint64_t get_read_total()   { return read_total;  }
     inline uint64_t get_write_total()  { return write_total; }

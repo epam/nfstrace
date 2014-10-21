@@ -159,7 +159,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime3& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::fattr3& obj)
 {
-    out << " type: "   << obj.type
+    out << " type: " << obj.type
         << " mode: ";
 
     print_mode3(out,obj.mode);
