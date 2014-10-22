@@ -84,10 +84,7 @@ public:
             memory = new uint8_t[newsize];
             if (0 < dlen)
             {
-                if(dlen <= CACHE_SIZE)
-                    memcpy(memory, cache, dlen);
-                else
-                    memcpy(memory, cache, CACHE_SIZE);
+                memcpy(memory, cache, dlen);
             }
             memsize = newsize;
             data = memory;
@@ -97,10 +94,7 @@ public:
             uint8_t* mem = new uint8_t[newsize];
             if (0 < dlen)
             {
-                if(dlen <= capacity())
-                    memcpy(mem, memory, dlen);
-                else
-                    memcpy(mem, memory, capacity());
+                memcpy(mem, memory, dlen);
             }
             data = mem;
             delete[] memory;
