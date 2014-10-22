@@ -82,7 +82,7 @@ public:
         if (nullptr == memory)
         {
             memory = new uint8_t[newsize];
-            if (0 < dlen)
+            if (dlen)
             {
                 memcpy(memory, cache, dlen);
             }
@@ -92,7 +92,7 @@ public:
         else // have some filled memory
         {
             uint8_t* mem = new uint8_t[newsize];
-            if (0 < dlen)
+            if (dlen)
             {
                 memcpy(mem, memory, dlen);
             }
