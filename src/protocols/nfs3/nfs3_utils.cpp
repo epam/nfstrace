@@ -93,35 +93,64 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::nfsstat3& obj)
 {
     switch(obj)
     {
-    case rpcgen::nfsstat3::NFS3_OK:             return out << "OK";
-    case rpcgen::nfsstat3::NFS3ERR_PERM:        return out << "ERR_PERM";
-    case rpcgen::nfsstat3::NFS3ERR_NOENT:       return out << "ERR_NOENT";
-    case rpcgen::nfsstat3::NFS3ERR_IO:          return out << "ERR_IO";
-    case rpcgen::nfsstat3::NFS3ERR_NXIO:        return out << "ERR_NXIO";
-    case rpcgen::nfsstat3::NFS3ERR_ACCES:       return out << "ERR_ACCES";
-    case rpcgen::nfsstat3::NFS3ERR_EXIST:       return out << "ERR_EXIST";
-    case rpcgen::nfsstat3::NFS3ERR_XDEV:        return out << "ERR_XDEV";
-    case rpcgen::nfsstat3::NFS3ERR_NODEV:       return out << "ERR_NODEV";
-    case rpcgen::nfsstat3::NFS3ERR_NOTDIR:      return out << "ERR_NOTDIR";
-    case rpcgen::nfsstat3::NFS3ERR_ISDIR:       return out << "ERR_ISDIR";
-    case rpcgen::nfsstat3::NFS3ERR_INVAL:       return out << "ERR_INVAL";
-    case rpcgen::nfsstat3::NFS3ERR_FBIG:        return out << "ERR_FBIG";
-    case rpcgen::nfsstat3::NFS3ERR_NOSPC:       return out << "ERR_NOSPC";
-    case rpcgen::nfsstat3::NFS3ERR_ROFS:        return out << "ERR_ROFS";
-    case rpcgen::nfsstat3::NFS3ERR_MLINK:       return out << "ERR_MLINK";
-    case rpcgen::nfsstat3::NFS3ERR_NAMETOOLONG: return out << "ERR_NAMETOOLONG";
-    case rpcgen::nfsstat3::NFS3ERR_NOTEMPTY:    return out << "ERR_NOTEMPTY";
-    case rpcgen::nfsstat3::NFS3ERR_DQUOT:       return out << "ERR_DQUOT";
-    case rpcgen::nfsstat3::NFS3ERR_STALE:       return out << "ERR_STALE";
-    case rpcgen::nfsstat3::NFS3ERR_REMOTE:      return out << "ERR_REMOTE";
-    case rpcgen::nfsstat3::NFS3ERR_BADHANDLE:   return out << "ERR_BADHANDLE";
-    case rpcgen::nfsstat3::NFS3ERR_NOT_SYNC:    return out << "ERR_NOT_SYNC";
-    case rpcgen::nfsstat3::NFS3ERR_BAD_COOKIE:  return out << "ERR_BAD_COOKIE";
-    case rpcgen::nfsstat3::NFS3ERR_NOTSUPP:     return out << "ERR_NOTSUPP";
-    case rpcgen::nfsstat3::NFS3ERR_TOOSMALL:    return out << "ERR_TOOSMALL";
-    case rpcgen::nfsstat3::NFS3ERR_SERVERFAULT: return out << "ERR_SERVERFAULT";
-    case rpcgen::nfsstat3::NFS3ERR_BADTYPE:     return out << "ERR_BADTYPE";
-    case rpcgen::nfsstat3::NFS3ERR_JUKEBOX:     return out << "ERR_JUKEBOX";
+    case rpcgen::nfsstat3::NFS3_OK:
+        return out << "OK";
+    case rpcgen::nfsstat3::NFS3ERR_PERM:
+        return out << "ERR_PERM";
+    case rpcgen::nfsstat3::NFS3ERR_NOENT:
+        return out << "ERR_NOENT";
+    case rpcgen::nfsstat3::NFS3ERR_IO:
+        return out << "ERR_IO";
+    case rpcgen::nfsstat3::NFS3ERR_NXIO:
+        return out << "ERR_NXIO";
+    case rpcgen::nfsstat3::NFS3ERR_ACCES:
+        return out << "ERR_ACCES";
+    case rpcgen::nfsstat3::NFS3ERR_EXIST:
+        return out << "ERR_EXIST";
+    case rpcgen::nfsstat3::NFS3ERR_XDEV:
+        return out << "ERR_XDEV";
+    case rpcgen::nfsstat3::NFS3ERR_NODEV:
+        return out << "ERR_NODEV";
+    case rpcgen::nfsstat3::NFS3ERR_NOTDIR:
+        return out << "ERR_NOTDIR";
+    case rpcgen::nfsstat3::NFS3ERR_ISDIR:
+        return out << "ERR_ISDIR";
+    case rpcgen::nfsstat3::NFS3ERR_INVAL:
+        return out << "ERR_INVAL";
+    case rpcgen::nfsstat3::NFS3ERR_FBIG:
+        return out << "ERR_FBIG";
+    case rpcgen::nfsstat3::NFS3ERR_NOSPC:
+        return out << "ERR_NOSPC";
+    case rpcgen::nfsstat3::NFS3ERR_ROFS:
+        return out << "ERR_ROFS";
+    case rpcgen::nfsstat3::NFS3ERR_MLINK:
+        return out << "ERR_MLINK";
+    case rpcgen::nfsstat3::NFS3ERR_NAMETOOLONG:
+        return out << "ERR_NAMETOOLONG";
+    case rpcgen::nfsstat3::NFS3ERR_NOTEMPTY:
+        return out << "ERR_NOTEMPTY";
+    case rpcgen::nfsstat3::NFS3ERR_DQUOT:
+        return out << "ERR_DQUOT";
+    case rpcgen::nfsstat3::NFS3ERR_STALE:
+        return out << "ERR_STALE";
+    case rpcgen::nfsstat3::NFS3ERR_REMOTE:
+        return out << "ERR_REMOTE";
+    case rpcgen::nfsstat3::NFS3ERR_BADHANDLE:
+        return out << "ERR_BADHANDLE";
+    case rpcgen::nfsstat3::NFS3ERR_NOT_SYNC:
+        return out << "ERR_NOT_SYNC";
+    case rpcgen::nfsstat3::NFS3ERR_BAD_COOKIE:
+        return out << "ERR_BAD_COOKIE";
+    case rpcgen::nfsstat3::NFS3ERR_NOTSUPP:
+        return out << "ERR_NOTSUPP";
+    case rpcgen::nfsstat3::NFS3ERR_TOOSMALL:
+        return out << "ERR_TOOSMALL";
+    case rpcgen::nfsstat3::NFS3ERR_SERVERFAULT:
+        return out << "ERR_SERVERFAULT";
+    case rpcgen::nfsstat3::NFS3ERR_BADTYPE:
+        return out << "ERR_BADTYPE";
+    case rpcgen::nfsstat3::NFS3ERR_JUKEBOX:
+        return out << "ERR_JUKEBOX";
     }
     return out;
 }
@@ -143,7 +172,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::ftype3& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::specdata3& obj)
 {
-    return out << " specdata1: " << obj.specdata1 << " specdata2: " << obj.specdata2;
+    return out << " specdata1: " << obj.specdata1
+               << " specdata2: " << obj.specdata2;
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_fh3& obj)
@@ -154,7 +184,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_fh3& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime3& obj)
 {
-    return out << "seconds: " << obj.seconds << " nseconds: " << obj.nseconds << ' ';
+    return out << "seconds: "   << obj.seconds
+               << " nseconds: " << obj.nseconds << ' ';
 }
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::fattr3& obj)
@@ -204,7 +235,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::wcc_data& obj)
 
 std::ostream& operator<<(std::ostream& out, const rpcgen::post_op_fh3& obj)
 {
-    if(obj.handle_follows) return out << " handle: " << obj.post_op_fh3_u.handle;
+    if(obj.handle_follows) return out << " handle: "
+                                      << obj.post_op_fh3_u.handle;
     else                   return out << " void ";
 }
 
@@ -212,9 +244,12 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::time_how& obj)
 {
     switch(obj)
     {
-    case rpcgen::time_how::DONT_CHANGE:        return out << "DONT_CHANGE";
-    case rpcgen::time_how::SET_TO_SERVER_TIME: return out << "SET_TO_SERVER_TIME";
-    case rpcgen::time_how::SET_TO_CLIENT_TIME: return out << "SET_TO_CLIENT_TIME";
+    case rpcgen::time_how::DONT_CHANGE:
+        return out << "DONT_CHANGE";
+    case rpcgen::time_how::SET_TO_SERVER_TIME:
+        return out << "SET_TO_SERVER_TIME";
+    case rpcgen::time_how::SET_TO_CLIENT_TIME:
+        return out << "SET_TO_CLIENT_TIME";
     }
     return out;
 }
@@ -268,8 +303,10 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::sattr3& obj)
     if(obj.uid.set_it)   out << " uid: "   << obj.uid.set_uid3_u.uid;
     if(obj.gid.set_it)   out << " gid: "   << obj.gid.set_gid3_u.gid;
     if(obj.size.set_it)  out << " size: "  << obj.size.set_size3_u.size;
-    if(obj.atime.set_it == rpcgen::time_how::SET_TO_CLIENT_TIME) out << " atime: " << obj.atime.set_atime_u.atime;
-    if(obj.mtime.set_it == rpcgen::time_how::SET_TO_CLIENT_TIME) out << " atime: " << obj.mtime.set_mtime_u.mtime;
+    if(obj.atime.set_it == rpcgen::time_how::SET_TO_CLIENT_TIME)
+        out << " atime: " << obj.atime.set_atime_u.atime;
+    if(obj.mtime.set_it == rpcgen::time_how::SET_TO_CLIENT_TIME)
+        out << " atime: " << obj.mtime.set_mtime_u.mtime;
 
     return out;
 }
@@ -314,7 +351,8 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::createhow3& obj)
     {
     case rpcgen::createmode3::UNCHECKED:
     case rpcgen::createmode3::GUARDED:
-        return out << obj.mode << " obj attributes: " << obj.createhow3_u.obj_attributes;
+        return out << obj.mode << " obj attributes: "
+                   << obj.createhow3_u.obj_attributes;
     case rpcgen::createmode3::EXCLUSIVE:
         out << obj.mode << " verf: ";
         print_hex(out, obj.createhow3_u.verf, rpcgen::NFS3_COOKIEVERFSIZE);

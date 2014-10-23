@@ -83,13 +83,13 @@ public:
         inline const T& data() const { return ptr->data; } // get data
         inline Ptr get_current() // return element and switch to next
         {
-            Element* tmp = ptr;
+            Element* tmp {ptr};
             ptr = ptr->prev;
             return Ptr{&tmp->data, ElementDeleter{queue}};
         }
         inline void free_current() // deallocate element and switch to next
         {
-            Element* tmp = ptr->prev;
+            Element* tmp {ptr->prev};
             queue->deallocate(ptr);
             ptr = tmp;
         }
@@ -114,7 +114,7 @@ public:
                       "The construction of T must not to throw any exception");
 
         Spinlock::Lock lock{a_spinlock};
-            Element* e = (Element*)allocator.allocate(); // may throw std::bad_alloc
+            Element* e {(Element*)allocator.allocate()}; // may throw std::bad_alloc
             auto ptr = &(e->data);
             ::new(ptr)T; // only call constructor of T (placement)
             return ptr;
@@ -123,13 +123,13 @@ public:
     inline void deallocate(T* ptr)
     {
         ptr->~T(); // placement allocation functions syntax is used 
-        Element* e = (Element*)( ((char*)ptr) - sizeof(Element*) );
+        Element* e { (Element*)( ((char*)ptr) - sizeof(Element*) ) };
         deallocate(e);
     }
 
     inline void push(T* ptr)
     {
-        Element* e = (Element*)( ((char*)ptr) - sizeof(Element*) );
+        Element* e { (Element*)( ((char*)ptr) - sizeof(Element*) ) };
         Spinlock::Lock lock{q_spinlock};
             if(last)
             {

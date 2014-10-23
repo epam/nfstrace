@@ -39,7 +39,7 @@ public:
     PacketDumper(pcap_t* handle, const char* path)
     : dumper{ pcap_dump_open(handle, path) }
     {
-        if(NULL == dumper)
+        if(dumper == nullptr)
         {
             throw PcapError{"pcap_dump_open", pcap_geterr(handle)};
         }
@@ -63,7 +63,7 @@ public:
     void truncate_all_pcap_data_and_header()
     {
         pcap_dump_flush(dumper);
-        FILE* stream = pcap_dump_file(dumper);
+        FILE* stream {pcap_dump_file(dumper)};
         rewind(stream); // truncate a file to zero
         pcap_dump_flush(dumper);
     }

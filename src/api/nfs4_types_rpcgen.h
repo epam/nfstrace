@@ -551,11 +551,14 @@ typedef enum nfs_lock_type4 nfs_lock_type4;
 // for compatibility
 struct NULL4args
 {
+    bool t {};
 };
 typedef struct NULL4args NULL4args;
 
+// for compatibility
 struct NULL4res
 {
+    bool t {};
 };
 typedef struct NULL4res NULL4res;
 
@@ -1597,10 +1600,10 @@ typedef struct CB_COMPOUND4res CB_COMPOUND4res;
 #define CB_NULL 0
 #define CB_COMPOUND 1
 
-bool_t xdr_int32_t (XDR *, int32_t*);
-bool_t xdr_uint32_t (XDR *, uint32_t*);
-bool_t xdr_int64_t (XDR *, int64_t*);
-bool_t xdr_uint64_t (XDR *, uint64_t*);
+bool_t xdr_int32_t (XDR *, int32_t*) noexcept;
+bool_t xdr_uint32_t (XDR *, uint32_t*) noexcept;
+bool_t xdr_int64_t (XDR *, int64_t*) noexcept;
+bool_t xdr_uint64_t (XDR *, uint64_t*) noexcept;
 bool_t xdr_nfs_ftype4 (XDR *, nfs_ftype4*);
 bool_t xdr_nfsstat4 (XDR *, nfsstat4*);
 bool_t xdr_bitmap4 (XDR *, bitmap4*);

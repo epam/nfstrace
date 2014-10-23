@@ -40,25 +40,25 @@ namespace
 
 bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 {
-    bool result = false;
+    bool result {false};
     NST::utils::operator<<(out, *(proc->session));
 
     auto& call = proc->rpc_call;
-    const int nfs_version = call.ru.RM_cmb.cb_vers;
+    const unsigned long nfs_version {call.ru.RM_cmb.cb_vers};
     if(out_all())
     {
         out << " XID: "         << call.rm_xid
             << " RPC version: " << call.ru.RM_cmb.cb_rpcvers
             << " RPC program: " << call.ru.RM_cmb.cb_prog
-            << " version: "     << nfs_version;
+            << " version: "     << nfs_version << ' ';
     }
     switch(nfs_version)
     {
     case NFS_V3:
-        out << ' ' << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(call.ru.RM_cmb.cb_proc));
+        out << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(call.ru.RM_cmb.cb_proc));
         break;
     case NFS_V4:
-        out << ' ' << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(call.ru.RM_cmb.cb_proc));
+        out << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(call.ru.RM_cmb.cb_proc));
         break;
     }
 
@@ -97,8 +97,10 @@ bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
         {
             case reject_stat::RPC_MISMATCH:
                 out << "RPC version number mismatch, "
-                    << " low: "  << reply.ru.RM_rmb.ru.RP_dr.ru.RJ_versions.low
-                    << " high: " << reply.ru.RM_rmb.ru.RP_dr.ru.RJ_versions.high;
+                    << " low: "
+                    << reply.ru.RM_rmb.ru.RP_dr.ru.RJ_versions.low
+                    << " high: "
+                    << reply.ru.RM_rmb.ru.RP_dr.ru.RJ_versions.high;
                 break;
             case reject_stat::AUTH_ERROR:
             {
@@ -173,7 +175,8 @@ void PrintAnalyzer::getattr3(const struct RPCProcedure*         proc,
     {
         out << "\tREPLY [ status: " << res->status;
         if(out_all() && res->status == rpcgen::nfsstat3::NFS3_OK)
-            out << " obj attributes: " << res->GETATTR3res_u.resok.obj_attributes;
+            out << " obj attributes: "
+                << res->GETATTR3res_u.resok.obj_attributes;
         out << " ]\n";
     }
 }
@@ -194,9 +197,11 @@ void PrintAnalyzer::setattr3(const struct RPCProcedure*         proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " obj_wcc: " << res->SETATTR3res_u.resok.obj_wcc;
+                out << " obj_wcc: "
+                    << res->SETATTR3res_u.resok.obj_wcc;
             else
-                out << " obj_wcc: " << res->SETATTR3res_u.resfail.obj_wcc;
+                out << " obj_wcc: "
+                    << res->SETATTR3res_u.resfail.obj_wcc;
         }
         out << " ]\n";
     }
@@ -215,11 +220,15 @@ void PrintAnalyzer::lookup3(const struct RPCProcedure*        proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " object: "            << res->LOOKUP3res_u.resok.object
-                    << " object attributes: " << res->LOOKUP3res_u.resok.obj_attributes
-                    << " dir attributes: "    << res->LOOKUP3res_u.resok.dir_attributes;
+                out << " object: "
+                    << res->LOOKUP3res_u.resok.object
+                    << " object attributes: "
+                    << res->LOOKUP3res_u.resok.obj_attributes
+                    << " dir attributes: "
+                    << res->LOOKUP3res_u.resok.dir_attributes;
             else
-                out << " dir attributes: "    << res->LOOKUP3res_u.resfail.dir_attributes;
+                out << " dir attributes: "
+                    << res->LOOKUP3res_u.resfail.dir_attributes;
         }
         out << " ]\n";
     }
@@ -234,7 +243,9 @@ void PrintAnalyzer::access3(const struct RPCProcedure*        proc,
     if(args)
     {
         out << "\tCALL  [ object: ";
-        print_nfs_fh(out, args->object.data.data_val, args->object.data.data_len);
+        print_nfs_fh(out,
+                     args->object.data.data_val,
+                     args->object.data.data_len);
         out << " access: ";
         print_access3(out, args->access);
         out << " ]\n";
@@ -247,12 +258,15 @@ void PrintAnalyzer::access3(const struct RPCProcedure*        proc,
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
             {
-                out << " object attributes: " << res->ACCESS3res_u.resok.obj_attributes
-                    << " access: "; print_access3(out, res->ACCESS3res_u.resok.access);
+                out << " object attributes: "
+                    << res->ACCESS3res_u.resok.obj_attributes
+                    << " access: ";
+                print_access3(out, res->ACCESS3res_u.resok.access);
             }
             else
             {
-                out << " access: " << res->ACCESS3res_u.resfail.obj_attributes;
+                out << " access: "
+                    << res->ACCESS3res_u.resfail.obj_attributes;
             }
         }
         out << " ]\n";
@@ -272,10 +286,13 @@ void PrintAnalyzer::readlink3(const struct RPCProcedure*          proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " symlink attributes: " << res->READLINK3res_u.resok.symlink_attributes
-                    << " data: "               << res->READLINK3res_u.resok.data; 
+                out << " symlink attributes: "
+                    << res->READLINK3res_u.resok.symlink_attributes
+                    << " data: "
+                    << res->READLINK3res_u.resok.data;
             else
-                out << " symlink attributes: " << res->READLINK3res_u.resfail.symlink_attributes;
+                out << " symlink attributes: "
+                    << res->READLINK3res_u.resfail.symlink_attributes;
         }
         out << " ]\n";
     }
@@ -298,13 +315,17 @@ void PrintAnalyzer::read3(const struct RPCProcedure*      proc,
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
             {
-                out << " file attributes: " << res->READ3res_u.resok.file_attributes
-                    << " count: "           << res->READ3res_u.resok.count
-                    << " eof: "             << res->READ3res_u.resok.eof;
+                out << " file attributes: "
+                    << res->READ3res_u.resok.file_attributes
+                    << " count: "
+                    << res->READ3res_u.resok.count
+                    << " eof: "
+                    << res->READ3res_u.resok.eof;
             }
             else
             {
-                out << " symlink attributes: " << res->READ3res_u.resfail.file_attributes;
+                out << " symlink attributes: "
+                    << res->READ3res_u.resfail.file_attributes;
             }
         }
         out << " ]\n";
@@ -332,15 +353,21 @@ void PrintAnalyzer::write3(const struct RPCProcedure*       proc,
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
             {
-                out << " file_wcc: " << res->WRITE3res_u.resok.file_wcc
-                    << " count: "    << res->WRITE3res_u.resok.count
-                    << " commited: " << res->WRITE3res_u.resok.committed
+                out << " file_wcc: "
+                    << res->WRITE3res_u.resok.file_wcc
+                    << " count: "
+                    << res->WRITE3res_u.resok.count
+                    << " commited: "
+                    << res->WRITE3res_u.resok.committed
                     << " verf: ";
-                print_hex(out, res->WRITE3res_u.resok.verf, rpcgen::NFS3_WRITEVERFSIZE);
+                print_hex(out,
+                          res->WRITE3res_u.resok.verf,
+                          rpcgen::NFS3_WRITEVERFSIZE);
             }
             else
             {
-                out << " file_wcc: " << res->WRITE3res_u.resfail.file_wcc;
+                out << " file_wcc: "
+                    << res->WRITE3res_u.resfail.file_wcc;
             }
         }
         out << " ]\n";
@@ -363,11 +390,15 @@ void PrintAnalyzer::create3(const struct RPCProcedure*        proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " obj: " << res->CREATE3res_u.resok.obj
-                    << " obj attributes: " << res->CREATE3res_u.resok.obj_attributes
-                    << " dir_wcc: " << res->CREATE3res_u.resok.dir_wcc;
+                out << " obj: "
+                    << res->CREATE3res_u.resok.obj
+                    << " obj attributes: "
+                    << res->CREATE3res_u.resok.obj_attributes
+                    << " dir_wcc: "
+                    << res->CREATE3res_u.resok.dir_wcc;
             else
-                out << " dir_wcc: " << res->CREATE3res_u.resfail.dir_wcc;
+                out << " dir_wcc: "
+                    << res->CREATE3res_u.resfail.dir_wcc;
         }
         out << " ]\n";
     }
@@ -389,11 +420,15 @@ void PrintAnalyzer::mkdir3(const struct RPCProcedure*       proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " obj: "            << res->MKDIR3res_u.resok.obj
-                    << " obj attributes: " << res->MKDIR3res_u.resok.obj_attributes
-                    << " dir_wcc: "        << res->MKDIR3res_u.resok.dir_wcc;
+                out << " obj: "
+                    << res->MKDIR3res_u.resok.obj
+                    << " obj attributes: "
+                    << res->MKDIR3res_u.resok.obj_attributes
+                    << " dir_wcc: "
+                    << res->MKDIR3res_u.resok.dir_wcc;
             else
-                out << " dir_wcc: "        << res->MKDIR3res_u.resfail.dir_wcc;
+                out << " dir_wcc: "
+                    << res->MKDIR3res_u.resfail.dir_wcc;
         }
         out << " ]\n";
     }
@@ -415,11 +450,15 @@ void PrintAnalyzer::symlink3(const struct RPCProcedure*         proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " obj: "            << res->SYMLINK3res_u.resok.obj
-                    << " obj attributes: " << res->SYMLINK3res_u.resok.obj_attributes
-                    << " dir_wcc: "        << res->SYMLINK3res_u.resok.dir_wcc;
+                out << " obj: "
+                    << res->SYMLINK3res_u.resok.obj
+                    << " obj attributes: "
+                    << res->SYMLINK3res_u.resok.obj_attributes
+                    << " dir_wcc: "
+                    << res->SYMLINK3res_u.resok.dir_wcc;
             else
-                out << " dir_wcc: "        << res->SYMLINK3res_u.resfail.dir_wcc;
+                out << " dir_wcc: "
+                    << res->SYMLINK3res_u.resfail.dir_wcc;
         }
         out << " ]\n";
     }
@@ -443,11 +482,15 @@ void PrintAnalyzer::mknod3(const struct RPCProcedure*       proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " obj: "            << res->MKNOD3res_u.resok.obj
-                    << " obj attributes: " << res->MKNOD3res_u.resok.obj_attributes
-                    << " dir_wcc: "        << res->MKNOD3res_u.resok.dir_wcc;
+                out << " obj: "
+                    << res->MKNOD3res_u.resok.obj
+                    << " obj attributes: "
+                    << res->MKNOD3res_u.resok.obj_attributes
+                    << " dir_wcc: "
+                    << res->MKNOD3res_u.resok.dir_wcc;
             else
-                out << " dir_wcc: "        << res->MKNOD3res_u.resfail.dir_wcc;
+                out << " dir_wcc: "
+                    << res->MKNOD3res_u.resfail.dir_wcc;
         }
         out << " ]\n";
     }
@@ -467,9 +510,11 @@ void PrintAnalyzer::remove3(const struct RPCProcedure*        proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " dir_wcc: " << res->REMOVE3res_u.resok.dir_wcc;
+                out << " dir_wcc: "
+                    << res->REMOVE3res_u.resok.dir_wcc;
             else
-                out << " dir_wcc: " << res->REMOVE3res_u.resfail.dir_wcc;
+                out << " dir_wcc: "
+                    << res->REMOVE3res_u.resfail.dir_wcc;
         }
         out << " ]\n";
     }
@@ -491,9 +536,11 @@ void PrintAnalyzer::rmdir3(const struct RPCProcedure*       proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " dir_wcc: " << res->RMDIR3res_u.resok.dir_wcc;
+                out << " dir_wcc: "
+                    << res->RMDIR3res_u.resok.dir_wcc;
             else
-                out << " dir_wcc: " << res->RMDIR3res_u.resfail.dir_wcc;
+                out << " dir_wcc: "
+                    << res->RMDIR3res_u.resfail.dir_wcc;
         }
         out << " ]\n";
     }
@@ -515,11 +562,15 @@ void PrintAnalyzer::rename3(const struct RPCProcedure*        proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " from dir_wcc: " << res->RENAME3res_u.resok.fromdir_wcc
-                    << " to dir_wcc: "   << res->RENAME3res_u.resok.todir_wcc;
+                out << " from dir_wcc: "
+                    << res->RENAME3res_u.resok.fromdir_wcc
+                    << " to dir_wcc: "
+                    << res->RENAME3res_u.resok.todir_wcc;
             else
-                out << " from dir_wcc: " << res->RENAME3res_u.resfail.fromdir_wcc
-                    << " to dir_wcc: "   << res->RENAME3res_u.resfail.todir_wcc;
+                out << " from dir_wcc: "
+                    << res->RENAME3res_u.resfail.fromdir_wcc
+                    << " to dir_wcc: "
+                    << res->RENAME3res_u.resfail.todir_wcc;
         }
         out << " ]\n";
     }
@@ -541,11 +592,15 @@ void PrintAnalyzer::link3(const struct RPCProcedure*      proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " file attributes: " << res->LINK3res_u.resok.file_attributes
-                    << " link dir_wcc: "    << res->LINK3res_u.resok.linkdir_wcc;
+                out << " file attributes: "
+                    << res->LINK3res_u.resok.file_attributes
+                    << " link dir_wcc: "
+                    << res->LINK3res_u.resok.linkdir_wcc;
             else
-                out << " file attributes: " << res->LINK3res_u.resfail.file_attributes
-                    << " link dir_wcc: "    << res->LINK3res_u.resfail.linkdir_wcc;
+                out << " file attributes: "
+                    << res->LINK3res_u.resfail.file_attributes
+                    << " link dir_wcc: "
+                    << res->LINK3res_u.resfail.linkdir_wcc;
         }
         out << " ]\n";
     }
@@ -562,7 +617,9 @@ void PrintAnalyzer::readdir3(const struct RPCProcedure*         proc,
         out << "\tCALL  [ dir: " << args->dir
             << " cookie: "       << args->cookie
             << " cookieverf: ";
-        print_hex(out, args->cookieverf, rpcgen::NFS3_COOKIEVERFSIZE);
+        print_hex(out,
+                  args->cookieverf,
+                  rpcgen::NFS3_COOKIEVERFSIZE);
         out << " count: " << args->count
             << " ]\n";
     }
@@ -573,14 +630,19 @@ void PrintAnalyzer::readdir3(const struct RPCProcedure*         proc,
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
             {
-                out << " dir attributes: " << res->READDIR3res_u.resok.dir_attributes
+                out << " dir attributes: "
+                    << res->READDIR3res_u.resok.dir_attributes
                     << " cookieverf: ";
-                print_hex(out, res->READDIR3res_u.resok.cookieverf, rpcgen::NFS3_COOKIEVERFSIZE);
-                out << " reply: "          << res->READDIR3res_u.resok.reply;
+                print_hex(out,
+                          res->READDIR3res_u.resok.cookieverf,
+                          rpcgen::NFS3_COOKIEVERFSIZE);
+                out << " reply: "
+                    << res->READDIR3res_u.resok.reply;
             }
             else
             {
-                out << " dir attributes: " << res->READDIR3res_u.resfail.dir_attributes;
+                out << " dir attributes: "
+                    << res->READDIR3res_u.resfail.dir_attributes;
             }
         }
         out << " ]\n";
@@ -598,7 +660,9 @@ void PrintAnalyzer::readdirplus3(const struct RPCProcedure*             proc,
         out << "\tCALL  [ dir: " << args->dir
             << " cookie: "       << args->cookie
             << " cookieverf: ";
-        print_hex(out, args->cookieverf, rpcgen::NFS3_COOKIEVERFSIZE);
+        print_hex(out,
+                  args->cookieverf,
+                  rpcgen::NFS3_COOKIEVERFSIZE);
         out << " dir count: " << args->dircount
             << " max count: " << args->maxcount
             << " ]\n";
@@ -610,14 +674,19 @@ void PrintAnalyzer::readdirplus3(const struct RPCProcedure*             proc,
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
             {
-                out << " dir attributes: " << res->READDIRPLUS3res_u.resok.dir_attributes
+                out << " dir attributes: "
+                    << res->READDIRPLUS3res_u.resok.dir_attributes
                     << " cookieverf: ";
-                print_hex(out, res->READDIRPLUS3res_u.resok.cookieverf, rpcgen::NFS3_COOKIEVERFSIZE);
-                out << " reply: "          << res->READDIRPLUS3res_u.resok.reply;
+                print_hex(out,
+                          res->READDIRPLUS3res_u.resok.cookieverf,
+                          rpcgen::NFS3_COOKIEVERFSIZE);
+                out << " reply: "
+                    << res->READDIRPLUS3res_u.resok.reply;
             }
             else
             {
-                out << " dir attributes: " << res->READDIRPLUS3res_u.resfail.dir_attributes;
+                out << " dir attributes: "
+                    << res->READDIRPLUS3res_u.resfail.dir_attributes;
             }
         }
         out << " ]\n";
@@ -638,16 +707,25 @@ void PrintAnalyzer::fsstat3(const struct RPCProcedure*        proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " obj attributes: " << res->FSSTAT3res_u.resok.obj_attributes
-                    << " tbytes: "         << res->FSSTAT3res_u.resok.tbytes
-                    << " fbytes: "         << res->FSSTAT3res_u.resok.fbytes
-                    << " abytes: "         << res->FSSTAT3res_u.resok.abytes
-                    << " tfile: "          << res->FSSTAT3res_u.resok.tfiles
-                    << " ffile: "          << res->FSSTAT3res_u.resok.ffiles
-                    << " afile: "          << res->FSSTAT3res_u.resok.afiles
-                    << " invarsec: "       << res->FSSTAT3res_u.resok.invarsec;
+                out << " obj attributes: "
+                    << res->FSSTAT3res_u.resok.obj_attributes
+                    << " tbytes: "
+                    << res->FSSTAT3res_u.resok.tbytes
+                    << " fbytes: "
+                    << res->FSSTAT3res_u.resok.fbytes
+                    << " abytes: "
+                    << res->FSSTAT3res_u.resok.abytes
+                    << " tfile: "
+                    << res->FSSTAT3res_u.resok.tfiles
+                    << " ffile: "
+                    << res->FSSTAT3res_u.resok.ffiles
+                    << " afile: "
+                    << res->FSSTAT3res_u.resok.afiles
+                    << " invarsec: "
+                    << res->FSSTAT3res_u.resok.invarsec;
             else
-                out << " obj attributes: " << res->FSSTAT3res_u.resfail.obj_attributes;
+                out << " obj attributes: "
+                    << res->FSSTAT3res_u.resfail.obj_attributes;
         }
         out << " ]\n";
     }
@@ -667,27 +745,43 @@ void PrintAnalyzer::fsinfo3(const struct RPCProcedure*        proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " obj attributes: " << res->FSINFO3res_u.resok.obj_attributes
-                    << " rtmax: "          << res->FSINFO3res_u.resok.rtmax
-                    << " rtpref: "         << res->FSINFO3res_u.resok.rtpref
-                    << " rtmult: "         << res->FSINFO3res_u.resok.rtmult
-                    << " wtmax: "          << res->FSINFO3res_u.resok.wtmax
-                    << " wtpref: "         << res->FSINFO3res_u.resok.wtpref
-                    << " wtmult: "         << res->FSINFO3res_u.resok.wtmult
-                    << " dtpref: "         << res->FSINFO3res_u.resok.dtpref
-                    << " max file size: "  << res->FSINFO3res_u.resok.maxfilesize
-                    << " time delta: "     << res->FSINFO3res_u.resok.time_delta
-                    << " properties: "     << res->FSINFO3res_u.resok.properties
+                out << " obj attributes: "
+                    << res->FSINFO3res_u.resok.obj_attributes
+                    << " rtmax: "
+                    << res->FSINFO3res_u.resok.rtmax
+                    << " rtpref: "
+                    << res->FSINFO3res_u.resok.rtpref
+                    << " rtmult: "
+                    << res->FSINFO3res_u.resok.rtmult
+                    << " wtmax: "
+                    << res->FSINFO3res_u.resok.wtmax
+                    << " wtpref: "
+                    << res->FSINFO3res_u.resok.wtpref
+                    << " wtmult: "
+                    << res->FSINFO3res_u.resok.wtmult
+                    << " dtpref: "
+                    << res->FSINFO3res_u.resok.dtpref
+                    << " max file size: "
+                    << res->FSINFO3res_u.resok.maxfilesize
+                    << " time delta: "
+                    << res->FSINFO3res_u.resok.time_delta
+                    << " properties: "
+                    << res->FSINFO3res_u.resok.properties
                     << " LINK (filesystem supports hard links): "
-                    << static_cast<bool>(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_LINK)
+                    << static_cast<bool>(res->FSINFO3res_u.resok.properties &
+                                         rpcgen::FSF3_LINK)
                     << " SYMLINK (file system supports symbolic links): "
-                    << static_cast<bool>(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_SYMLINK)
+                    << static_cast<bool>(res->FSINFO3res_u.resok.properties &
+                                         rpcgen::FSF3_SYMLINK)
                     << " HOMOGENEOUS (PATHCONF: is valid for all files): "
-                    << static_cast<bool>(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_HOMOGENEOUS)
+                    << static_cast<bool>(res->FSINFO3res_u.resok.properties &
+                                         rpcgen::FSF3_HOMOGENEOUS)
                     << " CANSETTIME (SETATTR can set time on server): "
-                    << static_cast<bool>(res->FSINFO3res_u.resok.properties & rpcgen::FSF3_CANSETTIME);
+                    << static_cast<bool>(res->FSINFO3res_u.resok.properties &
+                                         rpcgen::FSF3_CANSETTIME);
             else
-                out << " obj attributes: " << res->FSINFO3res_u.resfail.obj_attributes;
+                out << " obj attributes: "
+                    << res->FSINFO3res_u.resfail.obj_attributes;
         }
         out << " ]\n";
     }
@@ -707,15 +801,23 @@ void PrintAnalyzer::pathconf3(const struct RPCProcedure*          proc,
         if(out_all())
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
-                out << " obj attributes: "   << res->PATHCONF3res_u.resok.obj_attributes
-                    << " link max: "         << res->PATHCONF3res_u.resok.linkmax
-                    << " name max: "         << res->PATHCONF3res_u.resok.name_max
-                    << " no trunc: "         << res->PATHCONF3res_u.resok.no_trunc
-                    << " chwon restricted: " << res->PATHCONF3res_u.resok.chown_restricted
-                    << " case insensitive: " << res->PATHCONF3res_u.resok.case_insensitive
-                    << " case preserving: "  << res->PATHCONF3res_u.resok.case_preserving;
+                out << " obj attributes: "
+                    << res->PATHCONF3res_u.resok.obj_attributes
+                    << " link max: "
+                    << res->PATHCONF3res_u.resok.linkmax
+                    << " name max: "
+                    << res->PATHCONF3res_u.resok.name_max
+                    << " no trunc: "
+                    << res->PATHCONF3res_u.resok.no_trunc
+                    << " chwon restricted: "
+                    << res->PATHCONF3res_u.resok.chown_restricted
+                    << " case insensitive: "
+                    << res->PATHCONF3res_u.resok.case_insensitive
+                    << " case preserving: "
+                    << res->PATHCONF3res_u.resok.case_preserving;
             else
-                out << " obj attributes: " << res->PATHCONF3res_u.resfail.obj_attributes;
+                out << " obj attributes: "
+                    << res->PATHCONF3res_u.resfail.obj_attributes;
         }
         out << " ]\n";
     }
@@ -739,13 +841,17 @@ void PrintAnalyzer::commit3(const struct RPCProcedure*        proc,
         {
             if(res->status == rpcgen::nfsstat3::NFS3_OK)
             {
-                out << " file_wcc: " << res->COMMIT3res_u.resok.file_wcc
+                out << " file_wcc: "
+                    << res->COMMIT3res_u.resok.file_wcc
                     << " verf: ";
-                print_hex(out, res->COMMIT3res_u.resok.verf, rpcgen::NFS3_WRITEVERFSIZE);
+                print_hex(out,
+                          res->COMMIT3res_u.resok.verf,
+                          rpcgen::NFS3_WRITEVERFSIZE);
             }
             else
             {
-                out << " file_wcc: " << res->COMMIT3res_u.resfail.file_wcc;
+                out << " file_wcc: "
+                    << res->COMMIT3res_u.resfail.file_wcc;
             }
         }
         out << " ]\n";
@@ -784,7 +890,7 @@ void PrintAnalyzer::compound4(const struct RPCProcedure*          proc,
             << " minor version: "       << args->minorversion;
         if(*array_len)
         {
-            rpcgen::nfs_argop4* current_el = args->argarray.argarray_val;
+            rpcgen::nfs_argop4* current_el {args->argarray.argarray_val};
             for(u_int i=0; i<*array_len; i++, current_el++)
             {
                 out << "\n\t\t[ ";
@@ -800,7 +906,7 @@ void PrintAnalyzer::compound4(const struct RPCProcedure*          proc,
         out << "\tREPLY [  operations: " << *array_len;
         if(*array_len)
         {
-            rpcgen::nfs_resop4* current_el = res->resarray.resarray_val;
+            rpcgen::nfs_resop4* current_el {res->resarray.resarray_val};
             for(u_int i=0; i<*array_len; i++, current_el++)
             {
                 out << "\n\t\t[ ";
@@ -820,45 +926,84 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::nfs_argop4* op)
         << '(' << op->argop << ") [ ";
         switch(op->argop)
         {
-        case rpcgen::OP_ACCESS:              return nfs4_operation(&op->nfs_argop4_u.opaccess);
-        case rpcgen::OP_CLOSE:               return nfs4_operation(&op->nfs_argop4_u.opclose);
-        case rpcgen::OP_COMMIT:              return nfs4_operation(&op->nfs_argop4_u.opcommit);
-        case rpcgen::OP_CREATE:              return nfs4_operation(&op->nfs_argop4_u.opcreate);
-        case rpcgen::OP_DELEGPURGE:          return nfs4_operation(&op->nfs_argop4_u.opdelegpurge);
-        case rpcgen::OP_DELEGRETURN:         return nfs4_operation(&op->nfs_argop4_u.opdelegreturn);
-        case rpcgen::OP_GETATTR:             return nfs4_operation(&op->nfs_argop4_u.opgetattr);
-        case rpcgen::OP_GETFH:               break; /* no such operation in call procedure */
-        case rpcgen::OP_LINK:                return nfs4_operation(&op->nfs_argop4_u.oplink);
-        case rpcgen::OP_LOCK:                return nfs4_operation(&op->nfs_argop4_u.oplock);
-        case rpcgen::OP_LOCKT:               return nfs4_operation(&op->nfs_argop4_u.oplockt);
-        case rpcgen::OP_LOCKU:               return nfs4_operation(&op->nfs_argop4_u.oplocku);
-        case rpcgen::OP_LOOKUP:              return nfs4_operation(&op->nfs_argop4_u.oplookup);
-        case rpcgen::OP_LOOKUPP:             break; /* no such operation in call procedure */
-        case rpcgen::OP_NVERIFY:             return nfs4_operation(&op->nfs_argop4_u.opnverify);
-        case rpcgen::OP_OPEN:                return nfs4_operation(&op->nfs_argop4_u.opopen);
-        case rpcgen::OP_OPENATTR:            return nfs4_operation(&op->nfs_argop4_u.opopenattr);
-        case rpcgen::OP_OPEN_CONFIRM:        return nfs4_operation(&op->nfs_argop4_u.opopen_confirm);
-        case rpcgen::OP_OPEN_DOWNGRADE:      return nfs4_operation(&op->nfs_argop4_u.opopen_downgrade);
-        case rpcgen::OP_PUTFH:               return nfs4_operation(&op->nfs_argop4_u.opputfh);
-        case rpcgen::OP_PUTPUBFH:            break; /* no such operation in call procedure */
-        case rpcgen::OP_PUTROOTFH:           break; /* no such operation in call procedure */
-        case rpcgen::OP_READ:                return nfs4_operation(&op->nfs_argop4_u.opread);
-        case rpcgen::OP_READDIR:             return nfs4_operation(&op->nfs_argop4_u.opreaddir);
-        case rpcgen::OP_READLINK:            break; /* no such operation in call procedure */
-        case rpcgen::OP_REMOVE:              return nfs4_operation(&op->nfs_argop4_u.opremove);
-        case rpcgen::OP_RENAME:              return nfs4_operation(&op->nfs_argop4_u.oprename);
-        case rpcgen::OP_RENEW:               return nfs4_operation(&op->nfs_argop4_u.oprenew);
-        case rpcgen::OP_RESTOREFH:           break; /* no such operation in call procedure */
-        case rpcgen::OP_SAVEFH:              break; /* no such operation in call procedure */
-        case rpcgen::OP_SECINFO:             return nfs4_operation(&op->nfs_argop4_u.opsecinfo);
-        case rpcgen::OP_SETATTR:             return nfs4_operation(&op->nfs_argop4_u.opsetattr);
-        case rpcgen::OP_SETCLIENTID:         return nfs4_operation(&op->nfs_argop4_u.opsetclientid);
-        case rpcgen::OP_SETCLIENTID_CONFIRM: return nfs4_operation(&op->nfs_argop4_u.opsetclientid_confirm);
-        case rpcgen::OP_VERIFY:              return nfs4_operation(&op->nfs_argop4_u.opverify);
-        case rpcgen::OP_WRITE:               return nfs4_operation(&op->nfs_argop4_u.opwrite);
-        case rpcgen::OP_RELEASE_LOCKOWNER:   return nfs4_operation(&op->nfs_argop4_u.oprelease_lockowner);
-        case rpcgen::OP_GET_DIR_DELEGATION:  return nfs4_operation(&op->nfs_argop4_u.opget_dir_delegation);
-        case rpcgen::OP_ILLEGAL:             break; /* no such operation in call procedure */
+        case rpcgen::OP_ACCESS:
+             return nfs4_operation(&op->nfs_argop4_u.opaccess);
+        case rpcgen::OP_CLOSE:
+             return nfs4_operation(&op->nfs_argop4_u.opclose);
+        case rpcgen::OP_COMMIT:
+             return nfs4_operation(&op->nfs_argop4_u.opcommit);
+        case rpcgen::OP_CREATE:
+             return nfs4_operation(&op->nfs_argop4_u.opcreate);
+        case rpcgen::OP_DELEGPURGE:
+             return nfs4_operation(&op->nfs_argop4_u.opdelegpurge);
+        case rpcgen::OP_DELEGRETURN:
+             return nfs4_operation(&op->nfs_argop4_u.opdelegreturn);
+        case rpcgen::OP_GETATTR:
+             return nfs4_operation(&op->nfs_argop4_u.opgetattr);
+        case rpcgen::OP_GETFH:
+             break; /* no such operation in call procedure */
+        case rpcgen::OP_LINK:
+             return nfs4_operation(&op->nfs_argop4_u.oplink);
+        case rpcgen::OP_LOCK:
+             return nfs4_operation(&op->nfs_argop4_u.oplock);
+        case rpcgen::OP_LOCKT:
+             return nfs4_operation(&op->nfs_argop4_u.oplockt);
+        case rpcgen::OP_LOCKU:
+             return nfs4_operation(&op->nfs_argop4_u.oplocku);
+        case rpcgen::OP_LOOKUP:
+             return nfs4_operation(&op->nfs_argop4_u.oplookup);
+        case rpcgen::OP_LOOKUPP:
+             break; /* no such operation in call procedure */
+        case rpcgen::OP_NVERIFY:
+             return nfs4_operation(&op->nfs_argop4_u.opnverify);
+        case rpcgen::OP_OPEN:
+             return nfs4_operation(&op->nfs_argop4_u.opopen);
+        case rpcgen::OP_OPENATTR:
+             return nfs4_operation(&op->nfs_argop4_u.opopenattr);
+        case rpcgen::OP_OPEN_CONFIRM:
+             return nfs4_operation(&op->nfs_argop4_u.opopen_confirm);
+        case rpcgen::OP_OPEN_DOWNGRADE:
+             return nfs4_operation(&op->nfs_argop4_u.opopen_downgrade);
+        case rpcgen::OP_PUTFH:
+             return nfs4_operation(&op->nfs_argop4_u.opputfh);
+        case rpcgen::OP_PUTPUBFH:
+             break; /* no such operation in call procedure */
+        case rpcgen::OP_PUTROOTFH:
+             break; /* no such operation in call procedure */
+        case rpcgen::OP_READ:
+             return nfs4_operation(&op->nfs_argop4_u.opread);
+        case rpcgen::OP_READDIR:
+             return nfs4_operation(&op->nfs_argop4_u.opreaddir);
+        case rpcgen::OP_READLINK:
+             break; /* no such operation in call procedure */
+        case rpcgen::OP_REMOVE:
+             return nfs4_operation(&op->nfs_argop4_u.opremove);
+        case rpcgen::OP_RENAME:
+             return nfs4_operation(&op->nfs_argop4_u.oprename);
+        case rpcgen::OP_RENEW:
+             return nfs4_operation(&op->nfs_argop4_u.oprenew);
+        case rpcgen::OP_RESTOREFH:
+             break; /* no such operation in call procedure */
+        case rpcgen::OP_SAVEFH:
+             break; /* no such operation in call procedure */
+        case rpcgen::OP_SECINFO:
+             return nfs4_operation(&op->nfs_argop4_u.opsecinfo);
+        case rpcgen::OP_SETATTR:
+             return nfs4_operation(&op->nfs_argop4_u.opsetattr);
+        case rpcgen::OP_SETCLIENTID:
+             return nfs4_operation(&op->nfs_argop4_u.opsetclientid);
+        case rpcgen::OP_SETCLIENTID_CONFIRM:
+             return nfs4_operation(&op->nfs_argop4_u.opsetclientid_confirm);
+        case rpcgen::OP_VERIFY:
+             return nfs4_operation(&op->nfs_argop4_u.opverify);
+        case rpcgen::OP_WRITE:
+             return nfs4_operation(&op->nfs_argop4_u.opwrite);
+        case rpcgen::OP_RELEASE_LOCKOWNER:
+             return nfs4_operation(&op->nfs_argop4_u.oprelease_lockowner);
+        case rpcgen::OP_GET_DIR_DELEGATION:
+             return nfs4_operation(&op->nfs_argop4_u.opget_dir_delegation);
+        case rpcgen::OP_ILLEGAL:
+             break; /* no such operation in call procedure */
         }
     out << " ]";
     }
@@ -872,45 +1017,84 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::nfs_resop4* op)
         << '(' << op->resop << ") [ ";
         switch(op->resop)
         {
-        case rpcgen::OP_ACCESS:              return nfs4_operation(&op->nfs_resop4_u.opaccess);
-        case rpcgen::OP_CLOSE:               return nfs4_operation(&op->nfs_resop4_u.opclose);
-        case rpcgen::OP_COMMIT:              return nfs4_operation(&op->nfs_resop4_u.opcommit);
-        case rpcgen::OP_CREATE:              return nfs4_operation(&op->nfs_resop4_u.opcreate);
-        case rpcgen::OP_DELEGPURGE:          return nfs4_operation(&op->nfs_resop4_u.opdelegpurge);
-        case rpcgen::OP_DELEGRETURN:         return nfs4_operation(&op->nfs_resop4_u.opdelegreturn);
-        case rpcgen::OP_GETATTR:             return nfs4_operation(&op->nfs_resop4_u.opgetattr);
-        case rpcgen::OP_GETFH:               return nfs4_operation(&op->nfs_resop4_u.opgetfh);
-        case rpcgen::OP_LINK:                return nfs4_operation(&op->nfs_resop4_u.oplink);
-        case rpcgen::OP_LOCK:                return nfs4_operation(&op->nfs_resop4_u.oplock);
-        case rpcgen::OP_LOCKT:               return nfs4_operation(&op->nfs_resop4_u.oplockt);
-        case rpcgen::OP_LOCKU:               return nfs4_operation(&op->nfs_resop4_u.oplocku);
-        case rpcgen::OP_LOOKUP:              return nfs4_operation(&op->nfs_resop4_u.oplookup);
-        case rpcgen::OP_LOOKUPP:             return nfs4_operation(&op->nfs_resop4_u.oplookupp);
-        case rpcgen::OP_NVERIFY:             return nfs4_operation(&op->nfs_resop4_u.opnverify);
-        case rpcgen::OP_OPEN:                return nfs4_operation(&op->nfs_resop4_u.opopen);
-        case rpcgen::OP_OPENATTR:            return nfs4_operation(&op->nfs_resop4_u.opopenattr);
-        case rpcgen::OP_OPEN_CONFIRM:        return nfs4_operation(&op->nfs_resop4_u.opopen_confirm);
-        case rpcgen::OP_OPEN_DOWNGRADE:      return nfs4_operation(&op->nfs_resop4_u.opopen_downgrade);
-        case rpcgen::OP_PUTFH:               return nfs4_operation(&op->nfs_resop4_u.opputfh);
-        case rpcgen::OP_PUTPUBFH:            return nfs4_operation(&op->nfs_resop4_u.opputpubfh);
-        case rpcgen::OP_PUTROOTFH:           return nfs4_operation(&op->nfs_resop4_u.opputrootfh);
-        case rpcgen::OP_READ:                return nfs4_operation(&op->nfs_resop4_u.opread);
-        case rpcgen::OP_READDIR:             return nfs4_operation(&op->nfs_resop4_u.opreaddir);
-        case rpcgen::OP_READLINK:            return nfs4_operation(&op->nfs_resop4_u.opreadlink);
-        case rpcgen::OP_REMOVE:              return nfs4_operation(&op->nfs_resop4_u.opremove);
-        case rpcgen::OP_RENAME:              return nfs4_operation(&op->nfs_resop4_u.oprename);
-        case rpcgen::OP_RENEW:               return nfs4_operation(&op->nfs_resop4_u.oprenew);
-        case rpcgen::OP_RESTOREFH:           return nfs4_operation(&op->nfs_resop4_u.oprestorefh);
-        case rpcgen::OP_SAVEFH:              return nfs4_operation(&op->nfs_resop4_u.opsavefh);
-        case rpcgen::OP_SECINFO:             return nfs4_operation(&op->nfs_resop4_u.opsecinfo);
-        case rpcgen::OP_SETATTR:             return nfs4_operation(&op->nfs_resop4_u.opsetattr);
-        case rpcgen::OP_SETCLIENTID:         return nfs4_operation(&op->nfs_resop4_u.opsetclientid);
-        case rpcgen::OP_SETCLIENTID_CONFIRM: return nfs4_operation(&op->nfs_resop4_u.opsetclientid_confirm);
-        case rpcgen::OP_VERIFY:              return nfs4_operation(&op->nfs_resop4_u.opverify);
-        case rpcgen::OP_WRITE:               return nfs4_operation(&op->nfs_resop4_u.opwrite);
-        case rpcgen::OP_RELEASE_LOCKOWNER:   return nfs4_operation(&op->nfs_resop4_u.oprelease_lockowner);
-        case rpcgen::OP_GET_DIR_DELEGATION:  return nfs4_operation(&op->nfs_resop4_u.opget_dir_delegation);
-        case rpcgen::OP_ILLEGAL:             return nfs4_operation(&op->nfs_resop4_u.opillegal);
+        case rpcgen::OP_ACCESS:
+             return nfs4_operation(&op->nfs_resop4_u.opaccess);
+        case rpcgen::OP_CLOSE:
+             return nfs4_operation(&op->nfs_resop4_u.opclose);
+        case rpcgen::OP_COMMIT:
+             return nfs4_operation(&op->nfs_resop4_u.opcommit);
+        case rpcgen::OP_CREATE:
+             return nfs4_operation(&op->nfs_resop4_u.opcreate);
+        case rpcgen::OP_DELEGPURGE:
+             return nfs4_operation(&op->nfs_resop4_u.opdelegpurge);
+        case rpcgen::OP_DELEGRETURN:
+             return nfs4_operation(&op->nfs_resop4_u.opdelegreturn);
+        case rpcgen::OP_GETATTR:
+             return nfs4_operation(&op->nfs_resop4_u.opgetattr);
+        case rpcgen::OP_GETFH:
+             return nfs4_operation(&op->nfs_resop4_u.opgetfh);
+        case rpcgen::OP_LINK:
+             return nfs4_operation(&op->nfs_resop4_u.oplink);
+        case rpcgen::OP_LOCK:
+             return nfs4_operation(&op->nfs_resop4_u.oplock);
+        case rpcgen::OP_LOCKT:
+             return nfs4_operation(&op->nfs_resop4_u.oplockt);
+        case rpcgen::OP_LOCKU:
+             return nfs4_operation(&op->nfs_resop4_u.oplocku);
+        case rpcgen::OP_LOOKUP:
+             return nfs4_operation(&op->nfs_resop4_u.oplookup);
+        case rpcgen::OP_LOOKUPP:
+             return nfs4_operation(&op->nfs_resop4_u.oplookupp);
+        case rpcgen::OP_NVERIFY:
+             return nfs4_operation(&op->nfs_resop4_u.opnverify);
+        case rpcgen::OP_OPEN:
+             return nfs4_operation(&op->nfs_resop4_u.opopen);
+        case rpcgen::OP_OPENATTR:
+             return nfs4_operation(&op->nfs_resop4_u.opopenattr);
+        case rpcgen::OP_OPEN_CONFIRM:
+             return nfs4_operation(&op->nfs_resop4_u.opopen_confirm);
+        case rpcgen::OP_OPEN_DOWNGRADE:
+             return nfs4_operation(&op->nfs_resop4_u.opopen_downgrade);
+        case rpcgen::OP_PUTFH:
+             return nfs4_operation(&op->nfs_resop4_u.opputfh);
+        case rpcgen::OP_PUTPUBFH:
+             return nfs4_operation(&op->nfs_resop4_u.opputpubfh);
+        case rpcgen::OP_PUTROOTFH:
+             return nfs4_operation(&op->nfs_resop4_u.opputrootfh);
+        case rpcgen::OP_READ:
+             return nfs4_operation(&op->nfs_resop4_u.opread);
+        case rpcgen::OP_READDIR:
+             return nfs4_operation(&op->nfs_resop4_u.opreaddir);
+        case rpcgen::OP_READLINK:
+             return nfs4_operation(&op->nfs_resop4_u.opreadlink);
+        case rpcgen::OP_REMOVE:
+             return nfs4_operation(&op->nfs_resop4_u.opremove);
+        case rpcgen::OP_RENAME:
+             return nfs4_operation(&op->nfs_resop4_u.oprename);
+        case rpcgen::OP_RENEW:
+             return nfs4_operation(&op->nfs_resop4_u.oprenew);
+        case rpcgen::OP_RESTOREFH:
+             return nfs4_operation(&op->nfs_resop4_u.oprestorefh);
+        case rpcgen::OP_SAVEFH:
+             return nfs4_operation(&op->nfs_resop4_u.opsavefh);
+        case rpcgen::OP_SECINFO:
+             return nfs4_operation(&op->nfs_resop4_u.opsecinfo);
+        case rpcgen::OP_SETATTR:
+             return nfs4_operation(&op->nfs_resop4_u.opsetattr);
+        case rpcgen::OP_SETCLIENTID:
+             return nfs4_operation(&op->nfs_resop4_u.opsetclientid);
+        case rpcgen::OP_SETCLIENTID_CONFIRM:
+             return nfs4_operation(&op->nfs_resop4_u.opsetclientid_confirm);
+        case rpcgen::OP_VERIFY:
+             return nfs4_operation(&op->nfs_resop4_u.opverify);
+        case rpcgen::OP_WRITE:
+             return nfs4_operation(&op->nfs_resop4_u.opwrite);
+        case rpcgen::OP_RELEASE_LOCKOWNER:
+             return nfs4_operation(&op->nfs_resop4_u.oprelease_lockowner);
+        case rpcgen::OP_GET_DIR_DELEGATION:
+             return nfs4_operation(&op->nfs_resop4_u.opget_dir_delegation);
+        case rpcgen::OP_ILLEGAL:
+             return nfs4_operation(&op->nfs_resop4_u.opillegal);
         }
     out << " ]";
     }
@@ -937,26 +1121,38 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::ACCESS4res*  res)
         if(out_all() && res->status == rpcgen::nfsstat4::NFS4_OK)
         {
             out << " supported: ";
-            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_READ)    out << "READ ";
-            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_LOOKUP)  out << "LOOKUP ";
-            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_MODIFY)  out << "MODIFY ";
-            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_EXTEND)  out << "EXTEND ";
-            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_DELETE)  out << "DELETE ";
-            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_EXECUTE) out << "EXECUTE ";
+            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_READ)
+                out << "READ ";
+            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_LOOKUP)
+                out << "LOOKUP ";
+            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_MODIFY)
+                out << "MODIFY ";
+            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_EXTEND)
+                out << "EXTEND ";
+            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_DELETE)
+                out << "DELETE ";
+            if ((res->ACCESS4res_u.resok4.supported) & ACCESS4_EXECUTE)
+                out << "EXECUTE ";
             out << " access: ";
-            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_READ)    out << "READ ";
-            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_LOOKUP)  out << "LOOKUP ";
-            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_MODIFY)  out << "MODIFY ";
-            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_EXTEND)  out << "EXTEND ";
-            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_DELETE)  out << "DELETE ";
-            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_EXECUTE) out << "EXECUTE ";
+            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_READ)
+                out << "READ ";
+            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_LOOKUP)
+                out << "LOOKUP ";
+            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_MODIFY)
+                out << "MODIFY ";
+            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_EXTEND)
+                out << "EXTEND ";
+            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_DELETE)
+                out << "DELETE ";
+            if ((res->ACCESS4res_u.resok4.access) & ACCESS4_EXECUTE)
+                out << "EXECUTE ";
         }
     }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::CLOSE4args* args)
 {
-    if(args) out <<  "seqid: "       << std::hex << args->seqid << std::dec
+    if(args) out <<  "seqid: "        << std::hex << args->seqid << std::dec
                  << " open state id:" << args->open_stateid;
 }
 
@@ -984,7 +1180,9 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::COMMIT4res*  res)
         if(out_all() && res->status == rpcgen::nfsstat4::NFS4_OK)
         {
             out << " write verifier: ";
-            print_hex(out, res->COMMIT4res_u.resok4.writeverf, rpcgen::NFS4_VERIFIER_SIZE);
+            print_hex(out,
+                      res->COMMIT4res_u.resok4.writeverf,
+                      rpcgen::NFS4_VERIFIER_SIZE);
         }
     }
 }
@@ -1076,12 +1274,15 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::LOCK4res*  res)
             switch(res->status)
             {
             case rpcgen::nfsstat4::NFS4_OK:
-                out << " lock stat id: " << res->LOCK4res_u.resok4.lock_stateid; break;
+                out << " lock stat id: "
+                    << res->LOCK4res_u.resok4.lock_stateid;
+                break;
             case rpcgen::nfsstat4::NFS4ERR_DENIED:
                 out << " offset: "    << res->LOCK4res_u.denied.offset
                     << " length: "    << res->LOCK4res_u.denied.length
                     << " lock type: " << res->LOCK4res_u.denied.locktype
-                    << " owner: "     << res->LOCK4res_u.denied.owner;           break;
+                    << " owner: "     << res->LOCK4res_u.denied.owner;
+                break;
             default: break;
             }
         }
@@ -1169,7 +1370,8 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::OPEN4res*  res)
         if(out_all() && res->status == rpcgen::nfsstat4::NFS4_OK)
             out << res->OPEN4res_u.resok4.stateid
                 << res->OPEN4res_u.resok4.cinfo
-                << " results flags: " << std::hex << res->OPEN4res_u.resok4.rflags << std::dec
+                << " results flags: "
+                << std::hex << res->OPEN4res_u.resok4.rflags << std::dec
                 << ' ' << res->OPEN4res_u.resok4.attrset
                 << ' ' << res->OPEN4res_u.resok4.delegation;
     }
@@ -1301,14 +1503,17 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::RENAME4res*  res)
     {
         out << "status: " << res->status;
         if(out_all() && res->status == rpcgen::nfsstat4::NFS4_OK)
-            out << " source: " << res->RENAME4res_u.resok4.source_cinfo
-                << " target: " << res->RENAME4res_u.resok4.target_cinfo;
+            out << " source: "
+                << res->RENAME4res_u.resok4.source_cinfo
+                << " target: "
+                << res->RENAME4res_u.resok4.target_cinfo;
     }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::RENEW4args* args)
 {
-    if(args) out << "client id: " << std::hex << args->clientid << std::dec;
+    if(args) out << "client id: "
+                 << std::hex << args->clientid << std::dec;
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::RENEW4res*  res)
@@ -1329,7 +1534,8 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::SECINFO4res*  res)
         if(out_all() && res->status == rpcgen::nfsstat4::NFS4_OK)
         {
             if(res->SECINFO4res_u.resok4.SECINFO4resok_len)
-                out << " data : " << *res->SECINFO4res_u.resok4.SECINFO4resok_val;
+                out << " data : "
+                    << *res->SECINFO4res_u.resok4.SECINFO4resok_val;
         }
     }
 }
@@ -1352,8 +1558,10 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETATTR4res*  res)
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETCLIENTID4args* args)
 {
     if(args) out << args->client
-                 << " callback: "       << args->callback
-                 << " callback ident: " << std::hex << args->callback_ident << std::dec;
+                 << " callback: "
+                 << args->callback
+                 << " callback ident: "
+                 << std::hex << args->callback_ident << std::dec;
 }
 
 void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETCLIENTID4res*  res)
@@ -1366,13 +1574,16 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::SETCLIENTID4res*  res)
             switch(res->status)
             {
             case rpcgen::nfsstat4::NFS4_OK:
-                out << " client id: " << std::hex << res->SETCLIENTID4res_u.resok4.clientid << std::dec
+                out << " client id: "
+                    << std::hex << res->SETCLIENTID4res_u.resok4.clientid << std::dec
                     << " verifier: ";
-                print_hex(out, res->SETCLIENTID4res_u.resok4.setclientid_confirm, rpcgen::NFS4_VERIFIER_SIZE);
-            break;
+                print_hex(out,
+                          res->SETCLIENTID4res_u.resok4.setclientid_confirm,
+                          rpcgen::NFS4_VERIFIER_SIZE);
+                break;
             case rpcgen::nfsstat4::NFS4ERR_CLID_INUSE:
                 out << " client using: " << res->SETCLIENTID4res_u.client_using;
-            break;
+                break;
             default: break;
             }
         }
@@ -1425,7 +1636,9 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::WRITE4res*  res)
             out << " count: "          << res->WRITE4res_u.resok4.count
                 << " commited: "       << res->WRITE4res_u.resok4.committed
                 << " write verifier: ";
-            print_hex(out, res->WRITE4res_u.resok4.writeverf, rpcgen::NFS4_VERIFIER_SIZE);
+            print_hex(out,
+                      res->WRITE4res_u.resok4.writeverf,
+                      rpcgen::NFS4_VERIFIER_SIZE);
         }
     }
 }
@@ -1456,10 +1669,14 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::GET_DIR_DELEGATION4res* 
         out << "status: " << res->status;
         if(out_all() && res->status == rpcgen::nfsstat4::NFS4_OK)
             out << ' ' << res->GET_DIR_DELEGATION4res_u.resok4.stateid
-                << " status: " << res->GET_DIR_DELEGATION4res_u.resok4.status
-                << " notification types: " << res->GET_DIR_DELEGATION4res_u.resok4.notif_types
-                << " dir: "       << res->GET_DIR_DELEGATION4res_u.resok4.dir_notif_attrs
-                << " dir entry: " << res->GET_DIR_DELEGATION4res_u.resok4.dir_entry_notif_attrs;
+                << " status: "
+                << res->GET_DIR_DELEGATION4res_u.resok4.status
+                << " notification types: "
+                << res->GET_DIR_DELEGATION4res_u.resok4.notif_types
+                << " dir: "
+                << res->GET_DIR_DELEGATION4res_u.resok4.dir_notif_attrs
+                << " dir entry: "
+                << res->GET_DIR_DELEGATION4res_u.resok4.dir_entry_notif_attrs;
     }
 }
 

@@ -44,7 +44,7 @@ protected:
     explicit DynamicLoad(const std::string& file)
     {
         handle = dlopen(file.c_str(), RTLD_LAZY);
-        if(handle == NULL)
+        if(handle == nullptr)
         {
             throw DLException{std::string{"Loading dynamic module: "} + file + " failed with error:" + dlerror()};
         }
@@ -63,7 +63,7 @@ protected:
         using hook_dlsym_t = SymbolPtr (*)(void *, const char *);
 
         address = reinterpret_cast<hook_dlsym_t>(dlsym)(handle, name.c_str());
-        if(address == NULL)
+        if(address == nullptr)
         {
             throw DLException{std::string{"Loading symbol "} + name + " failed with error:" + dlerror()};
         }

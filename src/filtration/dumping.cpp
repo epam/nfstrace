@@ -50,7 +50,7 @@ Dumping::~Dumping()
 
 void Dumping::open_dumping_file(const std::string& file_path)
 {
-    const char* path = file_path.c_str();
+    const char* path {file_path.c_str()};
     LOG("Dumping packets to file:%s", path);
     dumper.reset(new pcap::PacketDumper{handle, path});
 }
@@ -88,7 +88,7 @@ void Dumping::exec_command() const
            args  .emplace_back(const_cast<char*>(tokens.back().c_str()));
         }
         args.push_back(const_cast<char*>(name.c_str()));
-        args.push_back(NULL);  // need termination null pointer
+        args.push_back(nullptr);  // need termination null pointer
 
         if(execvp(args[0], &args[0]) == -1)
         {

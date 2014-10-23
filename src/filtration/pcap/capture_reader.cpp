@@ -33,39 +33,39 @@ namespace pcap
 CaptureReader::CaptureReader(const Params& params) : BaseReader{params.interface}
 {
     char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
-    const char* device = source.c_str();
+    const char* device {source.c_str()};
     handle = pcap_create(device, errbuf);
     if(!handle)
     {
         throw PcapError("pcap_create", errbuf);
     }
 
-    if(int status = pcap_set_snaplen(handle, params.snaplen))
+    if(int status {pcap_set_snaplen(handle, params.snaplen)})
     {
         throw PcapError("pcap_set_snaplen", pcap_statustostr(status));
     }
 
-    if(int status = pcap_set_promisc(handle, params.promisc ? 1 : 0))
+    if(int status {pcap_set_promisc(handle, params.promisc ? 1 : 0)})
     {
         throw PcapError("pcap_set_promisc", pcap_statustostr(status));
     }
 
-    if(int status = pcap_set_timeout(handle, params.timeout_ms))
+    if(int status {pcap_set_timeout(handle, params.timeout_ms)})
     {
         throw PcapError("pcap_set_timeout", pcap_statustostr(status));
     }
 
-    if(int status = pcap_set_buffer_size(handle, params.buffer_size))
+    if(int status {pcap_set_buffer_size(handle, params.buffer_size)})
     {
         throw PcapError("pcap_set_buffer_size", pcap_statustostr(status));
     }
 
-    if(int status = pcap_activate(handle))
+    if(int status {pcap_activate(handle)})
     {
         throw PcapError("pcap_activate", pcap_statustostr(status));
     }
 
-    pcap_direction_t diection = PCAP_D_INOUT;
+    pcap_direction_t diection {PCAP_D_INOUT};
     switch(params.direction)
     {
         using Direction = CaptureReader::Direction;
@@ -73,7 +73,7 @@ CaptureReader::CaptureReader(const Params& params) : BaseReader{params.interface
         case Direction::OUT  : diection = PCAP_D_OUT;   break;
         case Direction::INOUT: diection = PCAP_D_INOUT; break;
     }
-    if(int status = pcap_setdirection(handle, diection))
+    if(int status {pcap_setdirection(handle, diection)})
     {
         throw PcapError("pcap_setdirection", pcap_statustostr(status));
     }

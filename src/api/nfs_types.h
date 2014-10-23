@@ -54,7 +54,7 @@ struct ProcEnumNFS3
         PATHCONF    = 20,
         COMMIT      = 21
     };
-    static const int32_t count = 22;
+    static const int32_t count {22};
 };
 
 struct ProcEnumNFS4

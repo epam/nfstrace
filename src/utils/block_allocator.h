@@ -51,7 +51,7 @@ public:
 
     ~BlockAllocator()
     {
-        for(std::size_t i = 0; i<allocated; i++)
+        for(std::size_t i {0}; i<allocated; i++)
         {
             delete[] ((char*)blocks[i]);
         }
@@ -83,7 +83,7 @@ public:
             list = new_block();
         }
 
-        Chunk* c = list;
+        Chunk* c {list};
         list = list->next;
         --nfree;
         return c;
@@ -91,7 +91,7 @@ public:
 
     inline void deallocate(void* ptr)
     {
-        Chunk* c = (Chunk*) ptr;
+        Chunk* c {(Chunk*) ptr};
         c->next = list;
         list = c;
         ++nfree;
@@ -106,8 +106,8 @@ public:
 private:
     Chunk* new_block()
     {
-        char* ptr = new char[block*chunk];
-        for(std::size_t i = 0; i<block-1; ++i)
+        char* ptr {new char[block*chunk]};
+        for(std::size_t i {0}; i<block-1; ++i)
         {
             ((Chunk*) &ptr[i * chunk])->next = (Chunk*) &ptr[(i + 1) * chunk];
         }
@@ -120,9 +120,9 @@ private:
 
     void increase_blocks_limit()
     {
-        const std::size_t new_limit = limit * 2; // increase soft limit by twice
+        const std::size_t new_limit {limit * 2}; // increase soft limit by twice
 
-        Chunk** new_blocks = new Chunk*[new_limit]; // allocate new array of blocks pointers
+        Chunk** new_blocks {new Chunk*[new_limit]}; // allocate new array of blocks pointers
         limit = new_limit;
         memcpy(new_blocks, blocks, sizeof(Chunk*)*allocated); // copy pointers of existing blocks
         memset(&new_blocks[allocated], 0, sizeof(Chunk*)*(limit-allocated)); // fill pointers for new blocks by NULL

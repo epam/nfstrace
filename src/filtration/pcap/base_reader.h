@@ -58,7 +58,7 @@ protected:
 public:
     bool loop(void* user, pcap_handler callback, int count=0)
     {
-        const int err = pcap_loop(handle, count, callback, (u_char*)user);
+        const int err {pcap_loop(handle, count, callback, (u_char*)user)};
         if(err == -1) throw PcapError("pcap_loop", pcap_geterr(handle));
 
         return err == 0; // count is exhausted

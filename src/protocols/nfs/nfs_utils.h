@@ -43,12 +43,19 @@ inline bool out_all()
     return Out::Global::get_level() == Out::Level::All;
 }
 
-void print_hex(std::ostream& out, const uint32_t* const val, const uint32_t len);
-void print_hex(std::ostream& out,     const char* const val, const uint32_t len);
+void print_hex(std::ostream& out,
+       const uint32_t* const val,
+              const uint32_t len);
+
+void print_hex(std::ostream& out,
+           const char* const val,
+              const uint32_t len);
 
 extern "C"
 NST_PUBLIC
-void print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len);
+void print_nfs_fh(std::ostream& out,
+              const char* const val,
+                 const uint32_t len);
 
 } // namespace NFS
 } // namespace protocols

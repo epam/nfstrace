@@ -80,7 +80,7 @@ void print_ipv4_port(std::ostream& out, in_addr_t ipv4, in_port_t port)
     static_assert(sizeof(ipv4) == sizeof(struct in_addr), "they must be equal");
     char buf[INET_ADDRSTRLEN];
 
-    const char* str = inet_ntop(AF_INET, &ipv4, buf, sizeof(buf));
+    const char* str {inet_ntop(AF_INET, &ipv4, buf, sizeof(buf))};
     out << (str ? str : "Invalid IPv4 address")
         << ':' << ntohs(port);
 }
@@ -90,7 +90,7 @@ void print_ipv6_port(std::ostream& out, const uint8_t (&ipv6)[16], in_port_t por
     static_assert(sizeof(ipv6) == sizeof(struct in6_addr),"they must be equal");
     char buf[INET6_ADDRSTRLEN];
 
-    const char* str = inet_ntop(AF_INET6, ipv6, buf, sizeof(buf));
+    const char* str {inet_ntop(AF_INET6, ipv6, buf, sizeof(buf))};
     out << (str ? str : "Invalid IPv6 address")
         << ':' << ntohs(port);
 }
@@ -101,10 +101,10 @@ void print_sockaddr(std::ostream& out, SockAddr& addr)
 {
     char hostname[1025];
     char service [65];
-    const int err = getnameinfo((sockaddr*)&addr, sizeof(addr),
+    const int err {getnameinfo((sockaddr*)&addr, sizeof(addr),
                                         hostname, sizeof(hostname),
                                          service, sizeof(service),
-                                                  NI_NAMEREQD );
+                                                  NI_NAMEREQD ) };
     if(err == 0)
     {
         out << '(' << hostname << ':' << service << ')';
@@ -173,7 +173,7 @@ void print_session(std::ostream& out, const Session& session)
 
 std::ostream& operator<<(std::ostream& out, const ApplicationSession& session)
 {
-    const bool namelookup{Out::Global::get_level() == Out::Level::All};
+    const bool namelookup {Out::Global::get_level() == Out::Level::All};
 
     switch(session.ip_type)
     {
