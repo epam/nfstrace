@@ -114,8 +114,8 @@ public:
         {
             assert(nullptr != ptr);
 
-            uint8_t* offset_ptr = ptr->data + ptr->dlen;
-            const uint32_t avail = ptr->capacity() - ptr->dlen;
+            uint8_t* offset_ptr  { ptr->data + ptr->dlen };
+            const uint32_t avail { ptr->capacity() - ptr->dlen};
             if(len > avail) // inappropriate case. Must be one resize when get entire message size
             {
                 ptr->resize(ptr->dlen + len); // [! unbound extension !]

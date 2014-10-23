@@ -33,10 +33,10 @@ namespace controller
 namespace cmdline
 {
 
-const char* const Args::profiling_mode    = LIVE;
-const char* const Args::dumping_mode      = DUMP;
-const char* const Args::analysis_mode     = STAT;
-const char* const Args::draining_mode     = DRAIN;
+const char* const Args::profiling_mode {LIVE};
+const char* const Args::dumping_mode   {DUMP};
+const char* const Args::analysis_mode  {STAT};
+const char* const Args::draining_mode  {DRAIN};
 
 // This array will be indexed via elements of Args::Names enumeration. Keep it in the same order.
 Opt Args::options[Args::num] =

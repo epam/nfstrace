@@ -299,9 +299,9 @@ void CmdlineParser<CLI>::print_usage(std::ostream& out, const char* name)
             text += o.description;
         }
 
-        out << std::setw(6) << s_opt;
-        out << std::setiosflags(std::ios::left) << std::setw(35) << l_opt;
-        out << text << std::endl;
+        out << std::setw(6) << s_opt
+            << std::setiosflags(std::ios::left) << std::setw(35) << l_opt
+            << text << std::endl;
     }
 }
 

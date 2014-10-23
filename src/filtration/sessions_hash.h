@@ -93,8 +93,8 @@ struct MapperImpl
         if(key.port[0] > key.port[1]) return Session::Destination;
 
         // Ok, ports are equal, compare addresses
-        const uint32_t* s = key.ip.v6.addr_uint32[0];
-        const uint32_t* d = key.ip.v6.addr_uint32[1];
+        const uint32_t* s { key.ip.v6.addr_uint32[0] };
+        const uint32_t* d { key.ip.v6.addr_uint32[1] };
 
         if(s[0] != d[0]) return (s[0] < d[0]) ? Session::Source : Session::Destination;
         if(s[1] != d[1]) return (s[1] < d[1]) ? Session::Source : Session::Destination;
@@ -106,7 +106,7 @@ struct MapperImpl
     static inline void copy_ipv6(uint32_t dst[4], const uint8_t src[16])
     {
         // TODO:: fix alignment of src!
-        const uint32_t* s = reinterpret_cast<const uint32_t*>(src);
+        const uint32_t* s { reinterpret_cast<const uint32_t*>(src) };
         dst[0] = s[0];
         dst[1] = s[1];
         dst[2] = s[2];

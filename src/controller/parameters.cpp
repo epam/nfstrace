@@ -55,7 +55,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
 
             for(const auto& a : analysis_modules)
             {
-                const std::string& path = a.path;
+                const std::string& path {a.path};
                 try
                 {
                     std::cout << "Usage of " << path << ":\n";
@@ -91,10 +91,10 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
 
         // cashed values
         const std::string program_path(argv[0]);
-        size_t found = program_path.find_last_of("/\\");
+        size_t found {program_path.find_last_of("/\\")};
         program = program_path.substr(found+1);
 
-        const int limit = get(CLI::MSIZE).to_int();
+        const int limit {get(CLI::MSIZE).to_int()};
         if(limit < 1 || limit > 4000)
         {
             throw cmdline::CLIError{std::string{"Invalid limit of RPC messages: "} + get(CLI::MSIZE).to_cstr()};
@@ -112,7 +112,7 @@ protected:
         if(index == CLI::ANALYZERS) // may have multiple values
         {
             const std::string arg{v};
-            size_t ind = arg.find('#');
+            size_t ind {arg.find('#')};
             if(ind == std::string::npos)
             {
                 analysis_modules.emplace_back(arg);

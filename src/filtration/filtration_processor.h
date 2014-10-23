@@ -85,7 +85,7 @@ public:
                 {
                     if (NFS3::Validator::check(call))
                     {
-                        uint32_t proc = call->proc();
+                        uint32_t proc {call->proc()};
                         if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
                             hdr_len = (nfs3_rw_hdr_max < info.dlen ? nfs3_rw_hdr_max : info.dlen);
                         else
@@ -164,7 +164,7 @@ public:
 
         friend class TCPSession<StreamReader>;
 
-        Flow() : fragments{NULL}, sequence{0}
+        Flow() : fragments{nullptr}, sequence{0}
         {
         }
         ~Flow()
@@ -190,8 +190,8 @@ public:
 
         void reassemble(PacketInfo& info)
         {
-            uint32_t seq = info.tcp->seq();
-            uint32_t len = info.dlen;
+            uint32_t seq {info.tcp->seq()};
+            uint32_t len {info.dlen};
 
             if( sequence == 0 ) // this is the first time we have seen this src's sequence number
             {
@@ -216,17 +216,17 @@ public:
                 // this sequence number seems dated, but
                 // check the end to make sure it has no more
                 // info than we have already seen
-                uint32_t newseq = seq + len;
+                uint32_t newseq {seq + len};
                 if( GT_SEQ(newseq, sequence) )
                 {
 
                     // this one has more than we have seen. let's get the
                     // payload that we have not seen
-                    uint32_t new_len = sequence - seq;
+                    uint32_t new_len {sequence - seq};
 
                     if ( info.dlen <= new_len )
                     {
-                        info.data = NULL;
+                        info.data = nullptr;
                         info.dlen = 0;
                     }
                     else
@@ -267,15 +267,15 @@ public:
 
         bool check_fragments(const uint32_t acknowledged)
         {
-            Packet* current = fragments;
+            Packet* current {fragments};
             if( current )
             {
-                Packet* prev {NULL};
-                uint32_t lowest_seq = current->tcp->seq();
+                Packet* prev {nullptr};
+                uint32_t lowest_seq {current->tcp->seq()};
                 while( current )
                 {
-                    const uint32_t current_seq = current->tcp->seq();
-                    const uint32_t current_len = current->dlen;
+                    const uint32_t current_seq {current->tcp->seq()};
+                    const uint32_t current_len {current->dlen};
 
                     if( GT_SEQ(lowest_seq, current_seq) ) // lowest_seq > current_seq
                     {
@@ -287,13 +287,13 @@ public:
                         // this sequence number seems dated, but
                         // check the end to make sure it has no more
                         // info than we have already seen
-                        uint32_t newseq = current_seq + current_len;
+                        uint32_t newseq {current_seq + current_len};
                         if( GT_SEQ(newseq, sequence) )
                         {
                             // this one has more than we have seen. let's get the
                             // payload that we have not seen. This happens when
                             // part of this frame has been retransmitted
-                            uint32_t new_pos = sequence - current_seq;
+                            uint32_t new_pos {sequence - current_seq};
 
                             sequence += (current_len - new_pos);
 
@@ -376,7 +376,7 @@ public:
 
     void collect(PacketInfo& info)
     {
-        const uint32_t ack = info.tcp->ack();
+        const uint32_t ack {info.tcp->ack()};
 
         //check whether this frame acks fragments that were already seen.
         while( flows[1-info.direction].check_fragments(ack) );
@@ -502,13 +502,13 @@ public:
 
     inline bool collect_header(PacketInfo& info)
     {
-        static const size_t max_header = sizeof(RecordMark) + sizeof(CallHeader);
-        static const size_t max_reply_header = sizeof(RecordMark) + sizeof(ReplyHeader);
+        static const size_t max_header       {sizeof(RecordMark) + sizeof(CallHeader) };
+        static const size_t max_reply_header {sizeof(RecordMark) + sizeof(ReplyHeader)};
 
         if(collection && (collection.data_size() > 0)) // collection is allocated
         {
             assert(collection.capacity() >= max_header);
-            const uint32_t tocopy = max_header - collection.data_size();
+            const unsigned long tocopy {max_header - collection.data_size()};
             assert(tocopy != 0);
             if(info.dlen < tocopy)
             {
@@ -553,7 +553,7 @@ public:
 
         assert(collection);     // collection must be initialized
 
-        const RecordMark* rm = reinterpret_cast<const RecordMark*>(collection.data());
+        const RecordMark* rm {reinterpret_cast<const RecordMark*>(collection.data())};
         //if(rm->is_last()); // TODO: handle sequence field of record mark
         if(collection.data_size() < (sizeof(CallHeader) + sizeof(RecordMark)) && (rm->fragment())->type() != MsgType::REPLY ) // if message not Reply, try collect the rest for Call
         {
@@ -566,7 +566,7 @@ public:
                 assert(msg_len != 0);   // message is found
                 assert(msg_len >= collection.data_size());
                 assert(hdr_len <= msg_len);
-                const uint32_t written = collection.data_size();
+                const uint32_t written {collection.data_size()};
                 msg_len -= written; // substract how written (if written)
                 hdr_len -= std::min(hdr_len, written);
                 if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
@@ -597,7 +597,7 @@ public:
                     msg_len = len;   // length of current RPC message
                     if(NFS3::Validator::check(call))
                     {
-                        uint32_t proc = call->proc();
+                        uint32_t proc {call->proc()};
                         if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
                             hdr_len = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
                         else
@@ -703,7 +703,7 @@ public:
 
     void run()
     {
-        bool done = reader->loop(this, callback);
+        bool done {reader->loop(this, callback)};
         if(done)
         {
             throw controller::ProcessingDone("Filtration is done");

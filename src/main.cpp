@@ -47,7 +47,7 @@ catch(const std::exception& e)
 }
 catch(...)
 {
-    std::cerr << argv[0] << ": " << "Unknown exception" << std::endl;
+    std::cerr << argv[0] << ": Unknown exception" << std::endl;
     return -1;
 }
 //------------------------------------------------------------------------------

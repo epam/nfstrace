@@ -260,11 +260,13 @@ typedef struct diropargs3 diropargs3;
 // for compatibility
 struct NULL3args
 {
+    bool t {};
 };
 
 // for compatibility
 struct NULL3res
 {
+    bool t {};
 };
 
 struct GETATTR3args {

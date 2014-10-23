@@ -89,7 +89,7 @@ public:
         }
         else // have some filled memory
         {
-            uint8_t* mem = new uint8_t[newsize];
+            uint8_t* mem {new uint8_t[newsize]};
             if (dlen)
             {
                 memcpy(mem, memory, dlen);

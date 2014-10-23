@@ -251,7 +251,7 @@ struct PacketInfo
         if(dlen < sizeof(TCPHeader)) return;   // truncated TCP header
         auto header = reinterpret_cast<const TCPHeader*>(data);
 
-        uint8_t offset = header->offset();
+        uint8_t offset {header->offset()};
         if(offset < 20 || offset > 60) return; // invalid length of TCP header
 
         if(dlen < offset) return; // truncated packet
@@ -269,7 +269,7 @@ struct PacketInfo
     inline void check_udp() __attribute__((always_inline))
     {
         if(dlen < sizeof(UDPHeader)) return;   // fragmented UDP header
-        const UDPHeader* header = reinterpret_cast<const UDPHeader*>(data);
+        const UDPHeader* header {reinterpret_cast<const UDPHeader*>(data)};
 
         data += sizeof(UDPHeader);
         dlen -= sizeof(UDPHeader);
@@ -323,11 +323,11 @@ struct Packet: public PacketInfo
 
         // allocate memory for Packet structure and PCAP packet data
         // TODO: performance drop! improve data alignment!
-        uint8_t* memory    =  new uint8_t[sizeof(Packet) + sizeof(pcap_pkthdr) + info.header->caplen];
+        uint8_t* memory    {  new uint8_t[sizeof(Packet) + sizeof(pcap_pkthdr) + info.header->caplen]};
 
-        Packet* fragment   = (Packet*)      ((uint8_t*)memory                                       );
-        pcap_pkthdr* header= (pcap_pkthdr*) ((uint8_t*)memory + sizeof(Packet)                      );
-        uint8_t*  packet   = (uint8_t*)     ((uint8_t*)memory + sizeof(Packet) + sizeof(pcap_pkthdr));
+        Packet* fragment   { (Packet*)      ((uint8_t*)memory                                       )};
+        pcap_pkthdr* header{ (pcap_pkthdr*) ((uint8_t*)memory + sizeof(Packet)                      )};
+        uint8_t*  packet   { (uint8_t*)     ((uint8_t*)memory + sizeof(Packet) + sizeof(pcap_pkthdr))};
 
         // copy data
         *header = *info.header;                           // copy packet header
@@ -355,7 +355,7 @@ struct Packet: public PacketInfo
 
     static void destroy(Packet* fragment)
     {
-        uint8_t* ptr = (uint8_t*)fragment;
+        uint8_t* ptr { (uint8_t*)fragment };
         delete[] ptr;
     }
 };

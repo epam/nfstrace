@@ -48,8 +48,8 @@ static void handle_signals(const sigset_t    waitmask,
 {
     while(running.test_and_set())
     {
-        int signo = 0;
-        const int err = ::sigwait(&waitmask, &signo);
+        int signo {0};
+        const int err {::sigwait(&waitmask, &signo)};
         if(err != 0)
         {
             status.push(std::system_error{err, std::system_category(),
@@ -60,7 +60,7 @@ static void handle_signals(const sigset_t    waitmask,
         if(signo == SIGCHLD)
         {
             // wait childern(compression in dumping mode may call fork())
-            const pid_t pid{::wait(NULL)};
+            const pid_t pid {::wait(nullptr)};
             if(pid == -1 && errno != ECHILD)
             {
                 status.push(std::system_error{errno, std::system_category(),
@@ -89,7 +89,7 @@ SignalHandler::SignalHandler(RunningStatus& s)
     struct sigaction chld;
     memset(&chld, 0, sizeof(chld));
     chld.sa_handler = dummy;
-    if(::sigaction(SIGCHLD, &chld, NULL) != 0)
+    if(::sigaction(SIGCHLD, &chld, nullptr) != 0)
     {
         throw std::system_error(errno, std::system_category(),
                                 "error in SignalHandler sigaction");
@@ -99,7 +99,7 @@ SignalHandler::SignalHandler(RunningStatus& s)
     ::sigemptyset(&mask);
     ::sigaddset(&mask, SIGINT);  // correct exit from program by Ctrl-C
     ::sigaddset(&mask, SIGCHLD); // stop sigwait-thread and wait children
-    const int err = ::pthread_sigmask(SIG_BLOCK, &mask, NULL);
+    const int err = ::pthread_sigmask(SIG_BLOCK, &mask, nullptr);
     if(err != 0)
     {
         throw std::system_error(err, std::system_category(),

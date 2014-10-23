@@ -48,11 +48,11 @@ int main()
     {
         BlockAllocator allocator;
         allocator.init_allocation(CHUNK_SIZE, BLOCK_SIZE, MAX_BLOCK_COUNT);
-        for(unsigned int i = 0; i < allocator.max_chunks(); ++i)
+        for(unsigned int i {0}; i < allocator.max_chunks(); ++i)
         {
-            assert(allocator.allocate() != NULL); // ERROR! Memory should be enough
+            assert(allocator.allocate() != nullptr); // ERROR! Memory should be enough
         }
-        assert(allocator.allocate() == NULL); // ERROR! Extra memory
+        assert(allocator.allocate() == nullptr); // ERROR! Extra memory
         assert(allocator.free_chunks() == 0);
     }
     // Test for memory utilization
@@ -61,30 +61,30 @@ int main()
         allocator.init_allocation(CHUNK_SIZE, BLOCK_SIZE, MAX_BLOCK_COUNT);
         assert(allocator.free_chunks() == BLOCK_SIZE);
         void* chunks[BLOCK_SIZE * MAX_BLOCK_COUNT];
-        for(unsigned int i = 0; i < allocator.max_chunks(); ++i)
+        for(unsigned int i {0}; i < allocator.max_chunks(); ++i)
         {
             chunks[i] = allocator.allocate();
         }
         assert(allocator.free_chunks() == 0);
-        for(unsigned int i = 0; i < BLOCK_SIZE * MAX_BLOCK_COUNT; ++i)
+        for(unsigned int i {0}; i < BLOCK_SIZE * MAX_BLOCK_COUNT; ++i)
         {
             allocator.deallocate(chunks[i]);
         }
         assert(allocator.free_chunks() == BLOCK_SIZE * MAX_BLOCK_COUNT);
-        for(unsigned int i = 0; i < allocator.max_chunks(); ++i)
+        for(unsigned int i {0}; i < allocator.max_chunks(); ++i)
         {
-            assert(allocator.allocate() != NULL); // ERROR! Memory can not be reused
+            assert(allocator.allocate() != nullptr); // ERROR! Memory can not be reused
         }
-        assert(allocator.allocate() == NULL); // ERROR! Extra memory appearenced
+        assert(allocator.allocate() == nullptr); // ERROR! Extra memory appearenced
         assert(allocator.free_chunks() == 0);
     }
     // Test for memory reusability
     {
         BlockAllocator allocator;
         allocator.init_allocation(CHUNK_SIZE, BLOCK_SIZE, MAX_BLOCK_COUNT);
-        void* temp = NULL;
-        void* test = NULL;
-        for(unsigned int i = 0; i < allocator.max_chunks() / 3; ++i)
+        void* temp {nullptr};
+        void* test {nullptr};
+        for(unsigned int i {0}; i < allocator.max_chunks() / 3; ++i)
         {
             temp = test = allocator.allocate();
         }
@@ -96,7 +96,7 @@ int main()
     {
         BlockAllocator allocator;
         allocator.init_allocation(CHUNK_SIZE, BLOCK_SIZE, MAX_BLOCK_COUNT);
-        void* chunk = allocator.allocate();
+        void* chunk {allocator.allocate()};
         memcpy(chunk, "Hello", 6);
         assert(strcmp((const char*)chunk, "Hello") == 0); // Allocator cannot be used!!!
         allocator.deallocate(chunk);

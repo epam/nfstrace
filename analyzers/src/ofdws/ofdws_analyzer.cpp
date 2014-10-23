@@ -27,9 +27,11 @@
 #include "ofdws_analyzer.h"
 //------------------------------------------------------------------------------
 OFDWSAnalyzer::OFDWSAnalyzer(int32_t bl_size,
-                             int32_t bu_size) : read_total{0},
-                                               write_total{0},
-                                                       out{std::cout}
+                             int32_t bu_size)
+: read_total{0}
+, write_total{0}
+, out(std::cout)
+
 {
     FileRWOp::set_block_size(bl_size * 1024);
     FileRWOp::set_bucket_size(bu_size);

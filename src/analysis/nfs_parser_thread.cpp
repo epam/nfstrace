@@ -150,13 +150,13 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
     using namespace NST::protocols::NFS4;
 
     auto header = reinterpret_cast<const CallHeader*>(call->data);
-    const uint32_t procedure = header->proc();
-    const uint32_t version   = header->vers();
+    const uint32_t procedure {header->proc()};
+    const uint32_t version   {header->vers()};
     try
     {
-        XDRDecoder c{std::move(call) };
-        XDRDecoder r{std::move(reply)};
-        const Session* s = session->get_session();
+        XDRDecoder c {std::move(call) };
+        XDRDecoder r {std::move(reply)};
+        const Session* s {session->get_session()};
 
         switch(version)
         {

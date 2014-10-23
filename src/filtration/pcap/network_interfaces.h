@@ -111,7 +111,7 @@ public:
     inline static std::string default_device()
     {
         char errbuf[PCAP_ERRBUF_SIZE];
-        const char* default_device = pcap_lookupdev(errbuf);
+        const char* default_device {pcap_lookupdev(errbuf)};
         if(default_device == nullptr)
         {
             throw PcapError("pcap_lookupdev", errbuf);
@@ -136,7 +136,7 @@ std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Interface&
 {
     out.width(8);
     out << std::left << i.name();
-    const char* dscr = i.dscr();
+    const char* dscr {i.dscr()};
     if(dscr)
     {
         out << '(' << dscr << ')';
@@ -150,8 +150,8 @@ std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Interface&
 
 std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Address& a)
 {
-    sockaddr* s_address=a.address();
-    sockaddr* s_netmask=a.netmask();
+    sockaddr* s_address {a.address()};
+    sockaddr* s_netmask {a.netmask()};
     if(s_address)
     {
         switch(s_address->sa_family)
@@ -161,24 +161,36 @@ std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Address& a
             char ip[INET_ADDRSTRLEN]{};
             char netmask[INET_ADDRSTRLEN]{};
 
-            inet_ntop(AF_INET,&(reinterpret_cast<sockaddr_in*>(s_address)->sin_addr), ip, sizeof(ip));
+            inet_ntop(AF_INET,
+                      &(reinterpret_cast<sockaddr_in*>(s_address)->sin_addr),
+                      ip,
+                      sizeof(ip));
             out << "inet " << ip;
-            inet_ntop(AF_INET,&(reinterpret_cast<sockaddr_in*>(s_netmask)->sin_addr), netmask, sizeof(netmask));
+            inet_ntop(AF_INET,
+                      &(reinterpret_cast<sockaddr_in*>(s_netmask)->sin_addr),
+                      netmask,
+                      sizeof(netmask));
             out << " netmask " << netmask;
 
-            sockaddr* s_broadaddr=a.broadaddr();
+            sockaddr* s_broadaddr {a.broadaddr()};
             if(s_broadaddr)
             {
                 char broadaddr[INET_ADDRSTRLEN]{};
-                inet_ntop(AF_INET,&(reinterpret_cast<sockaddr_in*>(s_broadaddr)->sin_addr), broadaddr, sizeof(broadaddr));
+                inet_ntop(AF_INET,
+                          &(reinterpret_cast<sockaddr_in*>(s_broadaddr)->sin_addr),
+                          broadaddr,
+                          sizeof(broadaddr));
                 out << " broadcast " << broadaddr;
             }
 
-            sockaddr* s_destaddr=a.destaddr();
+            sockaddr* s_destaddr {a.destaddr()};
             if(s_destaddr)
             {
                 char destaddr[INET_ADDRSTRLEN]{};
-                inet_ntop(AF_INET,&(reinterpret_cast<sockaddr_in*>(s_destaddr)->sin_addr), destaddr, sizeof(destaddr));
+                inet_ntop(AF_INET,
+                          &(reinterpret_cast<sockaddr_in*>(s_destaddr)->sin_addr),
+                          destaddr,
+                          sizeof(destaddr));
                 out << " destadrr " << destaddr;
             }
             break;
@@ -187,17 +199,26 @@ std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Address& a
         {
             char ip6[INET6_ADDRSTRLEN]{};
             char netmask6[INET6_ADDRSTRLEN]{};
-            inet_ntop(AF_INET6,&(reinterpret_cast<sockaddr_in6*>(s_address)->sin6_addr), ip6, sizeof(ip6));
+            inet_ntop(AF_INET6,
+                      &(reinterpret_cast<sockaddr_in6*>(s_address)->sin6_addr),
+                      ip6,
+                      sizeof(ip6));
             out << "inet6 " << ip6;
-            out << " scopeid " << std::showbase << std::hex << reinterpret_cast<sockaddr_in6*>(s_address)->sin6_scope_id << std::dec;
+            out << " scopeid " << std::showbase << std::hex
+                << reinterpret_cast<sockaddr_in6*>(s_address)->sin6_scope_id << std::dec;
 
-            inet_ntop(AF_INET6,&(reinterpret_cast<sockaddr_in6*>(s_netmask)->sin6_addr), netmask6, sizeof(netmask6));
+            inet_ntop(AF_INET6,
+                      &(reinterpret_cast<sockaddr_in6*>(s_netmask)->sin6_addr),
+                      netmask6,
+                      sizeof(netmask6));
             out << " netmask " << netmask6;
             break;
         }
         default:
         {
-            out << "Unsupported address family(" << static_cast<uint32_t>(s_address->sa_family) << ')';
+            out << "Unsupported address family("
+                << static_cast<uint32_t>(s_address->sa_family)
+                << ')';
         }
         }
     }

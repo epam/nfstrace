@@ -35,7 +35,7 @@ void print_hex(std::ostream& out, const uint32_t* const val, const uint32_t len)
     if(len)
     {
         out << std::hex << std::setfill('0');
-        for(uint32_t i = 0; i < len; i++)
+        for(uint32_t i {0}; i < len; i++)
         {
             out << std::setw(2) << val[i];
         }
@@ -52,9 +52,10 @@ void print_hex(std::ostream& out, const char* const val, const uint32_t len)
     if(len)
     {
         out << std::hex << std::setfill('0');
-        for(uint32_t i = 0; i < len; i++)
+        for(uint32_t i {0}; i < len; i++)
         {
-                out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
+                out << std::setw(2)
+                    << ((static_cast<int32_t>(val[i])) & 0xFF);
         }
         out << std::dec << std::setfill(' ');
     }
@@ -71,21 +72,24 @@ void print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len)
         out << std::hex << std::setfill('0');
         if(len <= 8 || out_all())
         {
-            for(uint32_t i = 0; i < len; i++)
+            for(uint32_t i {0}; i < len; i++)
             {
-                out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
+                out << std::setw(2)
+                    << ((static_cast<int32_t>(val[i])) & 0xFF);
             }
         }
         else // truncate binary data to: 00112233...CCDDEEFF
         {
-            for(uint32_t i = 0; i < 4; i++)
+            for(uint32_t i {0}; i < 4; i++)
             {
-                out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
+                out << std::setw(2)
+                    << ((static_cast<int32_t>(val[i])) & 0xFF);
             }
             out << "...";
-            for(uint32_t i = len-4; i < len; i++)
+            for(uint32_t i {len-4}; i < len; i++)
             {
-                out << std::setw(2) << ((static_cast<int32_t>(val[i])) & 0xFF);
+                out << std::setw(2)
+                    << ((static_cast<int32_t>(val[i])) & 0xFF);
             }
         }
         out << std::dec << std::setfill(' ');

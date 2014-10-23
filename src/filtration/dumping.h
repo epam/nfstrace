@@ -45,7 +45,7 @@ public:
     class Collection
     {
     private:
-        const static int cache_size = 4096;
+        const static int cache_size {4096};
 
     public:
         inline Collection()
@@ -91,7 +91,7 @@ public:
         inline void resize(uint32_t amount)
         {
             buff_size = amount;
-            uint8_t* buff = new uint8_t[amount];
+            uint8_t* buff {new uint8_t[amount]};
             memcpy(buff, payload, payload_len);
             if(payload != cache)
                 delete[] payload;
@@ -158,7 +158,7 @@ public:
     {
         if(limit)
         {
-            if(size + sizeof(pcap_pkthdr) + header->caplen > limit)
+            if( (size + sizeof(pcap_pkthdr) + header->caplen) > limit )
             {
                 close_dumping_file();
 
