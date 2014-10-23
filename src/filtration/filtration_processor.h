@@ -555,21 +555,12 @@ public:
 
         const RecordMark* rm = reinterpret_cast<const RecordMark*>(collection.data());
         //if(rm->is_last()); // TODO: handle sequence field of record mark
-        if(rm->fragment_len())
+        if(collection.data_size() < (sizeof(CallHeader) + sizeof(RecordMark)) && (rm->fragment())->type() != MsgType::REPLY ) // if message not Reply, try collect the rest for Call
         {
-            if(collection.data_size() < (sizeof(CallHeader) + sizeof(RecordMark)) && (rm->fragment())->type() != MsgType::REPLY ) // if message not Reply, try collect the rest for Call
-            {
-                return;
-            }
-            if(rm->fragment_len() < sizeof(ReplyHeader)) // incorrect fragment len, not valid rpc message
-            {
-                TRACE("Incorrect fragment len. Not valid rpc message.");
-                assert(msg_len == 0);   // message is not found
-                assert(hdr_len == 0);   // header should be skipped
-                collection.reset();     // skip collected data
-                info.dlen = 0;
-                return;
-            }
+            return;
+        }
+        if(rm->fragment_len() >= sizeof(ReplyHeader)) // incorrect fragment len, not valid rpc message
+        {
             if(validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
             {
                 assert(msg_len != 0);   // message is found
