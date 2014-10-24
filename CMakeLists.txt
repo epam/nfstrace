@@ -50,7 +50,7 @@ set  (LIBS  ${CMAKE_DL_LIBS}            # libdl with dlopen()
             ${PCAP_LIBRARY}             # libpcap
             )
 
-configure_file(docs/man/nfstrace.8.in          ${PROJECT_SOURCE_DIR}/docs/man/nfstrace.8)
+configure_file(docs/nfstrace.8.in              ${PROJECT_SOURCE_DIR}/docs/nfstrace.8)
 configure_file(src/api/plugin_api.h.in         ${PROJECT_SOURCE_DIR}/src/api/plugin_api.h)
 configure_file(src/controller/build_info.h.in  ${PROJECT_SOURCE_DIR}/src/controller/build_info.h)
 
@@ -79,7 +79,7 @@ file (GLOB headers "src/api/*.h")
 install (FILES ${headers} DESTINATION include/nfstrace/api)
 
 # installation of man page =====================================================
-install (FILES ${PROJECT_SOURCE_DIR}/docs/man/nfstrace.8 DESTINATION share/man/man8)
+install (FILES ${PROJECT_SOURCE_DIR}/docs/nfstrace.8 DESTINATION share/man/man8)
 
 # build packages ===============================================================
 set (CPACK_PACKAGE_VERSION ${NST_VERSION})
