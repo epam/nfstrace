@@ -1,120 +1,114 @@
 NFSTRACE
 ===============================================================================
 
-The nfstrace tool performs live Ethernet 1Gbps - 10Gbps packet’s capturing and 
-helps to determine NFS procedures in raw network traffic. It performs packets capturing,
-filtration, dumping traces, compression, statistical analysis, visualization and
-provides API for custom analysis modules.
+`nfstrace` is an NFS tracing/monitoring/capturing/analysing tool.
 
-The nfstrace supports following protocols: Ethernet – IPv4|IPv6 – UDP|TCP – NFSv3|NFSv4.
+It performs live Ethernet 1 Gbps - 10 Gbps packets capturing and helps to
+determine NFS procedures in raw network traffic. Furthermore, it performs
+filtration, dumping, compression, statistical analysis, visualization and
+provides the API for custom pluggable analysis modules.
 
-Detailed technical description you can find in *docs/NFSTRACE.Releasenotes.pdf*
-or on the following [page](https://docs.google.com/document/d/185ghjXQOhYllzZzmAi2VJg38lk2tnAchGvmgW0ua9Wo/edit?usp=sharing)
+`nfstrace` is written in C++11 programming language and currently supports the
+following protocols:
 
-Problems, bugs, questions, desirable enhancements, etc. should be sent to <nfstrace@epam.com>
+- Ethernet
+- IPv4 | IPv6
+- UPD | TCP
+- NFSv3 | NFSv4
 
-### Original authors:
-Vitali  Adamenka ([vitali_adamenka@epam.com](mailto:vitali_adamenka@epam.com))
+`nfstrace` has been tested on the following GNU/Linux and FreeBSD systems:
 
-Yauheni Azaranka ([yauheni_azaranka@epam.com](mailto:yaheni_azaranka@epam.com))
+- Fedora 20
+- OpenSUSE 13.1
+- Ubuntu 13.10
+- CentOS 6.5
+- Arch Linux
+- FreeBSD 8.4
+- FreeBSD 10.0
 
-Alexey  Costroma ([alexey_costroma@epam.com](mailto:alexey_costroma@epam.com))
+You can find more detailed description at `docs/nfstrace_manual.pdf`
 
-Dzianis Huznou ([dzianis_huznou@epam.com](mailto:dzianis_huznou@epam.com))
-
-Pavel   Karneliuk ([pavel_karneliuk@epam.com](mailto:pavel_karneliuk@epam.com))
-
-Mikhail Litvinets ([mikhail_litvinets@epam.com](mailto:mikhail_litvinets@epam.com))
+Problems, bugs, questions, desirable enhancements, etc. should be sent to
+<nfstrace@epam.com>
 
 
-### Build by CMake
+Building
+--------
 
-Create a build directory in top-level directory:
+Since `nfstrace` is written in C++11 you have to use `gcc` >= 4.8 or
+`clang` >= 3.3.  Additionally, you need to install development version of
+`libpcap` (version 1.3 or newer).
 
-    $ mkdir ./release
+You can build `nfstrace` using [CMake](http://cmake.org) (version 2.8.12 or
+newer). From the top level project's directory run:
 
-Change into your build directory:
-
-    $ cd ./release
-
-Run cmake pointing it to the directory of the top-level CMakeLists.txt.
-
-The *-DCMAKE_BUILD_TYPE=Release* produces release configuration.
-
-Other configurations(*Debug, MinSizeRel, RelWithDebInfo*) are avaliable likewise.
-
-CMake will check compiler, libraries and generate build scripts for main
-application, analyzers and tests. All files will be created in current directory.
-
-Note: In FreeBSD 8.4 your need to install gcc >= 4.8 and edit */etc/libmap.conf*
-according to this [page](http://www.freebsd.org/doc/en/articles/custom-gcc/article.html)
-
-    $ cmake -DCMAKE_BUILD_TYPE=Release ../
-
-After that, you can start to build application:
-
+    $ mkdir release
+    $ cd release
+    $ cmake -DCMAKE_BUILD_TYPE=release ../
     $ make
 
-Binaries will be created in current directory
+If you want to use specific compiler you can set the `CC` and `CXX` environment
+variables:
 
-### Build by CMake with special compiler
+    $ CC="path/to/clang" CXX="path/to/clang++" cmake -DCMAKE_BUILD_TYPE=release ../
 
-Set up environment variables with path to the compiler:
-
-for Linux:
-
-    $ export CC="/usr/bin/gcc"
-    $ export CXX="/usr/bin/g++"
-
-for FreeBSD:
-
-    $ setenv CC "/usr/local/bin/gcc48"
-    $ setenv CXX "/usr/local/bin/g++48"
-
-Then build by CMake as described above or pass these variables to shell
-directly for cmake command, f.e.:
-
-    $ CC="/usr/bin/gcc48" CXX="/usr/bin/g++48" cmake -DCMAKE_BUILD_TYPE=Release ../
-
-### Installation by CMake
-
-Create a build directory in top-level directory:
-
-    $ mkdir ./release
-
-Change into your build directory:
-
-    $ cd ./release
-
-Run CMake to generate build scripts main application and it's plugins
-
-(Note: Use */usr* or */usr/local* for most cases):
+If you want to specify different installation prefix:
 
     $ cmake -DCMAKE_INSTALL_PREFIX=/your/path ../
 
-Run make. It will build and install nfstrace and it's plugins and plugin api
-headers in */usr/bin*, */usr/lib/nfstrace/* and
-*/usr/include/nfstrace* respectively:
+Installation
+------------
+
+By default `nfstrace` will be installed to `/usr/`.
+After you build `nfstrace` simply run:
 
     $ sudo make install
 
-### Test by CMake
+If you're using rpm- or debian based Linux distribution you can generate
+package for your system using `cpack`. Please note that you need rpm or debian
+tools to be installed.
 
-Build application and run following command from build directory:
+In order to generate rpm package:
+
+    $ cpack -G RPM
+
+In order to generate deb package:
+
+    $ cpack -G DEB
+
+After that you'll be able to install generated package using your package
+manager.
+
+Testing
+-------
+
+There are prepared dumps in `traces/` directory so you can perform quick sanity
+check with the following command:
 
     $ make test
 
-Scripts will compare output of processing traces with reference results.
+Scripts will run `nfstrace` in different modes and compare its output with
+reference results.
 
-### Version
 
-0.3.0
+Authors
+--------
 
-### Copyright
+Vitali  Adamenka  ([vitali_adamenka@epam.com](mailto:vitali_adamenka@epam.com))
+
+Yauheni Azaranka  ([yauheni_azaranka@epam.com](mailto:yaheni_azaranka@epam.com))
+
+Alexey  Costroma  ([alexey_costroma@epam.com](mailto:alexey_costroma@epam.com))
+
+Dzianis Huznou    ([dzianis_huznou@epam.com](mailto:dzianis_huznou@epam.com))
+
+Pavel   Karneliuk ([pavel_karneliuk@epam.com](mailto:pavel_karneliuk@epam.com))
+
+
+License
+-------
 
 Copyright (c) 2013, 2014 EPAM Systems
-
-### License
 
 Nfstrace is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
