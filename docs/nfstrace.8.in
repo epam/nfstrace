@@ -1,0 +1,586 @@
+.\"
+.\" nfstrace(8)
+.\"
+.\" Author: Alexey Costroma
+.\"
+.\" Copyright (c) 2014 EPAM Systems
+.\"
+.\" This file is part of Nfstrace.
+.\"
+.\" Nfstrace is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, version 2 of the License.
+.\"
+.\" Nfstrace is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
+.\"
+.TH nfstrace 8 "@COMPILATION_DATE@" "version @NST_VERSION@"
+.\" --------------------- NAME -----------------------------------
+.SH NAME
+.B nfstrace \- NFS tracing/monitoring/capturing/analyzing tool
+.\" --------------------- SYNOPSIS -------------------------------
+.SH SYNOPSIS
+.B nfstrace
+[
+.B \-m
+.I drain|live|dump|stat
+] [
+.B \-i
+.I interface
+] [
+.B \-f
+.I filter
+]
+.br
+         [
+.B \-s
+.I 1..65535
+] [
+.B \-t
+.I Milliseconds
+] [
+.B \-b
+.I MBytes
+]
+.br
+         [
+.B \-d
+.I in|out|inout
+] [
+.B \-a
+.I path#opt1,opt2=val,...
+] [
+.B \-I
+.I path
+]
+.br
+         [
+.B \-O
+.I path
+] [
+.B \-C
+.I 'shell command'
+] [
+.B \-D
+.I MBytes
+] [
+.B \-M
+.I 1..4000
+]
+.br
+         [
+.B \-Q
+.I 1..65535
+] [
+.B \-Z
+.I username
+] [
+.B \-v
+.I 0|1|2
+]
+.\" --------------------- DESCRIPTION ----------------------------
+.SH DESCRIPTION
+.B nfstrace
+performs live Ethernet 1 Gbps – 10 Gbps packets capturing and helps to
+determine NFS procedures in raw network traffic. Furthermore, it performs
+filtration, dumping, compression, statistical analysis, visualization and
+provides the API for custom pluggable analysis modules.
+.PP
+.B nfstrace
+captures raw packets from an Ethernet interface using libpcap interface
+to Linux (LSF) or FreeBSD (BPF) implementations. At the moment it is assumed
+that libpcap delivers correct TCP and UDP packets. Assembling of IP packets
+from ethernet frames and IP packets defragmentation are performed in the
+operating system's kernel.
+.PP
+The application has been tested on the workstations with integrated 1 Gbps NICs
+(Ethernet 1000baseT/Full).
+.PP
+Currently
+.B nfstrace
+supports the following protocols:
+.PP
+    Ethernet > IPv4 | IPv6 > UDP | TCP > NFSv3 | NFSv4
+.PP
+.B nfstrace
+can operate in four different modes:
+.RS 3
+.PP
+\- online analysis
+.RB ( --mode=live ):
+performs online capturing, filtration and live analysis of detected NFS
+procedures using a pluggable analysis module or prints out them to
+.B stdout
+.RB ( -T
+or
+.B --trace
+options);
+.PP
+\- online dumping
+.RB ( --mode=dump ):
+performs online traffic capturing, filtration and dumping to the output file
+(specified with
+.B -O
+or
+.B --ofile
+options);
+.PP
+\- offline analysis
+.RB ( --mode=stat ):
+performs offline filtration of the
+.B .pcap
+file that contains previously captured traces and performs analysis using a
+pluggable analysis modules or prints found NFS procedures to
+.B stdout
+.RB ( -T
+or
+.B --trace
+options);
+.PP
+\- offline dumping
+.RB ( --mode=drain ):
+performs reading of traffic from the
+.B .pcap
+file (specified with
+.B -I
+or
+.B --ifile
+options), filtration, dumping to the output
+.B .pcap
+file (specified with
+.B -O
+or
+.B --ofile
+options) and removing all the packets that are not related to NFS procedures.
+.RE
+.PP
+.B nfstrace
+uses libpcap file format for input and output files so any external tool
+(e.g.
+.BR Wireshark )
+can be used in order to inspect filtered traces.
+.PP
+Since nfstrace internally uses libpcap that provides portable interface to the
+native system API for capturing network traffic, filtration is
+performed in the operating system's kernel.
+.B nfstrace
+provides special option
+.RB ( -f
+or
+.BR –-filtration )
+for specifying custom filters in BPF syntax (see
+.BR pcap-filter (7)).
+.PP
+The default BPF filter in
+.B nfstrace
+is
+.BR "'port 2049'" ,
+which means that each packet that is delivered to user-space from the kernel
+satisfies the following conditions: it has IPv4 or IPv6 header and it has TCP
+and UDP header with source or destination port number equals to 2049 (default
+NFS port).
+.PP
+The reality is that this filter is very heavy and support of IPv6 is
+experimental, so if you want to reach faster filtration of IPv4-only traffic we
+suggest to use the following BPF filter:
+.RS 4
+.B 'ip and port 2049'.
+.RE
+.\" --------------------- OPTIONS --------------------------------
+.SH OPTIONS
+.B nfstrace
+can usually be run without arguments: in this case default arguments will be
+used.
+.TP
+.BI "\-m, \-\-mode=" live|dump|drain|stat
+Set the running mode (see the description above)
+.RB (default:\  live ).
+.TP
+.BI "-i, --interface=" INTERFACE
+Listen interface, it is required for live and dump modes
+.RB (default:\  "searches for the lowest numbered, configured up interface"
+.BR "(except loopback)" ).
+.TP
+.BI "-f, --filtration=" filter
+Specify the packet filter in BPF syntax; for the expression syntax, see
+.BR pcap-filter (7)
+.RB (default:\  "'port 2049'" ).
+.TP
+.BI "-s, --snaplen=" 1..65535
+Set the max length of captured raw packet (bigger packets will be truncated).
+Can be used only for UPD
+.RB (default:\  65535 ).
+.TP
+.BI "-t, --timeout=" milliseconds
+Set the read timeout that will be used while capturing
+.RB (default:\  100 ).
+.TP
+.BI "-b, --bsize=" MBytes
+Set the size of operating system capture buffer in MBytes; note that this
+option is crucial for capturing performance
+.RB (default:\  20 ).
+.TP
+.BI "-p, --promisc"
+Put the capturing interface into promiscuous mode
+.RB (default:\  true ).
+.TP
+.BI "-d, --direction=" in|out|inout
+Set the direction for which packets will be captured
+.RB (default:\  inout ).
+.TP
+.BI "-a, --analysis=" PATH#opt1,opt2=val,...
+Specify the path to an analysis module and set it's options (if any).
+.TP
+.BI "-I, --ifile=" PATH
+Specify the input file for stat mode,
+.B '-'
+means
+.B stdin
+.RB (default:\  nfstrace-BPF.pcap ).
+.TP
+.BI "-O, --ofile=" PATH
+Specify the output file for dump mode,
+.B '-'
+means
+.B stdout
+.RB (default:\  nfstrace-BPF.pcap ).
+.TP
+.BI "-C, --command=" "'shell command'"
+Execute command for each dumped file.
+.TP
+.BI "-D, --dump-size=" MBytes
+Set the size of dumping file portion,
+.B 0
+means no limit
+.RB (default:\  0 ).
+.TP
+.BI "-L, --list"
+List all available network interfaces and exit; please note that this option is
+not supported unless nfstrace was built against the recent version of libpcap
+that supports the
+.B pcap_findalldevs()
+function.
+.TP
+.BI "-M, --msg-header=" 1..4000
+Truncate RPC messages to this limit (specified in bytes) before passing to a
+pluggable analysis module
+.RB (default:\  512 ).
+.TP
+.BI "-Q, --qcapacity=" 1..65535
+Set the initial capacity of the queue with RPC messages
+.RB (default:\  4096 ).
+.TP
+.BI "-T, --trace"
+Print collected NFSv3 or NFSv4 procedures, true if no modules were passed with
+.B -a
+option.
+.TP
+.BI "-Z, --droproot=" username
+Drop root privileges after opening the capture device.
+.TP
+.BI "-v, --verbose=" 0|1|2
+Specify verbosity level
+.RB (default:\  1 ).
+.TP
+.BI "-h, --help"
+Print help message and usage for modules passed with
+.B -a
+options, then exit.
+.\" --------------------- ANALYSIS MODULES -----------------------
+.SH ANALYSIS MODULES
+.SS Operation Breakdown Analyzer
+Operation Breakdown (OB) analyzer calculates average frequency of NFS
+procedures and computes standard deviation of latency using one of two
+algorithms (two-pass or one-pass).
+.PP
+Two-pass algorithm returns correct standard deviation but requires a lot of
+memory during computations. One-pass algorithm is memory-efficient but it
+accumulates computation error in case of large number of small latencies. It is
+possible to choose one of these algorithms by passing according parameter while
+attaching OB analyzer to
+.BR nfstrace .
+.RS 4
+.PP
+.B $ nfstrace -a libbreakdown.so -h
+.br
+.B nfstrace 0.3.0 (Release)
+.br
+.B built on Linux-3.16.1-1-generic
+.br
+.B by C++ compiler GNU 4.9.1
+.br
+.B Usage: ./nfstrace [OPTIONS]...
+.br
+.B ...
+.br
+.B Usage of libbreakdown.so:
+.br
+.B ACC - for accurate evaluation(default), MEM - for memory efficient
+.B evaluation. Options cannot be combined
+.RE
+.PP
+So, say, in order to choose two-pass algorithm you have to pass
+.B ACC
+to OB analyzer:
+.RS 4
+.PP
+.B $ nfstrace -m stat -a libreakdown.so#ACC
+.RE
+.PP
+OB analyzer produces
+.B .dat
+file in the current directory for each detected NFS session that can be
+visualized using
+.B nst.sh
+and
+.B breakdown_nfsv3.plt
+or
+.B breakdown_nfsv4.plt
+(according to NFS version).
+.RS 4
+.PP
+.B nst.sh -a breakdown_nfsv4.plt -d . -p 'breakdown_10.6.137.47:903*.dat'
+.RE
+.\" --------------------- EXAMPLES -------------------------------
+.SH EXAMPLES
+.SS Available options
+The following command demonstrates available options of the application and
+plugged analysis modules (attached with
+.B --analysis
+or
+.B -a
+options). Note that you can pass more than one module here.
+.RS 4
+.PP
+.B nfstrace –-help --analysis=libbreakdown.so
+.RE
+.SS Online tracing
+The following command will run
+.B nfstrace
+in online analysis mode (specified with
+.B --mode
+or
+.B -m
+options) without a pluggable analysis module. It will capture NFS traffic
+transferred over TCP or UDP with source or destination port number equals to
+2049 and will simply print them out to
+.B stdout
+.RB ( -T
+or
+.B --trace
+options). Capturing ends when
+.B nfstrace
+receives
+.B SIGINT
+(Control-C).
+.PP
+Note that capturing from network interface requires superuser privileges.
+.PP
+.RS 4
+.B nfstrace -–mode=live --filtration='ip and port 2049' --trace
+.RE
+.SS Online analysis
+The following command demonstrates running
+.B nfstrace
+in online analysis mode.  Just like in the previous example it will capture NFS
+traffic transferred over TCP or UDP with source or destination port number
+equals to 2049 and then it will perform Operation Breakdown analysis using
+pluggable analysis module
+.B libbreakdown.so.
+.PP
+.RS 4
+.B nfstrace –m live –f 'ip and port 2049' --analysis=libbreakdown.so
+.RE
+.SS Online dumping and offline analysis
+The following example demonstrates running
+.B nfstrace
+in online dumping and offline analysis modes.
+.PP
+At first
+.B nfstrace
+will capture NFS traffic transferred over TCP or UDP with source or destination
+port number equals to 2049 and will dump captured packets to
+.B dump.pcap
+file (specified with
+.B --ofile
+or
+.B -O
+options).
+.PP
+At the second run
+.B nfstrace
+will perform offline Operation Breakdown analysis using pluggable analysis
+module
+.B libbreakdown.so.
+.PP
+.RS 4
+.B # Dump captured packets to dump.pcap
+.br
+.B nfstrace –m dump -f 'ip and port 2049' --ofile=dump.pcap
+.br
+.PP
+.B # Analyse dump.pcap using libbreakdown.so
+.br
+.B nfstrace -m stat --ifile=dump.pcap -a libbreakdown.so
+.RE
+.SS Online dumping, compression and offline analysis
+The following example demonstrates running
+.B nfstrace
+in online dumping and offline analysis modes. Since dump file can easily
+exhaust disk space, compression makes sense.
+.PP
+At first
+.B nfstrace
+will capture NFS traffic transferred over TCP or UDP with source or destination
+port number equals to 2049 and will dump captured packets to
+.B dump.pcap
+file.
+.PP
+Note that compression is done by external tool (executed in script passed with
+.B --command
+or
+.B -C
+options) and it will be executed when capturing is done. The output file can
+be inspected using some external tool.
+.PP
+At the second run
+.B nfstrace
+will perform offline analysis. Again, the external tool
+.RB ( bzcat
+in this example) is used in order to decompress previously saved dump.
+.B nfstrace
+will read
+.B stdin
+(note the
+.B -I –
+option) and perform offline analysis using Operation Breakdown analyzer.
+.PP
+.RS 4
+.B # Dump captured procedures to dump.pcap file.
+.br
+.B # Compress output using bzip2 when capturing ends.
+.br
+.B nfstrace –m dump -f 'ip and port 2049' -O dump.pcap --command 'bzip2 -f -9'
+.PP
+.B # Extract dump.pcap from dump.pcap.bz2 to stdin.
+.br
+.B # Read stdin and analyze data with libbreakdown.so module.
+.br
+.B bzcat dump.pcap.bz2 | nfstrace –m stat -I - -a libbreakdown.so
+.RE
+.SS Online dumping with file limit, compression and offline analysis
+This example is similar to the previous one except one thing: output dump file
+can be very huge and cause problems in some situations, so
+.B nfstrace
+provides the ability to split it into parts.
+.PP
+At first
+.B nfstrace
+will be invoked in online dumping mode. Everything is similar to the previous
+example except
+.B -D
+.RB ( --dump-size )
+option: it specifies the size limit in MBytes, so dump file will be split
+according to this value.
+.PP
+At the second run
+.B nfstrace
+will perform offline analysis of captured packets using Operation Breakdown
+analyzer.
+.PP
+Please note that only the first dump file has the pcap header.
+.PP
+.RS 4
+.B # Dump captured procedures multiple files and compress them.
+.br
+.B nfstrace –m dump -f 'ip and port 2049' -O dump.pcap -D 1 -C "bzip2 -f -9"
+.PP
+.B # get list of parts in the right order:
+.br
+.B #    dump.pcap.bz2
+.br
+.B #    dump.pcap-1.bz2
+.br
+.B #    dump.pcap-2.bz2
+.br
+.B parts=$(ls dump.pcap*.bz2 | sort -n -t - -k 2)
+.PP
+.B # Extract dump.pcap from main dump.pcap.bz2 and parts to stdin.
+.br
+.B # Read stdin and analyze data with libbreakdown.so module.
+.br
+.B bzcat “$parts” | nfstrace --mode=stat -I - --analysis=libbreakdown.so
+.RE
+.SS Visualization
+This example demonstrates the ability to plot graphical representation of data
+collected by Operation Breakdown analyzer.
+.PP
+.B nst.sh
+is a shell script that collects data generated by analyzers and passes it to
+gnuplot script specified with
+.B -a
+option.
+.PP
+.B breakdown.plt
+is a gnuplot script that understands output data format of Operation Breakdown
+analyzer and generates
+.B .png
+files with plots.
+.PP
+Note that
+.B gnuplot
+must be installed.
+.PP
+.RS 4
+.B # Extract dump.pcap from dump.pcap.bz2 to stdin.
+.br
+.B # Read stdin and analyze data with libbreakdown.so module.
+.br
+.B bzcat trace.pcap.bz2 | nfstrace -m stat -I - -a libbreakdown.so
+.PP
+.B # Generate plot according to *.dat files generated by
+.br
+.B # libbreakdown.so analyzer.
+.br
+.B nst.sh -a breakdown.plt -d . -p 'breakdown*.dat' -v
+.\" --------------------- FILES ----------------------------------
+.SH FILES
+.TP
+API headers
+.B /usr/include/nfstrace/api/
+.TP
+Pluggable Analysis Modules (PAMs)
+.B /usr/lib/
+.\" ---------------------- BUGS ----------------------------------
+.SH BUGS
+.P
+Any problems, bugs, questions, desirable enhancements, etc.
+should be sent to
+.B <nfstrace@epam.com>
+.\" -------------------- AUTHORS ---------------------------------
+.SH AUTHORS
+Vitali Adamenka
+.B <Vitali_Adamenka@epam.com>
+.PP
+Yauheni Azaranka
+.B <Yauheni_Azaranka@epam.com>
+.PP
+Alexey Costroma
+.B <Alexey_Costroma@epam.com>
+.PP
+Dzianis Huznou
+.B <Dzianis_Huznou@epam.com>
+.PP
+Pavel Karneliuk
+.B <Pavel_Karneliuk@epam.com>
+.\" -------------------- SEE ALSO --------------------------------
+.SH SEE ALSO
+.BR bpf (4),
+.BR pcap (3),
+.BR nfsstat (8),
+.BR pcap-filter (7).
