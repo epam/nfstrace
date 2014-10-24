@@ -1,7 +1,7 @@
 NFSTRACE
 ===============================================================================
 
-`nfstrace` is an NFS tracing/monitoring/capturing/analysing tool.
+`nfstrace` is an NFS tracing/monitoring/capturing/analyzing tool.
 
 It performs live Ethernet 1 Gbps - 10 Gbps packets capturing and helps to
 determine NFS procedures in raw network traffic. Furthermore, it performs
