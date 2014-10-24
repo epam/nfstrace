@@ -22,7 +22,7 @@
 .TH nfstrace 8 "@COMPILATION_DATE@" "version @NST_VERSION@"
 .\" --------------------- NAME -----------------------------------
 .SH NAME
-.B nfstrace \- NFS tracing/monitoring/capturing/analysing tool
+.B nfstrace \- NFS tracing/monitoring/capturing/analyzing tool
 .\" --------------------- SYNOPSIS -------------------------------
 .SH SYNOPSIS
 .B nfstrace
