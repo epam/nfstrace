@@ -83,19 +83,18 @@ install (FILES ${PROJECT_SOURCE_DIR}/docs/man/nfstrace.8 DESTINATION share/man/m
 
 # build packages ===============================================================
 set (CPACK_PACKAGE_VERSION ${NST_VERSION})
-set (CPACK_GENERATOR "RPM;DEB;TGZ")
-set (CPACK_PACKAGING_INSTALL_PREFIX "/")
+set (CPACK_PACKAGING_INSTALL_PREFIX "/usr")
 set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "NFS tracing/monitoring/capturing/statistic tool")
 set (CPACK_PACKAGE_CONTACT "Nfstrace developers <nfstrace@epam.com>")
 
 set (CPACK_RPM_PACKAGE_GROUP "Applications/Internet")
 set (CPACK_RPM_PACKAGE_LICENSE "GPLv2")
 set (CPACK_RPM_PACKAGE_VENDOR "EPAM Systems")
-set (CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /bin /include /lib /share /share/man)
+set (CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/man /usr/share/man/man8)
 set (CPACK_RPM_PACKAGE_REQUIRES "libpcap >= 1.3.0-1")
 
 set (CPACK_DEBIAN_PACKAGE_SECTION "admin")
-set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12), libpcap0.8 (>=1.3.0-1)")
+set (CPACK_DEBIAN_PACKAGE_DEPENDS "libpcap0.8 (>=1.3.0-1)")
 
 include (CPack)
 
@@ -145,7 +144,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 
     if(GCOVR_PATH)
         add_custom_target(coverage
-                          COMMAND ${GCOVR_PATH} --xml -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.xml
+                          COMMAND ${GCOVR_PATH} --xml -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.xml 2>&1 >/dev/null
                           WORKING_DIRECTORY ${CMAKE_PROJECT_DIR})
     endif ()
 endif ()
