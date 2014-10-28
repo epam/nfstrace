@@ -47,6 +47,16 @@ public:
     private:
         const static int cache_size {4096};
 
+        inline void resize(uint32_t amount)
+        {
+            buff_size = amount;
+            uint8_t* buff {new uint8_t[amount]};
+            memcpy(buff, payload, payload_len);
+            if(payload != cache)
+                delete[] payload;
+            payload = buff;
+        }
+
     public:
         inline Collection()
         : dumper      {nullptr}
@@ -86,16 +96,6 @@ public:
         inline void reset()
         {
             payload_len = 0;
-        }
-
-        inline void resize(uint32_t amount)
-        {
-            buff_size = amount;
-            uint8_t* buff {new uint8_t[amount]};
-            memcpy(buff, payload, payload_len);
-            if(payload != cache)
-                delete[] payload;
-            payload = buff;
         }
 
         inline void push(const PacketInfo& info, const uint32_t len)
@@ -185,9 +185,9 @@ private:
 
     std::unique_ptr<pcap::PacketDumper> dumper;
     pcap_t* const       handle;
-    std::string         base;
+    const std::string   base;
     std::string         name;
-    std::string         command;
+    const std::string   command;
     const uint32_t      limit;
     uint32_t            part;
     uint32_t            size;
