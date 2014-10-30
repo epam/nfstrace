@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #------------------------------------------------------------------------------
 #    Copyright (c) 2013 EPAM Systems
 #------------------------------------------------------------------------------
@@ -46,57 +46,57 @@ i_files=
 
 while getopts “ha:d:f:p:rv” OPTION
 do
-     case $OPTION in
-         h)
-             usage
-             exit
-             ;;
-         a)
-             if [[ ! -z $analyzer ]] ; then
-                 usage
-                 exit 1
-             fi
+    case $OPTION in
+        h)
+            usage
+            exit
+            ;;
+        a)
+            if [[ ! -z "$analyzer" ]] ; then
+                usage
+                exit 1
+            fi
 
-             analyzer=$OPTARG
-             ;;
-         d)
-             directories+=$OPTARG
-             ;;
-         f)
-             i_files+="$OPTARG"$'\n'
-             ;;
-         p)
-             pattern+="$OPTARG"
-             ;;
-         r)
-             recursive=1 
-             ;;
-         v)
-             verbose=1
-             ;;
-         ?)
-             usage
-             exit
-             ;;
-     esac
+            analyzer="$OPTARG"
+            ;;
+        d)
+            directories+="$OPTARG"
+            ;;
+        f)
+            i_files+="$OPTARG"$'\n'
+            ;;
+        p)
+            pattern+="$OPTARG"
+            ;;
+        r)
+            recursive=1
+            ;;
+        v)
+            verbose=1
+            ;;
+        ?)
+            usage
+            exit
+            ;;
+    esac
 done
 
-for directory in $directories ; do
-    i_files+=$(ls $directory/$pattern)
+for directory in "$directories" ; do
+    i_files+=$(ls "$directory/$pattern")
 done
 
-if [[ -z $analyzer ]] || [[ -z $i_files ]] ; then
-     usage
-     exit 1
+if [[ -z "$analyzer" ]] || [[ -z "$i_files" ]] ; then
+    usage
+    exit 1
 fi
 
 OIFS="${IFS}"
 IFS=$'\n'
-for i_file in $i_files ; do
-    o_file=${i_file/%$i_ext/$o_ext}
-    gnuplot -e "i_file='$i_file';o_file='$o_file'" $analyzer$e_ext &>/dev/null
+for i_file in "$i_files" ; do
+    o_file="${i_file/%$i_ext/$o_ext}"
+    gnuplot -e "i_file='$i_file';o_file='$o_file'" "$analyzer$e_ext" &>/dev/null
     result=$?
-    if [[ ! -z $verbose ]] ; then
+    if [[ ! -z "$verbose" ]] ; then
         echo "gnuplot -e \"i_file='$i_file';o_file='$o_file'\" $analyzer$e_ext"
         if [[ ! $result == 0 ]] ; then
             echo "fail during $i_file processing (return: $result)" 1>&2
