@@ -68,12 +68,12 @@
 ] [
 .B \-D
 .I MBytes
-] [
-.B \-M
-.I 1..4000
 ]
 .br
          [
+.B \-M
+.I 1..4000
+] [
 .B \-Q
 .I 1..65535
 ] [
@@ -329,7 +329,7 @@ So, say, in order to choose two-pass algorithm you have to pass
 to OB analyzer:
 .RS 4
 .PP
-.B $ nfstrace -m stat -a libreakdown.so#ACC
+.B nfstrace -m stat -a libreakdown.so#ACC
 .RE
 .PP
 OB analyzer produces
