@@ -185,9 +185,9 @@ private:
 
     std::unique_ptr<pcap::PacketDumper> dumper;
     pcap_t* const       handle;
-    std::string         base;
+    const std::string   base;
     std::string         name;
-    std::string         command;
+    const std::string   command;
     const uint32_t      limit;
     uint32_t            part;
     uint32_t            size;
