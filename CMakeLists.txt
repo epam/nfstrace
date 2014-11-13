@@ -98,9 +98,7 @@ set (CPACK_DEBIAN_PACKAGE_DEPENDS "libpcap0.8 (>=1.3.0-1)")
 
 include (CPack)
 
-# testing ======================================================================
-enable_testing ()
-
+# TODO Move all staff below to 'tests/functional/CMakeLists.txt' file
 # script for verification processing of compressed .pcap.bz2 traces by diff
 set (check_pcapbz2 ${CMAKE_BINARY_DIR}/check-compressed-trace.sh)
 file (WRITE ${check_pcapbz2}
