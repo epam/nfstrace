@@ -64,7 +64,7 @@ add_library (ofdws        MODULE analyzers/src/ofdws/ofdws_analyzer.cpp
                                  analyzers/src/ofdws/file_rw_op.cpp)
 add_library (testanalyzer MODULE analyzers/src/test/test_analyzer.cpp)
 set_target_properties (breakdown ofws ofdws testanalyzer
-                       PROPERTIES LIBRARY_OUTPUT_DIRECTORY "analyzers")
+                       PROPERTIES LIBRARY_OUTPUT_DIRECTORY "analyzers" NO_SONAME ON)
 
 # build tests ==================================================================
 add_subdirectory (tests)
