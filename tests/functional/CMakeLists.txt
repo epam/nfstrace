@@ -5,7 +5,7 @@ configure_file ("${CHECK_DRANE_SCRIPT}.in" "${CHECK_DRANE_SCRIPT}")
 set (CHECK_OUTPUT_SCRIPT "check-output.sh")
 configure_file ("${CHECK_OUTPUT_SCRIPT}.in" "${CHECK_OUTPUT_SCRIPT}")
 
-# add trace/drane/output tests for each .pcap.bz2 trace
+# Adding trace/drane/output tests for each .pcap.bz2 trace
 file (GLOB traces "${CMAKE_SOURCE_DIR}/traces/*.pcap.bz2")
 foreach (trace ${traces})
     get_filename_component (name ${trace} NAME)
