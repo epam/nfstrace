@@ -66,7 +66,8 @@ add_library (testanalyzer MODULE analyzers/src/test/test_analyzer.cpp)
 set_target_properties (breakdown ofws ofdws testanalyzer
                        PROPERTIES LIBRARY_OUTPUT_DIRECTORY "analyzers")
 
-# build tests ==================================================================
+# testing ======================================================================
+enable_testing ()
 add_subdirectory (tests)
 
 # installation of main application and plugins =================================
@@ -97,44 +98,6 @@ set (CPACK_DEBIAN_PACKAGE_SECTION "admin")
 set (CPACK_DEBIAN_PACKAGE_DEPENDS "libpcap0.8 (>=1.3.0-1)")
 
 include (CPack)
-
-# TODO Move all staff below to 'tests/functional/CMakeLists.txt' file
-# script for verification processing of compressed .pcap.bz2 traces by diff
-set (check_pcapbz2 ${CMAKE_BINARY_DIR}/check-compressed-trace.sh)
-file (WRITE ${check_pcapbz2}
-"bzcat \"$1\" | ./${PROJECT_NAME} --mode=stat -a ./analyzers/libbreakdown.so -I - -v 0 >\"$2\"\n"
-"diff -uN \"$3\" \"$2\"\n"
-"exit $?"
-)
-
-# script for processing of cmpress .pcap.bz by DRAIN mode and precessing result with STAT mode and verification result by diff with default
-set (check_drain ${CMAKE_BINARY_DIR}/check-compressed-drane.sh)
-file (WRITE ${check_drain}
-"bzcat \"$1\" | ./${PROJECT_NAME} --mode=drain -I - -O - -v 0 | ./${PROJECT_NAME} --mode=stat -a ./analyzers/libbreakdown.so -I - -v 0 >\"$2\"\n"
-"diff -uN \"$3\" \"$2\"\n"
-"exit $?"
-)
-
-# script for check output symbols
-set (check_out ${CMAKE_BINARY_DIR}/check-out.sh)
-file (WRITE ${check_out}
-"bzcat \"$1\" | ./${PROJECT_NAME} --mode=stat -v 2 -T -a ./analyzers/libbreakdown.so -I - -O -  | grep --color='auto' -P -n '[^\\x00-\\x7F]' | wc -c |  awk '{ if($1 != 0) exit 1 ; exit 0 }';"
-)
-
-# add test for each .pcap.bz2 trace
-file (GLOB traces "traces/*.pcap.bz2")
-foreach (trace ${traces})
-    get_filename_component (name ${trace} NAME)
-    get_filename_component (path ${trace} PATH)
-    set (result ${CMAKE_BINARY_DIR}/Testing/Temporary/${name}.res)
-    set (reference ${path}/references/${name}.ref)
-    add_test (NAME  stat:${name}
-              COMMAND sh ${check_pcapbz2} ${trace} ${result} ${reference} )
-    add_test (NAME drain:${name}
-              COMMAND sh ${check_drain}   ${trace} ${result} ${reference} )
-    add_test (NAME   out:${name}
-              COMMAND sh ${check_out} ${trace} )
-endforeach ()
 
 # coverage =====================================================================
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
