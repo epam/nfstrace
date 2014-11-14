@@ -1,5 +1,3 @@
-set (NAME_INCLUDE "false" CACHE PATH "Path to gmock source distribution, for make it subproject")
-
 set (GMOCK_SOURCE_DIR "gmock-1.7.0")
 set (GMOCK_FOUND true)
 set (gmock_force_shared_crt true CACHE INTERNAL "")
