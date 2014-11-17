@@ -88,7 +88,7 @@ public:
                         uint32_t proc {call->proc()};
                         if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
                             hdr_len = (nfs3_rw_hdr_max < info.dlen ? nfs3_rw_hdr_max : info.dlen);
-                        else
+                        else//FIXME: use {}
                         {
                             if (API::ProcEnumNFS3::READ == proc)
                                 nfs3_read_match.insert(call->xid());
@@ -673,7 +673,8 @@ private:
 template
 <
     typename Reader,
-    typename Writer
+    typename Writer,
+    typename Filtrator
 >
 class FiltrationProcessor
 {
@@ -760,10 +761,10 @@ private:
     std::unique_ptr<Reader> reader;
     std::unique_ptr<Writer> writer;
 
-    SessionsHash< IPv4TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > ipv4_tcp_sessions;
+    SessionsHash< IPv4TCPMapper, TCPSession <Filtrator> , Writer > ipv4_tcp_sessions;
     SessionsHash< IPv4UDPMapper, UDPSession < Writer > , Writer >                  ipv4_udp_sessions;
 
-    SessionsHash< IPv6TCPMapper, TCPSession < RPCFiltrator < Writer > > , Writer > ipv6_tcp_sessions;
+    SessionsHash< IPv6TCPMapper, TCPSession < Filtrator> , Writer > ipv6_tcp_sessions;
     SessionsHash< IPv6UDPMapper, UDPSession < Writer > , Writer >                  ipv6_udp_sessions;
 
     int datalink;

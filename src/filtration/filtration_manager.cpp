@@ -28,6 +28,8 @@
 #include "filtration/pcap/file_reader.h"
 #include "filtration/processing_thread.h"
 #include "filtration/queuing.h"
+#include "filtration/cifs_filtrator.h"
+
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -52,6 +54,8 @@ template
 >
 class FiltrationImpl : public ProcessingThread
 {
+    typedef FiltrationProcessor<Reader, Writer, RPCFiltrator< Writer >> RPCProcessor;
+    typedef FiltrationProcessor<Reader, Writer, CIFSFiltrator< Writer >> CIFSProcessor;
 public:
     explicit FiltrationImpl(std::unique_ptr<Reader>& reader,
                             std::unique_ptr<Writer>& writer,
@@ -59,6 +63,7 @@ public:
     : ProcessingThread {status}
     , processor{reader, writer}
     {
+
     }
     ~FiltrationImpl() = default;
     FiltrationImpl(const FiltrationImpl&)            = delete;
@@ -82,7 +87,7 @@ private:
         }
     }
 
-    FiltrationProcessor<Reader, Writer> processor;
+    RPCProcessor processor;
 };
 
 // create Filtration thread emplaced in unique_ptr

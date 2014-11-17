@@ -65,7 +65,7 @@ CaptureReader::CaptureReader(const Params& params) : BaseReader{params.interface
         throw PcapError("pcap_activate", pcap_statustostr(status));
     }
 
-    pcap_direction_t diection {PCAP_D_INOUT};
+    pcap_direction_t diection {PCAP_D_INOUT};//FIXME: di(r)ection
     switch(params.direction)
     {
         using Direction = CaptureReader::Direction;

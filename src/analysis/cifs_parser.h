@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Parser of the NFS Data.
-// Copyright (c) 2013 EPAM Systems
+// Author: Andrey Kuznetsov
+// Description: Parser of filtrated CIFS Procedures.
+// Copyright (c) 2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,15 +19,10 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef NFS_PARSER_THREAD_H
-#define NFS_PARSER_THREAD_H
+#ifndef CIFS_PARSER_H
+#define CIFS_PARSER_H
 //------------------------------------------------------------------------------
-#include <atomic>
-#include <thread>
-
 #include "analysis/analyzers.h"
-#include "analysis/rpc_sessions.h"
-#include "controller/running_status.h"
 #include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -35,37 +30,23 @@ namespace NST
 namespace analysis
 {
 
-class NFSParserThread
-{
-    using RunningStatus     = NST::controller::RunningStatus;
+/*! \class It is class which can parse CIFS messages and it called by ParserThread
+ */
+class CIFSParser {
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
+    Analyzers& analyzers;//!< Plugins manager
 public:
-    NFSParserThread(FilteredDataQueue& q, Analyzers& a, RunningStatus& rs);
-    ~NFSParserThread();
 
-    void start();
-    void stop();
+    CIFSParser(Analyzers& a) : analyzers(a) {}
+    CIFSParser(CIFSParser& c) : analyzers(c.analyzers) {}
 
-private:
-    inline void thread();
-    inline void process_queue();
-
+    /*! Function which will be called by ParserThread class
+     * \param data - CIFS header
+     */
     void parse_data(FilteredDataQueue::Ptr&& data);
-    void analyze_nfs_operation(FilteredDataQueue::Ptr&& call,
-                               FilteredDataQueue::Ptr&& reply,
-                               RPCSession* session);
-
-    RunningStatus& status;
-    Analyzers& analyzers;
-    FilteredDataQueue& queue;
-    RPCSessions sessions;
-
-    std::thread parsing;
-    std::atomic_flag running;
 };
 
-} // namespace analysis
-} // namespace NST
-//------------------------------------------------------------------------------
-#endif//NFS_PARSER_THREAD_H
-//------------------------------------------------------------------------------
+}
+}
+
+#endif // CIFS_PARSER_H

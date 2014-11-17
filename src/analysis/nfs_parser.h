@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-// Author: Pavel Karneliuk
-// Description: Manager for all instances created inside analysis module.
+// Author: Dzianis Huznou
+// Description: Parser of filtrated NFSv3 Procedures.
 // Copyright (c) 2013 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,38 +19,40 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "analysis/analysis_manager.h"
+#ifndef NFS_PARSER_H
+#define NFS_PARSER_H
+//------------------------------------------------------------------------------
+#include "analysis/analyzers.h"
+#include "analysis/rpc_sessions.h"
+#include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis
 {
+/*! \class It is class which can parse NFS messages and it called by ParserThread
+ */
+class NFSParser {
+    using FilteredDataQueue = NST::utils::FilteredDataQueue;
 
-AnalysisManager::AnalysisManager(RunningStatus& status, const Parameters& params)
-                                 : analysiss    {nullptr}
-                                 , queue        {nullptr}
-                                 , parser_thread{nullptr}
-{
-    analysiss.reset(new Analyzers(params));
+    Analyzers& analyzers;
+    RPCSessions sessions;
+public:
 
-    queue.reset(new FilteredDataQueue(params.queue_capacity(), 1));
+    NFSParser(Analyzers& a) : analyzers(a) {}
+    NFSParser(NFSParser& c) : analyzers(c.analyzers) {}
 
-    NFSParser parser(*analysiss);
-    parser_thread.reset(new ParserThread<NFSParser>(parser, *queue, status));
+    /*! Function which will be called by ParserThread class
+     * \param data - RPC packet
+     */
+    void parse_data(FilteredDataQueue::Ptr&& data);
+    void analyze_nfs_operation(FilteredDataQueue::Ptr&& call,
+                               FilteredDataQueue::Ptr&& reply,
+                               RPCSession* session);
+
+};
+
+}
 }
 
-void AnalysisManager::start()
-{
-    parser_thread->start();
-}
-
-void AnalysisManager::stop()
-{
-    parser_thread->stop();
-
-    analysiss->flush_statistics();
-}
-
-} // namespace analysis
-} // namespace NST
-//------------------------------------------------------------------------------
+#endif // NFS_PARSER_H

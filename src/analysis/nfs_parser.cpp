@@ -19,7 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "analysis/nfs_parser_thread.h"
+#include "analysis/nfs_parser.h"
 #include "protocols/nfs/nfs_procedure.h"
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/xdr/xdr_decoder.h"
@@ -31,71 +31,8 @@ namespace NST
 namespace analysis
 {
 
-NFSParserThread::NFSParserThread(FilteredDataQueue& q, Analyzers& a, RunningStatus& s)
-: status   (s)
-, analyzers(a)
-, queue    (q)
-, running  {ATOMIC_FLAG_INIT} // false
-{
-}
 
-NFSParserThread::~NFSParserThread()
-{
-    if (parsing.joinable()) stop();
-}
-
-void NFSParserThread::start()
-{
-    if(running.test_and_set()) return;
-    parsing = std::thread(&NFSParserThread::thread, this);
-}
-
-void NFSParserThread::stop()
-{
-    running.clear();
-    parsing.join();
-}
-
-inline void NFSParserThread::thread()
-{
-    try
-    {
-        while(running.test_and_set())
-        {
-            // process all available items from queue
-            process_queue();
-
-            // then sleep this thread
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-        process_queue(); // flush data from queue
-    }
-    catch(...)
-    {
-        status.push_current_exception();
-    }
-}
-
-inline void NFSParserThread::process_queue()
-{
-    while(true)
-    {
-        // take all items from the queue
-        FilteredDataQueue::List list{queue};
-        if(!list)
-        {
-            return; // list from queue is empty, break infinity loop
-        }
-
-        do
-        {
-            parse_data(list.get_current());
-        }
-        while(list);
-    }
-}
-
-void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
+void NFSParser::parse_data(FilteredDataQueue::Ptr&& ptr)
 {
     using namespace NST::protocols::rpc;
 
@@ -141,7 +78,7 @@ void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
     }
 }
 
-void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
+void NFSParser::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
                                              FilteredDataQueue::Ptr&& reply,
                                              RPCSession* session)
 {

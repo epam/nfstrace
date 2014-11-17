@@ -215,7 +215,7 @@ IAnalyzer* create(const char* optarg)
                 break;
 
             default:
-                return NULL;
+                return NULL;//FIXME: NULL vs nullptr
         }
         value = NULL;
     }
