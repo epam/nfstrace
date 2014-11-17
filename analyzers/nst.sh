@@ -41,12 +41,11 @@ EOF
 o_ext=.png
 
 analyzer=
-directories=
-i_files=
+directories=()
+i_files=()
 
-while getopts “ha:d:f:p:rv” OPTION
-do
-    case $OPTION in
+while getopts “ha:d:f:p:rv” option; do
+    case "$option" in
         h)
             usage
             exit
@@ -60,13 +59,13 @@ do
             analyzer="$OPTARG"
             ;;
         d)
-            directories+="$OPTARG"
+            directories+=("$OPTARG")
             ;;
         f)
-            i_files+="$OPTARG"$'\n'
+            i_files+=("$OPTARG")
             ;;
         p)
-            pattern+="$OPTARG"
+            pattern="$OPTARG"
             ;;
         r)
             recursive=1
@@ -81,8 +80,10 @@ do
     esac
 done
 
-for directory in "$directories" ; do
-    i_files+=$(ls "$directory/$pattern")
+for directory in "${directories[@]}"; do
+    for filename in "$directory/$pattern"; do
+        i_files+=("$filename")
+    done
 done
 
 if [[ -z "$analyzer" ]] || [[ -z "$i_files" ]] ; then
