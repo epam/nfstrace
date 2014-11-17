@@ -605,7 +605,7 @@ IAnalyzer* create(const char* optarg)
                     return NULL;
             }
         } while (*optarg != '\0');
-    return NULL;
+    return NULL;//FIXME: NULL vs nullptr
 }
 
 void destroy(IAnalyzer* instance)
