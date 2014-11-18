@@ -29,6 +29,11 @@ using namespace NST::analysis;
 
 void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr &&data)
 {
+    for (int i = 0; i < 5 ; i++) {
+        std::cout << data->data[i];
+    }
+    std::cout << std::endl;
+
     auto header = CIFS::get_header(data->data);
     if (header) {
         std::cout << "msg: ";

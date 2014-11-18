@@ -25,6 +25,10 @@
 #define DUMP  "dump"
 #define STAT  "stat"
 #define DRAIN "drain"
+
+//! protocols
+#define CIFS  "CIFS"
+#define NFS   "NFS"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -37,6 +41,9 @@ const char* const Args::profiling_mode {LIVE};
 const char* const Args::dumping_mode   {DUMP};
 const char* const Args::analysis_mode  {STAT};
 const char* const Args::draining_mode  {DRAIN};
+
+const char* const Args::CIFS_protocol  {CIFS};
+const char* const Args::NFS_protocol  {NFS};
 
 // This array will be indexed via elements of Args::Names enumeration. Keep it in the same order.
 Opt Args::options[Args::num] =
@@ -59,6 +66,7 @@ Opt Args::options[Args::num] =
     {'Q', "qcapacity",  Opt::REQ, "4096",                "set the initial capacity of the queue with RPC messages",                                   "1..65535", nullptr, false},
     {'T', "trace",      Opt::NOA, "false",               "print collected NFSv3 or NFSv4 procedures, true if no modules were passed with -a option",  nullptr,    nullptr, false},
     {'Z', "droproot",   Opt::REQ, "",                    "drop root privileges, after opening the capture device",                                    "username", nullptr, false},
+    {'n', "nprotocol",  Opt::REQ, NFS,                   "Network high level protocol which to be analyzed. NFS by default",                          NFS "|" CIFS, nullptr, false},
     {'v', "verbose",    Opt::REQ, "1",                   "specify verbosity level",                                                                   "0|1|2",    nullptr, false},
     {'h', "help",       Opt::NOA, "false",               "print help message and usage for modules passed with -a options, then exit",                nullptr,    nullptr, false}
 };
