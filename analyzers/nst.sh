@@ -93,7 +93,7 @@ fi
 
 OIFS="${IFS}"
 IFS=$'\n'
-for i_file in "$i_files" ; do
+for i_file in "${i_files[@]}" ; do
     o_file="${i_file/%$i_ext/$o_ext}"
     gnuplot -e "i_file='$i_file';o_file='$o_file'" "$analyzer$e_ext" &>/dev/null
     result=$?
