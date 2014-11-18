@@ -19,10 +19,10 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+//------------------------------------------------------------------------------
 #ifndef CIFS_FILTRATOR_H
 #define CIFS_FILTRATOR_H
-
+//------------------------------------------------------------------------------
 #include <algorithm>
 #include <cassert>
 #include <memory>
@@ -41,12 +41,10 @@
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
-
 #include "protocols/netbios/netbios_header.h"
 #include "protocols/cifs/cifs_header.h"
-
 #include "filtration_processor.h"
-
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration

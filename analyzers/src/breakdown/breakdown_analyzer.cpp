@@ -602,10 +602,10 @@ IAnalyzer* create(const char* optarg)
                     break;
 
                 default:
-                    return NULL;
+                    return nullptr;
             }
         } while (*optarg != '\0');
-    return NULL;//FIXME: NULL vs nullptr
+    return nullptr;
 }
 
 void destroy(IAnalyzer* instance)

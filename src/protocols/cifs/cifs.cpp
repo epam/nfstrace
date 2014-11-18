@@ -18,10 +18,12 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
+//------------------------------------------------------------------------------
 #include <cstring>
 #include <map>
-#include "protocols/cifs/cifs_header.h"
 
+#include "protocols/cifs/cifs_header.h"
+//------------------------------------------------------------------------------
 using namespace NST::protocols::CIFS;
 using namespace std;
 

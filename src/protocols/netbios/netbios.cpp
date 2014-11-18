@@ -18,12 +18,12 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#include "protocols/netbios/netbios_header.h"
+//------------------------------------------------------------------------------
 #include <arpa/inet.h>
 
+#include "protocols/netbios/netbios_header.h"
+//------------------------------------------------------------------------------
 using namespace NST::protocols::NetBIOS;
-
 
 size_t MessageHeader::len() const
 {
