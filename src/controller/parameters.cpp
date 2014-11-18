@@ -313,6 +313,17 @@ const std::vector<AParams>& Parameters::analysis_modules() const
     return impl->analysis_modules;
 }
 
+NetProtocol Parameters::protocol() const
+{
+    const auto& protocol = impl->get(CLI::PROTOCOL);
+    if(protocol.is(CLI::CIFS_protocol))
+    {
+        return NetProtocol::CIFS;
+    }
+    // Use NFS by default
+    return NetProtocol::NFS;
+}
+
 unsigned short Parameters::rpcmsg_limit()
 {
     return impl->rpc_message_limit;
