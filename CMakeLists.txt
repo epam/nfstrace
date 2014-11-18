@@ -29,7 +29,7 @@ endif ()
 
 # build application ============================================================
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC -fvisibility=hidden")
-set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--export-dynamic")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage -O0")
