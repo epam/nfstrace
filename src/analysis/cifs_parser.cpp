@@ -19,12 +19,11 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "analysis/cifs_parser.h"
 #include <iostream>
 
+#include "analysis/cifs_parser.h"
 #include "protocols/cifs/cifs_header.h"
-
-using namespace std;
+//------------------------------------------------------------------------------
 using namespace NST::protocols;
 using namespace NST::analysis;
 
@@ -32,10 +31,10 @@ void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr &&data)
 {
     auto header = CIFS::get_header(data->data);
     if (header) {
-        cout << "msg: ";
-        cout << header->commandDescription() << dec;
-        cout << endl;
+        std::cout << "msg: ";
+        std::cout << header->commandDescription() << std::dec;
+        std::cout << std::endl;
     } else {
-        cout << "Got BAD message!" << endl;
+        std::cout << "Got BAD message!" << std::endl;
     }
 }

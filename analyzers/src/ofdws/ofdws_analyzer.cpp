@@ -198,24 +198,24 @@ IAnalyzer* create(const char* optarg)
     {
         int supopt = getsubopt((char**)&optarg, (char**)token, &value);
         if(value == NULL)
-            return NULL;
+            return nullptr;
 
         switch(supopt)
         {
             case bu_size:
                 bucket_size = atoi(value);
                 if(bucket_size < 1 || block_size > 32767)
-                    return NULL;
+                    return nullptr;
                 break;
 
             case bl_size:
                 block_size = atoi(value);
                 if(block_size < 1 || block_size > 31)
-                    return NULL;
+                    return nullptr;
                 break;
 
             default:
-                return NULL;//FIXME: NULL vs nullptr
+                return nullptr;
         }
         value = NULL;
     }
