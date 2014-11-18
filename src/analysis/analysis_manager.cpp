@@ -29,24 +29,40 @@ namespace analysis
 AnalysisManager::AnalysisManager(RunningStatus& status, const Parameters& params)
                                  : analysiss    {nullptr}
                                  , queue        {nullptr}
-                                 , parser_thread{nullptr}
+                                 , nfs_parser_thread{nullptr}
+                                 , cifs_parser_thread{nullptr}
+                                 , protocol(params.protocol())
 {
     analysiss.reset(new Analyzers(params));
 
     queue.reset(new FilteredDataQueue(params.queue_capacity(), 1));
 
-    NFSParser parser(*analysiss);
-    parser_thread.reset(new ParserThread<NFSParser>(parser, *queue, status));
+    if (protocol == NST::controller::NetProtocol::CIFS) {
+        CIFSParser parser(*analysiss);
+        cifs_parser_thread.reset(new ParserThread<CIFSParser>(parser, *queue, status));
+    } else {
+        NFSParser parser(*analysiss);
+        nfs_parser_thread.reset(new ParserThread<NFSParser>(parser, *queue, status));
+    }
+
 }
 
 void AnalysisManager::start()
 {
-    parser_thread->start();
+    if (protocol == NST::controller::NetProtocol::CIFS) {
+        cifs_parser_thread->start();
+    } else {
+        nfs_parser_thread->start();
+    }
 }
 
 void AnalysisManager::stop()
 {
-    parser_thread->stop();
+    if (protocol == NST::controller::NetProtocol::CIFS) {
+        cifs_parser_thread->stop();
+    } else {
+        nfs_parser_thread->stop();
+    }
 
     analysiss->flush_statistics();
 }
