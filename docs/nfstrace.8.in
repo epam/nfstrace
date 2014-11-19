@@ -213,7 +213,7 @@ Specify the packet filter in BPF syntax; for the expression syntax, see
 .TP
 .BI "-s, --snaplen=" 1..65535
 Set the max length of captured raw packet (bigger packets will be truncated).
-Can be used only for UPD
+Can be used only for UDP
 .RB (default:\  65535 ).
 .TP
 .BI "-t, --timeout=" milliseconds
