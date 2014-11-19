@@ -22,7 +22,7 @@
 #include <cstring>
 #include <map>
 
-#include "protocols/cifs/cifs_header.h"
+#include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFS;
 using namespace std;

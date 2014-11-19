@@ -24,7 +24,7 @@
 //------------------------------------------------------------------------------
 #include <sys/types.h>
 
-#include "protocols/netbios/netbios_header.h"
+#include "protocols/netbios/netbios.h"
 //------------------------------------------------------------------------------
 namespace NST
 {

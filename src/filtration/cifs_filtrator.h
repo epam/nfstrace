@@ -41,8 +41,8 @@
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
-#include "protocols/netbios/netbios_header.h"
-#include "protocols/cifs/cifs_header.h"
+#include "protocols/netbios/netbios.h"
+#include "protocols/cifs/cifs.h"
 #include "filtration_processor.h"
 //------------------------------------------------------------------------------
 namespace NST

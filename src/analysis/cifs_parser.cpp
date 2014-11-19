@@ -22,7 +22,7 @@
 #include <iostream>
 
 #include "analysis/cifs_parser.h"
-#include "protocols/cifs/cifs_header.h"
+#include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols;
 using namespace NST::analysis;
