@@ -357,7 +357,7 @@ void PrintAnalyzer::write3(const struct RPCProcedure*       proc,
                     << res->WRITE3res_u.resok.file_wcc
                     << " count: "
                     << res->WRITE3res_u.resok.count
-                    << " commited: "
+                    << " committed: "
                     << res->WRITE3res_u.resok.committed
                     << " verf: ";
                 print_hex(out,
@@ -1634,7 +1634,7 @@ void PrintAnalyzer::nfs4_operation(const struct rpcgen::WRITE4res*  res)
         if(out_all() && res->status == rpcgen::nfsstat4::NFS4_OK)
         {
             out << " count: "          << res->WRITE4res_u.resok4.count
-                << " commited: "       << res->WRITE4res_u.resok4.committed
+                << " committed: "       << res->WRITE4res_u.resok4.committed
                 << " write verifier: ";
             print_hex(out,
                       res->WRITE4res_u.resok4.writeverf,
