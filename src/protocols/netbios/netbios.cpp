@@ -21,7 +21,7 @@
 //------------------------------------------------------------------------------
 #include <arpa/inet.h>
 
-#include "protocols/netbios/netbios_header.h"
+#include "protocols/netbios/netbios.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::NetBIOS;
 
