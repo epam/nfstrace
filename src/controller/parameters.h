@@ -68,7 +68,6 @@ public:
 
     // access helpers
     const std::string&  program_name() const;
-    const std::string&  path_to_modules() const;
     RunningMode         running_mode() const;
     std::string         input_file() const;
     const std::string   dropuser() const;

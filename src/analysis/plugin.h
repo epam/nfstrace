@@ -35,10 +35,10 @@ namespace analysis
 class Plugin : private NST::utils::DynamicLoad
 {
 public:
-    static const std::string usage_of(const std::string& path, const std::string& default_location);
+    static const std::string usage_of(const std::string& path);
 
 protected:
-    explicit Plugin(const std::string& path, const std::string& default_location);
+    explicit Plugin(const std::string& path);
     Plugin(const Plugin&)            = delete;
     Plugin& operator=(const Plugin&) = delete;
 
@@ -50,7 +50,7 @@ protected:
 class PluginInstance : private Plugin
 {
 public:
-    PluginInstance(const std::string& path, const std::string& args, const std::string& default_location);
+    PluginInstance(const std::string& path, const std::string& args);
     PluginInstance(const PluginInstance&)            = delete;
     PluginInstance& operator=(const PluginInstance&) = delete;
     ~PluginInstance();

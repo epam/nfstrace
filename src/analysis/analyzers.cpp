@@ -37,7 +37,7 @@ Analyzers::Analyzers(const controller::Parameters& params)
         {
             message << "Loading module: '" << a.path << "' with args: [" << a.args << "]";
 
-            std::unique_ptr<PluginInstance> plugin{new PluginInstance{a.path, a.args, params.path_to_modules()}};
+            std::unique_ptr<PluginInstance> plugin{new PluginInstance{a.path, a.args}};
             modules.emplace_back(plugin->instance());
             plugins.emplace_back(std::move(plugin));
         }
