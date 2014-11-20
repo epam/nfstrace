@@ -25,6 +25,7 @@
 #include <stdexcept>
 
 #include <dlfcn.h>
+#include <unistd.h>
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -41,9 +42,16 @@ public:
     };
 
 protected:
-    explicit DynamicLoad(const std::string& file)
+    explicit DynamicLoad(const std::string& file, const std::string& default_location)
     {
-        handle = dlopen(file.c_str(), RTLD_LAZY);
+        std::string result_filename;
+
+        if(access(file.c_str(), F_OK) != -1)
+            result_filename = file;
+        else
+            result_filename = default_location + file;
+
+        handle = dlopen(result_filename.c_str(), RTLD_LAZY);
         if(handle == nullptr)
         {
             throw DLException{std::string{"Loading dynamic module: "} + file + " failed with error:" + dlerror()};

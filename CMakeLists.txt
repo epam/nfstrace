@@ -76,7 +76,7 @@ add_subdirectory (tests)
 # installation of main application and plugins =================================
 install (TARGETS ${PROJECT_NAME} breakdown ofws ofdws
          RUNTIME DESTINATION bin
-         LIBRARY DESTINATION lib)
+         LIBRARY DESTINATION lib/nfstrace)
 
 # installation of api headers ==================================================
 file (GLOB headers "src/api/*.h")
