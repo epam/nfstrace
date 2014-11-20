@@ -20,6 +20,7 @@
 */
 //------------------------------------------------------------------------------
 #include <iostream>
+#include <unistd.h>
 
 #include "analysis/plugin.h"
 #include "controller/cmdline_args.h"
@@ -46,7 +47,6 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
 
     ParametersImpl(int argc, char** argv)
     : rpc_message_limit{0}
-    , path_to_modules{full_filename} // from build_info.h
     {
         parse(argc, argv);
         if(get(CLI::HELP).to_bool())
@@ -60,7 +60,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
                 try
                 {
                     std::cout << "Usage of " << path << ":\n";
-                    std::cout << NST::analysis::Plugin::usage_of(path, path_to_modules) << std::endl;
+                    std::cout << NST::analysis::Plugin::usage_of(path) << std::endl;
                 }
                 catch(std::runtime_error& e)
                 {
@@ -113,15 +113,16 @@ protected:
         {
             const std::string arg{v};
             size_t ind {arg.find('#')};
+
             if(ind == std::string::npos)
             {
-                analysis_modules.emplace_back(arg);
+                analysis_modules.emplace_back(path_to_pam(arg));
             }
             else
             {
                 const std::string path{arg, 0, ind};
                 const std::string args{arg, ind + 1};
-                analysis_modules.emplace_back(path, args);
+                analysis_modules.emplace_back(path_to_pam(path), args);
             }
         }
     }
@@ -138,10 +139,24 @@ private:
         return str;
     }
 
+    std::string path_to_pam(const std::string& path) const
+    {
+        std::string result_path;
+
+        if(access(path.c_str(), F_OK) != -1)
+        {
+            result_path = path;
+        }
+        else
+        {
+            result_path = std::string{MODULES_DIRECTORY_PATH} + path;
+        }
+        return result_path;
+    }
+
     // cashed values
     unsigned short rpc_message_limit;
     std::string program;         // name of program in command line
-    std::string path_to_modules; // default path to modules
     std::vector<AParams> analysis_modules;
 };
 
@@ -173,11 +188,6 @@ bool Parameters::show_list() const
 const std::string& Parameters::program_name() const
 {
     return impl->program;
-}
-
-const std::string& Parameters::path_to_modules() const
-{
-    return impl->path_to_modules;
 }
 
 RunningMode Parameters::running_mode() const
