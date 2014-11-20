@@ -1,2 +1,2 @@
-bzcat $1 | ${CMAKE_BINARY_DIR}/${PROJECT_NAME} --mode=stat -v 2 -T -a ${CMAKE_BINARY_DIR}/analyzers/libbreakdown.so -I - -O - | \
+bzcat $1 | '${CMAKE_BINARY_DIR}/${PROJECT_NAME}' --mode=stat -v 2 -T -a '${CMAKE_BINARY_DIR}/analyzers/libbreakdown.so' -I - -O - | \
 	grep --color='auto' -P -n '[^\x00-\x7F]' | wc -c |  awk '{ if($1 != 0) exit 1 ; exit 0 }';
