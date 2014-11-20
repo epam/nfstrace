@@ -105,11 +105,21 @@ include (CPack)
 
 # coverage =====================================================================
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    find_program(GCOVR_PATH gcovr)
+    find_program (GCOVR_PATH gcovr)
 
-    if(GCOVR_PATH)
-        add_custom_target(coverage
-                          COMMAND ${GCOVR_PATH} --xml -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.xml 2>&1 >/dev/null
-                          WORKING_DIRECTORY ${CMAKE_PROJECT_DIR})
+    if (GCOVR_PATH)
+        add_custom_target (coverage
+                           COMMAND ${GCOVR_PATH} --xml -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.xml 2>&1 >/dev/null
+                           WORKING_DIRECTORY ${CMAKE_PROJECT_DIR})
     endif ()
+endif ()
+
+# documentation ================================================================
+
+find_program (DOXYGEN_PATH doxygen)
+
+if (DOXYGEN_PATH)
+    add_custom_target (documentation
+                       COMMAND ${DOXYGEN_PATH} Doxyfile
+                       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif ()
