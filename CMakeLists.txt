@@ -28,12 +28,7 @@ if ("${PCAP_LIBRARY}" STREQUAL "PCAP_LIBRARY-NOTFOUND")
 endif ()
 
 # build application ============================================================
-if (${CMAKE_SYSTEM} MATCHES "FreeBSD")
-    # CLang outputs an error on FreeBSD during compilation of Gtest/GMock - below is a temporary workaround
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -Wno-missing-field-initializers -fPIC -fvisibility=hidden")
-else ()
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC -fvisibility=hidden")
-endif ()
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC -fvisibility=hidden")
 set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
