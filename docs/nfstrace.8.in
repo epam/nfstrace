@@ -135,7 +135,7 @@ options);
 performs offline filtration of the
 .B .pcap
 file that contains previously captured traces and performs analysis using a
-pluggable analysis modules or prints found NFS procedures to
+pluggable analysis module or prints found NFS procedures to
 .B stdout
 .RB ( -T
 or
@@ -144,7 +144,7 @@ options);
 .PP
 \- offline dumping
 .RB ( --mode=drain ):
-performs reading of traffic from the
+performs a reading of traffic from the
 .B .pcap
 file (specified with
 .B -I
@@ -165,11 +165,11 @@ uses libpcap file format for input and output files so any external tool
 .BR Wireshark )
 can be used in order to inspect filtered traces.
 .PP
-Since nfstrace internally uses libpcap that provides portable interface to the
+Since nfstrace internally uses libpcap that provides a portable interface to the
 native system API for capturing network traffic, filtration is
 performed in the operating system's kernel.
 .B nfstrace
-provides special option
+provides a special option
 .RB ( -f
 or
 .BR –-filtration )
@@ -213,7 +213,7 @@ Specify the packet filter in BPF syntax; for the expression syntax, see
 .TP
 .BI "-s, --snaplen=" 1..65535
 Set the max length of captured raw packet (bigger packets will be truncated).
-Can be used only for UPD
+Can be used only for UDP
 .RB (default:\  65535 ).
 .TP
 .BI "-t, --timeout=" milliseconds
@@ -221,7 +221,7 @@ Set the read timeout that will be used while capturing
 .RB (default:\  100 ).
 .TP
 .BI "-b, --bsize=" MBytes
-Set the size of operating system capture buffer in MBytes; note that this
+Set the size of the operating system capture buffer in MBytes; note that this
 option is crucial for capturing performance
 .RB (default:\  20 ).
 .TP
@@ -234,7 +234,7 @@ Set the direction for which packets will be captured
 .RB (default:\  inout ).
 .TP
 .BI "-a, --analysis=" PATH#opt1,opt2=val,...
-Specify the path to an analysis module and set it's options (if any).
+Specify the path to an analysis module and set its options (if any).
 .TP
 .BI "-I, --ifile=" PATH
 Specify the input file for stat mode,
@@ -254,7 +254,7 @@ means
 Execute command for each dumped file.
 .TP
 .BI "-D, --dump-size=" MBytes
-Set the size of dumping file portion,
+Set the size of the dumping file portion,
 .B 0
 means no limit
 .RB (default:\  0 ).
@@ -290,7 +290,7 @@ Specify verbosity level
 .BI "-h, --help"
 Print help message and usage for modules passed with
 .B -a
-options, then exit.
+option, then exit.
 .\" --------------------- ANALYSIS MODULES -----------------------
 .SH ANALYSIS MODULES
 .SS Operation Breakdown Analyzer
@@ -300,9 +300,9 @@ algorithms (two-pass or one-pass).
 .PP
 Two-pass algorithm returns correct standard deviation but requires a lot of
 memory during computations. One-pass algorithm is memory-efficient but it
-accumulates computation error in case of large number of small latencies. It is
-possible to choose one of these algorithms by passing according parameter while
-attaching OB analyzer to
+accumulates computation error in case of a large number of small latencies. It
+is possible to choose one of these algorithms by passing according parameter
+while attaching OB analyzer to
 .BR nfstrace .
 .RS 4
 .PP
@@ -441,7 +441,8 @@ port number equals to 2049 and will dump captured packets to
 .B dump.pcap
 file.
 .PP
-Note that compression is done by external tool (executed in script passed with
+Note that compression is done by the external tool (executed in script passed
+with
 .B --command
 or
 .B -C
