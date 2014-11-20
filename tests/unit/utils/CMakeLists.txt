@@ -1,0 +1,5 @@
+set(UTILS_TEST_EXECUTABLE test_utils)
+aux_source_directory("." SRC_TEST_LIST)
+add_executable(${UTILS_TEST_EXECUTABLE} ${SRC_TEST_LIST})
+target_link_libraries(${UTILS_TEST_EXECUTABLE} ${GMOCK_LIBRARIES})
+add_test(test_utils ${UTILS_TEST_EXECUTABLE})
