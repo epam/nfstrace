@@ -136,7 +136,7 @@ void droproot(const std::string& dropuser)
         {
             message << "Note: It's potentially unsafe to run this program as root "
                     << "without dropping root privileges.\n"
-                    << "Note: Use -Z=username option for dropping root privileges "
+                    << "Note: Use -Z username option for dropping root privileges "
                     << "when you run this program as user with root privileges.";
         }
         return;
