@@ -49,7 +49,7 @@ public:
     void add_online_dumping  (const Parameters& params);  // dump to file
     void add_offline_dumping (const Parameters& params);  // dump to file from input file
     void add_online_analysis (const Parameters& params, FilteredDataQueue& queue);    // capture to queue
-    void add_offline_analysis(const std::string& ifile, FilteredDataQueue& queue);    // read file to queue
+    void add_offline_analysis(const std::string& ifile, FilteredDataQueue& queue, const Parameters& params);    // read file to queue
 
     void start();
     void stop();

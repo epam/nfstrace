@@ -35,7 +35,7 @@ namespace CIFS
 
 /*! CIFS commands
  */
-enum class Commands {
+enum class Commands : u_int8_t {
     SMB_COM_CREATE_DIRECTORY       =  0x00, //!< Create a new directory.
     SMB_COM_DELETE_DIRECTORY       =  0x01, //!< Delete an empty directory.
     SMB_COM_OPEN                   =  0x02, //!< Open a file.
@@ -113,12 +113,19 @@ enum class Commands {
     SMB_COM_NO_ANDX_COMMAND        =  0xFF //!<  Also known as the NIL command. It identifies the end of an AndX Chain
 };
 
+/*! SMB protocol codes
+ */
+enum class ProtocolCodes : u_int8_t {
+    SMB2 = 0xF3,     //!< SMB v2.0-2.1
+    SMB1 = 0xFF      //!< SMB v.1.0
+};
+
 #pragma pack(push,1)
 
 /*! \class CIFS message header
  */
 struct MessageHeader {
-    int8_t protocol_code;//!< Always 0xFF or 0xF3
+    ProtocolCodes protocol_code;//!< Protocol version - 0xFF or 0xF3
     int8_t protocol[3];//!< Protocol name (SMB)
     Commands cmd_code;//!< Code of SMB command
     int8_t other[27];//FIXME: SMB header to be precised!
