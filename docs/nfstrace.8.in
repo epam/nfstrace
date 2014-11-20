@@ -553,10 +553,10 @@ must be installed.
 .SH FILES
 .TP
 API headers
-.B /usr/include/nfstrace/api/
+.B @CMAKE_INSTALL_PREFIX@/nfstrace/api/
 .TP
 Pluggable Analysis Modules (PAMs)
-.B /usr/lib/
+.B @CMAKE_INSTALL_PREFIX@/lib/nfstrace/
 .\" ---------------------- BUGS ----------------------------------
 .SH BUGS
 .P

@@ -46,6 +46,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
 
     ParametersImpl(int argc, char** argv)
     : rpc_message_limit{0}
+    , path_to_modules{full_filename} // from build_info.h
     {
         parse(argc, argv);
         if(get(CLI::HELP).to_bool())
@@ -59,7 +60,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
                 try
                 {
                     std::cout << "Usage of " << path << ":\n";
-                    std::cout << NST::analysis::Plugin::usage_of(path) << std::endl;
+                    std::cout << NST::analysis::Plugin::usage_of(path, path_to_modules) << std::endl;
                 }
                 catch(std::runtime_error& e)
                 {
@@ -93,7 +94,6 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
         const std::string program_path(argv[0]);
         size_t found {program_path.find_last_of("/\\")};
         program = program_path.substr(found+1);
-
         const int limit {get(CLI::MSIZE).to_int()};
         if(limit < 1 || limit > 4000)
         {
@@ -140,7 +140,8 @@ private:
 
     // cashed values
     unsigned short rpc_message_limit;
-    std::string program;  // name of program in command line
+    std::string program;         // name of program in command line
+    std::string path_to_modules; // default path to modules
     std::vector<AParams> analysis_modules;
 };
 
@@ -172,6 +173,11 @@ bool Parameters::show_list() const
 const std::string& Parameters::program_name() const
 {
     return impl->program;
+}
+
+const std::string& Parameters::path_to_modules() const
+{
+    return impl->path_to_modules;
 }
 
 RunningMode Parameters::running_mode() const

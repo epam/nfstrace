@@ -28,8 +28,8 @@ namespace NST
 namespace analysis
 {
 
-Plugin::Plugin(const std::string& path)
-    : DynamicLoad{path}
+Plugin::Plugin(const std::string& path, const std::string& default_location)
+    : DynamicLoad{path, default_location}
     , usage  {nullptr}
     , create {nullptr}
     , destroy{nullptr}
@@ -61,13 +61,14 @@ Plugin::Plugin(const std::string& path)
     }
 }
 
-const std::string Plugin::usage_of(const std::string& path)
+const std::string Plugin::usage_of(const std::string& path, const std::string& default_location)
 {
-    Plugin instance{path};
+    Plugin instance{path, default_location};
     return instance.usage();
 }
 
-PluginInstance::PluginInstance(const std::string& path, const std::string& args) : Plugin{path}
+PluginInstance::PluginInstance(const std::string& path, const std::string& args, const std::string& default_location)
+    : Plugin{path, default_location}
 {
     analysis = create(args.c_str());
     if(!analysis) throw std::runtime_error{path + ": create call returns NULL-pointer"};
