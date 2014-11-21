@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 #include <sys/stat.h>
 
+#include "filtration/cifs_filtrator.h"
 #include "filtration/dumping.h"
 #include "filtration/filtration_manager.h"
 #include "filtration/filtration_processor.h"
@@ -28,8 +29,6 @@
 #include "filtration/pcap/file_reader.h"
 #include "filtration/processing_thread.h"
 #include "filtration/queuing.h"
-#include "filtration/cifs_filtrator.h"
-
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -54,8 +53,8 @@ template
 >
 class FiltrationImpl : public ProcessingThread
 {
-    typedef FiltrationProcessor<Reader, Writer, RPCFiltrator< Writer >> RPCProcessor;
-    typedef FiltrationProcessor<Reader, Writer, CIFSFiltrator< Writer >> CIFSProcessor;
+    using RPCProcessor = FiltrationProcessor<Reader, Writer, RPCFiltrator< Writer >>;
+    using CIFSProcessor = FiltrationProcessor<Reader, Writer, CIFSFiltrator< Writer >>;
 public:
     explicit FiltrationImpl(std::unique_ptr<Reader>& reader,
                             std::unique_ptr<Writer>& writer,
@@ -66,9 +65,12 @@ public:
     , cifs_processor{}
     , protocol(p)
     {
-        if (protocol == NST::controller::NetProtocol::CIFS) {
+        if (protocol == NST::controller::NetProtocol::CIFS)
+        {
             cifs_processor.reset(new CIFSProcessor{reader, writer});
-        } else {
+        }
+        else
+        {
             rpc_processor.reset(new RPCProcessor{reader, writer});
         }
     }
@@ -78,9 +80,12 @@ public:
 
     virtual void stop() override final
     {
-        if (protocol == NST::controller::NetProtocol::CIFS) {
+        if (protocol == NST::controller::NetProtocol::CIFS)
+        {
             cifs_processor->stop();
-        } else {
+        }
+        else
+        {
             rpc_processor->stop();
         }
     }
@@ -90,9 +95,12 @@ private:
     {
         try
         {
-            if (protocol == NST::controller::NetProtocol::CIFS) {
+            if (protocol == NST::controller::NetProtocol::CIFS)
+            {
                 cifs_processor->run();
-            } else {
+            }
+            else
+            {
                 rpc_processor->run();
             }
         }

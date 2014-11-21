@@ -28,6 +28,7 @@
 #include "nfs3_types_rpcgen.h"
 #include "nfs4_types_rpcgen.h"
 #include "rpc_procedure.h"
+#include "cifs_types.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -116,7 +117,38 @@ public:
             const struct rpcgen::COMPOUND4res*) {}
 };
 
-class IAnalyzer : public INFSv3rpcgen, public INFSv4rpcgen
+/*! Abstract interface of plugin which collects SMBv1 statistic
+ */
+class ISMBv1
+{
+public:
+    /*! SMBv1 echo request "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void echoRequest(const SMBv1::EchoRequestCommand *, const SMBv1::EchoRequestArgumentType &, const SMBv1::EchoRequestResultType &) {}
+
+    /*! SMBv1 "Close file" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void closeFile(const SMBv1::CloseFileCommand *, const SMBv1::CloseFileArgumentType &, const SMBv1::CloseFileResultType &) {}
+};
+
+/*! Abstract interface of plugin which collects SMBv2 statistic
+ */
+class ISMBv2
+{
+public:
+    /*! SMBv2 command "on receive" event handler
+     * \param cmd - command
+     */
+    virtual void command(const SMBv2::Command* /*cmd*/, const void* const, const void* const) {}
+};
+
+class IAnalyzer : public INFSv3rpcgen, public INFSv4rpcgen, public ISMBv1
 {
 public:
     virtual ~IAnalyzer() {};
