@@ -10,4 +10,5 @@ else ()
     include_directories (${CMAKE_SOURCE_DIR}/src ${GMOCK_INCLUDE_DIRS} ${GMOCK_SOURCE_DIR})
 
     add_subdirectory (utils)
+    add_subdirectory (net)
 endif ()
