@@ -66,8 +66,11 @@ add_library (breakdown    MODULE analyzers/src/breakdown/breakdown_analyzer.cpp)
 add_library (ofws         MODULE analyzers/src/ofws/ofws_analyzer.cpp)
 add_library (ofdws        MODULE analyzers/src/ofdws/ofdws_analyzer.cpp
                                  analyzers/src/ofdws/file_rw_op.cpp)
+add_library (webui        MODULE analyzers/src/webui/webui_analyzer.cpp
+	                         src/net/abstract_tcp_service.cpp
+				 src/net/tcp_endpoint.cpp)
 add_library (testanalyzer MODULE analyzers/src/test/test_analyzer.cpp)
-set_target_properties (breakdown ofws ofdws testanalyzer
+set_target_properties (breakdown ofws ofdws webui testanalyzer
                        PROPERTIES LIBRARY_OUTPUT_DIRECTORY "analyzers" NO_SONAME ON)
 
 # testing ======================================================================
