@@ -19,6 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
@@ -211,7 +212,8 @@ enum class Commands : uint8_t {
     SMB_COM_WRITE_BULK,             //!< Reserved
     SMB_COM_WRITE_BULK_DATA,        //!< Reserved
     SMB_COM_INVALID,                //!< As the name suggests
-    SMB_COM_NO_ANDX_COMMAND         //!<  Also known as the NIL command. It identifies the end of an AndX Chain
+    SMB_COM_NO_ANDX_COMMAND,        //!<  Also known as the NIL command. It identifies the end of an AndX Chain
+    SBM_COM_COUNT
 };
 
 const std::string commandDescription(Commands cmd_code)
@@ -298,6 +300,99 @@ const std::string commandDescription(Commands cmd_code)
     return cmdNames[cmd_code];
 }
 
+const std::string commandDescription(int cmd_code)
+{
+    return commandDescription(static_cast<Commands>(cmd_code));
+}
+
+const std::string commandName(Commands cmd_code)
+{
+    static std::map<Commands, const char *> cmdNames;
+    if (cmdNames.empty())
+    {
+        cmdNames[Commands::SMB_COM_CREATE_DIRECTORY]       = "CREATE_DIRECTORY";
+        cmdNames[Commands::SMB_COM_DELETE_DIRECTORY]       = "DELETE_DIRECTORY";
+        cmdNames[Commands::SMB_COM_OPEN]                   = "OPEN";
+        cmdNames[Commands::SMB_COM_CREATE]                 = "CREATE";
+        cmdNames[Commands::SMB_COM_CLOSE]                  = "CLOSE";
+        cmdNames[Commands::SMB_COM_FLUSH]                  = "FLUSH";
+        cmdNames[Commands::SMB_COM_DELETE]                 = "DELETE";
+        cmdNames[Commands::SMB_COM_RENAME]                 = "RENAME";
+        cmdNames[Commands::SMB_COM_QUERY_INFORMATION]      = "QUERY_INFORMATION";
+        cmdNames[Commands::SMB_COM_SET_INFORMATION]        = "SET_INFORMATION";
+        cmdNames[Commands::SMB_COM_READ]                   = "READ";
+        cmdNames[Commands::SMB_COM_WRITE]                  = "WRITE";
+        cmdNames[Commands::SMB_COM_LOCK_BYTE_RANGE]        = "LOCK_BYTE_RANGE";
+        cmdNames[Commands::SMB_COM_UNLOCK_BYTE_RANGE]      = "UNLOCK_BYTE_RANGE";
+        cmdNames[Commands::SMB_COM_CREATE_TEMPORARY]       = "CREATE_TEMPORARY";
+        cmdNames[Commands::SMB_COM_CREATE_NEW]             = "CREATE_NEW";
+        cmdNames[Commands::SMB_COM_CHECK_DIRECTORY]        = "CHECK_DIRECTORY";
+        cmdNames[Commands::SMB_COM_PROCESS_EXIT]           = "PROCESS_EXIT";
+        cmdNames[Commands::SMB_COM_SEEK]                   = "SEEK";
+        cmdNames[Commands::SMB_COM_LOCK_AND_READ]          = "LOCK_AND_READ";
+        cmdNames[Commands::SMB_COM_WRITE_AND_UNLOCK]       = "WRITE_AND_UNLOCK";
+        cmdNames[Commands::SMB_COM_READ_RAW]               = "READ_RAW";
+        cmdNames[Commands::SMB_COM_READ_MPX]               = "READ_MPX";
+        cmdNames[Commands::SMB_COM_READ_MPX_SECONDARY]     = "READ_MPX_SECONDARY";
+        cmdNames[Commands::SMB_COM_WRITE_RAW]              = "WRITE_RAW";
+        cmdNames[Commands::SMB_COM_WRITE_MPX]              = "WRITE_MPX";
+        cmdNames[Commands::SMB_COM_WRITE_MPX_SECONDARY]    = "WRITE_MPX_SECONDARY";
+        cmdNames[Commands::SMB_COM_WRITE_COMPLETE]         = "WRITE_COMPLETE";
+        cmdNames[Commands::SMB_COM_QUERY_SERVER]           = "QUERY_SERVER";
+        cmdNames[Commands::SMB_COM_SET_INFORMATION2]       = "SET_INFORMATION2";
+        cmdNames[Commands::SMB_COM_QUERY_INFORMATION2]     = "QUERY_INFORMATION2";
+        cmdNames[Commands::SMB_COM_LOCKING_ANDX]           = "LOCKING_ANDX";
+        cmdNames[Commands::SMB_COM_TRANSACTION]            = "TRANSACTION";
+        cmdNames[Commands::SMB_COM_TRANSACTION_SECONDARY]  = "TRANSACTION_SECONDARY";
+        cmdNames[Commands::SMB_COM_IOCTL]                  = "IOCTL";
+        cmdNames[Commands::SMB_COM_IOCTL_SECONDARY]        = "IOCTL_SECONDARY";
+        cmdNames[Commands::SMB_COM_COPY]                   = "COPY";
+        cmdNames[Commands::SMB_COM_MOVE]                   = "MOVE";
+        cmdNames[Commands::SMB_COM_ECHO]                   = "ECHO";
+        cmdNames[Commands::SMB_COM_WRITE_AND_CLOSE]        = "WRITE_AND_CLOSE";
+        cmdNames[Commands::SMB_COM_OPEN_ANDX]              = "OPEN_ANDX";
+        cmdNames[Commands::SMB_COM_READ_ANDX]              = "READ_ANDX";
+        cmdNames[Commands::SMB_COM_WRITE_ANDX]             = "WRITE_ANDX";
+        cmdNames[Commands::SMB_COM_NEW_FILE_SIZE]          = "NEW_FILE_SIZE";
+        cmdNames[Commands::SMB_COM_CLOSE_AND_TREE_DISC]    = "CLOSE_AND_TREE_DISC";
+        cmdNames[Commands::SMB_COM_TRANSACTION2]           = "TRANSACTION2";
+        cmdNames[Commands::SMB_COM_TRANSACTION2_SECONDARY] = "TRANSACTION2_SECONDARY";
+        cmdNames[Commands::SMB_COM_FIND_CLOSE2]            = "FIND_CLOSE2";
+        cmdNames[Commands::SMB_COM_FIND_NOTIFY_CLOSE]      = "FIND_NOTIFY_CLOSE";
+        cmdNames[Commands::SMB_COM_TREE_CONNECT]           = "TREE_CONNECT";
+        cmdNames[Commands::SMB_COM_TREE_DISCONNECT]        = "TREE_DISCONNECT";
+        cmdNames[Commands::SMB_COM_NEGOTIATE]              = "NEGOTIATE";
+        cmdNames[Commands::SMB_COM_SESSION_SETUP_ANDX]     = "SESSION_SETUP_ANDX";
+        cmdNames[Commands::SMB_COM_LOGOFF_ANDX]            = "LOGOFF_ANDX";
+        cmdNames[Commands::SMB_COM_TREE_CONNECT_ANDX]      = "TREE_CONNECT_ANDX";
+        cmdNames[Commands::SMB_COM_SECURITY_PACKAGE_ANDX]  = "SECURITY_PACKAGE_ANDX";
+        cmdNames[Commands::SMB_COM_QUERY_INFORMATION_DISK] = "QUERY_INFORMATION_DISK";
+        cmdNames[Commands::SMB_COM_SEARCH]                 = "SEARCH";
+        cmdNames[Commands::SMB_COM_FIND]                   = "FIND";
+        cmdNames[Commands::SMB_COM_FIND_UNIQUE]            = "FIND_UNIQUE";
+        cmdNames[Commands::SMB_COM_FIND_CLOSE]             = "FIND_CLOSE";
+        cmdNames[Commands::SMB_COM_NT_TRANSACT]            = "NT_TRANSACT";
+        cmdNames[Commands::SMB_COM_NT_TRANSACT_SECONDARY]  = "NT_TRANSACT_SECONDARY";
+        cmdNames[Commands::SMB_COM_NT_CREATE_ANDX]         = "NT_CREATE_ANDX";
+        cmdNames[Commands::SMB_COM_NT_CANCEL]              = "NT_CANCEL";
+        cmdNames[Commands::SMB_COM_NT_RENAME]              = "NT_RENAME";
+        cmdNames[Commands::SMB_COM_OPEN_PRINT_FILE]        = "OPEN_PRINT_FILE";
+        cmdNames[Commands::SMB_COM_WRITE_PRINT_FILE]       = "WRITE_PRINT_FILE";
+        cmdNames[Commands::SMB_COM_CLOSE_PRINT_FILE]       = "CLOSE_PRINT_FILE";
+        cmdNames[Commands::SMB_COM_GET_PRINT_QUEUE]        = "GET_PRINT_QUEUE";
+        cmdNames[Commands::SMB_COM_READ_BULK]              = "READ_BULK";
+        cmdNames[Commands::SMB_COM_WRITE_BULK]             = "WRITE_BULK";
+        cmdNames[Commands::SMB_COM_WRITE_BULK_DATA]        = "WRITE_BULK_DATA";
+        cmdNames[Commands::SMB_COM_INVALID]                = "INVALID";
+        cmdNames[Commands::SMB_COM_NO_ANDX_COMMAND]        = "NO_ANDX_COMMAND";
+    }
+    return cmdNames[cmd_code];
+}
+
+const std::string commandName(int cmd_code)
+{
+    return commandName(static_cast<Commands>(cmd_code));
+}
 
 template
 <
@@ -348,19 +443,27 @@ class BreakdownCounter
 public:
      BreakdownCounter() {}
     ~BreakdownCounter() {}
-    const Latencies<T, Algorithm>& operator[](uint32_t index) const
+    const Latencies<T, Algorithm>& operator[](int index) const
     {
         return latencies[index];
     }
-    Latencies<T, Algorithm>& operator[](uint32_t index)
+    Latencies<T, Algorithm>& operator[](int index)
     {
         return latencies[index];
+    }
+
+    uint64_t getTotalCount () const
+    {
+        return std::accumulate(std::begin(latencies), std::end(latencies), 0, [](int sum, const Latencies<T, Algorithm>& latency)
+        {
+            return sum + latency.get_count();
+        });
     }
 
 private:
     void operator=  (const BreakdownCounter&) = delete;
 
-    Latencies<T, Algorithm> latencies[ProcEnumNFS4::count];
+    Latencies<T, Algorithm> latencies[static_cast<int>(Commands::SBM_COM_COUNT)];
 };
 
 template
@@ -428,16 +531,13 @@ public:
              for(auto& it : per_procedure_statistic)
              {
                  const Breakdown& current = it.second;
-                 uint64_t s_total_proc {0};
-                 for(int i = 0; i < ProcEnumNFS3::count; ++i)
-                 {
-                     s_total_proc += current[i].get_count();
-                 }
+                 uint64_t s_total_proc = current.getTotalCount();
+
                  session.str("");
                  //print_session(session, it.first);//FIXME: print session
-                 print_per_session(current, session.str(), s_total_proc, 0, NFS_V3);
+                 print_per_session(current, session.str(), s_total_proc);
                  std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
-                 store_per_session(file, current, session.str(), s_total_proc, 0, NFS_V3);
+                 store_per_session(file, current, session.str(), s_total_proc);
              }
          }
     }
@@ -445,26 +545,17 @@ public:
     void store_per_session(std::ostream& file,
                            const Breakdown& breakdown,
                            const std::string& session,
-                           uint64_t s_total_proc,
-                           uint64_t s_total_ops,
-                           unsigned int nfs_vers) const
+                           uint64_t s_total_proc) const
     {
         file << "Session: " << session << std::endl;
 
-        unsigned int op_count {0};
-
-        if(nfs_vers == NFS_V3) op_count = ProcEnumNFS3::count;
-        if(nfs_vers == NFS_V4) op_count = ProcEnumNFS4::count;
+        unsigned int op_count  = static_cast<unsigned int>(Commands::SBM_COM_COUNT);
 
         for(unsigned i = 0; i < op_count; ++i)
         {
-            if(nfs_vers == NFS_V3)
-                file << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
+            file << commandName(i);
             file << ' ' << breakdown[i].get_count() << ' ';
-            if(nfs_vers == NFS_V4 && i >= ProcEnumNFS4::count_proc)
-                file << (s_total_ops ? (((T)(breakdown[i].get_count()) / s_total_ops) * 100) : 0);
-            else
-                file << (s_total_proc ? (((T)(breakdown[i].get_count()) / s_total_proc) * 100) : 0);
+            file << (s_total_proc ? (((T)(breakdown[i].get_count()) / s_total_proc) * 100) : 0);
             file << ' ' << to_sec<T>(breakdown[i].get_min())
                  << ' ' << to_sec<T>(breakdown[i].get_max())
                  << ' ' << breakdown[i].get_avg()
@@ -475,29 +566,19 @@ public:
 
     void print_per_session(const Breakdown& breakdown,
                            const std::string& session,
-                           uint64_t s_total_proc,
-                           uint64_t s_total_ops,
-                           unsigned int nfs_vers) const
+                           uint64_t s_total_proc) const
     {
         out << "Session: " << session << std::endl;
 
-        unsigned int op_count {0};
-
-        if(nfs_vers == NFS_V3) op_count = ProcEnumNFS3::count;
+        unsigned int op_count  = static_cast<unsigned int>(Commands::SBM_COM_COUNT);
 
         out << "Total procedures: " << s_total_proc
             << ". Per procedure:"   << std::endl;
         for(unsigned i = 0; i < op_count; ++i)
         {
-            if(nfs_vers == NFS_V4 && i == ProcEnumNFS4::count_proc)
-                out << "Total operations: "
-                    << s_total_ops
-                    << ". Per operation:"
-                    << std::endl;
             out.width(22);
-            if(nfs_vers == NFS_V3)
                 out << std::left
-                    << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
+                    << commandName(i);
             out.width(6);
             out << " Count:";
             out.width(5);
@@ -507,12 +588,8 @@ public:
             out.precision(2);
             out << '(';
             out.width(6);
-            if(nfs_vers == NFS_V4 && i>=ProcEnumNFS4::count_proc)
-                out << std::fixed
-                    << (s_total_ops ? (((T)(breakdown[i].get_count()) / s_total_ops) * 100) : 0);
-            else
-                out << std::fixed
-                    << (s_total_proc ? (((T)(breakdown[i].get_count()) / s_total_proc) * 100) : 0);
+            out << std::fixed
+                << (s_total_proc ? (((T)(breakdown[i].get_count()) / s_total_proc) * 100) : 0);
             out << "%) Min: ";
             out.precision(3);
             out << std::fixed
@@ -540,17 +617,15 @@ private:
         // diff between 'reply' and 'call' timestamps
         //timersub(0, 0, &latency);//FIXME: Latency?
 
-        {
-            ++procedures_total_count;
-            ++procedures_count[cmd_code];
+        ++procedures_total_count;
+        ++procedures_count[cmd_code];
 
-            i = per_procedure_statistic.find(proc->session());
-            if(i == per_procedure_statistic.end())
-            {
-                auto session_res = per_procedure_statistic.emplace(proc->session(), Breakdown{});
-                if(session_res.second == false) return;
-                i = session_res.first;
-            }
+        i = per_procedure_statistic.find(proc->session());
+        if(i == per_procedure_statistic.end())
+        {
+            auto session_res = per_procedure_statistic.emplace(proc->session(), Breakdown{});
+            if(session_res.second == false) return;
+            i = session_res.first;
         }
 
         (i->second)[static_cast<int>(cmd_code)].add(latency);
