@@ -32,18 +32,17 @@
 
 #include <pcap/pcap.h>
 
-#include "utils/log.h"
-#include "utils/out.h"
-#include "utils/sessions.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
 #include "filtration/sessions_hash.h"
-#include "protocols/rpc/rpc_header.h"
+#include "protocols/cifs/cifs.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/netbios/netbios.h"
-#include "protocols/cifs/cifs.h"
-#include "filtration_processor.h"
+#include "protocols/rpc/rpc_header.h"
+#include "utils/log.h"
+#include "utils/out.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -246,8 +245,9 @@ private:
     typename Writer::Collection collection;// storage for collection packet data
 };
 
-}
+} // filtration
 
-}
-
+} // NST
+//------------------------------------------------------------------------------
 #endif // CIFS_FILTRATOR_H
+//------------------------------------------------------------------------------

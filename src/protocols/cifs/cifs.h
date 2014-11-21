@@ -22,7 +22,7 @@
 #ifndef CIFS_HEADER_H
 #define CIFS_HEADER_H
 //------------------------------------------------------------------------------
-#include <sys/types.h>
+#include <cstdint>
 
 #include "protocols/netbios/netbios.h"
 //------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ namespace CIFS
 
 /*! CIFS commands
  */
-enum class Commands : u_int8_t {
+enum class Commands : uint8_t {
     SMB_COM_CREATE_DIRECTORY       =  0x00, //!< Create a new directory.
     SMB_COM_DELETE_DIRECTORY       =  0x01, //!< Delete an empty directory.
     SMB_COM_OPEN                   =  0x02, //!< Open a file.
@@ -110,43 +110,35 @@ enum class Commands : u_int8_t {
     SMB_COM_WRITE_BULK             =  0xD9, //!< Reserved
     SMB_COM_WRITE_BULK_DATA        =  0xDA, //!< Reserved
     SMB_COM_INVALID                =  0xFE, //!< As the name suggests
-    SMB_COM_NO_ANDX_COMMAND        =  0xFF //!<  Also known as the NIL command. It identifies the end of an AndX Chain
+    SMB_COM_NO_ANDX_COMMAND        =  0xFF  //!<  Also known as the NIL command. It identifies the end of an AndX Chain
 };
 
 /*! SMB protocol codes
  */
-enum class ProtocolCodes : u_int8_t {
+enum class ProtocolCodes : uint8_t {
     SMB2 = 0xF3,     //!< SMB v2.0-2.1
     SMB1 = 0xFF      //!< SMB v.1.0
 };
 
-#pragma pack(push,1)
-
-/*! \class CIFS message header
+/*! \class Raw CIFS message header
  */
 struct MessageHeader {
     ProtocolCodes protocol_code;//!< Protocol version - 0xFF or 0xF3
     int8_t protocol[3];//!< Protocol name (SMB)
     Commands cmd_code;//!< Code of SMB command
     int8_t other[27];//FIXME: SMB header to be precised!
-
-    /*! Returns command description. Performance may be affected!
-     * \return description of the command
-     */
-    std::string commandDescription() const;
-};
-
-#pragma pack(pop)
+} __attribute__ ((__packed__));
 
 /*! Check is data valid CIFS message's header and return header or nullptr
  * \param data - raw packet data
  * \return pointer to input data which is casted to header structure or nullptr (if it is not valid header)
  */
-const MessageHeader *get_header(const u_int8_t* data);
+const MessageHeader *get_header(const uint8_t *data);
 
-}
+} // CIFS
 
-}
-}
-
+} // protocols
+} // NST
+//------------------------------------------------------------------------------
 #endif // CIFS_HEADER_H
+//------------------------------------------------------------------------------

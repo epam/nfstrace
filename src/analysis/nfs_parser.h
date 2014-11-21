@@ -30,6 +30,7 @@ namespace NST
 {
 namespace analysis
 {
+
 /*! \class It is class which can parse NFS messages and it called by ParserThread
  */
 class NFSParser {
@@ -52,7 +53,8 @@ public:
 
 };
 
-}
-}
-
+} // analysis
+} // NST
+//------------------------------------------------------------------------------
 #endif // NFS_PARSER_H
+//------------------------------------------------------------------------------

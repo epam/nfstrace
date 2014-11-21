@@ -37,7 +37,7 @@ class CIFSParser {
     Analyzers& analyzers;//!< Plugins manager
 public:
 
-    CIFSParser(Analyzers& a) : analyzers(a) {}
+    CIFSParser(Analyzers& a);
     CIFSParser(CIFSParser& c) : analyzers(c.analyzers) {}
 
     /*! Function which will be called by ParserThread class
@@ -46,7 +46,8 @@ public:
     void parse_data(FilteredDataQueue::Ptr&& data);
 };
 
-}
-}
-
+} // analysis
+} // NST
+//------------------------------------------------------------------------------
 #endif // CIFS_PARSER_H
+//------------------------------------------------------------------------------

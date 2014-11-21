@@ -22,24 +22,32 @@
 #include <iostream>
 
 #include "analysis/cifs_parser.h"
+#include "api/cifs_types.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols;
 using namespace NST::analysis;
 
+CIFSParser::CIFSParser(Analyzers &a) :
+    analyzers(a)
+{
+}
+
 void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr &&data)
 {
-    for (int i = 0; i < 5 ; i++) {
-        std::cout << data->data[i];
-    }
-    std::cout << std::endl;
+    if (const CIFS::MessageHeader* header = CIFS::get_header(data->data))
+    {
+        using namespace NST::API;
 
-    auto header = CIFS::get_header(data->data);
-    if (header) {
-        std::cout << "msg: ";
-        std::cout << header->commandDescription() << std::dec;
-        std::cout << std::endl;
-    } else {
+        switch (header->cmd_code) {
+        case CIFS::Commands::SMB_COM_ECHO: return analyzers(&IAnalyzer::ISMBv1::echoRequest, SMBv1::EchoRequestCommand(header));
+        case CIFS::Commands::SMB_COM_CLOSE: return analyzers(&IAnalyzer::ISMBv1::closeFile, SMBv1::EchoRequestCommand(header));
+        default:
+            break;
+        }
+    }
+    else
+    {
         std::cout << "Got BAD message!" << std::endl;
     }
 }
