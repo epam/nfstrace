@@ -125,8 +125,28 @@ enum class ProtocolCodes : uint8_t {
 struct MessageHeader {
     ProtocolCodes protocol_code;//!< Protocol version - 0xFF or 0xF3
     int8_t protocol[3];//!< Protocol name (SMB)
+
     Commands cmd_code;//!< Code of SMB command
-    int8_t other[27];//FIXME: SMB header to be precised!
+    int32_t status;//!< Used to communicate error messages from the server to the client.
+    int8_t flags;//!< 1-bit flags describing various features in effect for the message.
+    int8_t flags2[2];//!< A 16-bit field of 1-bit flags that represent various features in effect for the message. Unspecified bits are reserved and MUST be zero.
+
+    int16_t PIDHigh;//!< If set to a nonzero value, this field represents the high-order bytes of a process identifier (PID). It is combined with the PIDLow field below to form a full PID.
+    union {
+        int8_t securityFeatures[8];//!< Somethink about security
+        struct {
+            int8_t key[4];//!< Somethink about security
+            int16_t CID;//!< A connection identifier (CID).
+            int16_t sequenceNumber;//!< A number used to identify the sequence of a message over connectionless transports.
+        } sec;
+    };
+    int16_t _;//!< Reserved
+
+    int16_t TID;//!< A tree identifier
+    int16_t PIDLow;//!< The lower 16-bits of the PID
+
+    int16_t UID;//!< A user identifier
+    int16_t MID;//!< A multiplex identifier
 } __attribute__ ((__packed__));
 
 /*! Check is data valid CIFS message's header and return header or nullptr

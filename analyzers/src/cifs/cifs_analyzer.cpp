@@ -135,6 +135,7 @@ private:
     T avg;
     T m2;
 };
+
 /*! CIFS commands
  */
 enum class Commands : uint8_t {
@@ -216,7 +217,7 @@ enum class Commands : uint8_t {
     SBM_COM_COUNT
 };
 
-const std::string commandDescription(Commands cmd_code)
+static const std::string commandDescription(Commands cmd_code)
 {
     static std::map<Commands, const char *> cmdNames;
     if (cmdNames.empty())
@@ -300,12 +301,12 @@ const std::string commandDescription(Commands cmd_code)
     return cmdNames[cmd_code];
 }
 
-const std::string commandDescription(int cmd_code)
+static inline const std::string commandDescription(int cmd_code)
 {
     return commandDescription(static_cast<Commands>(cmd_code));
 }
 
-const std::string commandName(Commands cmd_code)
+static const std::string commandName(Commands cmd_code)
 {
     static std::map<Commands, const char *> cmdNames;
     if (cmdNames.empty())
@@ -389,7 +390,7 @@ const std::string commandName(Commands cmd_code)
     return cmdNames[cmd_code];
 }
 
-const std::string commandName(int cmd_code)
+static inline const std::string commandName(int cmd_code)
 {
     return commandName(static_cast<Commands>(cmd_code));
 }
