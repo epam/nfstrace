@@ -20,8 +20,7 @@
 */
 //------------------------------------------------------------------------------
 #include <exception>
-#include <stdlib.h>
-#include <stdio.h>
+#include <iostream>
 #include <system_error>
 
 #include <unistd.h>
@@ -57,7 +56,7 @@ Plotter::Plotter()
     try
     {
         monitor_running.test_and_set();
-        printf("\n\n");
+        std::cout << "\n\n";
         initPlot();
         designPlot();
         signal(SIGWINCH, enableResize);
@@ -210,7 +209,7 @@ void Plotter::chronoUpdate()
     mvprintw(date_time.start_y, date_time.start_x,"Date: \t %d.%d.%d \t Time: %d:%d:%d",t->tm_mday, t->tm_mon + 1, t->tm_year + 1900,t->tm_hour, t->tm_min, t->tm_sec);
     mvprintw(el_time.start_y, el_time.start_x,"Elapsed time:  \t %d days; %d:%d:%d times",
              shift_time/SECINDAY, shift_time%SECINDAY/SECINHOUR, shift_time%SECINHOUR/SECINMIN, shift_time%SECINMIN);
-    mvprintw(packets.start_y, packets.start_x,"Total packets:  %lu(network)  %lu(to host)  %lu(dropped)", 999, 999 , 999);
+//    mvprintw(packets.start_y, packets.start_x,"Total packets:  %lu(network)  %lu(to host)  %lu(dropped)", 999, 999 , 999);
 }
 
 void Plotter::designPlot()
