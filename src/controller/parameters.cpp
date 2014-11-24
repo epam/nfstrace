@@ -95,6 +95,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
         const std::string program_path(argv[0]);
         size_t found {program_path.find_last_of("/\\")};
         program = program_path.substr(found+1);
+
         const int limit {get(CLI::MSIZE).to_int()};
         if(limit < 1 || limit > 4000)
         {
@@ -114,7 +115,6 @@ protected:
         {
             const std::string arg{v};
             size_t ind {arg.find('#')};
-
             if(ind == std::string::npos)
             {
                 analysis_modules.emplace_back(path_to_pam(arg));
@@ -157,7 +157,7 @@ private:
 
     // cashed values
     unsigned short rpc_message_limit;
-    std::string program;         // name of program in command line
+    std::string program;  // name of program in command line
     std::vector<AParams> analysis_modules;
 };
 
