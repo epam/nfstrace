@@ -27,7 +27,7 @@
 
 using namespace NST::net;
 
-static const char * TestResponse = "{copy:32,remove:46,getattr:154}";
+static const char * TestResponse = "{\"api_version\": \"0.0.1\", \"nfs_v3\": {\"copy\": 32, \"remove\": 46, \"getattr\": 154}}";
 
 class JsonTcpService : public AbstractTcpService
 {
