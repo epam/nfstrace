@@ -27,6 +27,7 @@ if ("${PCAP_LIBRARY}" STREQUAL "PCAP_LIBRARY-NOTFOUND")
     message (FATAL_ERROR "Could NOT find PCAP")
 endif ()
 
+
 # build application ============================================================
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -fPIC -fvisibility=hidden")
 set (CMAKE_EXE_LINKER_FLAGS "-Wl,--export-dynamic")
@@ -65,6 +66,8 @@ add_library (ofdws        MODULE analyzers/src/ofdws/ofdws_analyzer.cpp
 add_library (testanalyzer MODULE analyzers/src/test/test_analyzer.cpp)
 set_target_properties (breakdown ofws ofdws testanalyzer
                        PROPERTIES LIBRARY_OUTPUT_DIRECTORY "analyzers")
+# build watch analyzer
+add_subdirectory(analyzers)
 
 # build tests ==================================================================
 add_subdirectory (tests)

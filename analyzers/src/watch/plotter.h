@@ -19,14 +19,15 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef PLOTTER_H_
-#define PLOTTER_H_
+#ifndef PLOTTER_H
+#define PLOTTER_H
 //------------------------------------------------------------------------------
 #include <atomic>
+#include <cstdlib>
 #include <vector>
-#include <ncurses.h>
-#include <stdlib.h>
 #include <thread>
+
+#include <ncurses.h>
 //------------------------------------------------------------------------------
 struct operation_data
 {
@@ -44,7 +45,6 @@ struct operation_data
 //------------------------------------------------------------------------------
 class Plotter
 {
-
 public:
     Plotter();
     virtual ~Plotter();
@@ -80,5 +80,5 @@ private:
     uint16_t column_shift;
 };
 //------------------------------------------------------------------------------
-#endif /* PLOTTER_H_ */
+#endif // PLOTTER_H
 //------------------------------------------------------------------------------
