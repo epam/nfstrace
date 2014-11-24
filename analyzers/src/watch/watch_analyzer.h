@@ -24,7 +24,6 @@
 //------------------------------------------------------------------------------
 #include <cstdint>
 #include <cstring>
-#include <cmath>
 #include <ctime>
 
 #include <atomic>

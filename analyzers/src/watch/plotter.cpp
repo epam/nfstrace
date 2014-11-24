@@ -48,7 +48,7 @@ operation_data nfsv4_proc    {1, 3, NULL, 22 , 2, 9  ,0 , 0, 0};
 operation_data date_time     {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
 operation_data el_time       {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
 operation_data packets       {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
-
+//------------------------------------------------------------------------------
 Plotter::Plotter()
 : all_windows(3, NULL)
 , scroll_shift {0}
@@ -57,7 +57,6 @@ Plotter::Plotter()
     try
     {
         monitor_running.test_and_set();
-        sleep(2);
         printf("\n\n");
         initPlot();
         designPlot();

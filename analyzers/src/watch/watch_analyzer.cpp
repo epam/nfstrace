@@ -36,11 +36,11 @@ WatchAnalyzer::WatchAnalyzer(const char* opts)
 , write_number    {5}
 , options         {opts}
 , monitor_running {ATOMIC_FLAG_INIT}
-, refresh_delta   {atol(opts) > 100 ? atol(opts) : 2000}
+, refresh_delta   {atol(opts) > 0 ? atol(opts) : 2000}
 {
     sem_init(&read_sem, 0, write_number);
     monitor_running.test_and_set();
-    monitor_thread=std::thread(&WatchAnalyzer::thread, this);
+    monitor_thread = std::thread(&WatchAnalyzer::thread, this);
 }
 
 WatchAnalyzer::~WatchAnalyzer()
@@ -180,9 +180,7 @@ void WatchAnalyzer::getStatistic( uint64_t &nfs3_total, std::vector<int> nfs3_pr
     nfs3_pr_count.insert(nfs4_pr_count.begin(), nfs4_proc_count.begin(), nfs4_proc_count.end());
     sem_post(&read_sem);
 }
-
 //----------------------------------------------------------------------------
-
 inline void WatchAnalyzer::thread()
 {
     try
@@ -197,9 +195,7 @@ inline void WatchAnalyzer::thread()
 //        throw std::runtime_error("Watch plugin Unidentifying exception.");
     }
 }
-
 //------------------------------------------------------------------------------
-
 extern "C"
 {
 
@@ -218,12 +214,12 @@ void destroy(IAnalyzer* instance)
     delete instance;
 }
 
+/*
 bool output()
 {
     return false;
 }
-
-NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy, &output)
-
+*/
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
 }
 //------------------------------------------------------------------------------
