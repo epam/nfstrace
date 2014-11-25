@@ -33,13 +33,18 @@ namespace NetBIOS
 
 /*! \class NetBIOS message header in SMB-direct case
  */
-struct MessageHeader {
-    int8_t start;//!< In SMB direct always 0x00
+struct RawMessageHeader {
+    int8_t _start;//!< In SMB direct always 0x00
     int8_t flag;//!< Packet flags
-    size_t len() const;
-private:
     int16_t length;//!< Packet length
 } __attribute__ ((__packed__));
+
+/*! \class NetBIOS message header wrapper
+ */
+struct MessageHeader : private RawMessageHeader{
+    int8_t start() const;
+    size_t len() const;
+};
 
 /*! Check is data valid NetBIOS message's header and return header or nullptr
  * \param data - raw packet data

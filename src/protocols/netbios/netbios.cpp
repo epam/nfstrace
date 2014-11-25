@@ -25,6 +25,11 @@
 //------------------------------------------------------------------------------
 using namespace NST::protocols::NetBIOS;
 
+int8_t MessageHeader::start() const
+{
+    return _start;
+}
+
 size_t MessageHeader::len() const
 {
     return htons(length);
@@ -33,7 +38,7 @@ size_t MessageHeader::len() const
 const struct MessageHeader * NST::protocols::NetBIOS::get_header(const uint8_t* data)
 {
     const MessageHeader* header {reinterpret_cast<const MessageHeader*>(data)};
-    if (header->start == 0x00)
+    if (header->start() == 0x00)
     {
         return header;
     }
