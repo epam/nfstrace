@@ -2,8 +2,7 @@ cmake_minimum_required (VERSION 2.8.12)
 project (watch)
 
 # check system dependencies instructions ==================================================
-SET (CURSES_NEED_NCURSES TRUE) # Required NCurses
-find_package (Curses REQUIRED) # find ncurses library
+find_package (Curses) # find ncurses library
 
 # build instructions ======================================================================
 if (CURSES_FOUND)
