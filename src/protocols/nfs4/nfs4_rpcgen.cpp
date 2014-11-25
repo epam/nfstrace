@@ -25,7 +25,7 @@ namespace rpcgen
 {
 
 bool_t
-xdr_int32_t (XDR *xdrs, int32_t *objp) noexcept
+xdr_int32_t (XDR *xdrs, int32_t *objp)
 {
      if (!xdr_int (xdrs, objp))
          return FALSE;
@@ -33,7 +33,7 @@ xdr_int32_t (XDR *xdrs, int32_t *objp) noexcept
 }
 
 bool_t
-xdr_uint32_t (XDR *xdrs, uint32_t *objp) noexcept
+xdr_uint32_t (XDR *xdrs, uint32_t *objp)
 {
      if (!xdr_u_int (xdrs, objp))
          return FALSE;
@@ -41,7 +41,7 @@ xdr_uint32_t (XDR *xdrs, uint32_t *objp) noexcept
 }
 
 bool_t
-xdr_int64_t (XDR *xdrs, int64_t *objp) noexcept
+xdr_int64_t (XDR *xdrs, int64_t *objp)
 {
      if (!xdr_longlong_t (xdrs, objp))
          return FALSE;
@@ -49,7 +49,7 @@ xdr_int64_t (XDR *xdrs, int64_t *objp) noexcept
 }
 
 bool_t
-xdr_uint64_t (XDR *xdrs, uint64_t *objp) noexcept
+xdr_uint64_t (XDR *xdrs, uint64_t *objp)
 {
      if (!xdr_u_longlong_t (xdrs, objp))
          return FALSE;
