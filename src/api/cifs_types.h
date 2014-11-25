@@ -22,7 +22,6 @@
 #ifndef CIFS_TYPES_H
 #define CIFS_TYPES_H
 //------------------------------------------------------------------------------
-#include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -51,35 +50,9 @@ template<
         >
 class Command {
 public:
-
-    /*! Construct new command from message header
-     * \param h - message header
-     */
-    Command (const protocols::CIFS::MessageHeader *h)
-             : header(h)
-    {
-
-    }
-
-    /*! returns session ID
-     * \return session ID
-     */
-    inline Session session() const
-    {
-        return 0;
-    }
-
-    /*! returns code of command
-     * \return code of command
-     */
-    inline protocols::CIFS::Commands command() const
-    {
-        return header->cmd_code;
-    }
-
+    Session session;//!< session ID
     ArgumentType parg;//!< Arguments of specified command
     ResultType pres;//!< Results of specified command
-    const protocols::CIFS::MessageHeader *header;//!< Points to message's header
 };
 
 using EchoRequestCommand = Command<EchoRequestArgumentType, EchoRequestResultType>;//!< Echo request command
