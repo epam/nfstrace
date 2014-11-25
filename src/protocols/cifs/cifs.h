@@ -116,7 +116,7 @@ enum class Commands : uint8_t {
 /*! SMB protocol codes
  */
 enum class ProtocolCodes : uint8_t {
-    SMB2 = 0xF3,     //!< SMB v2.0-2.1
+    SMB2 = 0xFE,     //!< SMB v2.0-2.1
     SMB1 = 0xFF      //!< SMB v.1.0
 };
 

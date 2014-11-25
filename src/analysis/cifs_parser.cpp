@@ -24,6 +24,7 @@
 #include "analysis/cifs_parser.h"
 #include "api/cifs_types.h"
 #include "protocols/cifs/cifs.h"
+#include "protocols/cifs2/cifs2.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols;
 using namespace NST::analysis;
@@ -35,6 +36,7 @@ CIFSParser::CIFSParser(Analyzers &a) :
 
 void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr &&data)
 {
+    //FIXME: Sheet code
     if (const CIFS::MessageHeader* header = CIFS::get_header(data->data))
     {
         using namespace NST::API;
@@ -42,6 +44,16 @@ void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr &&data)
         switch (header->cmd_code) {
         case CIFS::Commands::SMB_COM_ECHO: return analyzers(&IAnalyzer::ISMBv1::echoRequest, CIFS::command<SMBv1::EchoRequestCommand>(header));
         case CIFS::Commands::SMB_COM_CLOSE: return analyzers(&IAnalyzer::ISMBv1::closeFile, CIFS::command<SMBv1::CloseFileCommand>(header));
+        default:
+            break;
+        }
+    }
+    else if (const CIFSv2::MessageHeader* header = CIFSv2::get_header(data->data))
+    {
+        using namespace NST::API;
+
+        switch (header->cmd_code) {
+        case CIFSv2::Commands::CLOSE: return analyzers(&IAnalyzer::ISMBv2::closeFileSMBv2, CIFSv2::command<SMBv2::CloseFileCommand>(header));
         default:
             break;
         }
