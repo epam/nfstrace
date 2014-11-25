@@ -1,11 +1,18 @@
 cmake_minimum_required (VERSION 2.8.12)
-project (analyzers)
-
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Wextra")
-#-Werror
 
 include_directories (../src/) # access to Plugin API
 include_directories (src)
 file (GLOB_RECURSE UTILS src/utils/*.cpp)
 
+# build analyzers ==============================================================
+add_library (breakdown    MODULE src/breakdown/breakdown_analyzer.cpp)
+add_library (ofws         MODULE src/ofws/ofws_analyzer.cpp)
+add_library (ofdws        MODULE src/ofdws/ofdws_analyzer.cpp
+                                 src/ofdws/file_rw_op.cpp)
+add_library (testanalyzer MODULE src/test/test_analyzer.cpp)
+set_target_properties (breakdown ofws ofdws testanalyzer
+                       PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/analyzers")
 add_subdirectory (src/watch)
+
+# installation of plugins ======================================================
+install (TARGETS breakdown ofws ofdws LIBRARY DESTINATION lib)
