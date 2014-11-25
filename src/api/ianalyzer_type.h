@@ -142,13 +142,15 @@ public:
 class ISMBv2
 {
 public:
-    /*! SMBv2 command "on receive" event handler
-     * \param cmd - command
+    /*! "Close file" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
      */
-    virtual void command(const SMBv2::Command* /*cmd*/, const void* const, const void* const) {}
+    virtual void closeFileSMBv2(const SMBv2::CloseFileCommand *, const SMBv2::CloseFileArgumentType &, const SMBv2::CloseFileResultType &) {}
 };
 
-class IAnalyzer : public INFSv3rpcgen, public INFSv4rpcgen, public ISMBv1
+class IAnalyzer : public INFSv3rpcgen, public INFSv4rpcgen, public ISMBv1, public ISMBv2
 {
 public:
     virtual ~IAnalyzer() {};

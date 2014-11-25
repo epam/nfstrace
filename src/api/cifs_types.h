@@ -58,23 +58,16 @@ public:
 using EchoRequestCommand = Command<EchoRequestArgumentType, EchoRequestResultType>;//!< Echo request command
 using CloseFileCommand = Command<CloseFileArgumentType, CloseFileResultType>;//!< Close file command
 
-
 }
 
 /*! SMB 2 version
  */
 namespace SMBv2 {
 
-enum class CommandType {
+using CloseFileArgumentType = int;//!< Close file command's arguments
+using CloseFileResultType = int;//!< Close file command's results
 
-};
-
-/*! Represents one SMB command
- */
-class Command {
-public:
-    CommandType cmd;
-};
+using CloseFileCommand = SMBv1::Command<CloseFileArgumentType, CloseFileResultType>;//!< Close file command
 
 }
 

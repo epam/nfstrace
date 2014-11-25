@@ -155,12 +155,32 @@ public:
         }
     }
 
+    static inline size_t header_length(const uint8_t* data, size_t size)
+    {
+        static const size_t base_header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeaderHead)};
+        size_t header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader)};
+        if (size >= base_header_len)
+        {
+            if (CIFS::get_header(data))//FIXME: do it twice
+            {
+                header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader);//FIXME: doesn't matter
+                std::cout << "hdrlen=" << header_len << std::endl;
+            }
+            else if (CIFSv2::get_header(data))//FIXME: do it twice
+            {
+                header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::MessageHeader);
+                std::cout << "hdrlen2=" << header_len << std::endl;
+            }
+        }
+        return header_len;
+    }
+
     inline bool collect_header(PacketInfo& info)
     {
-        static const size_t header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader)};
-
         if(collection && (collection.data_size() > 0)) // collection is allocated
         {
+            size_t header_len = header_length(collection.data(), collection.data_size());
+
             assert(collection.capacity() >= header_len);
             const unsigned long tocopy {header_len - collection.data_size()};
             assert(tocopy != 0);
@@ -180,7 +200,9 @@ public:
         }
         else // collection is empty
         {
-            collection.allocate(); // allocate new collection from writer 
+            size_t header_len = header_length(info.data, info.dlen);
+
+            collection.allocate(); // allocate new collection from writer
             if(info.dlen >= header_len) // is data enough to message validation?
             {
                 collection.push(info, header_len); // probability that message will be rejected / probability of valid message
@@ -212,11 +234,31 @@ public:
 
         if (const NetBIOS::MessageHeader *nb_header = NetBIOS::get_header(collection.data()))
         {
-            const CIFS::MessageHeader *header = CIFS::get_header(collection.data() + sizeof(NetBIOS::MessageHeader));
-            if (header)
+            if (CIFS::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
                 msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
                 hdr_len = (sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader) : msg_len);
+
+                assert(msg_len != 0);   // message is found
+                assert(msg_len >= collection.data_size());
+                assert(hdr_len <= msg_len);
+
+                const uint32_t written {collection.data_size()};
+                msg_len -= written; // substract how written (if written)
+                hdr_len -= std::min(hdr_len, written);
+                if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
+                                    // Next find message call will finding next message
+                {
+                    collection.skip_first(sizeof(NetBIOS::MessageHeader));
+                    collection.complete(info);
+                }
+                return;
+            }
+            else if (CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            {
+                //FIXME: code is dublicated!
+                msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
+                hdr_len = (sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::MessageHeader) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::MessageHeader) : msg_len);
 
                 assert(msg_len != 0);   // message is found
                 assert(msg_len >= collection.data_size());
