@@ -159,17 +159,15 @@ public:
     {
         static const size_t base_header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeaderHead)};
         size_t header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader)};
-        if (size >= base_header_len)
+        if (size >= base_header_len)//FIXME: Move to protocol
         {
             if (CIFS::get_header(data))//FIXME: do it twice
             {
                 header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader);//FIXME: doesn't matter
-                std::cout << "hdrlen=" << header_len << std::endl;
             }
             else if (CIFSv2::get_header(data))//FIXME: do it twice
             {
                 header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::MessageHeader);
-                std::cout << "hdrlen2=" << header_len << std::endl;
             }
         }
         return header_len;
@@ -220,6 +218,28 @@ public:
         return true;
     }
 
+    template<typename Header>
+    void read_message(const NetBIOS::MessageHeader* nb_header, const Header*, PacketInfo& info)
+    {
+        msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
+        hdr_len = (sizeof(NetBIOS::MessageHeader) + sizeof(Header) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(Header) : msg_len);
+
+        assert(msg_len != 0);   // message is found
+        assert(msg_len >= collection.data_size());
+        assert(hdr_len <= msg_len);
+
+        const uint32_t written {collection.data_size()};
+        msg_len -= written; // substract how written (if written)
+        hdr_len -= std::min(hdr_len, written);
+        if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
+                            // Next find message call will finding next message
+        {
+            collection.skip_first(sizeof(NetBIOS::MessageHeader));
+            collection.complete(info);
+        }
+
+    }
+
     // Find next message in packet info
     inline void find_message(PacketInfo& info)
     {
@@ -227,53 +247,20 @@ public:
 
         if (!collect_header(info))
         {
-            return;
+            return ;
         }
 
         assert(collection);     // collection must be initialized
 
-        if (const NetBIOS::MessageHeader *nb_header = NetBIOS::get_header(collection.data()))
+        if (const NetBIOS::MessageHeader* nb_header = NetBIOS::get_header(collection.data()))
         {
-            if (CIFS::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            if (const CIFS::MessageHeader* header = CIFS::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
-                msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
-                hdr_len = (sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader) : msg_len);
-
-                assert(msg_len != 0);   // message is found
-                assert(msg_len >= collection.data_size());
-                assert(hdr_len <= msg_len);
-
-                const uint32_t written {collection.data_size()};
-                msg_len -= written; // substract how written (if written)
-                hdr_len -= std::min(hdr_len, written);
-                if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
-                                    // Next find message call will finding next message
-                {
-                    collection.skip_first(sizeof(NetBIOS::MessageHeader));
-                    collection.complete(info);
-                }
-                return;
+                return read_message(nb_header, header, info);
             }
             else if (CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
-                //FIXME: code is dublicated!
-                msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
-                hdr_len = (sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::MessageHeader) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::MessageHeader) : msg_len);
-
-                assert(msg_len != 0);   // message is found
-                assert(msg_len >= collection.data_size());
-                assert(hdr_len <= msg_len);
-
-                const uint32_t written {collection.data_size()};
-                msg_len -= written; // substract how written (if written)
-                hdr_len -= std::min(hdr_len, written);
-                if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
-                                    // Next find message call will finding next message
-                {
-                    collection.skip_first(sizeof(NetBIOS::MessageHeader));
-                    collection.complete(info);
-                }
-                return;
+                return read_message(nb_header, header, info);
             }
         }
 

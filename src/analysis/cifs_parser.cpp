@@ -36,7 +36,7 @@ CIFSParser::CIFSParser(Analyzers &a) :
 
 void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr &&data)
 {
-    //FIXME: Sheet code
+    //FIXME: code smells
     if (const CIFS::MessageHeader* header = CIFS::get_header(data->data))
     {
         using namespace NST::API;
