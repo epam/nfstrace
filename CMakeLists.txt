@@ -61,23 +61,15 @@ configure_file(src/controller/build_info.h.in  ${PROJECT_SOURCE_DIR}/src/control
 add_executable        (${PROJECT_NAME} ${SRCS})
 target_link_libraries (${PROJECT_NAME} ${LIBS})
 
-# build analyzers ==============================================================
-add_library (breakdown    MODULE analyzers/src/breakdown/breakdown_analyzer.cpp)
-add_library (ofws         MODULE analyzers/src/ofws/ofws_analyzer.cpp)
-add_library (ofdws        MODULE analyzers/src/ofdws/ofdws_analyzer.cpp
-                                 analyzers/src/ofdws/file_rw_op.cpp)
-add_library (testanalyzer MODULE analyzers/src/test/test_analyzer.cpp)
-set_target_properties (breakdown ofws ofdws testanalyzer
-                       PROPERTIES LIBRARY_OUTPUT_DIRECTORY "analyzers" NO_SONAME ON)
+# build watch analyzer==========================================================
+add_subdirectory(analyzers)
 
 # testing ======================================================================
 enable_testing ()
 add_subdirectory (tests)
 
-# installation of main application and plugins =================================
-install (TARGETS ${PROJECT_NAME} breakdown ofws ofdws
-         RUNTIME DESTINATION bin
-         LIBRARY DESTINATION lib/nfstrace)
+# installation of main application =============================================
+install (TARGETS "${PROJECT_NAME}" RUNTIME DESTINATION bin)
 
 # installation of api headers ==================================================
 file (GLOB headers "src/api/*.h")
