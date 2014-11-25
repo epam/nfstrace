@@ -29,12 +29,12 @@ using namespace NST::protocols::CIFS;
 
 static const char * const smbProtocolName = "SMB";
 
-const MessageHeader *NST::protocols::CIFS::get_header(const uint8_t* data)
+const NST::protocols::CIFS::MessageHeader *NST::protocols::CIFS::get_header(const uint8_t* data)
 {
    const MessageHeader* header {reinterpret_cast<const MessageHeader*>(data)};
-   if (std::memcmp(header->protocol, smbProtocolName, sizeof(header->protocol)) == 0)
+   if (std::memcmp(header->head.protocol, smbProtocolName, sizeof(header->head.protocol)) == 0)
    {
-       if (header->protocol_code == ProtocolCodes::SMB1)
+       if (header->head.protocol_code == ProtocolCodes::SMB1)
        {
            return header;
        }

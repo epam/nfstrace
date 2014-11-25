@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Parser of filtrated CIFS Procedures.
+// Description: Helpers for parsing CIFS structures.
 // Copyright (c) 2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,35 +19,25 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <iostream>
+#include <cstring>
+#include <map>
+#include <string>
 
-#include "analysis/cifs_parser.h"
-#include "api/cifs_types.h"
+#include "protocols/cifs2/cifs2.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
-using namespace NST::protocols;
-using namespace NST::analysis;
+using namespace NST::protocols::CIFSv2;
 
-CIFSParser::CIFSParser(Analyzers &a) :
-    analyzers(a)
+const NST::protocols::CIFSv2::MessageHeader *NST::protocols::CIFSv2::get_header(const uint8_t* data)
 {
-}
-
-void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr &&data)
-{
-    if (const CIFS::MessageHeader* header = CIFS::get_header(data->data))
-    {
-        using namespace NST::API;
-
-        switch (header->cmd_code) {
-        case CIFS::Commands::SMB_COM_ECHO: return analyzers(&IAnalyzer::ISMBv1::echoRequest, CIFS::command<SMBv1::EchoRequestCommand>(header));
-        case CIFS::Commands::SMB_COM_CLOSE: return analyzers(&IAnalyzer::ISMBv1::closeFile, CIFS::command<SMBv1::CloseFileCommand>(header));
-        default:
-            break;
-        }
-    }
-    else
-    {
-        std::cout << "Got BAD message!" << std::endl;
-    }
+   static const char * const smbProtocolName = "SMB";
+   const MessageHeader* header {reinterpret_cast<const MessageHeader*>(data)};
+   if (std::memcmp(header->head.protocol, smbProtocolName, sizeof(header->head.protocol)) == 0)
+   {
+       if (header->head.protocol_code == NST::protocols::CIFS::ProtocolCodes::SMB2)
+       {
+           return header;
+       }
+   }
+   return nullptr;
 }

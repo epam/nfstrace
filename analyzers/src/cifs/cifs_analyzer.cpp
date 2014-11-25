@@ -621,10 +621,10 @@ private:
         ++procedures_total_count;
         ++procedures_count[cmd_code];
 
-        i = per_procedure_statistic.find(proc->session());
+        i = per_procedure_statistic.find(proc->session);
         if(i == per_procedure_statistic.end())
         {
-            auto session_res = per_procedure_statistic.emplace(proc->session(), Breakdown{});
+            auto session_res = per_procedure_statistic.emplace(proc->session, Breakdown{});
             if(session_res.second == false) return;
             i = session_res.first;
         }

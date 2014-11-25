@@ -120,19 +120,24 @@ enum class ProtocolCodes : uint8_t {
     SMB1 = 0xFF      //!< SMB v.1.0
 };
 
+/*! \class First part of CIFS header
+ */
+struct MessageHeaderHead {
+    ProtocolCodes protocol_code;//!< Protocol version - 0xFF or 0xF3
+    int8_t protocol[3];//!< Protocol name (SMB)
+} __attribute__ ((__packed__));
+
 /*! \class Raw CIFS message header
  */
 struct MessageHeader {
-    ProtocolCodes protocol_code;//!< Protocol version - 0xFF or 0xF3
-    int8_t protocol[3];//!< Protocol name (SMB)
-
+    MessageHeaderHead head;//!< Head of header
     Commands cmd_code;//!< Code of SMB command
     int32_t status;//!< Used to communicate error messages from the server to the client.
     int8_t flags;//!< 1-bit flags describing various features in effect for the message.
     int8_t flags2[2];//!< A 16-bit field of 1-bit flags that represent various features in effect for the message. Unspecified bits are reserved and MUST be zero.
 
     int16_t PIDHigh;//!< If set to a nonzero value, this field represents the high-order bytes of a process identifier (PID). It is combined with the PIDLow field below to form a full PID.
-    union {
+    union {// Depends on command
         int8_t securityFeatures[8];//!< Somethink about security
         struct {
             int8_t key[4];//!< Somethink about security
@@ -154,6 +159,18 @@ struct MessageHeader {
  * \return pointer to input data which is casted to header structure or nullptr (if it is not valid header)
  */
 const MessageHeader *get_header(const uint8_t *data);
+
+/*! Constructs new command for API from raw message
+ * \param header - message header
+ * \return Command structure
+ */
+template <typename Cmd>
+inline const Cmd command(const MessageHeader *header)
+{
+    Cmd cmd;
+    cmd.session = header->sec.CID;
+    return cmd;
+}
 
 } // CIFS
 

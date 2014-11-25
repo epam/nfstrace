@@ -36,6 +36,7 @@
 #include "filtration/packet.h"
 #include "filtration/sessions_hash.h"
 #include "protocols/cifs/cifs.h"
+#include "protocols/cifs2/cifs2.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/netbios/netbios.h"
@@ -203,16 +204,19 @@ public:
         assert(msg_len == 0);   // Message still undetected
 
         if (!collect_header(info))
+        {
             return;
+        }
 
         assert(collection);     // collection must be initialized
 
-        const NetBIOS::MessageHeader *nb_header = NetBIOS::get_header(collection.data());
-        if (nb_header) {
+        if (const NetBIOS::MessageHeader *nb_header = NetBIOS::get_header(collection.data()))
+        {
             const CIFS::MessageHeader *header = CIFS::get_header(collection.data() + sizeof(NetBIOS::MessageHeader));
-            if (header) {
-                msg_len = nb_header->len() + sizeof(nb_header);
-                hdr_len = (sizeof(nb_header) + sizeof(header) < msg_len ? sizeof(nb_header) + sizeof(header) : msg_len);
+            if (header)
+            {
+                msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
+                hdr_len = (sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader) : msg_len);
 
                 assert(msg_len != 0);   // message is found
                 assert(msg_len >= collection.data_size());
