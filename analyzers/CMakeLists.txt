@@ -1,9 +1,5 @@
 cmake_minimum_required (VERSION 2.8.12)
 
-include_directories (../src/) # access to Plugin API
-include_directories (src)
-file (GLOB_RECURSE UTILS src/utils/*.cpp)
-
 # build analyzers ==============================================================
 add_library (breakdown    MODULE src/breakdown/breakdown_analyzer.cpp)
 add_library (ofws         MODULE src/ofws/ofws_analyzer.cpp)

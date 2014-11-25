@@ -58,7 +58,7 @@ configure_file(src/controller/build_info.h.in  ${PROJECT_SOURCE_DIR}/src/control
 add_executable        (${PROJECT_NAME} ${SRCS})
 target_link_libraries (${PROJECT_NAME} ${LIBS})
 
-# build watch analyzer
+# build watch analyzer==========================================================
 add_subdirectory(analyzers)
 
 # build tests ==================================================================
