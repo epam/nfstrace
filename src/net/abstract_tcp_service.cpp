@@ -35,8 +35,6 @@ namespace net
 
 AbstractTcpService::AbstractTcpService(int port, std::size_t workersAmount, int backlog) :
 	_isRunning(true),
-	_port(port),
-	_backlog(backlog),
 	_threadPool(workersAmount),
 	_listenerThread(),
 	_serverSocket(0),
@@ -60,7 +58,7 @@ AbstractTcpService::AbstractTcpService(int port, std::size_t workersAmount, int 
 		throw std::system_error(errno, std::system_category(), "Binding server socket error");
 	}
 	// Converting socket to listening state
-	if (listen(_serverSocket, _backlog) != 0) {
+	if (listen(_serverSocket, backlog) != 0) {
 		throw std::system_error(errno, std::system_category(), "Converting socket to listening state error");
 	}
 	// Creating threads for thread-pool
