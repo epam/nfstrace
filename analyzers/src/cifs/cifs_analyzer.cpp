@@ -42,80 +42,14 @@ T to_sec(const timeval& val)
 }
 
 template <typename T>
-class TwoPassVariance
-{
-    using ConstIterator = std::list<timeval>::const_iterator;
-
-public:
-    TwoPassVariance() : count {0} {}
-    ~TwoPassVariance() {}
-
-    void add(const timeval& t)
-    {
-        ++count;
-        latencies.push_back(t);
-    }
-
-    uint32_t get_count() const
-    {
-        return count;
-    }
-
-    T get_avg() const
-    {
-        if (count == 0)
-        {
-            return T();
-        }
-
-        ConstIterator   i = latencies.begin();
-        ConstIterator end = latencies.end();
-
-        timeval res;
-        timerclear(&res);
-        for (; i != end; ++i)
-        {
-            timeradd(&res, &(*i), &res);
-        }
-        return to_sec<T>(res) / count;
-    }
-
-    T get_st_dev() const
-    {
-        if (count < 2)
-        {
-            return T();
-        }
-
-        const T avg = get_avg();
-        T st_dev = T();
-
-        ConstIterator   i = latencies.begin();
-        ConstIterator end = latencies.end();
-        for (T delta; i != end; ++i)
-        {
-            delta = to_sec<T>(*i) - avg;
-            st_dev += pow(delta, 2.0);
-        }
-        st_dev /= (count - 1);
-        return sqrt(st_dev);
-    }
-
-private:
-    void operator=(const TwoPassVariance&)  = delete;
-
-    uint32_t count;
-    std::list<timeval> latencies;
-};
-
-template <typename T>
 class OnlineVariance
 {
 public:
-    OnlineVariance() : count {0},
-                   st_dev {},
-                   avg {},
-                   m2 {}
+    OnlineVariance()
+        : count {0}
+        , st_dev {}
+        , avg {}
+        , m2 {}
     {}
     ~OnlineVariance() {}
 
@@ -715,14 +649,13 @@ public:
 
 /*! \class Analyzer for CIFS v1
  */
-template<template <class> class Algorithm>
 class CIFSBreakdownAnalyzer : public IAnalyzer
 {
     /*! \class All statistic data
      */
     struct Statistic
     {
-        using Breakdown = BreakdownCounter<long double, Algorithm>;
+        using Breakdown = BreakdownCounter<long double, OnlineVariance>;
         using PerOpStat = std::map<SMBv1::Session, Breakdown>;
         using Pair = typename PerOpStat::value_type;
         using ProceduresCount = std::map<SMBv1Commands, int>;
@@ -787,14 +720,13 @@ protected:
 
 /*! \class Analyzer for CIFS v2
  */
-template<template <class> class Algorithm>
-class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer<Algorithm>
+class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
 {
     /*! \class All statistic data
      */
     struct Statistic
     {
-        using Breakdown = BreakdownCounter<long double, Algorithm>;
+        using Breakdown = BreakdownCounter<long double, OnlineVariance>;
         using PerOpStat = std::map<SMBv1::Session, Breakdown>;
         using Pair = typename PerOpStat::value_type;
         using ProceduresCount = std::map<SMBv2Commands, int>;
@@ -810,19 +742,19 @@ class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer<Algorithm>
     Representer<Statistic, SMBv2Commands> representer;//!< Class for statistic representation
 public:
     CIFSv2BreakdownAnalyzer(std::ostream& o = std::cout)
-                            : CIFSBreakdownAnalyzer<Algorithm>(o)
+                            : CIFSBreakdownAnalyzer(o)
                             , representer(o)
     {
     }
 
     void closeFileSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseFileArgumentType&, const SMBv2::CloseFileResultType&) override final
     {
-        CIFSBreakdownAnalyzer<Algorithm>::account(cmd, SMBv2Commands::CLOSE, smbv2);
+        CIFSBreakdownAnalyzer::account(cmd, SMBv2Commands::CLOSE, smbv2);
     }
 
     virtual void flush_statistics()
     {
-        CIFSBreakdownAnalyzer<Algorithm>::flush_statistics();//FIXME: use observer
+        CIFSBreakdownAnalyzer::flush_statistics();//FIXME: use observer
         representer.flush_statistics(smbv2);
     }
 
@@ -833,47 +765,12 @@ extern "C"
 
     const char* usage()
     {
-        return "ACC - for accurate evaluation(default), MEM - for memory efficient evaluation. Options cannot be combined";
+        return "No options";
     }
 
-    IAnalyzer* create(const char* optarg)
+    IAnalyzer* create(const char*)
     {
-        enum
-        {
-            ACC = 0,
-            MEM
-        };
-        const char* token[] =
-        {
-            "ACC",
-            "MEM",
-            NULL
-        };
-
-        char* value = NULL;
-        if (*optarg == '\0')
-        {
-            return new CIFSv2BreakdownAnalyzer<OnlineVariance>();
-        }
-        else
-            do
-            {
-                switch (getsubopt((char**)&optarg, (char**)token, &value))
-                {
-                case ACC:
-                    return new CIFSv2BreakdownAnalyzer<TwoPassVariance>();
-                    break;
-
-                case MEM:
-                    return new CIFSv2BreakdownAnalyzer<OnlineVariance>();
-                    break;
-
-                default:
-                    return nullptr;
-                }
-            }
-            while (*optarg != '\0');
-        return nullptr;
+        return new CIFSv2BreakdownAnalyzer();
     }
 
     void destroy(IAnalyzer* instance)
