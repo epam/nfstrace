@@ -55,7 +55,7 @@ class CIFSFiltrator
 {
 public:
     CIFSFiltrator()
-    : collection{}
+        : collection {}
     {
         reset();
     }
@@ -79,9 +79,9 @@ public:
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
-        if(msg_len != 0)
+        if (msg_len != 0)
         {
-            if(hdr_len == 0 && msg_len >= n)
+            if (hdr_len == 0 && msg_len >= n)
             {
                 TRACE("We are lost %u bytes of payload marked for discard", n);
                 msg_len -= n;
@@ -102,13 +102,14 @@ public:
     {
         assert(info.dlen != 0);
 
-        while(info.dlen) // loop over data in packet
+        while (info.dlen) // loop over data in packet
         {
-            if(msg_len)    // we are on-stream and we are looking to some message
+            if (msg_len)   // we are on-stream and we are looking to some message
             {
-                if(hdr_len)
-                {// hdr_len != 0, readout a part of header of current message
-                    if(hdr_len > info.dlen) // got new part of header (not the all!)
+                if (hdr_len)
+                {
+                    // hdr_len != 0, readout a part of header of current message
+                    if (hdr_len > info.dlen) // got new part of header (not the all!)
                     {
                         //TRACE("got new part of header (not the all!)");
                         collection.push(info, info.dlen);
@@ -131,8 +132,9 @@ public:
                     }
                 }
                 else
-                {// message header is readout, discard the unused tail of message
-                    if(msg_len >= info.dlen) // discard whole new packet
+                {
+                    // message header is readout, discard the unused tail of message
+                    if (msg_len >= info.dlen) // discard whole new packet
                     {
                         //TRACE("discard whole new packet");
                         msg_len -= info.dlen;
@@ -157,7 +159,10 @@ public:
 
     static inline size_t header_length(const uint8_t* data, size_t size)
     {
-        static const size_t base_header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeaderHead)};
+        static const size_t base_header_len
+        {
+            sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeaderHead)
+        };
         size_t header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader)};
         if (size >= base_header_len)//FIXME: Move to protocol
         {
@@ -175,16 +180,19 @@ public:
 
     inline bool collect_header(PacketInfo& info)
     {
-        if(collection && (collection.data_size() > 0)) // collection is allocated
+        if (collection && (collection.data_size() > 0)) // collection is allocated
         {
             size_t header_len = header_length(collection.data(), collection.data_size());
 
             assert(collection.capacity() >= header_len);
-            const unsigned long tocopy {header_len - collection.data_size()};
-            assert(tocopy != 0);
-            if(info.dlen < tocopy)
+            const unsigned long tocopy
             {
-                collection.push(info, info.dlen);              
+                header_len - collection.data_size()
+            };
+            assert(tocopy != 0);
+            if (info.dlen < tocopy)
+            {
+                collection.push(info, info.dlen);
                 info.data += info.dlen;//   optimization
                 info.dlen = 0;
                 return false;
@@ -201,7 +209,7 @@ public:
             size_t header_len = header_length(info.data, info.dlen);
 
             collection.allocate(); // allocate new collection from writer
-            if(info.dlen >= header_len) // is data enough to message validation?
+            if (info.dlen >= header_len) // is data enough to message validation?
             {
                 collection.push(info, header_len); // probability that message will be rejected / probability of valid message
                 info.data += header_len;
@@ -228,11 +236,14 @@ public:
         assert(msg_len >= collection.data_size());
         assert(hdr_len <= msg_len);
 
-        const uint32_t written {collection.data_size()};
+        const uint32_t written
+        {
+            collection.data_size()
+        };
         msg_len -= written; // substract how written (if written)
         hdr_len -= std::min(hdr_len, written);
         if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
-                            // Next find message call will finding next message
+            // Next find message call will finding next message
         {
             collection.skip_first(sizeof(NetBIOS::MessageHeader));
             collection.complete(info);

@@ -30,7 +30,8 @@ namespace API
 
 /*! SMB 1 version
  */
-namespace SMBv1 {
+namespace SMBv1
+{
 
 static const int commandsCount = 255;
 
@@ -44,11 +45,12 @@ using CloseFileResultType = int;//!< Close file command's results
 
 /*! Represents one SMB command
  */
-template<
-        typename ArgumentType,
-        typename ResultType
-        >
-class Command {
+template <
+    typename ArgumentType,
+    typename ResultType
+    >
+class Command
+{
 public:
     Session session;//!< session ID
     ArgumentType parg;//!< Arguments of specified command
@@ -62,7 +64,8 @@ using CloseFileCommand = Command<CloseFileArgumentType, CloseFileResultType>;//!
 
 /*! SMB 2 version
  */
-namespace SMBv2 {
+namespace SMBv2
+{
 
 using CloseFileArgumentType = int;//!< Close file command's arguments
 using CloseFileResultType = int;//!< Close file command's results

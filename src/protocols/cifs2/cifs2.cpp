@@ -28,16 +28,16 @@
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFSv2;
 
-const NST::protocols::CIFSv2::MessageHeader *NST::protocols::CIFSv2::get_header(const uint8_t* data)
+const NST::protocols::CIFSv2::MessageHeader* NST::protocols::CIFSv2::get_header(const uint8_t* data)
 {
-   static const char * const smbProtocolName = "SMB";
-   const MessageHeader* header {reinterpret_cast<const MessageHeader*>(data)};
-   if (std::memcmp(header->head.protocol, smbProtocolName, sizeof(header->head.protocol)) == 0)
-   {
-       if (header->head.protocol_code == NST::protocols::CIFS::ProtocolCodes::SMB2)
-       {
-           return header;
-       }
-   }
-   return nullptr;
+    static const char* const smbProtocolName = "SMB";
+    const MessageHeader* header (reinterpret_cast<const MessageHeader*>(data));
+    if (std::memcmp(header->head.protocol, smbProtocolName, sizeof(header->head.protocol)) == 0)
+    {
+        if (header->head.protocol_code == NST::protocols::CIFS::ProtocolCodes::SMB2)
+        {
+            return header;
+        }
+    }
+    return nullptr;
 }

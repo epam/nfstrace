@@ -29,21 +29,24 @@
 using namespace NST::protocols;
 using namespace NST::analysis;
 
-CIFSParser::CIFSParser(Analyzers &a) :
+CIFSParser::CIFSParser(Analyzers& a) :
     analyzers(a)
 {
 }
 
-void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr &&data)
+void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr&& data)
 {
     //FIXME: code smells
     if (const CIFS::MessageHeader* header = CIFS::get_header(data->data))
     {
         using namespace NST::API;
 
-        switch (header->cmd_code) {
-        case CIFS::Commands::SMB_COM_ECHO: return analyzers(&IAnalyzer::ISMBv1::echoRequest, CIFS::command<SMBv1::EchoRequestCommand>(header));
-        case CIFS::Commands::SMB_COM_CLOSE: return analyzers(&IAnalyzer::ISMBv1::closeFile, CIFS::command<SMBv1::CloseFileCommand>(header));
+        switch (header->cmd_code)
+        {
+        case CIFS::Commands::SMB_COM_ECHO:
+            return analyzers(&IAnalyzer::ISMBv1::echoRequest, CIFS::command<SMBv1::EchoRequestCommand>(header));
+        case CIFS::Commands::SMB_COM_CLOSE:
+            return analyzers(&IAnalyzer::ISMBv1::closeFile, CIFS::command<SMBv1::CloseFileCommand>(header));
         default:
             break;
         }
@@ -52,8 +55,10 @@ void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr &&data)
     {
         using namespace NST::API;
 
-        switch (header->cmd_code) {
-        case CIFSv2::Commands::CLOSE: return analyzers(&IAnalyzer::ISMBv2::closeFileSMBv2, CIFSv2::command<SMBv2::CloseFileCommand>(header));
+        switch (header->cmd_code)
+        {
+        case CIFSv2::Commands::CLOSE:
+            return analyzers(&IAnalyzer::ISMBv2::closeFileSMBv2, CIFSv2::command<SMBv2::CloseFileCommand>(header));
         default:
             break;
         }
