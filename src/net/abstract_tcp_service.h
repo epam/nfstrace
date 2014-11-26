@@ -104,8 +104,6 @@ private:
 	void runListener();
 
 	std::atomic_bool _isRunning;
-	int _port;
-	int _backlog;
 	ThreadPool _threadPool;
 	std::unique_ptr<std::thread> _listenerThread;
 	int _serverSocket;
