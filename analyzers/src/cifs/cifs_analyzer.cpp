@@ -26,6 +26,7 @@
 #include <iomanip>
 #include <list>
 #include <map>
+#include <numeric>
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
