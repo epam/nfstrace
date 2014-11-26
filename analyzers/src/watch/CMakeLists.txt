@@ -11,7 +11,9 @@ if (CURSES_FOUND)
     file (GLOB_RECURSE UTILS ../utils/*.cpp)
     file (GLOB_RECURSE SRCS ./*.cpp)
     add_library (${PROJECT_NAME} SHARED ${UTILS} ${SRCS})
-    set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/analyzers) # direct output to nfstrace common binary dir
+    set_target_properties(${PROJECT_NAME}
+                          PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/analyzers # direct output to nfstrace common binary dir
+                          NO_SONAME ON)
     target_link_libraries (${PROJECT_NAME} ${CURSES_LIBRARIES})
     install (TARGETS watch LIBRARY DESTINATION lib/nfstrace)
 endif (CURSES_FOUND)
