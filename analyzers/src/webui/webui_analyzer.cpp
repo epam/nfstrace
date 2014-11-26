@@ -22,7 +22,7 @@
 #include <iostream>
 #include <string>
 #include <atomic>
-#include <jsoncpp/json/json.h>
+#include <json.h>
 
 #include <api/plugin_api.h> // include plugin development definitions
 #include <net/abstract_tcp_service.h>
@@ -357,38 +357,37 @@ private:
 void JsonTcpService::Task::execute()
 {
 	// Composing JSON with statistics
-	Json::Value root(Json::objectValue);
-	root["api_version"] = Json::Value(WEB_API_VERSION);
-	Json::Value nfsV3Stat(Json::objectValue);
-	nfsV3Stat["null"] = Json::Value(_service._analyzer.getNfsV3Stat().nullOpsAmount.load());
-	nfsV3Stat["getattr"] = Json::Value(_service._analyzer.getNfsV3Stat().getattrOpsAmount.load());
-	nfsV3Stat["setattr"] = Json::Value(_service._analyzer.getNfsV3Stat().setattrOpsAmount.load());
-	nfsV3Stat["lookup"] = Json::Value(_service._analyzer.getNfsV3Stat().lookupOpsAmount.load());
-	nfsV3Stat["access"] = Json::Value(_service._analyzer.getNfsV3Stat().accessOpsAmount.load());
-	nfsV3Stat["readlink"] = Json::Value(_service._analyzer.getNfsV3Stat().readlinkOpsAmount.load());
-	nfsV3Stat["read"] = Json::Value(_service._analyzer.getNfsV3Stat().readOpsAmount.load());
-	nfsV3Stat["write"] = Json::Value(_service._analyzer.getNfsV3Stat().writeOpsAmount.load());
-	nfsV3Stat["create"] = Json::Value(_service._analyzer.getNfsV3Stat().createOpsAmount.load());
-	nfsV3Stat["mkdir"] = Json::Value(_service._analyzer.getNfsV3Stat().mkdirOpsAmount.load());
-	nfsV3Stat["symlink"] = Json::Value(_service._analyzer.getNfsV3Stat().symlinkOpsAmount.load());
-	nfsV3Stat["mkdnod"] = Json::Value(_service._analyzer.getNfsV3Stat().mkdnodOpsAmount.load());
-	nfsV3Stat["remove"] = Json::Value(_service._analyzer.getNfsV3Stat().removeOpsAmount.load());
-	nfsV3Stat["rmdir"] = Json::Value(_service._analyzer.getNfsV3Stat().rmdirOpsAmount.load());
-	nfsV3Stat["rename"] = Json::Value(_service._analyzer.getNfsV3Stat().renameOpsAmount.load());
-	nfsV3Stat["link"] = Json::Value(_service._analyzer.getNfsV3Stat().linkOpsAmount.load());
-	nfsV3Stat["readdir"] = Json::Value(_service._analyzer.getNfsV3Stat().readdirOpsAmount.load());
-	nfsV3Stat["readdirplus"] = Json::Value(_service._analyzer.getNfsV3Stat().readdirplusOpsAmount.load());
-	nfsV3Stat["fsstat"] = Json::Value(_service._analyzer.getNfsV3Stat().fsstatOpsAmount.load());
-	nfsV3Stat["fsinfo"] = Json::Value(_service._analyzer.getNfsV3Stat().fsinfoOpsAmount.load());
-	nfsV3Stat["pathconf"] = Json::Value(_service._analyzer.getNfsV3Stat().pathconfOpsAmount.load());
-	nfsV3Stat["commit"] = Json::Value(_service._analyzer.getNfsV3Stat().commitOpsAmount.load());
-	root["nfs_v3"] = nfsV3Stat;
-	Json::Value nfsV4Stat(Json::objectValue);
-	nfsV4Stat["null"] = Json::Value(_service._analyzer.getNfsV4Stat().nullOpsAmount.load());
-	nfsV4Stat["compound"] = Json::Value(_service._analyzer.getNfsV4Stat().compoundOpsAmount.load());
-	root["nfs_v4"] = nfsV4Stat;
-	Json::StyledWriter writer;
-	std::string json = writer.write(root);
+	struct json_object* root = json_object_new_object();
+	struct json_object* nfsV3Stat = json_object_new_object();
+	json_object_object_add(nfsV3Stat, "null", json_object_new_int64(_service._analyzer.getNfsV3Stat().nullOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "getattr", json_object_new_int64(_service._analyzer.getNfsV3Stat().getattrOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "setattr", json_object_new_int64(_service._analyzer.getNfsV3Stat().setattrOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "lookup", json_object_new_int64(_service._analyzer.getNfsV3Stat().lookupOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "access", json_object_new_int64(_service._analyzer.getNfsV3Stat().accessOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "readlink", json_object_new_int64(_service._analyzer.getNfsV3Stat().readlinkOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "read", json_object_new_int64(_service._analyzer.getNfsV3Stat().readOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "write", json_object_new_int64(_service._analyzer.getNfsV3Stat().writeOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "create", json_object_new_int64(_service._analyzer.getNfsV3Stat().createOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "mkdir", json_object_new_int64(_service._analyzer.getNfsV3Stat().mkdirOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "symlink", json_object_new_int64(_service._analyzer.getNfsV3Stat().symlinkOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "mkdnod", json_object_new_int64(_service._analyzer.getNfsV3Stat().mkdnodOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "remove", json_object_new_int64(_service._analyzer.getNfsV3Stat().removeOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "rmdir", json_object_new_int64(_service._analyzer.getNfsV3Stat().rmdirOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "rename", json_object_new_int64(_service._analyzer.getNfsV3Stat().renameOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "link", json_object_new_int64(_service._analyzer.getNfsV3Stat().linkOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "readdir", json_object_new_int64(_service._analyzer.getNfsV3Stat().readdirOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "readdirplus", json_object_new_int64(_service._analyzer.getNfsV3Stat().readdirplusOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "fsstat", json_object_new_int64(_service._analyzer.getNfsV3Stat().fsstatOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "fsinfo", json_object_new_int64(_service._analyzer.getNfsV3Stat().fsinfoOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "pathconf", json_object_new_int64(_service._analyzer.getNfsV3Stat().pathconfOpsAmount.load()));
+	json_object_object_add(nfsV3Stat, "commit", json_object_new_int64(_service._analyzer.getNfsV3Stat().commitOpsAmount.load()));
+	json_object_object_add(root, "nfs_v3", nfsV3Stat);
+	struct json_object* nfsV4Stat = json_object_new_object();
+	json_object_object_add(nfsV4Stat, "null", json_object_new_int64(_service._analyzer.getNfsV4Stat().nullOpsAmount.load()));
+	json_object_object_add(nfsV4Stat, "compound", json_object_new_int64(_service._analyzer.getNfsV4Stat().compoundOpsAmount.load()));
+	json_object_object_add(root, "nfs_v4", nfsV4Stat);
+	std::string json(json_object_to_json_string_ext(root, JSON_C_TO_STRING_PRETTY));
+	json_object_put(root);
 	
 	// Sending JSON to the client
 	/*ssize_t bytesSent = */send(socket(), json.data(), json.size(), MSG_NOSIGNAL);
