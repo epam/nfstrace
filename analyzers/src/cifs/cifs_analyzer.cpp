@@ -748,7 +748,97 @@ public:
         account(cmd, SMBv2Commands::CLOSE, smbv2);
     }
 
-    virtual void flush_statistics()
+    void negotiateSMBv2(const SMBv2::NegotiateCommand* cmd, const SMBv2::NegotiateArgumentType &, const SMBv2::NegotiateResultType &) override final
+    {
+        account(cmd, SMBv2Commands::NEGOTIATE, smbv2);
+    }
+
+    void sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd, const SMBv2::SessionSetupArgumentType &, const SMBv2::SessionSetupResultType &) override final
+    {
+        account(cmd, SMBv2Commands::SESSION_SETUP, smbv2);
+    }
+
+    void logOffSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseFileArgumentType &, const SMBv2::CloseFileResultType &) override final
+    {
+        account(cmd, SMBv2Commands::LOGOFF, smbv2);
+    }
+
+    void treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd, const SMBv2::TreeConnectArgumentType &, const SMBv2::TreeConnectResultType &) override final
+    {
+        account(cmd, SMBv2Commands::TREE_CONNECT, smbv2);
+    }
+
+    void treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd, const SMBv2::TreeDisconnectArgumentType &, const SMBv2::TreeDisconnectResultType &) override final
+    {
+        account(cmd, SMBv2Commands::TREE_DISCONNECT, smbv2);
+    }
+
+    void createSMBv2(const SMBv2::CreateCommand* cmd, const SMBv2::CreateArgumentType &, const SMBv2::CreateResultType &) override final
+    {
+        account(cmd, SMBv2Commands::CREATE, smbv2);
+    }
+
+    void flushSMBv2(const SMBv2::FlushCommand* cmd, const SMBv2::FlushArgumentType &, const SMBv2::FlushResultType &) override final
+    {
+        account(cmd, SMBv2Commands::FLUSH, smbv2);
+    }
+
+    void readSMBv2(const SMBv2::ReadCommand* cmd, const SMBv2::ReadArgumentType &, const SMBv2::ReadResultType &) override final
+    {
+        account(cmd, SMBv2Commands::READ, smbv2);
+    }
+
+    void writeSMBv2(const SMBv2::WriteCommand* cmd, const SMBv2::WriteArgumentType &, const SMBv2::WriteResultType &) override final
+    {
+        account(cmd, SMBv2Commands::WRITE, smbv2);
+    }
+
+    void lockSMBv2(const SMBv2::LockCommand* cmd, const SMBv2::LockArgumentType &, const SMBv2::LockResultType &) override final
+    {
+        account(cmd, SMBv2Commands::LOCK, smbv2);
+    }
+
+    void ioctlSMBv2(const SMBv2::IoctlCommand* cmd, const SMBv2::IoctlArgumentType &, const SMBv2::IoctlResultType &) override final
+    {
+        account(cmd, SMBv2Commands::IOCTL, smbv2);
+    }
+
+    void cancelSMBv2(const SMBv2::CancelCommand* cmd, const SMBv2::CancelArgumentType &, const SMBv2::CancelResultType &) override final
+    {
+        account(cmd, SMBv2Commands::CANCEL, smbv2);
+    }
+
+    void echoSMBv2(const SMBv2::EchoCommand* cmd, const SMBv2::EchoArgumentType &, const SMBv2::EchoResultType &) override final
+    {
+        account(cmd, SMBv2Commands::ECHO, smbv2);
+    }
+
+    void queryDirSMBv2(const SMBv2::QueryDirCommand* cmd, const SMBv2::QueryDirArgumentType &, const SMBv2::QueryDirResultType &) override final
+    {
+        account(cmd, SMBv2Commands::QUERY_DIRECTORY, smbv2);
+    }
+
+    void changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* cmd, const SMBv2::ChangeNotifyArgumentType &, const SMBv2::ChangeNotifyResultType &) override final
+    {
+        account(cmd, SMBv2Commands::CHANGE_NOTIFY, smbv2);
+    }
+
+    void queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd, const SMBv2::QueryInfoArgumentType &, const SMBv2::QueryInfoResultType &) override final
+    {
+        account(cmd, SMBv2Commands::QUERY_INFO, smbv2);
+    }
+
+    void setInfoSMBv2(const SMBv2::SetInfoCommand* cmd, const SMBv2::SetInfoArgumentType &, const SMBv2::SetInfoResultType &) override final
+    {
+        account(cmd, SMBv2Commands::SET_INFO, smbv2);
+    }
+
+    void breakOplockSMBv2(const SMBv2::BreakOpLockCommand* cmd, const SMBv2::BreakOpLockArgumentType &, const SMBv2::BreakOpLockResultType &) override final
+    {
+        account(cmd, SMBv2Commands::OPLOCK_BREAK, smbv2);
+    }
+
+    void flush_statistics()
     {
         CIFSBreakdownAnalyzer::flush_statistics();//FIXME: use observer
         representer.flush_statistics(smbv2);
