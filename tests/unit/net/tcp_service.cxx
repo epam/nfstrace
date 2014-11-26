@@ -24,6 +24,7 @@
 #include <chrono>
 #include <thread>
 #include <net/abstract_tcp_service.h>
+#include <sys/socket.h>
 
 #define AWAIT_FOR_SERVICE_STARTUP_MS 200
 #define LISTEN_HOST TcpEndpoint::LoopbackAddress

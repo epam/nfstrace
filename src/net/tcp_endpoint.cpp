@@ -22,6 +22,7 @@
 #include <net/tcp_endpoint.h>
 #include <stdexcept>
 #include <string.h>
+#include <sys/socket.h>
 
 namespace NST
 {
