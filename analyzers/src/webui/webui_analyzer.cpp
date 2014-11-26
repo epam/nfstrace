@@ -356,6 +356,7 @@ private:
 
 void JsonTcpService::Task::execute()
 {
+	// Composing JSON with statistics
 	Json::Value root(Json::objectValue);
 	root["api_version"] = Json::Value(WEB_API_VERSION);
 	Json::Value nfsV3Stat(Json::objectValue);
@@ -388,7 +389,8 @@ void JsonTcpService::Task::execute()
 	root["nfs_v4"] = nfsV4Stat;
 	Json::StyledWriter writer;
 	std::string json = writer.write(root);
-
+	
+	// Sending JSON to the client
 	/*ssize_t bytesSent = */send(socket(), json.data(), json.size(), MSG_NOSIGNAL);
 	// TODO: Check result
 }

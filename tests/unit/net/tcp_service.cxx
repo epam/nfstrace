@@ -21,8 +21,11 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <chrono>
+#include <thread>
 #include <net/abstract_tcp_service.h>
 
+#define AWAIT_FOR_SERVICE_STARTUP_MS 200
 #define LISTEN_HOST TcpEndpoint::LoopbackAddress
 #define LISTEN_PORT 8888
 #define WORKERS_AMOUNT 100
@@ -80,6 +83,7 @@ TEST(TcpService, requestResponse)
 {
 	taskExecuteCallsCount = 0;
 	TestTcpService service(LISTEN_PORT, WORKERS_AMOUNT);
+	std::this_thread::sleep_for(std::chrono::milliseconds(AWAIT_FOR_SERVICE_STARTUP_MS));
 	int s = socket(PF_INET, SOCK_STREAM, 0);
 	ASSERT_GE(s, 0);
 	TcpEndpoint endpoint(LISTEN_HOST, LISTEN_PORT);
@@ -97,6 +101,7 @@ TEST(TestTcpService, multipleRequestResponse)
 {
 	taskExecuteCallsCount = 0;
 	TestTcpService service(LISTEN_PORT, WORKERS_AMOUNT);
+	std::this_thread::sleep_for(std::chrono::milliseconds(AWAIT_FOR_SERVICE_STARTUP_MS));
 	std::vector<int> sockets(WORKERS_AMOUNT);
 	for (auto& s : sockets) {
 		s = socket(PF_INET, SOCK_STREAM, 0);
