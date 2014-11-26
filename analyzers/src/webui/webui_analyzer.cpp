@@ -51,12 +51,12 @@ private:
 		{}
 		Task() = delete;
 
-		virtual void execute() override final;
+		void execute() override final;
 	private:
 		JsonTcpService& _service;
 	};
 
-	virtual AbstractTask * createTask(int socket)
+	AbstractTask * createTask(int socket) override final
 	{
 		return new Task(*this, socket);
 	}
@@ -332,7 +332,7 @@ public:
 	_nfsV4Stat.compoundOpsAmount++;
     }
 
-    virtual void flush_statistics()
+    void flush_statistics() override final
     {
         std::cout << "WebUiAnalyzer::flush_statistics()" << std::endl;
     }
