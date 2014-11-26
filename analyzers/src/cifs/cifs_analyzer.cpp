@@ -488,7 +488,8 @@ private:
 template
 <
     typename T,
-    template <class> class Algorithm
+    template <class> class Algorithm,
+    int COUNT
 >
 class BreakdownCounter
 {
@@ -515,7 +516,7 @@ public:
 private:
     void operator=  (const BreakdownCounter&) = delete;
 
-    Latencies<T, Algorithm> latencies[static_cast<int>(SMBv1Commands::COUNT)];//FIXME: wrong size
+    Latencies<T, Algorithm> latencies[COUNT];
 };
 
 /*! \class Represents statistic
@@ -573,15 +574,13 @@ public:
 
                 session.str("");
                 //print_session(session, it.first);//FIXME: print session
-                print_per_session<static_cast<int>(SMBCommands::COUNT)>(current, session.str(), s_total_proc);
+                print_per_session(current, session.str(), s_total_proc);
                 std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
-                store_per_session<static_cast<int>(SMBCommands::COUNT)>(file, current, session.str(), s_total_proc);
+                store_per_session(file, current, session.str(), s_total_proc);
             }
         }
     }
 
-
-    template<int op_count>
     void store_per_session(std::ostream& file,
                            const typename Statistic::Breakdown& breakdown,
                            const std::string& session,
@@ -589,7 +588,7 @@ public:
     {
         file << "Session: " << session << std::endl;
 
-        for (unsigned i = 0; i < op_count; ++i)
+        for (unsigned i = 0; i < static_cast<int>(SMBCommands::COUNT); ++i)
         {
             file << commandName(static_cast<SMBCommands>(i));
             file << ' ' << breakdown[i].get_count() << ' ';
@@ -602,7 +601,6 @@ public:
         }
     }
 
-    template<int op_count>
     void print_per_session(const typename Statistic::Breakdown& breakdown,
                            const std::string& session,
                            uint64_t s_total_proc) const
@@ -611,7 +609,7 @@ public:
 
         out << "Total procedures: " << s_total_proc
             << ". Per procedure:"   << std::endl;
-        for (unsigned i = 0; i < op_count; ++i)
+        for (unsigned i = 0; i < static_cast<int>(SMBCommands::COUNT); ++i)
         {
             out.width(22);
             out << std::left
@@ -646,6 +644,31 @@ public:
     }
 };
 
+template<typename Cmd, typename Code, typename Stats>
+void account(const Cmd* proc, Code cmd_code, Stats& stats)
+{
+    typename Stats::PerOpStat::iterator i;
+    timeval latency {0, 0};
+
+    // diff between 'reply' and 'call' timestamps
+    //timersub(0, 0, &latency);//FIXME: Latency?
+
+    ++stats.procedures_total_count;
+    ++stats.procedures_count[cmd_code];
+
+    i = stats.per_procedure_statistic.find(proc->session);
+    if (i == stats.per_procedure_statistic.end())
+    {
+        auto session_res = stats.per_procedure_statistic.emplace(proc->session, typename Stats::Breakdown {});
+        if (session_res.second == false)
+        {
+            return;
+        }
+        i = session_res.first;
+    }
+
+    (i->second)[static_cast<int>(cmd_code)].add(latency);
+}
 
 /*! \class Analyzer for CIFS v1
  */
@@ -655,9 +678,8 @@ class CIFSBreakdownAnalyzer : public IAnalyzer
      */
     struct Statistic
     {
-        using Breakdown = BreakdownCounter<long double, OnlineVariance>;
+        using Breakdown = BreakdownCounter<long double, OnlineVariance, static_cast<int>(SMBv1Commands::COUNT)>;
         using PerOpStat = std::map<SMBv1::Session, Breakdown>;
-        using Pair = typename PerOpStat::value_type;
         using ProceduresCount = std::map<SMBv1Commands, int>;
 
         uint64_t procedures_total_count;//!< Total amount of procedures
@@ -691,31 +713,6 @@ public:
     }
 
 protected:
-    template<typename Cmd, typename Code, typename Stats>
-    void account(const Cmd* proc, Code cmd_code, Stats& stats)
-    {
-        typename Statistic::PerOpStat::iterator i;
-        timeval latency {0, 0};
-
-        // diff between 'reply' and 'call' timestamps
-        //timersub(0, 0, &latency);//FIXME: Latency?
-
-        ++stats.procedures_total_count;
-        ++stats.procedures_count[cmd_code];
-
-        i = stats.per_procedure_statistic.find(proc->session);
-        if (i == stats.per_procedure_statistic.end())
-        {
-            auto session_res = stats.per_procedure_statistic.emplace(proc->session, typename Statistic::Breakdown {});
-            if (session_res.second == false)
-            {
-                return;
-            }
-            i = session_res.first;
-        }
-
-        (i->second)[static_cast<int>(cmd_code)].add(latency);
-    }
 };
 
 /*! \class Analyzer for CIFS v2
@@ -726,9 +723,8 @@ class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
      */
     struct Statistic
     {
-        using Breakdown = BreakdownCounter<long double, OnlineVariance>;
+        using Breakdown = BreakdownCounter<long double, OnlineVariance, static_cast<int>(SMBv2Commands::COUNT)>;
         using PerOpStat = std::map<SMBv1::Session, Breakdown>;
-        using Pair = typename PerOpStat::value_type;
         using ProceduresCount = std::map<SMBv2Commands, int>;
 
         uint64_t procedures_total_count;//!< Total amount of procedures
@@ -749,7 +745,7 @@ public:
 
     void closeFileSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseFileArgumentType&, const SMBv2::CloseFileResultType&) override final
     {
-        CIFSBreakdownAnalyzer::account(cmd, SMBv2Commands::CLOSE, smbv2);
+        account(cmd, SMBv2Commands::CLOSE, smbv2);
     }
 
     virtual void flush_statistics()
