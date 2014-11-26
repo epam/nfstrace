@@ -52,7 +52,7 @@ private:
 		{}
 		Task() = delete;
 
-		virtual void execute() override
+		void execute() override final
 		{
 			++taskExecuteCallsCount;
 			char receiveBuffer[RECEIVE_BUFFER_SIZE];
@@ -65,7 +65,7 @@ private:
 		TestTcpService& _service;
 	};
 
-	virtual AbstractTask * createTask(int socket)
+	AbstractTask * createTask(int socket) override final
 	{
 		return new Task(*this, socket);
 	}
@@ -98,25 +98,25 @@ TEST(TestTcpService, multipleRequestResponse)
 	taskExecuteCallsCount = 0;
 	TestTcpService service(LISTEN_PORT, WORKERS_AMOUNT);
 	std::vector<int> sockets(WORKERS_AMOUNT);
-	for (auto i = 0U; i < sockets.size(); ++i) {
-		sockets[i] = socket(PF_INET, SOCK_STREAM, 0);
-		ASSERT_GE(sockets[i], 0);
+	for (auto& s : sockets) {
+		s = socket(PF_INET, SOCK_STREAM, 0);
+		ASSERT_GE(s, 0);
 	}
 	TcpEndpoint endpoint(LISTEN_HOST, LISTEN_PORT);
-	for (auto i = 0U; i < sockets.size(); ++i) {
-		ASSERT_EQ(0, connect(sockets[i], endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
+	for (auto& s : sockets) {
+		ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
 	}
-	for (auto i = 0U; i < sockets.size(); ++i) {
-		ssize_t bytesSent = send(sockets[i], TestRequest, strlen(TestRequest), MSG_NOSIGNAL);
+	for (auto& s : sockets) {
+		ssize_t bytesSent = send(s, TestRequest, strlen(TestRequest), MSG_NOSIGNAL);
 		EXPECT_EQ(strlen(TestRequest), bytesSent);
 	}
 	char receiveBuffer[RECEIVE_BUFFER_SIZE];
-	for (auto i = 0U; i < sockets.size(); ++i) {
-		ssize_t bytesReceived = recv(sockets[i], receiveBuffer, sizeof(receiveBuffer), 0);
+	for (auto& s : sockets) {
+		ssize_t bytesReceived = recv(s, receiveBuffer, sizeof(receiveBuffer), 0);
 		EXPECT_EQ(TestResponse, std::string(receiveBuffer, bytesReceived));
 	}
-	for (auto i = 0U; i < sockets.size(); ++i) {
-		EXPECT_EQ(0, close(sockets[i]));
+	for (auto& s : sockets) {
+		EXPECT_EQ(0, close(s));
 	}
 	EXPECT_EQ(sockets.size(), taskExecuteCallsCount.load());
 }
