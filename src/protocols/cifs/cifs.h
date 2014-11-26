@@ -35,7 +35,8 @@ namespace CIFS
 
 /*! CIFS commands
  */
-enum class Commands : uint8_t {
+enum class Commands : uint8_t
+{
     SMB_COM_CREATE_DIRECTORY       =  0x00, //!< Create a new directory.
     SMB_COM_DELETE_DIRECTORY       =  0x01, //!< Delete an empty directory.
     SMB_COM_OPEN                   =  0x02, //!< Open a file.
@@ -115,21 +116,24 @@ enum class Commands : uint8_t {
 
 /*! SMB protocol codes
  */
-enum class ProtocolCodes : uint8_t {
+enum class ProtocolCodes : uint8_t
+{
     SMB2 = 0xFE,     //!< SMB v2.0-2.1
     SMB1 = 0xFF      //!< SMB v.1.0
 };
 
 /*! \class First part of CIFS header
  */
-struct MessageHeaderHead {
+struct MessageHeaderHead
+{
     ProtocolCodes protocol_code;//!< Protocol version - 0xFF or 0xF3
     int8_t protocol[3];//!< Protocol name (SMB)
 } __attribute__ ((__packed__));
 
 /*! \class Raw CIFS message header
  */
-struct MessageHeader {
+struct MessageHeader
+{
     MessageHeaderHead head;//!< Head of header
     Commands cmd_code;//!< Code of SMB command
     int32_t status;//!< Used to communicate error messages from the server to the client.
@@ -137,9 +141,11 @@ struct MessageHeader {
     int8_t flags2[2];//!< A 16-bit field of 1-bit flags that represent various features in effect for the message. Unspecified bits are reserved and MUST be zero.
 
     int16_t PIDHigh;//!< If set to a nonzero value, this field represents the high-order bytes of a process identifier (PID). It is combined with the PIDLow field below to form a full PID.
-    union {// Depends on command
+    union  // Depends on command
+    {
         int8_t securityFeatures[8];//!< Somethink about security
-        struct {
+        struct
+        {
             int8_t key[4];//!< Somethink about security
             int16_t CID;//!< A connection identifier (CID).
             int16_t sequenceNumber;//!< A number used to identify the sequence of a message over connectionless transports.
@@ -158,14 +164,14 @@ struct MessageHeader {
  * \param data - raw packet data
  * \return pointer to input data which is casted to header structure or nullptr (if it is not valid header)
  */
-const MessageHeader *get_header(const uint8_t *data);
+const MessageHeader* get_header(const uint8_t* data);
 
 /*! Constructs new command for API from raw message
  * \param header - message header
  * \return Command structure
  */
 template <typename Cmd>
-inline const Cmd command(const MessageHeader *header)
+inline const Cmd command(const MessageHeader* header)
 {
     Cmd cmd;
     cmd.session = header->sec.CID;

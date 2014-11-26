@@ -33,7 +33,8 @@ namespace analysis
 
 /*! \class It is class which can parse NFS messages and it called by ParserThread
  */
-class NFSParser {
+class NFSParser
+{
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
 
     Analyzers& analyzers;

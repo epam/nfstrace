@@ -47,7 +47,7 @@ class TwoPassVariance
     using ConstIterator = std::list<timeval>::const_iterator;
 
 public:
-    TwoPassVariance() : count{0} {}
+    TwoPassVariance() : count {0} {}
     ~TwoPassVariance() {}
 
     void add(const timeval& t)
@@ -56,18 +56,24 @@ public:
         latencies.push_back(t);
     }
 
-    uint32_t get_count() const { return count; }
+    uint32_t get_count() const
+    {
+        return count;
+    }
 
     T get_avg() const
     {
-        if(count == 0) return T();
+        if (count == 0)
+        {
+            return T();
+        }
 
         ConstIterator   i = latencies.begin();
         ConstIterator end = latencies.end();
 
         timeval res;
         timerclear(&res);
-        for(; i != end; ++i)
+        for (; i != end; ++i)
         {
             timeradd(&res, &(*i), &res);
         }
@@ -76,14 +82,17 @@ public:
 
     T get_st_dev() const
     {
-        if(count < 2) return T();
+        if (count < 2)
+        {
+            return T();
+        }
 
         const T avg = get_avg();
         T st_dev = T();
 
         ConstIterator   i = latencies.begin();
         ConstIterator end = latencies.end();
-        for(T delta; i != end; ++i)
+        for (T delta; i != end; ++i)
         {
             delta = to_sec<T>(*i) - avg;
             st_dev += pow(delta, 2.0);
@@ -103,10 +112,11 @@ template <typename T>
 class OnlineVariance
 {
 public:
-    OnlineVariance() : count{0},
-                       st_dev{},
-                          avg{},
-                           m2{} {}
+    OnlineVariance() : count {0},
+                   st_dev {},
+                   avg {},
+                   m2 {}
+    {}
     ~OnlineVariance() {}
 
     void add(const timeval& t)
@@ -117,13 +127,22 @@ public:
         m2 += delta * (x - avg);
     }
 
-    uint32_t get_count() const { return count; }
+    uint32_t get_count() const
+    {
+        return count;
+    }
 
-    T get_avg() const { return avg; }
+    T get_avg() const
+    {
+        return avg;
+    }
 
     T get_st_dev() const
     {
-        if(count < 2) return T();
+        if (count < 2)
+        {
+            return T();
+        }
         return sqrt(m2 / (count - 1));
     }
 
@@ -138,7 +157,8 @@ private:
 
 /*! CIFS v1 commands list
  */
-enum class SMBv1Commands {
+enum class SMBv1Commands
+{
     SMB_COM_CREATE_DIRECTORY,       //!< Create a new directory.
     SMB_COM_DELETE_DIRECTORY,       //!< Delete an empty directory.
     SMB_COM_OPEN,                   //!< Open a file.
@@ -219,7 +239,8 @@ enum class SMBv1Commands {
 
 /*! CIFS v2 commands list
  */
-enum class SMBv2Commands {
+enum class SMBv2Commands
+{
     NEGOTIATE,
     SESSION_SETUP,
     LOGOFF,
@@ -300,7 +321,7 @@ static const std::string commandName(SMBv2Commands cmd_code)
 
 static const std::string commandDescription(SMBv1Commands cmd_code)
 {
-    static std::map<SMBv1Commands, const char *> cmdNames;
+    static std::map<SMBv1Commands, const char*> cmdNames;
     if (cmdNames.empty())
     {
         cmdNames[SMBv1Commands::SMB_COM_CREATE_DIRECTORY]       = "SMB_COM_CREATE_DIRECTORY: Create a new directory.";
@@ -384,7 +405,7 @@ static const std::string commandDescription(SMBv1Commands cmd_code)
 
 static const std::string commandName(SMBv1Commands cmd_code)
 {
-    static std::map<SMBv1Commands, const char *> cmdNames;
+    static std::map<SMBv1Commands, const char*> cmdNames;
     if (cmdNames.empty())
     {
         cmdNames[SMBv1Commands::SMB_COM_CREATE_DIRECTORY]       = "CREATE_DIRECTORY";
@@ -468,8 +489,8 @@ static const std::string commandName(SMBv1Commands cmd_code)
 
 template
 <
-typename T, // Data type defines evaluation precision
-template <typename> class Algorithm // Evaluation algorithm
+    typename T, // Data type defines evaluation precision
+    template <typename> class Algorithm // Evaluation algorithm
 >
 class Latencies
 {
@@ -480,24 +501,49 @@ public:
         timerclear(&max);
     }
 
-    void add(const timeval& t)        { algorithm.add(t); set_range(t); }
-    uint64_t       get_count()  const { return algorithm.get_count();   }
-    long double    get_avg()    const { return algorithm.get_avg();     }
-    long double    get_st_dev() const { return algorithm.get_st_dev();  }
-    const timeval& get_min()    const { return min; }
-    const timeval& get_max()    const { return max; }
+    void add(const timeval& t)
+    {
+        algorithm.add(t);
+        set_range(t);
+    }
+    uint64_t       get_count()  const
+    {
+        return algorithm.get_count();
+    }
+    long double    get_avg()    const
+    {
+        return algorithm.get_avg();
+    }
+    long double    get_st_dev() const
+    {
+        return algorithm.get_st_dev();
+    }
+    const timeval& get_min()    const
+    {
+        return min;
+    }
+    const timeval& get_max()    const
+    {
+        return max;
+    }
 
 private:
     void operator=(const Latencies&) = delete;
 
     void set_range(const timeval& t)
     {
-        if(timercmp(&t, &min, <))
+        if (timercmp(&t, &min, < ))
+        {
             min = t;
-        if(min.tv_sec == 0 && min.tv_usec == 0)
+        }
+        if (min.tv_sec == 0 && min.tv_usec == 0)
+        {
             min = t;
-        if(timercmp(&t, &max, >))
+        }
+        if (timercmp(&t, &max, > ))
+        {
             max = t;
+        }
     }
 
     Algorithm<T> algorithm;
@@ -513,7 +559,7 @@ template
 class BreakdownCounter
 {
 public:
-     BreakdownCounter() {}
+    BreakdownCounter() {}
     ~BreakdownCounter() {}
     const Latencies<T, Algorithm>& operator[](int index) const
     {
@@ -554,50 +600,50 @@ public:
     {
     }
 
-    virtual void flush_statistics(const Statistic &statistic)
+    virtual void flush_statistics(const Statistic& statistic)
     {
-         out << "###  Breakdown analyzer  ###"
-             << std::endl
-             << "CIFS total procedures: "
-             << statistic.procedures_total_count
-             << ". Per procedure:"
-             << std::endl;
+        out << "###  Breakdown analyzer  ###"
+            << std::endl
+            << "CIFS total procedures: "
+            << statistic.procedures_total_count
+            << ". Per procedure:"
+            << std::endl;
 
-         for (const auto& procedure: statistic.procedures_count)
-         {
-             //FIXME: Sync primitives to be used
-             out.width(12);
-             out << std::left
-                 << commandDescription(procedure.first);
-             out.width(5);
-             out << std::right
-                 << procedure.second;
-             out.width(7);
-             out.setf(std::ios::fixed, std::ios::floatfield);
-             out.precision(2);
-             out << (statistic.procedures_total_count ? ((1.0 * procedure.second / statistic.procedures_total_count) * 100.0) : 0);
-             out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
-             out << '%' << std::endl;
-         };
+        for (const auto& procedure : statistic.procedures_count)
+        {
+            //FIXME: Sync primitives to be used
+            out.width(12);
+            out << std::left
+                << commandDescription(procedure.first);
+            out.width(5);
+            out << std::right
+                << procedure.second;
+            out.width(7);
+            out.setf(std::ios::fixed, std::ios::floatfield);
+            out.precision(2);
+            out << (statistic.procedures_total_count ? ((1.0 * procedure.second / statistic.procedures_total_count) * 100.0) : 0);
+            out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
+            out << '%' << std::endl;
+        };
 
-         if (statistic.per_procedure_statistic.size())  // is not empty?
-         {
+        if (statistic.per_procedure_statistic.size())  // is not empty?
+        {
             out << "Per connection info: " << std::endl;
 
             std::stringstream session;
 
-             for(auto& it : statistic.per_procedure_statistic)
-             {
-                 const typename Statistic::Breakdown& current = it.second;
-                 uint64_t s_total_proc = current.getTotalCount();
+            for (auto& it : statistic.per_procedure_statistic)
+            {
+                const typename Statistic::Breakdown& current = it.second;
+                uint64_t s_total_proc = current.getTotalCount();
 
-                 session.str("");
-                 //print_session(session, it.first);//FIXME: print session
-                 print_per_session<static_cast<int>(SMBCommands::COUNT)>(current, session.str(), s_total_proc);
-                 std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
-                 store_per_session<static_cast<int>(SMBCommands::COUNT)>(file, current, session.str(), s_total_proc);
-             }
-         }
+                session.str("");
+                //print_session(session, it.first);//FIXME: print session
+                print_per_session<static_cast<int>(SMBCommands::COUNT)>(current, session.str(), s_total_proc);
+                std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
+                store_per_session<static_cast<int>(SMBCommands::COUNT)>(file, current, session.str(), s_total_proc);
+            }
+        }
     }
 
 
@@ -609,7 +655,7 @@ public:
     {
         file << "Session: " << session << std::endl;
 
-        for(unsigned i = 0; i < op_count; ++i)
+        for (unsigned i = 0; i < op_count; ++i)
         {
             file << commandName(static_cast<SMBCommands>(i));
             file << ' ' << breakdown[i].get_count() << ' ';
@@ -631,11 +677,11 @@ public:
 
         out << "Total procedures: " << s_total_proc
             << ". Per procedure:"   << std::endl;
-        for(unsigned i = 0; i < op_count; ++i)
+        for (unsigned i = 0; i < op_count; ++i)
         {
             out.width(22);
-                out << std::left
-                    << commandName(static_cast<SMBCommands>(i));
+            out << std::left
+                << commandName(static_cast<SMBCommands>(i));
             out.width(6);
             out << " Count:";
             out.width(5);
@@ -669,15 +715,13 @@ public:
 
 /*! \class Analyzer for CIFS v1
  */
-template
-<
-    template <class> class Algorithm
->
+template<template <class> class Algorithm>
 class CIFSBreakdownAnalyzer : public IAnalyzer
 {
     /*! \class All statistic data
      */
-    struct Statistic {
+    struct Statistic
+    {
         using Breakdown = BreakdownCounter<long double, Algorithm>;
         using PerOpStat = std::map<SMBv1::Session, Breakdown>;
         using Pair = typename PerOpStat::value_type;
@@ -687,7 +731,7 @@ class CIFSBreakdownAnalyzer : public IAnalyzer
         ProceduresCount procedures_count;//!< Count of each procedure
         PerOpStat per_procedure_statistic;//!< Statistic for each procedure
 
-        Statistic() : procedures_total_count{0} {}
+        Statistic() : procedures_total_count {0} {}
     };
 
     Statistic smbv1;//!< Statistic
@@ -703,7 +747,7 @@ public:
         account(cmd, SMBv1Commands::SMB_COM_ECHO, smbv1);
     }
 
-    void closeFile(const SMBv1::CloseFileCommand *cmd, const SMBv1::CloseFileArgumentType &, const SMBv1::CloseFileResultType &) override final
+    void closeFile(const SMBv1::CloseFileCommand* cmd, const SMBv1::CloseFileArgumentType&, const SMBv1::CloseFileResultType&) override final
     {
         account(cmd, SMBv1Commands::SMB_COM_CLOSE, smbv1);
     }
@@ -715,10 +759,10 @@ public:
 
 protected:
     template<typename Cmd, typename Code, typename Stats>
-    void account(const Cmd* proc, Code cmd_code, Stats &stats)
+    void account(const Cmd* proc, Code cmd_code, Stats& stats)
     {
         typename Statistic::PerOpStat::iterator i;
-        timeval latency{0,0};
+        timeval latency {0, 0};
 
         // diff between 'reply' and 'call' timestamps
         //timersub(0, 0, &latency);//FIXME: Latency?
@@ -727,10 +771,13 @@ protected:
         ++stats.procedures_count[cmd_code];
 
         i = stats.per_procedure_statistic.find(proc->session);
-        if(i == stats.per_procedure_statistic.end())
+        if (i == stats.per_procedure_statistic.end())
         {
-            auto session_res = stats.per_procedure_statistic.emplace(proc->session, typename Statistic::Breakdown{});
-            if(session_res.second == false) return;
+            auto session_res = stats.per_procedure_statistic.emplace(proc->session, typename Statistic::Breakdown {});
+            if (session_res.second == false)
+            {
+                return;
+            }
             i = session_res.first;
         }
 
@@ -740,15 +787,13 @@ protected:
 
 /*! \class Analyzer for CIFS v2
  */
-template
-<
-        template <class> class Algorithm
->
+template<template <class> class Algorithm>
 class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer<Algorithm>
 {
     /*! \class All statistic data
      */
-    struct Statistic {
+    struct Statistic
+    {
         using Breakdown = BreakdownCounter<long double, Algorithm>;
         using PerOpStat = std::map<SMBv1::Session, Breakdown>;
         using Pair = typename PerOpStat::value_type;
@@ -758,7 +803,7 @@ class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer<Algorithm>
         ProceduresCount procedures_count;//!< Count of each procedure
         PerOpStat per_procedure_statistic;//!< Statistic for each procedure
 
-        Statistic() : procedures_total_count{0} {}
+        Statistic() : procedures_total_count {0} {}
     };
 
     Statistic smbv2;//!< Statistic
@@ -770,15 +815,15 @@ public:
     {
     }
 
-    void closeFileSMBv2(const SMBv2::CloseFileCommand *cmd, const SMBv2::CloseFileArgumentType &, const SMBv2::CloseFileResultType &) override final
+    void closeFileSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseFileArgumentType&, const SMBv2::CloseFileResultType&) override final
     {
         CIFSBreakdownAnalyzer<Algorithm>::account(cmd, SMBv2Commands::CLOSE, smbv2);
     }
 
     virtual void flush_statistics()
     {
-         CIFSBreakdownAnalyzer<Algorithm>::flush_statistics();//FIXME: use observer
-         representer.flush_statistics(smbv2);
+        CIFSBreakdownAnalyzer<Algorithm>::flush_statistics();//FIXME: use observer
+        representer.flush_statistics(smbv2);
     }
 
 };
@@ -786,32 +831,35 @@ public:
 extern "C"
 {
 
-const char* usage()
-{
-    return "ACC - for accurate evaluation(default), MEM - for memory efficient evaluation. Options cannot be combined";
-}
-
-IAnalyzer* create(const char* optarg)
-{
-    enum
+    const char* usage()
     {
-        ACC = 0,
-        MEM
-    };
-    const char* token[] = {
-        "ACC",
-        "MEM",
-         NULL
-    };
+        return "ACC - for accurate evaluation(default), MEM - for memory efficient evaluation. Options cannot be combined";
+    }
 
-    char* value = NULL;
-    if(*optarg == '\0')
-        return new CIFSv2BreakdownAnalyzer<OnlineVariance>();
-    else
-        do
+    IAnalyzer* create(const char* optarg)
+    {
+        enum
         {
-            switch(getsubopt((char**)&optarg, (char**)token, &value))
+            ACC = 0,
+            MEM
+        };
+        const char* token[] =
+        {
+            "ACC",
+            "MEM",
+            NULL
+        };
+
+        char* value = NULL;
+        if (*optarg == '\0')
+        {
+            return new CIFSv2BreakdownAnalyzer<OnlineVariance>();
+        }
+        else
+            do
             {
+                switch (getsubopt((char**)&optarg, (char**)token, &value))
+                {
                 case ACC:
                     return new CIFSv2BreakdownAnalyzer<TwoPassVariance>();
                     break;
@@ -822,17 +870,18 @@ IAnalyzer* create(const char* optarg)
 
                 default:
                     return nullptr;
+                }
             }
-        } while (*optarg != '\0');
-    return nullptr;
-}
+            while (*optarg != '\0');
+        return nullptr;
+    }
 
-void destroy(IAnalyzer* instance)
-{
-    delete instance;
-}
+    void destroy(IAnalyzer* instance)
+    {
+        delete instance;
+    }
 
-NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
+    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
 
 }//extern "C"
 //------------------------------------------------------------------------------

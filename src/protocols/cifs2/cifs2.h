@@ -35,7 +35,8 @@ namespace CIFSv2
 
 /*! CIFS v2 commands
  */
-enum class Commands : uint16_t {
+enum class Commands : uint16_t
+{
     NEGOTIATE         = 0x0000,
     SESSION_SETUP     = 0x0001,
     LOGOFF            = 0x0002,
@@ -59,7 +60,8 @@ enum class Commands : uint16_t {
 
 /*! \class Raw CIFS v2 message header
  */
-struct MessageHeader {
+struct MessageHeader
+{
     CIFS::MessageHeaderHead head;//!< Same head as CIFS v1
 
     int16_t StructureSize;//!< In the SMB 2.002 dialect, this field MUST NOT be used and MUST be reserved. The sender MUST set this to 0, and the receiver MUST ignore it. In all other dialects, this field indicates the number of credits that this request consumes.
@@ -96,14 +98,14 @@ struct MessageHeader {
  * \param data - raw packet data
  * \return pointer to input data which is casted to header structure or nullptr (if it is not valid header)
  */
-const MessageHeader *get_header(const uint8_t *data);
+const MessageHeader* get_header(const uint8_t* data);
 
 /*! Constructs new command for API from raw message
  * \param header - message header
  * \return Command structure
  */
 template <typename Cmd>
-inline const Cmd command(const MessageHeader *header)
+inline const Cmd command(const MessageHeader* header)
 {
     Cmd cmd;
     cmd.session = header->SessionId;//FIXME: size of var
