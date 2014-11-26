@@ -130,6 +130,15 @@ struct MessageHeaderHead
     int8_t protocol[3];//!< Protocol name (SMB)
 } __attribute__ ((__packed__));
 
+/*! Security field for CIFS header
+ */
+struct SecurityField
+{
+    int8_t key[4];//!< Somethink about security
+    int16_t CID;//!< A connection identifier (CID).
+    int16_t sequenceNumber;//!< A number used to identify the sequence of a message over connectionless transports.
+};
+
 /*! \class Raw CIFS message header
  */
 struct MessageHeader
@@ -144,12 +153,7 @@ struct MessageHeader
     union  // Depends on command
     {
         int8_t securityFeatures[8];//!< Somethink about security
-        struct
-        {
-            int8_t key[4];//!< Somethink about security
-            int16_t CID;//!< A connection identifier (CID).
-            int16_t sequenceNumber;//!< A number used to identify the sequence of a message over connectionless transports.
-        } sec;
+        SecurityField sec;//!< Security field structure
     };
     int16_t _;//!< Reserved
 
