@@ -21,6 +21,8 @@
 //------------------------------------------------------------------------------
 #include <iostream>
 
+#include <unistd.h>
+
 #include "analysis/plugin.h"
 #include "controller/cmdline_args.h"
 #include "controller/cmdline_parser.h"
@@ -115,13 +117,13 @@ protected:
             size_t ind {arg.find('#')};
             if(ind == std::string::npos)
             {
-                analysis_modules.emplace_back(arg);
+                analysis_modules.emplace_back(path_to_pam(arg));
             }
             else
             {
                 const std::string path{arg, 0, ind};
                 const std::string args{arg, ind + 1};
-                analysis_modules.emplace_back(path, args);
+                analysis_modules.emplace_back(path_to_pam(path), args);
             }
         }
     }
@@ -136,6 +138,21 @@ private:
         str.append(".pcap");
         std::replace(str.begin(), str.end(), ' ', '-');
         return str;
+    }
+
+    std::string path_to_pam(const std::string& path) const
+    {
+        std::string result_path;
+
+        if(access(path.c_str(), F_OK) != -1)
+        {
+            result_path = path;
+        }
+        else
+        {
+            result_path = std::string{MODULES_DIRECTORY_PATH} + path;
+        }
+        return result_path;
     }
 
     // cashed values

@@ -33,6 +33,8 @@ constexpr char PROGRAM_BUILD_INFO[]=
     "built on @CMAKE_SYSTEM@\n"
     "by C++ compiler @CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VERSION@";
 
+constexpr char MODULES_DIRECTORY_PATH[] = "@CMAKE_INSTALL_PREFIX@/lib/nfstrace/";
+
 } // namespace NST
 //------------------------------------------------------------------------------
 #endif//BUILD_INFO_H
