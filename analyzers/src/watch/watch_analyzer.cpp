@@ -33,12 +33,20 @@ WatchAnalyzer::WatchAnalyzer(const char* opts)
 , nfs4_ops_total  {0}
 , nfs4_proc_count (ProcEnumNFS4::count, 0)
 , monitor_running {ATOMIC_FLAG_INIT}
+, refresh_delta   {2000}
 , max_read        {5}
 , read_counter    {0}
 {
     monitor_running.test_and_set();
+    if(opts != nullptr && opts != NULL) try
+    {
+        refresh_delta = std::stoul(opts);
+    }
+    catch(std::exception& e)
+    {
+        throw std::runtime_error((std::string("Error in plugin options processing. ") + std::string("OPTS: ") + std::string(opts) + std::string(" Error: ")+ std::string(e.what())).c_str());
+    }
     monitor_thread = std::thread(&WatchAnalyzer::thread, this);
-    try{refresh_delta = std::stoul(opts);} catch(...){ refresh_delta = 2000;}
 }
 
 WatchAnalyzer::~WatchAnalyzer()
@@ -202,7 +210,7 @@ inline void WatchAnalyzer::thread()
     } catch(...) {
         DownRead();
         std::cerr << "Watch plugin Unidentifying exception.";
-//        throw std::runtime_error("Watch plugin Unidentifying exception.");
+//        throw std::exception("Watch plugin Unidentifying exception.");
     }
 }
 //------------------------------------------------------------------------------
@@ -216,7 +224,15 @@ const char* usage()
 
 IAnalyzer* create(const char* opts)
 {
-    return new WatchAnalyzer(opts);
+    try
+    {
+        return new WatchAnalyzer(opts);
+    }
+    catch(std::exception& e)
+    {
+        std::cerr << "Can't initalize plugin: " << e.what() << std::endl;
+        return nullptr;
+    }
 }
 
 void destroy(IAnalyzer* instance)
