@@ -63,9 +63,9 @@ public:
                                      uint32_t count,
                                      uint32_t time = 0);
 
-    inline uint64_t get_read_total()   { return read_total;  }
-    inline uint64_t get_write_total()  { return write_total; }
-    inline uint64_t get_total()        { return read_total + write_total; }
+    inline uint64_t get_read_total() const   { return read_total;  }
+    inline uint64_t get_write_total() const  { return write_total; }
+    inline uint64_t get_total() const        { return read_total + write_total; }
 
     inline Iterator begin() { return buckets.begin(); }
     inline Iterator end()   { return buckets.end(); }

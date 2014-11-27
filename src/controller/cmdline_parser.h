@@ -52,7 +52,7 @@ struct Opt
         Value(const char* const v) : value{v}{}
         Value(Value&&)                       = default;
         Value(const Value&)                  = delete;
-        const Value& operator=(const Value&) = delete;
+        Value& operator=(const Value&)       = delete;
 
         operator std::string() const { return std::string{value};           }
         const char*  to_cstr() const { return value;                        }
@@ -82,9 +82,9 @@ class CmdlineParser
 {
 public:
     CmdlineParser() = default;
-    ~CmdlineParser() = default;
+    virtual ~CmdlineParser() = default;
     CmdlineParser(const CmdlineParser&)                  = delete;
-    const CmdlineParser& operator=(const CmdlineParser&) = delete;
+    CmdlineParser& operator=(const CmdlineParser&)       = delete;
 
     void parse(int argc, char** argv);
     void validate();
