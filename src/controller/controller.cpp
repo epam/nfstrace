@@ -28,6 +28,7 @@
 #include "utils/filtered_data.h"
 #include "controller/controller.h"
 #include "controller/parameters.h"
+#include "controller/signal_handler.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -112,7 +113,25 @@ int Controller::run()
     try
     {
         Running running{*this};
-        status.wait_and_rethrow_exception();
+        while(true)
+        {
+            try
+            {
+                status.wait_and_rethrow_exception();
+            }
+            catch(SignalHandler::Signal& s)
+            {
+                if(s.signal_number == SIGHUP)
+                {
+                    NST::utils::Log log;
+                    log.reopen();
+                }
+                else
+                {
+                    throw ProcessingDone{std::string("Unhandled signal presents: ") + ::strsignal(s.signal_number)};
+                }
+            }
+        }
     }
     catch(ProcessingDone& e)
     {

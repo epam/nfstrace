@@ -40,6 +40,7 @@ public:
     {
     public:
         explicit Signal(int sig);
+        const int signal_number;
     };
 
     SignalHandler(RunningStatus&);

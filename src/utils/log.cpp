@@ -20,6 +20,7 @@
 */
 //------------------------------------------------------------------------------
 #include <cerrno>
+#include <condition_variable>
 #include <cstdarg>
 #include <cstdio>
 #include <ctime>
@@ -156,21 +157,17 @@ void Log::flush()
 
 void Log::reopen()
 {
-    if(log_file == ::stderr || log_file == ::stdout || log_file == nullptr || log_file == NULL)
+    if(log_file == ::stderr || log_file == ::stdout || log_file == nullptr)
         return;
 
     if(log_file_path.empty()) return;
     std::unique_lock<std::mutex> lck(mut);
     closeLog();
-    time_t actual_time = time(NULL);
-    tm* t = localtime(&actual_time);
-    std::string tmp;
-    std::string str_d("_");
-    tmp = log_file_path + '.' + std::to_string(t->tm_mday) + '.' + std::to_string(t->tm_mon + 1) + '.'
-            + std::to_string(t->tm_year + 1900) + '_' + std::to_string(t->tm_hour) + ':' + std::to_string(t->tm_min) + ':' + std::to_string(t->tm_sec);
+    std::time_t t = std::time(NULL);
+    std::string tmp{log_file_path + std::asctime(std::localtime(&t))};
     if(rename(log_file_path.c_str(), tmp.c_str()))
         throw std::system_error{errno, std::system_category(),
-            (std::string("Can't rename previous log file.") + log_file_path).c_str()};
+            (std::string{"Can't rename previous log file."} + log_file_path).c_str()};
     log_file = try_open(log_file_path);
     if(log_file == nullptr || log_file == NULL)
     {

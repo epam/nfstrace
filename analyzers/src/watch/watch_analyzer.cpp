@@ -38,13 +38,13 @@ WatchAnalyzer::WatchAnalyzer(const char* opts)
 , read_counter    {0}
 {
     monitor_running.test_and_set();
-    if(opts != nullptr && opts != NULL) try
+    if(*opts != '\0') try
     {
         refresh_delta = std::stoul(opts);
     }
     catch(std::exception& e)
     {
-        throw std::runtime_error((std::string("Error in plugin options processing. ") + std::string("OPTS: ") + std::string(opts) + std::string(" Error: ")+ std::string(e.what())).c_str());
+        throw std::runtime_error{std::string{"Error in plugin options processing. "} + "OPTS: " + opts + " Error: " + e.what()};
     }
     monitor_thread = std::thread(&WatchAnalyzer::thread, this);
 }

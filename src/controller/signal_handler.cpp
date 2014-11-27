@@ -31,14 +31,15 @@
 #include <sys/wait.h>
 
 #include "controller/signal_handler.h"
-#include "utils/log.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
 
-SignalHandler::Signal::Signal(int sig) : std::runtime_error{::strsignal(sig)}
+SignalHandler::Signal::Signal(int sig)
+: std::runtime_error{::strsignal(sig)}
+, signal_number{sig}
 {
 }
 
@@ -71,11 +72,6 @@ static void handle_signals(const sigset_t    waitmask,
         else if(signo == SIGINT)
         {
             status.push(ProcessingDone{"Interrupted by user."});
-        }
-        else if(signo == SIGHUP)
-        {
-            NST::utils::Log log;
-            log.reopen();
         }
         else
         {
