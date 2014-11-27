@@ -1,0 +1,3 @@
+bzcat $1 | '${CMAKE_BINARY_DIR}/${PROJECT_NAME}' --mode=stat -a '${CMAKE_BINARY_DIR}/analyzers/libbreakdown.so' -I - -v 0 >$2
+diff -uN $3 $2
+exit $?
