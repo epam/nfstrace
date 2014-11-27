@@ -88,6 +88,14 @@ private:
     std::unique_ptr<FiltrationManager> filtration;
 
 };
+
+/*! Drop root privileges
+ *
+ * Drops privileges to the given user. If SUID is set given user is ignored
+ * and IDs are set to real ones.
+ *
+ * \param dropuser - string with user name
+ */
 void droproot(const std::string& dropuser);
 
 } // namespace controller
