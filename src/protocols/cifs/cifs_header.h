@@ -125,7 +125,7 @@ enum class ProtocolCodes : u_int8_t {
 /*! \class CIFS message header
  */
 struct MessageHeader {
-    ProtocolCodes protocol_code;//!< Always 0xFF or 0xF3
+    ProtocolCodes protocol_code;//!< Protocol version - 0xFF or 0xF3
     int8_t protocol[3];//!< Protocol name (SMB)
     Commands cmd_code;//!< Code of SMB command
     int8_t other[27];//FIXME: SMB header to be precised!

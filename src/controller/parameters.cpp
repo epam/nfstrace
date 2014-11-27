@@ -337,6 +337,7 @@ NetProtocol Parameters::protocol() const
     {
         return NetProtocol::CIFS;
     }
+    // Use NFS by default
     return NetProtocol::NFS;
 }
 
