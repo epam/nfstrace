@@ -98,7 +98,7 @@ public:
     RPCSessions() = default;
     ~RPCSessions()= default;
     RPCSessions(const RPCSessions&)           = delete;
-    RPCSessions operator=(const RPCSessions&) = delete;
+    RPCSessions& operator=(const RPCSessions&) = delete;
 
     RPCSession* get_session(utils::NetworkSession* app, NST::utils::Session::Direction dir, MsgType type)
     {
