@@ -21,13 +21,11 @@
 //------------------------------------------------------------------------------
 #include <cerrno>
 #include <functional>   // std::ref
-#include <system_error>
-
-#include <unistd.h>
 #include <pthread.h>
-#include <signal.h>
+#include <system_error>
 #include <string.h>     // for strsignal()
 
+#include <unistd.h>
 #include <sys/wait.h>
 
 #include "controller/signal_handler.h"

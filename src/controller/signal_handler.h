@@ -26,6 +26,8 @@
 #include <stdexcept>
 #include <thread>
 
+#include <signal.h>
+
 #include "controller/running_status.h"
 //------------------------------------------------------------------------------
 namespace NST
