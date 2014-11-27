@@ -70,7 +70,10 @@ const std::string Plugin::usage_of(const std::string& path)
 PluginInstance::PluginInstance(const std::string& path, const std::string& args)
     : Plugin{path}
 {
-    analysis = create(args.c_str());
+    if(args.empty())
+        analysis = create(nullptr);
+    else
+        analysis = create(args.c_str());
     if(!analysis) throw std::runtime_error{path + ": create call returns NULL-pointer"};
 }
 
