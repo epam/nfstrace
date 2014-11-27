@@ -57,7 +57,10 @@ public:
     FilteredData(const FilteredData&)            = delete;
     FilteredData& operator=(const FilteredData&) = delete;
 
-    inline FilteredData() noexcept : data{cache} {}
+    inline FilteredData() noexcept : data{cache}
+    {
+    }
+
     inline ~FilteredData() {
         delete[] memory;
     }

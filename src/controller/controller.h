@@ -55,7 +55,7 @@ class Controller
         inline Running(Controller&);
         Running()                                = delete;
         Running(const Running&)                  = delete;
-        const Running& operator=(const Running&) = delete;
+        Running& operator=(const Running&)       = delete;
         inline ~Running();
     private:
         Controller& controller;
