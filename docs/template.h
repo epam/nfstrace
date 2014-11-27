@@ -24,31 +24,42 @@
 //------------------------------------------------------------------------------
 #include <string>
 //------------------------------------------------------------------------------
-#define MY_MIN(a,b) (((a) < (b)) ? (a) : (b))
+#define MY_MIN(a,b) (((a) < (b)) ? (a) : (b)) //!< This is example of preprocessor usage
 //------------------------------------------------------------------------------
 namespace hello
 {
 
+/*! \class Represents some entity
+ */
 class SayHello
 {
 public:
-    SayHello();
-    ~SayHello();
+    SayHello();// May be uncommented
+    ~SayHello();// May be uncommented
 
-    SayHello(const SayHello&);              // undefined
-    SayHello& operator=(const SayHello&);   // undefined
+    SayHello(const SayHello&);              // undefined. May be uncommented
+    SayHello& operator=(const SayHello&);   // undefined. May be uncommented
 
-    // small functions may be implemented in-place
+    /*!  small functions may be implemented in-place
+     * \return hello string
+     */
     inline const std::string& say() const { return text; }
 
+    /*! Returns value
+     * \return value of sth
+     */
     unsigned int get() const;
+
+    /*! Sets some value
+     * \param v - new value
+     */
     void set(unsigned int v);
 
 private:
-    std::string text;
-    unsigned int value; // just a value for get/set methods
+    std::string text;//!< Hello phrase
+    unsigned int value; //!< just a value for get/set methods
 
-    static const unsigned int BAD_COFFEE;
+    static const unsigned int BAD_COFFEE;//!< Some constant
 };
 
 } // namespace hello
