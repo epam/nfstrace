@@ -556,7 +556,7 @@ API headers
 .B @CMAKE_INSTALL_PREFIX@/include/nfstrace/api/
 .TP
 Pluggable Analysis Modules (PAMs)
-.B @CMAKE_INSTALL_PREFIX@/lib/
+.B @CMAKE_INSTALL_PREFIX@/lib/nfstrace/
 .\" ---------------------- BUGS ----------------------------------
 .SH BUGS
 .P
