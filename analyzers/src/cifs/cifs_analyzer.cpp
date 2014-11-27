@@ -698,15 +698,381 @@ public:
     {
     }
 
-    void echoRequest(const SMBv1::EchoRequestCommand* cmd, const SMBv1::EchoRequestArgumentType&, const SMBv1::EchoRequestResultType&) override final
+    void createDirectorySMBv1(const SMBv1::CreateDirectoryCommand* cmd, const SMBv1::CreateDirectoryArgumentType, const SMBv1::CreateDirectoryResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_CREATE_DIRECTORY, smbv1);
+    }
+
+    void deleteDirectorySMBv1(const SMBv1::DeleteDirectoryCommand* cmd, const SMBv1::DeleteDirectoryArgumentType, const SMBv1::DeleteDirectoryResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_DELETE_DIRECTORY, smbv1);
+    }
+
+    void openSMBv1(const SMBv1::OpenCommand* cmd, const SMBv1::OpenArgumentType, const SMBv1::OpenResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_OPEN, smbv1);
+    }
+
+    void createSMBv1(const SMBv1::CreateCommand* cmd, const SMBv1::CreateArgumentType, const SMBv1::CreateResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_CREATE, smbv1);
+    }
+
+    void closeSMBv1(const SMBv1::CloseCommand* cmd, const SMBv1::CloseArgumentType, const SMBv1::CloseResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_CLOSE, smbv1);
+    }
+
+    void flushSMBv1(const SMBv1::FlushCommand* cmd, const SMBv1::FlushArgumentType, const SMBv1::FlushResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_FLUSH, smbv1);
+    }
+
+    void deleteSMBv1(const SMBv1::DeleteCommand* cmd, const SMBv1::DeleteArgumentType, const SMBv1::DeleteResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_DELETE, smbv1);
+    }
+
+    void renameSMBv1(const SMBv1::RenameCommand* cmd, const SMBv1::RenameArgumentType, const SMBv1::RenameResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_RENAME, smbv1);
+    }
+
+    void queryInfoSMBv1(const SMBv1::QueryInformationCommand* cmd, const SMBv1::QueryInformationArgumentType, const SMBv1::QueryInformationResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_QUERY_INFORMATION, smbv1);
+    }
+
+    void setInfoSMBv1(const SMBv1::SetInformationCommand* cmd, const SMBv1::SetInformationArgumentType, const SMBv1::SetInformationResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_SET_INFORMATION, smbv1);
+    }
+
+    void readSMBv1(const SMBv1::ReadCommand* cmd, const SMBv1::ReadArgumentType, const SMBv1::ReadResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_READ, smbv1);
+    }
+
+    void writeSMBv1(const SMBv1::WriteCommand* cmd, const SMBv1::WriteArgumentType, const SMBv1::WriteResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_WRITE, smbv1);
+    }
+
+    void lockByteRangeSMBv1(const SMBv1::LockByteRangeCommand* cmd, const SMBv1::LockByteRangeArgumentType, const SMBv1::LockByteRangeResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_LOCK_BYTE_RANGE, smbv1);
+    }
+
+    void unlockByteRangeSMBv1(const SMBv1::UnlockByteRangeCommand* cmd, const SMBv1::UnlockByteRangeArgumentType, const SMBv1::UnlockByteRangeResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_UNLOCK_BYTE_RANGE, smbv1);
+    }
+
+    void createTmpSMBv1(const SMBv1::CreateTemporaryCommand* cmd, const SMBv1::CreateTemporaryArgumentType, const SMBv1::CreateTemporaryResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_CREATE_TEMPORARY, smbv1);
+    }
+
+    void createNewSMBv1(const SMBv1::CreateNewCommand* cmd, const SMBv1::CreateNewArgumentType, const SMBv1::CreateNewResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_CREATE_NEW, smbv1);
+    }
+
+    void checkDirectorySMBv1(const SMBv1::CheckDirectoryCommand* cmd, const SMBv1::CheckDirectoryArgumentType, const SMBv1::CheckDirectoryResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_CHECK_DIRECTORY, smbv1);
+    }
+
+    void processExitSMBv1(const SMBv1::ProcessExitCommand* cmd, const SMBv1::ProcessExitArgumentType, const SMBv1::ProcessExitResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_PROCESS_EXIT, smbv1);
+    }
+
+    void seekSMBv1(const SMBv1::SeekCommand* cmd, const SMBv1::SeekArgumentType, const SMBv1::SeekResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_SEEK, smbv1);
+    }
+
+    void lockAndReadSMBv1(const SMBv1::LockAndReadCommand* cmd, const SMBv1::LockAndReadArgumentType, const SMBv1::LockAndReadResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_LOCK_AND_READ, smbv1);
+    }
+
+    void writeAndUnlockSMBv1(const SMBv1::WriteAndUnlockCommand* cmd, const SMBv1::WriteAndUnlockArgumentType, const SMBv1::WriteAndUnlockResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_WRITE_AND_UNLOCK, smbv1);
+    }
+
+    void readRawSMBv1(const SMBv1::ReadRawCommand* cmd, const SMBv1::ReadRawArgumentType, const SMBv1::ReadRawResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_READ_RAW, smbv1);
+    }
+
+    void readMpxSMBv1(const SMBv1::ReadMpxCommand* cmd, const SMBv1::ReadMpxArgumentType, const SMBv1::ReadMpxResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_READ_MPX, smbv1);
+    }
+
+    void readMpxSecondarySMBv1(const SMBv1::ReadMpxSecondaryCommand* cmd, const SMBv1::ReadMpxSecondaryArgumentType, const SMBv1::ReadMpxSecondaryResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_READ_MPX_SECONDARY, smbv1);
+    }
+
+    void writeRawSMBv1(const SMBv1::WriteRawCommand* cmd, const SMBv1::WriteRawArgumentType, const SMBv1::WriteRawResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_WRITE_RAW, smbv1);
+    }
+
+    void writeMpxSMBv1(const SMBv1::WriteMpxCommand* cmd, const SMBv1::WriteMpxArgumentType, const SMBv1::WriteMpxResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_WRITE_MPX, smbv1);
+    }
+
+    void writeMpxSecondarySMBv1(const SMBv1::WriteMpxSecondaryCommand* cmd, const SMBv1::WriteMpxSecondaryArgumentType, const SMBv1::WriteMpxSecondaryResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_WRITE_MPX_SECONDARY, smbv1);
+    }
+
+    void writeCompleteSMBv1(const SMBv1::WriteCompleteCommand* cmd, const SMBv1::WriteCompleteArgumentType, const SMBv1::WriteCompleteResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_WRITE_COMPLETE, smbv1);
+    }
+
+    void queryServerSMBv1(const SMBv1::QueryServerCommand* cmd, const SMBv1::QueryServerArgumentType, const SMBv1::QueryServerResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_QUERY_SERVER, smbv1);
+    }
+
+    void setInfo2SMBv1(const SMBv1::SetInformation2Command* cmd, const SMBv1::SetInformation2ArgumentType, const SMBv1::SetInformation2ResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_SET_INFORMATION2, smbv1);
+    }
+
+    void queryInfo2SMBv1(const SMBv1::QueryInformation2Command* cmd, const SMBv1::QueryInformation2ArgumentType, const SMBv1::QueryInformation2ResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_QUERY_INFORMATION2, smbv1);
+    }
+
+    void lockingAndxSMBv1(const SMBv1::LockingAndxCommand* cmd, const SMBv1::LockingAndxArgumentType, const SMBv1::LockingAndxResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_LOCKING_ANDX, smbv1);
+    }
+
+    void transactionSMBv1(const SMBv1::TransactionCommand* cmd, const SMBv1::TransactionArgumentType, const SMBv1::TransactionResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_TRANSACTION, smbv1);
+    }
+
+    void transactionSecondarySMBv1(const SMBv1::TransactionSecondaryCommand* cmd, const SMBv1::TransactionSecondaryArgumentType, const SMBv1::TransactionSecondaryResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_TRANSACTION_SECONDARY, smbv1);
+    }
+
+    void ioctlSMBv1(const SMBv1::IoctlCommand* cmd, const SMBv1::IoctlArgumentType, const SMBv1::IoctlResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_IOCTL, smbv1);
+    }
+
+    void ioctlSecondarySMBv1(const SMBv1::IoctlSecondaryCommand* cmd, const SMBv1::IoctlSecondaryArgumentType, const SMBv1::IoctlSecondaryResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_IOCTL_SECONDARY, smbv1);
+    }
+
+    void copySMBv1(const SMBv1::CopyCommand* cmd, const SMBv1::CopyArgumentType, const SMBv1::CopyResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_COPY, smbv1);
+    }
+
+    void moveSMBv1(const SMBv1::MoveCommand* cmd, const SMBv1::MoveArgumentType, const SMBv1::MoveResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_MOVE, smbv1);
+    }
+
+    void echoSMBv1(const SMBv1::EchoCommand* cmd, const SMBv1::EchoArgumentType, const SMBv1::EchoResultType) override final
     {
         account(cmd, SMBv1Commands::SMB_COM_ECHO, smbv1);
     }
 
-    void closeFile(const SMBv1::CloseFileCommand* cmd, const SMBv1::CloseFileArgumentType&, const SMBv1::CloseFileResultType&) override final
+    void writeAndCloseSMBv1(const SMBv1::WriteAndCloseCommand* cmd, const SMBv1::WriteAndCloseArgumentType, const SMBv1::WriteAndCloseResultType) override final
     {
-        account(cmd, SMBv1Commands::SMB_COM_CLOSE, smbv1);
+        account(cmd, SMBv1Commands::SMB_COM_WRITE_AND_CLOSE, smbv1);
     }
+
+    void openAndxSMBv1(const SMBv1::OpenAndxCommand* cmd, const SMBv1::OpenAndxArgumentType, const SMBv1::OpenAndxResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_OPEN_ANDX, smbv1);
+    }
+
+    void readAndxSMBv1(const SMBv1::ReadAndxCommand* cmd, const SMBv1::ReadAndxArgumentType, const SMBv1::ReadAndxResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_READ_ANDX, smbv1);
+    }
+
+    void writeAndxSMBv1(const SMBv1::WriteAndxCommand* cmd, const SMBv1::WriteAndxArgumentType, const SMBv1::WriteAndxResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_WRITE_ANDX, smbv1);
+    }
+
+    void newFileSizeSMBv1(const SMBv1::NewFileSizeCommand* cmd, const SMBv1::NewFileSizeArgumentType, const SMBv1::NewFileSizeResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_NEW_FILE_SIZE, smbv1);
+    }
+
+    void closeAndTreeDiscSMBv1(const SMBv1::CloseAndTreeDiscCommand* cmd, const SMBv1::CloseAndTreeDiscArgumentType, const SMBv1::CloseAndTreeDiscResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_CLOSE_AND_TREE_DISC, smbv1);
+    }
+
+    void transaction2SMBv1(const SMBv1::Transaction2Command* cmd, const SMBv1::Transaction2ArgumentType, const SMBv1::Transaction2ResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_TRANSACTION2, smbv1);
+    }
+
+    void transaction2SecondarySMBv1(const SMBv1::Transaction2SecondaryCommand* cmd, const SMBv1::Transaction2SecondaryArgumentType, const SMBv1::Transaction2SecondaryResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_TRANSACTION2_SECONDARY, smbv1);
+    }
+
+    void findClose2SMBv1(const SMBv1::FindClose2Command* cmd, const SMBv1::FindClose2ArgumentType, const SMBv1::FindClose2ResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_FIND_CLOSE2, smbv1);
+    }
+
+    void findNotifyCloseSMBv1(const SMBv1::FindNotifyCloseCommand* cmd, const SMBv1::FindNotifyCloseArgumentType, const SMBv1::FindNotifyCloseResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_FIND_NOTIFY_CLOSE, smbv1);
+    }
+
+    void treeConnectSMBv1(const SMBv1::TreeConnectCommand* cmd, const SMBv1::TreeConnectArgumentType, const SMBv1::TreeConnectResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_TREE_CONNECT, smbv1);
+    }
+
+    void treeDisconnectSMBv1(const SMBv1::TreeDisconnectCommand* cmd, const SMBv1::TreeDisconnectArgumentType, const SMBv1::TreeDisconnectResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_TREE_DISCONNECT, smbv1);
+    }
+
+    void negotiateSMBv1(const SMBv1::NegotiateCommand* cmd, const SMBv1::NegotiateArgumentType, const SMBv1::NegotiateResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_NEGOTIATE, smbv1);
+    }
+
+    void sessionSetupAndxSMBv1(const SMBv1::SessionSetupAndxCommand* cmd, const SMBv1::SessionSetupAndxArgumentType, const SMBv1::SessionSetupAndxResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_SESSION_SETUP_ANDX, smbv1);
+    }
+
+    void logoffAndxSMBv1(const SMBv1::LogoffAndxCommand* cmd, const SMBv1::LogoffAndxArgumentType, const SMBv1::LogoffAndxResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_LOGOFF_ANDX, smbv1);
+    }
+
+    void treeConnectAndxSMBv1(const SMBv1::TreeConnectAndxCommand* cmd, const SMBv1::TreeConnectAndxArgumentType, const SMBv1::TreeConnectAndxResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_TREE_CONNECT_ANDX, smbv1);
+    }
+
+    void securityPackageAndxSMBv1(const SMBv1::SecurityPackageAndxCommand* cmd, const SMBv1::SecurityPackageAndxArgumentType, const SMBv1::SecurityPackageAndxResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_SECURITY_PACKAGE_ANDX, smbv1);
+    }
+
+    void queryInformationDiskSMBv1(const SMBv1::QueryInformationDiskCommand* cmd, const SMBv1::QueryInformationDiskArgumentType, const SMBv1::QueryInformationDiskResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_QUERY_INFORMATION_DISK, smbv1);
+    }
+
+    void searchSMBv1(const SMBv1::SearchCommand* cmd, const SMBv1::SearchArgumentType, const SMBv1::SearchResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_SEARCH, smbv1);
+    }
+
+    void findSMBv1(const SMBv1::FindCommand* cmd, const SMBv1::FindArgumentType, const SMBv1::FindResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_FIND, smbv1);
+    }
+
+    void findUniqueSMBv1(const SMBv1::FindUniqueCommand* cmd, const SMBv1::FindUniqueArgumentType, const SMBv1::FindUniqueResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_FIND_UNIQUE, smbv1);
+    }
+
+    void findCloseSMBv1(const SMBv1::FindCloseCommand* cmd, const SMBv1::FindCloseArgumentType, const SMBv1::FindCloseResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_FIND_CLOSE, smbv1);
+    }
+
+    void ntTransactSMBv1(const SMBv1::NtTransactCommand* cmd, const SMBv1::NtTransactArgumentType, const SMBv1::NtTransactResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_NT_TRANSACT, smbv1);
+    }
+
+    void ntTransactSecondarySMBv1(const SMBv1::NtTransactSecondaryCommand* cmd, const SMBv1::NtTransactSecondaryArgumentType, const SMBv1::NtTransactSecondaryResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_NT_TRANSACT_SECONDARY, smbv1);
+    }
+
+    void ntCreateAndxSMBv1(const SMBv1::NtCreateAndxCommand* cmd, const SMBv1::NtCreateAndxArgumentType, const SMBv1::NtCreateAndxResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_NT_CREATE_ANDX, smbv1);
+    }
+
+    void ntCancelSMBv1(const SMBv1::NtCancelCommand* cmd, const SMBv1::NtCancelArgumentType, const SMBv1::NtCancelResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_NT_CANCEL, smbv1);
+    }
+
+    void ntRenameSMBv1(const SMBv1::NtRenameCommand* cmd, const SMBv1::NtRenameArgumentType, const SMBv1::NtRenameResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_NT_RENAME, smbv1);
+    }
+
+    void openPrintFileSMBv1(const SMBv1::OpenPrintFileCommand* cmd, const SMBv1::OpenPrintFileArgumentType, const SMBv1::OpenPrintFileResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_OPEN_PRINT_FILE, smbv1);
+    }
+
+    void writePrintFileSMBv1(const SMBv1::WritePrintFileCommand* cmd, const SMBv1::WritePrintFileArgumentType, const SMBv1::WritePrintFileResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_WRITE_PRINT_FILE, smbv1);
+    }
+
+    void closePrintFileSMBv1(const SMBv1::ClosePrintFileCommand* cmd, const SMBv1::ClosePrintFileArgumentType, const SMBv1::ClosePrintFileResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_CLOSE_PRINT_FILE, smbv1);
+    }
+
+    void getPrintQueueSMBv1(const SMBv1::GetPrintQueueCommand* cmd, const SMBv1::GetPrintQueueArgumentType, const SMBv1::GetPrintQueueResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_GET_PRINT_QUEUE, smbv1);
+    }
+
+    void readBulkSMBv1(const SMBv1::ReadBulkCommand* cmd, const SMBv1::ReadBulkArgumentType, const SMBv1::ReadBulkResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_READ_BULK, smbv1);
+    }
+
+    void writeBulkSMBv1(const SMBv1::WriteBulkCommand* cmd, const SMBv1::WriteBulkArgumentType, const SMBv1::WriteBulkResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_WRITE_BULK, smbv1);
+    }
+
+    void writeBulkDataSMBv1(const SMBv1::WriteBulkDataCommand* cmd, const SMBv1::WriteBulkDataArgumentType, const SMBv1::WriteBulkDataResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_WRITE_BULK_DATA, smbv1);
+    }
+
+    void invalidSMBv1(const SMBv1::InvalidCommand* cmd, const SMBv1::InvalidArgumentType, const SMBv1::InvalidResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_INVALID, smbv1);
+    }
+
+    void noAndxCommandSMBv1(const SMBv1::NoAndxCommand* cmd, const SMBv1::NoAndxCmdArgumentType, const SMBv1::NoAndxCmdResultType) override final
+    {
+        account(cmd, SMBv1Commands::SMB_COM_NO_ANDX_COMMAND, smbv1);
+    }
+
 
     virtual void flush_statistics()
     {
