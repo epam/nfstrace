@@ -187,7 +187,7 @@ void droproot(const std::string& dropuser)
         }
 
         //check if we've really dropped privileges
-        if(getegid() != new_gid || geteuid() != new_uid)
+        if(setuid(0) != -1)
         {
             throw ControllerError{"Managed to regain root privileges"};
         }
