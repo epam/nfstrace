@@ -19,9 +19,10 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <cerrno>
 #include <cstdarg>
 #include <cstdio>
-#include <cerrno>
+#include <ctime>
 #include <iostream>
 #include <stdexcept>
 #include <system_error>
@@ -48,18 +49,13 @@ namespace NST
 namespace utils
 {
 
-static FILE* log_file {::stderr};
+static FILE* log_file {nullptr};
 static bool  own_file {false};
+static std::string log_file_path {};
+static std::mutex mut{};
 
 namespace // unnanmed
 {
-
-static std::string get_pid()
-{
-    char buff[8]={'\0'};
-    sprintf(buff,"%ld",(long)getpid());
-    return std::string{buff};
-}
 
 static FILE* try_open(const std::string& file_name)
 {
@@ -67,14 +63,14 @@ static FILE* try_open(const std::string& file_name)
     if(file == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
-                                       "Error in opening file."};
+            (std::string("Error in opening file: ") + file_name).c_str()};
     }
     chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
     {
         fclose(file);
         throw std::system_error{errno, std::system_category(),
-                                       "Log file already locked"};
+            ("Log file already locked: " + file_name).c_str()};
     }
     return file;
 }
@@ -83,52 +79,49 @@ static FILE* try_open(const std::string& file_name)
 
 Log::Global::Global(const std::string& path)
 {
-    const std::string log_path{"/tmp/nfstrace"};
-
-    if(log_file != ::stderr)
+    if(own_file) return;
+    std::string path_file(path);
+    if(!path_file.empty())
     {
-        throw std::runtime_error{"Global Logger already have been created"};
-    }
-
-    if(path.empty()) return;
-
-    struct stat s;
-    if(stat(log_path.c_str(), &s))            // check destination folder exists
-    {
-        if(mkdir(log_path.c_str(), ALLPERMS)) // create directory for nfs logs
+        if(path_file[path_file.size()-1] == '/') // this is path to folder
         {
-            throw std::system_error{errno, std::system_category(),
-                "Can't create log directory."};
+            path_file = path_file + ("nfstrace_logfile.log");
         }
     }
-    std::string tmp{log_path + '/' + path + ".log"};
-    FILE* file {nullptr};
-    try
+    else
     {
-        file = try_open(tmp);
+        path_file = path_file + ("./nfstrace_logfile.log");
     }
-    catch(std::system_error& err)
+    FILE* file {nullptr};
+    file = try_open(path_file);
+    if(file == nullptr || file == NULL)
     {
-        tmp = log_path + '/' + path + '-' + get_pid() + ".log";
-        file = try_open(tmp);
+        throw std::system_error{errno, std::system_category(),
+            (std::string("Can't create log file: ") + path_file).c_str()};
     }
     if(utils::Out message{})
     {
-        message << "Log folder: " << log_path;
+        message << "Log folder: " << path_file;
     }
 
     log_file = file;
     own_file = true;
+    log_file_path = path_file;
+}
+
+static void closeLog()
+{
+    flock(fileno(log_file), LOCK_UN);
+    fclose(log_file);
+    own_file = false;
+    log_file = ::stderr;
 }
 
 Log::Global::~Global()
 {
     if(own_file)
     {
-        flock(fileno(log_file), LOCK_UN);
-        fclose(log_file);
-        own_file = false;
-        log_file = ::stderr;
+        closeLog();
     }
 }
 
@@ -151,6 +144,7 @@ void Log::message(const char* format, ...)
 {
     va_list args;
     va_start(args, format);
+    std::unique_lock<std::mutex> lck(mut);
     vfprintf(log_file, format, args);
     va_end(args);
 }
@@ -160,6 +154,31 @@ void Log::flush()
     fflush(log_file);
 }
 
+void Log::reopen()
+{
+    if(log_file == ::stderr || log_file == ::stdout || log_file == nullptr || log_file == NULL)
+        return;
+
+    if(log_file_path.empty()) return;
+    std::unique_lock<std::mutex> lck(mut);
+    closeLog();
+    time_t actual_time = time(NULL);
+    tm* t = localtime(&actual_time);
+    std::string tmp;
+    std::string str_d("_");
+    tmp = log_file_path + '.' + std::to_string(t->tm_mday) + '.' + std::to_string(t->tm_mon + 1) + '.'
+            + std::to_string(t->tm_year + 1900) + '_' + std::to_string(t->tm_hour) + ':' + std::to_string(t->tm_min) + ':' + std::to_string(t->tm_sec);
+    if(rename(log_file_path.c_str(), tmp.c_str()))
+        throw std::system_error{errno, std::system_category(),
+            (std::string("Can't rename previous log file.") + log_file_path).c_str()};
+    log_file = try_open(log_file_path);
+    if(log_file == nullptr || log_file == NULL)
+    {
+        throw std::system_error{errno, std::system_category(),
+        "Can't reopen file."};
+    }
+    //main unlock
+}
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------

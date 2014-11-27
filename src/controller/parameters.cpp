@@ -224,6 +224,11 @@ const std::string Parameters::dropuser() const
     return impl->get(CLI::DROPROOT);
 }
 
+const std::string Parameters::log_path() const
+{
+    return impl->get(CLI::LOGPATH);
+}
+
 unsigned short Parameters::queue_capacity() const
 {
     const int capacity = impl->get(CLI::QSIZE).to_int();

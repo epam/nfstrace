@@ -59,7 +59,7 @@ Controller::Running::~Running()
 
 Controller::Controller(const Parameters& params) try
     : gout       {utils::Out::Level(params.verbose_level())}
-    , glog       {params.program_name()}
+    , glog       {params.log_path()}
     , signals    {status}
     , analysis   {}
     , filtration {new FiltrationManager{status}}

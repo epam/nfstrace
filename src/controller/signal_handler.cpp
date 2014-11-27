@@ -31,6 +31,7 @@
 #include <sys/wait.h>
 
 #include "controller/signal_handler.h"
+#include "utils/log.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -71,6 +72,11 @@ static void handle_signals(const sigset_t    waitmask,
         {
             status.push(ProcessingDone{"Interrupted by user."});
         }
+        else if(signo == SIGHUP)
+        {
+            NST::utils::Log log;
+            log.reopen();
+        }
         else
         {
             status.push(SignalHandler::Signal{signo});
@@ -99,6 +105,7 @@ SignalHandler::SignalHandler(RunningStatus& s)
     ::sigemptyset(&mask);
     ::sigaddset(&mask, SIGINT);  // correct exit from program by Ctrl-C
     ::sigaddset(&mask, SIGCHLD); // stop sigwait-thread and wait children
+    ::sigaddset(&mask, SIGHUP);  // signal for losing terminal
     const int err = ::pthread_sigmask(SIG_BLOCK, &mask, nullptr);
     if(err != 0)
     {

@@ -22,6 +22,7 @@
 #ifndef LOG_H
 #define LOG_H
 //------------------------------------------------------------------------------
+#include <condition_variable>
 #include <sstream>
 //------------------------------------------------------------------------------
 #ifdef NDEBUG
@@ -72,6 +73,7 @@ public:
     // lightweight logging
     static void message(const char* format, ...);
     static void flush();
+    static void reopen();
 private:
     char buffer[256];
 };

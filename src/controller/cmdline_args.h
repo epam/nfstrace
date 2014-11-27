@@ -48,6 +48,7 @@ struct Args
         ANALYZERS,
         IFILE,
         OFILE,
+        LOGPATH,
         COMMAND,
         DSIZE,
         LIST,
