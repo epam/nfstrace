@@ -28,6 +28,7 @@
 #include "nfs3_types_rpcgen.h"
 #include "nfs4_types_rpcgen.h"
 #include "rpc_procedure.h"
+#include "cifs_types.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -116,7 +117,166 @@ public:
             const struct rpcgen::COMPOUND4res*) {}
 };
 
-class IAnalyzer : public INFSv3rpcgen, public INFSv4rpcgen
+/*! Abstract interface of plugin which collects SMBv1 statistic
+ */
+class ISMBv1
+{
+public:
+    /*! SMBv1 echo request "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void echoRequest(const SMBv1::EchoRequestCommand *, const SMBv1::EchoRequestArgumentType &, const SMBv1::EchoRequestResultType &) {}
+
+    /*! SMBv1 "Close file" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void closeFile(const SMBv1::CloseFileCommand *, const SMBv1::CloseFileArgumentType &, const SMBv1::CloseFileResultType &) {}
+};
+
+/*! Abstract interface of plugin which collects SMBv2 statistic
+ */
+class ISMBv2
+{
+public:
+    /*! "Close file" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void closeFileSMBv2(const SMBv2::CloseFileCommand *, const SMBv2::CloseFileArgumentType &, const SMBv2::CloseFileResultType &) {}
+
+    /*! "Negotiate" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void negotiateSMBv2(const SMBv2::NegotiateCommand *, const SMBv2::NegotiateArgumentType &, const SMBv2::NegotiateResultType &) {}
+
+    /*! "session setup" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void sessionSetupSMBv2(const SMBv2::SessionSetupCommand *, const SMBv2::SessionSetupArgumentType &, const SMBv2::SessionSetupResultType &) {}
+
+    /*! "log off" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void logOffSMBv2(const SMBv2::CloseFileCommand *, const SMBv2::CloseFileArgumentType &, const SMBv2::CloseFileResultType &) {}
+
+    /*! "Tree Connect" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void treeConnectSMBv2(const SMBv2::TreeConnectCommand *, const SMBv2::TreeConnectArgumentType &, const SMBv2::TreeConnectResultType &) {}
+
+    /*! "Tree disconnect" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand *, const SMBv2::TreeDisconnectArgumentType &, const SMBv2::TreeDisconnectResultType &) {}
+
+    /*! "Create" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void createSMBv2(const SMBv2::CreateCommand *, const SMBv2::CreateArgumentType &, const SMBv2::CreateResultType &) {}
+
+    /*! "Flush" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void flushSMBv2(const SMBv2::FlushCommand *, const SMBv2::FlushArgumentType &, const SMBv2::FlushResultType &) {}
+
+    /*! "Read" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void readSMBv2(const SMBv2::ReadCommand *, const SMBv2::ReadArgumentType &, const SMBv2::ReadResultType &) {}
+
+    /*! "Write" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void writeSMBv2(const SMBv2::WriteCommand *, const SMBv2::WriteArgumentType &, const SMBv2::WriteResultType &) {}
+
+    /*! "Lock" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void lockSMBv2(const SMBv2::LockCommand *, const SMBv2::LockArgumentType &, const SMBv2::LockResultType &) {}
+
+    /*! "IO ctl" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void ioctlSMBv2(const SMBv2::IoctlCommand *, const SMBv2::IoctlArgumentType &, const SMBv2::IoctlResultType &) {}
+
+    /*! "Cancel" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void cancelSMBv2(const SMBv2::CancelCommand *, const SMBv2::CancelArgumentType &, const SMBv2::CancelResultType &) {}
+
+    /*! "Echo" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void echoSMBv2(const SMBv2::EchoCommand *, const SMBv2::EchoArgumentType &, const SMBv2::EchoResultType &) {}
+
+    /*! "Query directory" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void queryDirSMBv2(const SMBv2::QueryDirCommand *, const SMBv2::QueryDirArgumentType &, const SMBv2::QueryDirResultType &) {}
+
+    /*! "Change notify" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void changeNotifySMBv2(const SMBv2::ChangeNotifyCommand *, const SMBv2::ChangeNotifyArgumentType &, const SMBv2::ChangeNotifyResultType &) {}
+
+    /*! "Query Info" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void queryInfoSMBv2(const SMBv2::QueryInfoCommand *, const SMBv2::QueryInfoArgumentType &, const SMBv2::QueryInfoResultType &) {}
+
+    /*! "Set Info" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void setInfoSMBv2(const SMBv2::SetInfoCommand *, const SMBv2::SetInfoArgumentType &, const SMBv2::SetInfoResultType &) {}
+
+    /*! "Break opportunistic lock" command "on receive" event handler
+     * \param cmd - Specified command
+     * \param arg - arguments for the command
+     * \param res - result of the command
+     */
+    virtual void breakOplockSMBv2(const SMBv2::BreakOpLockCommand *, const SMBv2::BreakOpLockArgumentType &, const SMBv2::BreakOpLockResultType &) {}
+};
+
+class IAnalyzer : public INFSv3rpcgen, public INFSv4rpcgen, public ISMBv1, public ISMBv2
 {
 public:
     virtual ~IAnalyzer() {};

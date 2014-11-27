@@ -32,18 +32,18 @@
 
 #include <pcap/pcap.h>
 
-#include "utils/log.h"
-#include "utils/out.h"
-#include "utils/sessions.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
 #include "filtration/sessions_hash.h"
-#include "protocols/rpc/rpc_header.h"
+#include "protocols/cifs/cifs.h"
+#include "protocols/cifs2/cifs2.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
-#include "protocols/netbios/netbios_header.h"
-#include "protocols/cifs/cifs_header.h"
-#include "filtration_processor.h"
+#include "protocols/netbios/netbios.h"
+#include "protocols/rpc/rpc_header.h"
+#include "utils/log.h"
+#include "utils/out.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -55,7 +55,7 @@ class CIFSFiltrator
 {
 public:
     CIFSFiltrator()
-    : collection{}
+        : collection {}
     {
         reset();
     }
@@ -79,9 +79,9 @@ public:
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
-        if(msg_len != 0)
+        if (msg_len != 0)
         {
-            if(hdr_len == 0 && msg_len >= n)
+            if (hdr_len == 0 && msg_len >= n)
             {
                 TRACE("We are lost %u bytes of payload marked for discard", n);
                 msg_len -= n;
@@ -102,13 +102,14 @@ public:
     {
         assert(info.dlen != 0);
 
-        while(info.dlen) // loop over data in packet
+        while (info.dlen) // loop over data in packet
         {
-            if(msg_len)    // we are on-stream and we are looking to some message
+            if (msg_len)   // we are on-stream and we are looking to some message
             {
-                if(hdr_len)
-                {// hdr_len != 0, readout a part of header of current message
-                    if(hdr_len > info.dlen) // got new part of header (not the all!)
+                if (hdr_len)
+                {
+                    // hdr_len != 0, readout a part of header of current message
+                    if (hdr_len > info.dlen) // got new part of header (not the all!)
                     {
                         //TRACE("got new part of header (not the all!)");
                         collection.push(info, info.dlen);
@@ -131,8 +132,9 @@ public:
                     }
                 }
                 else
-                {// message header is readout, discard the unused tail of message
-                    if(msg_len >= info.dlen) // discard whole new packet
+                {
+                    // message header is readout, discard the unused tail of message
+                    if (msg_len >= info.dlen) // discard whole new packet
                     {
                         //TRACE("discard whole new packet");
                         msg_len -= info.dlen;
@@ -155,18 +157,42 @@ public:
         }
     }
 
+    static inline size_t header_length(const uint8_t* data, size_t size)
+    {
+        static const size_t base_header_len
+        {
+            sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeaderHead)
+        };
+        size_t header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader)};
+        if (size >= base_header_len)//FIXME: Move to protocol
+        {
+            if (CIFS::get_header(data))//FIXME: do it twice
+            {
+                header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader);//FIXME: doesn't matter
+            }
+            else if (CIFSv2::get_header(data))//FIXME: do it twice
+            {
+                header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::MessageHeader);
+            }
+        }
+        return header_len;
+    }
+
     inline bool collect_header(PacketInfo& info)
     {
-        static const size_t header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader)};
-
-        if(collection && (collection.data_size() > 0)) // collection is allocated
+        if (collection && (collection.data_size() > 0)) // collection is allocated
         {
+            size_t header_len = header_length(collection.data(), collection.data_size());
+
             assert(collection.capacity() >= header_len);
-            const unsigned long tocopy {header_len - collection.data_size()};
-            assert(tocopy != 0);
-            if(info.dlen < tocopy)
+            const unsigned long tocopy
             {
-                collection.push(info, info.dlen);              
+                header_len - collection.data_size()
+            };
+            assert(tocopy != 0);
+            if (info.dlen < tocopy)
+            {
+                collection.push(info, info.dlen);
                 info.data += info.dlen;//   optimization
                 info.dlen = 0;
                 return false;
@@ -180,8 +206,10 @@ public:
         }
         else // collection is empty
         {
-            collection.allocate(); // allocate new collection from writer 
-            if(info.dlen >= header_len) // is data enough to message validation?
+            size_t header_len = header_length(info.data, info.dlen);
+
+            collection.allocate(); // allocate new collection from writer
+            if (info.dlen >= header_len) // is data enough to message validation?
             {
                 collection.push(info, header_len); // probability that message will be rejected / probability of valid message
                 info.data += header_len;
@@ -198,37 +226,52 @@ public:
         return true;
     }
 
+    template<typename Header>
+    void read_message(const NetBIOS::MessageHeader* nb_header, const Header*, PacketInfo& info)
+    {
+        msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
+        hdr_len = (sizeof(NetBIOS::MessageHeader) + sizeof(Header) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(Header) : msg_len);
+
+        assert(msg_len != 0);   // message is found
+        assert(msg_len >= collection.data_size());
+        assert(hdr_len <= msg_len);
+
+        const uint32_t written
+        {
+            collection.data_size()
+        };
+        msg_len -= written; // substract how written (if written)
+        hdr_len -= std::min(hdr_len, written);
+        if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
+            // Next find message call will finding next message
+        {
+            collection.skip_first(sizeof(NetBIOS::MessageHeader));
+            collection.complete(info);
+        }
+
+    }
+
     // Find next message in packet info
     inline void find_message(PacketInfo& info)
     {
         assert(msg_len == 0);   // Message still undetected
 
         if (!collect_header(info))
-            return;
+        {
+            return ;
+        }
 
         assert(collection);     // collection must be initialized
 
-        const NetBIOS::MessageHeader *nb_header = NetBIOS::get_header(collection.data());
-        if (nb_header) {
-            const CIFS::MessageHeader *header = CIFS::get_header(collection.data() + sizeof(NetBIOS::MessageHeader));
-            if (header) {
-                msg_len = nb_header->len() + sizeof(nb_header);
-                hdr_len = (sizeof(nb_header) + sizeof(header) < msg_len ? sizeof(nb_header) + sizeof(header) : msg_len);
-
-                assert(msg_len != 0);   // message is found
-                assert(msg_len >= collection.data_size());
-                assert(hdr_len <= msg_len);
-
-                const uint32_t written {collection.data_size()};
-                msg_len -= written; // substract how written (if written)
-                hdr_len -= std::min(hdr_len, written);
-                if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
-                                    // Next find message call will finding next message
-                {
-                    collection.skip_first(sizeof(NetBIOS::MessageHeader));
-                    collection.complete(info);
-                }
-                return;
+        if (const NetBIOS::MessageHeader* nb_header = NetBIOS::get_header(collection.data()))
+        {
+            if (const CIFS::MessageHeader* header = CIFS::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            {
+                return read_message(nb_header, header, info);
+            }
+            else if (CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            {
+                return read_message(nb_header, header, info);
             }
         }
 
@@ -246,8 +289,9 @@ private:
     typename Writer::Collection collection;// storage for collection packet data
 };
 
-}
+} // filtration
 
-}
-
+} // NST
+//------------------------------------------------------------------------------
 #endif // CIFS_FILTRATOR_H
+//------------------------------------------------------------------------------

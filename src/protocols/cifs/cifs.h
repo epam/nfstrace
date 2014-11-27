@@ -22,9 +22,9 @@
 #ifndef CIFS_HEADER_H
 #define CIFS_HEADER_H
 //------------------------------------------------------------------------------
-#include <sys/types.h>
+#include <cstdint>
 
-#include "protocols/netbios/netbios_header.h"
+#include "protocols/netbios/netbios.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -35,7 +35,8 @@ namespace CIFS
 
 /*! CIFS commands
  */
-enum class Commands : u_int8_t {
+enum class Commands : uint8_t
+{
     SMB_COM_CREATE_DIRECTORY       =  0x00, //!< Create a new directory.
     SMB_COM_DELETE_DIRECTORY       =  0x01, //!< Delete an empty directory.
     SMB_COM_OPEN                   =  0x02, //!< Open a file.
@@ -110,43 +111,81 @@ enum class Commands : u_int8_t {
     SMB_COM_WRITE_BULK             =  0xD9, //!< Reserved
     SMB_COM_WRITE_BULK_DATA        =  0xDA, //!< Reserved
     SMB_COM_INVALID                =  0xFE, //!< As the name suggests
-    SMB_COM_NO_ANDX_COMMAND        =  0xFF //!<  Also known as the NIL command. It identifies the end of an AndX Chain
+    SMB_COM_NO_ANDX_COMMAND        =  0xFF  //!<  Also known as the NIL command. It identifies the end of an AndX Chain
 };
 
 /*! SMB protocol codes
  */
-enum class ProtocolCodes : u_int8_t {
-    SMB2 = 0xF3,     //!< SMB v2.0-2.1
+enum class ProtocolCodes : uint8_t
+{
+    SMB2 = 0xFE,     //!< SMB v2.0-2.1
     SMB1 = 0xFF      //!< SMB v.1.0
 };
 
-#pragma pack(push,1)
-
-/*! \class CIFS message header
+/*! \class First part of CIFS header
  */
-struct MessageHeader {
+struct MessageHeaderHead
+{
     ProtocolCodes protocol_code;//!< Protocol version - 0xFF or 0xF3
     int8_t protocol[3];//!< Protocol name (SMB)
-    Commands cmd_code;//!< Code of SMB command
-    int8_t other[27];//FIXME: SMB header to be precised!
+} __attribute__ ((__packed__));
 
-    /*! Returns command description. Performance may be affected!
-     * \return description of the command
-     */
-    std::string commandDescription() const;
+/*! Security field for CIFS header
+ */
+struct SecurityField
+{
+    int8_t key[4];//!< Somethink about security
+    int16_t CID;//!< A connection identifier (CID).
+    int16_t sequenceNumber;//!< A number used to identify the sequence of a message over connectionless transports.
 };
 
-#pragma pack(pop)
+/*! \class Raw CIFS message header
+ */
+struct MessageHeader
+{
+    MessageHeaderHead head;//!< Head of header
+    Commands cmd_code;//!< Code of SMB command
+    int32_t status;//!< Used to communicate error messages from the server to the client.
+    int8_t flags;//!< 1-bit flags describing various features in effect for the message.
+    int8_t flags2[2];//!< A 16-bit field of 1-bit flags that represent various features in effect for the message. Unspecified bits are reserved and MUST be zero.
+
+    int16_t PIDHigh;//!< If set to a nonzero value, this field represents the high-order bytes of a process identifier (PID). It is combined with the PIDLow field below to form a full PID.
+    union  // Depends on command
+    {
+        int8_t securityFeatures[8];//!< Somethink about security
+        SecurityField sec;//!< Security field structure
+    };
+    int16_t _;//!< Reserved
+
+    int16_t TID;//!< A tree identifier
+    int16_t PIDLow;//!< The lower 16-bits of the PID
+
+    int16_t UID;//!< A user identifier
+    int16_t MID;//!< A multiplex identifier
+} __attribute__ ((__packed__));
 
 /*! Check is data valid CIFS message's header and return header or nullptr
  * \param data - raw packet data
  * \return pointer to input data which is casted to header structure or nullptr (if it is not valid header)
  */
-const MessageHeader *get_header(const u_int8_t* data);
+const MessageHeader* get_header(const uint8_t* data);
 
+/*! Constructs new command for API from raw message
+ * \param header - message header
+ * \return Command structure
+ */
+template <typename Cmd>
+inline const Cmd command(const MessageHeader* header)
+{
+    Cmd cmd;
+    cmd.session = header->sec.CID;
+    return cmd;
 }
 
-}
-}
+} // CIFS
 
+} // protocols
+} // NST
+//------------------------------------------------------------------------------
 #endif // CIFS_HEADER_H
+//------------------------------------------------------------------------------

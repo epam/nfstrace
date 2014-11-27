@@ -37,10 +37,13 @@ AnalysisManager::AnalysisManager(RunningStatus& status, const Parameters& params
 
     queue.reset(new FilteredDataQueue(params.queue_capacity(), 1));
 
-    if (protocol == NST::controller::NetProtocol::CIFS) {
+    if (protocol == NST::controller::NetProtocol::CIFS)
+    {
         CIFSParser parser(*analysiss);
         cifs_parser_thread.reset(new ParserThread<CIFSParser>(parser, *queue, status));
-    } else {
+    }
+    else
+    {
         NFSParser parser(*analysiss);
         nfs_parser_thread.reset(new ParserThread<NFSParser>(parser, *queue, status));
     }
@@ -49,18 +52,24 @@ AnalysisManager::AnalysisManager(RunningStatus& status, const Parameters& params
 
 void AnalysisManager::start()
 {
-    if (protocol == NST::controller::NetProtocol::CIFS) {
+    if (protocol == NST::controller::NetProtocol::CIFS)
+    {
         cifs_parser_thread->start();
-    } else {
+    }
+    else
+    {
         nfs_parser_thread->start();
     }
 }
 
 void AnalysisManager::stop()
 {
-    if (protocol == NST::controller::NetProtocol::CIFS) {
+    if (protocol == NST::controller::NetProtocol::CIFS)
+    {
         cifs_parser_thread->stop();
-    } else {
+    }
+    else
+    {
         nfs_parser_thread->stop();
     }
 
