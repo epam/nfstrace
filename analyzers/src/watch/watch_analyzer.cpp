@@ -33,13 +33,12 @@ WatchAnalyzer::WatchAnalyzer(const char* opts)
 , nfs4_ops_total  {0}
 , nfs4_proc_count (ProcEnumNFS4::count, 0)
 , monitor_running {ATOMIC_FLAG_INIT}
-, refresh_delta   {2000}
 , max_read        {5}
 , read_counter    {0}
 {
     monitor_running.test_and_set();
     monitor_thread = std::thread(&WatchAnalyzer::thread, this);
-    if(std::stoul(opts) > 0) refresh_delta = std::stoul(opts);
+    try{refresh_delta = std::stoul(opts);} catch(...){ refresh_delta = 2000;}
 }
 
 WatchAnalyzer::~WatchAnalyzer()
