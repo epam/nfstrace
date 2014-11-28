@@ -62,6 +62,7 @@ public:
         ~Global();
         Global(const Global&)            = delete;
         Global& operator=(const Global&) = delete;
+        void reopen();
     };
 
     Log();
@@ -72,7 +73,6 @@ public:
     // lightweight logging
     static void message(const char* format, ...);
     static void flush();
-    static void reopen();
 private:
     char buffer[256];
 };

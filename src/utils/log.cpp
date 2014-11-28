@@ -52,6 +52,8 @@ namespace utils
 static FILE* log_file {nullptr};
 static bool  own_file {false};
 static std::string log_file_path {};
+static const std::string default_file_name{"nfstrace_logfile.log"};
+
 namespace // unnanmed
 {
 
@@ -61,14 +63,14 @@ static FILE* try_open(const std::string& file_name)
     if(file == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
-            (std::string("Error in opening file: ") + file_name).c_str()};
+                               {std::string("Error in opening file: ") + file_name}};
     }
     chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
     {
         fclose(file);
         throw std::system_error{errno, std::system_category(),
-            ("Log file already locked: " + file_name).c_str()};
+                               {"Log file already locked: " + file_name}};
     }
     return file;
 }
@@ -77,7 +79,10 @@ static FILE* try_open(const std::string& file_name)
 
 Log::Global::Global(const std::string& path)
 {
-    if(own_file) return;
+    if(own_file)
+    {
+        throw std::runtime_error{"Global Logger already have been created."};
+    }
     std::string path_file(path);
     if(!path_file.empty())
     {
@@ -86,20 +91,20 @@ Log::Global::Global(const std::string& path)
         if(S_ISDIR(st.st_mode)) // is this path to folder
         {
             if(path_file[path_file.size() - 1] == '/')
-                path_file = path_file + ("nfstrace_logfile.log");
+                path_file = path_file + default_file_name;
             else
-                path_file = path_file + ("/nfstrace_logfile.log");
+                path_file = path_file + '/' + default_file_name;
         }
     }
     else
     {
-        path_file = path_file + ("./nfstrace_logfile.log");
+        path_file = default_file_name;
     }
     FILE* file = try_open(path_file);
     if(file == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
-            (std::string("Can't create log file: ") + path_file).c_str()};
+                               {std::string{"Can't create log file: "} + path_file}};
     }
     if(utils::Out message{})
     {
@@ -111,18 +116,34 @@ Log::Global::Global(const std::string& path)
     log_file_path = path_file;
 }
 
-static void closeLog()
-{
-    flock(fileno(log_file), LOCK_UN);
-    fclose(log_file);
-    own_file = false;
-    log_file = nullptr;
-}
-
 Log::Global::~Global()
 {
     if(own_file)
-        closeLog();
+    {
+        flock(fileno(log_file), LOCK_UN);
+        fclose(log_file);
+        own_file = false;
+        log_file = nullptr;
+        std::time_t t = std::time(NULL);
+        std::string tmp{log_file_path + std::asctime(std::localtime(&t))};
+        if(rename(log_file_path.c_str(), tmp.c_str()))
+            throw std::system_error{errno, std::system_category(),
+                                   {std::string{"Can't rename previous log file."} + log_file_path}};
+    }
+}
+
+void Log::Global::reopen()
+{
+    if(log_file == ::stderr || log_file == ::stdout || log_file == nullptr)
+        return;
+
+    if(log_file_path.empty()) return;
+    log_file = freopen(log_file_path.c_str(), "a+", log_file);
+    if(log_file == nullptr)
+    {
+        throw std::system_error{errno, std::system_category(),
+        "Can't reopen file."};
+    }
 }
 
 Log::Log()
@@ -153,19 +174,6 @@ void Log::flush()
     fflush(log_file);
 }
 
-void Log::reopen()
-{
-    if(log_file == ::stderr || log_file == ::stdout || log_file == nullptr)
-        return;
-
-    if(log_file_path.empty()) return;
-    log_file = freopen(log_file_path.c_str(), "a+", log_file);
-    if(log_file == nullptr)
-    {
-        throw std::system_error{errno, std::system_category(),
-        "Can't reopen file."};
-    }
-}
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
