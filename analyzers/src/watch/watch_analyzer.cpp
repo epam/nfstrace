@@ -44,7 +44,7 @@ WatchAnalyzer::WatchAnalyzer(const char* opts)
     }
     catch(std::exception& e)
     {
-        throw std::runtime_error{std::string{"Error in plugin options processing. "} + "OPTS: " + opts + " Error: " + e.what()};
+        throw std::runtime_error{std::string{"Error in plugin options processing. OPTS: "} + opts + " Error: " + e.what()};
     }
     monitor_thread = std::thread(&WatchAnalyzer::thread, this);
 }
