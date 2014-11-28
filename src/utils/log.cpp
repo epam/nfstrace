@@ -49,7 +49,7 @@ namespace NST
 namespace utils
 {
 
-static FILE* log_file {nullptr};
+static FILE* log_file {::stderr};
 static bool  own_file {false};
 static std::string log_file_path {};
 static const std::string default_file_name{"nfstrace_logfile.log"};
@@ -87,8 +87,7 @@ Log::Global::Global(const std::string& path)
     if(!path_file.empty())
     {
         struct stat st;
-        stat(path_file.c_str(), &st);
-        if(S_ISDIR(st.st_mode)) // is this path to folder
+        if(!stat(path_file.c_str(), &st) && S_ISDIR(st.st_mode))
         {
             if(path_file[path_file.size() - 1] == '/')
                 path_file = path_file + default_file_name;
@@ -123,7 +122,7 @@ Log::Global::~Global()
         flock(fileno(log_file), LOCK_UN);
         fclose(log_file);
         own_file = false;
-        log_file = nullptr;
+        log_file = ::stderr;
         std::time_t t = std::time(NULL);
         std::string tmp{log_file_path + std::asctime(std::localtime(&t))};
         if(rename(log_file_path.c_str(), tmp.c_str()))
