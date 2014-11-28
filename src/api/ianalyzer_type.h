@@ -680,7 +680,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void logOffSMBv2(const SMBv2::CloseFileCommand *, const SMBv2::CloseFileArgumentType &, const SMBv2::CloseFileResultType &) {}
+    virtual void logOffSMBv2(const SMBv2::LogOffCommand *, const SMBv2::LogOffArgumentType &, const SMBv2::LogOffResultType &) {}
 
     /*! "Tree Connect" command "on receive" event handler
      * \param cmd - Specified command
