@@ -161,14 +161,14 @@ public:
     {
         static const size_t base_header_len
         {
-            sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeaderHead)
+            sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead)
         };
-        size_t header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader)};
+        size_t header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeader)};
         if (size >= base_header_len)//FIXME: Move to protocol
         {
-            if (CIFS::get_header(data))//FIXME: do it twice
+            if (CIFSv1::get_header(data))//FIXME: do it twice
             {
-                header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFS::MessageHeader);//FIXME: doesn't matter
+                header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeader);//FIXME: doesn't matter
             }
             else if (CIFSv2::get_header(data))//FIXME: do it twice
             {
@@ -265,7 +265,7 @@ public:
 
         if (const NetBIOS::MessageHeader* nb_header = NetBIOS::get_header(collection.data()))
         {
-            if (const CIFS::MessageHeader* header = CIFS::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            if (const CIFSv1::MessageHeader* header = CIFSv1::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
                 return read_message(nb_header, header, info);
             }
