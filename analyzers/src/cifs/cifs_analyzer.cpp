@@ -1125,7 +1125,7 @@ public:
         account(cmd, SMBv2Commands::SESSION_SETUP, smbv2);
     }
 
-    void logOffSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseFileArgumentType &, const SMBv2::CloseFileResultType &) override final
+    void logOffSMBv2(const SMBv2::LogOffCommand* cmd, const SMBv2::LogOffArgumentType &, const SMBv2::LogOffResultType &) override final
     {
         account(cmd, SMBv2Commands::LOGOFF, smbv2);
     }
