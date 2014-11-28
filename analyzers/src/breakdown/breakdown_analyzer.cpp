@@ -595,12 +595,8 @@ IAnalyzer* create(const char* optarg)
             {
                 case ACC:
                     return new BreakdownAnalyzer<long double, TwoPassVariance>();
-                    break;
-
                 case MEM:
                     return new BreakdownAnalyzer<long double, OnlineVariance>();
-                    break;
-
                 default:
                     return nullptr;
             }

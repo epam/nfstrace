@@ -172,15 +172,13 @@ void Plotter::enableResize(int)
 
 void Plotter::keyboard_thread()
 {
-    int tmp = 0;
-
     while(monitor_running.test_and_set())
     {
-        tmp = inputData();
+        int key = inputData();
 
-        if(tmp != 0 )
+        if(key != 0 )
         {
-            if(tmp == KEY_UP)
+            if(key == KEY_UP)
             {
                 if(scroll_shift > 0)
                 {
@@ -188,7 +186,7 @@ void Plotter::keyboard_thread()
                     resize++;
                 }
             }
-            else if(tmp == KEY_DOWN)
+            else if(key == KEY_DOWN)
             {
                 if(scroll_shift < 25)
                 {
