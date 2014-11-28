@@ -57,7 +57,7 @@ namespace // unnanmed
 
 static FILE* try_open(const std::string& file_name)
 {
-    FILE* file {fopen(file_name.c_str(), "w")};
+    FILE* file = fopen(file_name.c_str(), "w");
     if(file == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
