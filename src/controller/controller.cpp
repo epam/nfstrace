@@ -22,13 +22,13 @@
 //------------------------------------------------------------------------------
 #include <grp.h>
 #include <pwd.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 #include "utils/filtered_data.h"
 #include "controller/controller.h"
 #include "controller/parameters.h"
-#include "controller/signal_handler.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -128,7 +128,7 @@ int Controller::run()
                 }
                 else
                 {
-                    throw ProcessingDone{std::string("Unhandled signal presents: ") + ::strsignal(s.signal_number)};
+                    throw ProcessingDone{std::string{"Unhandled signal presents: "} + s.what()};
                 }
             }
         }

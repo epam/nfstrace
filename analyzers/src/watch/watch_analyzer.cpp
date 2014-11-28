@@ -210,7 +210,6 @@ inline void WatchAnalyzer::thread()
     } catch(...) {
         DownRead();
         std::cerr << "Watch plugin Unidentifying exception.";
-//        throw std::exception("Watch plugin Unidentifying exception.");
     }
 }
 //------------------------------------------------------------------------------
@@ -240,12 +239,6 @@ void destroy(IAnalyzer* instance)
     delete instance;
 }
 
-/*
-bool output()
-{
-    return false;
-}
-*/
 NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
 }
 //------------------------------------------------------------------------------

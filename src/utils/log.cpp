@@ -20,7 +20,6 @@
 */
 //------------------------------------------------------------------------------
 #include <cerrno>
-#include <condition_variable>
 #include <cstdarg>
 #include <cstdio>
 #include <ctime>
@@ -53,8 +52,6 @@ namespace utils
 static FILE* log_file {nullptr};
 static bool  own_file {false};
 static std::string log_file_path {};
-static std::mutex mut{};
-
 namespace // unnanmed
 {
 
@@ -84,18 +81,22 @@ Log::Global::Global(const std::string& path)
     std::string path_file(path);
     if(!path_file.empty())
     {
-        if(path_file[path_file.size()-1] == '/') // this is path to folder
+        struct stat st;
+        stat(path_file.c_str(), &st);
+        if(S_ISDIR(st.st_mode)) // is this path to folder
         {
-            path_file = path_file + ("nfstrace_logfile.log");
+            if(path_file[path_file.size() - 1] == '/')
+                path_file = path_file + ("nfstrace_logfile.log");
+            else
+                path_file = path_file + ("/nfstrace_logfile.log");
         }
     }
     else
     {
         path_file = path_file + ("./nfstrace_logfile.log");
     }
-    FILE* file {nullptr};
-    file = try_open(path_file);
-    if(file == nullptr || file == NULL)
+    FILE* file = try_open(path_file);
+    if(file == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
             (std::string("Can't create log file: ") + path_file).c_str()};
@@ -115,15 +116,13 @@ static void closeLog()
     flock(fileno(log_file), LOCK_UN);
     fclose(log_file);
     own_file = false;
-    log_file = ::stderr;
+    log_file = nullptr;
 }
 
 Log::Global::~Global()
 {
     if(own_file)
-    {
         closeLog();
-    }
 }
 
 Log::Log()
@@ -145,7 +144,6 @@ void Log::message(const char* format, ...)
 {
     va_list args;
     va_start(args, format);
-    std::unique_lock<std::mutex> lck(mut);
     vfprintf(log_file, format, args);
     va_end(args);
 }
@@ -161,20 +159,12 @@ void Log::reopen()
         return;
 
     if(log_file_path.empty()) return;
-    std::unique_lock<std::mutex> lck(mut);
-    closeLog();
-    std::time_t t = std::time(NULL);
-    std::string tmp{log_file_path + std::asctime(std::localtime(&t))};
-    if(rename(log_file_path.c_str(), tmp.c_str()))
-        throw std::system_error{errno, std::system_category(),
-            (std::string{"Can't rename previous log file."} + log_file_path).c_str()};
-    log_file = try_open(log_file_path);
-    if(log_file == nullptr || log_file == NULL)
+    log_file = freopen(log_file_path.c_str(), "a+", log_file);
+    if(log_file == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
         "Can't reopen file."};
     }
-    //main unlock
 }
 } // namespace utils
 } // namespace NST

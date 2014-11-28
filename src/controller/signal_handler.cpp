@@ -22,6 +22,7 @@
 #include <cerrno>
 #include <functional>   // std::ref
 #include <pthread.h>
+#include <signal.h>
 #include <system_error>
 #include <string.h>     // for strsignal()
 
