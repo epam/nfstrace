@@ -32,9 +32,9 @@ const NST::protocols::CIFSv2::MessageHeader* NST::protocols::CIFSv2::get_header(
 {
     static const char* const smbProtocolName = "SMB";
     const MessageHeader* header (reinterpret_cast<const MessageHeader*>(data));
-    if (std::memcmp(header->head.protocol, smbProtocolName, sizeof(header->head.protocol)) == 0)
+    if (std::memcmp(header->head.protocol, smbProtocolName, sizeof(header->head.protocol)) == 0)//FIXME: get rid of memcmp
     {
-        if (header->head.protocol_code == NST::protocols::CIFS::ProtocolCodes::SMB2)
+        if (header->head.protocol_code == NST::protocols::CIFSv1::ProtocolCodes::SMB2)
         {
             return header;
         }

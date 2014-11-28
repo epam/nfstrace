@@ -25,14 +25,14 @@
 
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
-using namespace NST::protocols::CIFS;
+using namespace NST::protocols::CIFSv1;
 
 static const char* const smbProtocolName = "SMB";
 
-const NST::protocols::CIFS::MessageHeader* NST::protocols::CIFS::get_header(const uint8_t* data)
+const NST::protocols::CIFSv1::MessageHeader* NST::protocols::CIFSv1::get_header(const uint8_t* data)
 {
     const MessageHeader* header (reinterpret_cast<const MessageHeader*>(data));
-    if (std::memcmp(header->head.protocol, smbProtocolName, sizeof(header->head.protocol)) == 0)
+    if (std::memcmp(header->head.protocol, smbProtocolName, sizeof(header->head.protocol)) == 0)//FIXME: get rid of memcmp
     {
         if (header->head.protocol_code == ProtocolCodes::SMB1)
         {
