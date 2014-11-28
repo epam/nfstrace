@@ -123,8 +123,7 @@ int Controller::run()
             {
                 if(s.signal_number == SIGHUP)
                 {
-                    NST::utils::Log log;
-                    log.reopen();
+                    glog.reopen();
                 }
                 else
                 {
