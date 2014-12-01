@@ -35,7 +35,7 @@ namespace NST
 namespace net
 {
 
-AbstractTcpService::AbstractTcpService(int port, std::size_t workersAmount, int backlog) :
+AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, const std::string& host, int backlog) :
 	_isRunning(true),
 	_threadPool(workersAmount),
 	_listenerThread(),
@@ -55,7 +55,7 @@ AbstractTcpService::AbstractTcpService(int port, std::size_t workersAmount, int 
 		throw std::system_error(errno, std::system_category(), "Setting SO_REUSEADDR socket option error");
 	}
 	// Binding server socket to endpoint
-	TcpEndpoint endpoint(TcpEndpoint::WildcardAddress, port);
+	TcpEndpoint endpoint(host.c_str(), port);
 	if (bind(_serverSocket, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen) != 0) {
 		throw std::system_error(errno, std::system_category(), "Binding server socket error");
 	}
