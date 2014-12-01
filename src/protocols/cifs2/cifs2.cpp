@@ -23,6 +23,8 @@
 #include <map>
 #include <string>
 
+#include <arpa/inet.h>
+
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
@@ -40,4 +42,9 @@ const NST::protocols::CIFSv2::MessageHeader* NST::protocols::CIFSv2::get_header(
         }
     }
     return nullptr;
+}
+
+bool MessageHeader::isFlag(const Flags flag) const
+{
+    return static_cast<uint32_t>(flag) & htonl(flags);
 }
