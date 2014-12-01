@@ -52,7 +52,8 @@ namespace utils
 static FILE* log_file {::stderr};
 static bool  own_file {false};
 static std::string log_file_path {};
-static const std::string default_file_name{"nfstrace_logfile.log"};
+static std::string default_file_name{"nfstrace_logfile"};
+static const std::string extention{".log"};
 
 namespace // unnanmed
 {
@@ -94,25 +95,26 @@ Log::Global::Global(const std::string& path)
             else
                 path_file = path_file + '/' + default_file_name;
         }
+        default_file_name = path_file;
     }
     else
     {
         path_file = default_file_name;
     }
-    FILE* file = try_open(path_file);
+    log_file_path = addtimestamp(path_file);
+    FILE* file = try_open(log_file_path);
     if(file == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
-                               {std::string{"Can't create log file: "} + path_file}};
+                               {std::string{"Can't create log file: "} + log_file_path}};
     }
     if(utils::Out message{})
     {
-        message << "Log folder: " << path_file;
+        message << "Log folder: " << log_file_path;
     }
 
     log_file = file;
     own_file = true;
-    log_file_path = path_file;
 }
 
 Log::Global::~Global()
@@ -123,26 +125,31 @@ Log::Global::~Global()
         fclose(log_file);
         own_file = false;
         log_file = ::stderr;
-        std::time_t t = std::time(NULL);
-        std::string tmp{log_file_path + std::asctime(std::localtime(&t))};
-        if(rename(log_file_path.c_str(), tmp.c_str()))
-            throw std::system_error{errno, std::system_category(),
-                                   {std::string{"Can't rename previous log file."} + log_file_path}};
     }
 }
 
 void Log::Global::reopen()
 {
-    if(log_file == ::stderr || log_file == ::stdout || log_file == nullptr)
+    if(!own_file || log_file == ::stderr || log_file == ::stdout || log_file == nullptr)
         return;
-
-    if(log_file_path.empty()) return;
-    log_file = freopen(log_file_path.c_str(), "a+", log_file);
-    if(log_file == nullptr)
+    FILE* temp = freopen(log_file_path.c_str(), "a+", log_file);
+    if(temp == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
-        "Can't reopen file."};
+                               {std::string{"Can't reopen file: "} + log_file_path}};
     }
+    log_file = temp;
+}
+
+const std::string Log::Global::addtimestamp(const std::string& path_file)
+{
+    std::string tmp_path;
+    if(path_file.size() > extention.size() && (std::string(path_file.end() - extention.size(), path_file.end()) + '\0').compare(extention))
+        tmp_path = std::string(path_file.begin(), (path_file.end() - extention.size())) + "_" + std::to_string(std::time(NULL));
+    else
+        tmp_path = path_file + "_" + std::to_string(std::time(NULL));
+    tmp_path += extention;
+    return tmp_path;
 }
 
 Log::Log()
