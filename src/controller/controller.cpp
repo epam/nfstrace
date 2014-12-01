@@ -164,7 +164,7 @@ void droproot(const std::string& dropuser)
     {
         if(utils::Out message{})
         {
-            message << "Superuser privileges can not be dropped.";
+            message << "Error dropping superuser privileges: " << e.what();
         }
         throw;
     }
