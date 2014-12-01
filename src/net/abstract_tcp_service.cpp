@@ -28,6 +28,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include <iostream>	// TODO: Remove it
+
 namespace NST
 {
 namespace net
@@ -120,15 +122,20 @@ void AbstractTcpService::runListener()
 		// Accepting incoming connection on socket
 		struct timespec acceptDuration;
 		fillDuration(acceptDuration);
-		fd_set descriptorsSet;
-		FD_ZERO(&descriptorsSet);
-		FD_SET(_serverSocket, &descriptorsSet);
-		int descriptorsCount = pselect(_serverSocket + 1, &descriptorsSet, NULL, NULL, &acceptDuration, NULL);
+		fd_set readDescriptorsSet;
+		FD_ZERO(&readDescriptorsSet);
+		FD_SET(_serverSocket, &readDescriptorsSet);
+		int descriptorsCount = pselect(_serverSocket + 1, &readDescriptorsSet, NULL, NULL, &acceptDuration, NULL);
 		if (descriptorsCount == 0) {
 			// Timeout expired
 			continue;
 		} else if (descriptorsCount < 0) {
-			std::system_error(errno, std::system_category(), "Awaiting for incoming connection on server socket error");
+			// TODO: Several first pselect(2) calls cause "Interrupted system call" error (errno == EINTR)
+			// if drop privileges option is used on Linux (see https://access.redhat.com/solutions/165483)
+			// TODO: Use general logging
+			std::system_error e(errno, std::system_category(), "Awaiting for incoming connection on server socket error");
+			std::cerr << e.what() << std::endl;
+			continue;
 		}
 		// Extracting and returning pending connection
 		int pendingSocketDescriptor = accept(_serverSocket, NULL, NULL);
