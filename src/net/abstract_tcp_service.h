@@ -42,14 +42,18 @@ namespace net
 class AbstractTcpService
 {
 public:
+	static const int DefaultBacklog = 15;
+
 	AbstractTcpService() = delete;
 	//! Constructs TCP-service and starts it
 	/*!
-	 * \param port Port to listen on
 	 * \param workersAmount Amount of workers in thread-pool
+	 * \param port Port to bind to
+	 * \param host Hostname/IP-address to listen
 	 * \param Listen backlog - see listen(2)
 	 */
-	AbstractTcpService(int port, std::size_t workersAmount, int backlog = 15);
+	AbstractTcpService(std::size_t workersAmount, int port, const std::string& host = TcpEndpoint::WildcardAddress,
+			int backlog = DefaultBacklog);
 	//! Stops TCP-service and destructs it
 	virtual ~AbstractTcpService();
 

@@ -28,6 +28,10 @@
 #include <net/abstract_tcp_service.h>
 
 #define WEB_API_VERSION "0.0.1"
+#define DEFAULT_PORT 8888
+#define DEFAULT_HOST TcpEndpoint::WildcardAddress
+#define DEFAULT_WORKERS_AMOUNT 10U
+#define DEFAULT_BACKLOG 15
 
 using namespace NST::net;
 
@@ -37,8 +41,8 @@ class JsonTcpService : public AbstractTcpService
 {
 public:
 	JsonTcpService() = delete;
-	JsonTcpService(WebUiAnalyzer& analyzer, int port, std::size_t workersAmount, int backlog = 15) :
-		AbstractTcpService(port, workersAmount, backlog),
+	JsonTcpService(WebUiAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host, int backlog) :
+		AbstractTcpService(workersAmount, port, host, backlog),
 		_analyzer(analyzer)
 	{}
 private:
@@ -128,8 +132,8 @@ public:
 	    {}
     };
 
-    WebUiAnalyzer(int port, std::size_t workersAmount) :
-	_jsonTcpService(*this, port, workersAmount),
+    WebUiAnalyzer(std::size_t workersAmount, int port, const std::string& host, int backlog) :
+	_jsonTcpService(*this, workersAmount, port, host, backlog),
 	_nfsV3Stat(),
 	_nfsV4Stat()
     {
@@ -334,7 +338,7 @@ public:
 
     void flush_statistics() override final
     {
-        std::cout << "WebUiAnalyzer::flush_statistics()" << std::endl;
+        //std::cout << "WebUiAnalyzer::flush_statistics()" << std::endl;
     }
 
     const NfsV3Stat& getNfsV3Stat() const
@@ -401,13 +405,66 @@ extern "C"
 
 const char* usage()
 {
-    return "WebUiAnalyzer: any options";
+	return "host - Network interface to listen (default is to listen all interfaces)\n"
+		"port - IP-port to bind to (default is 8888)\n"
+		"workers - Amount of workers (default is 10)\n"
+		"backlog - Listen backlog (default is 15)";
 }
 
-IAnalyzer* create(const char* /*opts*/)
+IAnalyzer* create(const char* opts)
 {
-    // TODO: Extract port and workers amount from options string
-    return new WebUiAnalyzer(8888, 10U);
+	// Initializing plugin options with default values
+	int backlog = DEFAULT_BACKLOG;
+	std::string host(DEFAULT_HOST);
+	int port = DEFAULT_PORT;
+	std::size_t workersAmount = DEFAULT_WORKERS_AMOUNT;
+	// Parising plugin options
+	enum {
+		BACKLOG_SUBOPT_INDEX = 0,
+		HOST_SUBOPT_INDEX,
+		PORT_SUBOPT_INDEX,
+		WORKERS_SUBOPT_INDEX
+	};
+	char backlogSubOptName[] = "backlog";
+	char hostSubOptName[] = "host";
+	char portSubOptName[] = "port";
+	char workersSubOptName[] = "workers";
+	char* const tokens[] = {
+		backlogSubOptName,
+		hostSubOptName,
+		portSubOptName,
+		workersSubOptName,
+		NULL
+	};
+	std::size_t optsLen = strlen(opts);
+	std::vector<char> optsBuf(opts, opts + optsLen + 2);
+	char* optionp = &optsBuf[0];
+	char* valuep;
+	int optIndex;
+	while ((optIndex = getsubopt(&optionp, tokens, &valuep)) >= 0) {
+		try {
+			switch (optIndex) {
+			case BACKLOG_SUBOPT_INDEX:
+				backlog = std::stoi(valuep);
+				break;
+			case HOST_SUBOPT_INDEX:
+				host = valuep;
+				break;
+			case PORT_SUBOPT_INDEX:
+				port = std::stoi(valuep);
+				break;
+			case WORKERS_SUBOPT_INDEX:
+				workersAmount = std::stoul(valuep);
+				break;
+			default:
+				throw std::runtime_error(std::string("Invalid suboption index: ") + std::to_string(optIndex));
+			}
+		} catch (std::logic_error& e) {
+			throw std::runtime_error(std::string("Invalid value provided for '") + tokens[optIndex] + "' suboption");
+		}
+	}
+	// Creating and returning plugin
+	return new WebUiAnalyzer(workersAmount, port, host, backlog);
 }
 
 void destroy(IAnalyzer* instance)

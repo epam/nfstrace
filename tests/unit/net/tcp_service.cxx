@@ -42,9 +42,8 @@ static std::atomic_int taskExecuteCallsCount;
 class TestTcpService : public AbstractTcpService
 {
 public:
-	TestTcpService() = delete;
-	TestTcpService(int port, std::size_t workersAmount, int backlog = 15) :
-		AbstractTcpService(port, workersAmount, backlog)
+	TestTcpService() :
+		AbstractTcpService(WORKERS_AMOUNT, LISTEN_PORT, LISTEN_HOST)
 	{}
 private:
 	class Task : public AbstractTask
@@ -77,13 +76,13 @@ private:
 
 TEST(TcpService, constructDestruct)
 {
-	EXPECT_NO_THROW(TestTcpService service(LISTEN_PORT, WORKERS_AMOUNT));
+	EXPECT_NO_THROW(TestTcpService service);
 }
 
 TEST(TcpService, requestResponse)
 {
 	taskExecuteCallsCount = 0;
-	TestTcpService service(LISTEN_PORT, WORKERS_AMOUNT);
+	TestTcpService service;
 	std::this_thread::sleep_for(std::chrono::milliseconds(AWAIT_FOR_SERVICE_STARTUP_MS));
 	int s = socket(PF_INET, SOCK_STREAM, 0);
 	ASSERT_GE(s, 0);
@@ -101,7 +100,7 @@ TEST(TcpService, requestResponse)
 TEST(TestTcpService, multipleRequestResponse)
 {
 	taskExecuteCallsCount = 0;
-	TestTcpService service(LISTEN_PORT, WORKERS_AMOUNT);
+	TestTcpService service;
 	std::this_thread::sleep_for(std::chrono::milliseconds(AWAIT_FOR_SERVICE_STARTUP_MS));
 	std::vector<int> sockets(WORKERS_AMOUNT);
 	for (auto& s : sockets) {
