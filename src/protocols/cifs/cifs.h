@@ -33,6 +33,20 @@ namespace protocols
 namespace CIFSv1
 {
 
+/*! Flags of message
+ */
+enum class Flags : uint8_t
+{
+    LOCK_AND_READ_OK              = 0x01, //!< This bit is set (1) in the SMB_COM_NEGOTIATE (0x72) Response (section 2.2.4.52.2) if the server supports SMB_COM_LOCK_AND_READ (0x13) (section 2.2.4.20) and SMB_COM_WRITE_AND_UNLOCK (0x14) (section 2.2.4.21) commands.
+    BUF_AVAIL                     = 0x02, //!< Obsolete. When set (on an SMB request being sent to the server), the client guarantees that there is a receive buffer posted such that a send without acknowledgment can be used by the server to respond to the client's request. This behavior is specific to an obsolete transport. This bit MUST be set to zero by the client and MUST be ignored by the server.
+    Reserved                      = 0x04, //!< This flag MUST be set to zero by the client and MUST be ignored by the server.
+    CASE_INSENSITIVE              = 0x08, //!< Obsolete. If this bit is set then all pathnames in the SMB SHOULD be treated as case-insensitive.<26>
+    CANONICALIZED_PATHS           = 0x10, //!< Obsolescent. When set in session setup, this bit indicates that all paths sent to the server are already in canonical format. That is, all file and directory names are composed of valid file name characters in all upper-case, and that the path segments are separated by backslash characters ('\').
+    OPLOCK                        = 0x20, //!< Obsolescent. This bit has meaning only in the deprecatedSMB_COM_OPEN (0x02) Request (section 2.2.4.3.1), SMB_COM_CREATE (0x03) Request (section 2.2.4.4.1), and SMB_COM_CREATE_NEW (0x0F) Request (section 2.2.4.16.1) messages, where it is used to indicate that the client is requesting an Exclusive OpLock. It SHOULD be set to zero by the client, and ignored by the server, in all other SMB requests. If the server grants this OpLock request, then this bit SHOULD remain set in the corresponding response SMB to indicate to the client that the OpLock request was granted.
+    OPBATCH                       = 0x40, //!< Obsolescent. This bit has meaning only in the deprecated SMB_COM_OPEN (0x02) Request (section 2.2.4.3.1), SMB_COM_CREATE (0x03) Request (section 2.2.4.4.1), and SMB_COM_CREATE_NEW (0x0F) Request (section 2.2.4.16.1) messages, where it is used to indicate that the client is requesting a Batch OpLock. It SHOULD be set to zero by the client, and ignored by the server, in all other SMB requests. If the server grants this OpLock request, then this bit SHOULD remain set in the corresponding response SMB to indicate to the client that the OpLock request was granted. If the SMB_FLAGS_OPLOCK bit is clear (0), then the SMB_FLAGS_OPBATCH bit is ignored.
+    REPLY                         = 0x80, //!< When on, this message is being sent from the server in response to a client request. The Command field usually contains the same value in a protocol request from the client to the server as in the matching response from the server to the client. This bit unambiguously distinguishes the message as a server response.
+};
+
 /*! CIFS commands
  */
 enum class Commands : uint8_t
@@ -146,8 +160,8 @@ struct RawMessageHeader
     MessageHeaderHead head;//!< Head of header
     Commands cmd_code;//!< Code of SMB command
     int32_t status;//!< Used to communicate error messages from the server to the client.
-    int8_t flags;//!< 1-bit flags describing various features in effect for the message.
-    int8_t flags2[2];//!< A 16-bit field of 1-bit flags that represent various features in effect for the message. Unspecified bits are reserved and MUST be zero.
+    Flags flags;//!< 1-bit flags describing various features in effect for the message.
+    uint8_t flags2[2];//!< A 16-bit field of 1-bit flags that represent various features in effect for the message. Unspecified bits are reserved and MUST be zero.
 
     int16_t PIDHigh;//!< If set to a nonzero value, this field represents the high-order bytes of a process identifier (PID). It is combined with the PIDLow field below to form a full PID.
     union  // Depends on command
@@ -164,9 +178,15 @@ struct RawMessageHeader
     int16_t MID;//!< A multiplex identifier
 } __attribute__ ((__packed__));
 
+/*! High level user friendly message structure
+ */
 struct MessageHeader : public RawMessageHeader
 {
-
+    /*! Check flag
+     * \param flag - flag to be check
+     * \return True, if flag set, and False in other case
+     */
+    bool isFlag(const Flags flag) const;
 };
 
 /*! Check is data valid CIFS message's header and return header or nullptr

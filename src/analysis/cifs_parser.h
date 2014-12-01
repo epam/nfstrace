@@ -23,6 +23,8 @@
 #define CIFS_PARSER_H
 //------------------------------------------------------------------------------
 #include "analysis/analyzers.h"
+#include "protocols/cifs/cifs.h"
+#include "protocols/cifs2/cifs2.h"
 #include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -34,8 +36,18 @@ namespace analysis
  */
 class CIFSParser
 {
-    using FilteredDataQueue = NST::utils::FilteredDataQueue;
+    using FilteredDataQueue = NST::utils::FilteredDataQueue;//!< Packets queue
     Analyzers& analyzers;//!< Plugins manager
+
+    /*! Parses SMBv1 packet
+     * \param header - Message's header
+     */
+    inline void parse_packet(const protocols::CIFSv1::MessageHeader* header);
+
+    /*! Parses SMBv2 packet
+     * \param header - Message's header
+     */
+    inline void parse_packet(const protocols::CIFSv2::MessageHeader* header);
 public:
 
     CIFSParser(Analyzers& a);

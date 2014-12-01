@@ -37,13 +37,13 @@ namespace CIFSv2
  */
 enum class Flags : uint32_t
 {
-    SMB2_FLAGS_SERVER_TO_REDIR      = 0x00000001, //!< When set, indicates the message is a response, rather than a request. This MUST be set on responses sent from the server to the client and MUST NOT be set on requests sent from the client to the server.
-    SMB2_FLAGS_ASYNC_COMMAND        = 0x00000002, //!< When set, indicates that this is an ASYNC SMB2 header. This flag MUST NOT be set when using the SYNC SMB2 header.
-    SMB2_FLAGS_RELATED_OPERATIONS   = 0x00000004, //!< When set in an SMB2 request, indicates that this request is a related operation in a compounded request chain. The use of this flag in an SMB2 request is as specified in 3.2.4.1.4.
-                                                  //!< When set in an SMB2 compound response, indicates that the request corresponding to this response was part of a related operation in a compounded request chain. The use of this flag in an SMB2 response is as specified in 3.3.5.2.7.2.
-    SMB2_FLAGS_SIGNED               = 0x00000008, //!< When set, indicates that this packet has been signed. The use of this flag is as specified in 3.1.5.1.
-    SMB2_FLAGS_DFS_OPERATIONS       = 0x10000000, //!< When set, indicates that this command is a DFS operation. The use of this flag is as specified in 3.3.5.9.
-    SMB2_FLAGS_REPLAY_OPERATION     = 0x20000000  //!< This flag is only valid for the SMB 3.x dialect family. When set, it indicates that this command is a replay operation. The client MUST ignore this bit on receipt.
+    SERVER_TO_REDIR      = 0x00000001, //!< When set, indicates the message is a response, rather than a request. This MUST be set on responses sent from the server to the client and MUST NOT be set on requests sent from the client to the server.
+    ASYNC_COMMAND        = 0x00000002, //!< When set, indicates that this is an ASYNC SMB2 header. This flag MUST NOT be set when using the SYNC SMB2 header.
+    RELATED_OPERATIONS   = 0x00000004, //!< When set in an SMB2 request, indicates that this request is a related operation in a compounded request chain. The use of this flag in an SMB2 request is as specified in 3.2.4.1.4.
+                                       //!< When set in an SMB2 compound response, indicates that the request corresponding to this response was part of a related operation in a compounded request chain. The use of this flag in an SMB2 response is as specified in 3.3.5.2.7.2.
+    SIGNED               = 0x00000008, //!< When set, indicates that this packet has been signed. The use of this flag is as specified in 3.1.5.1.
+    DFS_OPERATIONS       = 0x10000000, //!< When set, indicates that this command is a DFS operation. The use of this flag is as specified in 3.3.5.9.
+    REPLAY_OPERATION     = 0x20000000  //!< This flag is only valid for the SMB 3.x dialect family. When set, it indicates that this command is a replay operation. The client MUST ignore this bit on receipt.
 };
 
 /*! CIFS v2 commands
@@ -73,7 +73,7 @@ enum class Commands : uint16_t
 
 /*! \class Raw CIFS v2 message header
  */
-struct MessageHeader
+struct RawMessageHeader
 {
     CIFSv1::MessageHeaderHead head;//!< Same head as CIFS v1
 
@@ -106,6 +106,17 @@ struct MessageHeader
     int64_t SessionId;//!< Uniquely identifies the established session for the command
     int32_t Signature[4];//!< he 16-byte signature of the message, if SMB2_FLAGS_SIGNED is set in the Flags field of the SMB2 header. If the message is not signed, this field MUST be 0.
 } __attribute__ ((__packed__));
+
+/*! High level user friendly message structure
+ */
+struct MessageHeader : public RawMessageHeader
+{
+    /*! Check flag
+     * \param flag - flag to be check
+     * \return True, if flag set, and False in other case
+     */
+    bool isFlag(const Flags flag) const;
+};
 
 /*! Check is data valid CIFS message's header and return header or nullptr
  * \param data - raw packet data
