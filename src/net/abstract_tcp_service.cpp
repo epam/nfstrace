@@ -130,17 +130,25 @@ void AbstractTcpService::runListener()
 			// Timeout expired
 			continue;
 		} else if (descriptorsCount < 0) {
-			// TODO: Several first pselect(2) calls cause "Interrupted system call" error (errno == EINTR)
-			// if drop privileges option is used on Linux (see https://access.redhat.com/solutions/165483)
-			// TODO: Use general logging
 			std::system_error e(errno, std::system_category(), "Awaiting for incoming connection on server socket error");
+			// TODO: Use general logging
 			std::cerr << e.what() << std::endl;
-			continue;
+#ifdef __gnu_linux__
+			// Several first pselect(2) calls cause "Interrupted system call" error (errno == EINTR)
+			// if drop privileges option is used on Linux (see https://access.redhat.com/solutions/165483)
+			if (errno == EINTR) {
+				continue;
+			}
+#endif
+			throw e;
 		}
 		// Extracting and returning pending connection
 		int pendingSocketDescriptor = accept(_serverSocket, NULL, NULL);
 		if (pendingSocketDescriptor < 0) {
-			throw std::runtime_error("Accepting incoming connection on server socket error");
+			std::system_error e(errno, std::system_category(), "Accepting incoming connection on server socket error");
+			// TODO: Use general logging
+			std::cerr << e.what() << std::endl;
+			throw e;
 		}
 		// Create and enqueue task
 		std::unique_ptr<AbstractTask> newTask(createTask(pendingSocketDescriptor));
@@ -151,9 +159,10 @@ void AbstractTcpService::runListener()
 				newTask.release();
 				_tasksQueueCond.notify_one();
 			} else {
-				// TODO: To log overload event
 				// Just close pending socket on overload
 				close(pendingSocketDescriptor);
+				// TODO: Use general logging
+				std::cerr << "Tasks queue overload has been detected" << std::endl;
 			}
 		}
 	}
