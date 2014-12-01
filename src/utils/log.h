@@ -63,6 +63,8 @@ public:
         Global(const Global&)            = delete;
         Global& operator=(const Global&) = delete;
         void reopen();
+    private:
+        const std::string addtimestamp(const std::string&);
     };
 
     Log();
