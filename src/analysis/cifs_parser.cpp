@@ -57,7 +57,7 @@ void CIFSParser::parse_packet(const CIFSv1::MessageHeader* request, NST::utils::
     if (request->isFlag(Flags::REPLY))
     {
         // It is response
-        if (CIFSSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY))
+        if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY))
         {
             FilteredDataQueue::Ptr&& requestData = session->get_call_data(request->sec.CID);
             if (requestData)
@@ -74,7 +74,7 @@ void CIFSParser::parse_packet(const CIFSv1::MessageHeader* request, NST::utils::
     else
     {
         // It is request
-        if (CIFSSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL))
+        if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL))
         {
             return session->save_call_data(request->sec.CID, std::move(ptr));
         }
@@ -90,7 +90,7 @@ void CIFSParser::parse_packet(const CIFSv2::MessageHeader* request, NST::utils::
     if (request->isFlag(Flags::SERVER_TO_REDIR))
     {
         // It is response
-        if (CIFSSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY))
+        if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY))
         {
             FilteredDataQueue::Ptr&& requestData = session->get_call_data(request->SessionId);
             if (requestData)
@@ -107,7 +107,7 @@ void CIFSParser::parse_packet(const CIFSv2::MessageHeader* request, NST::utils::
     else
     {
         // It is request
-        if (CIFSSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL))
+        if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL))
         {
             return session->save_call_data(request->SessionId, std::move(ptr));
         }
@@ -333,43 +333,4 @@ void CIFSParser::analyse_operation(const CIFSv2::MessageHeader* request,
     default:
         LOG("Usupported command");
     }
-}
-
-CIFSParser::CIFSSession::CIFSSession(const utils::NetworkSession& s, utils::Session::Direction call_direction)
-    : utils::ApplicationSession {s, call_direction}
-{
-    utils::Out message;
-    message << "Detect session " << str();
-}
-
-void CIFSParser::CIFSSession::save_call_data(const uint32_t CID, NST::utils::FilteredDataQueue::Ptr&& data)
-{
-    NST::utils::FilteredDataQueue::Ptr& e = operations[CID];
-    if (e)                  // cid call already exists
-    {
-        LOG("replace CIFS Call CID:%u for %s", CID, str().c_str());
-    }
-
-    e = std::move(data);    // replace existing or set new
-}
-NST::utils::FilteredDataQueue::Ptr CIFSParser::CIFSSession::get_call_data(const uint32_t CID)
-{
-    auto i = operations.find(CID);
-    if (i != operations.end())
-    {
-        FilteredDataQueue::Ptr ptr {std::move(i->second)};
-        operations.erase(i);
-        return ptr;
-    }
-    else
-    {
-        LOG("CIFS Call CID:%u is not found for %s", CID, str().c_str());
-    }
-
-    return FilteredDataQueue::Ptr {};
-}
-
-inline const Session* CIFSParser::CIFSSession::get_session() const
-{
-    return this;
 }
