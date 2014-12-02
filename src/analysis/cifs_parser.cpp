@@ -35,13 +35,13 @@ CIFSParser::CIFSParser(Analyzers& a) :
 
 void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr&& data)
 {
-    if (const CIFSv1::MessageHeader* header = CIFSv1::get_header(data->data))
+    if (const CIFSv1::MessageHeader* request = CIFSv1::get_header(data->data))
     {
-        parse_packet(header, std::move(data));
+        parse_packet(request, std::move(data));
     }
-    else if (const CIFSv2::MessageHeader* header = CIFSv2::get_header(data->data))
+    else if (const CIFSv2::MessageHeader* request = CIFSv2::get_header(data->data))
     {
-        parse_packet(header);
+        parse_packet(request, std::move(data));
     }
     else
     {
@@ -49,21 +49,21 @@ void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr&& data)
     }
 }
 
-void CIFSParser::parse_packet(const CIFSv1::MessageHeader *header, NST::utils::FilteredDataQueue::Ptr&& ptr)
+void CIFSParser::parse_packet(const CIFSv1::MessageHeader *request, NST::utils::FilteredDataQueue::Ptr&& ptr)
 {
     using namespace NST::API::SMBv1;
     using namespace NST::protocols::CIFSv1;
 
-    if (header->isFlag(Flags::REPLY))
+    if (request->isFlag(Flags::REPLY))
     {// It is response
         if (CIFSSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY))
         {
-            FilteredDataQueue::Ptr&& requestData = session->get_call_data(header->sec.CID);
+            FilteredDataQueue::Ptr&& requestData = session->get_call_data(request->sec.CID);
             if (requestData)
             {
-                if(const CIFSv1::MessageHeader *request = CIFSv1::get_header(requestData->data))
+                if(const MessageHeader *request = get_header(requestData->data))
                 {
-                    return analyse_operation(request, header, std::move(requestData), std::move(ptr));
+                    return analyse_operation(request, request, std::move(requestData), std::move(ptr));
                 }
                 LOG("Can't find request for response");
             }
@@ -74,13 +74,41 @@ void CIFSParser::parse_packet(const CIFSv1::MessageHeader *header, NST::utils::F
     {// It is request
         if (CIFSSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL))
         {
-            session->save_call_data(header->sec.CID, std::move(ptr));
-            return;
+            return session->save_call_data(request->sec.CID, std::move(ptr));
         }
         LOG("Can't get right CIFS session");
-        return;
     }
+}
 
+void CIFSParser::parse_packet(const CIFSv2::MessageHeader *request, NST::utils::FilteredDataQueue::Ptr&& ptr)
+{
+    using namespace NST::API::SMBv2;
+    using namespace NST::protocols::CIFSv2;
+
+    if (request->isFlag(Flags::SERVER_TO_REDIR))
+    {// It is response
+        if (CIFSSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY))
+        {
+            FilteredDataQueue::Ptr&& requestData = session->get_call_data(request->SessionId);
+            if (requestData)
+            {
+                if(const MessageHeader *request = get_header(requestData->data))
+                {
+                    return analyse_operation(request, request, std::move(requestData), std::move(ptr));
+                }
+                LOG("Can't find request for response");
+            }
+            LOG("Can't find request's raw data for response");
+        }
+    }
+    else
+    {// It is request
+        if (CIFSSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL))
+        {
+            return session->save_call_data(request->SessionId, std::move(ptr));
+        }
+        LOG("Can't get right CIFS session");
+    }
 }
 
 void CIFSParser::analyse_operation(const CIFSv1::MessageHeader* request,
@@ -174,45 +202,38 @@ void CIFSParser::analyse_operation(const CIFSv1::MessageHeader* request,
     }
 }
 
-void CIFSParser::parse_packet(const CIFSv2::MessageHeader *header)
+
+void CIFSParser::analyse_operation(const CIFSv2::MessageHeader* request,
+                                   const CIFSv2::MessageHeader* /*response*/,
+                                   NST::utils::FilteredDataQueue::Ptr&& requestData,
+                                   NST::utils::FilteredDataQueue::Ptr&& responseData)
 {
     using namespace NST::API::SMBv2;
     using namespace NST::protocols::CIFSv2;
 
-    if (header->isFlag(Flags::SERVER_TO_REDIR))
-    {// It is response
-        LOG("It is response");
-    }
-    else
-    {// It is request
-
-        LOG("It is request");
-        return;
-    }
-
-    switch (header->cmd_code)
+    switch (request->cmd_code)
     {
-    case Commands::CLOSE:                  return analyzers(&IAnalyzer::ISMBv2::closeFileSMBv2,            command<CloseFileCommand>(header));
-    case Commands::NEGOTIATE:              return analyzers(&IAnalyzer::ISMBv2::negotiateSMBv2,            command<NegotiateCommand>(header));
-    case Commands::SESSION_SETUP:          return analyzers(&IAnalyzer::ISMBv2::sessionSetupSMBv2,         command<SessionSetupCommand>(header));
-    case Commands::LOGOFF:                 return analyzers(&IAnalyzer::ISMBv2::logOffSMBv2,               command<LogOffCommand>(header));
-    case Commands::TREE_CONNECT:           return analyzers(&IAnalyzer::ISMBv2::treeConnectSMBv2,          command<TreeConnectCommand>(header));
-    case Commands::TREE_DISCONNECT:        return analyzers(&IAnalyzer::ISMBv2::treeDisconnectSMBv2,       command<TreeDisconnectCommand>(header));
-    case Commands::CREATE:                 return analyzers(&IAnalyzer::ISMBv2::createSMBv2,               command<CreateCommand>(header));
-    case Commands::FLUSH:                  return analyzers(&IAnalyzer::ISMBv2::flushSMBv2,                command<FlushCommand>(header));
-    case Commands::READ:                   return analyzers(&IAnalyzer::ISMBv2::readSMBv2,                 command<ReadCommand>(header));
-    case Commands::WRITE:                  return analyzers(&IAnalyzer::ISMBv2::writeSMBv2,                command<WriteCommand>(header));
-    case Commands::LOCK:                   return analyzers(&IAnalyzer::ISMBv2::lockSMBv2,                 command<LockCommand>(header));
-    case Commands::IOCTL:                  return analyzers(&IAnalyzer::ISMBv2::ioctlSMBv2,                command<IoctlCommand>(header));
-    case Commands::CANCEL:                 return analyzers(&IAnalyzer::ISMBv2::cancelSMBv2,               command<CancelCommand>(header));
-    case Commands::ECHO:                   return analyzers(&IAnalyzer::ISMBv2::echoSMBv2,                 command<EchoCommand>(header));
-    case Commands::QUERY_DIRECTORY:        return analyzers(&IAnalyzer::ISMBv2::queryDirSMBv2,             command<QueryDirCommand>(header));
-    case Commands::CHANGE_NOTIFY:          return analyzers(&IAnalyzer::ISMBv2::changeNotifySMBv2,         command<ChangeNotifyCommand>(header));
-    case Commands::QUERY_INFO:             return analyzers(&IAnalyzer::ISMBv2::queryInfoSMBv2,            command<QueryInfoCommand>(header));
-    case Commands::SET_INFO:               return analyzers(&IAnalyzer::ISMBv2::setInfoSMBv2,              command<SetInfoCommand>(header));
-    case Commands::OPLOCK_BREAK:           return analyzers(&IAnalyzer::ISMBv2::breakOplockSMBv2,          command<BreakOpLockCommand>(header));
+    case Commands::CLOSE:                  return analyzers(&IAnalyzer::ISMBv2::closeFileSMBv2,            command<CloseFileCommand>(requestData, responseData));
+    case Commands::NEGOTIATE:              return analyzers(&IAnalyzer::ISMBv2::negotiateSMBv2,            command<NegotiateCommand>(requestData, responseData));
+    case Commands::SESSION_SETUP:          return analyzers(&IAnalyzer::ISMBv2::sessionSetupSMBv2,         command<SessionSetupCommand>(requestData, responseData));
+    case Commands::LOGOFF:                 return analyzers(&IAnalyzer::ISMBv2::logOffSMBv2,               command<LogOffCommand>(requestData, responseData));
+    case Commands::TREE_CONNECT:           return analyzers(&IAnalyzer::ISMBv2::treeConnectSMBv2,          command<TreeConnectCommand>(requestData, responseData));
+    case Commands::TREE_DISCONNECT:        return analyzers(&IAnalyzer::ISMBv2::treeDisconnectSMBv2,       command<TreeDisconnectCommand>(requestData, responseData));
+    case Commands::CREATE:                 return analyzers(&IAnalyzer::ISMBv2::createSMBv2,               command<CreateCommand>(requestData, responseData));
+    case Commands::FLUSH:                  return analyzers(&IAnalyzer::ISMBv2::flushSMBv2,                command<FlushCommand>(requestData, responseData));
+    case Commands::READ:                   return analyzers(&IAnalyzer::ISMBv2::readSMBv2,                 command<ReadCommand>(requestData, responseData));
+    case Commands::WRITE:                  return analyzers(&IAnalyzer::ISMBv2::writeSMBv2,                command<WriteCommand>(requestData, responseData));
+    case Commands::LOCK:                   return analyzers(&IAnalyzer::ISMBv2::lockSMBv2,                 command<LockCommand>(requestData, responseData));
+    case Commands::IOCTL:                  return analyzers(&IAnalyzer::ISMBv2::ioctlSMBv2,                command<IoctlCommand>(requestData, responseData));
+    case Commands::CANCEL:                 return analyzers(&IAnalyzer::ISMBv2::cancelSMBv2,               command<CancelCommand>(requestData, responseData));
+    case Commands::ECHO:                   return analyzers(&IAnalyzer::ISMBv2::echoSMBv2,                 command<EchoCommand>(requestData, responseData));
+    case Commands::QUERY_DIRECTORY:        return analyzers(&IAnalyzer::ISMBv2::queryDirSMBv2,             command<QueryDirCommand>(requestData, responseData));
+    case Commands::CHANGE_NOTIFY:          return analyzers(&IAnalyzer::ISMBv2::changeNotifySMBv2,         command<ChangeNotifyCommand>(requestData, responseData));
+    case Commands::QUERY_INFO:             return analyzers(&IAnalyzer::ISMBv2::queryInfoSMBv2,            command<QueryInfoCommand>(requestData, responseData));
+    case Commands::SET_INFO:               return analyzers(&IAnalyzer::ISMBv2::setInfoSMBv2,              command<SetInfoCommand>(requestData, responseData));
+    case Commands::OPLOCK_BREAK:           return analyzers(&IAnalyzer::ISMBv2::breakOplockSMBv2,          command<BreakOpLockCommand>(requestData, responseData));
     default:
-        break;
+        LOG("Usupported command");
     }
 }
 

@@ -46,5 +46,5 @@ const NST::protocols::CIFSv2::MessageHeader* NST::protocols::CIFSv2::get_header(
 
 bool MessageHeader::isFlag(const Flags flag) const
 {
-    return static_cast<uint32_t>(flag) & htonl(flags);
+    return static_cast<uint32_t>(flag) & flags;
 }
