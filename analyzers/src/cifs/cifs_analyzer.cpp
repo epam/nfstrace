@@ -652,7 +652,7 @@ void account(const Cmd* proc, Code cmd_code, Stats& stats)
     timeval latency {0, 0};
 
     // diff between 'reply' and 'call' timestamps
-    //timersub(0, 0, &latency);//FIXME: Latency?
+    timersub(&proc->rtimestamp, &proc->ctimestamp, &latency);
 
     ++stats.procedures_total_count;
     ++stats.procedures_count[cmd_code];
