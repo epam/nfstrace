@@ -53,7 +53,6 @@ static FILE* log_file {::stderr};
 static bool  own_file {false};
 static std::string log_file_path {};
 static std::string default_file_name{"nfstrace_logfile"};
-static const std::string extention{".log"};
 
 namespace // unnanmed
 {
@@ -64,7 +63,7 @@ static FILE* try_open(const std::string& file_name)
     if(file == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
-                               {std::string("Error in opening file: ") + file_name}};
+                               {"Error in opening file: " + file_name}};
     }
     chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
@@ -144,6 +143,8 @@ void Log::Global::reopen()
 const std::string Log::Global::addtimestamp(const std::string& path_file)
 {
     std::string tmp_path;
+    const std::string extention{".log"};
+    // check if log file path endings with the extension string
     if(path_file.size() > extention.size() && (std::string(path_file.end() - extention.size(), path_file.end()) + '\0').compare(extention))
         tmp_path = std::string(path_file.begin(), (path_file.end() - extention.size())) + "_" + std::to_string(std::time(NULL));
     else
