@@ -22,6 +22,7 @@
 #include <iostream>
 #include <string>
 #include <atomic>
+#include <chrono>
 #include <json.h>
 
 #include <api/plugin_api.h> // include plugin development definitions
@@ -32,6 +33,7 @@
 #define DEFAULT_HOST TcpEndpoint::WildcardAddress
 #define DEFAULT_WORKERS_AMOUNT 10U
 #define DEFAULT_BACKLOG 15
+#define DEFAULT_MAX_SERVING_DURATION_MS 500
 
 using namespace NST::net;
 
@@ -41,9 +43,11 @@ class JsonTcpService : public AbstractTcpService
 {
 public:
 	JsonTcpService() = delete;
-	JsonTcpService(WebUiAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host, int backlog) :
+	JsonTcpService(WebUiAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
+			std::size_t maxServingDurationMs, int backlog) :
 		AbstractTcpService(workersAmount, port, host, backlog),
-		_analyzer(analyzer)
+		_analyzer(analyzer),
+		_maxServingDurationMs(maxServingDurationMs)
 	{}
 private:
 	class Task : public AbstractTask
@@ -66,6 +70,7 @@ private:
 	}
 
 	WebUiAnalyzer& _analyzer;
+	std::size_t _maxServingDurationMs;
 };
 
 class WebUiAnalyzer : public IAnalyzer
@@ -132,8 +137,8 @@ public:
 	    {}
     };
 
-    WebUiAnalyzer(std::size_t workersAmount, int port, const std::string& host, int backlog) :
-	_jsonTcpService(*this, workersAmount, port, host, backlog),
+    WebUiAnalyzer(std::size_t workersAmount, int port, const std::string& host, std::size_t maxServingDurationMs, int backlog) :
+	_jsonTcpService(*this, workersAmount, port, host, maxServingDurationMs, backlog),
 	_nfsV3Stat(),
 	_nfsV4Stat()
     {
@@ -360,6 +365,7 @@ private:
 
 void JsonTcpService::Task::execute()
 {
+	std::chrono::system_clock::time_point servingStarted = std::chrono::system_clock::now();
 	// Composing JSON with statistics
 	struct json_object* root = json_object_new_object();
 	struct json_object* nfsV3Stat = json_object_new_object();
@@ -394,8 +400,44 @@ void JsonTcpService::Task::execute()
 	json_object_put(root);
 	
 	// Sending JSON to the client
-	/*ssize_t bytesSent = */send(socket(), json.data(), json.size(), MSG_NOSIGNAL);
-	// TODO: Check result
+	std::size_t totalBytesSent = 0U;
+	while (totalBytesSent < json.length()) {
+		if (!_service.isRunning()) {
+			// TODO: Use general logging
+			std::cerr << "Service shutdown detected - terminating task execution" << std::endl;
+			return;
+		}
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - servingStarted).count() >
+				static_cast<std::chrono::milliseconds::rep>(_service._maxServingDurationMs)) {
+			// TODO: Use general logging
+			std::cerr << "A client is too slow - terminating task execution" << std::endl;
+			return;
+		}
+		struct timespec writeDuration;
+		AbstractTcpService::fillDuration(writeDuration);
+		fd_set writeDescriptorsSet;
+		FD_ZERO(&writeDescriptorsSet);
+		FD_SET(socket(), &writeDescriptorsSet);
+		int descriptorsCount = pselect(socket() + 1, NULL, &writeDescriptorsSet, NULL, &writeDuration, NULL);
+		if (descriptorsCount < 0) {
+			throw std::system_error(errno, std::system_category(), "Error awaiting for sending data availability on socket");
+		} else if (descriptorsCount == 0) {
+			// Timeout expired
+			continue;
+		}
+		ssize_t bytesSent = send(socket(), json.data() + totalBytesSent, json.length() - totalBytesSent, MSG_NOSIGNAL);
+		if (bytesSent < 0) {
+			std::system_error e(errno, std::system_category(), "Sending data to client error");
+			// TODO: Use general logging
+			std::cerr << e.what() << std::endl;
+			return;
+		} else if (bytesSent == 0) {
+			// TODO: Use general logging
+			std::cerr << "Connection has been aborted by client while sending data" << std::endl;
+			return;
+		}
+		totalBytesSent += bytesSent;
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -408,6 +450,7 @@ const char* usage()
 	return "host - Network interface to listen (default is to listen all interfaces)\n"
 		"port - IP-port to bind to (default is 8888)\n"
 		"workers - Amount of workers (default is 10)\n"
+		"duration - Max serving duration in milliseconds (default is 500 ms)\n"
 		"backlog - Listen backlog (default is 15)";
 }
 
@@ -415,22 +458,26 @@ IAnalyzer* create(const char* opts)
 {
 	// Initializing plugin options with default values
 	int backlog = DEFAULT_BACKLOG;
+	std::size_t maxServingDurationMs = DEFAULT_MAX_SERVING_DURATION_MS;
 	std::string host(DEFAULT_HOST);
 	int port = DEFAULT_PORT;
 	std::size_t workersAmount = DEFAULT_WORKERS_AMOUNT;
 	// Parising plugin options
 	enum {
 		BACKLOG_SUBOPT_INDEX = 0,
+		DURATION_SUBOPT_INDEX,
 		HOST_SUBOPT_INDEX,
 		PORT_SUBOPT_INDEX,
 		WORKERS_SUBOPT_INDEX
 	};
 	char backlogSubOptName[] = "backlog";
+	char durationSubOptName[] = "duration";
 	char hostSubOptName[] = "host";
 	char portSubOptName[] = "port";
 	char workersSubOptName[] = "workers";
 	char* const tokens[] = {
 		backlogSubOptName,
+		durationSubOptName,
 		hostSubOptName,
 		portSubOptName,
 		workersSubOptName,
@@ -446,6 +493,9 @@ IAnalyzer* create(const char* opts)
 			switch (optIndex) {
 			case BACKLOG_SUBOPT_INDEX:
 				backlog = std::stoi(valuep);
+				break;
+			case DURATION_SUBOPT_INDEX:
+				maxServingDurationMs = std::stoul(valuep);
 				break;
 			case HOST_SUBOPT_INDEX:
 				host = valuep;
@@ -464,7 +514,7 @@ IAnalyzer* create(const char* opts)
 		}
 	}
 	// Creating and returning plugin
-	return new WebUiAnalyzer(workersAmount, port, host, backlog);
+	return new WebUiAnalyzer(workersAmount, port, host, maxServingDurationMs, backlog);
 }
 
 void destroy(IAnalyzer* instance)
