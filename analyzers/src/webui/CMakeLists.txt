@@ -3,7 +3,8 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 find_package (JSON)
 
 if (JSON_FOUND)
-    add_library (${PROJECT_NAME} SHARED webui_analyzer.cpp
+    aux_source_directory ("." SRC_LIST)
+    add_library (${PROJECT_NAME} SHARED ${SRC_LIST}
             ../../../src/net/abstract_tcp_service.cpp
             ../../../src/net/tcp_endpoint.cpp)
     set_target_properties(${PROJECT_NAME} PROPERTIES
