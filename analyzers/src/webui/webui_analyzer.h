@@ -44,7 +44,7 @@ public:
 		std::atomic_int createOpsAmount;
 		std::atomic_int mkdirOpsAmount;
 		std::atomic_int symlinkOpsAmount;
-		std::atomic_int mkdnodOpsAmount;
+		std::atomic_int mknodOpsAmount;
 		std::atomic_int removeOpsAmount;
 		std::atomic_int rmdirOpsAmount;
 		std::atomic_int renameOpsAmount;
@@ -68,7 +68,7 @@ public:
 			createOpsAmount(0),
 			mkdirOpsAmount(0),
 			symlinkOpsAmount(0),
-			mkdnodOpsAmount(0),
+			mknodOpsAmount(0),
 			removeOpsAmount(0),
 			rmdirOpsAmount(0),
 			renameOpsAmount(0),
