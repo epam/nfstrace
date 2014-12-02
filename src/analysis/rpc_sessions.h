@@ -90,34 +90,35 @@ private:
     std::unordered_map<uint32_t, FilteredDataQueue::Ptr> operations;
 };
 
-class RPCSessions
+template <typename Session>
+class Sessions
 {
 public:
     using MsgType = NST::protocols::rpc::MsgType;
 
-    RPCSessions() = default;
-    ~RPCSessions()= default;
-    RPCSessions(const RPCSessions&)           = delete;
-    RPCSessions& operator=(const RPCSessions&) = delete;
+    Sessions() = default;
+    ~Sessions()= default;
+    Sessions(const Sessions&)           = delete;
+    Sessions& operator=(const Sessions&) = delete;
 
-    RPCSession* get_session(utils::NetworkSession* app, NST::utils::Session::Direction dir, MsgType type)
+    Session* get_session(utils::NetworkSession* app, NST::utils::Session::Direction dir, MsgType type)
     {
         if(app->application == nullptr)
         {
             if(type == MsgType::CALL) // add new session only for Call
             {
-                std::unique_ptr<RPCSession> ptr{ new RPCSession{*app, dir} };
+                std::unique_ptr<Session> ptr{ new Session{*app, dir} };
                 sessions.emplace_back(std::move(ptr));
 
                 app->application = sessions.back().get(); // set reference
             }
         }
 
-        return reinterpret_cast<RPCSession*>(app->application);
+        return reinterpret_cast<Session*>(app->application);
     }
 
 private:
-    std::vector< std::unique_ptr<RPCSession> > sessions;
+    std::vector< std::unique_ptr<Session> > sessions;
 };
 
 } // namespace analysis

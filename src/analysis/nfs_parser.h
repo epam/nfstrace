@@ -38,7 +38,7 @@ class NFSParser
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
 
     Analyzers& analyzers;
-    RPCSessions sessions;
+    Sessions<RPCSession> sessions;
 public:
 
     NFSParser(Analyzers& a) : analyzers(a) {}

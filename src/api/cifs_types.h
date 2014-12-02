@@ -22,6 +22,7 @@
 #ifndef CIFS_TYPES_H
 #define CIFS_TYPES_H
 //------------------------------------------------------------------------------
+#include <sys/time.h>
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -49,6 +50,9 @@ public:
     Session session;//!< session ID
     ArgumentType parg;//!< Arguments of specified command
     ResultType pres;//!< Results of specified command
+
+    struct timeval ctimestamp;//!< Request's time stamp
+    struct timeval rtimestamp;//!< Response's time stamp
 };
 
 using CreateDirectoryArgumentType = struct {};                                                                                   //!< CreateDirectory arguments
