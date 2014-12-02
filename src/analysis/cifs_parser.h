@@ -64,11 +64,11 @@ class CIFSParser
 
     /*! Parses SMBv1 packet
      * \param header - Message's header
-     * \param data - raw packet
+     * \param ptr - raw packet
      */
-    inline void parse_packet(const protocols::CIFSv1::MessageHeader* request, FilteredDataQueue::Ptr&& ptr);
+    inline void parse_packet(const protocols::CIFSv1::MessageHeader* header, FilteredDataQueue::Ptr&& ptr);
 
-    /*! analyses CIFS operation: request and response
+    /*! analyses CIFS v1 operation: request and response
      * \param request - Call's header
      * \param response - Reply's header
      * \param requestData - Call's data
@@ -79,11 +79,22 @@ class CIFSParser
                                   FilteredDataQueue::Ptr&& requestData,
                                   FilteredDataQueue::Ptr&& responseData);
 
-    /*! Parses SMBv2 packet
+    /*! Parses SMB v2 packet
      * \param header - Message's header
-     * \param data - raw packet
+     * \param ptr - raw packet
      */
-    inline void parse_packet(const protocols::CIFSv2::MessageHeader* request);
+    inline void parse_packet(const protocols::CIFSv2::MessageHeader* header, NST::utils::FilteredDataQueue::Ptr&& ptr);
+
+    /*! analyses CIFS v2 operation: request and response
+     * \param request - Call's header
+     * \param response - Reply's header
+     * \param requestData - Call's data
+     * \param responseData - Reply's data
+     */
+    inline void analyse_operation(const protocols::CIFSv2::MessageHeader* request,
+                                  const protocols::CIFSv2::MessageHeader* response,
+                                  FilteredDataQueue::Ptr&& requestData,
+                                  FilteredDataQueue::Ptr&& responseData);
 public:
 
     CIFSParser(Analyzers& a);

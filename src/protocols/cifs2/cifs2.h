@@ -125,14 +125,22 @@ struct MessageHeader : public RawMessageHeader
 const MessageHeader* get_header(const uint8_t* data);
 
 /*! Constructs new command for API from raw message
- * \param header - message header
+ * \param request - Call's header
+ * \param response - Reply's header
  * \return Command structure
  */
-template <typename Cmd>
-inline const Cmd command(const MessageHeader* header)
+template <typename Cmd, typename Data>
+inline const Cmd command(Data& request, Data& response)
 {
     Cmd cmd;
-    cmd.session = header->SessionId;//FIXME: size of var
+    if (const MessageHeader* header = get_header(request->data))
+    {
+        cmd.session = header->SessionId;//FIXME: size of var
+    }
+    // Set time stamps
+    cmd.ctimestamp = request->timestamp;
+    cmd.rtimestamp = response->timestamp;
+
     return cmd;
 }
 
