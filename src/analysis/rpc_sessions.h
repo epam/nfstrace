@@ -40,22 +40,22 @@ namespace NST
 namespace analysis
 {
 
-class RPCSession : public utils::ApplicationSession
+class Session : public utils::ApplicationSession
 {
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
 public:
 
-    RPCSession(const utils::NetworkSession& s, utils::Session::Direction call_direction)
+    Session(const utils::NetworkSession& s, utils::Session::Direction call_direction)
     : utils::ApplicationSession{s, call_direction}
     {
         utils::Out message;
         message << "Detect session " << str();
     }
-    ~RPCSession() = default;
-    RPCSession(const RPCSession&)            = delete;
-    RPCSession& operator=(const RPCSession&) = delete;
+    ~Session() = default;
+    Session(const Session&)            = delete;
+    Session& operator=(const Session&) = delete;
     
-    void save_nfs_call_data(const uint32_t xid, FilteredDataQueue::Ptr&& data)
+    void save_call_data(const uint32_t xid, FilteredDataQueue::Ptr&& data)
     {
         FilteredDataQueue::Ptr& e = operations[xid];
         if(e)                   // xid call already exists
@@ -65,7 +65,7 @@ public:
 
         e = std::move(data);    // replace existing or set new
     }
-    inline FilteredDataQueue::Ptr get_nfs_call_data(const uint32_t xid)
+    inline FilteredDataQueue::Ptr get_call_data(const uint32_t xid)
     {
         auto i = operations.find(xid);
         if(i != operations.end())

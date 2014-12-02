@@ -39,28 +39,8 @@ class CIFSParser
 {
     using FilteredDataQueue = NST::utils::FilteredDataQueue;//!< Packets queue
 
-    /*! \class Represents CIFS session
-     */
-    class CIFSSession : public utils::ApplicationSession
-    {
-    public:
-        CIFSSession(const utils::NetworkSession& s, utils::Session::Direction call_direction);
-        ~CIFSSession() = default;
-        CIFSSession(const CIFSSession&)            = delete;
-        CIFSSession& operator=(const CIFSSession&) = delete;
-
-        inline void save_call_data(const uint32_t CID, FilteredDataQueue::Ptr&& data);
-        inline FilteredDataQueue::Ptr get_call_data(const uint32_t xid);
-
-        inline const Session* get_session() const;
-    private:
-        // TODO: add custom allocator based on BlockAllocator
-        // to decrease cost of expensive insert/erase operations
-        std::unordered_map<uint32_t, FilteredDataQueue::Ptr> operations;
-    };
-
     Analyzers& analyzers;//!< Plugins manager
-    Sessions<CIFSSession> sessions;//!< Sessions list
+    Sessions<Session> sessions;//!< Sessions list
 
     /*! Parses SMBv1 packet
      * \param header - Message's header

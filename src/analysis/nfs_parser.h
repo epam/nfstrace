@@ -38,7 +38,7 @@ class NFSParser
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
 
     Analyzers& analyzers;
-    Sessions<RPCSession> sessions;
+    Sessions<Session> sessions;
 public:
 
     NFSParser(Analyzers& a) : analyzers(a) {}
@@ -50,7 +50,7 @@ public:
     void parse_data(FilteredDataQueue::Ptr&& data);
     void analyze_nfs_operation(FilteredDataQueue::Ptr&& call,
                                FilteredDataQueue::Ptr&& reply,
-                               RPCSession* session);
+                               Session* session);
 
 };
 
