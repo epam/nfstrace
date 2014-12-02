@@ -26,11 +26,11 @@
 #include <net/abstract_tcp_service.h>
 #include <sys/socket.h>
 
-#define AWAIT_FOR_SERVICE_STARTUP_MS 200
+#define AWAIT_FOR_SERVICE_STARTUP_MS 100
 #define LISTEN_HOST TcpEndpoint::LoopbackAddress
 #define LISTEN_PORT 8888
 #define WORKERS_AMOUNT 100
-#define RECEIVE_BUFFER_SIZE 1024
+#define RECEIVE_BUFFER_SIZE 4096
 
 using namespace NST::net;
 

@@ -1,8 +1,8 @@
-project (webui)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 find_package (JSON)
 
 if (JSON_FOUND)
+    project (webui)
     aux_source_directory ("." SRC_LIST)
     add_library (${PROJECT_NAME} SHARED ${SRC_LIST}
             ../../../src/net/abstract_tcp_service.cpp

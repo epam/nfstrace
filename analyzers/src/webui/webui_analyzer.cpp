@@ -127,7 +127,7 @@ void WebUiAnalyzer::mknod3(const struct RPCProcedure* /*proc*/,
 		const struct rpcgen::MKNOD3res* /*res*/)
 {
 	//std::cout << "WebUiAnalyzer::mknod3()" << std::endl;
-	_nfsV3Stat.mkdnodOpsAmount++;
+	_nfsV3Stat.mknodOpsAmount++;
 }
 
 void WebUiAnalyzer::remove3(const struct RPCProcedure* /*proc*/,
