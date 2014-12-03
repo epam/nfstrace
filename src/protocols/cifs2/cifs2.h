@@ -75,7 +75,10 @@ enum class Commands : uint16_t
  */
 struct RawMessageHeader
 {
-    CIFSv1::MessageHeaderHead head;//!< Same head as CIFS v1
+    union {
+        CIFSv1::MessageHeaderHead head;//!< Head of header
+        uint32_t head_code;//!< For fast checking
+    };
 
     int16_t StructureSize;//!< In the SMB 2.002 dialect, this field MUST NOT be used and MUST be reserved. The sender MUST set this to 0, and the receiver MUST ignore it. In all other dialects, this field indicates the number of credits that this request consumes.
     int16_t CreditCharge;//!< In a request, this field is interpreted in different ways depending on the SMB2 dialect. In the SMB 3.x dialect family, this field is interpreted as the ChannelSequence field followed by the Reserved field in a request.

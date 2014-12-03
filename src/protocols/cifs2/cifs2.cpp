@@ -19,27 +19,23 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <cstring>
-#include <map>
-#include <string>
-
-#include <arpa/inet.h>
-
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFSv2;
 
+union SMBCode {
+    const uint8_t codes[4] = {static_cast<uint8_t>(NST::protocols::CIFSv1::ProtocolCodes::SMB2), 'S', 'M', 'B'};
+    uint32_t code;
+};
+
 const NST::protocols::CIFSv2::MessageHeader* NST::protocols::CIFSv2::get_header(const uint8_t* data)
 {
-    static const char* const smbProtocolName = "SMB";
+    static SMBCode code;
     const MessageHeader* header (reinterpret_cast<const MessageHeader*>(data));
-    if (std::memcmp(header->head.protocol, smbProtocolName, sizeof(header->head.protocol)) == 0)//FIXME: get rid of memcmp
+    if (header->head_code == code.code)
     {
-        if (header->head.protocol_code == NST::protocols::CIFSv1::ProtocolCodes::SMB2)
-        {
-            return header;
-        }
+        return header;
     }
     return nullptr;
 }

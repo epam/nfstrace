@@ -157,7 +157,10 @@ struct SecurityField
  */
 struct RawMessageHeader
 {
-    MessageHeaderHead head;//!< Head of header
+    union {
+        MessageHeaderHead head;//!< Head of header
+        uint32_t head_code;//!< For fast checking
+    };
     Commands cmd_code;//!< Code of SMB command
     int32_t status;//!< Used to communicate error messages from the server to the client.
     Flags flags;//!< 1-bit flags describing various features in effect for the message.
