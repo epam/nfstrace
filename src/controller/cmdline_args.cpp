@@ -52,7 +52,7 @@ Opt Args::options[Args::num] =
     {'a', "analysis",   Opt::MUL, "",                    "specify the path to an analysis module and set it's options (if any)","PATH#opt1,opt2=val,...", nullptr, false},
     {'I', "ifile",      Opt::REQ, "PROGRAMNAME-BPF.pcap","specify the input file for " STAT " mode, the '-' means stdin",       "PATH",                   nullptr, false},
     {'O', "ofile",      Opt::REQ, "PROGRAMNAME-BPF.pcap","specify the output file for " DUMP " mode, the '-' means stdout",     "PATH",                   nullptr, false},
-    {'o', "log",        Opt::REQ, "nfstrace_logfile",    "specify the log file path",                                           "PATH",                   nullptr, false},
+    {'o', "log",        Opt::REQ, "nfstrace.log",        "specify the log file path",                                           "PATH",                   nullptr, false},
     {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file",                                "\"shell command\"",      nullptr, false},
     {'D', "dump-size",  Opt::REQ, "0",                   "set the size of dumping file portion, 0 means no limit",              "MBytes",                 nullptr, false},
     {'L', "list",       Opt::NOA, "false",               "list all available network interfaces and exit",                      nullptr,                  nullptr, false},
