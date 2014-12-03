@@ -48,10 +48,10 @@ void NFSParser::parse_data(FilteredDataQueue::Ptr&& ptr)
         if(RPCValidator::check(call) && (protocols::NFS4::Validator::check(call) ||
                                          protocols::NFS3::Validator::check(call)))
         {
-            RPCSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL);
+            Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL);
             if(session)
             {
-                session->save_nfs_call_data(call->xid(), std::move(ptr));
+                session->save_call_data(call->xid(), std::move(ptr));
             }
         }
     }
@@ -63,10 +63,10 @@ void NFSParser::parse_data(FilteredDataQueue::Ptr&& ptr)
 
         if(!RPCValidator::check(reply)) return;
 
-        RPCSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY);
+        Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY);
         if(session)
         {
-            FilteredDataQueue::Ptr&& call_data = session->get_nfs_call_data(reply->xid());
+            FilteredDataQueue::Ptr&& call_data = session->get_call_data(reply->xid());
             if(call_data)
             {
                 analyze_nfs_operation(std::move(call_data), std::move(ptr), session);
@@ -79,7 +79,7 @@ void NFSParser::parse_data(FilteredDataQueue::Ptr&& ptr)
 
 void NFSParser::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
                                              FilteredDataQueue::Ptr&& reply,
-                                             RPCSession* session)
+                                             Session* session)
 {
     using namespace NST::protocols::rpc;
     using namespace NST::protocols::NFS3;

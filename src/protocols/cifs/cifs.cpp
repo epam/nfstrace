@@ -19,25 +19,27 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <cstring>
-#include <map>
-#include <string>
-
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
-using namespace NST::protocols::CIFS;
+using namespace NST::protocols::CIFSv1;
 
-static const char* const smbProtocolName = "SMB";
+union SMBCode {
+    const uint8_t codes[4] = {static_cast<uint8_t>(ProtocolCodes::SMB1), 'S', 'M', 'B'};
+    uint32_t code;
+};
 
-const NST::protocols::CIFS::MessageHeader* NST::protocols::CIFS::get_header(const uint8_t* data)
+const NST::protocols::CIFSv1::MessageHeader* NST::protocols::CIFSv1::get_header(const uint8_t* data)
 {
+    static SMBCode code;
     const MessageHeader* header (reinterpret_cast<const MessageHeader*>(data));
-    if (std::memcmp(header->head.protocol, smbProtocolName, sizeof(header->head.protocol)) == 0)
+    if (header->head_code == code.code)
     {
-        if (header->head.protocol_code == ProtocolCodes::SMB1)
-        {
-            return header;
-        }
+        return header;
     }
     return nullptr;
+}
+
+bool MessageHeader::isFlag(const Flags flag) const
+{
+    return static_cast<const uint8_t>(flag) & static_cast<const uint8_t>(flags);
 }
