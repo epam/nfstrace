@@ -51,8 +51,6 @@ namespace utils
 
 static FILE* log_file {::stderr};
 static bool  own_file {false};
-static std::string log_file_path {};
-static std::string default_file_name{"nfstrace_logfile"};
 
 namespace // unnanmed
 {
@@ -78,29 +76,39 @@ static FILE* try_open(const std::string& file_name)
 } // namespace unnamed
 
 Log::Global::Global(const std::string& path)
+    : default_file_name {"nfstrace.log"}
+    , log_file_path     {path}
 {
     if(own_file)
     {
         throw std::runtime_error{"Global Logger already have been created."};
     }
-    std::string path_file(path);
-    if(!path_file.empty())
+
+    if(!log_file_path.empty())
     {
         struct stat st;
-        if(!stat(path_file.c_str(), &st) && S_ISDIR(st.st_mode))
+        if(!stat(log_file_path.c_str(), &st) && S_ISDIR(st.st_mode))
         {
-            if(path_file[path_file.size() - 1] == '/')
-                path_file = path_file + default_file_name;
-            else
-                path_file = path_file + '/' + default_file_name;
+            log_file_path = log_file_path + '/' + default_file_name;
         }
-        default_file_name = path_file;
     }
     else
     {
-        path_file = default_file_name;
+        log_file_path = default_file_name;
     }
-    log_file_path = addtimestamp(path_file);
+
+    // Add timestamp before extention (if there is one)
+    std::string::size_type ext_idx = log_file_path.rfind('.');
+
+    if(ext_idx != std::string::npos)
+    {
+        log_file_path.insert(ext_idx, "_" + std::to_string(std::time(0)));
+    }
+    else
+    {
+        log_file_path = log_file_path + "_" + std::to_string(std::time(0));
+    }
+
     FILE* file = try_open(log_file_path);
     if(file == nullptr)
     {
@@ -109,7 +117,7 @@ Log::Global::Global(const std::string& path)
     }
     if(utils::Out message{})
     {
-        message << "Log folder: " << log_file_path;
+        message << "Log file: " << log_file_path;
     }
 
     log_file = file;
@@ -138,19 +146,6 @@ void Log::Global::reopen()
                                {std::string{"Can't reopen file: "} + log_file_path}};
     }
     log_file = temp;
-}
-
-const std::string Log::Global::addtimestamp(const std::string& path_file)
-{
-    std::string tmp_path;
-    const std::string extention{".log"};
-    // check if log file path endings with the extension string
-    if(path_file.size() > extention.size() && (std::string(path_file.end() - extention.size(), path_file.end()) + '\0').compare(extention))
-        tmp_path = std::string(path_file.begin(), (path_file.end() - extention.size())) + "_" + std::to_string(std::time(NULL));
-    else
-        tmp_path = path_file + "_" + std::to_string(std::time(NULL));
-    tmp_path += extention;
-    return tmp_path;
 }
 
 Log::Log()

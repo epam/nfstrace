@@ -64,7 +64,8 @@ public:
         Global& operator=(const Global&) = delete;
         void reopen();
     private:
-        const std::string addtimestamp(const std::string&);
+        std::string default_file_name;
+        std::string log_file_path;
     };
 
     Log();
