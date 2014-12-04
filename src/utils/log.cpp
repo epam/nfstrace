@@ -98,17 +98,8 @@ Log::Global::Global(const std::string& path)
         log_file_path = default_file_name;
     }
 
-    // Add timestamp before extention (if there is one)
-    std::string::size_type ext_idx = log_file_path.rfind('.');
-
-    if(ext_idx != std::string::npos)
-    {
-        log_file_path.insert(ext_idx, "_" + std::to_string(std::time(0)));
-    }
-    else
-    {
-        log_file_path = log_file_path + "_" + std::to_string(std::time(0));
-    }
+    // Append timestamp
+    log_file_path = log_file_path + "." + std::to_string(std::time(0));
 
     FILE* file = try_open(log_file_path);
     if(file == nullptr)
