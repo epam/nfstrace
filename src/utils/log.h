@@ -64,7 +64,6 @@ public:
         Global& operator=(const Global&) = delete;
         void reopen();
     private:
-        std::string default_file_name;
         std::string log_file_path;
     };
 

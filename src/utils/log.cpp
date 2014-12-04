@@ -76,13 +76,14 @@ static FILE* try_open(const std::string& file_name)
 } // namespace unnamed
 
 Log::Global::Global(const std::string& path)
-    : default_file_name {"nfstrace.log"}
-    , log_file_path     {path}
+    : log_file_path {path}
 {
     if(own_file)
     {
         throw std::runtime_error{"Global Logger already have been created."};
     }
+
+    const std::string default_file_name {"nfstrace.log"};
 
     if(!log_file_path.empty())
     {
