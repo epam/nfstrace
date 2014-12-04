@@ -67,7 +67,7 @@ public:
     inline void reset()
     {
         msg_len = 0;
-        hdr_len = 0;
+        to_be_copied = 0;
         collection.reset(); // data in external memory freed
     }
 
@@ -81,7 +81,7 @@ public:
     {
         if (msg_len != 0)
         {
-            if (hdr_len == 0 && msg_len >= n)
+            if (to_be_copied == 0 && msg_len >= n)
             {
                 TRACE("We are lost %u bytes of payload marked for discard", n);
                 msg_len -= n;
@@ -106,26 +106,26 @@ public:
         {
             if (msg_len)   // we are on-stream and we are looking to some message
             {
-                if (hdr_len)
+                if (to_be_copied)
                 {
                     // hdr_len != 0, readout a part of header of current message
-                    if (hdr_len > info.dlen) // got new part of header (not the all!)
+                    if (to_be_copied > info.dlen) // got new part of header (not the all!)
                     {
                         //TRACE("got new part of header (not the all!)");
                         collection.push(info, info.dlen);
-                        hdr_len     -= info.dlen;
+                        to_be_copied     -= info.dlen;
                         msg_len     -= info.dlen;
                         info.dlen = 0;  // return from while
                     }
                     else // hdr_len <= dlen, current message will be complete, also we have some additional data
                     {
                         //TRACE("current message will be complete, also we have some additional data");
-                        collection.push(info, hdr_len);
-                        info.dlen   -= hdr_len;
-                        info.data   += hdr_len;
+                        collection.push(info, to_be_copied);
+                        info.dlen   -= to_be_copied;
+                        info.data   += to_be_copied;
 
-                        msg_len -= hdr_len;
-                        hdr_len = 0;
+                        msg_len -= to_be_copied;
+                        to_be_copied = 0;
 
                         collection.skip_first(sizeof(NetBIOS::MessageHeader));
                         collection.complete(info);    // push complete message to queue
@@ -157,38 +157,14 @@ public:
         }
     }
 
-    static inline size_t header_length(const uint8_t* data, size_t size)
+    bool collect_header(PacketInfo& info)
     {
-        static const size_t base_header_len
-        {
-            sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead)
-        };
-        size_t header_len {sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeader)};
-        if (size >= base_header_len)//FIXME: Move to protocol
-        {
-            if (CIFSv1::get_header(data))//FIXME: do it twice
-            {
-                header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeader);//FIXME: doesn't matter
-            }
-            else if (CIFSv2::get_header(data))//FIXME: do it twice
-            {
-                header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::MessageHeader);
-            }
-        }
-        return header_len;
-    }
-
-    inline bool collect_header(PacketInfo& info)
-    {
+        static const size_t header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
         if (collection && (collection.data_size() > 0)) // collection is allocated
         {
-            size_t header_len = header_length(collection.data(), collection.data_size());
 
             assert(collection.capacity() >= header_len);
-            const unsigned long tocopy
-            {
-                header_len - collection.data_size()
-            };
+            const unsigned long tocopy {header_len - collection.data_size()};
             assert(tocopy != 0);
             if (info.dlen < tocopy)
             {
@@ -206,8 +182,6 @@ public:
         }
         else // collection is empty
         {
-            size_t header_len = header_length(info.data, info.dlen);
-
             collection.allocate(); // allocate new collection from writer
             if (info.dlen >= header_len) // is data enough to message validation?
             {
@@ -230,19 +204,16 @@ public:
     void read_message(const NetBIOS::MessageHeader* nb_header, const Header*, PacketInfo& info)
     {
         msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
-        hdr_len = (sizeof(NetBIOS::MessageHeader) + sizeof(Header) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(Header) : msg_len);
+        to_be_copied = (sizeof(NetBIOS::MessageHeader) + sizeof(Header) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(Header) : msg_len);
 
         assert(msg_len != 0);   // message is found
         assert(msg_len >= collection.data_size());
-        assert(hdr_len <= msg_len);
+        assert(to_be_copied <= msg_len);
 
-        const uint32_t written
-        {
-            collection.data_size()
-        };
+        const uint32_t written {collection.data_size()};
         msg_len -= written; // substract how written (if written)
-        hdr_len -= std::min(hdr_len, written);
-        if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
+        to_be_copied -= std::min(to_be_copied, written);
+        if (0 == to_be_copied)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
             // Next find message call will finding next message
         {
             collection.skip_first(sizeof(NetBIOS::MessageHeader));
@@ -252,7 +223,7 @@ public:
     }
 
     // Find next message in packet info
-    inline void find_message(PacketInfo& info)
+    void find_message(PacketInfo& info)
     {
         assert(msg_len == 0);   // Message still undetected
 
@@ -276,7 +247,7 @@ public:
         }
 
         assert(msg_len == 0);   // message is not found
-        assert(hdr_len == 0);   // header should be skipped
+        assert(to_be_copied == 0);   // header should be skipped
         collection.reset();     // skip collected data
         //[ Optimization ] skip data of current packet at all
         info.dlen = 0;
@@ -284,7 +255,7 @@ public:
 
 private:
     uint32_t msg_len;  // length of current RPC message + RM
-    uint32_t hdr_len;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
+    uint32_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
 
     typename Writer::Collection collection;// storage for collection packet data
 };

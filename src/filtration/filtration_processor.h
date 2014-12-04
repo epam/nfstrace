@@ -550,7 +550,9 @@ public:
         assert(msg_len == 0);   // RPC Message still undetected
 
         if (!collect_header(info))
+        {
             return;
+        }
 
         assert(collection);     // collection must be initialized
 
