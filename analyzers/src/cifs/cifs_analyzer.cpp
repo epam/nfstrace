@@ -652,15 +652,15 @@ void account(const Cmd* proc, Code cmd_code, Stats& stats)
     timeval latency {0, 0};
 
     // diff between 'reply' and 'call' timestamps
-    timersub(&proc->rtimestamp, &proc->ctimestamp, &latency);
+    timersub(proc->rtimestamp, proc->ctimestamp, &latency);
 
     ++stats.procedures_total_count;
     ++stats.procedures_count[cmd_code];
 
-    i = stats.per_procedure_statistic.find(proc->session);
+    i = stats.per_procedure_statistic.find(*proc->session);
     if (i == stats.per_procedure_statistic.end())
     {
-        auto session_res = stats.per_procedure_statistic.emplace(proc->session, typename Stats::Breakdown {});
+        auto session_res = stats.per_procedure_statistic.emplace(*proc->session, typename Stats::Breakdown {});
         if (session_res.second == false)
         {
             return;
@@ -675,12 +675,25 @@ void account(const Cmd* proc, Code cmd_code, Stats& stats)
  */
 class CIFSBreakdownAnalyzer : public IAnalyzer
 {
+protected:
+    /*! \class Comparator for session
+     */
+    struct Less
+    {
+        bool operator() (const Session& a, const Session& b) const
+        {
+            return ((a.port[0] < b.port[0]) && (a.port[1] <= b.port[1])) ||
+                   ((a.ip.v4.addr[0] < b.ip.v4.addr[0]) && (a.ip.v4.addr[1] <= b.ip.v4.addr[1]));
+        }
+    };
+
+private:
     /*! \class All statistic data
      */
     struct Statistic
     {
         using Breakdown = BreakdownCounter<long double, OnlineVariance, static_cast<int>(SMBv1Commands::COUNT)>;
-        using PerOpStat = std::map<SMBv1::Session, Breakdown>;
+        using PerOpStat = std::map<Session, Breakdown, Less>;
         using ProceduresCount = std::map<SMBv1Commands, int>;
 
         uint64_t procedures_total_count;//!< Total amount of procedures
@@ -1091,7 +1104,7 @@ class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
     struct Statistic
     {
         using Breakdown = BreakdownCounter<long double, OnlineVariance, static_cast<int>(SMBv2Commands::COUNT)>;
-        using PerOpStat = std::map<SMBv1::Session, Breakdown>;
+        using PerOpStat = std::map<Session, Breakdown, Less>;
         using ProceduresCount = std::map<SMBv2Commands, int>;
 
         uint64_t procedures_total_count;//!< Total amount of procedures

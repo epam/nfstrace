@@ -38,70 +38,70 @@ namespace API
 class INFSv3rpcgen
 {
 public:
-    virtual void null(const struct RPCProcedure*,
+    virtual void null(const RPCProcedure*,
                       const struct rpcgen::NULL3args*,
                       const struct rpcgen::NULL3res*) {}
-    virtual void getattr3(const struct RPCProcedure*,
+    virtual void getattr3(const RPCProcedure*,
                           const struct rpcgen::GETATTR3args*,
                           const struct rpcgen::GETATTR3res*) {}
-    virtual void setattr3(const struct RPCProcedure*,
+    virtual void setattr3(const RPCProcedure*,
                           const struct rpcgen::SETATTR3args*,
                           const struct rpcgen::SETATTR3res*) {}
-    virtual void lookup3(const struct RPCProcedure*,
+    virtual void lookup3(const RPCProcedure*,
                          const struct rpcgen::LOOKUP3args*,
                          const struct rpcgen::LOOKUP3res*) {}
-    virtual void access3(const struct RPCProcedure*,
+    virtual void access3(const RPCProcedure*,
                          const struct rpcgen::ACCESS3args*,
                          const struct rpcgen::ACCESS3res*) {}
-    virtual void readlink3(const struct RPCProcedure*,
+    virtual void readlink3(const RPCProcedure*,
                            const struct rpcgen::READLINK3args*,
                            const struct rpcgen::READLINK3res*) {}
-    virtual void read3(const struct RPCProcedure*,
+    virtual void read3(const RPCProcedure*,
                        const struct rpcgen::READ3args*,
                        const struct rpcgen::READ3res*) {}
-    virtual void write3(const struct RPCProcedure*,
+    virtual void write3(const RPCProcedure*,
                         const struct rpcgen::WRITE3args*,
                         const struct rpcgen::WRITE3res*) {}
-    virtual void create3(const struct RPCProcedure*,
+    virtual void create3(const RPCProcedure*,
                          const struct rpcgen::CREATE3args*,
                          const struct rpcgen::CREATE3res*) {}
-    virtual void mkdir3(const struct RPCProcedure*,
+    virtual void mkdir3(const RPCProcedure*,
                         const struct rpcgen::MKDIR3args*,
                         const struct rpcgen::MKDIR3res*) {}
-    virtual void symlink3(const struct RPCProcedure*,
+    virtual void symlink3(const RPCProcedure*,
                           const struct rpcgen::SYMLINK3args*,
                           const struct rpcgen::SYMLINK3res*) {}
-    virtual void mknod3(const struct RPCProcedure*,
+    virtual void mknod3(const RPCProcedure*,
                         const struct rpcgen::MKNOD3args*,
                         const struct rpcgen::MKNOD3res*) {}
-    virtual void remove3(const struct RPCProcedure*,
+    virtual void remove3(const RPCProcedure*,
                          const struct rpcgen::REMOVE3args*,
                          const struct rpcgen::REMOVE3res*) {}
-    virtual void rmdir3(const struct RPCProcedure*,
+    virtual void rmdir3(const RPCProcedure*,
                         const struct rpcgen::RMDIR3args*,
                         const struct rpcgen::RMDIR3res*) {}
-    virtual void rename3(const struct RPCProcedure*,
+    virtual void rename3(const RPCProcedure*,
                          const struct rpcgen::RENAME3args*,
                          const struct rpcgen::RENAME3res*) {}
-    virtual void link3(const struct RPCProcedure*,
+    virtual void link3(const RPCProcedure*,
                        const struct rpcgen::LINK3args*,
                        const struct rpcgen::LINK3res*) {}
-    virtual void readdir3(const struct RPCProcedure*,
+    virtual void readdir3(const RPCProcedure*,
                           const struct rpcgen::READDIR3args*,
                           const struct rpcgen::READDIR3res*) {}
-    virtual void readdirplus3(const struct RPCProcedure*,
+    virtual void readdirplus3(const RPCProcedure*,
                               const struct rpcgen::READDIRPLUS3args*,
                               const struct rpcgen::READDIRPLUS3res*) {}
-    virtual void fsstat3(const struct RPCProcedure*,
+    virtual void fsstat3(const RPCProcedure*,
                          const struct rpcgen::FSSTAT3args*,
                          const struct rpcgen::FSSTAT3res*) {}
-    virtual void fsinfo3(const struct RPCProcedure*,
+    virtual void fsinfo3(const RPCProcedure*,
                          const struct rpcgen::FSINFO3args*,
                          const struct rpcgen::FSINFO3res*) {}
-    virtual void pathconf3(const struct RPCProcedure*,
+    virtual void pathconf3(const RPCProcedure*,
                            const struct rpcgen::PATHCONF3args*,
                            const struct rpcgen::PATHCONF3res*) {}
-    virtual void commit3(const struct RPCProcedure*,
+    virtual void commit3(const RPCProcedure*,
                          const struct rpcgen::COMMIT3args*,
                          const struct rpcgen::COMMIT3res*) {}
 };
@@ -109,10 +109,10 @@ public:
 class INFSv4rpcgen
 {
 public:
-    virtual void null(const struct RPCProcedure*,
+    virtual void null(const RPCProcedure*,
                       const struct rpcgen::NULL4args*,
                       const struct rpcgen::NULL4res*) {}
-    virtual void compound4(const struct RPCProcedure*,
+    virtual void compound4(const RPCProcedure*,
                            const struct rpcgen::COMPOUND4args*,
                            const struct rpcgen::COMPOUND4res*) {}
 };

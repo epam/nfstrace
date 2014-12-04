@@ -51,77 +51,77 @@ WatchAnalyzer::~WatchAnalyzer()
     }
 }
 
-void WatchAnalyzer::null(const struct RPCProcedure* proc,
+void WatchAnalyzer::null(const RPCProcedure* proc,
           const struct rpcgen::NULL3args*,
           const struct rpcgen::NULL3res*) { account(proc);}
-void WatchAnalyzer::getattr3(const struct RPCProcedure* proc,
+void WatchAnalyzer::getattr3(const RPCProcedure* proc,
               const struct rpcgen::GETATTR3args*,
               const struct rpcgen::GETATTR3res*) { account(proc);}
-void WatchAnalyzer::setattr3(const struct RPCProcedure* proc,
+void WatchAnalyzer::setattr3(const RPCProcedure* proc,
               const struct rpcgen::SETATTR3args*,
               const struct rpcgen::SETATTR3res*) { account(proc);}
-void WatchAnalyzer::lookup3(const struct RPCProcedure* proc,
+void WatchAnalyzer::lookup3(const RPCProcedure* proc,
              const struct rpcgen::LOOKUP3args*,
              const struct rpcgen::LOOKUP3res*) { account(proc);}
-void WatchAnalyzer::access3(const struct RPCProcedure* proc,
+void WatchAnalyzer::access3(const RPCProcedure* proc,
              const struct rpcgen::ACCESS3args*,
              const struct rpcgen::ACCESS3res*) { account(proc);}
-void WatchAnalyzer::readlink3(const struct RPCProcedure* proc,
+void WatchAnalyzer::readlink3(const RPCProcedure* proc,
                const struct rpcgen::READLINK3args*,
                const struct rpcgen::READLINK3res*) { account(proc);}
-void WatchAnalyzer::read3(const struct RPCProcedure* proc,
+void WatchAnalyzer::read3(const RPCProcedure* proc,
            const struct rpcgen::READ3args*,
            const struct rpcgen::READ3res*) { account(proc);}
-void WatchAnalyzer::write3(const struct RPCProcedure* proc,
+void WatchAnalyzer::write3(const RPCProcedure* proc,
             const struct rpcgen::WRITE3args*,
             const struct rpcgen::WRITE3res*) { account(proc);}
-void WatchAnalyzer::create3(const struct RPCProcedure* proc,
+void WatchAnalyzer::create3(const RPCProcedure* proc,
              const struct rpcgen::CREATE3args*,
              const struct rpcgen::CREATE3res*) { account(proc);}
-void WatchAnalyzer::mkdir3(const struct RPCProcedure* proc,
+void WatchAnalyzer::mkdir3(const RPCProcedure* proc,
             const struct rpcgen::MKDIR3args*,
             const struct rpcgen::MKDIR3res*) { account(proc);}
-void WatchAnalyzer::symlink3(const struct RPCProcedure* proc,
+void WatchAnalyzer::symlink3(const RPCProcedure* proc,
              const struct rpcgen::SYMLINK3args*,
              const struct rpcgen::SYMLINK3res*) { account(proc);}
-void WatchAnalyzer::mknod3(const struct RPCProcedure* proc,
+void WatchAnalyzer::mknod3(const RPCProcedure* proc,
             const struct rpcgen::MKNOD3args*,
             const struct rpcgen::MKNOD3res*) { account(proc);}
-void WatchAnalyzer::remove3(const struct RPCProcedure* proc,
+void WatchAnalyzer::remove3(const RPCProcedure* proc,
              const struct rpcgen::REMOVE3args*,
              const struct rpcgen::REMOVE3res*) { account(proc);}
-void WatchAnalyzer::rmdir3(const struct RPCProcedure* proc,
+void WatchAnalyzer::rmdir3(const RPCProcedure* proc,
             const struct rpcgen::RMDIR3args*,
             const struct rpcgen::RMDIR3res*) { account(proc);}
-void WatchAnalyzer::rename3(const struct RPCProcedure* proc,
+void WatchAnalyzer::rename3(const RPCProcedure* proc,
              const struct rpcgen::RENAME3args*,
              const struct rpcgen::RENAME3res*) { account(proc);}
-void WatchAnalyzer::link3(const struct RPCProcedure* proc,
+void WatchAnalyzer::link3(const RPCProcedure* proc,
            const struct rpcgen::LINK3args*,
            const struct rpcgen::LINK3res*) { account(proc);}
-void WatchAnalyzer::readdir3(const struct RPCProcedure* proc,
+void WatchAnalyzer::readdir3(const RPCProcedure* proc,
               const struct rpcgen::READDIR3args*,
               const struct rpcgen::READDIR3res*) { account(proc);}
-void WatchAnalyzer::readdirplus3(const struct RPCProcedure* proc,
+void WatchAnalyzer::readdirplus3(const RPCProcedure* proc,
                   const struct rpcgen::READDIRPLUS3args*,
                   const struct rpcgen::READDIRPLUS3res*) { account(proc);}
-void WatchAnalyzer::fsstat3(const struct RPCProcedure* proc,
+void WatchAnalyzer::fsstat3(const RPCProcedure* proc,
              const struct rpcgen::FSSTAT3args*,
              const struct rpcgen::FSSTAT3res*) { account(proc);}
-void WatchAnalyzer::fsinfo3(const struct RPCProcedure* proc,
+void WatchAnalyzer::fsinfo3(const RPCProcedure* proc,
              const struct rpcgen::FSINFO3args*,
              const struct rpcgen::FSINFO3res*) { account(proc);}
-void WatchAnalyzer::pathconf3(const struct RPCProcedure* proc,
+void WatchAnalyzer::pathconf3(const RPCProcedure* proc,
                const struct rpcgen::PATHCONF3args*,
                const struct rpcgen::PATHCONF3res*) { account(proc);}
-void WatchAnalyzer::commit3(const struct RPCProcedure* proc,
+void WatchAnalyzer::commit3(const RPCProcedure* proc,
              const struct rpcgen::COMMIT3args*,
              const struct rpcgen::COMMIT3res*) { account(proc);}
 
-void WatchAnalyzer::null(const struct RPCProcedure* proc,
+void WatchAnalyzer::null(const RPCProcedure* proc,
           const struct rpcgen::NULL4args*,
           const struct rpcgen::NULL4res*) { account(proc);}
-void WatchAnalyzer::compound4(const struct RPCProcedure*  proc,
+void WatchAnalyzer::compound4(const RPCProcedure*  proc,
                const struct rpcgen::COMPOUND4args*,
                const struct rpcgen::COMPOUND4res*  res) { account(proc, res);}
 
@@ -129,7 +129,7 @@ void WatchAnalyzer::flush_statistics()
 {
 }
 
-void WatchAnalyzer::account(const struct RPCProcedure* proc,
+void WatchAnalyzer::account(const RPCProcedure* proc,
                 const struct rpcgen::COMPOUND4res* res)
 {
     const u_int nfs_proc = proc->rpc_call.ru.RM_cmb.cb_proc;

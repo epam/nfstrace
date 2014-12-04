@@ -45,7 +45,7 @@ OFDWSAnalyzer::~OFDWSAnalyzer()
         delete i->second;
 }
 
-void OFDWSAnalyzer::read3(const struct RPCProcedure*,
+void OFDWSAnalyzer::read3(const RPCProcedure*,
                           const struct rpcgen::READ3args* args,
                           const struct rpcgen::READ3res*  res)
 {
@@ -58,7 +58,7 @@ void OFDWSAnalyzer::read3(const struct RPCProcedure*,
     }
 }
 
-void OFDWSAnalyzer::write3(const struct RPCProcedure*,
+void OFDWSAnalyzer::write3(const RPCProcedure*,
                            const struct rpcgen::WRITE3args* args,
                            const struct rpcgen::WRITE3res*  res)
 {
