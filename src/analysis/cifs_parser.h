@@ -49,12 +49,14 @@ class CIFSParser
     inline void parse_packet(const protocols::CIFSv1::MessageHeader* header, FilteredDataQueue::Ptr&& ptr);
 
     /*! analyses CIFS v1 operation: request and response
+     * \param session - session
      * \param request - Call's header
      * \param response - Reply's header
      * \param requestData - Call's data
      * \param responseData - Reply's data
      */
-    inline void analyse_operation(const protocols::CIFSv1::MessageHeader* request,
+    inline void analyse_operation(Session* session,
+                                  const protocols::CIFSv1::MessageHeader* request,
                                   const protocols::CIFSv1::MessageHeader* response,
                                   FilteredDataQueue::Ptr&& requestData,
                                   FilteredDataQueue::Ptr&& responseData);
@@ -66,12 +68,14 @@ class CIFSParser
     inline void parse_packet(const protocols::CIFSv2::MessageHeader* header, NST::utils::FilteredDataQueue::Ptr&& ptr);
 
     /*! analyses CIFS v2 operation: request and response
+     * \param session - session
      * \param request - Call's header
      * \param response - Reply's header
      * \param requestData - Call's data
      * \param responseData - Reply's data
      */
-    inline void analyse_operation(const protocols::CIFSv2::MessageHeader* request,
+    inline void analyse_operation(Session* session,
+                                  const protocols::CIFSv2::MessageHeader* request,
                                   const protocols::CIFSv2::MessageHeader* response,
                                   FilteredDataQueue::Ptr&& requestData,
                                   FilteredDataQueue::Ptr&& responseData);

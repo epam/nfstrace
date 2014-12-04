@@ -203,17 +203,14 @@ const MessageHeader* get_header(const uint8_t* data);
  * \param response - Reply's header
  * \return Command structure
  */
-template <typename Cmd, typename Data>
-inline const Cmd command(Data& request, Data& response)
+template <typename Cmd, typename Data, typename Session>
+inline const Cmd command(Data& request, Data& response, Session* session)
 {
     Cmd cmd;
-    if (const MessageHeader* header = get_header(request->data))
-    {
-        cmd.session = header->sec.CID;
-    }
+    cmd.session = session;
     // Set time stamps
-    cmd.ctimestamp = request->timestamp;
-    cmd.rtimestamp = response->timestamp;
+    cmd.ctimestamp = &request->timestamp;
+    cmd.rtimestamp = &response->timestamp;
 
     return cmd;
 }

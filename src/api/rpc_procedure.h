@@ -33,15 +33,18 @@ namespace NST
 namespace API
 {
 
-struct RPCProcedure
+template<typename ProcedureType>
+struct Procedure
 {
-    struct rpc_msg rpc_call;
-    struct rpc_msg rpc_reply;
+    ProcedureType rpc_call;
+    ProcedureType rpc_reply;
 
     const struct Session* session;
     const struct timeval* ctimestamp;
     const struct timeval* rtimestamp;
 };
+
+using RPCProcedure = Procedure<struct rpc_msg>;
 
 } // namespace API
 } // namespace NST

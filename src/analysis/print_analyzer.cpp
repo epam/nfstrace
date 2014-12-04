@@ -38,7 +38,7 @@ using namespace NST::protocols::NFS4; // NFSv4 helpers
 namespace
 {
 
-bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
+bool print_procedure(std::ostream& out, const RPCProcedure* proc)
 {
     bool result {false};
     NST::utils::operator<<(out, *(proc->session));
@@ -154,7 +154,7 @@ bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 // 2nd line - <tabulation>related RPC procedure-specific arguments
 // 3rd line - <tabulation>related RPC procedure-specific results
 
-void PrintAnalyzer::null(const struct RPCProcedure* proc,
+void PrintAnalyzer::null(const RPCProcedure* proc,
                          const struct rpcgen::NULL3args*,
                          const struct rpcgen::NULL3res*)
 {
@@ -162,7 +162,7 @@ void PrintAnalyzer::null(const struct RPCProcedure* proc,
     out << "\tCALL  []\n\tREPLY []\n";
 }
 
-void PrintAnalyzer::getattr3(const struct RPCProcedure*         proc,
+void PrintAnalyzer::getattr3(const RPCProcedure*                proc,
                              const struct rpcgen::GETATTR3args* args,
                              const struct rpcgen::GETATTR3res*  res)
 {
@@ -181,7 +181,7 @@ void PrintAnalyzer::getattr3(const struct RPCProcedure*         proc,
     }
 }
 
-void PrintAnalyzer::setattr3(const struct RPCProcedure*         proc,
+void PrintAnalyzer::setattr3(const RPCProcedure*                proc,
                              const struct rpcgen::SETATTR3args* args,
                              const struct rpcgen::SETATTR3res*  res)
 {
@@ -207,7 +207,7 @@ void PrintAnalyzer::setattr3(const struct RPCProcedure*         proc,
     }
 }
 
-void PrintAnalyzer::lookup3(const struct RPCProcedure*        proc,
+void PrintAnalyzer::lookup3(const RPCProcedure*               proc,
                             const struct rpcgen::LOOKUP3args* args,
                             const struct rpcgen::LOOKUP3res*  res)
 {
@@ -234,7 +234,7 @@ void PrintAnalyzer::lookup3(const struct RPCProcedure*        proc,
     }
 }
 
-void PrintAnalyzer::access3(const struct RPCProcedure*        proc,
+void PrintAnalyzer::access3(const RPCProcedure*               proc,
                             const struct rpcgen::ACCESS3args* args,
                             const struct rpcgen::ACCESS3res*  res)
 {
@@ -273,7 +273,7 @@ void PrintAnalyzer::access3(const struct RPCProcedure*        proc,
     }
 }
 
-void PrintAnalyzer::readlink3(const struct RPCProcedure*          proc,
+void PrintAnalyzer::readlink3(const RPCProcedure*                 proc,
                               const struct rpcgen::READLINK3args* args,
                               const struct rpcgen::READLINK3res*  res)
 {
@@ -298,7 +298,7 @@ void PrintAnalyzer::readlink3(const struct RPCProcedure*          proc,
     }
 }
 
-void PrintAnalyzer::read3(const struct RPCProcedure*      proc,
+void PrintAnalyzer::read3(const RPCProcedure*             proc,
                           const struct rpcgen::READ3args* args,
                           const struct rpcgen::READ3res*  res)
 {
@@ -332,7 +332,7 @@ void PrintAnalyzer::read3(const struct RPCProcedure*      proc,
     }
 }
 
-void PrintAnalyzer::write3(const struct RPCProcedure*       proc,
+void PrintAnalyzer::write3(const RPCProcedure*              proc,
                            const struct rpcgen::WRITE3args* args,
                            const struct rpcgen::WRITE3res*  res)
 {
@@ -374,7 +374,7 @@ void PrintAnalyzer::write3(const struct RPCProcedure*       proc,
     }
 }
 
-void PrintAnalyzer::create3(const struct RPCProcedure*        proc,
+void PrintAnalyzer::create3(const RPCProcedure*               proc,
                             const struct rpcgen::CREATE3args* args,
                             const struct rpcgen::CREATE3res*  res)
 {
@@ -404,7 +404,7 @@ void PrintAnalyzer::create3(const struct RPCProcedure*        proc,
     }
 }
 
-void PrintAnalyzer::mkdir3(const struct RPCProcedure*       proc,
+void PrintAnalyzer::mkdir3(const RPCProcedure*              proc,
                            const struct rpcgen::MKDIR3args* args,
                            const struct rpcgen::MKDIR3res*  res)
 {
@@ -434,7 +434,7 @@ void PrintAnalyzer::mkdir3(const struct RPCProcedure*       proc,
     }
 }
 
-void PrintAnalyzer::symlink3(const struct RPCProcedure*         proc,
+void PrintAnalyzer::symlink3(const RPCProcedure*                proc,
                              const struct rpcgen::SYMLINK3args* args,
                              const struct rpcgen::SYMLINK3res*  res)
 {
@@ -464,7 +464,7 @@ void PrintAnalyzer::symlink3(const struct RPCProcedure*         proc,
     }
 }
 
-void PrintAnalyzer::mknod3(const struct RPCProcedure*       proc,
+void PrintAnalyzer::mknod3(const RPCProcedure*              proc,
                            const struct rpcgen::MKNOD3args* args,
                            const struct rpcgen::MKNOD3res*  res)
 {
@@ -496,7 +496,7 @@ void PrintAnalyzer::mknod3(const struct RPCProcedure*       proc,
     }
 }
 
-void PrintAnalyzer::remove3(const struct RPCProcedure*        proc,
+void PrintAnalyzer::remove3(const RPCProcedure*               proc,
                             const struct rpcgen::REMOVE3args* args,
                             const struct rpcgen::REMOVE3res*  res)
 {
@@ -520,7 +520,7 @@ void PrintAnalyzer::remove3(const struct RPCProcedure*        proc,
     }
 }
 
-void PrintAnalyzer::rmdir3(const struct RPCProcedure*       proc,
+void PrintAnalyzer::rmdir3(const RPCProcedure*              proc,
                            const struct rpcgen::RMDIR3args* args,
                            const struct rpcgen::RMDIR3res*  res)
 {
@@ -546,7 +546,7 @@ void PrintAnalyzer::rmdir3(const struct RPCProcedure*       proc,
     }
 }
 
-void PrintAnalyzer::rename3(const struct RPCProcedure*        proc,
+void PrintAnalyzer::rename3(const RPCProcedure*               proc,
                             const struct rpcgen::RENAME3args* args,
                             const struct rpcgen::RENAME3res*  res)
 {
@@ -576,7 +576,7 @@ void PrintAnalyzer::rename3(const struct RPCProcedure*        proc,
     }
 }
 
-void PrintAnalyzer::link3(const struct RPCProcedure*      proc,
+void PrintAnalyzer::link3(const RPCProcedure*             proc,
                           const struct rpcgen::LINK3args* args,
                           const struct rpcgen::LINK3res*  res)
 {
@@ -606,7 +606,7 @@ void PrintAnalyzer::link3(const struct RPCProcedure*      proc,
     }
 }
 
-void PrintAnalyzer::readdir3(const struct RPCProcedure*         proc,
+void PrintAnalyzer::readdir3(const RPCProcedure*                proc,
                              const struct rpcgen::READDIR3args* args,
                              const struct rpcgen::READDIR3res*  res)
 {
@@ -649,7 +649,7 @@ void PrintAnalyzer::readdir3(const struct RPCProcedure*         proc,
     }
 }
 
-void PrintAnalyzer::readdirplus3(const struct RPCProcedure*             proc,
+void PrintAnalyzer::readdirplus3(const RPCProcedure*                    proc,
                                  const struct rpcgen::READDIRPLUS3args* args,
                                  const struct rpcgen::READDIRPLUS3res*  res)
 {
@@ -693,7 +693,7 @@ void PrintAnalyzer::readdirplus3(const struct RPCProcedure*             proc,
     }
 }
 
-void PrintAnalyzer::fsstat3(const struct RPCProcedure*        proc,
+void PrintAnalyzer::fsstat3(const RPCProcedure*               proc,
                             const struct rpcgen::FSSTAT3args* args,
                             const struct rpcgen::FSSTAT3res*  res)
 {
@@ -731,7 +731,7 @@ void PrintAnalyzer::fsstat3(const struct RPCProcedure*        proc,
     }
 }
 
-void PrintAnalyzer::fsinfo3(const struct RPCProcedure*        proc,
+void PrintAnalyzer::fsinfo3(const RPCProcedure*               proc,
                             const struct rpcgen::FSINFO3args* args,
                             const struct rpcgen::FSINFO3res*  res)
 {
@@ -787,7 +787,7 @@ void PrintAnalyzer::fsinfo3(const struct RPCProcedure*        proc,
     }
 }
 
-void PrintAnalyzer::pathconf3(const struct RPCProcedure*          proc,
+void PrintAnalyzer::pathconf3(const RPCProcedure*                 proc,
                               const struct rpcgen::PATHCONF3args* args,
                               const struct rpcgen::PATHCONF3res*  res)
 {
@@ -823,7 +823,7 @@ void PrintAnalyzer::pathconf3(const struct RPCProcedure*          proc,
     }
 }
 
-void PrintAnalyzer::commit3(const struct RPCProcedure*        proc,
+void PrintAnalyzer::commit3(const RPCProcedure*               proc,
                             const struct rpcgen::COMMIT3args* args,
                             const struct rpcgen::COMMIT3res*  res)
 {
@@ -866,7 +866,7 @@ void PrintAnalyzer::commit3(const struct RPCProcedure*        proc,
 // 4th line - <tabulation>related RPC procedure-specific results
 // 5rd line - <tabulation>related NFSv4-operations
 
-void PrintAnalyzer::null(const struct RPCProcedure* proc,
+void PrintAnalyzer::null(const RPCProcedure* proc,
                          const struct rpcgen::NULL4args*,
                          const struct rpcgen::NULL4res*)
 {
@@ -875,7 +875,7 @@ void PrintAnalyzer::null(const struct RPCProcedure* proc,
     out << "\tCALL  []\n\tREPLY []\n";
 }
 
-void PrintAnalyzer::compound4(const struct RPCProcedure*          proc,
+void PrintAnalyzer::compound4(const RPCProcedure*                 proc,
                               const struct rpcgen::COMPOUND4args* args,
                               const struct rpcgen::COMPOUND4res*  res)
 {
