@@ -25,6 +25,7 @@
 #include <sys/time.h>
 
 #include "rpc_procedure.h"
+#include "cifs_commands.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -353,7 +354,7 @@ using NoAndxCmdArgumentType = struct {};                                        
 using NoAndxCmdResultType = struct {};                                                                                           //!< No command's results
 using NoAndxCommand = SMBv1::Command< NoAndxCmdArgumentType, NoAndxCmdResultType>;                                               //!< No command
 
-}
+}//SMBv1
 
 /*! SMB 2 version
  */
@@ -436,8 +437,9 @@ using BreakOpLockArgumentType = struct {};                                      
 using BreakOpLockResultType = struct {};                                                              //!< Break opportunistic lock command's results
 using BreakOpLockCommand = SMBv1::Command<BreakOpLockArgumentType, BreakOpLockResultType>;            //!< Break opportunistic lock command
 
-}
-
-}
-}
-#endif // CIFS_TYPES_H
+} // namespace SMBv2
+} // namespace API
+} // namespace NST
+//------------------------------------------------------------------------------
+#endif//CIFS_TYPES_H
+//------------------------------------------------------------------------------
