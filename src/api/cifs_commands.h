@@ -36,62 +36,89 @@ namespace SMBv2
 #define SMB2_ERROR_STRUCTURE_SIZE2 __constant_cpu_to_le16(9)
 #define cpu_to_le32
 
-/*! securityMode flags
+/*!
+ * \brief The errResponse struct
+ * The SMB2 ERROR Response packet is sent by the server to respond to a request that has failed or encountered an error.
+ */
+struct errResponse {
+    uint16_t structureSize;
+    uint16_t reserved;                           //!< 0
+    uint32_t byteCount;                          //!< even if zero, at least one byte follows
+    uint8_t  errorData[1];                       //!< Error message. Variable length
+}  __attribute__ ((__packed__));
+
+/*!
+ * security modes. The security mode field specifies whether SMB signing is enabled or required at the client.
  */
 enum class SecurityMode : uint16_t
 {
-    SIGNING_ENABLED   = 0x0001,
-    SIGNING_REQUIRED  = 0x0002
+    SIGNING_ENABLED   = 0x0001,                   //!< When set, indicates that security signatures are enabled on the client.
+    SIGNING_REQUIRED  = 0x0002                    //!< When set, indicates that security signatures are required by the client.
 };
 
-/*! capabilities flags
+/*!
+ * Capabilities flags
+ * If the client implements the SMB 3.x dialect family, the Capabilities field MUST be constructed using the following values.
+ * Otherwise, this field MUST be set to 0.
  */
 enum class Capabilities : uint32_t
 {
-    DFS         = 0x00000001,
-    LEASING     = 0x00000002, /* Resp only New to SMB2.1 */
-    LARGE_MTU   = 0x00000004, /* Resp only New to SMB2.1 */
-    DFS2        = 0x00000008 //FIXME: Dublicate?
+    DFS                 = 0x00000001,             //!< When set, indicates that the client supports the Distributed File System (DFS).
+    LEASING             = 0x00000002,             //!< When set, indicates that the client supports leasing.
+    LARGE_MTU           = 0x00000004,             //!< When set, indicates that the client supports multi-credit operations.
+    MULTI_CHANNEL       = 0x00000008,             //!< When set, indicates that the client supports establishing multiple channels for a single session.
+    PERSISTENT_HANDLES  = 0x00000010,             //!< When set, indicates that the client supports persistent handles.
+    DIRECTORY_LEASING   = 0x00000020,             //!< When set, indicates that the client supports directory leasing.
+    ENCRYPTION          = 0x00000040              //!< When set, indicates that the client supports encryption.
 };
 
-struct errResponse {
-    uint16_t structureSize;
-    uint16_t Reserved; /* MBZ */
-    uint32_t ByteCount;  /* even if zero, at least one byte follows */
-    uint8_t  ErrorData[1];  /* variable length */
-}  __attribute__ ((__packed__));
+/*!
+ * Supported dialect revision numbers
+ */
+enum class Dialects
+{
 
+    SMB_2_002          = 0x0202,                  //!< SMB 2.002 dialect revision number.
+    SMB_2_1            = 0x0210,                  //!< SMB 2.1 dialect revision number.
+    SMB_3_0            = 0x0300,                  //!< SMB 3.0 dialect revision number.
+    SMB_3_02           = 0x0302                   //!< SMB 3.02 dialect revision number.
+};
+
+/*!
+ * \brief The negotiateRequest struct
+ * The SMB2 NEGOTIATE Request packet is used by the client to notify the server what dialects of the SMB 2 Protocol the client understands. This request is composed of an SMB2 header, followed by this request structure.
+ */
 struct negotiateRequest {
-    uint16_t structureSize; /* Must be 36 */
-    uint16_t DialectCount;
-    SecurityMode securityMode;
-    uint16_t Reserved; /* MBZ */
-    Capabilities capabilities;
-    uint8_t  ClientGUID[16]; /* MBZ */
-    uint64_t ClientStartTime; /* MBZ */
-    uint16_t Dialects[2]; /* variable length */
+    uint16_t structureSize;                      //!< Must be 36
+    uint16_t dialectCount;                       //!< The number of dialects that are contained in the Dialects[] array
+    SecurityMode securityMode;                   //!< The security mode field specifies whether SMB signing is enabled or required at the client.
+    uint16_t _;                                  //!< Reserved
+    Capabilities capabilities;                   //!< Client's capabilities
+    uint8_t  clientGUID[16];                     //!< Must be 0
+    uint64_t clientStartTime;                    //!< Must be 0
+    Dialects dialects[1];                        //!< An array of one or more 16-bit integers specifying the supported dialect revision numbers. The array MUST contain at least one of the following values. Variable length
 }  __attribute__ ((__packed__));
 
-/* Internal types */
-#define SMB2_NT_FIND   0x00100000
-#define SMB2_LARGE_FILES  0x00200000
-
+/*!
+ * \brief The negotiateResponse struct
+ * The SMB2 NEGOTIATE Response packet is sent by the server to notify the client of the preferred common dialect. This response is composed of an SMB2 header, followed by this response structure.
+ */
 struct negotiateResponse {
-    uint16_t structureSize; /* Must be 65 */
-    SecurityMode securityMode;
-    uint16_t DialectRevision;
-    uint16_t Reserved; /* MBZ */
-    uint8_t  ServerGUID[16];
-    Capabilities capabilities;
-    uint32_t MaxTransactSize;
-    uint32_t MaxReadSize;
-    uint32_t MaxWriteSize;
-    uint64_t SystemTime; /* MBZ */
-    uint64_t ServerStartTime;
-    uint16_t SecurityBufferOffset;
-    uint16_t SecurityBufferLength;
-    uint32_t Reserved2; /* may be any value, ignore */
-    uint8_t  Buffer[1]; /* variable length GSS security buffer */
+    uint16_t structureSize;                      //!< Must be 65
+    SecurityMode securityMode;                   //!< The security mode field specifies whether SMB signing is enabled, required at the server, or both.
+    uint16_t dialectRevision;                    //!< The preferred common SMB 2 Protocol dialect number from the Dialects array that is sent in the SMB2 NEGOTIATE Request or the SMB2 wildcard revision number
+    uint16_t reserved;                           //!< Must be 0
+    uint8_t  serverGUID[16];                     //!< A globally unique identifier that is generated by the server to uniquely identify this server.
+    Capabilities capabilities;                   //!< The Capabilities field specifies protocol capabilities for the server.
+    uint32_t maxTransactSize;                    //!< The maximum size, in bytes, of the buffer that can be used for QUERY_INFO, QUERY_DIRECTORY, SET_INFO and CHANGE_NOTIFY operations.
+    uint32_t maxReadSize;                        //!< The maximum size, in bytes, of the Length in an SMB2 READ Request (section 2.2.19) that the server will accept.
+    uint32_t maxWriteSize;                       //!< The maximum size, in bytes, of the Length in an SMB2 WRITE Request (section 2.2.21) that the server will accept.
+    uint64_t systemTime;                         //!< The system time of the SMB2 server when the SMB2 NEGOTIATE Request was processed
+    uint64_t serverStartTime;                    //!< The SMB2 server start time, in FILETIME format
+    uint16_t securityBufferOffset;               //!< The offset, in bytes, from the beginning of the SMB2 header to the security buffer.
+    uint16_t securityBufferLength;               //!< The length, in bytes, of the security buffer.
+    uint32_t reserved2;                          //!< /* may be any value, ignore */
+    uint8_t  buffer[1];                          //!< /* variable length GSS security buffer */
 }  __attribute__ ((__packed__));
 
 struct sess_setupRequest {
