@@ -88,8 +88,19 @@ Log::Global::Global(const std::string& path)
     if(!log_file_path.empty())
     {
         struct stat st;
-        if(!stat(log_file_path.c_str(), &st) && S_ISDIR(st.st_mode))
+
+        if(stat(log_file_path.c_str(), &st) == -1 && log_file_path.back() == '/')
         {
+            throw std::system_error{errno, std::system_category(),
+                                   {"Error accessing directory: " + log_file_path}};
+        }
+
+        if(S_ISDIR(st.st_mode))
+        {
+            if(log_file_path.back() == '/')
+            {
+                log_file_path.erase(log_file_path.find_last_not_of('/') + 1);
+            }
             log_file_path = log_file_path + '/' + default_file_name;
         }
     }
