@@ -88,14 +88,15 @@ Log::Global::Global(const std::string& path)
     if(!log_file_path.empty())
     {
         struct stat st;
+        bool exists = stat(log_file_path.c_str(), &st) == 0 ? true : false;
 
-        if(stat(log_file_path.c_str(), &st) == -1 && log_file_path.back() == '/')
+        if(!exists && log_file_path.back() == '/')
         {
             throw std::system_error{errno, std::system_category(),
                                    {"Error accessing directory: " + log_file_path}};
         }
 
-        if(S_ISDIR(st.st_mode))
+        if(exists && S_ISDIR(st.st_mode))
         {
             if(log_file_path.back() == '/')
             {
@@ -112,19 +113,13 @@ Log::Global::Global(const std::string& path)
     // Append timestamp
     log_file_path = log_file_path + "." + std::to_string(std::time(0));
 
-    FILE* file = try_open(log_file_path);
-    if(file == nullptr)
-    {
-        throw std::system_error{errno, std::system_category(),
-                               {std::string{"Can't create log file: "} + log_file_path}};
-    }
+    log_file = try_open(log_file_path);
+    own_file = true;
+
     if(utils::Out message{})
     {
         message << "Log file: " << log_file_path;
     }
-
-    log_file = file;
-    own_file = true;
 }
 
 Log::Global::~Global()
