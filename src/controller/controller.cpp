@@ -22,6 +22,7 @@
 //------------------------------------------------------------------------------
 #include <grp.h>
 #include <pwd.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -59,7 +60,7 @@ Controller::Running::~Running()
 
 Controller::Controller(const Parameters& params) try
     : gout       {utils::Out::Level(params.verbose_level())}
-    , glog       {params.program_name()}
+    , glog       {params.log_path()}
     , signals    {status}
     , analysis   {}
     , filtration {new FiltrationManager{status}}
@@ -112,7 +113,24 @@ int Controller::run()
     try
     {
         Running running{*this};
-        status.wait_and_rethrow_exception();
+        while(true)
+        {
+            try
+            {
+                status.wait_and_rethrow_exception();
+            }
+            catch(SignalHandler::Signal& s)
+            {
+                if(s.signal_number == SIGHUP)
+                {
+                    glog.reopen();
+                }
+                else
+                {
+                    throw ProcessingDone{std::string{"Unhandled signal presents: "} + s.what()};
+                }
+            }
+        }
     }
     catch(ProcessingDone& e)
     {
