@@ -1,0 +1,30 @@
+{
+  "nfs_v3":{
+    "null":0,
+    "getattr":7,
+    "setattr":0,
+    "lookup":5,
+    "access":6,
+    "readlink":0,
+    "read":0,
+    "write":5,
+    "create":5,
+    "mkdir":0,
+    "symlink":0,
+    "mkdnod":0,
+    "remove":5,
+    "rmdir":0,
+    "rename":0,
+    "link":0,
+    "readdir":0,
+    "readdirplus":1,
+    "fsstat":0,
+    "fsinfo":0,
+    "pathconf":0,
+    "commit":0
+  },
+  "nfs_v4":{
+    "null":0,
+    "compound":0
+  }
+}
