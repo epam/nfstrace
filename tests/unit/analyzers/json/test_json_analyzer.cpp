@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Ilya Storozhilov
-// Description: WebUI analyzer tests executable.
+// Description: JSON analyzer tests executable.
 // Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -56,17 +56,17 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <webui_analyzer.h>
+#include <json_analyzer.h>
 #include <chrono>
 #include <thread>
 #include <json.h>
 
-class WebUiAnalyzerCase : public ::testing::Test {
+class JsonAnalyzerCase : public ::testing::Test {
 protected:
 	virtual void SetUp() override final
 	{
 		// Starting service
-		analyzer.reset(new WebUiAnalyzer(WORKERS_AMOUNT, LISTEN_PORT, LISTEN_HOST, MAX_SERVING_DURATION_MS, LISTEN_BACKLOG));
+		analyzer.reset(new JsonAnalyzer(WORKERS_AMOUNT, LISTEN_PORT, LISTEN_HOST, MAX_SERVING_DURATION_MS, LISTEN_BACKLOG));
 		std::this_thread::sleep_for(std::chrono::milliseconds(AWAIT_FOR_SERVICE_STARTUP_MS));
 		// Setting up analyzer (NFSv3)
 		for (int i = 0; i < NFSV3_NULL_OPS_AMOUNT; ++i) {
@@ -196,10 +196,10 @@ protected:
 		analyzer.reset();
 	}
 
-	std::unique_ptr<WebUiAnalyzer> analyzer;
+	std::unique_ptr<JsonAnalyzer> analyzer;
 };
 
-TEST_F(WebUiAnalyzerCase, collectStatistics)
+TEST_F(JsonAnalyzerCase, collectStatistics)
 {
 	EXPECT_EQ(NFSV3_NULL_OPS_AMOUNT, analyzer->getNfsV3Stat().nullOpsAmount.load());
 	EXPECT_EQ(NFSV3_GETATTR_OPS_AMOUNT, analyzer->getNfsV3Stat().getattrOpsAmount.load());
@@ -227,7 +227,7 @@ TEST_F(WebUiAnalyzerCase, collectStatistics)
 	EXPECT_EQ(NFSV4_COMPOUND_OPS_AMOUNT, analyzer->getNfsV4Stat().compoundOpsAmount.load());
 }
 
-TEST_F(WebUiAnalyzerCase, requestResponse)
+TEST_F(JsonAnalyzerCase, requestResponse)
 {
 	// Connecting to service
 	int s = socket(PF_INET, SOCK_STREAM, 0);
@@ -379,7 +379,7 @@ TEST_F(WebUiAnalyzerCase, requestResponse)
 	EXPECT_EQ(0, close(s));
 }
 
-TEST_F(WebUiAnalyzerCase, slowClient)
+TEST_F(JsonAnalyzerCase, slowClient)
 {
 	int s = socket(PF_INET, SOCK_STREAM, 0);
 	ASSERT_GE(s, 0);

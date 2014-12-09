@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Ilya Storozhilov
-// Description: WebUI analyzer TCP-service
+// Description: JSON analyzer TCP-service
 // Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -26,13 +26,13 @@
 
 using namespace NST::net;
 
-class WebUiAnalyzer;
+class JsonAnalyzer;
 
 class JsonTcpService : public AbstractTcpService
 {
 public:
 	JsonTcpService() = delete;
-	JsonTcpService(WebUiAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
+	JsonTcpService(JsonAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
 			std::size_t maxServingDurationMs, int backlog);
 private:
 	class Task : public AbstractTask
@@ -48,7 +48,7 @@ private:
 
 	AbstractTask * createTask(int socket) override final;
 
-	WebUiAnalyzer& _analyzer;
+	JsonAnalyzer& _analyzer;
 	std::size_t _maxServingDurationMs;
 };
 

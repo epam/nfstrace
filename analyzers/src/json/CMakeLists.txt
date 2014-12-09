@@ -2,7 +2,7 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 find_package (JSON)
 
 if (JSON_FOUND)
-    project (webui)
+    project (json)
     aux_source_directory ("." SRC_LIST)
     add_library (${PROJECT_NAME} SHARED ${SRC_LIST}
             ../../../src/net/abstract_tcp_service.cpp
@@ -13,5 +13,5 @@ if (JSON_FOUND)
     target_link_libraries (${PROJECT_NAME} ${JSON_LIBRARIES})
     install (TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 else ()
-    message (WARNING "JSON library not found - WebUI plugin is not available!")
+    message (WARNING "JSON library not found - JSON analyzer plugin is not available!")
 endif ()

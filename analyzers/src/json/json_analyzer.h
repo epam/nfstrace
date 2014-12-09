@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Ilya Storozhilov
-// Description: WebUI analyzer class
+// Description: JSON analyzer class
 // Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -28,7 +28,7 @@
 
 using namespace NST::API;
 
-class WebUiAnalyzer : public IAnalyzer
+class JsonAnalyzer : public IAnalyzer
 {
 public:
 	struct NfsV3Stat
@@ -92,8 +92,8 @@ public:
 		{}
 	};
 
-	WebUiAnalyzer(std::size_t workersAmount, int port, const std::string& host, std::size_t maxServingDurationMs, int backlog);
-	//~WebUiAnalyzer();
+	JsonAnalyzer(std::size_t workersAmount, int port, const std::string& host, std::size_t maxServingDurationMs, int backlog);
+	//~JsonAnalyzer();
 
 	void null(const struct RPCProcedure* /*proc*/,
 			const struct rpcgen::NULL3args* /*args*/,
