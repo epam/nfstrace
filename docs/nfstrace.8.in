@@ -241,14 +241,18 @@ Specify the input file for stat mode,
 .B '-'
 means
 .B stdin
-.RB (default:\  nfstrace-BPF.pcap ).
+.RB (default:\  nfstrace-{filter}.pcap ).
 .TP
 .BI "\-O, \-\-ofile=" PATH
 Specify the output file for dump mode,
 .B '-'
 means
 .B stdout
-.RB (default:\  nfstrace-BPF.pcap ).
+.RB (default:\  nfstrace-{filter}.pcap ).
+.TP
+.BI \-\-log= PATH
+Specify the log file
+.RB (default:\  nfstrace.log.{timestamp} ).
 .TP
 .BI "\-C, \-\-command=" "'shell command'"
 Execute command for each dumped file.
