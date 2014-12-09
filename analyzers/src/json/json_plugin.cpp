@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Ilya Storozhilov
-// Description: WebUI analyzer plugin
+// Description: JSON analyzer plugin
 // Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -26,7 +26,7 @@
 #define DEFAULT_BACKLOG 15
 #define DEFAULT_MAX_SERVING_DURATION_MS 500
 
-#include "webui_analyzer.h"
+#include "json_analyzer.h"
 #include <api/plugin_api.h> // include plugin development definitions
 
 extern "C"
@@ -101,7 +101,7 @@ IAnalyzer* create(const char* opts)
 		}
 	}
 	// Creating and returning plugin
-	return new WebUiAnalyzer(workersAmount, port, host, maxServingDurationMs, backlog);
+	return new JsonAnalyzer(workersAmount, port, host, maxServingDurationMs, backlog);
 }
 
 void destroy(IAnalyzer* instance)

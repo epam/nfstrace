@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Ilya Storozhilov
-// Description: WebUI analyzer TCP-service
+// Description: JSON analyzer TCP-service
 // Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -20,13 +20,13 @@
 */
 
 #include "json_tcp_service.h"
-#include "webui_analyzer.h"
+#include "json_analyzer.h"
 #include <chrono>
 #include <json.h>
 
 #include <iostream>	// TODO: Remove it
 
-JsonTcpService::JsonTcpService(WebUiAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
+JsonTcpService::JsonTcpService(JsonAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
 		std::size_t maxServingDurationMs, int backlog) :
 	AbstractTcpService(workersAmount, port, host, backlog),
 	_analyzer(analyzer),

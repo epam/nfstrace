@@ -31,21 +31,25 @@ if len(sys.argv) < 2:
     print os.path.basename(sys.argv[0]) + " <trace.pcap.bz2> <reference.json>"
     exit(1)
 
-if_name = "eth0"
-#if_name = "tap0"   # TODO: Use virtual interface
+IF_NAME = "eth0"
+#IF_NAME = "tap0"   # TODO: Use virtual interface
+AWAIT_TIMEOUT = 0.5
 
 # Starting nfstrace with JSON service
-captureProcess = subprocess.Popen(["${CMAKE_BINARY_DIR}/${PROJECT_NAME}", "-Z", "$ENV{USER}", "-i", if_name, "-a", "${CMAKE_BINARY_DIR}/analyzers/libwebui.so#host=localhost"])
+captureProcess = subprocess.Popen(["${CMAKE_BINARY_DIR}/${PROJECT_NAME}", "-Z", "$ENV{USER}", "-i", IF_NAME, "-a", "${CMAKE_BINARY_DIR}/analyzers/libjson.so#host=localhost"])
+
+# Awaiting for nfstrace to start capturing
+time.sleep(AWAIT_TIMEOUT)
 
 # Playing trace file
 bzcatProcess = subprocess.Popen(["bzcat", sys.argv[1]], stdout=subprocess.PIPE)
-replayProcess = subprocess.Popen(["tcpreplay", "-i", if_name, "-"], stdin=bzcatProcess.stdout, stdout=subprocess.PIPE)
+replayProcess = subprocess.Popen(["tcpreplay", "-i", IF_NAME, "-"], stdin=bzcatProcess.stdout, stdout=subprocess.PIPE)
 bzcatProcess.wait()
 bzcatProcess.stdout.close()
 replayProcess.wait();
 
 # Awaiting for packets to be processed by nfstrace
-time.sleep(0.5)
+time.sleep(AWAIT_TIMEOUT)
 
 # Fetching statistics from nfstrace JSON service
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

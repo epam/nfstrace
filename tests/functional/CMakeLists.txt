@@ -18,4 +18,4 @@ foreach (trace ${traces})
     add_test (NAME out:${name} COMMAND sh ${CHECK_OUTPUT_SCRIPT} ${trace})
 endforeach ()
 
-add_subdirectory (json-service)
+add_subdirectory (json-analyzer)

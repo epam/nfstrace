@@ -64,7 +64,7 @@ target_link_libraries (${PROJECT_NAME} ${LIBS})
 # build watch analyzer==========================================================
 add_subdirectory(analyzers)
 
-add_subdirectory (analyzers/src/webui)
+add_subdirectory (analyzers/src/json)
 
 # testing ======================================================================
 enable_testing ()
