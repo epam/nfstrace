@@ -22,6 +22,7 @@
 //------------------------------------------------------------------------------
 #include <grp.h>
 #include <pwd.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -59,7 +60,7 @@ Controller::Running::~Running()
 
 Controller::Controller(const Parameters& params) try
     : gout       {utils::Out::Level(params.verbose_level())}
-    , glog       {params.program_name()}
+    , glog       {params.log_path()}
     , signals    {status}
     , analysis   {}
     , filtration {new FiltrationManager{status}}
@@ -112,7 +113,24 @@ int Controller::run()
     try
     {
         Running running{*this};
-        status.wait_and_rethrow_exception();
+        while(true)
+        {
+            try
+            {
+                status.wait_and_rethrow_exception();
+            }
+            catch(SignalHandler::Signal& s)
+            {
+                if(s.signal_number == SIGHUP)
+                {
+                    glog.reopen();
+                }
+                else
+                {
+                    throw ProcessingDone{std::string{"Unhandled signal presents: "} + s.what()};
+                }
+            }
+        }
     }
     catch(ProcessingDone& e)
     {
@@ -130,7 +148,41 @@ int Controller::run()
 
 void droproot(const std::string& dropuser)
 {
-    if(dropuser.empty()) // username is not passed
+    gid_t re_gid = getgid();
+    gid_t ef_gid = getegid();
+
+    uid_t re_uid = getuid();
+    uid_t ef_uid = geteuid();
+
+    gid_t new_gid;
+    uid_t new_uid;
+
+    if(re_gid != ef_gid || re_uid != ef_uid) // suid bit is being set
+    {
+        new_gid = re_gid;
+        new_uid = re_uid;
+
+        if(!dropuser.empty())
+        {
+            if(utils::Out message{})
+            {
+                message << "Note: Ignoring -Z option since SUID bit is set.";
+            }
+        }
+    }
+    else if(!dropuser.empty())
+    {
+        struct passwd *pw = getpwnam(dropuser.c_str()); //get user uid & gid
+
+        if(!pw)
+        {
+            throw ControllerError{std::string{"The user is not found: "} + dropuser};
+        }
+
+        new_gid = pw->pw_gid;
+        new_uid = pw->pw_uid;
+    }
+    else
     {
         if(utils::Out message{})
         {
@@ -141,24 +193,22 @@ void droproot(const std::string& dropuser)
         }
         return;
     }
+
     try
     {
-        struct passwd *pw = getpwnam(dropuser.c_str());//get user uid&gid
-        if(!pw)
+        if(setgroups(1, &new_gid) == -1 ||
+           setgid(new_gid) == -1 ||
+           setuid(new_uid) == -1)
         {
-            throw ControllerError{std::string{"The user is not found: "} + dropuser};
+            throw ControllerError{std::string{"Error dropping root: "} +
+                                  std::string{strerror(errno)}};
         }
-        int status{0};
-        if( 
-           (status = initgroups(pw->pw_name, pw->pw_gid)) ||
-           (status = setgid(pw->pw_gid)) ||
-           (status = setuid(pw->pw_uid))
-          )
+
+        //check if we've really dropped privileges
+        if(setuid(0) != -1)
         {
-            throw ControllerError{strerror(status)};
+            throw ControllerError{"Managed to regain root privileges"};
         }
-        //check if we've really dropped privileges to non-root capable user
-        if(setuid(0) != -1) throw ControllerError{"Managed to regain root privileges"};
     }
     catch(const ControllerError& e)
     {

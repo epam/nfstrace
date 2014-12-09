@@ -19,9 +19,10 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <cerrno>
 #include <cstdarg>
 #include <cstdio>
-#include <cerrno>
+#include <ctime>
 #include <iostream>
 #include <stdexcept>
 #include <system_error>
@@ -54,27 +55,20 @@ static bool  own_file {false};
 namespace // unnanmed
 {
 
-static std::string get_pid()
-{
-    char buff[8]={'\0'};
-    sprintf(buff,"%ld",(long)getpid());
-    return std::string{buff};
-}
-
 static FILE* try_open(const std::string& file_name)
 {
-    FILE* file {fopen(file_name.c_str(), "w")};
+    FILE* file = fopen(file_name.c_str(), "w");
     if(file == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
-                                       "Error in opening file."};
+                               {"Error in opening file: " + file_name}};
     }
     chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
     {
         fclose(file);
         throw std::system_error{errno, std::system_category(),
-                                       "Log file already locked"};
+                               {"Log file already locked: " + file_name}};
     }
     return file;
 }
@@ -82,43 +76,50 @@ static FILE* try_open(const std::string& file_name)
 } // namespace unnamed
 
 Log::Global::Global(const std::string& path)
+    : log_file_path {path}
 {
-    const std::string log_path{"/tmp/nfstrace"};
-
-    if(log_file != ::stderr)
+    if(own_file)
     {
-        throw std::runtime_error{"Global Logger already have been created"};
+        throw std::runtime_error{"Global Logger already have been created."};
     }
 
-    if(path.empty()) return;
+    const std::string default_file_name {"nfstrace.log"};
 
-    struct stat s;
-    if(stat(log_path.c_str(), &s))            // check destination folder exists
+    if(!log_file_path.empty())
     {
-        if(mkdir(log_path.c_str(), ALLPERMS)) // create directory for nfs logs
+        struct stat st;
+        bool exists = stat(log_file_path.c_str(), &st) == 0 ? true : false;
+
+        if(!exists && log_file_path.back() == '/')
         {
             throw std::system_error{errno, std::system_category(),
-                "Can't create log directory."};
+                                   {"Error accessing directory: " + log_file_path}};
+        }
+
+        if(exists && S_ISDIR(st.st_mode))
+        {
+            if(log_file_path.back() == '/')
+            {
+                log_file_path.erase(log_file_path.find_last_not_of('/') + 1);
+            }
+            log_file_path = log_file_path + '/' + default_file_name;
         }
     }
-    std::string tmp{log_path + '/' + path + ".log"};
-    FILE* file {nullptr};
-    try
+    else
     {
-        file = try_open(tmp);
-    }
-    catch(std::system_error& err)
-    {
-        tmp = log_path + '/' + path + '-' + get_pid() + ".log";
-        file = try_open(tmp);
-    }
-    if(utils::Out message{})
-    {
-        message << "Log folder: " << log_path;
+        log_file_path = default_file_name;
     }
 
-    log_file = file;
+    // Append timestamp
+    log_file_path = log_file_path + "." + std::to_string(std::time(0));
+
+    log_file = try_open(log_file_path);
     own_file = true;
+
+    if(utils::Out message{})
+    {
+        message << "Log file: " << log_file_path;
+    }
 }
 
 Log::Global::~Global()
@@ -130,6 +131,19 @@ Log::Global::~Global()
         own_file = false;
         log_file = ::stderr;
     }
+}
+
+void Log::Global::reopen()
+{
+    if(!own_file || log_file == ::stderr || log_file == ::stdout || log_file == nullptr)
+        return;
+    FILE* temp = freopen(log_file_path.c_str(), "a+", log_file);
+    if(temp == nullptr)
+    {
+        throw std::system_error{errno, std::system_category(),
+                               {std::string{"Can't reopen file: "} + log_file_path}};
+    }
+    log_file = temp;
 }
 
 Log::Log()

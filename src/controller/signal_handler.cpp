@@ -37,7 +37,9 @@ namespace NST
 namespace controller
 {
 
-SignalHandler::Signal::Signal(int sig) : std::runtime_error{::strsignal(sig)}
+SignalHandler::Signal::Signal(int sig)
+: std::runtime_error{::strsignal(sig)}
+, signal_number{sig}
 {
 }
 
@@ -104,6 +106,7 @@ SignalHandler::SignalHandler(RunningStatus& s)
     ::sigaddset(&mask, SIGINT);  // correct exit from program by Ctrl-C
     ::sigaddset(&mask, SIGTERM); // correct exit when SIGTERM has been received
     ::sigaddset(&mask, SIGCHLD); // stop sigwait-thread and wait children
+    ::sigaddset(&mask, SIGHUP);  // signal for losing terminal
     const int err = ::pthread_sigmask(SIG_BLOCK, &mask, nullptr);
     if(err != 0)
     {

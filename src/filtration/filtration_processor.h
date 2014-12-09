@@ -484,7 +484,7 @@ public:
                         info.data   += hdr_len;
 
                         msg_len -= hdr_len;
-                        hdr_len -= hdr_len; // set 0
+                        hdr_len = 0;
 
                         // we should remove RM(uin32_t) from collected data
                         collection.skip_first(sizeof(RecordMark));
