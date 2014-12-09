@@ -2,7 +2,7 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 find_package (JSON)
 
 if (JSON_FOUND)
-    project (test_webui_analyzer)
+    project (unit_test_webui_analyzer)
     aux_source_directory ("." SRC_LIST)
     add_executable (${PROJECT_NAME} ${SRC_LIST}
             ${CMAKE_SOURCE_DIR}/analyzers/src/webui/webui_analyzer.cpp
