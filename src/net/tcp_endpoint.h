@@ -18,13 +18,13 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+//------------------------------------------------------------------------------
 #ifndef TCP_ENPOINT_H
 #define TCP_ENPOINT_H
-
+//------------------------------------------------------------------------------
 #include <string>
 #include <netdb.h>
-
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace net
@@ -61,4 +61,6 @@ private:
 } // namespace net
 } // namespace NST
 
+//------------------------------------------------------------------------------
 #endif // TCP_ENPOINT_H
+//------------------------------------------------------------------------------

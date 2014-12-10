@@ -18,17 +18,17 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+//------------------------------------------------------------------------------
 #define WEB_API_VERSION "0.0.1"
 #define DEFAULT_PORT 8888
 #define DEFAULT_HOST TcpEndpoint::WildcardAddress
 #define DEFAULT_WORKERS_AMOUNT 10U
 #define DEFAULT_BACKLOG 15
 #define DEFAULT_MAX_SERVING_DURATION_MS 500
-
+//------------------------------------------------------------------------------
 #include "json_analyzer.h"
 #include <api/plugin_api.h> // include plugin development definitions
-
+//------------------------------------------------------------------------------
 extern "C"
 {
 
@@ -112,3 +112,4 @@ void destroy(IAnalyzer* instance)
 NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
 
 } //extern "C"
+//------------------------------------------------------------------------------

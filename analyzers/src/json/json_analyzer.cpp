@@ -18,8 +18,9 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+//------------------------------------------------------------------------------
 #include "json_analyzer.h"
+//------------------------------------------------------------------------------
 
 JsonAnalyzer::JsonAnalyzer(std::size_t workersAmount, int port, const std::string& host, std::size_t maxServingDurationMs, int backlog) :
 	_jsonTcpService(*this, workersAmount, port, host, maxServingDurationMs, backlog),
@@ -229,3 +230,4 @@ void JsonAnalyzer::flush_statistics()
 {
 	//std::cout << "JsonAnalyzer::flush_statistics()" << std::endl;
 }
+//------------------------------------------------------------------------------

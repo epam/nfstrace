@@ -18,11 +18,12 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+//------------------------------------------------------------------------------
 #ifndef JSON_TCP_SERVICE_H
 #define JSON_TCP_SERVICE_H
-
+//------------------------------------------------------------------------------
 #include <net/abstract_tcp_service.h>
+//------------------------------------------------------------------------------
 
 using namespace NST::net;
 
@@ -52,4 +53,6 @@ private:
 	std::size_t _maxServingDurationMs;
 };
 
+//------------------------------------------------------------------------------
 #endif // JSON_TCP_SERVICE_H
+//------------------------------------------------------------------------------
