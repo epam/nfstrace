@@ -21,10 +21,9 @@
 
 #include "json_tcp_service.h"
 #include "json_analyzer.h"
+#include <utils/log.h>
 #include <chrono>
 #include <json.h>
-
-#include <iostream>	// TODO: Remove it
 
 JsonTcpService::JsonTcpService(JsonAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
 		std::size_t maxServingDurationMs, int backlog) :
@@ -85,14 +84,13 @@ void JsonTcpService::Task::execute()
 	std::size_t totalBytesSent = 0U;
 	while (totalBytesSent < json.length()) {
 		if (!_service.isRunning()) {
-			// TODO: Use general logging
-			std::cerr << "Service shutdown detected - terminating task execution" << std::endl;
+			LOG("WARNING: Service shutdown detected - terminating task execution");
 			return;
 		}
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - servingStarted).count() >
 				static_cast<std::chrono::milliseconds::rep>(_service._maxServingDurationMs)) {
 			// TODO: Use general logging
-			std::cerr << "A client is too slow - terminating task execution" << std::endl;
+			LOG("WARNING: A client is too slow - terminating task execution");
 			return;
 		}
 		struct timespec writeDuration;
@@ -110,12 +108,10 @@ void JsonTcpService::Task::execute()
 		ssize_t bytesSent = send(socket(), json.data() + totalBytesSent, json.length() - totalBytesSent, MSG_NOSIGNAL);
 		if (bytesSent < 0) {
 			std::system_error e(errno, std::system_category(), "Sending data to client error");
-			// TODO: Use general logging
-			std::cerr << e.what() << std::endl;
+			LOG("WARNING: %s", e.what());
 			return;
 		} else if (bytesSent == 0) {
-			// TODO: Use general logging
-			std::cerr << "Connection has been aborted by client while sending data" << std::endl;
+			LOG("WARNING: Connection has been aborted by client while sending data");
 			return;
 		}
 		totalBytesSent += bytesSent;
