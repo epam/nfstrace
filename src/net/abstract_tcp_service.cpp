@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+//------------------------------------------------------------------------------
 #include <net/abstract_tcp_service.h>
 #include <utils/log.h>
 #include <functional>
@@ -27,7 +27,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace net
@@ -176,3 +176,4 @@ AbstractTcpService::AbstractTask::~AbstractTask()
 
 } // namespace net
 } // namespace NST
+//------------------------------------------------------------------------------

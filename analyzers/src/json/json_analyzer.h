@@ -18,13 +18,14 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#ifndef WEB_UI_ANALYZER_H
-#define WEB_UI_ANALYZER_H
-
+//------------------------------------------------------------------------------
+#ifndef JSON_ANALYZER_H
+#define JSON_ANALYZER_H
+//------------------------------------------------------------------------------
 #include "json_tcp_service.h"
 #include <api/ianalyzer_type.h>
 #include <atomic>
+//------------------------------------------------------------------------------
 
 using namespace NST::API;
 
@@ -207,5 +208,6 @@ private:
 	NfsV3Stat _nfsV3Stat;
 	NfsV4Stat _nfsV4Stat;
 };
-
-#endif // WEB_UI_ANALYZER_H
+//------------------------------------------------------------------------------
+#endif // JSON_ANALYZER_H
+//------------------------------------------------------------------------------

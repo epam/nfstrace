@@ -18,10 +18,10 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#ifndef TCP_SERVICE_H
-#define TCP_SERVICE_H
-
+//------------------------------------------------------------------------------
+#ifndef ABSTRACT_TCP_SERVICE_H
+#define ABSTRACT_TCP_SERVICE_H
+//------------------------------------------------------------------------------
 #include <net/tcp_endpoint.h>
 #include <vector>
 #include <queue>
@@ -29,7 +29,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <atomic>
-
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace net
@@ -118,6 +118,6 @@ private:
 
 } // namespace net
 } // namespace NST
-
-#endif // TCP_ENPOINT_H
-
+//------------------------------------------------------------------------------
+#endif // ABSTRACT_TCP_SERVICE_H
+//------------------------------------------------------------------------------

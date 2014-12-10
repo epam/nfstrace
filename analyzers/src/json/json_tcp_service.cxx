@@ -18,12 +18,13 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+//------------------------------------------------------------------------------
 #include "json_tcp_service.h"
 #include "json_analyzer.h"
 #include <utils/log.h>
 #include <chrono>
 #include <json.h>
+//------------------------------------------------------------------------------
 
 JsonTcpService::JsonTcpService(JsonAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
 		std::size_t maxServingDurationMs, int backlog) :
@@ -117,4 +118,4 @@ void JsonTcpService::Task::execute()
 		totalBytesSent += bytesSent;
 	}
 }
-
+//------------------------------------------------------------------------------
