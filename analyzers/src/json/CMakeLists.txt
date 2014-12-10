@@ -6,7 +6,9 @@ if (JSON_FOUND)
     aux_source_directory ("." SRC_LIST)
     add_library (${PROJECT_NAME} SHARED ${SRC_LIST}
             ../../../src/net/abstract_tcp_service.cpp
-            ../../../src/net/tcp_endpoint.cpp)
+            ../../../src/net/tcp_endpoint.cpp
+            ../../../src/utils/log.cpp
+            ../../../src/utils/out.cpp)
     set_target_properties(${PROJECT_NAME} PROPERTIES
             LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/analyzers) # direct output to nfstrace common binary dir
     include_directories (${JSON_INCLUDE_DIRS})

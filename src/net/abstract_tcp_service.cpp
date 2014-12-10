@@ -20,15 +20,13 @@
 */
 
 #include <net/abstract_tcp_service.h>
+#include <utils/log.h>
 #include <functional>
 #include <system_error>
-
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-
-#include <iostream>	// TODO: Remove it
 
 namespace NST
 {
@@ -131,8 +129,7 @@ void AbstractTcpService::runListener()
 			continue;
 		} else if (descriptorsCount < 0) {
 			std::system_error e(errno, std::system_category(), "Awaiting for incoming connection on server socket error");
-			// TODO: Use general logging
-			std::cerr << e.what() << std::endl;
+			LOG("ERROR: %s", e.what());
 #ifdef __gnu_linux__
 			// Several first pselect(2) calls cause "Interrupted system call" error (errno == EINTR)
 			// if drop privileges option is used on Linux (see https://access.redhat.com/solutions/165483)
@@ -146,8 +143,7 @@ void AbstractTcpService::runListener()
 		int pendingSocketDescriptor = accept(_serverSocket, NULL, NULL);
 		if (pendingSocketDescriptor < 0) {
 			std::system_error e(errno, std::system_category(), "Accepting incoming connection on server socket error");
-			// TODO: Use general logging
-			std::cerr << e.what() << std::endl;
+			LOG("ERROR: %s", e.what());
 			throw e;
 		}
 		// Create and enqueue task
@@ -161,8 +157,7 @@ void AbstractTcpService::runListener()
 			} else {
 				// Just close pending socket on overload
 				close(pendingSocketDescriptor);
-				// TODO: Use general logging
-				std::cerr << "Tasks queue overload has been detected" << std::endl;
+				LOG("ERROR: TCP-service tasks queue overload has been detected")
 			}
 		}
 	}
