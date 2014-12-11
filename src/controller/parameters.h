@@ -65,6 +65,7 @@ public:
 
     bool show_help() const;
     bool show_list() const;
+    bool show_pams() const;
 
     // access helpers
     const std::string&  program_name() const;
