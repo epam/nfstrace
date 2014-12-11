@@ -52,6 +52,7 @@ struct Args
         COMMAND,
         DSIZE,
         LIST,
+        PAMS,
         MSIZE,
         QSIZE,
         TRACE,

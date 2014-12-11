@@ -56,6 +56,7 @@ Opt Args::options[Args::num] =
     {'C', "command",    Opt::REQ, "",                    "execute command for each dumped file",                                "\"shell command\"",      nullptr, false},
     {'D', "dump-size",  Opt::REQ, "0",                   "set the size of dumping file portion, 0 means no limit",              "MBytes",                 nullptr, false},
     {'L', "list",       Opt::NOA, "false",               "list all available network interfaces and exit",                      nullptr,                  nullptr, false},
+    {'l', "list-pams",  Opt::NOA, "false",               "list available pluggable analysis modules and exit",                  nullptr,                  nullptr, false},
     {'M', "msg-header", Opt::REQ, "512",                 "Truncate RPC messages to this limit (specified in bytes) before passing to a pluggable analysis module", "1..4000", nullptr, false},
     {'Q', "qcapacity",  Opt::REQ, "4096",                "set the initial capacity of the queue with RPC messages",                                   "1..65535", nullptr, false},
     {'T', "trace",      Opt::NOA, "false",               "print collected NFSv3 or NFSv4 procedures, true if no modules were passed with -a option",  nullptr,    nullptr, false},

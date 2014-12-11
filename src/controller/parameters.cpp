@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 #include <iostream>
 
+#include <dirent.h>
 #include <unistd.h>
 
 #include "analysis/plugin.h"
@@ -89,6 +90,38 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
                 std::cerr << "Note: Reading list of network interfaces may "
                              "require that you have special privileges." << std::endl;
             }
+        }
+
+        if(get(CLI::PAMS).to_bool())
+        {
+            DIR *dir;
+            struct dirent *ent;
+
+            if((dir = opendir(MODULES_DIRECTORY_PATH)) != nullptr)
+            {
+                while((ent = readdir(dir)) != nullptr)
+                {
+                    std::string full_path = std::string{MODULES_DIRECTORY_PATH}
+                                          + ent->d_name;
+                    std::string plugin_usage;
+                    try
+                    {
+                        plugin_usage = NST::analysis::Plugin::usage_of(full_path);
+
+                        std::cout << ent->d_name << ":" << std::endl;
+                        std::cout << plugin_usage << std::endl;
+                        std::cout << std::endl;
+                    }
+                    catch(std::runtime_error& e) { }
+                }
+                closedir(dir);
+            }
+            else
+            {
+                std::cerr << "Error: Can't access " << MODULES_DIRECTORY_PATH <<std::endl;
+            }
+
+            return;
         }
 
         // cashed values
@@ -184,6 +217,11 @@ bool Parameters::show_help() const
 bool Parameters::show_list() const
 {
     return impl->get(CLI::LIST).to_bool();
+}
+
+bool Parameters::show_pams() const
+{
+    return impl->get(CLI::PAMS).to_bool();
 }
 
 const std::string& Parameters::program_name() const
