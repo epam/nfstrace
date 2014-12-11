@@ -50,7 +50,7 @@ public:
 	 * \param workersAmount Amount of workers in thread-pool
 	 * \param port Port to bind to
 	 * \param host Hostname/IP-address to listen
-	 * \param Listen backlog - see listen(2)
+	 * \param backlog Listen backlog - see listen(2)
 	 */
 	AbstractTcpService(std::size_t workersAmount, int port, const std::string& host = TcpEndpoint::WildcardAddress,
 			int backlog = DefaultBacklog);
@@ -79,7 +79,7 @@ protected:
 		 */
 		AbstractTask(int socket);
 		AbstractTask() = delete;
-		//! Descructs TCP-service task and closes I/O socket
+		//! Destructs TCP-service task and closes I/O socket
 		virtual ~AbstractTask();
 
 		//! Returns a socket for I/O

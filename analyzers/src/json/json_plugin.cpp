@@ -36,7 +36,7 @@ const char* usage()
 {
 	return "host - Network interface to listen (default is to listen all interfaces)\n"
 		"port - IP-port to bind to (default is 8888)\n"
-		"workers - Amount of workers (default is 10)\n"
+		"workers - Amount of worker threads (default is 10)\n"
 		"duration - Max serving duration in milliseconds (default is 500 ms)\n"
 		"backlog - Listen backlog (default is 15)";
 }
