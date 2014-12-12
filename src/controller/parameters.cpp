@@ -69,12 +69,13 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
                     std::cout << e.what() << std::endl;
                 }
             }
-            return;
         }
         validate();
 
-        if(get(CLI::LIST).to_bool())
+        if(get(CLI::ENUM).is("-") || get(CLI::ENUM).is("interfaces"))
         {
+            std::cout << "\nAvailable interfaces:" << std::endl;
+
             NST::filtration::pcap::NetworkInterfaces interfaces;
             if(interfaces.begin() != interfaces.end())
             {
@@ -92,13 +93,14 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
             }
         }
 
-        if(get(CLI::PAMS).to_bool())
+        if(get(CLI::ENUM).is("-") || get(CLI::ENUM).is("plugins"))
         {
+            std::cout << "\nAvailable plugins:" << std::endl;
             DIR *dir;
-            struct dirent *ent;
 
             if((dir = opendir(MODULES_DIRECTORY_PATH)) != nullptr)
             {
+                struct dirent *ent;
                 while((ent = readdir(dir)) != nullptr)
                 {
                     std::string full_path = std::string{MODULES_DIRECTORY_PATH}
@@ -120,9 +122,9 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
             {
                 std::cerr << "Error: Can't access " << MODULES_DIRECTORY_PATH <<std::endl;
             }
-
-            return;
         }
+
+        if(!get(CLI::ENUM).is("none")) return;
 
         // cashed values
         const std::string program_path(argv[0]);
@@ -214,14 +216,9 @@ bool Parameters::show_help() const
     return impl->get(CLI::HELP).to_bool();
 }
 
-bool Parameters::show_list() const
+bool Parameters::show_enum() const
 {
-    return impl->get(CLI::LIST).to_bool();
-}
-
-bool Parameters::show_pams() const
-{
-    return impl->get(CLI::PAMS).to_bool();
+    return !impl->get(CLI::ENUM).is("none");
 }
 
 const std::string& Parameters::program_name() const

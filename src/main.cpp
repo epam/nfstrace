@@ -31,9 +31,9 @@ int main(int argc, char* argv[]) try
 {
     Parameters params(argc, argv); // set and validate CLI options
 
-    if(params.show_help() || params.show_list() || params.show_pams())
+    if(params.show_help() || params.show_enum())
     {
-        return 0; // -h, -l or -L were passed
+        return 0; // -h or -E were passed
     }
 
     Controller controller(params);
