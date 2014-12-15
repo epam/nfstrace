@@ -1,8 +1,7 @@
 #!/bin/sh
 #
-# JSON-service functional test trace file creation script
 # Author: Ilya Storozhilov
-# Description: JSON-service functional test launcher script
+# Description: JSON-service functional test trace file creation script
 # Copyright (c) 2013-2014 EPAM Systems
 #
 #    This file is part of Nfstrace.

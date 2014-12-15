@@ -1,6 +1,5 @@
 #!/usr/bin/python
 #
-# JSON-service functional test launcher script
 # Author: Ilya Storozhilov
 # Description: JSON-service functional test launcher script
 # Copyright (c) 2013-2014 EPAM Systems
@@ -20,30 +19,23 @@
 #    along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-import os
 import signal
 import subprocess
 import time
 import socket
 import json
 
-if len(sys.argv) < 2:
-    print os.path.basename(sys.argv[0]) + " <trace.pcap.bz2> <reference.json>"
-    exit(1)
-
-IF_NAME = "eth0"
-#IF_NAME = "tap0"   # TODO: Use virtual interface
 AWAIT_TIMEOUT = 0.5
 
 # Starting nfstrace with JSON service
-captureProcess = subprocess.Popen(["${CMAKE_BINARY_DIR}/${PROJECT_NAME}", "-Z", "$ENV{USER}", "-i", IF_NAME, "-a", "${CMAKE_BINARY_DIR}/analyzers/libjson.so#host=localhost"])
+captureProcess = subprocess.Popen(["${CMAKE_BINARY_DIR}/${PROJECT_NAME}", "-Z", "$ENV{USER}", "-i", "${IF_NAME}", "-a", "${CMAKE_BINARY_DIR}/analyzers/libjson.so#host=localhost"])
 
 # Awaiting for nfstrace to start capturing
 time.sleep(AWAIT_TIMEOUT)
 
 # Playing trace file
-bzcatProcess = subprocess.Popen(["bzcat", sys.argv[1]], stdout=subprocess.PIPE)
-replayProcess = subprocess.Popen(["tcpreplay", "-i", IF_NAME, "-"], stdin=bzcatProcess.stdout, stdout=subprocess.PIPE)
+bzcatProcess = subprocess.Popen(["bzcat", "${CMAKE_SOURCE_DIR}/tests/functional/json-analyzer/trace.pcap.bz2"], stdout=subprocess.PIPE)
+replayProcess = subprocess.Popen(["tcpreplay", "-i", "${IF_NAME}", "-"], stdin=bzcatProcess.stdout, stdout=subprocess.PIPE)
 bzcatProcess.wait()
 bzcatProcess.stdout.close()
 replayProcess.wait();
@@ -62,7 +54,7 @@ captureProcess.send_signal(signal.SIGTERM)
 captureProcess.wait();
 
 # Checking result against reference
-referenceFile = open(sys.argv[2])
+referenceFile = open("${CMAKE_SOURCE_DIR}/tests/functional/json-analyzer/reference.json")
 referenceJson = json.load(referenceFile)
 referenceFile.close();
 if statisticsJson == referenceJson:
