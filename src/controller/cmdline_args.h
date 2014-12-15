@@ -51,7 +51,7 @@ struct Args
         LOGPATH,
         COMMAND,
         DSIZE,
-        LIST,
+        ENUM,
         MSIZE,
         QSIZE,
         TRACE,
