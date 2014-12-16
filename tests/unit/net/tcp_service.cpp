@@ -27,7 +27,7 @@
 #include <sys/socket.h>
 
 #define AWAIT_FOR_SERVICE_STARTUP_MS 250
-#define TRANSMISSION_TIMEOUT_MS 100
+#define TRANSMISSION_TIMEOUT_MS 10000
 #define LISTEN_HOST TcpEndpoint::LoopbackAddress
 #define LISTEN_PORT 8888
 #define WORKERS_AMOUNT 100
@@ -95,12 +95,12 @@ private:
     }
 };
 
-TEST(TcpService, constructDestruct)
+TEST(TestTcpService, constructDestruct)
 {
     EXPECT_NO_THROW(TestTcpService service);
 }
 
-TEST(TcpService, requestResponse)
+TEST(TestTcpService, requestResponse)
 {
     taskExecuteCallsCount = 0;
     TestTcpService service;
