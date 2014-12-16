@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 #include <iostream>
 
+#include <dirent.h>
 #include <unistd.h>
 
 #include "analysis/plugin.h"
@@ -68,12 +69,13 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
                     std::cout << e.what() << std::endl;
                 }
             }
-            return;
         }
         validate();
 
-        if(get(CLI::LIST).to_bool())
+        if(get(CLI::ENUM).is("-") || get(CLI::ENUM).is("interfaces"))
         {
+            std::cout << "\nAvailable interfaces:" << std::endl;
+
             NST::filtration::pcap::NetworkInterfaces interfaces;
             if(interfaces.begin() != interfaces.end())
             {
@@ -90,6 +92,39 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
                              "require that you have special privileges." << std::endl;
             }
         }
+
+        if(get(CLI::ENUM).is("-") || get(CLI::ENUM).is("plugins"))
+        {
+            std::cout << "\nAvailable plugins:" << std::endl;
+            DIR *dir;
+
+            if((dir = opendir(MODULES_DIRECTORY_PATH)) != nullptr)
+            {
+                struct dirent *ent;
+                while((ent = readdir(dir)) != nullptr)
+                {
+                    std::string full_path = std::string{MODULES_DIRECTORY_PATH}
+                                          + ent->d_name;
+                    std::string plugin_usage;
+                    try
+                    {
+                        plugin_usage = NST::analysis::Plugin::usage_of(full_path);
+
+                        std::cout << ent->d_name << ":" << std::endl;
+                        std::cout << plugin_usage << std::endl;
+                        std::cout << std::endl;
+                    }
+                    catch(std::runtime_error& e) { }
+                }
+                closedir(dir);
+            }
+            else
+            {
+                std::cerr << "Error: Can't access " << MODULES_DIRECTORY_PATH <<std::endl;
+            }
+        }
+
+        if(!get(CLI::ENUM).is("none")) return;
 
         // cashed values
         const std::string program_path(argv[0]);
@@ -181,9 +216,9 @@ bool Parameters::show_help() const
     return impl->get(CLI::HELP).to_bool();
 }
 
-bool Parameters::show_list() const
+bool Parameters::show_enum() const
 {
-    return impl->get(CLI::LIST).to_bool();
+    return !impl->get(CLI::ENUM).is("none");
 }
 
 const std::string& Parameters::program_name() const

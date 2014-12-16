@@ -263,12 +263,13 @@ Set the size of the dumping file portion,
 means no limit
 .RB (default:\  0 ).
 .TP
-.BI "\-L, \-\-list"
-List all available network interfaces and exit; please note that this option is
-not supported unless nfstrace was built against the recent version of libpcap
-that supports the
+.BI "\-E, \-\-enum=" interfaces|plugins|-
+Enumerate all available network interfaces and and/or all available plugins,
+then exit; please note that interfaces can't be listed unless nfstrace was built
+against the recent version of libpcap that supports the
 .B pcap_findalldevs()
-function.
+function
+.RB (default:\  none ).
 .TP
 .BI "\-M, \-\-msg-header=" 1..4000
 Truncate RPC messages to this limit (specified in bytes) before passing to a
