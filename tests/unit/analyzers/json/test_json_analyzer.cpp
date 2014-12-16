@@ -19,7 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define AWAIT_FOR_SERVICE_STARTUP_MS 100
+#define AWAIT_FOR_SERVICE_STARTUP_MS 250
 #define WORKERS_AMOUNT 100
 #define LISTEN_PORT 8888
 #define LISTEN_HOST NST::net::TcpEndpoint::LoopbackAddress

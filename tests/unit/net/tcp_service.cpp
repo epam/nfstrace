@@ -26,7 +26,7 @@
 #include <net/abstract_tcp_service.h>
 #include <sys/socket.h>
 
-#define AWAIT_FOR_SERVICE_STARTUP_MS 100
+#define AWAIT_FOR_SERVICE_STARTUP_MS 250
 #define LISTEN_HOST TcpEndpoint::LoopbackAddress
 #define LISTEN_PORT 8888
 #define WORKERS_AMOUNT 100
