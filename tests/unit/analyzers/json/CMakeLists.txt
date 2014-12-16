@@ -6,7 +6,7 @@ if (JSON_FOUND)
     aux_source_directory ("." SRC_LIST)
     add_executable (${PROJECT_NAME} ${SRC_LIST}
             ${CMAKE_SOURCE_DIR}/analyzers/src/json/json_analyzer.cpp
-            ${CMAKE_SOURCE_DIR}/analyzers/src/json/json_tcp_service.cxx
+            ${CMAKE_SOURCE_DIR}/analyzers/src/json/json_tcp_service.cpp
             ${CMAKE_SOURCE_DIR}/src/net/abstract_tcp_service.cpp
             ${CMAKE_SOURCE_DIR}/src/net/tcp_endpoint.cpp
             ${CMAKE_SOURCE_DIR}/src/utils/log.cpp
