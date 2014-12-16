@@ -32,25 +32,25 @@ class JsonAnalyzer;
 class JsonTcpService : public AbstractTcpService
 {
 public:
-	JsonTcpService() = delete;
-	JsonTcpService(JsonAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
-			std::size_t maxServingDurationMs, int backlog);
+    JsonTcpService() = delete;
+    JsonTcpService(JsonAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
+                   std::size_t maxServingDurationMs, int backlog);
 private:
-	class Task : public AbstractTask
-	{
-	public:
-		Task(JsonTcpService& service, int socket);
-		Task() = delete;
+    class Task : public AbstractTask
+    {
+    public:
+        Task(JsonTcpService& service, int socket);
+        Task() = delete;
 
-		void execute() override final;
-	private:
-		JsonTcpService& _service;
-	};
+        void execute() override final;
+    private:
+        JsonTcpService& _service;
+    };
 
-	AbstractTask * createTask(int socket) override final;
+    AbstractTask* createTask(int socket) override final;
 
-	JsonAnalyzer& _analyzer;
-	std::size_t _maxServingDurationMs;
+    JsonAnalyzer& _analyzer;
+    std::size_t _maxServingDurationMs;
 };
 
 //------------------------------------------------------------------------------

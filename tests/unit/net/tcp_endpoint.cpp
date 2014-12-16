@@ -33,8 +33,8 @@ using namespace NST::net;
 
 TEST(TcpEndpoint, constructDestruct)
 {
-	EXPECT_NO_THROW(TcpEndpoint endpoint(VALID_HOST, VALID_PORT));
-	EXPECT_THROW(TcpEndpoint endpoint(VALID_HOST, INVALID_PORT), std::runtime_error);
-	EXPECT_THROW(TcpEndpoint endpoint(INVALID_HOST, VALID_PORT), std::runtime_error);
-	EXPECT_THROW(TcpEndpoint endpoint(INVALID_HOST, INVALID_PORT), std::runtime_error);
+    EXPECT_NO_THROW(TcpEndpoint endpoint(VALID_HOST, VALID_PORT));
+    EXPECT_THROW(TcpEndpoint endpoint(VALID_HOST, INVALID_PORT), std::runtime_error);
+    EXPECT_THROW(TcpEndpoint endpoint(INVALID_HOST, VALID_PORT), std::runtime_error);
+    EXPECT_THROW(TcpEndpoint endpoint(INVALID_HOST, INVALID_PORT), std::runtime_error);
 }
