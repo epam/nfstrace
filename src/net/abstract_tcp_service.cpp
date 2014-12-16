@@ -177,8 +177,6 @@ void AbstractTcpService::runListener()
             }
             else
             {
-                // Just close pending socket on overload
-                close(pendingSocketDescriptor);
                 LOG("ERROR: TCP-service tasks queue overload has been detected")
             }
         }
