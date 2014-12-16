@@ -34,28 +34,29 @@ namespace net
 class TcpEndpoint
 {
 public:
-	//! Loopback address name
-	static const char * LoopbackAddress;
-	//! Wildcard address name
-	static const char * WildcardAddress;
-	
-	TcpEndpoint() = delete;
-	//! Constructs TCP-endpoint
-	/*!
-	 * \param host Hostname or IP-address of the endpoint
-	 * \param port TCP-port
-	 * \param hostAsAddress Consider host as IP-address flag
-	 */
-	TcpEndpoint(const std::string& host, int port, bool hostAsAddress = false);
-	//! Destructs TCP-endpoint
-	~TcpEndpoint();
+    //! Loopback address name
+    static const char* LoopbackAddress;
+    //! Wildcard address name
+    static const char* WildcardAddress;
 
-	//! Returns a pointer to 'struct addrinfo' structure for TCP-endpoint
-	struct addrinfo * addrinfo() {
-		return _addrinfo;
-	}
+    TcpEndpoint() = delete;
+    //! Constructs TCP-endpoint
+    /*!
+     * \param host Hostname or IP-address of the endpoint
+     * \param port TCP-port
+     * \param hostAsAddress Consider host as IP-address flag
+     */
+    TcpEndpoint(const std::string& host, int port, bool hostAsAddress = false);
+    //! Destructs TCP-endpoint
+    ~TcpEndpoint();
+
+    //! Returns a pointer to 'struct addrinfo' structure for TCP-endpoint
+    struct addrinfo* addrinfo()
+    {
+        return _addrinfo;
+    }
 private:
-	struct addrinfo * _addrinfo;
+    struct addrinfo* _addrinfo;
 };
 
 } // namespace net
