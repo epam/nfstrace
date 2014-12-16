@@ -19,7 +19,6 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#define WEB_API_VERSION "0.0.1"
 #define DEFAULT_PORT 8888
 #define DEFAULT_HOST TcpEndpoint::WildcardAddress
 #define DEFAULT_WORKERS_AMOUNT 10U
