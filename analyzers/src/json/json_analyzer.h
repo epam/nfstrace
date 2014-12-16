@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Ilya Storozhilov
-// Description: JSON analyzer class
+// Description: JSON analyzer class declaration
 // Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -94,7 +94,6 @@ public:
 	};
 
 	JsonAnalyzer(std::size_t workersAmount, int port, const std::string& host, std::size_t maxServingDurationMs, int backlog);
-	//~JsonAnalyzer();
 
 	void null(const struct RPCProcedure* /*proc*/,
 			const struct rpcgen::NULL3args* /*args*/,

@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Ilya Storozhilov
-// Description: TCP-endpoint tests.
+// Description: TCP-endpoint tests
 // Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
