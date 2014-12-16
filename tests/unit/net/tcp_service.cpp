@@ -27,6 +27,7 @@
 #include <sys/socket.h>
 
 #define AWAIT_FOR_SERVICE_STARTUP_MS 250
+#define TRANSMISSION_TIMEOUT_MS 100
 #define LISTEN_HOST TcpEndpoint::LoopbackAddress
 #define LISTEN_PORT 8888
 #define WORKERS_AMOUNT 100
@@ -58,9 +59,29 @@ private:
 		void execute() override final
 		{
 			++taskExecuteCallsCount;
+			// Receiving request
+			struct timespec readTimeout;
+			readTimeout.tv_sec = TRANSMISSION_TIMEOUT_MS / 1000;
+			readTimeout.tv_nsec = TRANSMISSION_TIMEOUT_MS % 1000 * 1000000;
+			fd_set readDescriptiorsSet;
+			FD_ZERO(&readDescriptiorsSet);
+			FD_SET(socket(), &readDescriptiorsSet);
+			int readDescriptorsCount = pselect(socket() + 1, &readDescriptiorsSet, NULL, NULL, &readTimeout, NULL);
+			ASSERT_GT(readDescriptorsCount, 0);
+			ASSERT_TRUE(FD_ISSET(socket(), &readDescriptiorsSet));
 			char receiveBuffer[RECEIVE_BUFFER_SIZE];
 			ssize_t bytesReceived = recv(socket(), receiveBuffer, sizeof(receiveBuffer), 0);
 			EXPECT_EQ(TestRequest, std::string(receiveBuffer, bytesReceived));
+			// Sending response
+			struct timespec writeTimeout;
+			writeTimeout.tv_sec = TRANSMISSION_TIMEOUT_MS / 1000;
+			writeTimeout.tv_nsec = TRANSMISSION_TIMEOUT_MS % 1000 * 1000000;
+			fd_set writeDescriptiorsSet;
+			FD_ZERO(&writeDescriptiorsSet);
+			FD_SET(socket(), &writeDescriptiorsSet);
+			int writeDescriptorsCount = pselect(socket() + 1, NULL, &writeDescriptiorsSet, NULL, &writeTimeout, NULL);
+			ASSERT_GT(writeDescriptorsCount, 0);
+			ASSERT_TRUE(FD_ISSET(socket(), &writeDescriptiorsSet));
 			ssize_t bytesSent = send(socket(), TestResponse, strlen(TestResponse), MSG_NOSIGNAL);
 			EXPECT_EQ(strlen(TestResponse), bytesSent);
 		}
