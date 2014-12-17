@@ -99,15 +99,21 @@ reference results.
 Authors
 -------
 
-Vitali  Adamenka  ([vitali_adamenka@epam.com](mailto:vitali_adamenka@epam.com))
+Vitali  Adamenka    ([vitali_adamenka@epam.com](mailto:vitali_adamenka@epam.com))
 
-Yauheni Azaranka  ([yauheni_azaranka@epam.com](mailto:yaheni_azaranka@epam.com))
+Yauheni Azaranka    ([yauheni_azaranka@epam.com](mailto:yaheni_azaranka@epam.com))
 
-Alexey  Costroma  ([alexey_costroma@epam.com](mailto:alexey_costroma@epam.com))
+Alexey  Costroma    ([alexey_costroma@epam.com](mailto:alexey_costroma@epam.com))
 
-Dzianis Huznou    ([dzianis_huznou@epam.com](mailto:dzianis_huznou@epam.com))
+Dzianis Huznou      ([dzianis_huznou@epam.com](mailto:dzianis_huznou@epam.com))
 
-Pavel   Karneliuk ([pavel_karneliuk@epam.com](mailto:pavel_karneliuk@epam.com))
+Pavel   Karneliuk   ([pavel_karneliuk@epam.com](mailto:pavel_karneliuk@epam.com))
+
+Andrey  Kuznetsov   ([andrey_kuznetsov@epam.com](mailto:andrey_kuznetsov@epam.com))
+
+Mikhail Litvinets   ([mikhail_litvinets@epam.com](mailto:mikhail_litvinets@epam.com))
+
+Ilya    Storozhilov ([ilya_storozhilov@epam.com](mailto:ilya_storozhilov@epam.com))
 
 
 License
