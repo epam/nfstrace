@@ -19,9 +19,9 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <cstring>
 #include <stdexcept>
 
-#include <string.h>
 #include <sys/socket.h>
 
 #include "net/tcp_endpoint.h"
