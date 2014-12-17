@@ -43,7 +43,7 @@ namespace net
 class AbstractTcpService
 {
 public:
-    static const int DefaultBacklog = 15;
+    static constexpr int DefaultBacklog = 15;
 
     AbstractTcpService() = delete;
     //! Constructs TCP-service and starts it
@@ -97,13 +97,13 @@ protected:
 
     virtual AbstractTask* createTask(int socket) = 0;
 private:
-    typedef std::vector<std::thread*> ThreadPool;
+    using ThreadPool = std::vector<std::unique_ptr<std::thread>>;
 
-    static const int ClockTimeoutMs = 100;
-    static const std::size_t ReadBufferSize = 1024;
-    static const std::size_t WriteBufferSize = 4096;
-    static const std::size_t HeaderPartSize = 1024;
-    static const int MaxTasksQueueSize = 128;
+    static constexpr int ClockTimeoutMs = 100;
+    static constexpr std::size_t ReadBufferSize = 1024;
+    static constexpr std::size_t WriteBufferSize = 4096;
+    static constexpr std::size_t HeaderPartSize = 1024;
+    static constexpr int MaxTasksQueueSize = 128;
 
     void runWorker();
     void runListener();
