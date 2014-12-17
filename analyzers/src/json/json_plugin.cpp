@@ -25,8 +25,8 @@
 #define DEFAULT_BACKLOG 15
 #define DEFAULT_MAX_SERVING_DURATION_MS 500
 //------------------------------------------------------------------------------
+#include "api/plugin_api.h" // include plugin development definitions
 #include "json_analyzer.h"
-#include <api/plugin_api.h> // include plugin development definitions
 //------------------------------------------------------------------------------
 extern "C"
 {

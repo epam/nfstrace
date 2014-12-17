@@ -54,12 +54,14 @@
 #define NFSV4_NULL_OPS_AMOUNT 81
 #define NFSV4_COMPOUND_OPS_AMOUNT 18
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
-#include <json_analyzer.h>
 #include <chrono>
 #include <thread>
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include <json.h>
+
+#include "json_analyzer.h"
 
 class JsonAnalyzerCase : public ::testing::Test
 {

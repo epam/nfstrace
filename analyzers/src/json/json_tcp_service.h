@@ -22,7 +22,7 @@
 #ifndef JSON_TCP_SERVICE_H
 #define JSON_TCP_SERVICE_H
 //------------------------------------------------------------------------------
-#include <net/abstract_tcp_service.h>
+#include "net/abstract_tcp_service.h"
 //------------------------------------------------------------------------------
 
 using namespace NST::net;

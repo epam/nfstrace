@@ -19,10 +19,12 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
-#include <net/tcp_endpoint.h>
 #include <stdexcept>
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
+#include "net/tcp_endpoint.h"
 
 #define VALID_HOST TcpEndpoint::LoopbackAddress
 #define VALID_PORT 8888

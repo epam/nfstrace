@@ -19,10 +19,12 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <net/tcp_endpoint.h>
 #include <stdexcept>
+
 #include <string.h>
 #include <sys/socket.h>
+
+#include "net/tcp_endpoint.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
