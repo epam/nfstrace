@@ -27,13 +27,11 @@
 
 using namespace NST::net;
 
-class JsonAnalyzer;
-
 class JsonTcpService : public AbstractTcpService
 {
 public:
     JsonTcpService() = delete;
-    JsonTcpService(JsonAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
+    JsonTcpService(class JsonAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
                    std::size_t maxServingDurationMs, int backlog);
 private:
     class Task : public AbstractTask
