@@ -35,63 +35,33 @@ class JsonAnalyzer : public IAnalyzer
 public:
     struct NfsV3Stat
     {
-        std::atomic_int nullOpsAmount;
-        std::atomic_int getattrOpsAmount;
-        std::atomic_int setattrOpsAmount;
-        std::atomic_int lookupOpsAmount;
-        std::atomic_int accessOpsAmount;
-        std::atomic_int readlinkOpsAmount;
-        std::atomic_int readOpsAmount;
-        std::atomic_int writeOpsAmount;
-        std::atomic_int createOpsAmount;
-        std::atomic_int mkdirOpsAmount;
-        std::atomic_int symlinkOpsAmount;
-        std::atomic_int mknodOpsAmount;
-        std::atomic_int removeOpsAmount;
-        std::atomic_int rmdirOpsAmount;
-        std::atomic_int renameOpsAmount;
-        std::atomic_int linkOpsAmount;
-        std::atomic_int readdirOpsAmount;
-        std::atomic_int readdirplusOpsAmount;
-        std::atomic_int fsstatOpsAmount;
-        std::atomic_int fsinfoOpsAmount;
-        std::atomic_int pathconfOpsAmount;
-        std::atomic_int commitOpsAmount;
-
-        NfsV3Stat() :
-            nullOpsAmount(0),
-            getattrOpsAmount(0),
-            setattrOpsAmount(0),
-            lookupOpsAmount(0),
-            accessOpsAmount(0),
-            readlinkOpsAmount(0),
-            readOpsAmount(0),
-            writeOpsAmount(0),
-            createOpsAmount(0),
-            mkdirOpsAmount(0),
-            symlinkOpsAmount(0),
-            mknodOpsAmount(0),
-            removeOpsAmount(0),
-            rmdirOpsAmount(0),
-            renameOpsAmount(0),
-            linkOpsAmount(0),
-            readdirOpsAmount(0),
-            readdirplusOpsAmount(0),
-            fsstatOpsAmount(0),
-            fsinfoOpsAmount(0),
-            pathconfOpsAmount(0),
-            commitOpsAmount(0)
-        {}
+        std::atomic_int nullOpsAmount = {0};
+        std::atomic_int getattrOpsAmount = {0};
+        std::atomic_int setattrOpsAmount = {0};
+        std::atomic_int lookupOpsAmount = {0};
+        std::atomic_int accessOpsAmount = {0};
+        std::atomic_int readlinkOpsAmount = {0};
+        std::atomic_int readOpsAmount = {0};
+        std::atomic_int writeOpsAmount = {0};
+        std::atomic_int createOpsAmount = {0};
+        std::atomic_int mkdirOpsAmount = {0};
+        std::atomic_int symlinkOpsAmount = {0};
+        std::atomic_int mknodOpsAmount = {0};
+        std::atomic_int removeOpsAmount = {0};
+        std::atomic_int rmdirOpsAmount = {0};
+        std::atomic_int renameOpsAmount = {0};
+        std::atomic_int linkOpsAmount = {0};
+        std::atomic_int readdirOpsAmount = {0};
+        std::atomic_int readdirplusOpsAmount = {0};
+        std::atomic_int fsstatOpsAmount = {0};
+        std::atomic_int fsinfoOpsAmount = {0};
+        std::atomic_int pathconfOpsAmount = {0};
+        std::atomic_int commitOpsAmount = {0};
     };
     struct NfsV4Stat
     {
-        std::atomic_int nullOpsAmount;
-        std::atomic_int compoundOpsAmount;
-
-        NfsV4Stat() :
-            nullOpsAmount(0),
-            compoundOpsAmount(0)
-        {}
+        std::atomic_int nullOpsAmount = {0};
+        std::atomic_int compoundOpsAmount = {0};
     };
 
     JsonAnalyzer(std::size_t workersAmount, int port, const std::string& host, std::size_t maxServingDurationMs, int backlog);
