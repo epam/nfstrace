@@ -22,13 +22,14 @@
 #ifndef ABSTRACT_TCP_SERVICE_H
 #define ABSTRACT_TCP_SERVICE_H
 //------------------------------------------------------------------------------
-#include <net/tcp_endpoint.h>
-#include <vector>
-#include <queue>
-#include <thread>
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
-#include <atomic>
+#include <queue>
+#include <thread>
+#include <vector>
+
+#include "net/tcp_endpoint.h"
 //------------------------------------------------------------------------------
 namespace NST
 {

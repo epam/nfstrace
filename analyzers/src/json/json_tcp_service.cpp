@@ -19,11 +19,13 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "json_tcp_service.h"
-#include "json_analyzer.h"
-#include <utils/log.h>
 #include <chrono>
+
 #include <json.h>
+
+#include "json_analyzer.h"
+#include "json_tcp_service.h"
+#include "utils/log.h"
 //------------------------------------------------------------------------------
 
 JsonTcpService::JsonTcpService(JsonAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,

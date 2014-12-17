@@ -19,12 +19,14 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include <chrono>
 #include <thread>
-#include <net/abstract_tcp_service.h>
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include <sys/socket.h>
+
+#include "net/abstract_tcp_service.h"
 
 #define AWAIT_FOR_SERVICE_STARTUP_MS 250
 #define TRANSMISSION_TIMEOUT_MS 10000

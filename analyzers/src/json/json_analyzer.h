@@ -22,9 +22,10 @@
 #ifndef JSON_ANALYZER_H
 #define JSON_ANALYZER_H
 //------------------------------------------------------------------------------
-#include "json_tcp_service.h"
-#include <api/ianalyzer_type.h>
 #include <atomic>
+
+#include "api/ianalyzer_type.h"
+#include "json_tcp_service.h"
 //------------------------------------------------------------------------------
 
 using namespace NST::API;
