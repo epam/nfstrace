@@ -19,15 +19,16 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#define DEFAULT_PORT 8888
-#define DEFAULT_HOST TcpEndpoint::WildcardAddress
-#define DEFAULT_WORKERS_AMOUNT 10U
-#define DEFAULT_BACKLOG 15
-#define DEFAULT_MAX_SERVING_DURATION_MS 500
-//------------------------------------------------------------------------------
 #include "api/plugin_api.h" // include plugin development definitions
 #include "json_analyzer.h"
 //------------------------------------------------------------------------------
+
+static constexpr int DefaultPort = 8888;
+static constexpr const char * DefaultHost = TcpEndpoint::WildcardAddress;
+static constexpr std::size_t DefaultWorkersAmount = 10U;
+static constexpr int DefaultBacklog = 15;
+static constexpr std::size_t DefaultMaxServingDurationMs = 500U;
+
 extern "C"
 {
 
@@ -43,11 +44,11 @@ extern "C"
     IAnalyzer* create(const char* opts)
     {
         // Initializing plugin options with default values
-        int backlog = DEFAULT_BACKLOG;
-        std::size_t maxServingDurationMs = DEFAULT_MAX_SERVING_DURATION_MS;
-        std::string host(DEFAULT_HOST);
-        int port = DEFAULT_PORT;
-        std::size_t workersAmount = DEFAULT_WORKERS_AMOUNT;
+        int backlog = DefaultBacklog;
+        std::size_t maxServingDurationMs = DefaultMaxServingDurationMs;
+        std::string host(DefaultHost);
+        int port = DefaultPort;
+        std::size_t workersAmount = DefaultWorkersAmount;
         // Parising plugin options
         enum
         {

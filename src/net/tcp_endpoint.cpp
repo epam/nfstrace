@@ -31,9 +31,6 @@ namespace NST
 namespace net
 {
 
-const char* TcpEndpoint::LoopbackAddress = "localhost";
-const char* TcpEndpoint::WildcardAddress = "*";
-
 TcpEndpoint::TcpEndpoint(const std::string& host, int port, bool hostAsAddress) :
     _addrinfo()
 {
