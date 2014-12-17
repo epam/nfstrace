@@ -36,9 +36,9 @@ class TcpEndpoint
 {
 public:
     //! Loopback address name
-    static const char* LoopbackAddress;
+    static constexpr const char* LoopbackAddress = "localhost";
     //! Wildcard address name
-    static const char* WildcardAddress;
+    static constexpr const char* WildcardAddress = "*";
 
     TcpEndpoint() = delete;
     //! Constructs TCP-endpoint
