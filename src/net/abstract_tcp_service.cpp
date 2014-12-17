@@ -70,7 +70,7 @@ AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, cons
     // Creating threads for thread-pool
     for (std::size_t i = 0; i < _threadPool.size(); ++i)
     {
-        _threadPool[i] = new std::thread(std::bind(&AbstractTcpService::runWorker, this));
+	_threadPool[i].reset(new std::thread(std::bind(&AbstractTcpService::runWorker, this)));
     }
     _listenerThread.reset(new std::thread(std::bind(&AbstractTcpService::runListener, this)));
 }
@@ -87,7 +87,6 @@ AbstractTcpService::~AbstractTcpService()
     for (std::size_t i = 0; i < _threadPool.size(); ++i)
     {
         _threadPool[i]->join();
-        delete _threadPool[i];
     }
     _threadPool.clear();
     _listenerThread->join();
