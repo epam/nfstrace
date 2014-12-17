@@ -73,10 +73,6 @@ static void handle_signals(const sigset_t    waitmask,
         {
             status.push(ProcessingDone{"Interrupted by user."});
         }
-        else if(signo == SIGTERM)
-        {
-            status.push(ProcessingDone{"Interrupted by SIGTERM."});
-        }
         else
         {
             status.push(SignalHandler::Signal{signo});
