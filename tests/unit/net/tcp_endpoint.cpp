@@ -18,25 +18,25 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+//------------------------------------------------------------------------------
 #include <stdexcept>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "net/tcp_endpoint.h"
-
-#define VALID_HOST TcpEndpoint::LoopbackAddress
-#define VALID_PORT 8888
-#define INVALID_HOST "трололо"
-#define INVALID_PORT -1
-
+//------------------------------------------------------------------------------
 using namespace NST::net;
+
+static constexpr const char* ValidHost = TcpEndpoint::LoopbackAddress;
+static constexpr int ValidPort = 8888;
+static constexpr const char* InvalidHost = "трололо";
+static constexpr int InvalidPort = -1;
 
 TEST(TestTcpEndpoint, constructDestruct)
 {
-    EXPECT_NO_THROW(TcpEndpoint endpoint(VALID_HOST, VALID_PORT));
-    EXPECT_THROW(TcpEndpoint endpoint(VALID_HOST, INVALID_PORT), std::runtime_error);
-    EXPECT_THROW(TcpEndpoint endpoint(INVALID_HOST, VALID_PORT), std::runtime_error);
-    EXPECT_THROW(TcpEndpoint endpoint(INVALID_HOST, INVALID_PORT), std::runtime_error);
+    EXPECT_NO_THROW(TcpEndpoint endpoint(ValidHost, ValidPort));
+    EXPECT_THROW(TcpEndpoint endpoint(ValidHost, InvalidPort), std::runtime_error);
+    EXPECT_THROW(TcpEndpoint endpoint(InvalidHost, ValidPort), std::runtime_error);
+    EXPECT_THROW(TcpEndpoint endpoint(InvalidHost, InvalidPort), std::runtime_error);
 }
