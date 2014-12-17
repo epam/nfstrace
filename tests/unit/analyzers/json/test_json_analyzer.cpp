@@ -71,8 +71,8 @@ protected:
     virtual void SetUp() override final
     {
         // Starting service
-        analyzer.reset(new JsonAnalyzer(WorkersAmount, ListenPort, ListenHost, MaxServingDurationMs, ListenBacklog));
-        std::this_thread::sleep_for(std::chrono::milliseconds(AwaitForServiceStartupMs));
+        analyzer.reset(new JsonAnalyzer{WorkersAmount, ListenPort, ListenHost, MaxServingDurationMs, ListenBacklog});
+        std::this_thread::sleep_for(std::chrono::milliseconds{AwaitForServiceStartupMs});
         // Setting up analyzer (NFSv3)
         for (int i = 0; i < NfsV3NullOpsAmount; ++i)
         {
@@ -261,7 +261,7 @@ TEST_F(JsonAnalyzerCase, requestResponse)
     // Connecting to service
     int s = socket(PF_INET, SOCK_STREAM, 0);
     ASSERT_GE(s, 0);
-    TcpEndpoint endpoint(ListenHost, ListenPort);
+    TcpEndpoint endpoint{ListenHost, ListenPort};
     ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
     char receiveBuffer[ReceiveBufferSize];
     ssize_t bytesReceived = recv(s, receiveBuffer, sizeof(receiveBuffer), 0);
@@ -412,9 +412,9 @@ TEST_F(JsonAnalyzerCase, slowClient)
 {
     int s = socket(PF_INET, SOCK_STREAM, 0);
     ASSERT_GE(s, 0);
-    TcpEndpoint endpoint(ListenHost, ListenPort);
+    TcpEndpoint endpoint{ListenHost, ListenPort};
     ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
-    std::this_thread::sleep_for(std::chrono::milliseconds(SlowClientTimeoutMs));
+    std::this_thread::sleep_for(std::chrono::milliseconds{SlowClientTimeoutMs});
     char receiveBuffer[ReceiveBufferSize];
     ssize_t bytesReceived = recv(s, receiveBuffer, sizeof(receiveBuffer), 0);
     EXPECT_GT(bytesReceived, 0);

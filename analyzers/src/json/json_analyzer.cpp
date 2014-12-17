@@ -23,9 +23,9 @@
 //------------------------------------------------------------------------------
 
 JsonAnalyzer::JsonAnalyzer(std::size_t workersAmount, int port, const std::string& host, std::size_t maxServingDurationMs, int backlog) :
-    _jsonTcpService(*this, workersAmount, port, host, maxServingDurationMs, backlog),
-    _nfsV3Stat(),
-    _nfsV4Stat()
+    _jsonTcpService{*this, workersAmount, port, host, maxServingDurationMs, backlog},
+    _nfsV3Stat{},
+    _nfsV4Stat{}
 {
 }
 

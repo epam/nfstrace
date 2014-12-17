@@ -32,14 +32,14 @@ namespace net
 {
 
 TcpEndpoint::TcpEndpoint(const std::string& host, int port, bool hostAsAddress) :
-    _addrinfo()
+    _addrinfo{}
 {
     struct addrinfo hints;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags |= AI_NUMERICSERV;
-    std::string serviceStr(std::to_string(port));
+    std::string serviceStr{std::to_string(port)};
     if (host == WildcardAddress)
     {
         hints.ai_flags |= AI_PASSIVE;
@@ -56,7 +56,7 @@ TcpEndpoint::TcpEndpoint(const std::string& host, int port, bool hostAsAddress) 
                              serviceStr.c_str(), &hints, &_addrinfo);
     if (status != 0)
     {
-        throw std::runtime_error(gai_strerror(status));
+        throw std::runtime_error{gai_strerror(status)};
     }
 }
 
