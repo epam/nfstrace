@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+//------------------------------------------------------------------------------
 #include <chrono>
 #include <thread>
 
@@ -27,18 +27,17 @@
 #include <sys/socket.h>
 
 #include "net/abstract_tcp_service.h"
-
-#define AWAIT_FOR_SERVICE_STARTUP_MS 250
-#define TRANSMISSION_TIMEOUT_MS 10000
-#define LISTEN_HOST TcpEndpoint::LoopbackAddress
-#define LISTEN_PORT 8888
-#define WORKERS_AMOUNT 100
-#define RECEIVE_BUFFER_SIZE 4096
-
+//------------------------------------------------------------------------------
 using namespace NST::net;
 
-static const char* TestRequest = "GET";
-static const char* TestResponse = "{copy:32,remove:46,getattr:154}";
+static constexpr std::size_t AwaitForServiceStartupMs = 250U;
+static constexpr std::size_t TransmissionTimeoutMs = 10000U;
+static constexpr const char* ListenHost = TcpEndpoint::LoopbackAddress;
+static constexpr int ListenPort = 8888;
+static constexpr std::size_t WorkersAmount = 100U;
+static constexpr std::size_t ReceiveBufferSize = 4096U;
+static constexpr const char* TestRequest = "GET";
+static constexpr const char* TestResponse = "{copy:32,remove:46,getattr:154}";
 
 static std::atomic_int taskExecuteCallsCount;
 
@@ -46,7 +45,7 @@ class TestTcpService : public AbstractTcpService
 {
 public:
     TestTcpService() :
-        AbstractTcpService(WORKERS_AMOUNT, LISTEN_PORT, LISTEN_HOST)
+        AbstractTcpService(WorkersAmount, ListenPort, ListenHost)
     {}
 private:
     class Task : public AbstractTask
@@ -63,21 +62,21 @@ private:
             ++taskExecuteCallsCount;
             // Receiving request
             struct timespec readTimeout;
-            readTimeout.tv_sec = TRANSMISSION_TIMEOUT_MS / 1000;
-            readTimeout.tv_nsec = TRANSMISSION_TIMEOUT_MS % 1000 * 1000000;
+            readTimeout.tv_sec = TransmissionTimeoutMs / 1000;
+            readTimeout.tv_nsec = TransmissionTimeoutMs % 1000 * 1000000;
             fd_set readDescriptiorsSet;
             FD_ZERO(&readDescriptiorsSet);
             FD_SET(socket(), &readDescriptiorsSet);
             int readDescriptorsCount = pselect(socket() + 1, &readDescriptiorsSet, NULL, NULL, &readTimeout, NULL);
             ASSERT_GT(readDescriptorsCount, 0);
             ASSERT_TRUE(FD_ISSET(socket(), &readDescriptiorsSet));
-            char receiveBuffer[RECEIVE_BUFFER_SIZE];
+            char receiveBuffer[ReceiveBufferSize];
             ssize_t bytesReceived = recv(socket(), receiveBuffer, sizeof(receiveBuffer), 0);
             EXPECT_EQ(TestRequest, std::string(receiveBuffer, bytesReceived));
             // Sending response
             struct timespec writeTimeout;
-            writeTimeout.tv_sec = TRANSMISSION_TIMEOUT_MS / 1000;
-            writeTimeout.tv_nsec = TRANSMISSION_TIMEOUT_MS % 1000 * 1000000;
+            writeTimeout.tv_sec = TransmissionTimeoutMs / 1000;
+            writeTimeout.tv_nsec = TransmissionTimeoutMs % 1000 * 1000000;
             fd_set writeDescriptiorsSet;
             FD_ZERO(&writeDescriptiorsSet);
             FD_SET(socket(), &writeDescriptiorsSet);
@@ -106,14 +105,14 @@ TEST(TestTcpService, requestResponse)
 {
     taskExecuteCallsCount = 0;
     TestTcpService service;
-    std::this_thread::sleep_for(std::chrono::milliseconds(AWAIT_FOR_SERVICE_STARTUP_MS));
+    std::this_thread::sleep_for(std::chrono::milliseconds(AwaitForServiceStartupMs));
     int s = socket(PF_INET, SOCK_STREAM, 0);
     ASSERT_GE(s, 0);
-    TcpEndpoint endpoint(LISTEN_HOST, LISTEN_PORT);
+    TcpEndpoint endpoint(ListenHost, ListenPort);
     ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
     ssize_t bytesSent = send(s, TestRequest, strlen(TestRequest), MSG_NOSIGNAL);
     EXPECT_EQ(strlen(TestRequest), bytesSent);
-    char receiveBuffer[RECEIVE_BUFFER_SIZE];
+    char receiveBuffer[ReceiveBufferSize];
     ssize_t bytesReceived = recv(s, receiveBuffer, sizeof(receiveBuffer), 0);
     EXPECT_EQ(TestResponse, std::string(receiveBuffer, bytesReceived));
     EXPECT_EQ(0, close(s));
@@ -124,14 +123,14 @@ TEST(TestTcpService, multipleRequestResponse)
 {
     taskExecuteCallsCount = 0;
     TestTcpService service;
-    std::this_thread::sleep_for(std::chrono::milliseconds(AWAIT_FOR_SERVICE_STARTUP_MS));
-    std::vector<int> sockets(WORKERS_AMOUNT);
+    std::this_thread::sleep_for(std::chrono::milliseconds(AwaitForServiceStartupMs));
+    std::vector<int> sockets(WorkersAmount);
     for (auto & s : sockets)
     {
         s = socket(PF_INET, SOCK_STREAM, 0);
         ASSERT_GE(s, 0);
     }
-    TcpEndpoint endpoint(LISTEN_HOST, LISTEN_PORT);
+    TcpEndpoint endpoint(ListenHost, ListenPort);
     for (auto & s : sockets)
     {
         ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
@@ -141,7 +140,7 @@ TEST(TestTcpService, multipleRequestResponse)
         ssize_t bytesSent = send(s, TestRequest, strlen(TestRequest), MSG_NOSIGNAL);
         EXPECT_EQ(strlen(TestRequest), bytesSent);
     }
-    char receiveBuffer[RECEIVE_BUFFER_SIZE];
+    char receiveBuffer[ReceiveBufferSize];
     for (auto & s : sockets)
     {
         ssize_t bytesReceived = recv(s, receiveBuffer, sizeof(receiveBuffer), 0);

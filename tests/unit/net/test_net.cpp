@@ -18,10 +18,10 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+//------------------------------------------------------------------------------
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
+//------------------------------------------------------------------------------
 int main(int argc, char** argv)
 {
     setenv("LANG", "C", 1);
