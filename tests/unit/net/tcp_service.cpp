@@ -45,14 +45,14 @@ class TestTcpService : public AbstractTcpService
 {
 public:
     TestTcpService() :
-        AbstractTcpService(WorkersAmount, ListenPort, ListenHost)
+        AbstractTcpService{WorkersAmount, ListenPort, ListenHost}
     {}
 private:
     class Task : public AbstractTask
     {
     public:
         Task(TestTcpService& service, int socket) :
-            AbstractTask(socket),
+            AbstractTask{socket},
             _service(service)
         {}
         Task() = delete;
@@ -92,7 +92,7 @@ private:
 
     AbstractTask* createTask(int socket) override final
     {
-        return new Task(*this, socket);
+        return new Task{*this, socket};
     }
 };
 
@@ -105,10 +105,10 @@ TEST(TestTcpService, requestResponse)
 {
     taskExecuteCallsCount = 0;
     TestTcpService service;
-    std::this_thread::sleep_for(std::chrono::milliseconds(AwaitForServiceStartupMs));
+    std::this_thread::sleep_for(std::chrono::milliseconds{AwaitForServiceStartupMs});
     int s = socket(PF_INET, SOCK_STREAM, 0);
     ASSERT_GE(s, 0);
-    TcpEndpoint endpoint(ListenHost, ListenPort);
+    TcpEndpoint endpoint{ListenHost, ListenPort};
     ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
     ssize_t bytesSent = send(s, TestRequest, strlen(TestRequest), MSG_NOSIGNAL);
     EXPECT_EQ(strlen(TestRequest), bytesSent);
@@ -123,14 +123,14 @@ TEST(TestTcpService, multipleRequestResponse)
 {
     taskExecuteCallsCount = 0;
     TestTcpService service;
-    std::this_thread::sleep_for(std::chrono::milliseconds(AwaitForServiceStartupMs));
+    std::this_thread::sleep_for(std::chrono::milliseconds{AwaitForServiceStartupMs});
     std::vector<int> sockets(WorkersAmount);
     for (auto & s : sockets)
     {
         s = socket(PF_INET, SOCK_STREAM, 0);
         ASSERT_GE(s, 0);
     }
-    TcpEndpoint endpoint(ListenHost, ListenPort);
+    TcpEndpoint endpoint{ListenHost, ListenPort};
     for (auto & s : sockets)
     {
         ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
