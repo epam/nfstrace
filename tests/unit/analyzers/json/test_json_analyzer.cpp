@@ -33,7 +33,7 @@ using namespace NST::net;
 static constexpr std::size_t AwaitForServiceStartupMs = 250U;
 static constexpr std::size_t WorkersAmount = 100U;
 static constexpr int ListenPort = 8888;
-static constexpr const char* ListenHost = TcpEndpoint::LoopbackAddress;
+static constexpr const char* ListenHost = IpEndpoint::LoopbackAddress;
 static constexpr std::size_t MaxServingDurationMs = 200;
 static constexpr int ListenBacklog = 15;
 static constexpr std::size_t ReceiveBufferSize = 4096U;
@@ -261,7 +261,7 @@ TEST_F(JsonAnalyzerCase, requestResponse)
     // Connecting to service
     int s = socket(PF_INET, SOCK_STREAM, 0);
     ASSERT_GE(s, 0);
-    TcpEndpoint endpoint{ListenHost, ListenPort};
+    IpEndpoint endpoint{ListenHost, ListenPort};
     ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
     char receiveBuffer[ReceiveBufferSize];
     ssize_t bytesReceived = recv(s, receiveBuffer, sizeof(receiveBuffer), 0);
@@ -412,7 +412,7 @@ TEST_F(JsonAnalyzerCase, slowClient)
 {
     int s = socket(PF_INET, SOCK_STREAM, 0);
     ASSERT_GE(s, 0);
-    TcpEndpoint endpoint{ListenHost, ListenPort};
+    IpEndpoint endpoint{ListenHost, ListenPort};
     ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
     std::this_thread::sleep_for(std::chrono::milliseconds{SlowClientTimeoutMs});
     char receiveBuffer[ReceiveBufferSize];

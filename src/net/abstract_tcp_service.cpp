@@ -57,7 +57,7 @@ AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, cons
         throw std::system_error{errno, std::system_category(), "Setting SO_REUSEADDR socket option error"};
     }
     // Binding server socket to endpoint
-    TcpEndpoint endpoint{host.c_str(), port};
+    IpEndpoint endpoint{host.c_str(), port};
     if (bind(_serverSocket, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen) != 0)
     {
         throw std::system_error{errno, std::system_category(), "Binding server socket error"};

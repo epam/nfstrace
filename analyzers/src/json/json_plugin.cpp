@@ -24,7 +24,7 @@
 //------------------------------------------------------------------------------
 
 static constexpr int DefaultPort = 8888;
-static constexpr const char * DefaultHost = TcpEndpoint::WildcardAddress;
+static constexpr const char * DefaultHost = IpEndpoint::WildcardAddress;
 static constexpr std::size_t DefaultWorkersAmount = 10U;
 static constexpr int DefaultBacklog = 15;
 static constexpr std::size_t DefaultMaxServingDurationMs = 500U;
