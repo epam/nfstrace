@@ -125,6 +125,10 @@ int Controller::run()
                 {
                     glog.reopen();
                 }
+                else if(s.signal_number == SIGINT)
+                {
+                    throw ProcessingDone{std::string{"Interrupted by user."}};
+                }
                 else if(s.signal_number == SIGTERM)
                 {
                     throw ProcessingDone{std::string{"Interrupted by SIGTERM."}};
