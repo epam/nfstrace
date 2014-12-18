@@ -51,7 +51,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
     : rpc_message_limit{0}
     {
         parse(argc, argv);
-        if(get(CLI::HELP).to_bool())
+        if(get(CLI::ArgHelp).to_bool())
         {
             std::cout << PROGRAM_BUILD_INFO << std::endl;
             print_usage(std::cout, argv[0]);
@@ -72,7 +72,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
         }
         validate();
 
-        if(get(CLI::ENUM).is("-") || get(CLI::ENUM).is("interfaces"))
+        if(get(CLI::ArgEnum).is("-") || get(CLI::ArgEnum).is("interfaces"))
         {
             std::cout << "\nAvailable interfaces:" << std::endl;
 
@@ -93,7 +93,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
             }
         }
 
-        if(get(CLI::ENUM).is("-") || get(CLI::ENUM).is("plugins"))
+        if(get(CLI::ArgEnum).is("-") || get(CLI::ArgEnum).is("plugins"))
         {
             std::cout << "\nAvailable plugins:" << std::endl;
             DIR *dir;
@@ -124,17 +124,17 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
             }
         }
 
-        if(!get(CLI::ENUM).is("none")) return;
+        if(!get(CLI::ArgEnum).is("none")) return;
 
         // cashed values
         const std::string program_path(argv[0]);
         size_t found {program_path.find_last_of("/\\")};
         program = program_path.substr(found+1);
 
-        const int limit {get(CLI::MSIZE).to_int()};
+        const int limit {get(CLI::ArgMSize).to_int()};
         if(limit < 1 || limit > 4000)
         {
-            throw cmdline::CLIError{std::string{"Invalid limit of RPC messages: "} + get(CLI::MSIZE).to_cstr()};
+            throw cmdline::CLIError{std::string{"Invalid limit of RPC messages: "} + get(CLI::ArgMSize).to_cstr()};
         }
 
         rpc_message_limit = limit;
@@ -146,7 +146,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
 protected:
     void set_multiple_value(int index, char *const v) override
     {
-        if(index == CLI::ANALYZERS) // may have multiple values
+        if(index == CLI::ArgAnalyzers) // may have multiple values
         {
             const std::string arg{v};
             size_t ind {arg.find('#')};
@@ -169,7 +169,7 @@ private:
         // create string: PROGRAMNAME-BPF-FILTER.pcap
         std::string str { impl->program };
         str.push_back('-');
-        str.append(get(CLI::FILTER).to_cstr());
+        str.append(get(CLI::ArgFilter).to_cstr());
         str.append(".pcap");
         std::replace(str.begin(), str.end(), ' ', '-');
         return str;
@@ -213,12 +213,12 @@ Parameters::~Parameters()
 
 bool Parameters::show_help() const
 {
-    return impl->get(CLI::HELP).to_bool();
+    return impl->get(CLI::ArgHelp).to_bool();
 }
 
 bool Parameters::show_enum() const
 {
-    return !impl->get(CLI::ENUM).is("none");
+    return !impl->get(CLI::ArgEnum).is("none");
 }
 
 const std::string& Parameters::program_name() const
@@ -228,7 +228,7 @@ const std::string& Parameters::program_name() const
 
 RunningMode Parameters::running_mode() const
 {
-    const auto& mode = impl->get(CLI::MODE);
+    const auto& mode = impl->get(CLI::ArgMode);
     if(mode.is(CLI::profiling_mode))
     {
         return RunningMode::Profiling;
@@ -251,26 +251,26 @@ RunningMode Parameters::running_mode() const
 std::string Parameters::input_file() const
 {
     // TODO: add file validation
-    return impl->is_default(CLI::IFILE) ? impl->default_iofile() : impl->get(CLI::IFILE);
+    return impl->is_default(CLI::ArgIFile) ? impl->default_iofile() : impl->get(CLI::ArgIFile);
 }
 
 const std::string Parameters::dropuser() const
 {
-    return impl->get(CLI::DROPROOT);
+    return impl->get(CLI::ArgDropRoot);
 }
 
 const std::string Parameters::log_path() const
 {
-    return impl->get(CLI::LOGPATH);
+    return impl->get(CLI::ArgLogPath);
 }
 
 unsigned short Parameters::queue_capacity() const
 {
-    const int capacity = impl->get(CLI::QSIZE).to_int();
+    const int capacity = impl->get(CLI::ArgQSize).to_int();
     if(capacity < 1 || capacity > 65535)
     {
         throw cmdline::CLIError(std::string{"Invalid value of queue capacity: "}
-                                 + impl->get(CLI::QSIZE).to_cstr());
+                                 + impl->get(CLI::ArgQSize).to_cstr());
     }
 
     return capacity;
@@ -279,26 +279,26 @@ unsigned short Parameters::queue_capacity() const
 bool Parameters::trace() const
 {
     // enable tracing if no analysis module was passed
-    return impl->get(CLI::TRACE).to_bool() || impl->analysis_modules.empty();
+    return impl->get(CLI::ArgTrace).to_bool() || impl->analysis_modules.empty();
 }
 
 int Parameters::verbose_level() const
 {
-    return impl->get(CLI::VERBOSE).to_int();
+    return impl->get(CLI::ArgVerbose).to_int();
 }
 
 const Parameters::CaptureParams Parameters::capture_params() const
 {
     Parameters::CaptureParams params;
-    params.interface    = impl->get(CLI::INTERFACE);
-    params.filter       = impl->get(CLI::FILTER);
-    params.snaplen      = impl->get(CLI::SNAPLEN).to_int();
-    params.timeout_ms   = impl->get(CLI::TIMEOUT).to_int();
-    params.buffer_size  = impl->get(CLI::BSIZE).to_int() * 1024 * 1024; // MBytes
-    params.promisc      = impl->get(CLI::PROMISC).to_bool();
+    params.interface    = impl->get(CLI::ArgInterface);
+    params.filter       = impl->get(CLI::ArgFilter);
+    params.snaplen      = impl->get(CLI::ArgSnaplen).to_int();
+    params.timeout_ms   = impl->get(CLI::ArgTimeout).to_int();
+    params.buffer_size  = impl->get(CLI::ArgBSize).to_int() * 1024 * 1024; // MBytes
+    params.promisc      = impl->get(CLI::ArgPromisc).to_bool();
 
     // check interface
-    if(impl->is_default(CLI::INTERFACE))
+    if(impl->is_default(CLI::ArgInterface))
     {
         params.interface = NST::filtration::pcap::NetworkInterfaces::default_device();
     }
@@ -307,25 +307,25 @@ const Parameters::CaptureParams Parameters::capture_params() const
     if(params.buffer_size < 1024 * 1024) // less than 1 MBytes
     {
         throw cmdline::CLIError{std::string{"Invalid value of kernel buffer size: "}
-                                 + impl->get(CLI::BSIZE).to_cstr()};
+                                 + impl->get(CLI::ArgBSize).to_cstr()};
     }
 
     // check max length of raw captured UDP packet
     if(params.snaplen < 1 || params.snaplen > 65535)
     {
         throw cmdline::CLIError{std::string{"Invalid value of max length of raw captured UDP packet: "}
-                                 + impl->get(CLI::SNAPLEN).to_cstr()};
+                                 + impl->get(CLI::ArgSnaplen).to_cstr()};
     }
 
     // check the read timeout that will be used on a capture
     if(params.timeout_ms < 1)
     {
         throw cmdline::CLIError{std::string{"Invalid value of read timeout that will be used on a capture: "}
-                                 + impl->get(CLI::TIMEOUT).to_cstr()};
+                                 + impl->get(CLI::ArgTimeout).to_cstr()};
     }
 
     // check and set capture direction
-    const auto& direction = impl->get(CLI::DIRECTION);
+    const auto& direction = impl->get(CLI::ArgDirection);
     if(direction.is("in"))
     {
         params.direction = decltype(params.direction)::IN;
@@ -349,10 +349,10 @@ const Parameters::CaptureParams Parameters::capture_params() const
 
 const Parameters::DumpingParams Parameters::dumping_params() const
 {
-    std::string ofile = impl->is_default(CLI::OFILE) ? impl->default_iofile() : impl->get(CLI::OFILE);
+    std::string ofile = impl->is_default(CLI::ArgOFile) ? impl->default_iofile() : impl->get(CLI::ArgOFile);
     // TODO: add file validation
 
-    const int dsize = impl->get(CLI::DSIZE).to_int();
+    const int dsize = impl->get(CLI::ArgDSize).to_int();
     if(dsize != 0 && ofile == "-") // '-' is alias for stdout in libpcap dumps
     {
         throw cmdline::CLIError{std::string{"Output file \"-\" means stdout, the dump-size must be 0"}};
@@ -360,7 +360,7 @@ const Parameters::DumpingParams Parameters::dumping_params() const
 
     Parameters::DumpingParams params;
     params.output_file = ofile;
-    params.command     = impl->get(CLI::COMMAND);
+    params.command     = impl->get(CLI::ArgCommand);
     params.size_limit  = dsize * 1024 * 1024; // MBytes
     return params;
 }
