@@ -97,7 +97,7 @@ protected:
 
     virtual AbstractTask* createTask(int socket) = 0;
 private:
-    using ThreadPool = std::vector<std::unique_ptr<std::thread>>;
+    using ThreadPool = std::vector<std::thread>;
 
     static constexpr int ClockTimeoutMs = 100;
     static constexpr std::size_t ReadBufferSize = 1024;
@@ -110,7 +110,7 @@ private:
 
     std::atomic_bool _isRunning;
     ThreadPool _threadPool;
-    std::unique_ptr<std::thread> _listenerThread;
+    std::thread _listenerThread;
     int _serverSocket;
     std::queue<AbstractTask*> _tasksQueue;
     std::mutex _tasksQueueMutex;

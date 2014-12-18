@@ -68,11 +68,11 @@ AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, cons
         throw std::system_error{errno, std::system_category(), "Converting socket to listening state error"};
     }
     // Creating threads for thread-pool
-    for (std::size_t i = 0; i < _threadPool.size(); ++i)
+    for (auto & thr : _threadPool)
     {
-	_threadPool[i].reset(new std::thread{std::bind(&AbstractTcpService::runWorker, this)});
+        thr = std::thread{[this]() { this->runWorker(); }};
     }
-    _listenerThread.reset(new std::thread{std::bind(&AbstractTcpService::runListener, this)});
+    _listenerThread = std::thread{[this]() { this->runListener(); }};
 }
 
 AbstractTcpService::~AbstractTcpService()
@@ -84,12 +84,12 @@ AbstractTcpService::~AbstractTcpService()
         _tasksQueueCond.notify_all();
     }
     // Joining to thread-pool threads and disposing them
-    for (std::size_t i = 0; i < _threadPool.size(); ++i)
+    for (auto & thr : _threadPool)
     {
-        _threadPool[i]->join();
+        thr.join();
     }
     _threadPool.clear();
-    _listenerThread->join();
+    _listenerThread.join();
     close(_serverSocket);
     // Disposing tasks which are still in queue
     while (!_tasksQueue.empty())
