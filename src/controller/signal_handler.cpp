@@ -69,10 +69,6 @@ static void handle_signals(const sigset_t    waitmask,
                                               "error in SignalHandler wait"});
             }
         }
-        else if(signo == SIGINT)
-        {
-            status.push(ProcessingDone{"Interrupted by user."});
-        }
         else
         {
             status.push(SignalHandler::Signal{signo});
