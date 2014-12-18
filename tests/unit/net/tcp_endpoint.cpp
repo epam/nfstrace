@@ -30,7 +30,7 @@ using namespace NST::net;
 
 static constexpr const char* ValidHost = TcpEndpoint::LoopbackAddress;
 static constexpr int ValidPort = 8888;
-static constexpr const char* InvalidHost = "трололо";
+static constexpr const char* InvalidHost = "invalid_host_name";
 static constexpr int InvalidPort = -1;
 
 TEST(TestTcpEndpoint, constructDestruct)
