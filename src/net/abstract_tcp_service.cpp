@@ -77,10 +77,10 @@ AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, cons
 
 AbstractTcpService::~AbstractTcpService()
 {
-    _isRunning = false;
     {
         // Waking up all awaiting threads
         std::unique_lock<std::mutex> lock{_tasksQueueMutex};
+        _isRunning = false;
         _tasksQueueCond.notify_all();
     }
     // Joining to thread-pool threads and disposing them
@@ -101,30 +101,29 @@ AbstractTcpService::~AbstractTcpService()
 
 void AbstractTcpService::runWorker()
 {
-    while (_isRunning.load())
+    while (true)
     {
         std::unique_ptr<AbstractTask> pendingTask;
         {
             std::unique_lock<std::mutex> lock{_tasksQueueMutex};
-            if (!_tasksQueue.empty())
+            while (pendingTask.get() == nullptr)
             {
-                pendingTask.reset(_tasksQueue.front());
-                _tasksQueue.pop();
-            }
-            else
-            {
-                _tasksQueueCond.wait(lock);
+                if (!_isRunning.load())
+                {
+                    return;
+                }
                 if (!_tasksQueue.empty())
                 {
                     pendingTask.reset(_tasksQueue.front());
                     _tasksQueue.pop();
                 }
+                else
+                {
+                    _tasksQueueCond.wait(lock);
+                }
             }
         }
-        if (pendingTask.get() != nullptr)
-        {
-            pendingTask->execute();
-        }
+        pendingTask->execute();
     }
 }
 
