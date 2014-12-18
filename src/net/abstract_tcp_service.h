@@ -29,7 +29,7 @@
 #include <thread>
 #include <vector>
 
-#include "net/tcp_endpoint.h"
+#include "net/ip_endpoint.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -53,7 +53,7 @@ public:
      * \param host Hostname/IP-address to listen
      * \param backlog Listen backlog - see listen(2)
      */
-    AbstractTcpService(std::size_t workersAmount, int port, const std::string& host = TcpEndpoint::WildcardAddress,
+    AbstractTcpService(std::size_t workersAmount, int port, const std::string& host = IpEndpoint::WildcardAddress,
                        int backlog = DefaultBacklog);
     //! Stops TCP-service and destructs it
     virtual ~AbstractTcpService();

@@ -32,7 +32,7 @@ using namespace NST::net;
 
 static constexpr std::size_t AwaitForServiceStartupMs = 250U;
 static constexpr std::size_t TransmissionTimeoutMs = 10000U;
-static constexpr const char* ListenHost = TcpEndpoint::LoopbackAddress;
+static constexpr const char* ListenHost = IpEndpoint::LoopbackAddress;
 static constexpr int ListenPort = 8888;
 static constexpr std::size_t WorkersAmount = 100U;
 static constexpr std::size_t ReceiveBufferSize = 4096U;
@@ -108,7 +108,7 @@ TEST(TestTcpService, requestResponse)
     std::this_thread::sleep_for(std::chrono::milliseconds{AwaitForServiceStartupMs});
     int s = socket(PF_INET, SOCK_STREAM, 0);
     ASSERT_GE(s, 0);
-    TcpEndpoint endpoint{ListenHost, ListenPort};
+    IpEndpoint endpoint{ListenHost, ListenPort};
     ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
     ssize_t bytesSent = send(s, TestRequest, strlen(TestRequest), MSG_NOSIGNAL);
     EXPECT_EQ(strlen(TestRequest), bytesSent);
@@ -130,7 +130,7 @@ TEST(TestTcpService, multipleRequestResponse)
         s = socket(PF_INET, SOCK_STREAM, 0);
         ASSERT_GE(s, 0);
     }
-    TcpEndpoint endpoint{ListenHost, ListenPort};
+    IpEndpoint endpoint{ListenHost, ListenPort};
     for (auto & s : sockets)
     {
         ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));

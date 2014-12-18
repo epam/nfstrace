@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Ilya Storozhilov
-// Description: TCP-endpoint class declaration
+// Description: TCP-endpoint class definition
 // Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,50 +19,52 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef TCP_ENPOINT_H
-#define TCP_ENPOINT_H
-//------------------------------------------------------------------------------
-#include <string>
+#include <cstring>
+#include <stdexcept>
 
-#include <netdb.h>
+#include <sys/socket.h>
+
+#include "net/ip_endpoint.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace net
 {
 
-//! TCP-endpoint (host:port) helper class to use in socket operations
-class TcpEndpoint
+IpEndpoint::IpEndpoint(const std::string& host, int port, bool hostAsAddress) :
+    _addrinfo{}
 {
-public:
-    //! Loopback address name
-    static constexpr const char* LoopbackAddress = "localhost";
-    //! Wildcard address name
-    static constexpr const char* WildcardAddress = "*";
-
-    TcpEndpoint() = delete;
-    //! Constructs TCP-endpoint
-    /*!
-     * \param host Hostname or IP-address of the endpoint
-     * \param port TCP-port
-     * \param hostAsAddress Consider host as IP-address flag
-     */
-    TcpEndpoint(const std::string& host, int port, bool hostAsAddress = false);
-    //! Destructs TCP-endpoint
-    ~TcpEndpoint();
-
-    //! Returns a pointer to 'struct addrinfo' structure for TCP-endpoint
-    struct addrinfo* addrinfo()
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags |= AI_NUMERICSERV;
+    std::string serviceStr{std::to_string(port)};
+    if (host == WildcardAddress)
     {
-        return _addrinfo;
+        hints.ai_flags |= AI_PASSIVE;
     }
-private:
-    struct addrinfo* _addrinfo;
-};
+    if ((host != WildcardAddress) && (host != LoopbackAddress))
+    {
+        hints.ai_flags |= AI_CANONNAME;
+        if (hostAsAddress)
+        {
+            hints.ai_flags |= AI_NUMERICHOST;
+        }
+    }
+    int status = getaddrinfo((host == LoopbackAddress) || (host == WildcardAddress) ? nullptr : host.c_str(),
+                             serviceStr.c_str(), &hints, &_addrinfo);
+    if (status != 0)
+    {
+        throw std::runtime_error{gai_strerror(status)};
+    }
+}
+
+IpEndpoint::~IpEndpoint()
+{
+    freeaddrinfo(_addrinfo);
+}
 
 } // namespace net
 } // namespace NST
-
-//------------------------------------------------------------------------------
-#endif // TCP_ENPOINT_H
 //------------------------------------------------------------------------------
