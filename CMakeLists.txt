@@ -64,6 +64,8 @@ target_link_libraries (${PROJECT_NAME} ${LIBS})
 # build watch analyzer==========================================================
 add_subdirectory(analyzers)
 
+add_subdirectory (analyzers/src/json)
+
 # testing ======================================================================
 enable_testing ()
 add_subdirectory (tests)
@@ -89,9 +91,11 @@ set (CPACK_RPM_PACKAGE_LICENSE "GPLv2")
 set (CPACK_RPM_PACKAGE_VENDOR "EPAM Systems")
 set (CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/man /usr/share/man/man8)
 set (CPACK_RPM_PACKAGE_REQUIRES "libpcap >= 1.3.0-1")
+set (CPACK_RPM_PACKAGE_REQUIRES "libjson-c2 >= 0.11")
 
 set (CPACK_DEBIAN_PACKAGE_SECTION "admin")
 set (CPACK_DEBIAN_PACKAGE_DEPENDS "libpcap0.8 (>=1.3.0-1)")
+set (CPACK_DEBIAN_PACKAGE_DEPENDS "libjson-c2 (>=0.11)")
 
 include (CPack)
 

@@ -69,10 +69,6 @@ static void handle_signals(const sigset_t    waitmask,
                                               "error in SignalHandler wait"});
             }
         }
-        else if(signo == SIGINT)
-        {
-            status.push(ProcessingDone{"Interrupted by user."});
-        }
         else
         {
             status.push(SignalHandler::Signal{signo});
@@ -100,6 +96,7 @@ SignalHandler::SignalHandler(RunningStatus& s)
     sigset_t mask;
     ::sigemptyset(&mask);
     ::sigaddset(&mask, SIGINT);  // correct exit from program by Ctrl-C
+    ::sigaddset(&mask, SIGTERM); // correct exit when SIGTERM has been received
     ::sigaddset(&mask, SIGCHLD); // stop sigwait-thread and wait children
     ::sigaddset(&mask, SIGHUP);  // signal for losing terminal
     const int err = ::pthread_sigmask(SIG_BLOCK, &mask, nullptr);

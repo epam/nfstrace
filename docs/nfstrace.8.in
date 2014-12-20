@@ -351,6 +351,90 @@ or
 .PP
 .B nst.sh \-a breakdown_nfsv4.plt \-d . \-p 'breakdown_10.6.137.47:903*.dat'
 .RE
+.SS JSON Analyzer
+JSON analyzer calculates a total amount of each supported application protocol
+operation. It accepts TCP-connections on particular TCP-endpoint (host:port),
+sends a respective JSON to the TCP-client and closes connection. Suggested to
+be used in
+.B live
+mode.
+.PP
+.B Available options
+.RS 4
+.TP
+.BI "host=" hostname
+Network interface to listen (default is to listen all interfaces)
+.TP
+.BI "port=" port
+IP-port to bind to
+.RB (default:\  8888 )
+.TP
+.BI "workers=" workers
+Amount of worker threads
+.RB (default:\  10 )
+.TP
+.BI "duration=" duration
+Max serving duration in milliseconds
+.RB (default:\  500 )
+.TP
+.BI "backlog=" backlog
+Listen backlog
+.RB (default:\  15 )
+.RE
+.PP
+.B Example of use
+.RS 4
+.PP
+Start
+.B nfstrace
+in one console:
+.RS 4
+.PP
+.B $ sudo nfstrace -i eth0 -a analyzers/libjson.so#host=localhost
+.br
+\[char46]..
+.RE
+.PP
+Make a TCP-request to
+.B nfstrace
+in another console to fetch current statistics:
+.RS 4
+.PP
+.B $ telnet localhost 8888
+.br
+Trying 127.0.0.1...
+.br
+Connected to localhost.
+.br
+Escape character is '^]'.
+.br
+{
+.br
+.RS 2
+"nfs_v3":{
+.br
+.RS 2
+"null":32,
+.br
+"getattr":4582,
+.br
+\[char46]..
+.RE
+},
+.RE
+.RS 2
+"nfs_v4":{
+.br
+.RS 2
+\[char46]..
+.RE
+},
+.br
+\[char46]..
+.RE
+}Connection closed by foreign host.
+.RE
+.RE
 .\" --------------------- EXAMPLES -------------------------------
 .SH EXAMPLES
 .SS Available options
@@ -584,6 +668,15 @@ Dzianis Huznou
 .PP
 Pavel Karneliuk
 .B <Pavel_Karneliuk@epam.com>
+.PP
+Andrey Kuznetsov
+.B <Andrey_Kuznetsov@epam.com>
+.PP
+Mikhail Litvinets
+.B <Mikhail_Litvinets@epam.com>
+.PP
+Ilya Storozhilov
+.B <Ilya_Storozhilov@epam.com>
 .\" -------------------- SEE ALSO --------------------------------
 .SH SEE ALSO
 .BR bpf (4),
