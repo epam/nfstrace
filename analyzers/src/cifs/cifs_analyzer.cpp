@@ -1123,7 +1123,7 @@ public:
     {
     }
 
-    void closeFileSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseFileArgumentType*, const SMBv2::CloseFileResultType*) override final
+    void closeFileSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseRequest*, const SMBv2::CloseResponse*) override final
     {
         account(cmd, SMBv2Commands::CLOSE, smbv2);
     }
@@ -1133,12 +1133,12 @@ public:
         account(cmd, SMBv2Commands::NEGOTIATE, smbv2);
     }
 
-    void sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd, const SMBv2::SessionSetupArgumentType*, const SMBv2::SessionSetupResultType*) override final
+    void sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd, const SMBv2::SessionSetupRequest*, const SMBv2::SessionSetupResponse*) override final
     {
         account(cmd, SMBv2Commands::SESSION_SETUP, smbv2);
     }
 
-    void logOffSMBv2(const SMBv2::LogOffCommand* cmd, const SMBv2::LogOffArgumentType*, const SMBv2::LogOffResultType*) override final
+    void logOffSMBv2(const SMBv2::LogOffCommand* cmd, const SMBv2::LogOffRequest*, const SMBv2::LogOffResponse*) override final
     {
         account(cmd, SMBv2Commands::LOGOFF, smbv2);
     }
@@ -1188,7 +1188,7 @@ public:
         account(cmd, SMBv2Commands::CANCEL, smbv2);
     }
 
-    void echoSMBv2(const SMBv2::EchoCommand* cmd, const SMBv2::EchoArgumentType*, const SMBv2::EchoResultType*) override final
+    void echoSMBv2(const SMBv2::EchoCommand* cmd, const SMBv2::EchoRequest*, const SMBv2::EchoResponse*) override final
     {
         account(cmd, SMBv2Commands::ECHO, smbv2);
     }

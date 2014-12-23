@@ -34,14 +34,16 @@ namespace SMBv2
 {
 
 #define SMB2_ERROR_STRUCTURE_SIZE2 __constant_cpu_to_le16(9)
-#define cpu_to_le32
+#define cpu_to_le32//FIXME: define cpu_to_le<>
+#define cpu_to_le16
 
 /*!
  * \brief The errResponse struct
  * The SMB2 ERROR Response packet is sent by the server
  * to respond to a request that has failed or encountered an error.
  */
-struct errResponse {
+struct errResponse
+{
     uint16_t structureSize;
     uint16_t reserved;                           //!< 0
     uint32_t byteCount;                          //!< even if zero, at least one byte follows
@@ -103,7 +105,8 @@ enum class Dialects
  * This request is composed of an SMB2 header,
  * followed by this request structure.
  */
-struct NegotiateRequest {
+struct NegotiateRequest
+{
     uint16_t structureSize;                      //!< Must be 36
     uint16_t dialectCount;                       //!< The number of dialects that are contained in the Dialects[] array
     SecurityMode securityMode;                   //!< The security mode field specifies whether SMB signing is enabled or required at the client.
@@ -121,7 +124,8 @@ struct NegotiateRequest {
  * This response is composed of an SMB2 header,
  * followed by this response structure.
  */
-struct NegotiateResponse {
+struct NegotiateResponse
+{
     uint16_t structureSize;                      //!< Must be 65
     SecurityMode securityMode;                   //!< The security mode field specifies whether SMB signing is enabled, required at the server, or both.
     uint16_t dialectRevision;                    //!< The preferred common SMB 2 Protocol dialect number from the Dialects array that is sent in the SMB2 NEGOTIATE Request or the SMB2 wildcard revision number
@@ -143,7 +147,8 @@ struct NegotiateResponse {
  * Is used if the client implements the SMB 3.x dialect family.
  * Otherwise, it MUST be set to NONE.
  */
-enum class SessionFlagsBinding : uint8_t {
+enum class SessionFlagsBinding : uint8_t
+{
     NONE     = 0x00,                             //!< Default
     BINDING  = 0x01                              //!< When set, indicates that the request is to bind an existing session to a new connection.
 };
@@ -154,7 +159,8 @@ enum class SessionFlagsBinding : uint8_t {
  * transport connection to the server. This request is composed of an SMB2
  * header as specified in section 2.2.1 followed by this request structure.
  */
-struct SessionSetupRequest {
+struct SessionSetupRequest
+{
     uint16_t structureSize;                      //!< Must be 25
     SessionFlagsBinding  VcNumber;               //!< If the client implements the SMB 3.x dialect family, this field MUST be set to combination of zero or more of the following values. Otherwise, it MUST be set to 0.
     SecurityModeShort  securityMode;             //!< The security mode field specifies whether SMB signing is enabled or required at the client. This field MUST be constructed using the following values.
@@ -182,7 +188,8 @@ enum class SessionFlags : uint16_t
  * an SMB2 SESSION_SETUP Request packet. This response is composed of an SMB2
  * header, that is followed by this response structure.
  */
-struct SessionSetupResponse {
+struct SessionSetupResponse
+{
     uint16_t structureSize;                       //!< Must be 9
     SessionFlags sessionFlags;                    //!< A flags field that indicates additional information about the session.
     uint16_t SecurityBufferOffset;                //!< The offset, in bytes, from the beginning of the SMB2 header to the security buffer.
@@ -190,17 +197,30 @@ struct SessionSetupResponse {
     uint8_t  Buffer[1];                           //!< A variable-length buffer that contains the security buffer for the response, as specified by SecurityBufferOffset and SecurityBufferLength.
 } __attribute__ ((__packed__));
 
-struct logoffRequest {
-    uint16_t structureSize; /* Must be 4 */
-    uint16_t Reserved;
+/*!
+ * \brief The LogoffRequest struct.
+ * The SMB2 LOGOFF Request packet is sent by the client to request termination
+ * of a particular session
+ */
+struct LogOffRequest
+{
+    uint16_t structureSize;                       //!< Must be 4
+    uint16_t Reserved;                            //!< This field MUST NOT be used and MUST be reserved
 } __attribute__ ((__packed__));
 
-struct logoffResponse {
-    uint16_t structureSize; /* Must be 4 */
-    uint16_t Reserved;
+/*!
+ * \brief The LogoffResponse struct
+ * The SMB2 LOGOFF Response packet is sent by the server to confirm that an
+ * SMB2 LOGOFF Request was completed successfully
+ */
+struct LogOffResponse
+{
+    uint16_t structureSize;                       //!< Must be 4
+    uint16_t Reserved;                            //!< This field MUST NOT be used and MUST be reserved
 } __attribute__ ((__packed__));
 
-struct tree_connectRequest {
+struct TreeConnectRequest
+{
     uint16_t structureSize; /* Must be 9 */
     uint16_t Reserved;
     uint16_t PathOffset;
@@ -425,37 +445,62 @@ struct createResponse {
     uint8_t   Buffer[1];
 }  __attribute__ ((__packed__));
 
-/* Currently defined values for close flags */
-#define SMB2_CLOSE_FLAG_POSTQUERY_ATTRIB cpu_to_le16(0x0001)//FIXME: WTF
-struct closeRequest {
-    uint16_t structureSize; /* Must be 24 */
-    uint16_t Flags;
-    uint32_t Reserved;
-    uint64_t  PersistentFileId; /* opaque endianness */
-    uint64_t  VolatileFileId; /* opaque endianness */
+/*!
+ * A Flags field indicates how to process the operation.
+ * This field MUST be constructed using the following value
+ */
+enum class CloseFlags : uint16_t {
+    POSTQUERY_ATTRIB         = cpu_to_le16(0x0001)
+};
+
+/*!
+ * \brief The closeRequest struct. The SMB2 CLOSE Request packet is used
+ *  by the client to close an instance of a file that was opened previously
+ *  with a successful SMB2 CREATE Request. This request is composed of an
+ *  SMB2 header.
+ */
+struct CloseRequest {
+    uint16_t structureSize;                      //!< The client MUST set this field to 24, indicating the size of the request structure, not including the header.
+    CloseFlags Flags;                            //!< If set, the server MUST set the attribute fields in the response to valid values. If not set, the client MUST NOT use the values that are returned in the response.
+    uint32_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
+    uint64_t  PersistentFileId;                  //!< The identifier of the open to a file or named pipe that is being close
+    uint64_t  VolatileFileId;                    //!< The identifier of the open to a file or named pipe that is being close
 }  __attribute__ ((__packed__));
 
-struct closeResponse {
-    uint16_t structureSize; /* 60 */
-    uint16_t Flags;
-    uint32_t Reserved;
-    uint64_t CreationTime;
-    uint64_t LastAccessTime;
-    uint64_t LastWriteTime;
-    uint64_t ChangeTime;
-    uint64_t AllocationSize; /* Beginning of FILE_STANDARD_INFO equivalent */
-    uint64_t EndOfFile;
-    uint32_t Attributes;
+/*!
+ * \brief The closeResponse struct. The SMB2 CLOSE Response packet is sent
+ *  by the server to indicate that an SMB2 CLOSE Request was processed
+ *  successfully. This response is composed of an SMB2 header
+ */
+struct CloseResponse {
+    uint16_t structureSize;                      //!< The server MUST set this field to 60, indicating the size of the response structure, not including the header.
+    CloseFlags Flags;                            //!< A Flags field indicates how to process the operation
+    uint32_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
+    uint64_t CreationTime;                       //!< The time when the file was created
+    uint64_t LastAccessTime;                     //!< The time when the file was last accessed
+    uint64_t LastWriteTime;                      //!< The time when data was last written to the file
+    uint64_t ChangeTime;                         //!< The time when the file was last modified
+    uint64_t AllocationSize;                     //!< The size, in bytes, of the data that is allocated to the file
+    uint64_t EndOfFile;                          //!< The size, in bytes, of the file
+    uint32_t Attributes;                         //!< The attributes of the file.
 }  __attribute__ ((__packed__));
 
-struct echoRequest {
-    uint16_t structureSize; /* Must be 4 */
-    uint16_t  Reserved;
+/*!
+ * \brief The echoRequest struct. The SMB2 ECHO Request packet is sent
+ * by a client to determine whether a server is processing requests.
+ */
+struct EchoRequest {
+    uint16_t structureSize;                      //!< The client MUST set this to 4, indicating the size of the request structure, not including the header.
+    uint16_t  Reserved;                          //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
 
-struct echoResponse {
-    uint16_t structureSize; /* Must be 4 */
-    uint16_t  Reserved;
+/*!
+ * \brief The echoResponse struct.The SMB2 ECHO Response packet is sent
+ * by the server to confirm that an SMB2 ECHO Request was successfully processed
+ */
+struct EchoResponse {
+    uint16_t structureSize;                      //!< The server MUST set this to 4, indicating the size of the response structure, not including the header.
+    uint16_t  Reserved;                          //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
 
 /*! Possible InfoType values
