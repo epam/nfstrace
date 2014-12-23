@@ -24,8 +24,8 @@
 //------------------------------------------------------------------------------
 #include <sys/time.h>
 
-#include "rpc_procedure.h"
 #include "cifs_commands.h"
+#include "rpc_procedure.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -368,18 +368,9 @@ using NegotiateCommand = SMBv1::Command<NegotiateRequest, NegotiateResponse>;   
 using SessionSetupCommand = SMBv1::Command<SessionSetupRequest, SessionSetupResponse>;                //!< Session setup command
 using EchoCommand = SMBv1::Command<EchoRequest, EchoResponse>;                                        //!< Echo command
 using LogOffCommand = SMBv1::Command<LogOffRequest, LogOffResponse>;                                  //!< Log off command
-
-using TreeConnectArgumentType = struct {};                                                            //!< Tree connect command's arguments
-using TreeConnectResultType = struct {};                                                              //!< Tree connect command's results
-using TreeConnectCommand = SMBv1::Command<TreeConnectArgumentType, TreeConnectResultType>;            //!< Tree connect command
-
-using TreeDisconnectArgumentType = struct {};                                                         //!< Tree disconnect command's arguments
-using TreeDisconnectResultType = struct {};                                                           //!< Tree disconnect command's results
-using TreeDisconnectCommand = SMBv1::Command<TreeDisconnectArgumentType, TreeDisconnectResultType>;   //!< Tree disconnect command
-
-using CreateArgumentType = struct {};                                                                 //!< Create command's arguments
-using CreateResultType = struct {};                                                                   //!< Create command's results
-using CreateCommand = SMBv1::Command<CreateArgumentType, CreateResultType>;                           //!< Create command
+using TreeConnectCommand = SMBv1::Command<TreeConnectRequest, TreeConnectResponse>;                   //!< Tree connect command
+using TreeDisconnectCommand = SMBv1::Command<TreeDisconnectRequest, TreeDisconnectResponse>;          //!< Tree disconnect command
+using CreateCommand = SMBv1::Command<CreateRequest, CreateResponse>;                                  //!< Create command
 
 using FlushArgumentType = struct {};                                                                  //!< Flush command's arguments
 using FlushResultType = struct {};                                                                    //!< Flush command's results
