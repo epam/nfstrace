@@ -1128,7 +1128,7 @@ public:
         account(cmd, SMBv2Commands::CLOSE, smbv2);
     }
 
-    void negotiateSMBv2(const SMBv2::NegotiateCommand* cmd, const SMBv2::NegotiateArgumentType*, const SMBv2::NegotiateResultType*) override final
+    void negotiateSMBv2(const SMBv2::NegotiateCommand* cmd, const SMBv2::NegotiateRequest*, const SMBv2::NegotiateResponse*) override final
     {
         account(cmd, SMBv2Commands::NEGOTIATE, smbv2);
     }

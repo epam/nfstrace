@@ -204,7 +204,7 @@ public:
     void read_message(const NetBIOS::MessageHeader* nb_header, const Header*, PacketInfo& info)
     {
         msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
-        to_be_copied = (sizeof(NetBIOS::MessageHeader) + sizeof(Header) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(Header) : msg_len);
+        to_be_copied = msg_len;//(sizeof(NetBIOS::MessageHeader) + sizeof(Header) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(Header) : msg_len);
 
         assert(msg_len != 0);   // message is found
         assert(msg_len >= collection.data_size());
@@ -240,7 +240,7 @@ public:
             {
                 return read_message(nb_header, header, info);
             }
-            else if (CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            else if (const CIFSv2::MessageHeader* header = CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
                 return read_message(nb_header, header, info);
             }

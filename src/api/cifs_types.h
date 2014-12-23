@@ -44,14 +44,16 @@ using Session = u_int16_t;//!< Session IDentifier
 /*! Represents one SMB command
  */
 template <
-    typename ArgumentType,
-    typename ResultType
+    typename Request,
+    typename Response
     >
 class Command : public Procedure<int>
 {
 public:
-    ArgumentType* parg;//!< Arguments of specified command
-    ResultType* pres;//!< Results of specified command
+    typedef Request RequestType;
+    typedef Response ResponseType;
+    const RequestType* parg;//!< Arguments of specified command
+    const ResponseType* pres;//!< Results of specified command
 };
 
 using CreateDirectoryArgumentType = struct {};                                                                                   //!< CreateDirectory arguments
@@ -365,9 +367,7 @@ using CloseFileArgumentType = struct {};                                        
 using CloseFileResultType = struct {};                                                                //!< Close file command's results
 using CloseFileCommand = SMBv1::Command<CloseFileArgumentType, CloseFileResultType>;                  //!< Close file command
 
-using NegotiateArgumentType = struct {};                                                              //!< Close file command's arguments
-using NegotiateResultType = struct {};                                                                //!< Close file command's results
-using NegotiateCommand = SMBv1::Command<NegotiateArgumentType, NegotiateResultType>;                  //!< Negotiate command
+using NegotiateCommand = SMBv1::Command<NegotiateRequest, NegotiateResponse>;                  //!< Negotiate command
 
 using SessionSetupArgumentType = struct {};                                                           //!< Session setup command's arguments
 using SessionSetupResultType = struct {};                                                             //!< Session setup command's results
