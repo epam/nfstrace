@@ -38,7 +38,8 @@ namespace SMBv2
 
 /*!
  * \brief The errResponse struct
- * The SMB2 ERROR Response packet is sent by the server to respond to a request that has failed or encountered an error.
+ * The SMB2 ERROR Response packet is sent by the server
+ * to respond to a request that has failed or encountered an error.
  */
 struct errResponse {
     uint16_t structureSize;
@@ -48,7 +49,8 @@ struct errResponse {
 }  __attribute__ ((__packed__));
 
 /*!
- * security modes. The security mode field specifies whether SMB signing is enabled or required at the client.
+ * security modes. The security mode field specifies whether
+ * SMB signing is enabled or required at the client.
  */
 enum class SecurityMode : uint16_t
 {
@@ -57,8 +59,19 @@ enum class SecurityMode : uint16_t
 };
 
 /*!
+ * security modes. The security mode field specifies whether
+ * SMB signing is enabled or required at the client.
+ */
+enum class SecurityModeShort : uint8_t
+{
+    SIGNING_ENABLED   = 0x01,                     //!< When set, indicates that security signatures are enabled on the client.
+    SIGNING_REQUIRED  = 0x02                      //!< When set, indicates that security signatures are required by the client.
+};
+
+/*!
  * Capabilities flags
- * If the client implements the SMB 3.x dialect family, the Capabilities field MUST be constructed using the following values.
+ * If the client implements the SMB 3.x dialect family,
+ * the Capabilities field MUST be constructed using the following values.
  * Otherwise, this field MUST be set to 0.
  */
 enum class Capabilities : uint32_t
@@ -77,7 +90,6 @@ enum class Capabilities : uint32_t
  */
 enum class Dialects
 {
-
     SMB_2_002          = 0x0202,                  //!< SMB 2.002 dialect revision number.
     SMB_2_1            = 0x0210,                  //!< SMB 2.1 dialect revision number.
     SMB_3_0            = 0x0300,                  //!< SMB 3.0 dialect revision number.
@@ -86,9 +98,12 @@ enum class Dialects
 
 /*!
  * \brief The negotiateRequest struct
- * The SMB2 NEGOTIATE Request packet is used by the client to notify the server what dialects of the SMB 2 Protocol the client understands. This request is composed of an SMB2 header, followed by this request structure.
+ * The SMB2 NEGOTIATE Request packet is used by the client to notify
+ * the server what dialects of the SMB 2 Protocol the client understands.
+ * This request is composed of an SMB2 header,
+ * followed by this request structure.
  */
-struct negotiateRequest {
+struct NegotiateRequest {
     uint16_t structureSize;                      //!< Must be 36
     uint16_t dialectCount;                       //!< The number of dialects that are contained in the Dialects[] array
     SecurityMode securityMode;                   //!< The security mode field specifies whether SMB signing is enabled or required at the client.
@@ -101,9 +116,12 @@ struct negotiateRequest {
 
 /*!
  * \brief The negotiateResponse struct
- * The SMB2 NEGOTIATE Response packet is sent by the server to notify the client of the preferred common dialect. This response is composed of an SMB2 header, followed by this response structure.
+ * The SMB2 NEGOTIATE Response packet is sent by the server to notify
+ * the client of the preferred common dialect.
+ * This response is composed of an SMB2 header,
+ * followed by this response structure.
  */
-struct negotiateResponse {
+struct NegotiateResponse {
     uint16_t structureSize;                      //!< Must be 65
     SecurityMode securityMode;                   //!< The security mode field specifies whether SMB signing is enabled, required at the server, or both.
     uint16_t dialectRevision;                    //!< The preferred common SMB 2 Protocol dialect number from the Dialects array that is sent in the SMB2 NEGOTIATE Request or the SMB2 wildcard revision number
@@ -117,47 +135,70 @@ struct negotiateResponse {
     uint64_t serverStartTime;                    //!< The SMB2 server start time, in FILETIME format
     uint16_t securityBufferOffset;               //!< The offset, in bytes, from the beginning of the SMB2 header to the security buffer.
     uint16_t securityBufferLength;               //!< The length, in bytes, of the security buffer.
-    uint32_t reserved2;                          //!< /* may be any value, ignore */
-    uint8_t  buffer[1];                          //!< /* variable length GSS security buffer */
-}  __attribute__ ((__packed__));
+    uint32_t reserved2;                          //!< This field MUST NOT be used and MUST be reserved. The server may set this to any value, and the client MUST ignore it on receipt.
+    uint8_t  buffer[1];                          //!< The variable-length buffer that contains the security buffer for the response
+} __attribute__ ((__packed__));
 
-struct sess_setupRequest {
-    uint16_t structureSize; /* Must be 25 */
-    uint8_t  VcNumber;
-    uint8_t  securityMode;
-    Capabilities capabilities;
-    uint32_t Channel;
-    uint16_t SecurityBufferOffset;
-    uint16_t SecurityBufferLength;
-    uint64_t PreviousSessionId;
-    uint8_t  Buffer[1]; /* variable length GSS security buffer */
-}  __attribute__ ((__packed__));
+/*! Session binding to connections flags
+ * Is used if the client implements the SMB 3.x dialect family.
+ * Otherwise, it MUST be set to NONE.
+ */
+enum class SessionFlagsBinding : uint8_t {
+    NONE     = 0x00,                             //!< Default
+    BINDING  = 0x01                              //!< When set, indicates that the request is to bind an existing session to a new connection.
+};
+
+/*!
+ * \brief The SMB2 SESSION_SETUP Request packet is sent by the client to
+ * request a new authenticated session within a new or existing SMB 2 Protocol
+ * transport connection to the server. This request is composed of an SMB2
+ * header as specified in section 2.2.1 followed by this request structure.
+ */
+struct SessionSetupRequest {
+    uint16_t structureSize;                      //!< Must be 25
+    SessionFlagsBinding  VcNumber;               //!< If the client implements the SMB 3.x dialect family, this field MUST be set to combination of zero or more of the following values. Otherwise, it MUST be set to 0.
+    SecurityModeShort  securityMode;             //!< The security mode field specifies whether SMB signing is enabled or required at the client. This field MUST be constructed using the following values.
+    Capabilities capabilities;                   //!< Specifies protocol capabilities for the client. This field MUST be constructed using the following values.
+    uint32_t Channel;                            //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
+    uint16_t SecurityBufferOffset;               //!< The offset, in bytes, from the beginning of the SMB 2 Protocol header to the security buffer.
+    uint16_t SecurityBufferLength;               //!< The length, in bytes, of the security buffer.
+    uint64_t PreviousSessionId;                  //!< A previously established session identifier. The server uses this value to identify the client session that was disconnected due to a network error.
+    uint8_t  Buffer[1];                          //!< A variable-length buffer that contains the security buffer for the request, as specified by SecurityBufferOffset and SecurityBufferLength
+} __attribute__ ((__packed__));
 
 /*! Currently defined SessionFlags
  */
 enum class SessionFlags : uint16_t
 {
-    IS_GUEST = 0x0001,
-    IS_NULL  = 0x0002
+    NONE            = 0x0000,                     //!< Default
+    IS_GUEST        = 0x0001,                     //!< If set, the client has been authenticated as a guest user.
+    IS_NULL         = 0x0002,                     //!< If set, the client has been authenticated as an anonymous user.
+    IS_ENCRYPT_DATA = 0x0004                      //!< If set, the server requires encryption of messages on this session. This flag is only valid for the SMB 3.x dialect family.
 };
 
-struct sess_setupResponse {
-    uint16_t structureSize; /* Must be 9 */
-    uint16_t SessionFlags;
-    uint16_t SecurityBufferOffset;
-    uint16_t SecurityBufferLength;
-    uint8_t  Buffer[1]; /* variable length GSS security buffer */
-}  __attribute__ ((__packed__));
+/*!
+ * \brief The sess_setupResponse struct
+ * The SMB2 SESSION_SETUP Response packet is sent by the server in response to
+ * an SMB2 SESSION_SETUP Request packet. This response is composed of an SMB2
+ * header, that is followed by this response structure.
+ */
+struct SessionSetupResponse {
+    uint16_t structureSize;                       //!< Must be 9
+    SessionFlags SessionFlags;                    //!< A flags field that indicates additional information about the session.
+    uint16_t SecurityBufferOffset;                //!< The offset, in bytes, from the beginning of the SMB2 header to the security buffer.
+    uint16_t SecurityBufferLength;                //!< The length, in bytes, of the security buffer.
+    uint8_t  Buffer[1];                           //!< A variable-length buffer that contains the security buffer for the response, as specified by SecurityBufferOffset and SecurityBufferLength.
+} __attribute__ ((__packed__));
 
 struct logoffRequest {
     uint16_t structureSize; /* Must be 4 */
     uint16_t Reserved;
-}  __attribute__ ((__packed__));
+} __attribute__ ((__packed__));
 
 struct logoffResponse {
     uint16_t structureSize; /* Must be 4 */
     uint16_t Reserved;
-}  __attribute__ ((__packed__));
+} __attribute__ ((__packed__));
 
 struct tree_connectRequest {
     uint16_t structureSize; /* Must be 9 */
@@ -165,7 +206,7 @@ struct tree_connectRequest {
     uint16_t PathOffset;
     uint16_t PathLength;
     uint8_t  Buffer[1]; /* variable length */
-}  __attribute__ ((__packed__));
+} __attribute__ ((__packed__));
 
 /*! Possible ShareType values
  */
