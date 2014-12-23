@@ -659,7 +659,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void closeFileSMBv2(const SMBv2::CloseFileCommand*, const SMBv2::CloseFileArgumentType*, const SMBv2::CloseFileResultType*) {}
+    virtual void closeFileSMBv2(const SMBv2::CloseFileCommand*, const SMBv2::CloseRequest*, const SMBv2::CloseResponse*) {}
 
     /*! "Negotiate" command "on receive" event handler
      * \param cmd - Specified command
@@ -673,14 +673,14 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void sessionSetupSMBv2(const SMBv2::SessionSetupCommand*, const SMBv2::SessionSetupArgumentType*, const SMBv2::SessionSetupResultType*) {}
+    virtual void sessionSetupSMBv2(const SMBv2::SessionSetupCommand*, const SMBv2::SessionSetupRequest*, const SMBv2::SessionSetupResponse*) {}
 
     /*! "log off" command "on receive" event handler
      * \param cmd - Specified command
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void logOffSMBv2(const SMBv2::LogOffCommand*, const SMBv2::LogOffArgumentType*, const SMBv2::LogOffResultType*) {}
+    virtual void logOffSMBv2(const SMBv2::LogOffCommand*, const SMBv2::LogOffRequest*, const SMBv2::LogOffResponse*) {}
 
     /*! "Tree Connect" command "on receive" event handler
      * \param cmd - Specified command
@@ -750,7 +750,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void echoSMBv2(const SMBv2::EchoCommand*, const SMBv2::EchoArgumentType*, const SMBv2::EchoResultType*) {}
+    virtual void echoSMBv2(const SMBv2::EchoCommand*, const SMBv2::EchoRequest*, const SMBv2::EchoResponse*) {}
 
     /*! "Query directory" command "on receive" event handler
      * \param cmd - Specified command

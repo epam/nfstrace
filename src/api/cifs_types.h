@@ -363,19 +363,11 @@ using NoAndxCommand = SMBv1::Command< NoAndxCmdArgumentType, NoAndxCmdResultType
 namespace SMBv2
 {
 
-using CloseFileArgumentType = struct {};                                                              //!< Close file command's arguments
-using CloseFileResultType = struct {};                                                                //!< Close file command's results
-using CloseFileCommand = SMBv1::Command<CloseFileArgumentType, CloseFileResultType>;                  //!< Close file command
-
-using NegotiateCommand = SMBv1::Command<NegotiateRequest, NegotiateResponse>;                  //!< Negotiate command
-
-using SessionSetupArgumentType = struct {};                                                           //!< Session setup command's arguments
-using SessionSetupResultType = struct {};                                                             //!< Session setup command's results
-using SessionSetupCommand = SMBv1::Command<SessionSetupArgumentType, SessionSetupResultType>;         //!< Session setup command
-
-using LogOffArgumentType = struct {};                                                                 //!< Log off command's arguments
-using LogOffResultType = struct {};                                                                   //!< Log off command's results
-using LogOffCommand = SMBv1::Command<LogOffArgumentType, LogOffResultType>;                           //!< Log off command
+using CloseFileCommand = SMBv1::Command<CloseRequest, CloseResponse>;                                 //!< Close file command
+using NegotiateCommand = SMBv1::Command<NegotiateRequest, NegotiateResponse>;                         //!< Negotiate command
+using SessionSetupCommand = SMBv1::Command<SessionSetupRequest, SessionSetupResponse>;                //!< Session setup command
+using EchoCommand = SMBv1::Command<EchoRequest, EchoResponse>;                                        //!< Echo command
+using LogOffCommand = SMBv1::Command<LogOffRequest, LogOffResponse>;                                  //!< Log off command
 
 using TreeConnectArgumentType = struct {};                                                            //!< Tree connect command's arguments
 using TreeConnectResultType = struct {};                                                              //!< Tree connect command's results
@@ -412,10 +404,6 @@ using IoctlCommand = SMBv1::Command<IoctlArgumentType, IoctlResultType>;        
 using CancelArgumentType = struct {};                                                                 //!< Cancel command's arguments
 using CancelResultType = struct {};                                                                   //!< Cancel command's results
 using CancelCommand = SMBv1::Command<CancelArgumentType, CancelResultType>;                           //!< Cancel command
-
-using EchoArgumentType = struct {};                                                                   //!< Echo command's arguments
-using EchoResultType = struct {};                                                                     //!< Echo command's results
-using EchoCommand = SMBv1::Command<EchoArgumentType, EchoResultType>;                                 //!< Echo command
 
 using QueryDirArgumentType = struct {};                                                               //!< Query directory command's arguments
 using QueryDirResultType = struct {};                                                                 //!< Query directory command's results
