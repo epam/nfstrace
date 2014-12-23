@@ -24,11 +24,11 @@
 #ifndef IANALYZER_TYPE_H
 #define IANALYZER_TYPE_H
 //------------------------------------------------------------------------------
+#include "cifs_types.h"
 #include "nfs_types.h"
 #include "nfs3_types_rpcgen.h"
 #include "nfs4_types_rpcgen.h"
 #include "rpc_procedure.h"
-#include "cifs_types.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -687,21 +687,21 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void treeConnectSMBv2(const SMBv2::TreeConnectCommand*, const SMBv2::TreeConnectArgumentType*, const SMBv2::TreeConnectResultType*) {}
+    virtual void treeConnectSMBv2(const SMBv2::TreeConnectCommand*, const SMBv2::TreeConnectRequest*, const SMBv2::TreeConnectResponse*) {}
 
     /*! "Tree disconnect" command "on receive" event handler
      * \param cmd - Specified command
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand*, const SMBv2::TreeDisconnectArgumentType*, const SMBv2::TreeDisconnectResultType*) {}
+    virtual void treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand*, const SMBv2::TreeDisconnectRequest*, const SMBv2::TreeDisconnectResponse*) {}
 
     /*! "Create" command "on receive" event handler
      * \param cmd - Specified command
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void createSMBv2(const SMBv2::CreateCommand*, const SMBv2::CreateArgumentType*, const SMBv2::CreateResultType*) {}
+    virtual void createSMBv2(const SMBv2::CreateCommand*, const SMBv2::CreateRequest*, const SMBv2::CreateResponse*) {}
 
     /*! "Flush" command "on receive" event handler
      * \param cmd - Specified command

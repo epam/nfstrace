@@ -219,22 +219,28 @@ struct LogOffResponse
     uint16_t Reserved;                            //!< This field MUST NOT be used and MUST be reserved
 } __attribute__ ((__packed__));
 
+/*!
+ * \brief The TreeConnectRequest struct
+ * The SMB2 TREE_CONNECT Request packet is sent by a client to request
+ * access to a particular share on the server
+ */
 struct TreeConnectRequest
 {
-    uint16_t structureSize; /* Must be 9 */
-    uint16_t Reserved;
-    uint16_t PathOffset;
-    uint16_t PathLength;
-    uint8_t  Buffer[1]; /* variable length */
+    uint16_t structureSize;                      //!< The client MUST set this field to 9, indicating the size of the request structure, not including the header. The client MUST set it to this value regardless of how long Buffer[] actually is in the request being sent.
+    uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
+    uint16_t PathOffset;                         //!< The offset, in bytes, of the full share path name from the beginning of the packet header.
+    uint16_t PathLength;                         //!< The length, in bytes, of the path name.
+    uint8_t  Buffer[1];                          //!< A variable-length buffer that contains the path name of the share in Unicode in the form "\\server\share" for the request, as described by PathOffset and PathLength
 } __attribute__ ((__packed__));
 
-/*! Possible ShareType values
+/*!
+ * Possible ShareType values
  */
 enum class ShareTypes : uint8_t
 {
-    DISK  = 0x01,
-    PIPE  = 0x02,
-    PRINT = 0x03
+    DISK  = 0x01,                                //!< Physical disk share.
+    PIPE  = 0x02,                                //!< Named pipe share.
+    PRINT = 0x03                                 //!< Printer share.
 };
 
 /*!
@@ -244,37 +250,55 @@ enum class ShareTypes : uint8_t
  */
 enum class ShareFlags : uint32_t
 {
-    MANUAL_CACHING               = 0x00000000,
-    AUTO_CACHING                 = 0x00000010,
-    VDO_CACHING                  = 0x00000020,
-    NO_CACHING                   = 0x00000030,
-    DFS                          = 0x00000001,
-    DFS_ROOT                     = 0x00000002,
-    RESTRICT_EXCLUSIVE_OPENS     = 0x00000100,
-    FORCE_SHARED_DELETE          = 0x00000200,
-    ALLOW_NAMESPACE_CACHING      = 0x00000400,
-    ACCESS_BASED_DIRECTORY_ENUM  = 0x00000800,
-    FORCE_LEVELII_OPLOCK         = 0x00001000,
-    ENABLE_HASH                  = 0x00002000
+    MANUAL_CACHING               = 0x00000000,   //!< The client may cache files that are explicitly selected by the user for offline use.
+    AUTO_CACHING                 = 0x00000010,   //!< The client may automatically cache files that are used by the user for offline access.
+    VDO_CACHING                  = 0x00000020,   //!< The client may automatically cache files that are used by the user for offline access and may use those files in an offline mode even if the share is available.
+    NO_CACHING                   = 0x00000030,   //!< Offline caching MUST NOT occur.
+    DFS                          = 0x00000001,   //!< The specified share is present in a Distributed File System (DFS) tree structure.
+    DFS_ROOT                     = 0x00000002,   //!< The specified share is present in a DFS tree structure.
+    RESTRICT_EXCLUSIVE_OPENS     = 0x00000100,   //!< The specified share disallows exclusive file opens that deny reads to an open file.
+    FORCE_SHARED_DELETE          = 0x00000200,   //!< The specified share disallows clients from opening files on the share in an exclusive mode that prevents the file from being deleted until the client closes the file.
+    ALLOW_NAMESPACE_CACHING      = 0x00000400,   //!< The client MUST ignore this flag.
+    ACCESS_BASED_DIRECTORY_ENUM  = 0x00000800,   //!< The server will filter directory entries based on the access permissions of the client.
+    FORCE_LEVELII_OPLOCK         = 0x00001000,   //!< The server will not issue exclusive caching rights on this share.
+    ENABLE_HASH                  = 0x00002000,   //!< The share supports hash generation for branch cache retrieval of data. For more information, see section 2.2.31.2. This flag is not valid for the SMB 2.002 dialect.
+    ENABLE_HASH_2                = 0x00004000,   //!< The share supports v2 hash generation for branch cache retrieval of data. For more information, see section 2.2.31.2. This flag is not valid for the SMB 2.002 and SMB 2.1 dialects.
+    ENABLE_ENCRYPT_DATA          = 0x00008000    //!< The server requires encryption of remote file access messages on this share, per the conditions specified in section 3.3.5.2.11. This flag is only valid for the SMB 3.x dialect family.
 };
 
-struct tree_connectResponse {
-    uint16_t structureSize; /* Must be 16 */
-    ShareTypes ShareType;  /* see below */
-    uint8_t   Reserved;
-    ShareFlags shareFlags; /* see below */
-    Capabilities capabilities; /* see below */
-    uint32_t MaximalAccess;
+/*!
+ * \brief The TreeConnectResponse struct
+ * The SMB2 TREE_CONNECT Response packet is sent by the server when an SMB2
+ * TREE_CONNECT request is processed successfully by the server.
+ */
+struct TreeConnectResponse {
+    uint16_t structureSize;                      //!< Must be 16
+    ShareTypes ShareType;                        //!< The type of share being accessed.
+    uint8_t   Reserved;                          //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
+    ShareFlags shareFlags;                       //!< This field contains properties for this share.
+    Capabilities capabilities;                   //!< Indicates various capabilities for this share
+    uint32_t MaximalAccess;                      //!< Contains the maximal access for the user that establishes the tree connect on the share based on the share's permissions
 }  __attribute__ ((__packed__));
 
-struct tree_disconnectRequest {
-    uint16_t structureSize; /* Must be 4 */
-    uint16_t Reserved;
+/*!
+ * \brief The tree_disconnectRequest struct
+ * The SMB2 TREE_DISCONNECT Request packet is sent by the client
+ * to request that the tree connect that is specified in the TreeId within
+ * the SMB2 header be disconnected.
+ */
+struct TreeDisconnectRequest {
+    uint16_t structureSize;                      //!< The client MUST set this field to 4, indicating the size of the request structure, not including the header.
+    uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
 
-struct tree_disconnectResponse {
-    uint16_t structureSize; /* Must be 4 */
-    uint16_t Reserved;
+/*!
+ * \brief The TreeDisconnectResponse struct
+ * The SMB2 TREE_DISCONNECT Response packet is sent by the server to confirm
+ * that an SMB2 TREE_DISCONNECT Request was successfully processed.
+ */
+struct TreeDisconnectResponse {
+    uint16_t structureSize;                      //!< The client MUST set this field to 4, indicating the size of the request structure, not including the header.
+    uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
 
 /*! File Attrubutes
@@ -296,15 +320,16 @@ NOT_CONTENT_INDEXED = 0x00002000,
 ENCRYPTED           = 0x00004000
 };
 
-/*! Oplock levels
+/*!
+ * Oplock levels
  */
 enum class OplockLevels : uint8_t
 {
-    NONE      = 0x00,
-    II        = 0x01,
-    EXCLUSIVE = 0x08,
-    BATCH     = 0x09,
-    LEASE     = 0xFF
+    NONE      = 0x00,                            //!< No oplock is requested.
+    II        = 0x01,                            //!< A level II oplock is requested.
+    EXCLUSIVE = 0x08,                            //!< An exclusive oplock is requested.
+    BATCH     = 0x09,                            //!< A batch oplock is requested.
+    LEASE     = 0xFF                             //!< A lease is requested. If set, the request packet MUST contain an SMB2_CREATE_REQUEST_LEASE create context. This value is not valid for the SMB 2.002 dialect.
 };
 
 /*! Desired Access Flags
@@ -332,69 +357,80 @@ enum class DesiredAccessFlags : uint32_t
     GENERIC_READ_LE           = cpu_to_le32(0x80000000)
 };
 
-/*! Share Access Flags
+/*!
+ * Share Access Flags
  */
-enum class ShareAccessFlags : uint32_t
+enum ShareAccessFlags : uint32_t
 {
-    READ_LE     = cpu_to_le32(0x00000001),
-    WRITE_LE    = cpu_to_le32(0x00000002),
-    DELETE_LE   = cpu_to_le32(0x00000004),
-    ALL_LE      = cpu_to_le32(0x00000007)
+    READ_LE     = cpu_to_le32(0x00000001),       //!< When set, indicates that other opens are allowed to read this file while this open is present.
+    WRITE_LE    = cpu_to_le32(0x00000002),       //!< When set, indicates that other opens are allowed to write this file while this open is present
+    DELETE_LE   = cpu_to_le32(0x00000004),       //!< When set, indicates that other opens are allowed to delete or rename this file while this open is present
+    ALL_LE      = cpu_to_le32(0x00000007)        //!< Combine
 };
 
-/* CreateDisposition Flags */
+/*!
+ * CreateDisposition Flags
+ */
 enum class CreateDisposition : uint32_t
 {
-    SUPERSEDE_LE    = cpu_to_le32(0x00000000),
-    OPEN_LE         = cpu_to_le32(0x00000001),
-    CREATE_LE       = cpu_to_le32(0x00000002),
-    OPEN_IF_LE      = cpu_to_le32(0x00000003),
-    OVERWRITE_LE    = cpu_to_le32(0x00000004),
-    OVERWRITE_IF_LE = cpu_to_le32(0x00000005)
+    SUPERSEDE    = cpu_to_le32(0x00000000),      //!< If the file already exists, supersede it. Otherwise, create the file.
+    OPEN         = cpu_to_le32(0x00000001),      //!< If the file already exists, return success; otherwise, fail the operation.
+    CREATE       = cpu_to_le32(0x00000002),      //!< If the file already exists, fail the operation; otherwise, create the file.
+    OPEN_IF      = cpu_to_le32(0x00000003),      //!< Open the file if it already exists; otherwise, create the file.
+    OVERWRITE    = cpu_to_le32(0x00000004),      //!< Overwrite the file if it already exists; otherwise, fail the operation.
+    OVERWRITE_IF = cpu_to_le32(0x00000005)       //!< Overwrite the file if it already exists; otherwise, create the file.
 };
 
-/* Create options Flags */
-enum class CreateOptionsFlags : uint32_t
+/*!
+ * Create options Flags
+ */
+enum CreateOptionsFlags : uint32_t
 {
-    DIRECTORY_FILE_LE             = cpu_to_le32(0x00000001), //!< same as CREATE_NOT_FILE_LE cpu_to_le32(0x00000001)
-    WRITE_THROUGH_LE              = cpu_to_le32(0x00000002),
-    SEQUENTIAL_ONLY_LE            = cpu_to_le32(0x00000004),
-    NO_INTERMEDIATE_BUFFERRING_LE = cpu_to_le32(0x00000008),
-    SYNCHRONOUS_IO_ALERT_LE       = cpu_to_le32(0x00000010),
-    SYNCHRONOUS_IO_NON_ALERT_LE   = cpu_to_le32(0x00000020),
-    NON_DIRECTORY_FILE_LE         = cpu_to_le32(0x00000040),
-    COMPLETE_IF_OPLOCKED_LE       = cpu_to_le32(0x00000100),
-    NO_EA_KNOWLEDGE_LE            = cpu_to_le32(0x00000200),
-    RANDOM_ACCESS_LE              = cpu_to_le32(0x00000800),
-    DELETE_ON_CLOSE_LE            = cpu_to_le32(0x00001000),
-    OPEN_BY_FILE_ID_LE            = cpu_to_le32(0x00002000),
-    OPEN_FOR_BACKUP_INTENT_LE     = cpu_to_le32(0x00004000),
-    NO_COMPRESSION_LE             = cpu_to_le32(0x00008000),
-    RESERVE_OPFILTER_LE           = cpu_to_le32(0x00100000),
-    OPEN_REPARSE_POINT_LE         = cpu_to_le32(0x00200000),
-    OPEN_NO_RECALL_LE             = cpu_to_le32(0x00400000),
-    OPEN_FOR_FREE_SPACE_QUERY_LE  = cpu_to_le32(0x00800000)
+    DIRECTORY_FILE_LE             = cpu_to_le32(0x00000001), //!< The file being created or opened is a directory file.
+    WRITE_THROUGH_LE              = cpu_to_le32(0x00000002), //!< The server MUST propagate writes to this open to persistent storage before returning success to the client on write operations.
+    SEQUENTIAL_ONLY_LE            = cpu_to_le32(0x00000004), //!< This indicates that the application intends to read or write at sequential offsets using this handle, so the server SHOULD optimize for sequential access
+    NO_INTERMEDIATE_BUFFERRING_LE = cpu_to_le32(0x00000008), //!< The server or underlying object store SHOULD NOT cache data at intermediate layers and SHOULD allow it to flow through to persistent storage.
+    SYNCHRONOUS_IO_ALERT_LE       = cpu_to_le32(0x00000010), //!< This bit SHOULD be set to 0 and MUST be ignored by the server.<34>
+    SYNCHRONOUS_IO_NON_ALERT_LE   = cpu_to_le32(0x00000020), //!< This bit SHOULD be set to 0 and MUST be ignored by the server.<35>
+    NON_DIRECTORY_FILE_LE         = cpu_to_le32(0x00000040), //!< If the name of the file being created or opened matches with an existing directory file, the server MUST fail the request with STATUS_FILE_IS_A_DIRECTORY.
+    COMPLETE_IF_OPLOCKED_LE       = cpu_to_le32(0x00000100), //!< This bit SHOULD be set to 0 and MUST be ignored by the server
+    NO_EA_KNOWLEDGE_LE            = cpu_to_le32(0x00000200), //!< The caller does not understand how to handle extended attributes.
+    RANDOM_ACCESS_LE              = cpu_to_le32(0x00000800), //!< This indicates that the application intends to read or write at random offsets using this handle, so the server SHOULD optimize for random access.
+    DELETE_ON_CLOSE_LE            = cpu_to_le32(0x00001000), //!< The file MUST be automatically deleted when the last open request on this file is closed.
+    OPEN_BY_FILE_ID_LE            = cpu_to_le32(0x00002000), //!< This bit SHOULD be set to 0 and the server MUST fail the request with a STATUS_NOT_SUPPORTED error if this bit is set.<37>
+    OPEN_FOR_BACKUP_INTENT_LE     = cpu_to_le32(0x00004000), //!< The file is being opened for backup intent. That is, it is being opened or created for the purposes of either a backup or a restore operation
+    NO_COMPRESSION_LE             = cpu_to_le32(0x00008000), //!< The file cannot be compressed.
+    RESERVE_OPFILTER_LE           = cpu_to_le32(0x00100000), //!< This bit SHOULD be set to 0 and the server MUST fail the request with a STATUS_NOT_SUPPORTED error if this bit is set.<38>
+    OPEN_REPARSE_POINT_LE         = cpu_to_le32(0x00200000), //!< If the file or directory being opened is a reparse point, open the reparse point itself rather than the target that the reparse point references.
+    OPEN_NO_RECALL_LE             = cpu_to_le32(0x00400000), //!< In an HSM (Hierarchical Storage Management) environment, this flag means the file SHOULD NOT be recalled from tertiary storage such as tape. The recall can take several minutes. The caller can specify this flag to avoid those delays.
+    OPEN_FOR_FREE_SPACE_QUERY_LE  = cpu_to_le32(0x00800000)  //!< Open file to query for free space. The client SHOULD set this to 0 and the server MUST ignore it.<39>
 };
 
-//FIXME: rid out
-#define FILE_READ_RIGHTS_LE (FILE_READ_DATA_LE | FILE_READ_EA_LE \
-    | FILE_READ_ATTRIBUTES_LE)
-#define FILE_WRITE_RIGHTS_LE (FILE_WRITE_DATA_LE | FILE_APPEND_DATA_LE \
-    | FILE_WRITE_EA_LE | FILE_WRITE_ATTRIBUTES_LE)
-#define FILE_EXEC_RIGHTS_LE (FILE_EXECUTE_LE)
+/*!
+ * CreateDisposition Flags
+ */
+enum class CreateActions : uint32_t
+{
+    SUPERSEDED        = cpu_to_le32(0x00000000), //!< An existing file was deleted and a new file was created in its place.
+    OPENED            = cpu_to_le32(0x00000001), //!< An existing file was opened.
+    CREATED           = cpu_to_le32(0x00000002), //!< A new file was created.
+    FILE_OVERWRITTEN  = cpu_to_le32(0x00000003), //!< An existing file was overwritten.
+};
 
-/*! Impersonation Levels
+/*!
+ * Impersonation Levels
  */
 enum class ImpersonationLevels : uint32_t
 {
-    ANONYMOUS      = cpu_to_le32(0x00000000),
-    IDENTIFICATION = cpu_to_le32(0x00000001),
-    IMPERSONATION  = cpu_to_le32(0x00000002),
-    DELEGATE       = cpu_to_le32(0x00000003)
+    ANONYMOUS      = cpu_to_le32(0x00000000),    //!< The application-requested impersonation level is Anonymous.
+    IDENTIFICATION = cpu_to_le32(0x00000001),    //!< The application-requested impersonation level is Identification.
+    IMPERSONATION  = cpu_to_le32(0x00000002),    //!< The application-requested impersonation level is Impersonation.
+    DELEGATE       = cpu_to_le32(0x00000003)     //!< The application-requested impersonation level is Delegate.
 };
 
-//FIXME: WTF?
-/*! Create Context Values
+//FIXME: To be deleted?
+/*!
+ * Create Context Values
  */
 #define SMB2_CREATE_EA_BUFFER   "ExtA" /* extended attributes */
 #define SMB2_CREATE_SD_BUFFER   "SecD" /* security descriptor */
@@ -406,43 +442,54 @@ enum class ImpersonationLevels : uint32_t
 #define SMB2_CREATE_QUERY_ON_DISK_ID  "QFid"
 #define SMB2_CREATE_REQUEST_LEASE  "RqLs"
 
-struct createRequest {
-    uint16_t structureSize; /* Must be 57 */
-    uint8_t   SecurityFlags;
-    uint8_t   RequestedOplockLevel;
-    ImpersonationLevels ImpersonationLevel;
-    uint64_t SmbCreateFlags;
-    uint64_t Reserved;
-    DesiredAccessFlags desiredAccess;
-    FileAttributes attributes;
-    ShareAccessFlags shareAccess;
-    CreateDisposition createDisposition;
-    CreateOptionsFlags createOptions;
-    uint16_t NameOffset;
-    uint16_t NameLength;
-    uint32_t CreateContextsOffset;
-    uint32_t CreateContextsLength;
-    uint8_t   Buffer[1];
+/*!
+ * \brief The createRequest struct
+ * The SMB2 CREATE Request packet is sent by a client to request either
+ * creation of or access to a file. In case of a named pipe or printer,
+ * the server MUST create a new file.
+ */
+struct CreateRequest {
+    uint16_t structureSize;                      //!< The client MUST set this field to 57, indicating the size of the request structure, not including the header. The client MUST set it to this value regardless of how long Buffer[] actually is in the request being sent.
+    uint8_t   SecurityFlags;                     //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it.
+    OplockLevels   RequestedOplockLevel;         //!< The requested oplock level.
+    ImpersonationLevels ImpersonationLevel;      //!< This field specifies the impersonation level requested by the application that is issuing the create request
+    uint64_t SmbCreateFlags;                     //!< This field MUST NOT be used and MUST be reserved. The client SHOULD set this field to zero, and the server MUST ignore it on receipt.
+    uint64_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client sets this to any value, and the server MUST ignore it on receipt.
+    DesiredAccessFlags desiredAccess;            //!< The level of access that is required
+    FileAttributes attributes;                   //!< This field MUST be a combination of the values
+    ShareAccessFlags shareAccess;                //!< Specifies the sharing mode for the open
+    CreateDisposition createDisposition;         //!< Defines the action the server MUST take if the file that is specified in the name field already exists.
+    CreateOptionsFlags createOptions;            //!< Specifies the options to be applied when creating or opening the file. Combinations of the bit positions are valid, unless otherwise noted.
+    uint16_t NameOffset;                         //!< The offset, in bytes, from the beginning of the SMB2 header to the 8-byte aligned file name
+    uint16_t NameLength;                         //!< The length of the file name, in bytes.
+    uint32_t CreateContextsOffset;               //!< The offset, in bytes, from the beginning of the SMB2 header to the first 8-byte aligned SMB2_CREATE_CONTEXT structure in the request
+    uint32_t CreateContextsLength;               //!< The length, in bytes, of the list of SMB2_CREATE_CONTEXT structures sent in this request.
+    uint8_t   Buffer[1];                         //!< A variable-length buffer that contains the Unicode file name and create context list, as defined by NameOffset, NameLength, CreateContextsOffset, and CreateContextsLength.
 }  __attribute__ ((__packed__));
 
-struct createResponse {
-    uint16_t structureSize; /* Must be 89 */
-    uint8_t   OplockLevel;
-    uint8_t   Reserved;
-    uint32_t CreateAction;
-    uint64_t CreationTime;
-    uint64_t LastAccessTime;
-    uint64_t LastWriteTime;
-    uint64_t ChangeTime;
-    uint64_t AllocationSize;
-    uint64_t EndofFile;
-    FileAttributes attributes;
-    uint32_t Reserved2;
-    uint64_t  PersistentFileId; /* opaque endianness */
-    uint64_t  VolatileFileId; /* opaque endianness */
-    uint32_t CreateContextsOffset;
-    uint32_t CreateContextsLength;
-    uint8_t   Buffer[1];
+/*!
+ * \brief The CreateResponse struct
+ * The SMB2 CREATE Response packet is sent by the server to notify
+ * the client of the status of its SMB2 CREATE Request.
+ */
+struct CreateResponse {
+    uint16_t structureSize;                       //!< Must be 89
+    OplockLevels oplockLevel;                     //!< The oplock level that is granted to the client for this open.
+    uint8_t flag;                                 //!< If the server implements the SMB 3.x dialect family, this field MUST be constructed using the 0x01 value. Otherwise, this field MUST NOT be used and MUST be reserved.
+    CreateActions CreateAction;                   //!< The action taken in establishing the open
+    uint64_t CreationTime;                        //!< The time when the file was created
+    uint64_t LastAccessTime;                      //!< The time the file was last accessed
+    uint64_t LastWriteTime;                       //!< The time when data was last written to the file
+    uint64_t ChangeTime;                          //!< The time when the file was last modified
+    uint64_t AllocationSize;                      //!< The size, in bytes, of the data that is allocated to the file.
+    uint64_t EndofFile;                           //!< The size, in bytes, of the file.
+    FileAttributes attributes;                    //!< The attributes of the file
+    uint32_t Reserved2;                           //!< This field MUST NOT be used and MUST be reserved. The server SHOULD set this to 0, and the client MUST ignore it on receipt.<51>
+    uint64_t  PersistentFileId;                   //!< The identifier of the open to a file or pipe that was established. Opaque endianness
+    uint64_t  VolatileFileId;                     //!<
+    uint32_t CreateContextsOffset;                //!< The offset, in bytes, from the beginning of the SMB2 header to the first 8-byte aligned SMB2_CREATE_CONTEXT response that is contained in this response.
+    uint32_t CreateContextsLength;                //!<  The length, in bytes, of the list of SMB2_CREATE_CONTEXT response structures that are contained in this response.
+    uint8_t   Buffer[1];                          //!<  A variable-length buffer that contains the list of create contexts that are contained in this response, as described by CreateContextsOffset and CreateContextsLength.
 }  __attribute__ ((__packed__));
 
 /*!

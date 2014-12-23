@@ -1143,17 +1143,17 @@ public:
         account(cmd, SMBv2Commands::LOGOFF, smbv2);
     }
 
-    void treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd, const SMBv2::TreeConnectArgumentType*, const SMBv2::TreeConnectResultType*) override final
+    void treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd, const SMBv2::TreeConnectRequest*, const SMBv2::TreeConnectResponse*) override final
     {
         account(cmd, SMBv2Commands::TREE_CONNECT, smbv2);
     }
 
-    void treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd, const SMBv2::TreeDisconnectArgumentType*, const SMBv2::TreeDisconnectResultType*) override final
+    void treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd, const SMBv2::TreeDisconnectRequest*, const SMBv2::TreeDisconnectResponse*) override final
     {
         account(cmd, SMBv2Commands::TREE_DISCONNECT, smbv2);
     }
 
-    void createSMBv2(const SMBv2::CreateCommand* cmd, const SMBv2::CreateArgumentType*, const SMBv2::CreateResultType*) override final
+    void createSMBv2(const SMBv2::CreateCommand* cmd, const SMBv2::CreateRequest*, const SMBv2::CreateResponse*) override final
     {
         account(cmd, SMBv2Commands::CREATE, smbv2);
     }
