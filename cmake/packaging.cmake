@@ -10,8 +10,7 @@ set (CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/man /usr/share/man
 set (CPACK_RPM_PACKAGE_REQUIRES "libpcap >= 1.3.0-1")
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND EXISTS "/etc/os-release")
     execute_process (
-        COMMAND cat /etc/os-release
-        COMMAND grep "^NAME="
+        COMMAND grep "^NAME=" /etc/os-release
         COMMAND sed -e "s/NAME=//g"
         COMMAND sed -e "s/\"//g"
         RESULT_VARIABLE DIFINE_LINUX_DISTRO_RESULT
