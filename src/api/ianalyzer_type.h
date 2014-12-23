@@ -666,7 +666,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void negotiateSMBv2(const SMBv2::NegotiateCommand*, const SMBv2::NegotiateArgumentType*, const SMBv2::NegotiateResultType*) {}
+    virtual void negotiateSMBv2(const SMBv2::NegotiateCommand*, const SMBv2::NegotiateRequest*, const SMBv2::NegotiateResponse*) {}
 
     /*! "session setup" command "on receive" event handler
      * \param cmd - Specified command

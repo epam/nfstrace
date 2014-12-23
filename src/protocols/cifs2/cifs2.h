@@ -119,12 +119,6 @@ struct MessageHeader : public RawMessageHeader
      * \return True, if flag set, and False in other case
      */
     bool isFlag(const Flags flag) const;
-
-    template<typename Cmd>
-    const Cmd* body()
-    {
-        return reinterpret_cast<const Cmd*>(this + sizeof(RawMessageHeader));
-    }
 };
 
 /*! Check is data valid CIFS message's header and return header or nullptr
@@ -134,8 +128,9 @@ struct MessageHeader : public RawMessageHeader
 const MessageHeader* get_header(const uint8_t* data);
 
 /*! Constructs new command for API from raw message
- * \param request - Call's header
- * \param response - Reply's header
+ * \param request - Call's
+ * \param response - Reply's
+ * \param session - session
  * \return Command structure
  */
 template <typename Cmd, typename Data, typename Session>
@@ -146,6 +141,9 @@ inline const Cmd command(Data& request, Data& response, Session* session)
     // Set time stamps
     cmd.ctimestamp = &request->timestamp;
     cmd.rtimestamp = &response->timestamp;
+
+    cmd.parg = reinterpret_cast<const typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
+    cmd.pres = reinterpret_cast<const typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader));
 
     return cmd;
 }
