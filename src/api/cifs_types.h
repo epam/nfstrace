@@ -50,8 +50,8 @@ template <
 class Command : public Procedure<int>
 {
 public:
-    ArgumentType parg;//!< Arguments of specified command
-    ResultType pres;//!< Results of specified command
+    ArgumentType* parg;//!< Arguments of specified command
+    ResultType* pres;//!< Results of specified command
 };
 
 using CreateDirectoryArgumentType = struct {};                                                                                   //!< CreateDirectory arguments
