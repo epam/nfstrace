@@ -184,7 +184,7 @@ enum class SessionFlags : uint16_t
  */
 struct SessionSetupResponse {
     uint16_t structureSize;                       //!< Must be 9
-    SessionFlags SessionFlags;                    //!< A flags field that indicates additional information about the session.
+    SessionFlags sessionFlags;                    //!< A flags field that indicates additional information about the session.
     uint16_t SecurityBufferOffset;                //!< The offset, in bytes, from the beginning of the SMB2 header to the security buffer.
     uint16_t SecurityBufferLength;                //!< The length, in bytes, of the security buffer.
     uint8_t  Buffer[1];                           //!< A variable-length buffer that contains the security buffer for the response, as specified by SecurityBufferOffset and SecurityBufferLength.

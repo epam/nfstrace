@@ -119,6 +119,12 @@ struct MessageHeader : public RawMessageHeader
      * \return True, if flag set, and False in other case
      */
     bool isFlag(const Flags flag) const;
+
+    template<typename Cmd>
+    const Cmd* body()
+    {
+        return reinterpret_cast<const Cmd*>(this + sizeof(RawMessageHeader));
+    }
 };
 
 /*! Check is data valid CIFS message's header and return header or nullptr
