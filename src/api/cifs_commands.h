@@ -756,6 +756,66 @@ struct FlushResponse
     uint16_t reserved1;                          //!< This field MUST NOT be used and MUST be reserved. The server may set this to 0, and the client MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
 
+/*!
+ * For the SMB 2.002, 2.1 and 3.0 dialects,
+ * this field MUST NOT be used and MUST be reserved.
+ * The client MUST set this field to 0, and the server MUST
+ * ignore it on receipt. Used by the SMB 3.02 dialect.
+ */
+enum class BufferingFlags : uint8_t
+{
+    NONE                          = 0x00,        //!< Default for SMB 2.002, 2.1 and 3.0 dialects
+    SMB2_READFLAG_READ_UNBUFFERED = 0x01,        //!< The server or underlying object store SHOULD NOT cache the read data at intermediate layers.
+};
+
+/*!
+ * For SMB 2.002 and 2.1 dialects, this field MUST NOT be used and MUST be reserved.
+ * The client MUST set this field to 0, and the server MUST ignore it on receipt.
+ */
+enum class Channels : uint32_t
+{
+    SMB2_CHANNEL_NONE               = 0x00000000,//!< No channel information is present in the request. The ReadChannelInfoOffset and ReadChannelInfoLength fields MUST be set to 0 by the client and MUST be ignored by the server.
+    SMB2_CHANNEL_RDMA_V1            = 0x00000001,//!< One or more SMB_DIRECT_BUFFER_DESCRIPTOR_V1 structures as specified in [MS-SMBD] section 2.2.3.1 are present in the channel information specified by ReadChannelInfoOffset and ReadChannelInfoLength fields.
+    SMB2_CHANNEL_RDMA_V1_INVALIDATE = 0x00000002,//!< This value is valid only for the SMB 3.02 dialect. One or more SMB_DIRECT_BUFFER_DESCRIPTOR_V1 structures, as specified in [MS-SMBD] section 2.2.3.1, are present in the channel information specified by the ReadChannelInfoOffset and ReadChannelInfoLength fields. The server is requested to perform remote invalidation when responding to the request as specified in [MS-SMBD] section 3.1.4.2.
+};
+
+/*!
+ * \brief The ReadRequest structure
+ * The SMB2 READ Request packet is sent by the client
+ * to request a read operation on the file that is specified by the FileId
+ */
+struct ReadRequest
+{
+    uint16_t structureSize;                      //!< Must be 49
+    uint8_t  padding;                            //!< The requested offset from the start of the SMB2 header, in bytes, at which to place the data read in the SMB2 READ Response
+    BufferingFlags flags;                        //!< For the SMB 2.002, 2.1 and 3.0 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt. Used by SMB 3.02 dialect
+    uint32_t length;                             //!< The length, in bytes, of the data to read from the specified file or pipe. The length of the data being read may be zero bytes.
+    uint64_t offset;                             //!< The offset, in bytes, into the file from which the data MUST be read
+    uint64_t persistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t volatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint32_t minimumCount;                       //!< The minimum number of bytes to be read for this operation to be successful
+    Channels channel;                            //!< For SMB 2.002 and 2.1 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt.
+    uint32_t RemainingBytes;                     //!< The number of subsequent bytes that the client intends to read from the file after this operation completes. This value is provided to facilitate read-ahead caching, and is not binding on the server.
+    uint32_t ReadChannelInfoOffset;              //!< For the SMB 2.002 and 2.1 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt. For the SMB 3.x dialect family, it contains the offset, in bytes, from the beginning of the SMB2 header to the channel data as specified by the Channel field of the request.
+    uint32_t ReadChannelInfoLength;              //!< For the SMB 2.002 and 2.1 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt. For the SMB 3.x dialect family, it contains the length, in bytes, of the channel data as specified by the Channel field of the request.
+    uint8_t  Buffer[1];                          //!< A variable-length buffer that contains the read channel information, as described by ReadChannelInfoOffset and ReadChannelInfoLength. Unused at present. The client MUST set one byte of this field to 0, and the server MUST ignore it on receipt.
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The ReadResponse structure
+ * The SMB2 READ Response packet is sent in response
+ * to an SMB2 READ Request packet
+ */
+struct ReadResponse
+{
+    uint16_t structureSize;                      //!< Must be 17
+    uint8_t  DataOffset;                         //!< The offset, in bytes, from the beginning of the header to the data read being returned in this response
+    uint8_t  Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
+    uint32_t DataLength;                         //!< The length, in bytes, of the data read being returned in this response.
+    uint32_t DataRemaining;                      //!< The length, in bytes, of the data being sent on the Channel specified in the request
+    uint32_t Reserved2;                          //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
+    uint8_t  Buffer[1];                          //!< A variable-length buffer that contains the data read for the response, as described by DataOffset and DataLength. The minimum length is 1 byte. If 0 bytes are returned from the underlying object store, the server MUST send a failure response with status equal to STATUS_END_OF_FILE.
+}  __attribute__ ((__packed__));
 
 } // namespace SMBv2
 } // namespace API
