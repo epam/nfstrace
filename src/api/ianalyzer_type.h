@@ -708,7 +708,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void flushSMBv2(const SMBv2::FlushCommand*, const SMBv2::FlushArgumentType*, const SMBv2::FlushResultType*) {}
+    virtual void flushSMBv2(const SMBv2::FlushCommand*, const SMBv2::FlushRequest*, const SMBv2::FlushResponse*) {}
 
     /*! "Read" command "on receive" event handler
      * \param cmd - Specified command

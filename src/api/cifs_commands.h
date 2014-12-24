@@ -729,6 +729,32 @@ struct QueryDirResponse
     uint8_t  Buffer[1];                          //!< A variable-length buffer containing the directory enumeration being returned in the response, as described by the OutputBufferOffset and OutputBufferLength
 }  __attribute__ ((__packed__));
 
+/*!
+ * \brief The FlushRequest struct
+ * The SMB2 FLUSH Request packet is sent by a client to
+ * request that a server flush all cached file information
+ * for a specified open of a file to the persistent store that backs the file
+ */
+struct FlushRequest
+{
+    uint16_t structureSize;                      //!< Must be 24
+    uint16_t reserved1;                          //!< This field MUST NOT be used and MUST be reserved. The client may set this to 0, and the server MUST ignore it on receipt.
+    uint32_t reserved2;                          //!< This field MUST NOT be used and MUST be reserved. The client may set this to 0, and the server MUST ignore it on receipt.
+    uint64_t PersistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t VolatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The FlushResponse struct
+ * The SMB2 FLUSH Request packet is sent by a client to
+ * request that a server flush all cached file information
+ * for a specified open of a file to the persistent store that backs the file
+ */
+struct FlushResponse
+{
+    uint16_t structureSize;                      //!< Must be 4
+    uint16_t reserved1;                          //!< This field MUST NOT be used and MUST be reserved. The server may set this to 0, and the client MUST ignore it on receipt.
+}  __attribute__ ((__packed__));
 
 
 } // namespace SMBv2
