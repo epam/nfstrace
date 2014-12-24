@@ -715,7 +715,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void readSMBv2(const SMBv2::ReadCommand*, const SMBv2::ReadArgumentType*, const SMBv2::ReadResultType*) {}
+    virtual void readSMBv2(const SMBv2::ReadCommand*, const SMBv2::ReadRequest*, const SMBv2::ReadResponse*) {}
 
     /*! "Write" command "on receive" event handler
      * \param cmd - Specified command

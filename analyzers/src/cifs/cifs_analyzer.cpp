@@ -1163,7 +1163,7 @@ public:
         account(cmd, SMBv2Commands::FLUSH, smbv2);
     }
 
-    void readSMBv2(const SMBv2::ReadCommand* cmd, const SMBv2::ReadArgumentType*, const SMBv2::ReadResultType*) override final
+    void readSMBv2(const SMBv2::ReadCommand* cmd, const SMBv2::ReadRequest*, const SMBv2::ReadResponse*) override final
     {
         account(cmd, SMBv2Commands::READ, smbv2);
     }
