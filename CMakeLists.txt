@@ -120,6 +120,7 @@ find_program (ASTYLE_PATH astyle)
 
 if (ASTYLE_PATH)
     add_custom_target (codestyle
-                       COMMAND ${ASTYLE_PATH} --options=${CMAKE_SOURCE_DIR}/astyle.cfg '*.cpp' '*.h'
-                       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src)
+                       COMMAND find {analyzers,src,tests} -name '*.h' -o -name '*.cpp' |
+                               xargs ${ASTYLE_PATH} --options=${CMAKE_SOURCE_DIR}/astyle.cfg
+                       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif ()
