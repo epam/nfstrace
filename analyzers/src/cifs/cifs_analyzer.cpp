@@ -1193,7 +1193,7 @@ public:
         account(cmd, SMBv2Commands::ECHO, smbv2);
     }
 
-    void queryDirSMBv2(const SMBv2::QueryDirCommand* cmd, const SMBv2::QueryDirArgumentType*, const SMBv2::QueryDirResultType*) override final
+    void queryDirSMBv2(const SMBv2::QueryDirCommand* cmd, const SMBv2::QueryDirRequest*, const SMBv2::QueryDirResponse*) override final
     {
         account(cmd, SMBv2Commands::QUERY_DIRECTORY, smbv2);
     }

@@ -372,6 +372,7 @@ using TreeConnectCommand = SMBv1::Command<TreeConnectRequest, TreeConnectRespons
 using TreeDisconnectCommand = SMBv1::Command<TreeDisconnectRequest, TreeDisconnectResponse>;          //!< Tree disconnect command
 using CreateCommand = SMBv1::Command<CreateRequest, CreateResponse>;                                  //!< Create command
 using QueryInfoCommand = SMBv1::Command<QueryInfoRequest, QueryInfoResponse>;                         //!< Query Info command
+using QueryDirCommand = SMBv1::Command<QueryDirRequest, QueryDirResponse>;                            //!< Query directory command
 
 using FlushArgumentType = struct {};                                                                  //!< Flush command's arguments
 using FlushResultType = struct {};                                                                    //!< Flush command's results
@@ -396,10 +397,6 @@ using IoctlCommand = SMBv1::Command<IoctlArgumentType, IoctlResultType>;        
 using CancelArgumentType = struct {};                                                                 //!< Cancel command's arguments
 using CancelResultType = struct {};                                                                   //!< Cancel command's results
 using CancelCommand = SMBv1::Command<CancelArgumentType, CancelResultType>;                           //!< Cancel command
-
-using QueryDirArgumentType = struct {};                                                               //!< Query directory command's arguments
-using QueryDirResultType = struct {};                                                                 //!< Query directory command's results
-using QueryDirCommand = SMBv1::Command<QueryDirArgumentType, QueryDirResultType>;                     //!< Query directory command
 
 using ChangeNotifyArgumentType = struct {};                                                           //!< Change Notify command's arguments
 using ChangeNotifyResultType = struct {};                                                             //!< Change Notify command's results
