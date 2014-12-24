@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Definition of CIFS commands
+// Description: Definition of CIFSv2 commands
 // Copyright (c) 2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -564,44 +564,18 @@ struct EchoResponse
  */
 enum class InfoTypes : uint8_t
 {
-    FILE       = 0x01,
-    FILESYSTEM = 0x02,
-    SECURITY   = 0x03,
-    QUOTA      = 0x04
+    FILE       = 0x01,                           //!< The file information is requested.
+    FILESYSTEM = 0x02,                           //!< The underlying object store information is requested.
+    SECURITY   = 0x03,                           //!< The security information is requested.
+    QUOTA      = 0x04                            //!< The underlying object store quota information is requested.
 };
 
-struct query_infoRequest
-{
-    uint16_t structureSize; /* Must be 41 */
-    InfoTypes infoType;
-    uint8_t   FileInfoClass;
-    uint32_t OutputBufferLength;
-    uint16_t InputBufferOffset;
-    uint16_t  Reserved;
-    uint32_t InputBufferLength;
-    uint32_t AdditionalInformation;
-    uint32_t Flags;
-    uint64_t  PersistentFileId; /* opaque endianness */
-    uint64_t  VolatileFileId; /* opaque endianness */
-    uint8_t   Buffer[1];
-}  __attribute__ ((__packed__));
-
-struct query_infoResponse
-{
-    uint16_t structureSize; /* Must be 9 */
-    uint16_t OutputBufferOffset;
-    uint32_t OutputBufferLength;
-    uint8_t   Buffer[1];
-}  __attribute__ ((__packed__));
-
-/*
+/*!
  * PDU infolevel structure definitions
  * BB consider moving to a different header
+ * partial list of QUERY INFO levels
  */
-
-/*! partial list of QUERY INFO levels
- */
-enum class QueryInfoLevels
+enum class QueryInfoLevels : uint8_t
 {
     DIRECTORY_INFORMATION                = 1,
     FULL_DIRECTORY_INFORMATION           = 2,
@@ -651,34 +625,67 @@ enum class QueryInfoLevels
     STANDARD_LINK_INFORMATION            = 54
 };
 
-/*
- * This level 18, although with struct with same name is different from cifs
- * level 0x107. Level 0x107 has an extra u64 between AccessFlags and
- * CurrentByteOffset.
+/*!
+ * Provides additional information to the server.
+ * If security information is being queried, this value contains a 4-byte bit
+ * field of flags indicating what security attributes MUST be returned.
  */
-struct file_all_info   /* data block encoding of response to level 18 */
+enum class AdditionInfo : uint32_t
 {
-    uint64_t CreationTime; /* Beginning of FILE_BASIC_INFO equivalent */
-    uint64_t LastAccessTime;
-    uint64_t LastWriteTime;
-    uint64_t ChangeTime;
-    uint32_t Attributes;
-    uint32_t Pad1;  /* End of FILE_BASIC_INFO_INFO equivalent */
-    uint64_t AllocationSize; /* Beginning of FILE_STANDARD_INFO equivalent */
-    uint64_t EndOfFile; /* size ie offset to first free byte in file */
-    uint32_t NumberOfLinks; /* hard links */
-    uint8_t  DeletePending;
-    uint8_t  Directory;
-    uint16_t Pad2;  /* End of FILE_STANDARD_INFO equivalent */
-    uint64_t IndexNumber;
-    uint32_t EASize;
-    uint32_t AccessFlags;
-    uint64_t CurrentByteOffset;
-    uint32_t Mode;
-    uint32_t AlignmentRequirement;
-    uint32_t FileNameLength;
-    char     FileName [1];
-}  __attribute__ ((__packed__)); /* level 18 Query */
+    OWNER_SECURITY_INFORMATION     = 0x00000001, //!< The client is querying the owner from the security descriptor of the file or named pipe.
+    GROUP_SECURITY_INFORMATION     = 0x00000002, //!< The client is querying the group from the security descriptor of the file or named pipe.
+    DACL_SECURITY_INFORMATION      = 0x00000004, //!< The client is querying the discretionary access control list from the security descriptor of the file or named pipe.
+    SACL_SECURITY_INFORMATION      = 0x00000008, //!< The client is querying the system access control list from the security descriptor of the file or named pipe.
+    LABEL_SECURITY_INFORMATION     = 0x00000010, //!< The client is querying the integrity label from the security descriptor of the file or named pipe.
+    ATTRIBUTE_SECURITY_INFORMATION = 0x00000020, //!< The client is querying the resource attribute from the security descriptor of the file or named pipe.
+    SCOPE_SECURITY_INFORMATION     = 0x00000040, //!< The client is querying the central access policy of the resource from the security descriptor of the file or named pipe.
+    BACKUP_SECURITY_INFORMATION    = 0x00010000  //!< The client is querying the security descriptor information used for backup operation.
+};
+
+/*!
+ * The flags MUST be set to a combination of zero or more of these bit values
+ * for a FileFullEaInformation query.
+ */
+enum FileFullEaInformation : uint32_t
+{
+    SL_RESTART_SCAN        = 0x00000001,         //!< Restart the scan for EAs from the beginning.
+    SL_RETURN_SINGLE_ENTRY = 0x00000002,         //!< Return a single EA entry in the response buffer.
+    SL_INDEX_SPECIFIED     = 0x00000004          //!< The caller has specified an EA index.
+};
+
+/*!
+ * \brief The QueryInfoRequest struct
+ * The SMB2 QUERY_INFO Request (section 2.2.37) packet is sent by a client
+ * to request information on a file, named pipe, or underlying volume.
+ */
+struct QueryInfoRequest
+{
+    uint16_t  structureSize;                     //!< Must be 41
+    InfoTypes infoType;                          //!< The type of information queried
+    QueryInfoLevels FileInfoClass;               //!< Class of info
+    uint32_t  OutputBufferLength;                //!< The maximum number of bytes of information the server can send in the response.
+    uint16_t  InputBufferOffset;                 //!< The offset, in bytes, from the beginning of the SMB2 header to the input buffer.
+    uint16_t  Reserved;                          //!< This field MUST NOT be used and MUST be reserved.
+    uint32_t  InputBufferLength;                 //!< The length of the input buffer
+    AdditionInfo AdditionalInformation;          //!< Provides additional information to the server.
+    FileFullEaInformation  Flags;                //!< The flags MUST be set to a combination of zero or more of these bit values for a FileFullEaInformation query.
+    uint64_t  PersistentFileId;                  //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t  VolatileFileId;                    //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint8_t   Buffer[1];                         //!< A variable-length buffer containing the input buffer for the request, as described by the InputBufferOffset and InputBufferLength fields.
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The query_infoResponse struct
+ * The SMB2 QUERY_INFO Response packet is sent by the server
+ * in response to an SMB2 QUERY_INFO Request packet.
+ */
+struct QueryInfoResponse
+{
+    uint16_t structureSize;                      //!< Must be 9
+    uint16_t OutputBufferOffset;                 //!< The offset, in bytes, from the beginning of the SMB2 header to the information being returned.
+    uint32_t OutputBufferLength;                 //!< The length, in bytes, of the information being returned.
+    uint8_t   Buffer[1];                         //!< A variable-length buffer that contains the information that is returned in the response, as described by the OutputBufferOffset and OutputBufferLength fields
+}  __attribute__ ((__packed__));
 
 } // namespace SMBv2
 } // namespace API

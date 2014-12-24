@@ -371,6 +371,7 @@ using LogOffCommand = SMBv1::Command<LogOffRequest, LogOffResponse>;            
 using TreeConnectCommand = SMBv1::Command<TreeConnectRequest, TreeConnectResponse>;                   //!< Tree connect command
 using TreeDisconnectCommand = SMBv1::Command<TreeDisconnectRequest, TreeDisconnectResponse>;          //!< Tree disconnect command
 using CreateCommand = SMBv1::Command<CreateRequest, CreateResponse>;                                  //!< Create command
+using QueryInfoCommand = SMBv1::Command<QueryInfoRequest, QueryInfoResponse>;                         //!< Query Info command
 
 using FlushArgumentType = struct {};                                                                  //!< Flush command's arguments
 using FlushResultType = struct {};                                                                    //!< Flush command's results
@@ -403,10 +404,6 @@ using QueryDirCommand = SMBv1::Command<QueryDirArgumentType, QueryDirResultType>
 using ChangeNotifyArgumentType = struct {};                                                           //!< Change Notify command's arguments
 using ChangeNotifyResultType = struct {};                                                             //!< Change Notify command's results
 using ChangeNotifyCommand = SMBv1::Command<ChangeNotifyArgumentType, ChangeNotifyResultType>;         //!< Change Notify command
-
-using QueryInfoArgumentType = struct {};                                                              //!< Query Info command's arguments
-using QueryInfoResultType = struct {};                                                                //!< Query Info command's results
-using QueryInfoCommand = SMBv1::Command<QueryInfoArgumentType, QueryInfoResultType>;                  //!< Query Info command
 
 using SetInfoArgumentType = struct {};                                                                //!< Set Info command's arguments
 using SetInfoResultType = struct {};                                                                  //!< Set Info command's results

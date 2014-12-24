@@ -771,7 +771,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void queryInfoSMBv2(const SMBv2::QueryInfoCommand*, const SMBv2::QueryInfoArgumentType*, const SMBv2::QueryInfoResultType*) {}
+    virtual void queryInfoSMBv2(const SMBv2::QueryInfoCommand*, const SMBv2::QueryInfoRequest*, const SMBv2::QueryInfoResponse*) {}
 
     /*! "Set Info" command "on receive" event handler
      * \param cmd - Specified command
