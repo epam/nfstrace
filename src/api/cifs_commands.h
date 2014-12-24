@@ -687,6 +687,50 @@ struct QueryInfoResponse
     uint8_t   Buffer[1];                         //!< A variable-length buffer that contains the information that is returned in the response, as described by the OutputBufferOffset and OutputBufferLength fields
 }  __attribute__ ((__packed__));
 
+/*!
+ */
+enum class OpFlags : uint8_t
+{
+    SMB2_RESTART_SCANS       = 0x01,             //!< The server MUST restart the enumeration from the beginning, but the search pattern is not changed.
+    SMB2_RETURN_SINGLE_ENTRY = 0x02,             //!< The server MUST only return the first entry of the search results.
+    SMB2_INDEX_SPECIFIED     = 0x04,             //!< The server SHOULD<64> return entries beginning at the byte number specified by FileIndex.
+    SMB2_REOPEN              = 0x10              //!< The server MUST restart the enumeration from the beginning, and the search pattern MUST be changed to the provided value. This often involves silently closing and reopening the directory on the server side.
+};
+
+/*!
+ * \brief The QueryDirRequest struct
+ * The SMB2 QUERY_DIRECTORY Request packet is sent by the client
+ * to obtain a directory enumeration on a directory open.
+ */
+struct QueryDirRequest
+{
+    uint16_t structureSize;                      //!< Must be 33
+    QueryInfoLevels infoType;                    //!< The file information class describing the format that data MUST be returned in.
+    OpFlags  flags;                              //!< Flags indicating how the query directory operation MUST be processed
+    uint32_t FileIndex;                          //!< The byte offset within the directory, indicating the position at which to resume the enumeration
+    uint64_t PersistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t VolatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint16_t FileNameOffset;                     //!< The offset, in bytes, from the beginning of the SMB2 header to the search pattern to be used for the enumeration
+    uint16_t FileNameLength;                     //!< The length, in bytes, of the search pattern. This field MUST be 0 if no search pattern is provided
+    uint32_t OutputBufferLength;                 //!< The maximum number of bytes the server is allowed to return in the SMB2 QUERY_DIRECTORY Response.
+    uint8_t  Buffer[1];                          //!< A variable-length buffer containing the Unicode search pattern for the request, as described by the FileNameOffset and FileNameLength fields
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The QueryDirResponse struct
+ * The SMB2 QUERY_DIRECTORY Response packet is sent by a server in
+ * response to an SMB2 QUERY_DIRECTORY Reques
+ */
+struct QueryDirResponse
+{
+    uint16_t structureSize;                      //!< Must be 9
+    uint16_t OutputBufferOffset;                 //!< The offset, in bytes, from the beginning of the SMB2 header to the directory enumeration data being returned.
+    uint32_t OutputBufferLength;                 //!< The length, in bytes, of the directory enumeration being returned.
+    uint8_t  Buffer[1];                          //!< A variable-length buffer containing the directory enumeration being returned in the response, as described by the OutputBufferOffset and OutputBufferLength
+}  __attribute__ ((__packed__));
+
+
+
 } // namespace SMBv2
 } // namespace API
 } // namespace NST

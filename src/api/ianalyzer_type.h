@@ -757,7 +757,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void queryDirSMBv2(const SMBv2::QueryDirCommand*, const SMBv2::QueryDirArgumentType*, const SMBv2::QueryDirResultType*) {}
+    virtual void queryDirSMBv2(const SMBv2::QueryDirCommand*, const SMBv2::QueryDirRequest*, const SMBv2::QueryDirResponse*) {}
 
     /*! "Change notify" command "on receive" event handler
      * \param cmd - Specified command
