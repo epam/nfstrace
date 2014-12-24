@@ -1158,7 +1158,7 @@ public:
         account(cmd, SMBv2Commands::CREATE, smbv2);
     }
 
-    void flushSMBv2(const SMBv2::FlushCommand* cmd, const SMBv2::FlushArgumentType*, const SMBv2::FlushResultType*) override final
+    void flushSMBv2(const SMBv2::FlushCommand* cmd, const SMBv2::FlushRequest*, const SMBv2::FlushResponse*) override final
     {
         account(cmd, SMBv2Commands::FLUSH, smbv2);
     }

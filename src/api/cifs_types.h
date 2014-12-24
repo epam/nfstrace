@@ -373,10 +373,7 @@ using TreeDisconnectCommand = SMBv1::Command<TreeDisconnectRequest, TreeDisconne
 using CreateCommand = SMBv1::Command<CreateRequest, CreateResponse>;                                  //!< Create command
 using QueryInfoCommand = SMBv1::Command<QueryInfoRequest, QueryInfoResponse>;                         //!< Query Info command
 using QueryDirCommand = SMBv1::Command<QueryDirRequest, QueryDirResponse>;                            //!< Query directory command
-
-using FlushArgumentType = struct {};                                                                  //!< Flush command's arguments
-using FlushResultType = struct {};                                                                    //!< Flush command's results
-using FlushCommand = SMBv1::Command<FlushArgumentType, FlushResultType>;                              //!< Flush command
+using FlushCommand = SMBv1::Command<FlushRequest, FlushResponse>;                                     //!< Flush command
 
 using ReadArgumentType = struct {};                                                                   //!< Read command's arguments
 using ReadResultType = struct {};                                                                     //!< Read command's results
