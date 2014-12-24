@@ -1203,7 +1203,7 @@ public:
         account(cmd, SMBv2Commands::CHANGE_NOTIFY, smbv2);
     }
 
-    void queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd, const SMBv2::QueryInfoArgumentType*, const SMBv2::QueryInfoResultType*) override final
+    void queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd, const SMBv2::QueryInfoRequest*, const SMBv2::QueryInfoResponse*) override final
     {
         account(cmd, SMBv2Commands::QUERY_INFO, smbv2);
     }
