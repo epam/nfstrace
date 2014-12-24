@@ -29,3 +29,6 @@ src/controller/build_info.h
 *.exe
 *.out
 *.app
+
+# Astyle backups
+*.orig
