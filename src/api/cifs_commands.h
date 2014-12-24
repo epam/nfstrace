@@ -271,7 +271,8 @@ enum class ShareFlags : uint32_t
  * The SMB2 TREE_CONNECT Response packet is sent by the server when an SMB2
  * TREE_CONNECT request is processed successfully by the server.
  */
-struct TreeConnectResponse {
+struct TreeConnectResponse
+{
     uint16_t structureSize;                      //!< Must be 16
     ShareTypes ShareType;                        //!< The type of share being accessed.
     uint8_t   Reserved;                          //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
@@ -286,7 +287,8 @@ struct TreeConnectResponse {
  * to request that the tree connect that is specified in the TreeId within
  * the SMB2 header be disconnected.
  */
-struct TreeDisconnectRequest {
+struct TreeDisconnectRequest
+{
     uint16_t structureSize;                      //!< The client MUST set this field to 4, indicating the size of the request structure, not including the header.
     uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
@@ -296,7 +298,8 @@ struct TreeDisconnectRequest {
  * The SMB2 TREE_DISCONNECT Response packet is sent by the server to confirm
  * that an SMB2 TREE_DISCONNECT Request was successfully processed.
  */
-struct TreeDisconnectResponse {
+struct TreeDisconnectResponse
+{
     uint16_t structureSize;                      //!< The client MUST set this field to 4, indicating the size of the request structure, not including the header.
     uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
@@ -305,19 +308,19 @@ struct TreeDisconnectResponse {
  */
 enum class FileAttributes : uint32_t
 {
-READONLY            = 0x00000001,
-HIDDEN              = 0x00000002,
-SYSTEM              = 0x00000004,
-DIRECTORY           = 0x00000010,
-ARCHIVE             = 0x00000020,
-NORMAL              = 0x00000080,
-TEMPORARY           = 0x00000100,
-SPARSE_FILE         = 0x00000200,
-REPARSE_POINT       = 0x00000400,
-COMPRESSED          = 0x00000800,
-OFFLINE             = 0x00001000,
-NOT_CONTENT_INDEXED = 0x00002000,
-ENCRYPTED           = 0x00004000
+    READONLY            = 0x00000001,
+    HIDDEN              = 0x00000002,
+    SYSTEM              = 0x00000004,
+    DIRECTORY           = 0x00000010,
+    ARCHIVE             = 0x00000020,
+    NORMAL              = 0x00000080,
+    TEMPORARY           = 0x00000100,
+    SPARSE_FILE         = 0x00000200,
+    REPARSE_POINT       = 0x00000400,
+    COMPRESSED          = 0x00000800,
+    OFFLINE             = 0x00001000,
+    NOT_CONTENT_INDEXED = 0x00002000,
+    ENCRYPTED           = 0x00004000
 };
 
 /*!
@@ -448,7 +451,8 @@ enum class ImpersonationLevels : uint32_t
  * creation of or access to a file. In case of a named pipe or printer,
  * the server MUST create a new file.
  */
-struct CreateRequest {
+struct CreateRequest
+{
     uint16_t structureSize;                      //!< The client MUST set this field to 57, indicating the size of the request structure, not including the header. The client MUST set it to this value regardless of how long Buffer[] actually is in the request being sent.
     uint8_t   SecurityFlags;                     //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it.
     OplockLevels   RequestedOplockLevel;         //!< The requested oplock level.
@@ -472,7 +476,8 @@ struct CreateRequest {
  * The SMB2 CREATE Response packet is sent by the server to notify
  * the client of the status of its SMB2 CREATE Request.
  */
-struct CreateResponse {
+struct CreateResponse
+{
     uint16_t structureSize;                       //!< Must be 89
     OplockLevels oplockLevel;                     //!< The oplock level that is granted to the client for this open.
     uint8_t flag;                                 //!< If the server implements the SMB 3.x dialect family, this field MUST be constructed using the 0x01 value. Otherwise, this field MUST NOT be used and MUST be reserved.
@@ -496,8 +501,9 @@ struct CreateResponse {
  * A Flags field indicates how to process the operation.
  * This field MUST be constructed using the following value
  */
-enum class CloseFlags : uint16_t {
-    POSTQUERY_ATTRIB         = cpu_to_le16(0x0001)
+enum class CloseFlags : uint16_t
+{
+    POSTQUERY_ATTRIB = cpu_to_le16(0x0001)
 };
 
 /*!
@@ -506,7 +512,8 @@ enum class CloseFlags : uint16_t {
  *  with a successful SMB2 CREATE Request. This request is composed of an
  *  SMB2 header.
  */
-struct CloseRequest {
+struct CloseRequest
+{
     uint16_t structureSize;                      //!< The client MUST set this field to 24, indicating the size of the request structure, not including the header.
     CloseFlags Flags;                            //!< If set, the server MUST set the attribute fields in the response to valid values. If not set, the client MUST NOT use the values that are returned in the response.
     uint32_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
@@ -519,7 +526,8 @@ struct CloseRequest {
  *  by the server to indicate that an SMB2 CLOSE Request was processed
  *  successfully. This response is composed of an SMB2 header
  */
-struct CloseResponse {
+struct CloseResponse
+{
     uint16_t structureSize;                      //!< The server MUST set this field to 60, indicating the size of the response structure, not including the header.
     CloseFlags Flags;                            //!< A Flags field indicates how to process the operation
     uint32_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
@@ -536,7 +544,8 @@ struct CloseResponse {
  * \brief The echoRequest struct. The SMB2 ECHO Request packet is sent
  * by a client to determine whether a server is processing requests.
  */
-struct EchoRequest {
+struct EchoRequest
+{
     uint16_t structureSize;                      //!< The client MUST set this to 4, indicating the size of the request structure, not including the header.
     uint16_t  Reserved;                          //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
@@ -545,7 +554,8 @@ struct EchoRequest {
  * \brief The echoResponse struct.The SMB2 ECHO Response packet is sent
  * by the server to confirm that an SMB2 ECHO Request was successfully processed
  */
-struct EchoResponse {
+struct EchoResponse
+{
     uint16_t structureSize;                      //!< The server MUST set this to 4, indicating the size of the response structure, not including the header.
     uint16_t  Reserved;                          //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
@@ -560,7 +570,8 @@ enum class InfoTypes : uint8_t
     QUOTA      = 0x04
 };
 
-struct query_infoRequest {
+struct query_infoRequest
+{
     uint16_t structureSize; /* Must be 41 */
     InfoTypes infoType;
     uint8_t   FileInfoClass;
@@ -575,7 +586,8 @@ struct query_infoRequest {
     uint8_t   Buffer[1];
 }  __attribute__ ((__packed__));
 
-struct query_infoResponse {
+struct query_infoResponse
+{
     uint16_t structureSize; /* Must be 9 */
     uint16_t OutputBufferOffset;
     uint32_t OutputBufferLength;
@@ -644,7 +656,8 @@ enum class QueryInfoLevels
  * level 0x107. Level 0x107 has an extra u64 between AccessFlags and
  * CurrentByteOffset.
  */
-struct file_all_info { /* data block encoding of response to level 18 */
+struct file_all_info   /* data block encoding of response to level 18 */
+{
     uint64_t CreationTime; /* Beginning of FILE_BASIC_INFO equivalent */
     uint64_t LastAccessTime;
     uint64_t LastWriteTime;
