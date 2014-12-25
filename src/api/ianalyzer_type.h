@@ -743,7 +743,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void cancelSMBv2(const SMBv2::CancelCommand*, const SMBv2::CancelArgumentType*, const SMBv2::CancelResultType*) {}
+    virtual void cancelSMBv2(const SMBv2::CancelCommand*, const SMBv2::CancelRequest*, const SMBv2::CancelResponce*) {}
 
     /*! "Echo" command "on receive" event handler
      * \param cmd - Specified command

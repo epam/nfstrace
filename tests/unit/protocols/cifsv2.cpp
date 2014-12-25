@@ -33,5 +33,7 @@ TEST(CIFSv2, bodies)
 
     EXPECT_EQ(48, sizeof(struct LockRequest));
     EXPECT_EQ(4,  sizeof(struct LockResponse));
+
+    EXPECT_EQ(4,  sizeof(struct CancelResponce));
 }
 //------------------------------------------------------------------------------

@@ -874,6 +874,11 @@ struct Lock
 
 /*!
  * \brief The LockRequest structure
+ * he SMB2 LOCK Request packet is sent by the client to either lock
+ * or unlock portions of a file.
+ * Several different segments of the file can be affected with a
+ * single SMB2 LOCK Request packet, but they all MUST be
+ * within the same file.
  */
 struct LockRequest
 {
@@ -887,8 +892,23 @@ struct LockRequest
 
 /*!
  * \brief The LockResponse structure
+ * The SMB2 LOCK Response packet is sent by a server
+ * in response to an SMB2 LOCK Request packet
  */
 struct LockResponse
+{
+    uint16_t structureSize;                      //!< The server MUST set this to 4
+    uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The CancelRequest structure
+ * The SMB2 CANCEL Request packet is sent by the client to
+ * cancel a previously sent message on the same SMB2 transport
+ * connection. The MessageId of the request to be canceled MUST
+ * be set in the SMB2 header of the request
+ */
+struct CancelRequest
 {
     uint16_t structureSize;                      //!< The server MUST set this to 4
     uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.

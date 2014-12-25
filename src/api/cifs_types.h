@@ -377,14 +377,12 @@ using FlushCommand = SMBv1::Command<FlushRequest, FlushResponse>;               
 using ReadCommand = SMBv1::Command<ReadRequest, ReadResponse>;                                        //!< Read command
 using WriteCommand = SMBv1::Command<WriteRequest, WriteResponse>;                                     //!< Write command
 using LockCommand = SMBv1::Command<LockRequest, LockResponse>;                                        //!< Lock command
+using CancelResponce = struct {};                                                                     //!< Cancel command's results
+using CancelCommand = SMBv1::Command<CancelRequest, CancelResponce>;                                  //!< Cancel command
 
 using IoctlArgumentType = struct {};                                                                  //!< Ioctl command's arguments
 using IoctlResultType = struct {};                                                                    //!< Ioctl command's results
 using IoctlCommand = SMBv1::Command<IoctlArgumentType, IoctlResultType>;                              //!< Ioctl command
-
-using CancelArgumentType = struct {};                                                                 //!< Cancel command's arguments
-using CancelResultType = struct {};                                                                   //!< Cancel command's results
-using CancelCommand = SMBv1::Command<CancelArgumentType, CancelResultType>;                           //!< Cancel command
 
 using ChangeNotifyArgumentType = struct {};                                                           //!< Change Notify command's arguments
 using ChangeNotifyResultType = struct {};                                                             //!< Change Notify command's results

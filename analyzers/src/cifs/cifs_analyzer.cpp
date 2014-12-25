@@ -1183,7 +1183,7 @@ public:
         account(cmd, SMBv2Commands::IOCTL, smbv2);
     }
 
-    void cancelSMBv2(const SMBv2::CancelCommand* cmd, const SMBv2::CancelArgumentType*, const SMBv2::CancelResultType*) override final
+    void cancelSMBv2(const SMBv2::CancelCommand* cmd, const SMBv2::CancelRequest*, const SMBv2::CancelResponce*) override final
     {
         account(cmd, SMBv2Commands::CANCEL, smbv2);
     }
