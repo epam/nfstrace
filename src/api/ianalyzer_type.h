@@ -778,7 +778,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void setInfoSMBv2(const SMBv2::SetInfoCommand*, const SMBv2::SetInfoArgumentType*, const SMBv2::SetInfoResultType*) {}
+    virtual void setInfoSMBv2(const SMBv2::SetInfoCommand*, const SMBv2::SetInfoRequest*, const SMBv2::SetInfoResponse*) {}
 
     /*! "Break opportunistic lock" command "on receive" event handler
      * \param cmd - Specified command

@@ -1058,6 +1058,9 @@ enum class CtlCodes : uint32_t
     FSCTL_VALIDATE_NEGOTIATE_INFO      = 0x00140204,
 };
 
+/*!
+ * A Flags field indicating how to process the operation
+ */
 enum class IoCtlOpFlags: uint32_t
 {
     NONE           = 0x00000000,                 //!< If Flags is set to this value
@@ -1107,6 +1110,36 @@ struct IoCtlResponse
     IoCtlOpFlags flags;                          //!< A Flags field indicating how to process the operation
     uint32_t Reserved2;                          //!< This field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt.
     uint8_t Buffer[1];                           //!< A variable-length buffer that contains the input and output data buffer for the request, as described by the InputOffset, InputCount, OutputOffset, and OutputCount. There is no minimum size restriction for this field as there can be FSCTLs with no input or output buffers. For FSCTL_SRV_COPYCHUNK or FSCTL_SRV_COPYCHUNK_WRITE, the format of this buffer is specified in SRV_COPYCHUNK_COPY. The Buffer format for FSCTL_DFS_GET_REFERRALS is specified in [MS-DFSC] section 2.2.2. The format of this buffer for all other FSCTLs is specified in the reference topic for the FSCTL being called.
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The SetInfoRequest structure
+ * The SMB2 SET_INFO Request packet is sent by a client
+ * to set information on a file or underlying object store
+ */
+struct SetInfoRequest
+{
+    uint16_t structureSize;                      //!< The server MUST set this to 33
+    InfoTypes infoType;                          //!< The type of information being set
+    QueryInfoLevels FileInfoClass;               //!< For setting file information, this field MUST contain one of the FILE_INFORMATION_CLASS values
+    uint32_t BufferLength;                       //!< The length, in bytes, of the information to be set.
+    uint16_t BufferOffset;                       //!< The offset, in bytes, from the beginning of the SMB2 header to the information to be set.
+    uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt.
+    AdditionInfo AdditionalInformation;          //!< Provides additional information to the server.
+    uint64_t persistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t volatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint8_t Buffer[1];
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The SetInfoResponse structure
+ * The SMB2 SET_INFO Response packet is sent by the server
+ * in response to an SMB2 SET_INFO Request to notify the
+ * client that its request has been successfully processed
+ */
+struct SetInfoResponse
+{
+    uint16_t structureSize;                      //!< The server MUST set this to 2
 }  __attribute__ ((__packed__));
 
 } // namespace SMBv2

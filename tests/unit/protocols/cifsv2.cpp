@@ -41,5 +41,8 @@ TEST(CIFSv2, bodies)
 
     EXPECT_EQ(57, sizeof(struct IoCtlRequest));
     EXPECT_EQ(49,  sizeof(struct IoCtlResponse));
+
+    EXPECT_EQ(33, sizeof(struct SetInfoRequest));
+    EXPECT_EQ(2,  sizeof(struct SetInfoResponse));
 }
 //------------------------------------------------------------------------------
