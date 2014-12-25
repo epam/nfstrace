@@ -22,6 +22,7 @@
 //------------------------------------------------------------------------------
 #include <grp.h>
 #include <pwd.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -59,7 +60,7 @@ Controller::Running::~Running()
 
 Controller::Controller(const Parameters& params) try
     : gout       {utils::Out::Level(params.verbose_level())}
-    , glog       {params.program_name()}
+    , glog       {params.log_path()}
     , signals    {status}
     , analysis   {}
     , filtration {new FiltrationManager{status}}
@@ -113,7 +114,32 @@ int Controller::run()
     try
     {
         Running running{*this};
-        status.wait_and_rethrow_exception();
+        while(true)
+        {
+            try
+            {
+                status.wait_and_rethrow_exception();
+            }
+            catch(SignalHandler::Signal& s)
+            {
+                if(s.signal_number == SIGHUP)
+                {
+                    glog.reopen();
+                }
+                else if(s.signal_number == SIGINT)
+                {
+                    throw ProcessingDone{std::string{"Interrupted by user."}};
+                }
+                else if(s.signal_number == SIGTERM)
+                {
+                    throw ProcessingDone{std::string{"Interrupted by SIGTERM."}};
+                }
+                else
+                {
+                    throw ProcessingDone{std::string{"Unhandled signal presents: "} + s.what()};
+                }
+            }
+        }
     }
     catch(ProcessingDone& e)
     {
@@ -197,7 +223,7 @@ void droproot(const std::string& dropuser)
     {
         if(utils::Out message{})
         {
-            message << "Superuser privileges can not be dropped.";
+            message << "Error dropping superuser privileges: " << e.what();
         }
         throw;
     }

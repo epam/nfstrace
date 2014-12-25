@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Pavel Karneliuk
-// Description: Handling signals and map them to exceptions.
-// Copyright (c) 2013 EPAM Systems
+// Author: Ilya Storozhilov
+// Description: JSON analyzer TCP-service declaration
+// Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,43 +19,38 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef SIGNAL_HANDLER_H
-#define SIGNAL_HANDLER_H
+#ifndef JSON_TCP_SERVICE_H
+#define JSON_TCP_SERVICE_H
 //------------------------------------------------------------------------------
-#include <atomic>
-#include <stdexcept>
-#include <thread>
-
-#include "controller/running_status.h"
+#include "net/abstract_tcp_service.h"
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace controller
-{
 
-class SignalHandler
+using namespace NST::net;
+
+class JsonTcpService : public AbstractTcpService
 {
 public:
-    class Signal : public std::runtime_error
+    JsonTcpService() = delete;
+    JsonTcpService(class JsonAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
+                   std::size_t maxServingDurationMs, int backlog);
+private:
+    class Task : public AbstractTask
     {
     public:
-        explicit Signal(int sig);
-        const int signal_number;
+        Task(JsonTcpService& service, int socket);
+        Task() = delete;
+
+        void execute() override final;
+    private:
+        JsonTcpService& _service;
     };
 
-    SignalHandler(RunningStatus&);
-    SignalHandler(const SignalHandler&)            = delete;
-    SignalHandler& operator=(const SignalHandler&) = delete;
-    ~SignalHandler();
+    AbstractTask* createTask(int socket) override final;
 
-private:
-    std::thread handler;
-    std::atomic_flag running;
+    JsonAnalyzer& _analyzer;
+    std::size_t _maxServingDurationMs;
 };
 
-} // namespace controller
-} // namespace NST
 //------------------------------------------------------------------------------
-#endif//SIGNAL_HANDLER_H
+#endif // JSON_TCP_SERVICE_H
 //------------------------------------------------------------------------------
-

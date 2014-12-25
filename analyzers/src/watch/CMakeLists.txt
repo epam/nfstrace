@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 2.8.12)
 project (watch)
 
 # check system dependencies instructions =======================================
+set (CURSES_NEED_NCURSES TRUE)
 find_package (Curses) # find ncurses library
 
 # build instructions ===========================================================
@@ -16,4 +17,6 @@ if (CURSES_FOUND)
                           NO_SONAME ON)
     target_link_libraries (${PROJECT_NAME} ${CURSES_LIBRARIES})
     install (TARGETS watch LIBRARY DESTINATION lib/nfstrace)
-endif (CURSES_FOUND)
+else ()
+    message (WARNING "CURSES library not found - libwatch plugin is not available!")
+endif ()

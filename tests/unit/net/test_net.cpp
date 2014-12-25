@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Pavel Karneliuk
-// Description: Entry point of program.
-// Copyright (c) 2013 EPAM Systems
+// Author: Ilya Storozhilov
+// Description: Network tests executable
+// Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,36 +19,12 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <exception>
-#include <iostream>
-
-#include "controller/controller.h"
-#include "controller/parameters.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 //------------------------------------------------------------------------------
-using namespace NST::controller;
-//------------------------------------------------------------------------------
-int main(int argc, char* argv[]) try
+int main(int argc, char** argv)
 {
-    Parameters params(argc, argv); // set and validate CLI options
-
-    if(params.show_help() || params.show_enum())
-    {
-        return 0; // -h or -E were passed
-    }
-
-    Controller controller(params);
-
-    return controller.run();
+    setenv("LANG", "C", 1);
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
-catch(const std::exception& e)
-{
-    std::cerr << argv[0] << ": " << e.what() << std::endl;
-    return -1;
-}
-catch(...)
-{
-    std::cerr << argv[0] << ": Unknown exception" << std::endl;
-    return -1;
-}
-//------------------------------------------------------------------------------
-

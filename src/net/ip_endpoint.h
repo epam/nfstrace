@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Pavel Karneliuk
-// Description: Handling signals and map them to exceptions.
-// Copyright (c) 2013 EPAM Systems
+// Author: Ilya Storozhilov
+// Description: TCP-endpoint class declaration
+// Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,43 +19,50 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef SIGNAL_HANDLER_H
-#define SIGNAL_HANDLER_H
+#ifndef IP_ENDPOINT
+#define IP_ENDPOINT
 //------------------------------------------------------------------------------
-#include <atomic>
-#include <stdexcept>
-#include <thread>
+#include <string>
 
-#include "controller/running_status.h"
+#include <netdb.h>
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace controller
+namespace net
 {
 
-class SignalHandler
+//! IP-endpoint (host:port) helper class to use in socket operations
+class IpEndpoint
 {
 public:
-    class Signal : public std::runtime_error
+    //! Loopback address name
+    static constexpr const char* LoopbackAddress = "localhost";
+    //! Wildcard address name
+    static constexpr const char* WildcardAddress = "*";
+
+    IpEndpoint() = delete;
+    //! Constructs TCP-endpoint
+    /*!
+     * \param host Hostname or IP-address of the endpoint
+     * \param port TCP-port
+     * \param hostAsAddress Consider host as IP-address flag
+     */
+    IpEndpoint(const std::string& host, int port, bool hostAsAddress = false);
+    //! Destructs TCP-endpoint
+    ~IpEndpoint();
+
+    //! Returns a pointer to 'struct addrinfo' structure for TCP-endpoint
+    struct addrinfo* addrinfo()
     {
-    public:
-        explicit Signal(int sig);
-        const int signal_number;
-    };
-
-    SignalHandler(RunningStatus&);
-    SignalHandler(const SignalHandler&)            = delete;
-    SignalHandler& operator=(const SignalHandler&) = delete;
-    ~SignalHandler();
-
+        return _addrinfo;
+    }
 private:
-    std::thread handler;
-    std::atomic_flag running;
+    struct addrinfo* _addrinfo;
 };
 
-} // namespace controller
+} // namespace net
 } // namespace NST
-//------------------------------------------------------------------------------
-#endif//SIGNAL_HANDLER_H
-//------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------
+#endif // IP_ENDPOINT
+//------------------------------------------------------------------------------

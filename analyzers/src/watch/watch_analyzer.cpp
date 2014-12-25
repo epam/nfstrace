@@ -38,8 +38,15 @@ WatchAnalyzer::WatchAnalyzer(const char* opts)
 , read_counter    {0}
 {
     monitor_running.test_and_set();
+    if(*opts != '\0') try
+    {
+        refresh_delta = std::stoul(opts);
+    }
+    catch(std::exception& e)
+    {
+        throw std::runtime_error{std::string{"Error in plugin options processing. OPTS: "} + opts + " Error: " + e.what()};
+    }
     monitor_thread = std::thread(&WatchAnalyzer::thread, this);
-    if(std::stoul(opts) > 0) refresh_delta = std::stoul(opts);
 }
 
 WatchAnalyzer::~WatchAnalyzer()
@@ -203,7 +210,6 @@ inline void WatchAnalyzer::thread()
     } catch(...) {
         DownRead();
         std::cerr << "Watch plugin Unidentifying exception.";
-//        throw std::runtime_error("Watch plugin Unidentifying exception.");
     }
 }
 //------------------------------------------------------------------------------
@@ -217,7 +223,15 @@ const char* usage()
 
 IAnalyzer* create(const char* opts)
 {
-    return new WatchAnalyzer(opts);
+    try
+    {
+        return new WatchAnalyzer(opts);
+    }
+    catch(std::exception& e)
+    {
+        std::cerr << "Can't initalize plugin: " << e.what() << std::endl;
+        return nullptr;
+    }
 }
 
 void destroy(IAnalyzer* instance)
@@ -225,12 +239,6 @@ void destroy(IAnalyzer* instance)
     delete instance;
 }
 
-/*
-bool output()
-{
-    return false;
-}
-*/
 NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
 }
 //------------------------------------------------------------------------------
