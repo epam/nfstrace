@@ -1,5 +1,5 @@
 NFSTRACE
-===============================================================================
+========
 
 `nfstrace` is an NFS tracing/monitoring/capturing/analyzing tool.
 
@@ -19,12 +19,12 @@ following protocols:
 `nfstrace` has been tested on the following GNU/Linux and FreeBSD systems:
 
 - Fedora 20
-- OpenSUSE 13.1
-- Ubuntu 13.10
-- CentOS 6.5
+- OpenSUSE 13.2
+- Ubuntu 14.10
+- CentOS 7
 - Arch Linux
-- FreeBSD 8.4
-- FreeBSD 10.0
+- FreeBSD 10.1
+- Alt Linux 7.0.4
 
 You can find more detailed description at `docs/nfstrace_manual.pdf`
 
@@ -56,6 +56,7 @@ If you want to specify different installation prefix:
 
     $ cmake -DCMAKE_INSTALL_PREFIX=/your/path ../
 
+
 Installation
 ------------
 
@@ -64,7 +65,7 @@ After you build `nfstrace` simply run:
 
     $ sudo make install
 
-If you're using rpm- or debian based Linux distribution you can generate
+If you're using rpm- or debian based Linux distribution you can try to generate
 package for your system using `cpack`. Please note that you need rpm or debian
 tools to be installed.
 
@@ -79,6 +80,7 @@ In order to generate deb package:
 After that you'll be able to install generated package using your package
 manager.
 
+
 Testing
 -------
 
@@ -87,22 +89,31 @@ check with the following command:
 
     $ make test
 
+Please note that `ctest` is required in order to run tests, on some platforms
+it is packaged separately from `cmake`.
+
 Scripts will run `nfstrace` in different modes and compare its output with
 reference results.
 
 
 Authors
---------
+-------
 
-Vitali  Adamenka  ([vitali_adamenka@epam.com](mailto:vitali_adamenka@epam.com))
+Vitali  Adamenka    ([vitali_adamenka@epam.com](mailto:vitali_adamenka@epam.com))
 
-Yauheni Azaranka  ([yauheni_azaranka@epam.com](mailto:yaheni_azaranka@epam.com))
+Yauheni Azaranka    ([yauheni_azaranka@epam.com](mailto:yaheni_azaranka@epam.com))
 
-Alexey  Costroma  ([alexey_costroma@epam.com](mailto:alexey_costroma@epam.com))
+Alexey  Costroma    ([alexey_costroma@epam.com](mailto:alexey_costroma@epam.com))
 
-Dzianis Huznou    ([dzianis_huznou@epam.com](mailto:dzianis_huznou@epam.com))
+Dzianis Huznou      ([dzianis_huznou@epam.com](mailto:dzianis_huznou@epam.com))
 
-Pavel   Karneliuk ([pavel_karneliuk@epam.com](mailto:pavel_karneliuk@epam.com))
+Pavel   Karneliuk   ([pavel_karneliuk@epam.com](mailto:pavel_karneliuk@epam.com))
+
+Andrey  Kuznetsov   ([andrey_kuznetsov@epam.com](mailto:andrey_kuznetsov@epam.com))
+
+Mikhail Litvinets   ([mikhail_litvinets@epam.com](mailto:mikhail_litvinets@epam.com))
+
+Ilya    Storozhilov ([ilya_storozhilov@epam.com](mailto:ilya_storozhilov@epam.com))
 
 
 License

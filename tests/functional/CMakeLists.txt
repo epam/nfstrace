@@ -17,3 +17,5 @@ foreach (trace ${traces})
     add_test (NAME drain:${name} COMMAND sh ${CHECK_DRANE_SCRIPT} ${trace} ${result} ${reference})
     add_test (NAME out:${name} COMMAND sh ${CHECK_OUTPUT_SCRIPT} ${trace})
 endforeach ()
+
+add_subdirectory (json-analyzer)

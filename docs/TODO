@@ -9,7 +9,9 @@ The '*'s mean a complexity of implementation.
 **** Improve performance of rpcgen-generated code. Exclude copying data to dynamically allocated arrays by standard rpcgen routines
 ****** Implement filtration of NFSv4 payload data in READ/WRITE operations
 *** Introduce RuntimeStatistic class and make it accessible via API for plugins
-*** Implement libwatch.so plugin (it should mimic to nfswatch tool). Use functionality of RuntimeStatistic
 ****  Add batching to Analyzers API. Passing a sequence of RPC Procedures to an analyser
 *** Implement drawing graphics in analyzers via gnuplot directly, without external .sh script
 **** Implement libpyadapter.so or libjavaadapter.so
+***** Implement CIFS support
+**** Implement NFSv4.1 support
+**** Implement WebUI
