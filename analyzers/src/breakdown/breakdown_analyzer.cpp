@@ -30,6 +30,7 @@
 #include <map>
 #include <vector>
 
+#include <arpa/inet.h> // for ntohs()/ntohl()
 #include <sys/time.h>
 
 #include <api/plugin_api.h>
@@ -206,12 +207,19 @@ template
 >
 class BreakdownAnalyzer : public IAnalyzer
 {
-    struct Less
+    struct Less // defines order for sessions in output
     {
         bool operator() (const Session& a, const Session& b) const
         {
-            return ((a.port[0] < b.port[0]) && (a.port[1] <= b.port[1])) ||
-                   ((a.ip.v4.addr[0] < b.ip.v4.addr[0]) && (a.ip.v4.addr[1] <= b.ip.v4.addr[1]));
+            return ( (std::uint16_t)(a.ip_type) < (std::uint16_t)(b.ip_type) ) || // compare versions of IP address
+                   ( ntohs(a.port[0]) < ntohs(b.port[0])                     ) || // compare Source(client) ports
+                   ( ntohs(a.port[1]) < ntohs(b.port[1])                     ) || // compare Destination(server) ports
+
+                   ( (a.ip_type == Session::IPType::v4) ? // compare IPv4
+                        ((ntohl(a.ip.v4.addr[0]) < ntohl(b.ip.v4.addr[0])) || (ntohl(a.ip.v4.addr[1]) < ntohl(b.ip.v4.addr[1])))
+                     :
+                        (memcmp(&a.ip.v6, &b.ip.v6, sizeof(a.ip.v6)) < 0 )
+                   );
         }
     };
 
