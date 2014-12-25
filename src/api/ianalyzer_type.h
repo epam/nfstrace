@@ -722,7 +722,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void writeSMBv2(const SMBv2::WriteCommand*, const SMBv2::WriteArgumentType*, const SMBv2::WriteResultType*) {}
+    virtual void writeSMBv2(const SMBv2::WriteCommand*, const SMBv2::WriteRequest*, const SMBv2::WriteResponse*) {}
 
     /*! "Lock" command "on receive" event handler
      * \param cmd - Specified command

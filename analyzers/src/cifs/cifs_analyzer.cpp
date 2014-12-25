@@ -1168,7 +1168,7 @@ public:
         account(cmd, SMBv2Commands::READ, smbv2);
     }
 
-    void writeSMBv2(const SMBv2::WriteCommand* cmd, const SMBv2::WriteArgumentType*, const SMBv2::WriteResultType*) override final
+    void writeSMBv2(const SMBv2::WriteCommand* cmd, const SMBv2::WriteRequest*, const SMBv2::WriteResponse*) override final
     {
         account(cmd, SMBv2Commands::WRITE, smbv2);
     }
