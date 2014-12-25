@@ -38,7 +38,7 @@ namespace SMBv2
  * The SMB2 ERROR Response packet is sent by the server
  * to respond to a request that has failed or encountered an error.
  */
-struct errResponse
+struct ErrResponse
 {
     uint16_t structureSize;
     uint16_t reserved;                           //!< 0
@@ -86,7 +86,7 @@ enum class Capabilities : uint32_t
 /*!
  * Supported dialect revision numbers
  */
-enum class Dialects
+enum class Dialects : uint16_t
 {
     SMB_2_002          = 0x0202,                  //!< SMB 2.002 dialect revision number.
     SMB_2_1            = 0x0210,                  //!< SMB 2.1 dialect revision number.
@@ -778,8 +778,8 @@ struct ReadRequest
     uint32_t minimumCount;                       //!< The minimum number of bytes to be read for this operation to be successful
     Channels channel;                            //!< For SMB 2.002 and 2.1 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt.
     uint32_t RemainingBytes;                     //!< The number of subsequent bytes that the client intends to read from the file after this operation completes. This value is provided to facilitate read-ahead caching, and is not binding on the server.
-    uint32_t ReadChannelInfoOffset;              //!< For the SMB 2.002 and 2.1 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt. For the SMB 3.x dialect family, it contains the offset, in bytes, from the beginning of the SMB2 header to the channel data as specified by the Channel field of the request.
-    uint32_t ReadChannelInfoLength;              //!< For the SMB 2.002 and 2.1 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt. For the SMB 3.x dialect family, it contains the length, in bytes, of the channel data as specified by the Channel field of the request.
+    uint16_t ReadChannelInfoOffset;              //!< For the SMB 2.002 and 2.1 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt. For the SMB 3.x dialect family, it contains the offset, in bytes, from the beginning of the SMB2 header to the channel data as specified by the Channel field of the request.
+    uint16_t ReadChannelInfoLength;              //!< For the SMB 2.002 and 2.1 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt. For the SMB 3.x dialect family, it contains the length, in bytes, of the channel data as specified by the Channel field of the request.
     uint8_t  Buffer[1];                          //!< A variable-length buffer that contains the read channel information, as described by ReadChannelInfoOffset and ReadChannelInfoLength. Unused at present. The client MUST set one byte of this field to 0, and the server MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
 
