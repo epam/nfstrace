@@ -736,7 +736,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void ioctlSMBv2(const SMBv2::IoctlCommand*, const SMBv2::IoctlArgumentType*, const SMBv2::IoctlResultType*) {}
+    virtual void ioctlSMBv2(const SMBv2::IoctlCommand*, const SMBv2::IoCtlRequest*, const SMBv2::IoCtlResponse*) {}
 
     /*! "Cancel" command "on receive" event handler
      * \param cmd - Specified command
@@ -764,7 +764,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void changeNotifySMBv2(const SMBv2::ChangeNotifyCommand*, const SMBv2::ChangeNotifyArgumentType*, const SMBv2::ChangeNotifyResultType*) {}
+    virtual void changeNotifySMBv2(const SMBv2::ChangeNotifyCommand*, const SMBv2::ChangeNotifyRequest*, const SMBv2::ChangeNotifyResponse*) {}
 
     /*! "Query Info" command "on receive" event handler
      * \param cmd - Specified command
@@ -785,7 +785,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void breakOplockSMBv2(const SMBv2::BreakOpLockCommand*, const SMBv2::BreakOpLockArgumentType*, const SMBv2::BreakOpLockResultType*) {}
+    virtual void breakOplockSMBv2(const SMBv2::BreakOpLockCommand*, const SMBv2::OplockAcknowledgment*, const SMBv2::OplockResponse*) {}
 };
 
 class IAnalyzer : public INFSv3rpcgen, public INFSv4rpcgen, public ISMBv1, public ISMBv2

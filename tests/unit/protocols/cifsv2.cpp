@@ -34,6 +34,12 @@ TEST(CIFSv2, bodies)
     EXPECT_EQ(48, sizeof(struct LockRequest));
     EXPECT_EQ(4,  sizeof(struct LockResponse));
 
-    EXPECT_EQ(4,  sizeof(struct CancelResponce));
+    EXPECT_EQ(4,  sizeof(struct CancelRequest));
+
+    EXPECT_EQ(32, sizeof(struct ChangeNotifyRequest));
+    EXPECT_EQ(8 + sizeof(struct FileNotifyInformation),  sizeof(struct ChangeNotifyResponse));
+
+    EXPECT_EQ(57, sizeof(struct IoCtlRequest));
+    EXPECT_EQ(49,  sizeof(struct IoCtlResponse));
 }
 //------------------------------------------------------------------------------

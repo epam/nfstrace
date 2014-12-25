@@ -1178,7 +1178,7 @@ public:
         account(cmd, SMBv2Commands::LOCK, smbv2);
     }
 
-    void ioctlSMBv2(const SMBv2::IoctlCommand* cmd, const SMBv2::IoctlArgumentType*, const SMBv2::IoctlResultType*) override final
+    void ioctlSMBv2(const SMBv2::IoctlCommand* cmd, const SMBv2::IoCtlRequest*, const SMBv2::IoCtlResponse*) override final
     {
         account(cmd, SMBv2Commands::IOCTL, smbv2);
     }
@@ -1198,7 +1198,7 @@ public:
         account(cmd, SMBv2Commands::QUERY_DIRECTORY, smbv2);
     }
 
-    void changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* cmd, const SMBv2::ChangeNotifyArgumentType*, const SMBv2::ChangeNotifyResultType*) override final
+    void changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* cmd, const SMBv2::ChangeNotifyRequest*, const SMBv2::ChangeNotifyResponse*) override final
     {
         account(cmd, SMBv2Commands::CHANGE_NOTIFY, smbv2);
     }
@@ -1213,7 +1213,7 @@ public:
         account(cmd, SMBv2Commands::SET_INFO, smbv2);
     }
 
-    void breakOplockSMBv2(const SMBv2::BreakOpLockCommand* cmd, const SMBv2::BreakOpLockArgumentType*, const SMBv2::BreakOpLockResultType*) override final
+    void breakOplockSMBv2(const SMBv2::BreakOpLockCommand* cmd, const SMBv2::OplockAcknowledgment*, const SMBv2::OplockResponse*) override final
     {
         account(cmd, SMBv2Commands::OPLOCK_BREAK, smbv2);
     }

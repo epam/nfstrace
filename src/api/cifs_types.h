@@ -379,22 +379,13 @@ using WriteCommand = SMBv1::Command<WriteRequest, WriteResponse>;               
 using LockCommand = SMBv1::Command<LockRequest, LockResponse>;                                        //!< Lock command
 using CancelResponce = struct {};                                                                     //!< Cancel command's results
 using CancelCommand = SMBv1::Command<CancelRequest, CancelResponce>;                                  //!< Cancel command
-
-using IoctlArgumentType = struct {};                                                                  //!< Ioctl command's arguments
-using IoctlResultType = struct {};                                                                    //!< Ioctl command's results
-using IoctlCommand = SMBv1::Command<IoctlArgumentType, IoctlResultType>;                              //!< Ioctl command
-
-using ChangeNotifyArgumentType = struct {};                                                           //!< Change Notify command's arguments
-using ChangeNotifyResultType = struct {};                                                             //!< Change Notify command's results
-using ChangeNotifyCommand = SMBv1::Command<ChangeNotifyArgumentType, ChangeNotifyResultType>;         //!< Change Notify command
+using ChangeNotifyCommand = SMBv1::Command<ChangeNotifyRequest, ChangeNotifyResponse>;                //!< Change Notify command
+using BreakOpLockCommand = SMBv1::Command<OplockAcknowledgment, OplockResponse>;                      //!< Break opportunistic lock command
+using IoctlCommand = SMBv1::Command<IoCtlRequest, IoCtlResponse>;                                     //!< Ioctl command
 
 using SetInfoArgumentType = struct {};                                                                //!< Set Info command's arguments
 using SetInfoResultType = struct {};                                                                  //!< Set Info command's results
 using SetInfoCommand = SMBv1::Command<SetInfoArgumentType, SetInfoResultType>;                        //!< Set Info command
-
-using BreakOpLockArgumentType = struct {};                                                            //!< Break opportunistic lock command's arguments
-using BreakOpLockResultType = struct {};                                                              //!< Break opportunistic lock command's results
-using BreakOpLockCommand = SMBv1::Command<BreakOpLockArgumentType, BreakOpLockResultType>;            //!< Break opportunistic lock command
 
 } // namespace SMBv2
 } // namespace API
