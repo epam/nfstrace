@@ -837,6 +837,7 @@ struct WriteRequest
  */
 struct WriteResponse
 {
+//FIXME: size must be 17, but actual structure size = 16. Why?
     uint16_t structureSize;                      //!< The server MUST set this field to 17, the actual size of the response structure notwithstanding.
     uint16_t reserved1;                          //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
     uint32_t Count;                              //!< The number of bytes written.
