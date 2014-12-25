@@ -50,8 +50,8 @@ template <
 class Command : public Procedure<int>
 {
 public:
-    typedef Request RequestType;
-    typedef Response ResponseType;
+    using RequestType = Request;
+    using ResponseType = Response;
     const RequestType* parg;//!< Arguments of specified command
     const ResponseType* pres;//!< Results of specified command
 };

@@ -33,10 +33,6 @@ namespace API
 namespace SMBv2
 {
 
-#define SMB2_ERROR_STRUCTURE_SIZE2 __constant_cpu_to_le16(9)
-#define cpu_to_le32//FIXME: define cpu_to_le<>
-#define cpu_to_le16
-
 /*!
  * \brief The errResponse struct
  * The SMB2 ERROR Response packet is sent by the server
@@ -339,25 +335,25 @@ enum class OplockLevels : uint8_t
  */
 enum class DesiredAccessFlags : uint32_t
 {
-    READ_DATA_LE              = cpu_to_le32(0x00000001),
-    WRITE_DATA_LE             = cpu_to_le32(0x00000002),
-    APPEND_DATA_LE            = cpu_to_le32(0x00000004),
-    READ_EA_LE                = cpu_to_le32(0x00000008),
-    WRITE_EA_LE               = cpu_to_le32(0x00000010),
-    EXECUTE_LE                = cpu_to_le32(0x00000020),
-    READ_ATTRIBUTES_LE        = cpu_to_le32(0x00000080),
-    WRITE_ATTRIBUTES_LE       = cpu_to_le32(0x00000100),
-    DELETE_LE                 = cpu_to_le32(0x00010000),
-    READ_CONTROL_LE           = cpu_to_le32(0x00020000),
-    WRITE_DAC_LE              = cpu_to_le32(0x00040000),
-    WRITE_OWNER_LE            = cpu_to_le32(0x00080000),
-    SYNCHRONIZE_LE            = cpu_to_le32(0x00100000),
-    ACCESS_SYSTEM_SECURITY_LE = cpu_to_le32(0x01000000),
-    MAXIMAL_ACCESS_LE         = cpu_to_le32(0x02000000),
-    GENERIC_ALL_LE            = cpu_to_le32(0x10000000),
-    GENERIC_EXECUTE_LE        = cpu_to_le32(0x20000000),
-    GENERIC_WRITE_LE          = cpu_to_le32(0x40000000),
-    GENERIC_READ_LE           = cpu_to_le32(0x80000000)
+    READ_DATA_LE              = (0x00000001),
+    WRITE_DATA_LE             = (0x00000002),
+    APPEND_DATA_LE            = (0x00000004),
+    READ_EA_LE                = (0x00000008),
+    WRITE_EA_LE               = (0x00000010),
+    EXECUTE_LE                = (0x00000020),
+    READ_ATTRIBUTES_LE        = (0x00000080),
+    WRITE_ATTRIBUTES_LE       = (0x00000100),
+    DELETE_LE                 = (0x00010000),
+    READ_CONTROL_LE           = (0x00020000),
+    WRITE_DAC_LE              = (0x00040000),
+    WRITE_OWNER_LE            = (0x00080000),
+    SYNCHRONIZE_LE            = (0x00100000),
+    ACCESS_SYSTEM_SECURITY_LE = (0x01000000),
+    MAXIMAL_ACCESS_LE         = (0x02000000),
+    GENERIC_ALL_LE            = (0x10000000),
+    GENERIC_EXECUTE_LE        = (0x20000000),
+    GENERIC_WRITE_LE          = (0x40000000),
+    GENERIC_READ_LE           = (0x80000000)
 };
 
 /*!
@@ -365,10 +361,10 @@ enum class DesiredAccessFlags : uint32_t
  */
 enum ShareAccessFlags : uint32_t
 {
-    READ_LE     = cpu_to_le32(0x00000001),       //!< When set, indicates that other opens are allowed to read this file while this open is present.
-    WRITE_LE    = cpu_to_le32(0x00000002),       //!< When set, indicates that other opens are allowed to write this file while this open is present
-    DELETE_LE   = cpu_to_le32(0x00000004),       //!< When set, indicates that other opens are allowed to delete or rename this file while this open is present
-    ALL_LE      = cpu_to_le32(0x00000007)        //!< Combine
+    READ_LE     = (0x00000001),       //!< When set, indicates that other opens are allowed to read this file while this open is present.
+    WRITE_LE    = (0x00000002),       //!< When set, indicates that other opens are allowed to write this file while this open is present
+    DELETE_LE   = (0x00000004),       //!< When set, indicates that other opens are allowed to delete or rename this file while this open is present
+    ALL_LE      = (0x00000007)        //!< Combine
 };
 
 /*!
@@ -376,12 +372,12 @@ enum ShareAccessFlags : uint32_t
  */
 enum class CreateDisposition : uint32_t
 {
-    SUPERSEDE    = cpu_to_le32(0x00000000),      //!< If the file already exists, supersede it. Otherwise, create the file.
-    OPEN         = cpu_to_le32(0x00000001),      //!< If the file already exists, return success; otherwise, fail the operation.
-    CREATE       = cpu_to_le32(0x00000002),      //!< If the file already exists, fail the operation; otherwise, create the file.
-    OPEN_IF      = cpu_to_le32(0x00000003),      //!< Open the file if it already exists; otherwise, create the file.
-    OVERWRITE    = cpu_to_le32(0x00000004),      //!< Overwrite the file if it already exists; otherwise, fail the operation.
-    OVERWRITE_IF = cpu_to_le32(0x00000005)       //!< Overwrite the file if it already exists; otherwise, create the file.
+    SUPERSEDE    = (0x00000000),      //!< If the file already exists, supersede it. Otherwise, create the file.
+    OPEN         = (0x00000001),      //!< If the file already exists, return success; otherwise, fail the operation.
+    CREATE       = (0x00000002),      //!< If the file already exists, fail the operation; otherwise, create the file.
+    OPEN_IF      = (0x00000003),      //!< Open the file if it already exists; otherwise, create the file.
+    OVERWRITE    = (0x00000004),      //!< Overwrite the file if it already exists; otherwise, fail the operation.
+    OVERWRITE_IF = (0x00000005)       //!< Overwrite the file if it already exists; otherwise, create the file.
 };
 
 /*!
@@ -389,24 +385,24 @@ enum class CreateDisposition : uint32_t
  */
 enum CreateOptionsFlags : uint32_t
 {
-    DIRECTORY_FILE_LE             = cpu_to_le32(0x00000001), //!< The file being created or opened is a directory file.
-    WRITE_THROUGH_LE              = cpu_to_le32(0x00000002), //!< The server MUST propagate writes to this open to persistent storage before returning success to the client on write operations.
-    SEQUENTIAL_ONLY_LE            = cpu_to_le32(0x00000004), //!< This indicates that the application intends to read or write at sequential offsets using this handle, so the server SHOULD optimize for sequential access
-    NO_INTERMEDIATE_BUFFERRING_LE = cpu_to_le32(0x00000008), //!< The server or underlying object store SHOULD NOT cache data at intermediate layers and SHOULD allow it to flow through to persistent storage.
-    SYNCHRONOUS_IO_ALERT_LE       = cpu_to_le32(0x00000010), //!< This bit SHOULD be set to 0 and MUST be ignored by the server.<34>
-    SYNCHRONOUS_IO_NON_ALERT_LE   = cpu_to_le32(0x00000020), //!< This bit SHOULD be set to 0 and MUST be ignored by the server.<35>
-    NON_DIRECTORY_FILE_LE         = cpu_to_le32(0x00000040), //!< If the name of the file being created or opened matches with an existing directory file, the server MUST fail the request with STATUS_FILE_IS_A_DIRECTORY.
-    COMPLETE_IF_OPLOCKED_LE       = cpu_to_le32(0x00000100), //!< This bit SHOULD be set to 0 and MUST be ignored by the server
-    NO_EA_KNOWLEDGE_LE            = cpu_to_le32(0x00000200), //!< The caller does not understand how to handle extended attributes.
-    RANDOM_ACCESS_LE              = cpu_to_le32(0x00000800), //!< This indicates that the application intends to read or write at random offsets using this handle, so the server SHOULD optimize for random access.
-    DELETE_ON_CLOSE_LE            = cpu_to_le32(0x00001000), //!< The file MUST be automatically deleted when the last open request on this file is closed.
-    OPEN_BY_FILE_ID_LE            = cpu_to_le32(0x00002000), //!< This bit SHOULD be set to 0 and the server MUST fail the request with a STATUS_NOT_SUPPORTED error if this bit is set.<37>
-    OPEN_FOR_BACKUP_INTENT_LE     = cpu_to_le32(0x00004000), //!< The file is being opened for backup intent. That is, it is being opened or created for the purposes of either a backup or a restore operation
-    NO_COMPRESSION_LE             = cpu_to_le32(0x00008000), //!< The file cannot be compressed.
-    RESERVE_OPFILTER_LE           = cpu_to_le32(0x00100000), //!< This bit SHOULD be set to 0 and the server MUST fail the request with a STATUS_NOT_SUPPORTED error if this bit is set.<38>
-    OPEN_REPARSE_POINT_LE         = cpu_to_le32(0x00200000), //!< If the file or directory being opened is a reparse point, open the reparse point itself rather than the target that the reparse point references.
-    OPEN_NO_RECALL_LE             = cpu_to_le32(0x00400000), //!< In an HSM (Hierarchical Storage Management) environment, this flag means the file SHOULD NOT be recalled from tertiary storage such as tape. The recall can take several minutes. The caller can specify this flag to avoid those delays.
-    OPEN_FOR_FREE_SPACE_QUERY_LE  = cpu_to_le32(0x00800000)  //!< Open file to query for free space. The client SHOULD set this to 0 and the server MUST ignore it.<39>
+    DIRECTORY_FILE_LE             = (0x00000001), //!< The file being created or opened is a directory file.
+    WRITE_THROUGH_LE              = (0x00000002), //!< The server MUST propagate writes to this open to persistent storage before returning success to the client on write operations.
+    SEQUENTIAL_ONLY_LE            = (0x00000004), //!< This indicates that the application intends to read or write at sequential offsets using this handle, so the server SHOULD optimize for sequential access
+    NO_INTERMEDIATE_BUFFERRING_LE = (0x00000008), //!< The server or underlying object store SHOULD NOT cache data at intermediate layers and SHOULD allow it to flow through to persistent storage.
+    SYNCHRONOUS_IO_ALERT_LE       = (0x00000010), //!< This bit SHOULD be set to 0 and MUST be ignored by the server.<34>
+    SYNCHRONOUS_IO_NON_ALERT_LE   = (0x00000020), //!< This bit SHOULD be set to 0 and MUST be ignored by the server.<35>
+    NON_DIRECTORY_FILE_LE         = (0x00000040), //!< If the name of the file being created or opened matches with an existing directory file, the server MUST fail the request with STATUS_FILE_IS_A_DIRECTORY.
+    COMPLETE_IF_OPLOCKED_LE       = (0x00000100), //!< This bit SHOULD be set to 0 and MUST be ignored by the server
+    NO_EA_KNOWLEDGE_LE            = (0x00000200), //!< The caller does not understand how to handle extended attributes.
+    RANDOM_ACCESS_LE              = (0x00000800), //!< This indicates that the application intends to read or write at random offsets using this handle, so the server SHOULD optimize for random access.
+    DELETE_ON_CLOSE_LE            = (0x00001000), //!< The file MUST be automatically deleted when the last open request on this file is closed.
+    OPEN_BY_FILE_ID_LE            = (0x00002000), //!< This bit SHOULD be set to 0 and the server MUST fail the request with a STATUS_NOT_SUPPORTED error if this bit is set.<37>
+    OPEN_FOR_BACKUP_INTENT_LE     = (0x00004000), //!< The file is being opened for backup intent. That is, it is being opened or created for the purposes of either a backup or a restore operation
+    NO_COMPRESSION_LE             = (0x00008000), //!< The file cannot be compressed.
+    RESERVE_OPFILTER_LE           = (0x00100000), //!< This bit SHOULD be set to 0 and the server MUST fail the request with a STATUS_NOT_SUPPORTED error if this bit is set.<38>
+    OPEN_REPARSE_POINT_LE         = (0x00200000), //!< If the file or directory being opened is a reparse point, open the reparse point itself rather than the target that the reparse point references.
+    OPEN_NO_RECALL_LE             = (0x00400000), //!< In an HSM (Hierarchical Storage Management) environment, this flag means the file SHOULD NOT be recalled from tertiary storage such as tape. The recall can take several minutes. The caller can specify this flag to avoid those delays.
+    OPEN_FOR_FREE_SPACE_QUERY_LE  = (0x00800000)  //!< Open file to query for free space. The client SHOULD set this to 0 and the server MUST ignore it.<39>
 };
 
 /*!
@@ -414,10 +410,10 @@ enum CreateOptionsFlags : uint32_t
  */
 enum class CreateActions : uint32_t
 {
-    SUPERSEDED        = cpu_to_le32(0x00000000), //!< An existing file was deleted and a new file was created in its place.
-    OPENED            = cpu_to_le32(0x00000001), //!< An existing file was opened.
-    CREATED           = cpu_to_le32(0x00000002), //!< A new file was created.
-    FILE_OVERWRITTEN  = cpu_to_le32(0x00000003), //!< An existing file was overwritten.
+    SUPERSEDED        = (0x00000000), //!< An existing file was deleted and a new file was created in its place.
+    OPENED            = (0x00000001), //!< An existing file was opened.
+    CREATED           = (0x00000002), //!< A new file was created.
+    FILE_OVERWRITTEN  = (0x00000003), //!< An existing file was overwritten.
 };
 
 /*!
@@ -425,25 +421,11 @@ enum class CreateActions : uint32_t
  */
 enum class ImpersonationLevels : uint32_t
 {
-    ANONYMOUS      = cpu_to_le32(0x00000000),    //!< The application-requested impersonation level is Anonymous.
-    IDENTIFICATION = cpu_to_le32(0x00000001),    //!< The application-requested impersonation level is Identification.
-    IMPERSONATION  = cpu_to_le32(0x00000002),    //!< The application-requested impersonation level is Impersonation.
-    DELEGATE       = cpu_to_le32(0x00000003)     //!< The application-requested impersonation level is Delegate.
+    ANONYMOUS      = (0x00000000),    //!< The application-requested impersonation level is Anonymous.
+    IDENTIFICATION = (0x00000001),    //!< The application-requested impersonation level is Identification.
+    IMPERSONATION  = (0x00000002),    //!< The application-requested impersonation level is Impersonation.
+    DELEGATE       = (0x00000003)     //!< The application-requested impersonation level is Delegate.
 };
-
-//FIXME: To be deleted?
-/*!
- * Create Context Values
- */
-#define SMB2_CREATE_EA_BUFFER   "ExtA" /* extended attributes */
-#define SMB2_CREATE_SD_BUFFER   "SecD" /* security descriptor */
-#define SMB2_CREATE_DURABLE_HANDLE_REQUEST "DHnQ"
-#define SMB2_CREATE_DURABLE_HANDLE_RECONNECT "DHnC"
-#define SMB2_CREATE_ALLOCATION_SIZE  "AlSi"
-#define SMB2_CREATE_QUERY_MAXIMAL_ACCESS_REQUEST "MxAc"
-#define SMB2_CREATE_TIMEWARP_REQUEST  "TWrp"
-#define SMB2_CREATE_QUERY_ON_DISK_ID  "QFid"
-#define SMB2_CREATE_REQUEST_LEASE  "RqLs"
 
 /*!
  * \brief The createRequest struct
@@ -503,7 +485,7 @@ struct CreateResponse
  */
 enum class CloseFlags : uint16_t
 {
-    POSTQUERY_ATTRIB = cpu_to_le16(0x0001)
+    POSTQUERY_ATTRIB = (0x0001)
 };
 
 /*!
