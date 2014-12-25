@@ -164,7 +164,7 @@ public:
         {
 
             assert(collection.capacity() >= header_len);
-            const unsigned long tocopy {header_len - collection.data_size()};
+            const size_t tocopy {header_len - collection.data_size()};
             assert(tocopy != 0);
             if (info.dlen < tocopy)
             {
