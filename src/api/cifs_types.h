@@ -375,10 +375,7 @@ using QueryInfoCommand = SMBv1::Command<QueryInfoRequest, QueryInfoResponse>;   
 using QueryDirCommand = SMBv1::Command<QueryDirRequest, QueryDirResponse>;                            //!< Query directory command
 using FlushCommand = SMBv1::Command<FlushRequest, FlushResponse>;                                     //!< Flush command
 using ReadCommand = SMBv1::Command<ReadRequest, ReadResponse>;                                        //!< Read command
-
-using WriteArgumentType = struct {};                                                                  //!< Write command's arguments
-using WriteResultType = struct {};                                                                    //!< Write command's results
-using WriteCommand = SMBv1::Command<WriteArgumentType, WriteResultType>;                              //!< Write command
+using WriteCommand = SMBv1::Command<WriteRequest, WriteResponse>;                                     //!< Write command
 
 using LockArgumentType = struct {};                                                                   //!< Lock command's arguments
 using LockResultType = struct {};                                                                     //!< Lock command's results

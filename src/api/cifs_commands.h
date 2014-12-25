@@ -799,6 +799,53 @@ struct ReadResponse
     uint8_t  Buffer[1];                          //!< A variable-length buffer that contains the data read for the response, as described by DataOffset and DataLength. The minimum length is 1 byte. If 0 bytes are returned from the underlying object store, the server MUST send a failure response with status equal to STATUS_END_OF_FILE.
 }  __attribute__ ((__packed__));
 
+/*!
+ * A Flags field indicates how to process the operation.
+ * This field MUST be constructed using zero or more of possible values
+ */
+enum class WriteFlags : uint32_t
+{
+    SMB2_WRITEFLAG_WRITE_THROUGH    = 0x00000001,//!< The write data should be written to persistent storage before the response is sent regardless of how the file was opened. This value is not valid for the SMB 2.002 dialect.
+    SMB2_WRITEFLAG_WRITE_UNBUFFERED = 0x00000002,//!< The server or underlying object store SHOULD NOT cache the write data at intermediate layers and SHOULD allow it to flow through to persistent storage. This bit is only valid for the SMB 3.02 dialect.
+};
+
+/*!
+ * \brief The WriteRequest structure
+ * The SMB2 WRITE Request packet is sent by the client
+ * to write data to the file or named pipe on the server.
+ */
+struct WriteRequest
+{
+    uint16_t structureSize;                      //!< The client MUST set this field to 49, indicating the size of the request structure, not including the header. The client MUST set it to this value regardless of how long Buffer[] actually is in the request being sent.
+    uint16_t dataOffset;                         //!< The offset, in bytes, from the beginning of the SMB2 header to the data being written.
+    uint32_t Length;                             //!< The length of the data being written, in bytes. The length of the data being written may be zero bytes.
+    uint64_t Offset;                             //!< he offset, in bytes, of where to write the data in the destination file. If the write is being executed on a pipe, the Offset MUST be set to 0 by the client and MUST be ignored by the server.
+    uint64_t persistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t volatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    Channels Channel;                            //!< For the SMB 2.002 and 2.1 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt. For the SMB 3.x dialect family, this field MUST contain exactly one of possible values
+    uint32_t RemainingBytes;                     //!< The number of subsequent bytes the client intends to write to the file after this operation completes. This value is provided to facilitate write caching and is not binding on the server
+    uint16_t WriteChannelInfoOffset;             //!< For the SMB 2.002 and 2.1 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt. For the SMB 3.x dialect family, it contains the offset, in bytes, from the beginning of the SMB2 header to the channel data as described by the Channel field of the request.
+    uint16_t WriteChannelInfoLength;             //!< For the SMB 2.002 and SMB 2.1 dialects, this field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt. For the SMB 3.x dialect family, it contains the offset, in bytes, from the beginning of the SMB2 header to the channel data as described by the Channel field of the request.
+    WriteFlags Flags;                            //!< A Flags field indicates how to process the operation. This field MUST be constructed using zero or more of possible values
+    uint8_t  Buffer[1];                          //!< A variable-length buffer that contains the data to write and the write channel information, as described by DataOffset, Length, WriteChannelInfoOffset, and WriteChannelInfoLength.
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The WriteResponse structure
+ * The SMB2 WRITE Response packet is sent in response to an
+ * SMB2 WRITE Request packet
+ */
+struct WriteResponse
+{
+    uint16_t structureSize;                      //!< The server MUST set this field to 17, the actual size of the response structure notwithstanding.
+    uint16_t reserved1;                          //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
+    uint32_t Count;                              //!< The number of bytes written.
+    uint32_t Remaining;                          //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
+    uint16_t WriteChannelInfoOffset;             //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
+    uint16_t WriteChannelInfoLength;             //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
+}  __attribute__ ((__packed__));
+
+
 } // namespace SMBv2
 } // namespace API
 } // namespace NST
