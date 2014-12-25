@@ -914,6 +914,201 @@ struct CancelRequest
     uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
 
+/*!
+ * Flags indicating how the operation MUST be processed
+ */
+enum class ChangeFlags : uint16_t
+{
+    NONE            = 0x0000,
+    SMB2_WATCH_TREE = 0x0001                     //!< The request MUST monitor changes on any file or directory contained beneath the directory specified by FileId.
+};
+
+/*!
+ * Specifies the types of changes to monitor. It is valid to choose multiple trigger conditions
+ */
+enum class Events : uint32_t
+{
+    FILE_NOTIFY_CHANGE_FILE_NAME    = 0x00000001,//!< The client is notified if a file-name changes.
+    FILE_NOTIFY_CHANGE_DIR_NAME     = 0x00000002,//!< The client is notified if a directory name changes.
+    FILE_NOTIFY_CHANGE_ATTRIBUTES   = 0x00000004,//!< The client is notified if a file's attributes change. Possible file attribute values are specified in [MS-FSCC] section 2.6.
+    FILE_NOTIFY_CHANGE_SIZE         = 0x00000008,//!< The client is notified if a file's size changes.
+    FILE_NOTIFY_CHANGE_LAST_WRITE   = 0x00000010,//!< The client is notified if the last write time of a file changes.
+    FILE_NOTIFY_CHANGE_LAST_ACCESS  = 0x00000020,//!< The client is notified if the last access time of a file changes.
+    FILE_NOTIFY_CHANGE_CREATION     = 0x00000040,//!< The client is notified if the creation time of a file changes.
+    FILE_NOTIFY_CHANGE_EA           = 0x00000080,//!< The client is notified if a file's extended attributes (EAs) change.
+    FILE_NOTIFY_CHANGE_SECURITY     = 0x00000100,//!< The client is notified of a file's access control list (ACL) settings change.
+    FILE_NOTIFY_CHANGE_STREAM_NAME  = 0x00000200,//!< The client is notified if a named stream is added to a file.
+    FILE_NOTIFY_CHANGE_STREAM_SIZE  = 0x00000400,//!< The client is notified if the size of a named stream is changed.
+    FILE_NOTIFY_CHANGE_STREAM_WRITE = 0x00000800,//!< The client is notified if a named stream is modified.
+};
+
+/*!
+ * \brief The LockRequest structure
+ * The SMB2 CHANGE_NOTIFY Request packet is sent by the client to
+ * request change notifications on a directory
+ */
+struct ChangeNotifyRequest
+{
+    uint16_t structureSize;                      //!< The client MUST set this to 32
+    ChangeFlags flags;                           //!< Flags indicating how the operation MUST be processed
+    uint32_t OutputBufferLength;                 //!< The maximum number of bytes the server is allowed to return in the SMB2 CHANGE_NOTIFY Response
+    uint64_t persistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t volatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    Events   CompletionFilter;                   //!< Specifies the types of changes to monitor. It is valid to choose multiple trigger conditions
+    uint32_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt.
+}  __attribute__ ((__packed__));
+
+/*!
+ * The changes that occurred on the file
+ */
+enum class FileAction : uint32_t
+{
+    ADDED             = 0x00000001,              //!< The file was added to the directory.
+    REMOVED           = 0x00000002,              //!< The file was removed from the directory.
+    MODIFIED          = 0x00000003,              //!< The file was modified. This may be a change to the data or attributes of the file.
+    RENAMED_OLD_NAME  = 0x00000004,              //!< The file was renamed, and this is the old name. If the new name resides within the directory being monitored, the client will also receive the FILE_ACTION_RENAMED_NEW_NAME bit value as described in the next list item. If the new name resides outside of the directory being monitored, the client will not receive the FILE_ACTION_RENAMED_NEW_NAME bit value.
+    RENAMED_NEW_NAME  = 0x00000005,              //!< The file was renamed, and this is the new name. If the old name resides within the directory being monitored, the client will also receive the FILE_ACTION_RENAME_OLD_NAME bit value. If the old name resides outside of the directory being monitored, the client will not receive the FILE_ACTION_RENAME_OLD_NAME bit value.
+    ADDED_STREAM      = 0x00000006,              //!< The file was added to a named stream.
+    REMOVED_STREAM    = 0x00000007,              //!< The file was removed from the named stream.
+    MODIFIED_STREAM   = 0x00000008,              //!< The file was modified. This may be a change to the data or attributes of the file.
+    REMOVED_BY_DELETE = 0x00000009,              //!< The file was removed by delete.
+};
+
+/*!
+ * The FILE_NOTIFY_INFORMATION structure contains the changes
+ * that the client is being notified of
+ */
+struct FileNotifyInformation
+{
+    uint32_t NextEntryOffset;                    //!< The offset, in bytes, from the beginning of this structure to the subsequent FILE_NOTIFY_INFORMATION structure. If there are no subsequent structures, the NextEntryOffset field MUST be 0. NextEntryOffset MUST always be an integral multiple of 4. The FileName array MUST be padded to the next 4-byte boundary counted from the beginning of the structure.
+    FileAction action;                           //!< The changes that occurred on the file. This field MUST contain one of the following values.
+    uint32_t FileNameLength;                     //!< The length, in bytes, of the file name in the FileName field.
+    uint32_t FileName[1];                        //!< A Unicode string with the name of the file that changed.
+};
+
+/*!
+ * \brief The LockResponse structure
+ * The SMB2 CHANGE_NOTIFY Response packet is sent by the
+ * server to transmit the results of a client's SMB2 CHANGE_NOTIFY Request
+ */
+struct ChangeNotifyResponse
+{
+    uint16_t structureSize;                      //!< The server MUST set this to 9
+    uint16_t OutputBufferOffset;                 //!< he offset, in bytes, from the beginning of the SMB2 header to the change information being returned.
+    uint32_t OutputBufferLength;                 //!< The length, in bytes, of the change information being returned.
+    FileNotifyInformation Buffer[1];             //!< A variable-length buffer containing the change information being returned in the response, as described by the OutputBufferOffset and OutputBufferLength fields. This field is an array of FileNotifyInformation structures
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The OplockAcknowledgment structure
+ * The Oplock Break Acknowledgment packet is sent by the client in response
+ * to an SMB2 Oplock Break Notification packet sent by the server.
+ * The server responds to an oplock break acknowledgment with an SMB2
+ * Oplock Break response. The client MUST NOT send an oplock break
+ * acknowledgment for an oplock break from level II to none.
+ * A break from level II MUST transition to none.
+ * Thus, the client does not send a request to the server because there
+ * is no question how the transition was made.
+ */
+struct OplockAcknowledgment
+{
+    uint16_t     structureSize;                  //!< The client MUST set this to 24
+    OplockLevels LockCount;                      //!< The client will set this field to the lowered oplock level that the client accepts for this file
+    uint8_t Reserved1;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
+    uint32_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
+    uint64_t persistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t volatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The OplockResponse structure
+ * The Oplock Break Response packet is sent by the server in response
+ * to an Oplock Break Acknowledgment from the client.
+ */
+struct OplockResponse
+{
+    uint16_t     structureSize;                  //!< The client MUST set this to 24
+    OplockLevels LockCount;                      //!< The client will set this field to the lowered oplock level that the client accepts for this file
+    uint8_t Reserved1;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
+    uint32_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
+    uint64_t persistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t volatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+}  __attribute__ ((__packed__));
+
+/*!
+ * The control code of the FSCTL/IOCTL method.
+ * The values are listed in subsequent sections
+ */
+enum class CtlCodes : uint32_t
+{
+    SCTL_DFS_GET_REFERRALS             = 0x00060194,
+    FSCTL_PIPE_PEEK                    = 0x0011400C,
+    FSCTL_PIPE_WAIT                    = 0x00110018,
+    FSCTL_PIPE_TRANSCEIVE              = 0x0011C017,
+    FSCTL_SRV_COPYCHUNK                = 0x001440F2,
+    FSCTL_SRV_ENUMERATE_SNAPSHOTS      = 0x00144064,
+    FSCTL_SRV_REQUEST_RESUME_KEY       = 0x00140078,
+    FSCTL_SRV_READ_HASH                = 0x001441bb,
+    FSCTL_SRV_COPYCHUNK_WRITE          = 0x001480F2,
+    FSCTL_LMR_REQUEST_RESILIENCY       = 0x001401D4,
+    FSCTL_QUERY_NETWORK_INTERFACE_INFO = 0x001401FC,
+    FSCTL_SET_REPARSE_POINT            = 0x000900A4,
+    FSCTL_DFS_GET_REFERRALS_EX         = 0x000601B0,
+    FSCTL_FILE_LEVEL_TRIM              = 0x00098208,
+    FSCTL_VALIDATE_NEGOTIATE_INFO      = 0x00140204,
+};
+
+enum class IoCtlOpFlags: uint32_t
+{
+    NONE           = 0x00000000,                 //!< If Flags is set to this value
+    IOCTL_IS_FSCTL = 0x00000001,                 //!< If Flags is set to this value
+};
+
+/*!
+ * \brief The IoCtlRequest structure
+ * The SMB2 IOCTL Request packet is sent by a client
+ * to issue an implementation-specific file system
+ * control or device control (FSCTL/IOCTL) command across the network
+ */
+struct IoCtlRequest
+{
+    uint16_t structureSize;                      //!< The server MUST set this to 57
+    uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
+    CtlCodes CtlCode;                            //!< The control code of the FSCTL/IOCTL method
+    uint64_t persistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t volatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint32_t InputOffset;                        //!< The offset, in bytes, from the beginning of the SMB2 header to the input data buffer. If no input data is required for the FSCTL/IOCTL command being issued, the client SHOULD set this value to 0.<56>
+    uint32_t InputCount;                         //!< The size, in bytes, of the input data.
+    uint32_t MaxInputResponse;                   //!< The maximum number of bytes that the server can return for the input data in the SMB2 IOCTL Response.
+    uint32_t OutputOffset;                       //!< The client SHOULD set this to 0.<57>
+    uint32_t OutputCount;                        //!< The client MUST set this to 0.
+    uint32_t MaxOutputResponse;                  //!< The maximum number of bytes that the server can return for the output data in the SMB2 IOCTL Response.
+    IoCtlOpFlags flags;                          //!< A Flags field indicating how to process the operation
+    uint32_t Reserved2;                          //!< This field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt.
+    uint8_t Buffer[1];                           //!< A variable-length buffer that contains the input and output data buffer for the request, as described by the InputOffset, InputCount, OutputOffset, and OutputCount. There is no minimum size restriction for this field as there can be FSCTLs with no input or output buffers. For FSCTL_SRV_COPYCHUNK or FSCTL_SRV_COPYCHUNK_WRITE, the format of this buffer is specified in SRV_COPYCHUNK_COPY. The Buffer format for FSCTL_DFS_GET_REFERRALS is specified in [MS-DFSC] section 2.2.2. The format of this buffer for all other FSCTLs is specified in the reference topic for the FSCTL being called.
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The IoCtlResponse structure
+ * The SMB2 IOCTL Response packet is sent by the server
+ * to transmit the results of a client SMB2 IOCTL Request.
+ */
+struct IoCtlResponse
+{
+    uint16_t structureSize;                      //!< The server MUST set this to 49
+    uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
+    CtlCodes CtlCode;                            //!< The control code of the FSCTL/IOCTL method
+    uint64_t persistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t volatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint32_t InputOffset;                        //!< The offset, in bytes, from the beginning of the SMB2 header to the input data buffer. If no input data is required for the FSCTL/IOCTL command being issued, the client SHOULD set this value to 0.<56>
+    uint32_t InputCount;                         //!< The size, in bytes, of the input data.
+    uint32_t OutputOffset;                       //!< The client SHOULD set this to 0.<57>
+    uint32_t OutputCount;                        //!< The client MUST set this to 0.
+    IoCtlOpFlags flags;                          //!< A Flags field indicating how to process the operation
+    uint32_t Reserved2;                          //!< This field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt.
+    uint8_t Buffer[1];                           //!< A variable-length buffer that contains the input and output data buffer for the request, as described by the InputOffset, InputCount, OutputOffset, and OutputCount. There is no minimum size restriction for this field as there can be FSCTLs with no input or output buffers. For FSCTL_SRV_COPYCHUNK or FSCTL_SRV_COPYCHUNK_WRITE, the format of this buffer is specified in SRV_COPYCHUNK_COPY. The Buffer format for FSCTL_DFS_GET_REFERRALS is specified in [MS-DFSC] section 2.2.2. The format of this buffer for all other FSCTLs is specified in the reference topic for the FSCTL being called.
+}  __attribute__ ((__packed__));
+
 } // namespace SMBv2
 } // namespace API
 } // namespace NST
