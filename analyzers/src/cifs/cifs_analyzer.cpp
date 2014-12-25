@@ -1208,7 +1208,7 @@ public:
         account(cmd, SMBv2Commands::QUERY_INFO, smbv2);
     }
 
-    void setInfoSMBv2(const SMBv2::SetInfoCommand* cmd, const SMBv2::SetInfoArgumentType*, const SMBv2::SetInfoResultType*) override final
+    void setInfoSMBv2(const SMBv2::SetInfoCommand* cmd, const SMBv2::SetInfoRequest*, const SMBv2::SetInfoResponse*) override final
     {
         account(cmd, SMBv2Commands::SET_INFO, smbv2);
     }

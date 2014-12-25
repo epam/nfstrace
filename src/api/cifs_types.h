@@ -382,10 +382,7 @@ using CancelCommand = SMBv1::Command<CancelRequest, CancelResponce>;            
 using ChangeNotifyCommand = SMBv1::Command<ChangeNotifyRequest, ChangeNotifyResponse>;                //!< Change Notify command
 using BreakOpLockCommand = SMBv1::Command<OplockAcknowledgment, OplockResponse>;                      //!< Break opportunistic lock command
 using IoctlCommand = SMBv1::Command<IoCtlRequest, IoCtlResponse>;                                     //!< Ioctl command
-
-using SetInfoArgumentType = struct {};                                                                //!< Set Info command's arguments
-using SetInfoResultType = struct {};                                                                  //!< Set Info command's results
-using SetInfoCommand = SMBv1::Command<SetInfoArgumentType, SetInfoResultType>;                        //!< Set Info command
+using SetInfoCommand = SMBv1::Command<SetInfoRequest, SetInfoResponse>;                               //!< Set Info command
 
 } // namespace SMBv2
 } // namespace API
