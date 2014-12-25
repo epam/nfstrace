@@ -376,10 +376,7 @@ using QueryDirCommand = SMBv1::Command<QueryDirRequest, QueryDirResponse>;      
 using FlushCommand = SMBv1::Command<FlushRequest, FlushResponse>;                                     //!< Flush command
 using ReadCommand = SMBv1::Command<ReadRequest, ReadResponse>;                                        //!< Read command
 using WriteCommand = SMBv1::Command<WriteRequest, WriteResponse>;                                     //!< Write command
-
-using LockArgumentType = struct {};                                                                   //!< Lock command's arguments
-using LockResultType = struct {};                                                                     //!< Lock command's results
-using LockCommand = SMBv1::Command<LockArgumentType, LockResultType>;                                 //!< Lock command
+using LockCommand = SMBv1::Command<LockRequest, LockResponse>;                                        //!< Lock command
 
 using IoctlArgumentType = struct {};                                                                  //!< Ioctl command's arguments
 using IoctlResultType = struct {};                                                                    //!< Ioctl command's results
