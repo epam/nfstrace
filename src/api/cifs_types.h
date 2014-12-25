@@ -23,6 +23,9 @@
 #define CIFS_TYPES_H
 //------------------------------------------------------------------------------
 #include <sys/time.h>
+
+#include "cifs_commands.h"
+#include "rpc_procedure.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -41,18 +44,16 @@ using Session = u_int16_t;//!< Session IDentifier
 /*! Represents one SMB command
  */
 template <
-    typename ArgumentType,
-    typename ResultType
+    typename Request,
+    typename Response
     >
-class Command
+class Command : public Procedure<int>
 {
 public:
-    Session session;//!< session ID
-    ArgumentType parg;//!< Arguments of specified command
-    ResultType pres;//!< Results of specified command
-
-    struct timeval ctimestamp;//!< Request's time stamp
-    struct timeval rtimestamp;//!< Response's time stamp
+    using RequestType = Request;
+    using ResponseType = Response;
+    const RequestType* parg;//!< Arguments of specified command
+    const ResponseType* pres;//!< Results of specified command
 };
 
 using CreateDirectoryArgumentType = struct {};                                                                                   //!< CreateDirectory arguments
@@ -355,48 +356,25 @@ using NoAndxCmdArgumentType = struct {};                                        
 using NoAndxCmdResultType = struct {};                                                                                           //!< No command's results
 using NoAndxCommand = SMBv1::Command< NoAndxCmdArgumentType, NoAndxCmdResultType>;                                               //!< No command
 
-}
+}//SMBv1
 
 /*! SMB 2 version
  */
 namespace SMBv2
 {
 
-using CloseFileArgumentType = struct {};                                                              //!< Close file command's arguments
-using CloseFileResultType = struct {};                                                                //!< Close file command's results
-using CloseFileCommand = SMBv1::Command<CloseFileArgumentType, CloseFileResultType>;                  //!< Close file command
-
-using NegotiateArgumentType = struct {};                                                              //!< Close file command's arguments
-using NegotiateResultType = struct {};                                                                //!< Close file command's results
-using NegotiateCommand = SMBv1::Command<NegotiateArgumentType, NegotiateResultType>;                  //!< Negotiate command
-
-using SessionSetupArgumentType = struct {};                                                           //!< Session setup command's arguments
-using SessionSetupResultType = struct {};                                                             //!< Session setup command's results
-using SessionSetupCommand = SMBv1::Command<SessionSetupArgumentType, SessionSetupResultType>;         //!< Session setup command
-
-using LogOffArgumentType = struct {};                                                                 //!< Log off command's arguments
-using LogOffResultType = struct {};                                                                   //!< Log off command's results
-using LogOffCommand = SMBv1::Command<LogOffArgumentType, LogOffResultType>;                           //!< Log off command
-
-using TreeConnectArgumentType = struct {};                                                            //!< Tree connect command's arguments
-using TreeConnectResultType = struct {};                                                              //!< Tree connect command's results
-using TreeConnectCommand = SMBv1::Command<TreeConnectArgumentType, TreeConnectResultType>;            //!< Tree connect command
-
-using TreeDisconnectArgumentType = struct {};                                                         //!< Tree disconnect command's arguments
-using TreeDisconnectResultType = struct {};                                                           //!< Tree disconnect command's results
-using TreeDisconnectCommand = SMBv1::Command<TreeDisconnectArgumentType, TreeDisconnectResultType>;   //!< Tree disconnect command
-
-using CreateArgumentType = struct {};                                                                 //!< Create command's arguments
-using CreateResultType = struct {};                                                                   //!< Create command's results
-using CreateCommand = SMBv1::Command<CreateArgumentType, CreateResultType>;                           //!< Create command
-
-using FlushArgumentType = struct {};                                                                  //!< Flush command's arguments
-using FlushResultType = struct {};                                                                    //!< Flush command's results
-using FlushCommand = SMBv1::Command<FlushArgumentType, FlushResultType>;                              //!< Flush command
-
-using ReadArgumentType = struct {};                                                                   //!< Read command's arguments
-using ReadResultType = struct {};                                                                     //!< Read command's results
-using ReadCommand = SMBv1::Command<ReadArgumentType, ReadResultType>;                                 //!< Read command
+using CloseFileCommand = SMBv1::Command<CloseRequest, CloseResponse>;                                 //!< Close file command
+using NegotiateCommand = SMBv1::Command<NegotiateRequest, NegotiateResponse>;                         //!< Negotiate command
+using SessionSetupCommand = SMBv1::Command<SessionSetupRequest, SessionSetupResponse>;                //!< Session setup command
+using EchoCommand = SMBv1::Command<EchoRequest, EchoResponse>;                                        //!< Echo command
+using LogOffCommand = SMBv1::Command<LogOffRequest, LogOffResponse>;                                  //!< Log off command
+using TreeConnectCommand = SMBv1::Command<TreeConnectRequest, TreeConnectResponse>;                   //!< Tree connect command
+using TreeDisconnectCommand = SMBv1::Command<TreeDisconnectRequest, TreeDisconnectResponse>;          //!< Tree disconnect command
+using CreateCommand = SMBv1::Command<CreateRequest, CreateResponse>;                                  //!< Create command
+using QueryInfoCommand = SMBv1::Command<QueryInfoRequest, QueryInfoResponse>;                         //!< Query Info command
+using QueryDirCommand = SMBv1::Command<QueryDirRequest, QueryDirResponse>;                            //!< Query directory command
+using FlushCommand = SMBv1::Command<FlushRequest, FlushResponse>;                                     //!< Flush command
+using ReadCommand = SMBv1::Command<ReadRequest, ReadResponse>;                                        //!< Read command
 
 using WriteArgumentType = struct {};                                                                  //!< Write command's arguments
 using WriteResultType = struct {};                                                                    //!< Write command's results
@@ -414,21 +392,9 @@ using CancelArgumentType = struct {};                                           
 using CancelResultType = struct {};                                                                   //!< Cancel command's results
 using CancelCommand = SMBv1::Command<CancelArgumentType, CancelResultType>;                           //!< Cancel command
 
-using EchoArgumentType = struct {};                                                                   //!< Echo command's arguments
-using EchoResultType = struct {};                                                                     //!< Echo command's results
-using EchoCommand = SMBv1::Command<EchoArgumentType, EchoResultType>;                                 //!< Echo command
-
-using QueryDirArgumentType = struct {};                                                               //!< Query directory command's arguments
-using QueryDirResultType = struct {};                                                                 //!< Query directory command's results
-using QueryDirCommand = SMBv1::Command<QueryDirArgumentType, QueryDirResultType>;                     //!< Query directory command
-
 using ChangeNotifyArgumentType = struct {};                                                           //!< Change Notify command's arguments
 using ChangeNotifyResultType = struct {};                                                             //!< Change Notify command's results
 using ChangeNotifyCommand = SMBv1::Command<ChangeNotifyArgumentType, ChangeNotifyResultType>;         //!< Change Notify command
-
-using QueryInfoArgumentType = struct {};                                                              //!< Query Info command's arguments
-using QueryInfoResultType = struct {};                                                                //!< Query Info command's results
-using QueryInfoCommand = SMBv1::Command<QueryInfoArgumentType, QueryInfoResultType>;                  //!< Query Info command
 
 using SetInfoArgumentType = struct {};                                                                //!< Set Info command's arguments
 using SetInfoResultType = struct {};                                                                  //!< Set Info command's results
@@ -438,8 +404,9 @@ using BreakOpLockArgumentType = struct {};                                      
 using BreakOpLockResultType = struct {};                                                              //!< Break opportunistic lock command's results
 using BreakOpLockCommand = SMBv1::Command<BreakOpLockArgumentType, BreakOpLockResultType>;            //!< Break opportunistic lock command
 
-}
-
-}
-}
-#endif // CIFS_TYPES_H
+} // namespace SMBv2
+} // namespace API
+} // namespace NST
+//------------------------------------------------------------------------------
+#endif//CIFS_TYPES_H
+//------------------------------------------------------------------------------
