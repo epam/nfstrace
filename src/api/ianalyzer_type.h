@@ -729,7 +729,7 @@ public:
      * \param arg - arguments for the command
      * \param res - result of the command
      */
-    virtual void lockSMBv2(const SMBv2::LockCommand*, const SMBv2::LockArgumentType*, const SMBv2::LockResultType*) {}
+    virtual void lockSMBv2(const SMBv2::LockCommand*, const SMBv2::LockRequest*, const SMBv2::LockResponse*) {}
 
     /*! "IO ctl" command "on receive" event handler
      * \param cmd - Specified command

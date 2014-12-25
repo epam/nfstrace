@@ -1173,7 +1173,7 @@ public:
         account(cmd, SMBv2Commands::WRITE, smbv2);
     }
 
-    void lockSMBv2(const SMBv2::LockCommand* cmd, const SMBv2::LockArgumentType*, const SMBv2::LockResultType*) override final
+    void lockSMBv2(const SMBv2::LockCommand* cmd, const SMBv2::LockRequest*, const SMBv2::LockResponse*) override final
     {
         account(cmd, SMBv2Commands::LOCK, smbv2);
     }

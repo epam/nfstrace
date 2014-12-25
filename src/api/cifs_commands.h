@@ -846,6 +846,53 @@ struct WriteResponse
     uint16_t WriteChannelInfoLength;             //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
 
+/*!
+ * The description of how the range is being locked or
+ * unlocked and how to process the operation
+ */
+enum class LockFlags : uint32_t
+{
+    SMB2_LOCKFLAG_SHARED_LOCK      = 0x00000001, //!< The range MUST be locked shared, allowing other opens to read from or take a shared lock on the range. All opens MUST NOT be allowed to write within the range. Other locks can be requested and taken on this range.
+    SMB2_LOCKFLAG_EXCLUSIVE_LOCK   = 0x00000002, //!< The range MUST be locked exclusive, not allowing other opens to read, write, or lock within the range.
+    SMB2_LOCKFLAG_UNLOCK           = 0x00000004, //!< The range MUST be unlocked from a previous lock taken on this range. The unlock range MUST be identical to the lock range. Sub-ranges cannot be unlocked.
+    SMB2_LOCKFLAG_FAIL_IMMEDIATELY = 0x00000010, //!< The lock operation MUST fail immediately if it conflicts with an existing lock, instead of waiting for the range to become available.
+};
+
+/*!
+ * \brief The Lock structure
+ * The SMB2_LOCK_ELEMENT Structure packet is used by the SMB2 LOCK
+ * Request packet to indicate segments of files that
+ * should be locked or unlocked.
+ */
+struct Lock
+{
+    uint64_t Offset;                             //!<  The starting offset, in bytes, in the destination file from where the range being locked or unlocked starts.
+    uint64_t Length;                             //!< The length, in bytes, of the range being locked or unlocked.
+    LockFlags Flags;                             //!< The description of how the range is being locked or unlocked and how to process the operation
+    uint32_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
+} __attribute__ ((__packed__));
+
+/*!
+ * \brief The LockRequest structure
+ */
+struct LockRequest
+{
+    uint16_t structureSize;                      //!< The client MUST set this to 48
+    uint16_t LockCount;                          //!< TMUST be set to the number of SMB2_LOCK_ELEMENT structures that are contained in the Locks[] array. The lock count MUST be greater than or equal to 1.
+    uint32_t LockSequence;                       //!< The client MUST set this to 48, indicating the size of an SMB2 LOCK Request with a single SMB2_LOCK_ELEMENT structure. This value is set regardless of the number of locks that are sent.
+    uint64_t persistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint64_t volatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    Lock     locks[1];                           //!< An array of LockCount (SMB2_LOCK_ELEMENT) structures that define the ranges to be locked or unlocked.
+}  __attribute__ ((__packed__));
+
+/*!
+ * \brief The LockResponse structure
+ */
+struct LockResponse
+{
+    uint16_t structureSize;                      //!< The server MUST set this to 4
+    uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
+}  __attribute__ ((__packed__));
 
 } // namespace SMBv2
 } // namespace API

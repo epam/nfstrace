@@ -30,5 +30,8 @@ TEST(CIFSv2, bodies)
 {
     EXPECT_EQ(49, sizeof(struct WriteRequest));
     EXPECT_EQ(16, sizeof(struct WriteResponse));
+
+    EXPECT_EQ(48, sizeof(struct LockRequest));
+    EXPECT_EQ(4,  sizeof(struct LockResponse));
 }
 //------------------------------------------------------------------------------
