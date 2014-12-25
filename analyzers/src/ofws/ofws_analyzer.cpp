@@ -68,7 +68,7 @@ void OFWSAnalyzer::lookup3(const RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::access3(const struct RPCProcedure*,
+void OFWSAnalyzer::access3(const RPCProcedure*,
                            const struct rpcgen::ACCESS3args* args,
                            const struct rpcgen::ACCESS3res* res)
 {
@@ -79,7 +79,7 @@ void OFWSAnalyzer::access3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::readlink3(const struct RPCProcedure*,
+void OFWSAnalyzer::readlink3(const RPCProcedure*,
                              const struct rpcgen::READLINK3args* args,
                              const struct rpcgen::READLINK3res* res)
 {
@@ -90,7 +90,7 @@ void OFWSAnalyzer::readlink3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::read3(const struct RPCProcedure*,
+void OFWSAnalyzer::read3(const RPCProcedure*,
                          const struct rpcgen::READ3args* args,
                          const struct rpcgen::READ3res* res)
 {
@@ -101,7 +101,7 @@ void OFWSAnalyzer::read3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::write3(const struct RPCProcedure*,
+void OFWSAnalyzer::write3(const RPCProcedure*,
                           const struct rpcgen::WRITE3args* args,
                           const struct rpcgen::WRITE3res* res)
 {
@@ -112,7 +112,7 @@ void OFWSAnalyzer::write3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::create3(const struct RPCProcedure*,
+void OFWSAnalyzer::create3(const RPCProcedure*,
                            const struct rpcgen::CREATE3args*,
                            const struct rpcgen::CREATE3res* res)
 {
@@ -126,7 +126,7 @@ void OFWSAnalyzer::create3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::mkdir3(const struct RPCProcedure*,
+void OFWSAnalyzer::mkdir3(const RPCProcedure*,
                           const struct rpcgen::MKDIR3args*,
                           const struct rpcgen::MKDIR3res* res)
 {
@@ -140,7 +140,7 @@ void OFWSAnalyzer::mkdir3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::symlink3(const struct RPCProcedure*,
+void OFWSAnalyzer::symlink3(const RPCProcedure*,
                             const struct rpcgen::SYMLINK3args*,
                             const struct rpcgen::SYMLINK3res* res)
 {
@@ -154,7 +154,7 @@ void OFWSAnalyzer::symlink3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::mknod3(const struct RPCProcedure*,
+void OFWSAnalyzer::mknod3(const RPCProcedure*,
                           const struct rpcgen::MKNOD3args*,
                           const struct rpcgen::MKNOD3res* res)
 {
@@ -168,7 +168,7 @@ void OFWSAnalyzer::mknod3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::remove3(const struct RPCProcedure*,
+void OFWSAnalyzer::remove3(const RPCProcedure*,
                            const struct rpcgen::REMOVE3args* args,
                            const struct rpcgen::REMOVE3res* res)
 {
@@ -179,7 +179,7 @@ void OFWSAnalyzer::remove3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::rmdir3(const struct RPCProcedure*,
+void OFWSAnalyzer::rmdir3(const RPCProcedure*,
                           const struct rpcgen::RMDIR3args* args,
                           const struct rpcgen::RMDIR3res* res)
 {
@@ -190,7 +190,7 @@ void OFWSAnalyzer::rmdir3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::rename3(const struct RPCProcedure*,
+void OFWSAnalyzer::rename3(const RPCProcedure*,
                            const struct rpcgen::RENAME3args* args,
                            const struct rpcgen::RENAME3res* res)
 {
@@ -201,7 +201,7 @@ void OFWSAnalyzer::rename3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::link3(const struct RPCProcedure*,
+void OFWSAnalyzer::link3(const RPCProcedure*,
                          const struct rpcgen::LINK3args* args,
                          const struct rpcgen::LINK3res* res)
 {
@@ -212,7 +212,7 @@ void OFWSAnalyzer::link3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::readdir3(const struct RPCProcedure*,
+void OFWSAnalyzer::readdir3(const RPCProcedure*,
                             const struct rpcgen::READDIR3args* args,
                             const struct rpcgen::READDIR3res* res)
 {
@@ -223,7 +223,7 @@ void OFWSAnalyzer::readdir3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::readdirplus3(const struct RPCProcedure*,
+void OFWSAnalyzer::readdirplus3(const RPCProcedure*,
                                 const struct rpcgen::READDIRPLUS3args* args,
                                 const struct rpcgen::READDIRPLUS3res* res)
 {
@@ -234,7 +234,7 @@ void OFWSAnalyzer::readdirplus3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::fsstat3(const struct RPCProcedure*,
+void OFWSAnalyzer::fsstat3(const RPCProcedure*,
                            const struct rpcgen::FSSTAT3args* args,
                            const struct rpcgen::FSSTAT3res* res)
 {
@@ -245,7 +245,7 @@ void OFWSAnalyzer::fsstat3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::fsinfo3(const struct RPCProcedure*,
+void OFWSAnalyzer::fsinfo3(const RPCProcedure*,
                            const struct rpcgen::FSINFO3args* args,
                            const struct rpcgen::FSINFO3res* res)
 {
@@ -256,7 +256,7 @@ void OFWSAnalyzer::fsinfo3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::pathconf3(const struct RPCProcedure*,
+void OFWSAnalyzer::pathconf3(const RPCProcedure*,
                              const struct rpcgen::PATHCONF3args* args,
                              const struct rpcgen::PATHCONF3res* res)
 {
@@ -267,7 +267,7 @@ void OFWSAnalyzer::pathconf3(const struct RPCProcedure*,
     }
 }
 
-void OFWSAnalyzer::commit3(const struct RPCProcedure*,
+void OFWSAnalyzer::commit3(const RPCProcedure*,
                            const struct rpcgen::COMMIT3args* args,
                            const struct rpcgen::COMMIT3res* res)
 {
