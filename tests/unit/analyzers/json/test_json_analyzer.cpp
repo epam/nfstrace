@@ -76,146 +76,146 @@ protected:
         // Setting up analyzer (NFSv3)
         for (int i = 0; i < NfsV3NullOpsAmount; ++i)
         {
-            analyzer->null(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->null(static_cast<const RPCProcedure*>(nullptr),
                            static_cast<const struct rpcgen::NULL3args*>(nullptr),
                            static_cast<const struct rpcgen::NULL3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3GetattrOpsAmount; ++i)
         {
-            analyzer->getattr3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->getattr3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct rpcgen::GETATTR3args*>(nullptr),
                                static_cast<const struct rpcgen::GETATTR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3SetattrOpsAmount; ++i)
         {
-            analyzer->setattr3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->setattr3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct rpcgen::SETATTR3args*>(nullptr),
                                static_cast<const struct rpcgen::SETATTR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3LookupOpsAmount; ++i)
         {
-            analyzer->lookup3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->lookup3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct rpcgen::LOOKUP3args*>(nullptr),
                               static_cast<const struct rpcgen::LOOKUP3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3AccessOpsAmount; ++i)
         {
-            analyzer->access3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->access3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct rpcgen::ACCESS3args*>(nullptr),
                               static_cast<const struct rpcgen::ACCESS3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReadlinkOpsAmount; ++i)
         {
-            analyzer->readlink3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readlink3(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct rpcgen::READLINK3args*>(nullptr),
                                 static_cast<const struct rpcgen::READLINK3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReadOpsAmount; ++i)
         {
-            analyzer->read3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->read3(static_cast<const RPCProcedure*>(nullptr),
                             static_cast<const struct rpcgen::READ3args*>(nullptr),
                             static_cast<const struct rpcgen::READ3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3WriteOpsAmount; ++i)
         {
-            analyzer->write3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->write3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct rpcgen::WRITE3args*>(nullptr),
                              static_cast<const struct rpcgen::WRITE3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3CreateOpsAmount; ++i)
         {
-            analyzer->create3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->create3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct rpcgen::CREATE3args*>(nullptr),
                               static_cast<const struct rpcgen::CREATE3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3MkdirOpsAmount; ++i)
         {
-            analyzer->mkdir3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->mkdir3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct rpcgen::MKDIR3args*>(nullptr),
                              static_cast<const struct rpcgen::MKDIR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3SymlinkOpsAmount; ++i)
         {
-            analyzer->symlink3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->symlink3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct rpcgen::SYMLINK3args*>(nullptr),
                                static_cast<const struct rpcgen::SYMLINK3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3MknodOpsAmount; ++i)
         {
-            analyzer->mknod3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->mknod3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct rpcgen::MKNOD3args*>(nullptr),
                              static_cast<const struct rpcgen::MKNOD3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3RemoveOpsAmount; ++i)
         {
-            analyzer->remove3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->remove3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct rpcgen::REMOVE3args*>(nullptr),
                               static_cast<const struct rpcgen::REMOVE3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3RmdirOpsAmount; ++i)
         {
-            analyzer->rmdir3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->rmdir3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct rpcgen::RMDIR3args*>(nullptr),
                              static_cast<const struct rpcgen::RMDIR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3RenameOpsAmount; ++i)
         {
-            analyzer->rename3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->rename3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct rpcgen::RENAME3args*>(nullptr),
                               static_cast<const struct rpcgen::RENAME3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3LinkOpsAmount; ++i)
         {
-            analyzer->link3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->link3(static_cast<const RPCProcedure*>(nullptr),
                             static_cast<const struct rpcgen::LINK3args*>(nullptr),
                             static_cast<const struct rpcgen::LINK3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReaddirOpsAmount; ++i)
         {
-            analyzer->readdir3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readdir3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct rpcgen::READDIR3args*>(nullptr),
                                static_cast<const struct rpcgen::READDIR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReaddirplusOpsAmount; ++i)
         {
-            analyzer->readdirplus3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readdirplus3(static_cast<const RPCProcedure*>(nullptr),
                                    static_cast<const struct rpcgen::READDIRPLUS3args*>(nullptr),
                                    static_cast<const struct rpcgen::READDIRPLUS3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3FsstatOpsAmount; ++i)
         {
-            analyzer->fsstat3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->fsstat3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct rpcgen::FSSTAT3args*>(nullptr),
                               static_cast<const struct rpcgen::FSSTAT3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3FsinfoOpsAmount; ++i)
         {
-            analyzer->fsinfo3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->fsinfo3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct rpcgen::FSINFO3args*>(nullptr),
                               static_cast<const struct rpcgen::FSINFO3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3PathconfOpsAmount; ++i)
         {
-            analyzer->pathconf3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->pathconf3(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct rpcgen::PATHCONF3args*>(nullptr),
                                 static_cast<const struct rpcgen::PATHCONF3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3CommitOpsAmount; ++i)
         {
-            analyzer->commit3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->commit3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct rpcgen::COMMIT3args*>(nullptr),
                               static_cast<const struct rpcgen::COMMIT3res*>(nullptr));
         }
         // Setting up analyzer (NFSv4)
         for (int i = 0; i < NfsV4NullOpsAmount; ++i)
         {
-            analyzer->null(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->null(static_cast<const RPCProcedure*>(nullptr),
                            static_cast<const struct rpcgen::NULL4args*>(nullptr),
                            static_cast<const struct rpcgen::NULL4res*>(nullptr));
         }
         for (int i = 0; i < NfsV4CompoundOpsAmount; ++i)
         {
-            analyzer->compound4(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->compound4(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct rpcgen::COMPOUND4args*>(nullptr),
                                 static_cast<const struct rpcgen::COMPOUND4res*>(nullptr));
         }
