@@ -34,10 +34,27 @@ if [ "$PLATFORM" = "Linux" ] ; then
     LINUX_DISTRO=$(grep "^NAME=" "$OS_RELEASE_FILE" | sed -e 's/NAME=//g' | sed -e 's/"//g')
 fi
 
+# Pulling environment
+: ${WORKSPACE:="$(pwd)/$(dirname $0)/.."}
+
+# Doing static analysis of the source-code
+
+cd $WORKSPACE
+if [ "$PLATFORM" = "Linux" -a "$LINUX_DISTRO" = "ALT Linux" ] ; then
+    # TODO: Run cppcheck on ALT Linux
+    echo "Will not generate cppcheck report on ALT Linux"
+else
+    echo "Generating cppcheck report"
+    cppcheck --enable=all --std=c++11 --inconclusive --xml --xml-version=2 src analyzers/src 2> cppcheck.xml
+    if [ $? -ne 0 ] ; then
+        echo "Cppcheck report generation error"
+        exit 1
+    fi
+fi
+
 # Doing Debug build
 
-SCRIPT_DIR=$(pwd)/$(dirname $0)
-DEBUG_BUILD_DIR=$SCRIPT_DIR/../debug
+DEBUG_BUILD_DIR=$WORKSPACE/debug
 echo "Doing Debug build in '$DEBUG_BUILD_DIR' directory"
 rm -rf $DEBUG_BUILD_DIR
 if [ $? -ne 0 ] ; then
@@ -67,18 +84,7 @@ if [ $? -ne 0 ] ; then
 fi
 if [ "$PLATFORM" = "FreeBSD" ] ; then
     # TODO: Support for code coverage in FreeBSD
-    echo "Generating empty coverage report in FreeBSD:"
-    tee coverage.xml << EOD
-<?xml version="1.0" ?>
-<!DOCTYPE coverage
-  SYSTEM 'http://cobertura.sourceforge.net/xml/coverage-03.dtd'>
-<coverage branch-rate="1.0" line-rate="1.0" timestamp="1419521315" version="gcovr 3.2">
-<sources>
-<source>/home/nst/epm-nfs</source>
-</sources>
-<packages/>
-</coverage>
-EOD
+    echo "Will not generate coverage report on FreeBSD"
 else
     make coverage
 fi
@@ -94,9 +100,9 @@ fi
 
 # Doing Release build
 
-RELEASE_BUILD_DIR=$SCRIPT_DIR/../release
+RELEASE_BUILD_DIR=$WORKSPACE/release
 echo "Doing Release build in '$RELEASE_BUILD_DIR' directory"
-cd $SCRIPT_DIR/../
+cd $WORKSPACE
 rm -rf $RELEASE_BUILD_DIR
 if [ $? -ne 0 ] ; then
     echo "Release build directory removal error"
