@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Presentation info about ISO/OSI layers up to RPC protocol.
+// Author: Andrey Kuznetsov
+// Description: Abstraction of operation (CIFS or NFS)
 // Copyright (c) 2013 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,23 +19,31 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef RPC_PROCEDURE_H
-#define RPC_PROCEDURE_H
+#ifndef PROCEDURE_H
+#define PROCEDURE_H
 //------------------------------------------------------------------------------
-#include <rpc/rpc_msg.h>
+#include <sys/time.h>
 
-#include "procedure.h"
-#include "rpc_types.h"
+#include "session.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace API
 {
 
-using RPCProcedure = Procedure<struct rpc_msg>;
+template<typename ProcedureType>
+struct Procedure
+{
+    ProcedureType rpc_call;
+    ProcedureType rpc_reply;
+
+    const struct Session* session;
+    const struct timeval* ctimestamp;
+    const struct timeval* rtimestamp;
+};
 
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//RPC_PROCEDURE_H
+#endif // PROCEDURE_H
 //------------------------------------------------------------------------------
