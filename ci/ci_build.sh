@@ -34,21 +34,124 @@ if [ "$PLATFORM" = "Linux" ] ; then
     LINUX_DISTRO=$(grep "^NAME=" "$OS_RELEASE_FILE" | sed -e 's/NAME=//g' | sed -e 's/"//g')
 fi
 
-# Pulling environment
+# Pulling environment variables using default values
+
 : ${WORKSPACE:="$(pwd)/$(dirname $0)/.."}
 
-# Doing static analysis of the source-code
+# Generating cppcheck report
 
 cd $WORKSPACE
-if [ "$PLATFORM" = "Linux" -a "$LINUX_DISTRO" = "ALT Linux" ] ; then
-    # TODO: Run cppcheck on ALT Linux
-    echo "Will not generate cppcheck report on ALT Linux"
+echo "Generating cppcheck report"
+cppcheck --enable=all --std=c++11 --inconclusive --xml --xml-version=2 src analyzers/src 2> cppcheck.xml
+if [ $? -ne 0 ] ; then
+    echo "Cppcheck report generation error"
+    exit 1
+fi
+
+# Generating scan-build report
+
+if [ "$LINUX_DISTRO" = "openSUSE" ] ; then
+    echo "Will not generate scan-build report - OpenSUSE is not supported at the moment"
 else
-    echo "Generating cppcheck report"
-    cppcheck --enable=all --std=c++11 --inconclusive --xml --xml-version=2 src analyzers/src 2> cppcheck.xml
+    SCAN_BUILD_TMPDIR=$(mktemp -d /tmp/scan-build.XXXXXX)
+    SCAN_BUILD_ARCHIVE=$WORKSPACE/scan-build-archive
+    SCAN_BUILD_DIR=$WORKSPACE/scan-build
+
+    if [ "$PLATFORM" = "FreeBSD" ] ; then
+        CCC_ANALYZER=ccc-analyzer35
+        CXX_ANALYZER=c++-analyzer35
+        SCAN_BUILD=/usr/local/llvm35/bin/scan-build
+    elif [ "$LINUX_DISTRO" = "Ubuntu" ] ; then
+        # Different Ubuntu versions have different locations for CLang analyser binaries
+        CCC_ANALYZER=$(find /usr/share/clang/ -name ccc-analyzer)
+        if [ $? -ne 0 ] ; then
+            echo "Scan-build C language analyzer executable lookup error"
+            exit 1
+        fi
+        CXX_ANALYZER=$(find /usr/share/clang/ -name c++-analyzer)
+        if [ $? -ne 0 ] ; then
+            echo "Scan-build C++ language analyzer executable lookup error"
+            exit 1
+        fi
+        SCAN_BUILD=scan-build
+    elif [ "$LINUX_DISTRO" = "ALT Linux" ] ; then
+        CCC_ANALYZER=/usr/lib64/clang-analyzer/scan-build/ccc-analyzer
+        CXX_ANALYZER=/usr/lib64/clang-analyzer/scan-build/c++-analyzer
+        SCAN_BUILD=scan-build
+    elif [ "$LINUX_DISTRO" = "CentOS Linux" ] ; then
+        CCC_ANALYZER=/usr/libexec/clang-analyzer/scan-build/ccc-analyzer
+        CXX_ANALYZER=/usr/libexec/clang-analyzer/scan-build/c++-analyzer
+        SCAN_BUILD=scan-build
+    else
+        echo "WARNING: Scan-build binaries supposed to be in PATH environment variable due to unknown platform"
+        CCC_ANALYZER=ccc-analyzer
+        CXX_ANALYZER=c++-analyzer
+        SCAN_BUILD=scan-build
+    fi
+
+    echo "Generating scan-build report"
+    rm -rf $SCAN_BUILD_DIR
     if [ $? -ne 0 ] ; then
-        echo "Cppcheck report generation error"
+        echo "Scan-build directory removal error"
         exit 1
+    fi
+    mkdir $SCAN_BUILD_DIR
+    if [ $? -ne 0 ] ; then
+        echo "Scan-build directory creation error"
+        exit 1
+    fi
+    cd $SCAN_BUILD_DIR
+    cmake -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_C_COMPILER=$CCC_ANALYZER \
+            -DCMAKE_CXX_COMPILER=$CXX_ANALYZER ../
+    if [ $? -ne 0 ] ; then
+        echo "Scan-build configuration error"
+        exit 1
+    fi
+    $SCAN_BUILD --use-analyzer=/usr/bin/clang++ \
+            -analyze-headers \
+            -o ${SCAN_BUILD_TMPDIR} \
+            -enable-checker alpha.core \
+            -enable-checker alpha.cplusplus \
+            -enable-checker alpha.deadcode \
+            -enable-checker alpha.security \
+            -enable-checker alpha.unix \
+            -enable-checker security \
+            make
+    if [ $? -ne 0 ] ; then
+        echo "Scan-build report generation error"
+        exit 1
+    fi
+    # Get the directory name of the report created by scan-build
+    SCAN_BUILD_REPORT=$(find $SCAN_BUILD_TMPDIR -maxdepth 1 -not -empty -not -name `basename $SCAN_BUILD_TMPDIR`)
+    if [ $? -ne 0 ] ; then
+        echo "Scan-build report output directory identification error"
+        exit 1
+    fi
+    if [ -z "$SCAN_BUILD_REPORT" ]; then
+        echo "No scan-build report has been generated"
+    else
+        echo "Scan-build report has been generated in '$SCAN_BUILD_REPORT' directory"
+        if [ ! -d "$SCAN_BUILD_ARCHIVE" ]; then
+            mkdir "$SCAN_BUILD_ARCHIVE"
+            if [ $? -ne 0 ] ; then
+                echo "Scan-build report archive directory creation error"
+                exit 1
+            fi
+        else
+            rm -rf $SCAN_BUILD_ARCHIVE/*
+            if [ $? -ne 0 ] ; then
+                echo "Scan-build report archive directory cleanup error"
+                exit 1
+            fi
+        fi
+        echo "Archiving scan-build report to '$SCAN_BUILD_ARCHIVE' directory"
+        mv $SCAN_BUILD_REPORT/* $SCAN_BUILD_ARCHIVE/
+        if [ $? -ne 0 ] ; then
+            echo "Scan-build report archiving error"
+            exit 1
+        fi
+        rm -rf "$SCAN_BUILD_TMPDIR"
     fi
 fi
 
