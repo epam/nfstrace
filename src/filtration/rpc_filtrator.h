@@ -1,27 +1,37 @@
+//------------------------------------------------------------------------------
+// Author: Pavel Karneliuk
+// Description: RPC filtrator
+// Copyright (c) 2013 EPAM Systems
+//------------------------------------------------------------------------------
+/*
+    This file is part of Nfstrace.
+
+    Nfstrace is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 2 of the License.
+
+    Nfstrace is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
+*/
+//------------------------------------------------------------------------------
 #ifndef RPC_FILTRATOR_H
 #define RPC_FILTRATOR_H
-
-#include <algorithm>
+//------------------------------------------------------------------------------
 #include <cassert>
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
 
 #include <pcap/pcap.h>
 
-#include "controller/parameters.h"
 #include "filtration/packet.h"
-#include "filtration/sessions_hash.h"
-#include "protocols/cifs/cifs.h"
-#include "protocols/cifs2/cifs2.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/netbios/netbios.h"
 #include "protocols/rpc/rpc_header.h"
 #include "utils/log.h"
-#include "utils/out.h"
-#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -60,6 +70,25 @@ public:
         assert(w);
         collection.set(*w, session_ptr);
         nfs3_rw_hdr_max = max_rpc_hdr;
+    }
+
+    inline bool inProgress(PacketInfo& info) const
+    {
+        if (msg_len || hdr_len)
+        {
+            return true;
+        }
+
+        static const size_t header_len = sizeof(RecordMark) + sizeof(MessageHeader);
+        if (info.dlen >= header_len)
+        {
+            const RecordMark* rm {reinterpret_cast<const RecordMark*>(info.data)};
+            if ((rm->fragment()->type() == MsgType::REPLY ) || (rm->fragment()->type() == MsgType::CALL ))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
@@ -103,7 +132,8 @@ public:
                         //TRACE("discard only a part of packet payload related to current message");
                         info.dlen -= msg_len;
                         info.data += msg_len;
-                        msg_len = 0; find_message(info); // <- optimization
+                        msg_len = 0;
+                        find_message(info); // <- optimization
                     }
                 }
                 else // hdr_len != 0, readout a part of header of current message
@@ -312,6 +342,8 @@ private:
     MessageSet nfs3_read_match;
 };
 
-}
-}
+} // analysis
+} // NST
+//------------------------------------------------------------------------------
 #endif // RPC_FILTRATOR_H
+//------------------------------------------------------------------------------

@@ -23,27 +23,15 @@
 #ifndef CIFS_FILTRATOR_H
 #define CIFS_FILTRATOR_H
 //------------------------------------------------------------------------------
-#include <algorithm>
 #include <cassert>
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
 
 #include <pcap/pcap.h>
 
-#include "controller/parameters.h"
 #include "filtration/packet.h"
-#include "filtration/sessions_hash.h"
 #include "protocols/cifs/cifs.h"
 #include "protocols/cifs2/cifs2.h"
-#include "protocols/nfs3/nfs3_utils.h"
-#include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/netbios/netbios.h"
-#include "protocols/rpc/rpc_header.h"
 #include "utils/log.h"
-#include "utils/out.h"
-#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -69,6 +57,31 @@ public:
         msg_len = 0;
         to_be_copied = 0;
         collection.reset(); // data in external memory freed
+    }
+
+    inline bool inProgress(PacketInfo& info) const
+    {
+        if (msg_len || to_be_copied)
+        {
+            return true;
+        }
+
+        static const size_t header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
+        if (info.dlen >= header_len)
+        {
+            if (NetBIOS::get_header(info.data))
+            {
+                if (CIFSv1::get_header(info.data + sizeof(NetBIOS::MessageHeader)))
+                {
+                    return true;
+                }
+                else if (CIFSv2::get_header(info.data + sizeof(NetBIOS::MessageHeader)))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t /*max_rpc_hdr*/)
