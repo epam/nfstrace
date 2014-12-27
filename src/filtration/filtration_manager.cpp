@@ -21,16 +21,14 @@
 //------------------------------------------------------------------------------
 #include <sys/stat.h>
 
-#include "filtration/cifs_filtrator.h"
 #include "filtration/dumping.h"
 #include "filtration/filtration_manager.h"
 #include "filtration/filtration_processor.h"
+#include "filtration/Filtrators.h"
 #include "filtration/pcap/capture_reader.h"
 #include "filtration/pcap/file_reader.h"
 #include "filtration/processing_thread.h"
 #include "filtration/queuing.h"
-#include "filtration/rpc_filtrator.h"
-#include "filtration/Filtrators.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -55,26 +53,17 @@ template
 >
 class FiltrationImpl : public ProcessingThread
 {
-    using RPCProcessor = FiltrationProcessor<Reader, Writer, RPCFiltrator< Writer >>;
-    using CIFSProcessor = FiltrationProcessor<Reader, Writer, Filtrators< Writer >>;
+    using Processor = FiltrationProcessor<Reader, Writer, Filtrators< Writer >>;
 public:
     explicit FiltrationImpl(std::unique_ptr<Reader>& reader,
                             std::unique_ptr<Writer>& writer,
                             RunningStatus& status,
                             NST::controller::NetProtocol p)
     : ProcessingThread {status}
-    , rpc_processor{}
-    , cifs_processor{}
+    , processor{}
     , protocol(p)
     {
-        if (protocol == NST::controller::NetProtocol::CIFS)
-        {
-            cifs_processor.reset(new CIFSProcessor{reader, writer});
-        }
-        else
-        {
-            rpc_processor.reset(new RPCProcessor{reader, writer});
-        }
+        processor.reset(new Processor{reader, writer});
     }
     ~FiltrationImpl() = default;
     FiltrationImpl(const FiltrationImpl&)            = delete;
@@ -82,14 +71,7 @@ public:
 
     virtual void stop() override final
     {
-        if (protocol == NST::controller::NetProtocol::CIFS)
-        {
-            cifs_processor->stop();
-        }
-        else
-        {
-            rpc_processor->stop();
-        }
+        processor->stop();
     }
 private:
 
@@ -97,14 +79,7 @@ private:
     {
         try
         {
-            if (protocol == NST::controller::NetProtocol::CIFS)
-            {
-                cifs_processor->run();
-            }
-            else
-            {
-                rpc_processor->run();
-            }
+            processor->run();
         }
         catch(...)
         {
@@ -112,8 +87,7 @@ private:
         }
     }
 
-    std::unique_ptr<RPCProcessor> rpc_processor;
-    std::unique_ptr<CIFSProcessor> cifs_processor;
+    std::unique_ptr<Processor> processor;
     const NST::controller::NetProtocol protocol;
 };
 
