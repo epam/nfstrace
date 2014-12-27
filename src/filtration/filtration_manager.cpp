@@ -29,6 +29,8 @@
 #include "filtration/pcap/file_reader.h"
 #include "filtration/processing_thread.h"
 #include "filtration/queuing.h"
+#include "filtration/rpc_filtrator.h"
+#include "filtration/Filtrators.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -54,7 +56,7 @@ template
 class FiltrationImpl : public ProcessingThread
 {
     using RPCProcessor = FiltrationProcessor<Reader, Writer, RPCFiltrator< Writer >>;
-    using CIFSProcessor = FiltrationProcessor<Reader, Writer, CIFSFiltrator< Writer >>;
+    using CIFSProcessor = FiltrationProcessor<Reader, Writer, Filtrators< Writer >>;
 public:
     explicit FiltrationImpl(std::unique_ptr<Reader>& reader,
                             std::unique_ptr<Writer>& writer,
