@@ -37,8 +37,8 @@ namespace filtration
 template<typename Writer>
 class Filtrators
 {
-    CIFSFiltrator<Writer> filtratorCIFS;
-    RPCFiltrator<Writer> filtratorRPC;
+    CIFSFiltrator<Writer> filtratorCIFS;//!< CIFS filtrator
+    RPCFiltrator<Writer> filtratorRPC;//!< RPC filtrator
 public:
     Filtrators()
     {
@@ -48,12 +48,21 @@ public:
     Filtrators(const Filtrators&)            = delete;
     Filtrators& operator=(const Filtrators&) = delete;
 
+    /*!
+     * resets state of filtrator
+     */
     inline void reset()
     {
         filtratorCIFS.reset();
         filtratorRPC.reset ();
     }
 
+    /*!
+     * Sets queue
+     * \param session_ptr - TCP session
+     * \param w - queue, where we are going to write messages
+     * \param max_rpc_hdr -
+     */
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {
         assert(w);
@@ -67,16 +76,23 @@ public:
         filtratorRPC.lost (n);
     }
 
-    void push(PacketInfo& info)
+    /*!
+     * Receives and filtrates next part of TCP-stream
+     * \param info - data
+     */
+    inline void push(PacketInfo& info)
     {
+        // is it CIFS message?
         if (filtratorCIFS.inProgress(info))
         {
             filtratorCIFS.push (info);
         }
+        // is it RPC message?
         else if (filtratorRPC.inProgress(info))
         {
             filtratorRPC.push (info);
         }
+        // it is Unknown message
         else
         {
             //LOG("Unknown packet")
