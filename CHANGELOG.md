@@ -1,3 +1,11 @@
+0.3.2
+=====
+- new libjson plugin that outputs gathered statistics as json (via TCP);
+- fix endianess bug on mips/powerpc/s390x/sparc;
+- fix build issue on debian/kFreeBSD;
+- add missing dependencies to cpack configuration;
+- new `nfstrace` cli option: list available plugins and/or available interfaces.
+
 0.3.1
 =====
 - new experimental `libwatch.so` plugin with functionality similar to the
