@@ -25,7 +25,7 @@
 #include <sys/time.h>
 
 #include "cifs_commands.h"
-#include "rpc_procedure.h"
+#include "procedure.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
