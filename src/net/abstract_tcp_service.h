@@ -46,7 +46,7 @@ public:
     static constexpr int DefaultBacklog = 15;
 
     AbstractTcpService() = delete;
-    //! Constructs TCP-service and starts it
+    //! Constructs TCP-service
     /*!
      * \param workersAmount Amount of workers in thread-pool
      * \param port Port to bind to
@@ -55,7 +55,10 @@ public:
      */
     AbstractTcpService(std::size_t workersAmount, int port, const std::string& host = IpEndpoint::WildcardAddress,
                        int backlog = DefaultBacklog);
-    //! Stops TCP-service and destructs it
+    //! Destructs stopped TCP-service
+    /*!
+     * \note Destruction of non-stopped TCP-service causes undefined behaviour
+     */
     virtual ~AbstractTcpService();
 
     //! Returns TRUE if service is in running state
@@ -69,6 +72,11 @@ public:
         ts.tv_sec = ClockTimeoutMs / 1000;
         ts.tv_nsec = ClockTimeoutMs % 1000 * 1000000;
     }
+
+    //! Starts TCP-service
+    virtual void start();
+    //! Stops TCP-service
+    virtual void stop();
 protected:
     //! Asbtract TCP-service task
     class AbstractTask
@@ -108,6 +116,9 @@ private:
     void runWorker();
     void runListener();
 
+    const int _port;
+    const std::string _host;
+    const int _backlog;
     std::atomic_bool _isRunning;
     ThreadPool _threadPool;
     std::thread _listenerThread;
