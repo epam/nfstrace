@@ -37,10 +37,19 @@ namespace filtration
 template<typename Writer>
 class Filtrators
 {
+    enum class FiltratorTypes
+    {
+        DEFAULT = 0,
+        RPC,
+        CIFS
+    };
+
     CIFSFiltrator<Writer> filtratorCIFS;//!< CIFS filtrator
     RPCFiltrator<Writer> filtratorRPC;//!< RPC filtrator
+    FiltratorTypes currentFiltrator;
 public:
-    Filtrators()
+    Filtrators() :
+        currentFiltrator(FiltratorTypes::DEFAULT)
     {
     }
 
@@ -55,6 +64,7 @@ public:
     {
         filtratorCIFS.reset();
         filtratorRPC.reset ();
+        currentFiltrator = FiltratorTypes::DEFAULT;
     }
 
     /*!
@@ -83,13 +93,16 @@ public:
     inline void push(PacketInfo& info)
     {
         // is it CIFS message?
-        if (filtratorCIFS.inProgress(info))
+        if (currentFiltrator == FiltratorTypes::CIFS || filtratorCIFS.inProgress(info))
         {
+            currentFiltrator = FiltratorTypes::CIFS;
             filtratorCIFS.push (info);
         }
         // is it RPC message?
-        else if (filtratorRPC.inProgress(info))
+        else
+        if (currentFiltrator == FiltratorTypes::RPC || filtratorRPC.inProgress(info))
         {
+            currentFiltrator = FiltratorTypes::RPC;
             filtratorRPC.push (info);
         }
         // it is Unknown message
