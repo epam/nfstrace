@@ -218,7 +218,8 @@ extern "C"
 
 const char* usage()
 {
-    return "User can set chrono output timeout in msec.";
+    return "User can set chrono output timeout in msec.\n"
+           "You have to run nfstrace with verbosity level set to 0 (nfstrace -v 0 ...)";
 }
 
 IAnalyzer* create(const char* opts)
