@@ -25,7 +25,7 @@
 #include <sys/time.h>
 
 #include "cifs_commands.h"
-#include "rpc_procedure.h"
+#include "procedure.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -375,34 +375,14 @@ using QueryInfoCommand = SMBv1::Command<QueryInfoRequest, QueryInfoResponse>;   
 using QueryDirCommand = SMBv1::Command<QueryDirRequest, QueryDirResponse>;                            //!< Query directory command
 using FlushCommand = SMBv1::Command<FlushRequest, FlushResponse>;                                     //!< Flush command
 using ReadCommand = SMBv1::Command<ReadRequest, ReadResponse>;                                        //!< Read command
-
-using WriteArgumentType = struct {};                                                                  //!< Write command's arguments
-using WriteResultType = struct {};                                                                    //!< Write command's results
-using WriteCommand = SMBv1::Command<WriteArgumentType, WriteResultType>;                              //!< Write command
-
-using LockArgumentType = struct {};                                                                   //!< Lock command's arguments
-using LockResultType = struct {};                                                                     //!< Lock command's results
-using LockCommand = SMBv1::Command<LockArgumentType, LockResultType>;                                 //!< Lock command
-
-using IoctlArgumentType = struct {};                                                                  //!< Ioctl command's arguments
-using IoctlResultType = struct {};                                                                    //!< Ioctl command's results
-using IoctlCommand = SMBv1::Command<IoctlArgumentType, IoctlResultType>;                              //!< Ioctl command
-
-using CancelArgumentType = struct {};                                                                 //!< Cancel command's arguments
-using CancelResultType = struct {};                                                                   //!< Cancel command's results
-using CancelCommand = SMBv1::Command<CancelArgumentType, CancelResultType>;                           //!< Cancel command
-
-using ChangeNotifyArgumentType = struct {};                                                           //!< Change Notify command's arguments
-using ChangeNotifyResultType = struct {};                                                             //!< Change Notify command's results
-using ChangeNotifyCommand = SMBv1::Command<ChangeNotifyArgumentType, ChangeNotifyResultType>;         //!< Change Notify command
-
-using SetInfoArgumentType = struct {};                                                                //!< Set Info command's arguments
-using SetInfoResultType = struct {};                                                                  //!< Set Info command's results
-using SetInfoCommand = SMBv1::Command<SetInfoArgumentType, SetInfoResultType>;                        //!< Set Info command
-
-using BreakOpLockArgumentType = struct {};                                                            //!< Break opportunistic lock command's arguments
-using BreakOpLockResultType = struct {};                                                              //!< Break opportunistic lock command's results
-using BreakOpLockCommand = SMBv1::Command<BreakOpLockArgumentType, BreakOpLockResultType>;            //!< Break opportunistic lock command
+using WriteCommand = SMBv1::Command<WriteRequest, WriteResponse>;                                     //!< Write command
+using LockCommand = SMBv1::Command<LockRequest, LockResponse>;                                        //!< Lock command
+using CancelResponce = struct {};                                                                     //!< Cancel command's results
+using CancelCommand = SMBv1::Command<CancelRequest, CancelResponce>;                                  //!< Cancel command
+using ChangeNotifyCommand = SMBv1::Command<ChangeNotifyRequest, ChangeNotifyResponse>;                //!< Change Notify command
+using BreakOpLockCommand = SMBv1::Command<OplockAcknowledgment, OplockResponse>;                      //!< Break opportunistic lock command
+using IoctlCommand = SMBv1::Command<IoCtlRequest, IoCtlResponse>;                                     //!< Ioctl command
+using SetInfoCommand = SMBv1::Command<SetInfoRequest, SetInfoResponse>;                               //!< Set Info command
 
 } // namespace SMBv2
 } // namespace API

@@ -1168,22 +1168,22 @@ public:
         account(cmd, SMBv2Commands::READ, smbv2);
     }
 
-    void writeSMBv2(const SMBv2::WriteCommand* cmd, const SMBv2::WriteArgumentType*, const SMBv2::WriteResultType*) override final
+    void writeSMBv2(const SMBv2::WriteCommand* cmd, const SMBv2::WriteRequest*, const SMBv2::WriteResponse*) override final
     {
         account(cmd, SMBv2Commands::WRITE, smbv2);
     }
 
-    void lockSMBv2(const SMBv2::LockCommand* cmd, const SMBv2::LockArgumentType*, const SMBv2::LockResultType*) override final
+    void lockSMBv2(const SMBv2::LockCommand* cmd, const SMBv2::LockRequest*, const SMBv2::LockResponse*) override final
     {
         account(cmd, SMBv2Commands::LOCK, smbv2);
     }
 
-    void ioctlSMBv2(const SMBv2::IoctlCommand* cmd, const SMBv2::IoctlArgumentType*, const SMBv2::IoctlResultType*) override final
+    void ioctlSMBv2(const SMBv2::IoctlCommand* cmd, const SMBv2::IoCtlRequest*, const SMBv2::IoCtlResponse*) override final
     {
         account(cmd, SMBv2Commands::IOCTL, smbv2);
     }
 
-    void cancelSMBv2(const SMBv2::CancelCommand* cmd, const SMBv2::CancelArgumentType*, const SMBv2::CancelResultType*) override final
+    void cancelSMBv2(const SMBv2::CancelCommand* cmd, const SMBv2::CancelRequest*, const SMBv2::CancelResponce*) override final
     {
         account(cmd, SMBv2Commands::CANCEL, smbv2);
     }
@@ -1198,7 +1198,7 @@ public:
         account(cmd, SMBv2Commands::QUERY_DIRECTORY, smbv2);
     }
 
-    void changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* cmd, const SMBv2::ChangeNotifyArgumentType*, const SMBv2::ChangeNotifyResultType*) override final
+    void changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* cmd, const SMBv2::ChangeNotifyRequest*, const SMBv2::ChangeNotifyResponse*) override final
     {
         account(cmd, SMBv2Commands::CHANGE_NOTIFY, smbv2);
     }
@@ -1208,12 +1208,12 @@ public:
         account(cmd, SMBv2Commands::QUERY_INFO, smbv2);
     }
 
-    void setInfoSMBv2(const SMBv2::SetInfoCommand* cmd, const SMBv2::SetInfoArgumentType*, const SMBv2::SetInfoResultType*) override final
+    void setInfoSMBv2(const SMBv2::SetInfoCommand* cmd, const SMBv2::SetInfoRequest*, const SMBv2::SetInfoResponse*) override final
     {
         account(cmd, SMBv2Commands::SET_INFO, smbv2);
     }
 
-    void breakOplockSMBv2(const SMBv2::BreakOpLockCommand* cmd, const SMBv2::BreakOpLockArgumentType*, const SMBv2::BreakOpLockResultType*) override final
+    void breakOplockSMBv2(const SMBv2::BreakOpLockCommand* cmd, const SMBv2::OplockAcknowledgment*, const SMBv2::OplockResponse*) override final
     {
         account(cmd, SMBv2Commands::OPLOCK_BREAK, smbv2);
     }
