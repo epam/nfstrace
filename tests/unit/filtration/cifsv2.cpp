@@ -30,6 +30,8 @@
 //------------------------------------------------------------------------------
 using namespace NST::filtration;
 using ::testing::Return;
+using ::testing::AtLeast;
+using ::testing::_;
 //------------------------------------------------------------------------------
 class Writer
 {
@@ -52,37 +54,169 @@ public:
             }
         }
 
+        virtual void push(PacketInfo& info, size_t size)
+        {
+            if (pImpl)
+            {
+                pImpl->push(info, size);
+            }
+        }
+
+        virtual void skip_first(size_t size)
+        {
+            if (pImpl)
+            {
+                pImpl->skip_first(size);
+            }
+        }
+
+        virtual void complete(PacketInfo& info)
+        {
+            if (pImpl)
+            {
+                pImpl->complete(info);
+            }
+        }
+
+        operator bool()
+        {
+            return true;
+        }
+
+        virtual const uint8_t * data()
+        {
+            if (pImpl)
+            {
+                return pImpl->data();
+            }
+            return nullptr;
+        }
+
+        virtual size_t data_size()
+        {
+            if (pImpl)
+            {
+                return pImpl->data_size();
+            }
+            return 0;
+        }
+
+        virtual size_t capacity()
+        {
+            if (pImpl)
+            {
+                return pImpl->capacity();
+            }
+            return 0;
+        }
+
+        virtual void allocate()
+        {
+            if (pImpl)
+            {
+                pImpl->allocate();
+            }
+        }
     };
     class CollectionMock : public Collection
     {
     public:
         MOCK_METHOD0(reset, void());
+        MOCK_METHOD2(push, void(PacketInfo&, size_t));
+        MOCK_METHOD0(data, const uint8_t *());
+        MOCK_METHOD0(data_size, size_t());
+        MOCK_METHOD0(capacity, size_t());
+        MOCK_METHOD0(allocate, void());
+        MOCK_METHOD1(skip_first, void(size_t));
+        MOCK_METHOD1(complete, void(PacketInfo&));
 
     };
 
     CollectionMock collection;
 };
 
-TEST(Filtration, CIFSFiltrator)
+TEST(Filtration, CIFSFiltratorReset)
 {
+    // Set conditions
     Writer mock;
     EXPECT_CALL(mock.collection, reset())
         .Times(1);
 
     CIFSFiltrator<Writer> f;
     f.set_writer(nullptr, &mock, 0);
+    // Check
     f.reset();
 }
 
-TEST(Filtration, filtrators)
+TEST(Filtration, filtratorsResets)
 {
+    // Set conditions
     Writer mock;
     EXPECT_CALL(mock.collection, reset())
         .Times(2);
 
     Filtrators<Writer> f;
     f.set_writer(nullptr, &mock, 0);
+    // Check
     f.reset();
+}
+
+TEST(Filtration, pushRPCheader)
+{
+    // Prepare data
+    struct pcap_pkthdr header;
+    header.caplen = 16;
+    header.len = 16;
+    const uint8_t packet[] = {0x80, 0x00, 0x00, 0x84,
+                              0xec, 0x8a, 0x42, 0xcb,
+                              0x00, 0x00, 0x00, 0x00,
+                              0x00, 0x00, 0x00, 0x02};
+    PacketInfo info(&header, packet, 0);
+
+    Writer mock;
+    EXPECT_CALL(mock.collection, data())
+        .WillRepeatedly(Return(packet));
+    EXPECT_CALL(mock.collection, data_size())
+        .WillRepeatedly(Return(sizeof(packet)));
+    EXPECT_CALL(mock.collection, capacity())
+        .WillRepeatedly(Return(1000000));
+    // Set conditions
+    EXPECT_CALL(mock.collection, push(_, _))
+        .Times(AtLeast(1));
+
+    Filtrators<Writer> f;
+    f.set_writer(nullptr, &mock, 0);
+    // Check
+    f.push(info);
+}
+
+TEST(Filtration, pushCIFSheader)
+{
+    // Prepare data
+    struct pcap_pkthdr header;
+    header.caplen = 16;
+    header.len = 16;
+    const uint8_t packet[] = {0x00, 0x00, 0x00, 0x68,
+                              0xfe, 0x53, 0x4d, 0x42,
+                              0x00, 0x00, 0x00, 0x00,
+                              0x00, 0x00, 0x00, 0x00};
+    PacketInfo info(&header, packet, 0);
+
+    Writer mock;
+    EXPECT_CALL(mock.collection, data())
+        .WillRepeatedly(Return(packet));
+    EXPECT_CALL(mock.collection, data_size())
+        .WillRepeatedly(Return(sizeof(packet)));
+    EXPECT_CALL(mock.collection, capacity())
+        .WillRepeatedly(Return(1000000));
+    // Set conditions
+    EXPECT_CALL(mock.collection, push(_, _))
+        .Times(AtLeast(1));
+
+    Filtrators<Writer> f;
+    f.set_writer(nullptr, &mock, 0);
+    // Check
+    f.push(info);
 }
 
 //------------------------------------------------------------------------------
