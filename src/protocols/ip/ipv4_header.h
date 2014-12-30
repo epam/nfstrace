@@ -76,10 +76,10 @@ struct IPv4Header : private ipv4_header
     inline in_addr_t dst()     const { return ipv4_dst;             }
     inline uint16_t checksum() const { return ntohs(ipv4_checksum); }
 
-    inline bool is_fragmented() const { return ipv4_fragmentation & 0xff3f /*0xff3f == htons(MF | OFFMASK)*/; }
+    inline bool is_fragmented() const { return ipv4_fragmentation & htons(MF | OFFMASK); }
     inline bool is_fragmented_and_not_the_first_part() const
     {
-        return ipv4_fragmentation & 0xff1f /*offset() != 0*/;
+        return ipv4_fragmentation & htons(OFFMASK) /*offset() != 0*/;
     }
 } __attribute__ ((__packed__));
 
