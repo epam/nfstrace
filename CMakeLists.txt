@@ -91,6 +91,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         add_custom_target (coverage
                            COMMAND ${GCOVR_PATH} --xml -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.xml 2>&1 >/dev/null
                            WORKING_DIRECTORY ${CMAKE_PROJECT_DIR})
+    else ()
+        message (WARNING "'gcovr' executable not found - coverage report is not available.")
     endif ()
 endif ()
 
