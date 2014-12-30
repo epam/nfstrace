@@ -41,19 +41,49 @@ fi
 
 : ${WORKSPACE:="$(pwd)/$(dirname $0)/.."}
 
+# Processing CLI arguments
+
+SKIP_CPPCHECK=false
+SKIP_SCAN_BUILD=false
+SKIP_MEMCHECK=false
+SKIP_PACKAGING=false
+
+CLI_ARGS=$(getopt -o csmp -l skip-cppcheck,skip-scan-build,skip-memcheck,skip-packaging -n "`basename $0`" -- "$@")
+if [ $? -ne 0 ] ; then
+    echo ">>> Parsing CLI parameters error"
+    exit 1
+fi
+eval set -- "$CLI_ARGS"
+while true ; do
+    case "$1" in
+        -c|--skip-cppcheck) SKIP_CPPCHECK=true ; shift ;;
+        -s|--skip-scan-build) SKIP_SCAN_BUILD=true ; shift ;;
+        -m|--skip-memcheck) SKIP_MEMCHECK=true ; shift ;;
+        -p|--skip-packaging) SKIP_PACKAGING=true ; shift ;;
+        --) shift ; break ;;
+        *) echo ">>> Internal error!" ; exit 1 ;;
+    esac
+done
+
 # Generating cppcheck report
 
-cd $WORKSPACE
-echo ">>> Generating cppcheck report"
-cppcheck --enable=all --std=c++11 --inconclusive --xml --xml-version=2 src analyzers/src 2> cppcheck.xml
-if [ $? -ne 0 ] ; then
-    echo ">>> Cppcheck report generation error"
-    exit 1
+if [ "$SKIP_CPPCHECK" = true ] ; then
+    echo ">>> Skipping cppcheck report generation"
+else
+    cd $WORKSPACE
+    echo ">>> Generating cppcheck report"
+    cppcheck --enable=all --std=c++11 --inconclusive --xml --xml-version=2 src analyzers/src 2> cppcheck.xml
+    if [ $? -ne 0 ] ; then
+        echo ">>> Cppcheck report generation error"
+        exit 1
+    fi
 fi
 
 # Generating scan-build report
 
-if [ "$LINUX_DISTRO" = "openSUSE" ] ; then
+if [ "$SKIP_SCAN_BUILD" = true ] ; then
+    echo ">>> Skipping scan-build report generation"
+elif [ "$LINUX_DISTRO" = "openSUSE" ] ; then
     echo ">>> Will not generate scan-build report - OpenSUSE is not supported at the moment"
 else
     SCAN_BUILD_TMPDIR=$(mktemp -d /tmp/scan-build.XXXXXX)
@@ -189,14 +219,14 @@ if [ $? -ne 0 ] ; then
     exit 1
 fi
 if [ "$PLATFORM" = "FreeBSD" ] ; then
-    # TODO: Support for code coverage in FreeBSD
-    echo ">>> Will not generate coverage report on FreeBSD"
+    # TODO: Support for code coverage on FreeBSD
+    echo ">>> Coverage report generation is not supported on FreeBSD at the moment"
 else
     make coverage
-fi
-if [ $? -ne 0 ] ; then
-    echo ">>> Code coverage report creation error"
-    exit 1
+    if [ $? -ne 0 ] ; then
+        echo ">>> Code coverage report creation error"
+        exit 1
+    fi
 fi
 CTEST_OUTPUT_ON_FAILURE=TRUE ctest -E unit*
 if [ $? -ne 0 ] ; then
@@ -206,9 +236,11 @@ fi
 
 # Running valgrind/memcheck
 
-if [ "$PLATFORM" = "FreeBSD" ] ; then
+if [ "$SKIP_MEMCHECK" = true ] ; then
+    echo ">>> Skipping valgrind/memcheck report generation"
+elif [ "$PLATFORM" = "FreeBSD" ] ; then
     # TODO: Valgrind causes error on FreeBSD, see https://bugs.kde.org/show_bug.cgi?id=306235
-    echo ">>> Will not generate valgrind/memcheck report on FreeBSD, see https://bugs.kde.org/show_bug.cgi?id=306235"
+    echo ">>> Valgrind/memcheck report generation is not supported on FreeBSD, see https://bugs.kde.org/show_bug.cgi?id=306235"
 else
     bzcat $WORKSPACE/traces/eth-ipv4-tcp-nfsv3.pcap.bz2 > ./eth-ipv4-tcp-nfsv3.pcap
     bzcat $WORKSPACE/traces/eth-ipv4-tcp-nfsv4.pcap.bz2 > ./eth-ipv4-tcp-nfsv4.pcap
@@ -277,9 +309,13 @@ if [ $? -ne 0 ] ; then
 fi
 
 # Packaging
-# TODO: Install/uninstall package on ALT Linux (see below)
 
-if [ "$LINUX_DISTRO" = "Ubuntu" -o "$LINUX_DISTRO" = "Debian" ] ; then
+if [ "$SKIP_PACKAGING" = true ] ; then
+    echo ">>> Skipping packaging"
+elif [ "$LINUX_DISTRO" = "ALT Linux" ] ; then
+    # TODO: Packaging support on ALT Linux
+    echo ">>> Packaging is not supported on ALT Linux at the moment"
+elif [ "$LINUX_DISTRO" = "Ubuntu" -o "$LINUX_DISTRO" = "Debian" ] ; then
     echo ">>> Making DEB-package"
     cpack -G DEB
     if [ $? -ne 0 ] ; then
@@ -298,11 +334,8 @@ if [ "$LINUX_DISTRO" = "Ubuntu" -o "$LINUX_DISTRO" = "Debian" ] ; then
         echo ">>> Uninstalling DEB-package error"
         exit 1
     fi
-elif [ "$LINUX_DISTRO" = "CentOS Linux" -o "$LINUX_DISTRO" = "openSUSE" -o "$LINUX_DISTRO" = "ALT Linux" ] ; then
-    if [ "$LINUX_DISTRO" = "ALT Linux" ] ; then
-        # TODO: Remove it
-        exit 0
-    fi
+#elif [ "$LINUX_DISTRO" = "CentOS Linux" -o "$LINUX_DISTRO" = "openSUSE" -o "$LINUX_DISTRO" = "ALT Linux" ] ; then
+elif [ "$LINUX_DISTRO" = "CentOS Linux" -o "$LINUX_DISTRO" = "openSUSE" ] ; then
     echo ">>> Making RPM-package"
     cpack -G RPM
     echo ">>> Installing RPM-package"
