@@ -46,7 +46,7 @@ class Filtrators
 
     CIFSFiltrator<Writer> filtratorCIFS;//!< CIFS filtrator
     RPCFiltrator<Writer> filtratorRPC;//!< RPC filtrator
-    FiltratorTypes currentFiltrator;
+    FiltratorTypes currentFiltrator;//!< Indicates which filtrator is currently active?
 public:
     Filtrators() :
         currentFiltrator(FiltratorTypes::DEFAULT)

@@ -1,0 +1,5 @@
+project (unit_test_filtration)
+aux_source_directory ("." SRC_TEST_LIST)
+add_executable (${PROJECT_NAME} ${SRC_TEST_LIST})
+target_link_libraries (${PROJECT_NAME} ${GMOCK_LIBRARIES})
+add_test (${PROJECT_NAME} ${PROJECT_NAME})

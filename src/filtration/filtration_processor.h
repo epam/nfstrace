@@ -47,7 +47,7 @@ namespace NST
 namespace filtration
 {
 
-using namespace NST::protocols::rpc;
+using namespace NST::protocols::rpc;//FIXME: It is not good to use "using" in headers - should be removed
 
 /*
  *  uint32_t: Message XID (Call or Reply)
