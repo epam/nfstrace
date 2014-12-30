@@ -32,6 +32,9 @@ if [ "$PLATFORM" = "Linux" ] ; then
         exit 1
     fi
     LINUX_DISTRO=$(grep "^NAME=" "$OS_RELEASE_FILE" | sed -e 's/NAME=//g' | sed -e 's/"//g')
+    echo "Running CI-cycle on '$LINUX_DISTRO'"
+else
+    echo "Running CI-cycle on '$PLATFORM'"
 fi
 
 # Pulling environment variables using default values
@@ -199,6 +202,46 @@ CTEST_OUTPUT_ON_FAILURE=TRUE ctest -E unit*
 if [ $? -ne 0 ] ; then
     echo "Running functional tests on Debug build error"
     exit 1
+fi
+
+# Running valgrind/memcheck
+
+if [ "$PLATFORM" = "FreeBSD" ] ; then
+    # TODO: Valgrind causes error on FreeBSD, see https://bugs.kde.org/show_bug.cgi?id=306235
+    echo "Will not generate valgrind/memcheck report on FreeBSD, see https://bugs.kde.org/show_bug.cgi?id=306235"
+else
+    bzcat $WORKSPACE/traces/eth-ipv4-tcp-nfsv3.pcap.bz2 > ./eth-ipv4-tcp-nfsv3.pcap
+    bzcat $WORKSPACE/traces/eth-ipv4-tcp-nfsv4.pcap.bz2 > ./eth-ipv4-tcp-nfsv4.pcap
+    
+    echo "Generating valgrind/memcheck report for NFSv3 in 'drain' mode"
+    valgrind --tool=memcheck --leak-check=full --show-reachable=yes \
+    	--undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
+    	--trace-children=no --xml=yes --xml-file=./nfstrace.%p.drain.nfsv3.memcheck.xml \
+    	./nfstrace --mode=drain -b 20 -Q 4096 -M 512 -I ./eth-ipv4-tcp-nfsv3.pcap
+    if [ $? -ne 0 ] ; then
+        echo "Error generating valgrind/memcheck report for NFSv3 in 'drain' mode"
+        exit 1
+    fi
+    echo "Generating valgrind/memcheck report for NFSv3 in 'stat' mode"
+    valgrind --tool=memcheck --leak-check=full --show-reachable=yes \
+    	--undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
+    	--trace-children=no --xml=yes --xml-file=./nfstrace.%p.stat.nfsv3.memcheck.xml \
+    	./nfstrace --mode=stat -a ./analyzers/libbreakdown.so -b 20 -Q 4096 -M 512 \
+    	-I ./eth-ipv4-tcp-nfsv3.pcap
+    if [ $? -ne 0 ] ; then
+        echo "Error generating valgrind/memcheck report for NFSv3 in 'stat' mode"
+        exit 1
+    fi
+    echo "Generating valgrind/memcheck report for NFSv4 in 'stat' mode"
+    valgrind --tool=memcheck --leak-check=full --show-reachable=yes \
+    	--undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
+    	--trace-children=no --xml=yes --xml-file=./nfstrace.%p.stat.nfsv4.memcheck.xml \
+    	./nfstrace --mode=stat -a ./analyzers/libbreakdown.so -b 20 -Q 4096 -M 512 \
+    	-I ./eth-ipv4-tcp-nfsv4.pcap
+    if [ $? -ne 0 ] ; then
+        echo "Error generating valgrind/memcheck report for NFSv4 in 'stat' mode"
+        exit 1
+    fi
 fi
 
 # Doing Release build
