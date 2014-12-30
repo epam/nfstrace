@@ -178,7 +178,7 @@ public:
         if(collection && (collection.data_size() > 0)) // collection is allocated
         {
             assert(collection.capacity() >= max_header);
-            const unsigned long tocopy {max_header - collection.data_size()};
+            const size_t tocopy {max_header - collection.data_size()};
             assert(tocopy != 0);
             if(info.dlen < tocopy)
             {

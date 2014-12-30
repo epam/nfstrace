@@ -165,8 +165,7 @@ TEST(Filtration, pushRPCheader)
 {
     // Prepare data
     struct pcap_pkthdr header;
-    header.caplen = 16;
-    header.len = 16;
+    header.caplen = header.len = 16;
     const uint8_t packet[] = {0x80, 0x00, 0x00, 0x84,
                               0xec, 0x8a, 0x42, 0xcb,
                               0x00, 0x00, 0x00, 0x00,
@@ -194,8 +193,7 @@ TEST(Filtration, pushCIFSheader)
 {
     // Prepare data
     struct pcap_pkthdr header;
-    header.caplen = 16;
-    header.len = 16;
+    header.caplen = header.len = 16;
     const uint8_t packet[] = {0x00, 0x00, 0x00, 0x68,
                               0xfe, 0x53, 0x4d, 0x42,
                               0x00, 0x00, 0x00, 0x00,
