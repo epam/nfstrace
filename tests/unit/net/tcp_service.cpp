@@ -31,6 +31,7 @@
 using namespace NST::net;
 
 static constexpr std::size_t AwaitForServiceStartupMs = 250U;
+static constexpr std::size_t StartStopCyclesAmount = 5U;
 static constexpr std::size_t TransmissionTimeoutMs = 10000U;
 static constexpr const char* ListenHost = IpEndpoint::LoopbackAddress;
 static constexpr int ListenPort = 8888;
@@ -105,24 +106,29 @@ TEST(TestTcpService, requestResponse)
 {
     taskExecuteCallsCount = 0;
     TestTcpService service;
-    std::this_thread::sleep_for(std::chrono::milliseconds{AwaitForServiceStartupMs});
-    int s = socket(PF_INET, SOCK_STREAM, 0);
-    ASSERT_GE(s, 0);
-    IpEndpoint endpoint{ListenHost, ListenPort};
-    ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
-    ssize_t bytesSent = send(s, TestRequest, strlen(TestRequest), MSG_NOSIGNAL);
-    EXPECT_EQ(strlen(TestRequest), bytesSent);
-    char receiveBuffer[ReceiveBufferSize];
-    ssize_t bytesReceived = recv(s, receiveBuffer, sizeof(receiveBuffer), 0);
-    EXPECT_EQ(TestResponse, std::string(receiveBuffer, bytesReceived));
-    EXPECT_EQ(0, close(s));
-    EXPECT_EQ(1, taskExecuteCallsCount.load());
+    for (int i = 0; i < StartStopCyclesAmount; ++i) {
+        EXPECT_NO_THROW(service.start());
+        std::this_thread::sleep_for(std::chrono::milliseconds{AwaitForServiceStartupMs});
+        int s = socket(PF_INET, SOCK_STREAM, 0);
+        ASSERT_GE(s, 0);
+        IpEndpoint endpoint{ListenHost, ListenPort};
+        ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
+        ssize_t bytesSent = send(s, TestRequest, strlen(TestRequest), MSG_NOSIGNAL);
+        EXPECT_EQ(strlen(TestRequest), bytesSent);
+        char receiveBuffer[ReceiveBufferSize];
+        ssize_t bytesReceived = recv(s, receiveBuffer, sizeof(receiveBuffer), 0);
+        EXPECT_EQ(TestResponse, std::string(receiveBuffer, bytesReceived));
+        EXPECT_EQ(0, close(s));
+        EXPECT_NO_THROW(service.stop());
+    }
+    EXPECT_EQ(StartStopCyclesAmount, taskExecuteCallsCount.load());
 }
 
 TEST(TestTcpService, multipleRequestResponse)
 {
     taskExecuteCallsCount = 0;
     TestTcpService service;
+    EXPECT_NO_THROW(service.start());
     std::this_thread::sleep_for(std::chrono::milliseconds{AwaitForServiceStartupMs});
     std::vector<int> sockets(WorkersAmount);
     for (auto & s : sockets)
@@ -151,6 +157,7 @@ TEST(TestTcpService, multipleRequestResponse)
         EXPECT_EQ(0, close(s));
     }
     EXPECT_EQ(sockets.size(), taskExecuteCallsCount.load());
+    EXPECT_NO_THROW(service.stop());
 }
 
 // TODO
