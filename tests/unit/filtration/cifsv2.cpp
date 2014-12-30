@@ -25,7 +25,7 @@
 #include "controller/running_status.h"
 #include "filtration/filtration_processor.h"
 #include "filtration/cifs_filtrator.h"
-#include "filtration/Filtrators.h"
+#include "filtration/filtrators.h"
 #include "filtration/packet.h"
 //------------------------------------------------------------------------------
 using namespace NST::filtration;

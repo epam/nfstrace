@@ -24,7 +24,7 @@
 #include "filtration/dumping.h"
 #include "filtration/filtration_manager.h"
 #include "filtration/filtration_processor.h"
-#include "filtration/Filtrators.h"
+#include "filtration/filtrators.h"
 #include "filtration/pcap/capture_reader.h"
 #include "filtration/pcap/file_reader.h"
 #include "filtration/processing_thread.h"
