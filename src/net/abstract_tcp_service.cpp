@@ -36,6 +36,9 @@ namespace net
 {
 
 AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, const std::string& host, int backlog) :
+    _port{port},
+    _host{host},
+    _backlog{backlog},
     _isRunning{true},
     _threadPool{workersAmount},
     _listenerThread{},
@@ -44,6 +47,21 @@ AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, cons
     _tasksQueueMutex{},
     _tasksQueueCond{}
 {
+}
+
+AbstractTcpService::~AbstractTcpService()
+{
+    // Disposing tasks which are still in queue
+    while (!_tasksQueue.empty())
+    {
+        delete _tasksQueue.front();
+        _tasksQueue.pop();
+    }
+}
+
+void AbstractTcpService::start()
+{
+    _isRunning = true;
     // Setting up server TCP-socket
     _serverSocket = socket(PF_INET, SOCK_STREAM, 0);
     if (_serverSocket < 0)
@@ -57,13 +75,13 @@ AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, cons
         throw std::system_error{errno, std::system_category(), "Setting SO_REUSEADDR socket option error"};
     }
     // Binding server socket to endpoint
-    IpEndpoint endpoint{host.c_str(), port};
+    IpEndpoint endpoint{_host.c_str(), _port};
     if (bind(_serverSocket, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen) != 0)
     {
         throw std::system_error{errno, std::system_category(), "Binding server socket error"};
     }
     // Converting socket to listening state
-    if (listen(_serverSocket, backlog) != 0)
+    if (listen(_serverSocket, _backlog) != 0)
     {
         throw std::system_error{errno, std::system_category(), "Converting socket to listening state error"};
     }
@@ -75,7 +93,7 @@ AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, cons
     _listenerThread = std::thread{[this]() { this->runListener(); }};
 }
 
-AbstractTcpService::~AbstractTcpService()
+void AbstractTcpService::stop()
 {
     {
         // Waking up all awaiting threads
@@ -88,15 +106,9 @@ AbstractTcpService::~AbstractTcpService()
     {
         thr.join();
     }
-    _threadPool.clear();
+    // Joining to listener thread and closing server socket
     _listenerThread.join();
     close(_serverSocket);
-    // Disposing tasks which are still in queue
-    while (!_tasksQueue.empty())
-    {
-        delete _tasksQueue.front();
-        _tasksQueue.pop();
-    }
 }
 
 void AbstractTcpService::runWorker()
