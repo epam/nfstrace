@@ -241,6 +241,9 @@ if [ "$SKIP_MEMCHECK" = true ] ; then
 elif [ "$PLATFORM" = "FreeBSD" ] ; then
     # TODO: Valgrind causes error on FreeBSD, see https://bugs.kde.org/show_bug.cgi?id=306235
     echo ">>> Valgrind/memcheck report generation is not supported on FreeBSD, see https://bugs.kde.org/show_bug.cgi?id=306235"
+elif [ "$LINUX_DISTRO" = "ALT Linux" ] ; then
+    # TODO: Jenkins causes error on ALT Linux on publish valgrind report phase
+    echo ">>> Valgrind/memcheck report generation is not supported on ALT Linux"
 else
     bzcat $WORKSPACE/traces/eth-ipv4-tcp-nfsv3.pcap.bz2 > ./eth-ipv4-tcp-nfsv3.pcap
     bzcat $WORKSPACE/traces/eth-ipv4-tcp-nfsv4.pcap.bz2 > ./eth-ipv4-tcp-nfsv4.pcap
