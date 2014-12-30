@@ -27,6 +27,12 @@ JsonAnalyzer::JsonAnalyzer(std::size_t workersAmount, int port, const std::strin
     _nfsV3Stat{},
     _nfsV4Stat{}
 {
+    _jsonTcpService.start();
+}
+
+JsonAnalyzer::~JsonAnalyzer()
+{
+    _jsonTcpService.stop();
 }
 
 void JsonAnalyzer::null(const struct RPCProcedure* /*proc*/,
