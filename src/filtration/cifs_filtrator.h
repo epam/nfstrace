@@ -223,7 +223,7 @@ public:
         assert(msg_len >= collection.data_size());
         assert(to_be_copied <= msg_len);
 
-        const uint32_t written {collection.data_size()};
+        const size_t written {collection.data_size()};
         msg_len -= written; // substract how written (if written)
         to_be_copied -= std::min(to_be_copied, written);
         if (0 == to_be_copied)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
@@ -267,8 +267,8 @@ public:
     }
 
 private:
-    uint32_t msg_len;  // length of current RPC message + RM
-    uint32_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
+    size_t msg_len;  // length of current RPC message + RM
+    size_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
 
     typename Writer::Collection collection;// storage for collection packet data
 };

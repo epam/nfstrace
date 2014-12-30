@@ -238,7 +238,7 @@ public:
                 assert(msg_len != 0);   // message is found
                 assert(msg_len >= collection.data_size());
                 assert(hdr_len <= msg_len);
-                const uint32_t written {collection.data_size()};
+                const size_t written {collection.data_size()};
                 msg_len -= written; // substract how written (if written)
                 hdr_len -= std::min(hdr_len, written);
                 if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
@@ -334,9 +334,9 @@ public:
     }
 
 private:
-    uint32_t nfs3_rw_hdr_max {512}; // limit for NFSv3 to truncate WRITE call and READ reply messages
-    uint32_t msg_len;  // length of current RPC message + RM
-    uint32_t hdr_len;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
+    size_t nfs3_rw_hdr_max {512}; // limit for NFSv3 to truncate WRITE call and READ reply messages
+    size_t msg_len;  // length of current RPC message + RM
+    size_t hdr_len;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
 
     typename Writer::Collection collection;// storage for collection packet data
     MessageSet nfs3_read_match;
