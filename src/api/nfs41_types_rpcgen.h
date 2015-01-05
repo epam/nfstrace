@@ -33,16 +33,17 @@ namespace NFS41
 
 typedef struct authunix_parms authsys_parms;
 
-#define NFS4_FHSIZE 128
-#define NFS4_VERIFIER_SIZE 8
-#define NFS4_OPAQUE_LIMIT 1024
-#define NFS4_SESSIONID_SIZE 16
-#define NFS4_INT64_MAX 0x7fffffffffffffff
-#define NFS4_UINT64_MAX 0xffffffffffffffff
-#define NFS4_INT32_MAX 0x7fffffff
-#define NFS4_UINT32_MAX 0xffffffff
-#define NFS4_MAXFILELEN 0xffffffffffffffff
-#define NFS4_MAXFILEOFF 0xfffffffffffffffe
+const uint32_t RPCSEC_GSS         {6};
+const uint32_t NFS4_FHSIZE         {128};
+const uint32_t NFS4_VERIFIER_SIZE  {8};
+const uint32_t NFS4_OPAQUE_LIMIT   {1024};
+const uint32_t NFS4_SESSIONID_SIZE {16};
+const uint64_t NFS4_INT64_MAX      {0x7fffffffffffffff};
+const uint64_t NFS4_UINT64_MAX     {0xffffffffffffffff};
+const uint32_t NFS4_INT32_MAX      {0x7fffffff};
+const uint32_t NFS4_UINT32_MAX     {0xffffffff};
+const uint64_t NFS4_MAXFILELEN     {0xffffffffffffffff};
+const uint64_t NFS4_MAXFILEOFF     {0xfffffffffffffffe};
 
 enum nfs_ftype4 {
 	NF4REG = 1,
@@ -282,50 +283,52 @@ struct fs_locations4 {
 	} locations;
 };
 typedef struct fs_locations4 fs_locations4;
-#define ACL4_SUPPORT_ALLOW_ACL 0x00000001
-#define ACL4_SUPPORT_DENY_ACL 0x00000002
-#define ACL4_SUPPORT_AUDIT_ACL 0x00000004
-#define ACL4_SUPPORT_ALARM_ACL 0x00000008
+
+typedef uint32_t fattr4_aclsupport;
+const fattr4_aclsupport ACL4_SUPPORT_ALLOW_ACL {0x00000001};
+const fattr4_aclsupport ACL4_SUPPORT_DENY_ACL {0x00000002};
+const fattr4_aclsupport ACL4_SUPPORT_AUDIT_ACL {0x00000004};
+const fattr4_aclsupport ACL4_SUPPORT_ALARM_ACL {0x00000008};
 
 typedef uint32_t acetype4;
-#define ACE4_ACCESS_ALLOWED_ACE_TYPE 0x00000000
-#define ACE4_ACCESS_DENIED_ACE_TYPE 0x00000001
-#define ACE4_SYSTEM_AUDIT_ACE_TYPE 0x00000002
-#define ACE4_SYSTEM_ALARM_ACE_TYPE 0x00000003
+const acetype4 ACE4_ACCESS_ALLOWED_ACE_TYPE {0x00000000};
+const acetype4 ACE4_ACCESS_DENIED_ACE_TYPE {0x00000001};
+const acetype4 ACE4_SYSTEM_AUDIT_ACE_TYPE {0x00000002};
+const acetype4 ACE4_SYSTEM_ALARM_ACE_TYPE {0x00000003};
 
 typedef uint32_t aceflag4;
-#define ACE4_FILE_INHERIT_ACE 0x00000001
-#define ACE4_DIRECTORY_INHERIT_ACE 0x00000002
-#define ACE4_NO_PROPAGATE_INHERIT_ACE 0x00000004
-#define ACE4_INHERIT_ONLY_ACE 0x00000008
-#define ACE4_SUCCESSFUL_ACCESS_ACE_FLAG 0x00000010
-#define ACE4_FAILED_ACCESS_ACE_FLAG 0x00000020
-#define ACE4_IDENTIFIER_GROUP 0x00000040
-#define ACE4_INHERITED_ACE 0x00000080
+const aceflag4 ACE4_FILE_INHERIT_ACE {0x00000001};
+const aceflag4 ACE4_DIRECTORY_INHERIT_ACE {0x00000002};
+const aceflag4 ACE4_NO_PROPAGATE_INHERIT_ACE {0x00000004};
+const aceflag4 ACE4_INHERIT_ONLY_ACE {0x00000008};
+const aceflag4 ACE4_SUCCESSFUL_ACCESS_ACE_FLAG {0x00000010};
+const aceflag4 ACE4_FAILED_ACCESS_ACE_FLAG {0x00000020};
+const aceflag4 ACE4_IDENTIFIER_GROUP {0x00000040};
+const aceflag4 ACE4_INHERITED_ACE {0x00000080};
 
 typedef uint32_t acemask4;
-#define ACE4_READ_DATA 0x00000001
-#define ACE4_LIST_DIRECTORY 0x00000001
-#define ACE4_WRITE_DATA 0x00000002
-#define ACE4_ADD_FILE 0x00000002
-#define ACE4_APPEND_DATA 0x00000004
-#define ACE4_ADD_SUBDIRECTORY 0x00000004
-#define ACE4_READ_NAMED_ATTRS 0x00000008
-#define ACE4_WRITE_NAMED_ATTRS 0x00000010
-#define ACE4_EXECUTE 0x00000020
-#define ACE4_DELETE_CHILD 0x00000040
-#define ACE4_READ_ATTRIBUTES 0x00000080
-#define ACE4_WRITE_ATTRIBUTES 0x00000100
-#define ACE4_WRITE_RETENTION 0x00000200
-#define ACE4_WRITE_RETENTION_HOLD 0x00000400
-#define ACE4_DELETE 0x00010000
-#define ACE4_READ_ACL 0x00020000
-#define ACE4_WRITE_ACL 0x00040000
-#define ACE4_WRITE_OWNER 0x00080000
-#define ACE4_SYNCHRONIZE 0x00100000
-#define ACE4_GENERIC_READ 0x00120081
-#define ACE4_GENERIC_WRITE 0x00160106
-#define ACE4_GENERIC_EXECUTE 0x001200A0
+const acemask4 ACE4_READ_DATA {0x00000001};
+const acemask4 ACE4_LIST_DIRECTORY {0x00000001};
+const acemask4 ACE4_WRITE_DATA {0x00000002};
+const acemask4 ACE4_ADD_FILE {0x00000002};
+const acemask4 ACE4_APPEND_DATA {0x00000004};
+const acemask4 ACE4_ADD_SUBDIRECTORY {0x00000004};
+const acemask4 ACE4_READ_NAMED_ATTRS {0x00000008};
+const acemask4 ACE4_WRITE_NAMED_ATTRS {0x00000010};
+const acemask4 ACE4_EXECUTE {0x00000020};
+const acemask4 ACE4_DELETE_CHILD {0x00000040};
+const acemask4 ACE4_READ_ATTRIBUTES {0x00000080};
+const acemask4 ACE4_WRITE_ATTRIBUTES {0x00000100};
+const acemask4 ACE4_WRITE_RETENTION {0x00000200};
+const acemask4 ACE4_WRITE_RETENTION_HOLD {0x00000400};
+const acemask4 ACE4_DELETE {0x00010000};
+const acemask4 ACE4_READ_ACL {0x00020000};
+const acemask4 ACE4_WRITE_ACL {0x00040000};
+const acemask4 ACE4_WRITE_OWNER {0x00080000};
+const acemask4 ACE4_SYNCHRONIZE {0x00100000};
+const acemask4 ACE4_GENERIC_READ {0x00120081};
+const acemask4 ACE4_GENERIC_WRITE {0x00160106};
+const acemask4 ACE4_GENERIC_EXECUTE {0x001200A0};
 
 struct nfsace4 {
 	acetype4 type;
@@ -336,9 +339,9 @@ struct nfsace4 {
 typedef struct nfsace4 nfsace4;
 
 typedef uint32_t aclflag4;
-#define ACL4_AUTO_INHERIT 0x00000001
-#define ACL4_PROTECTED 0x00000002
-#define ACL4_DEFAULTED 0x00000004
+const aclflag4 ACL4_AUTO_INHERIT {0x00000001};
+const aclflag4 ACL4_PROTECTED {0x00000002};
+const aclflag4 ACL4_DEFAULTED {0x00000004};
 
 struct nfsacl41 {
 	aclflag4 na41_flag;
@@ -348,18 +351,19 @@ struct nfsacl41 {
 	} na41_aces;
 };
 typedef struct nfsacl41 nfsacl41;
-#define MODE4_SUID 0x800
-#define MODE4_SGID 0x400
-#define MODE4_SVTX 0x200
-#define MODE4_RUSR 0x100
-#define MODE4_WUSR 0x080
-#define MODE4_XUSR 0x040
-#define MODE4_RGRP 0x020
-#define MODE4_WGRP 0x010
-#define MODE4_XGRP 0x008
-#define MODE4_ROTH 0x004
-#define MODE4_WOTH 0x002
-#define MODE4_XOTH 0x001
+
+const mode4 MODE4_SUID {0x800};
+const mode4 MODE4_SGID {0x400};
+const mode4 MODE4_SVTX {0x200};
+const mode4 MODE4_RUSR {0x100};
+const mode4 MODE4_WUSR {0x080};
+const mode4 MODE4_XUSR {0x040};
+const mode4 MODE4_RGRP {0x020};
+const mode4 MODE4_WGRP {0x010};
+const mode4 MODE4_XGRP {0x008};
+const mode4 MODE4_ROTH {0x004};
+const mode4 MODE4_WOTH {0x002};
+const mode4 MODE4_XOTH {0x001};
 
 struct mode_masked4 {
 	mode4 mm_value_to_set;
@@ -372,11 +376,12 @@ struct specdata4 {
 	uint32_t specdata2;
 };
 typedef struct specdata4 specdata4;
-#define FH4_PERSISTENT 0x00000000
-#define FH4_NOEXPIRE_WITH_OPEN 0x00000001
-#define FH4_VOLATILE_ANY 0x00000002
-#define FH4_VOL_MIGRATION 0x00000004
-#define FH4_VOL_RENAME 0x00000008
+
+const uint32_t FH4_PERSISTENT {0x00000000};
+const uint32_t FH4_NOEXPIRE_WITH_OPEN {0x00000001};
+const uint32_t FH4_VOLATILE_ANY {0x00000002};
+const uint32_t FH4_VOL_MIGRATION {0x00000004};
+const uint32_t FH4_VOL_RENAME {0x00000008};
 
 struct netaddr4 {
 	char *na_r_netid;
@@ -445,7 +450,7 @@ struct layout4 {
 	layout_content4 lo_content;
 };
 typedef struct layout4 layout4;
-#define NFS4_DEVICEID4_SIZE 16
+const uint32_t NFS4_DEVICEID4_SIZE {16};
 
 typedef char deviceid4[NFS4_DEVICEID4_SIZE];
 
@@ -467,9 +472,9 @@ struct layoutupdate4 {
 };
 typedef struct layoutupdate4 layoutupdate4;
 
-#define LAYOUT4_RET_REC_FILE 1
-#define LAYOUT4_RET_REC_FSID 2
-#define LAYOUT4_RET_REC_ALL 3
+const uint32_t LAYOUT4_RET_REC_FILE {1};
+const uint32_t LAYOUT4_RET_REC_FSID {2};
+const uint32_t LAYOUT4_RET_REC_ALL {3};
 
 
 enum layoutreturn_type4 {
@@ -518,10 +523,10 @@ struct fs4_status {
 	nfstime4 fss_version;
 };
 typedef struct fs4_status fs4_status;
-#define TH4_READ_SIZE 0
-#define TH4_WRITE_SIZE 1
-#define TH4_READ_IOSIZE 2
-#define TH4_WRITE_IOSIZE 3
+const uint32_t TH4_READ_SIZE    {0};
+const uint32_t TH4_WRITE_SIZE   {1};
+const uint32_t TH4_READ_IOSIZE  {2};
+const uint32_t TH4_WRITE_IOSIZE {3};
 
 typedef length4 threshold4_read_size;
 
@@ -548,7 +553,7 @@ struct mdsthreshold4 {
 	} mth_hints;
 };
 typedef struct mdsthreshold4 mdsthreshold4;
-#define RET4_DURATION_INFINITE 0xffffffffffffffff
+const uint64_t RET4_DURATION_INFINITE {0xffffffffffffffff};
 
 struct retention_get4 {
 	uint64_t rg_duration;
@@ -567,8 +572,8 @@ struct retention_set4 {
 	} rs_duration;
 };
 typedef struct retention_set4 retention_set4;
-#define FSCHARSET_CAP4_CONTAINS_NON_UTF8 0x1
-#define FSCHARSET_CAP4_ALLOWS_ONLY_UTF8 0x2
+const uint32_t FSCHARSET_CAP4_CONTAINS_NON_UTF8 {0x1};
+const uint32_t FSCHARSET_CAP4_ALLOWS_ONLY_UTF8  {0x2};
 
 typedef uint32_t fs_charset_cap4;
 
@@ -600,8 +605,6 @@ typedef struct {
 	u_int fattr4_acl_len;
 	nfsace4 *fattr4_acl_val;
 } fattr4_acl;
-
-typedef uint32_t fattr4_aclsupport;
 
 typedef bool_t fattr4_archive;
 
@@ -735,90 +738,90 @@ typedef change_policy4 fattr4_change_policy;
 /*
  * REQUIRED Attributes
  */
-#define FATTR4_SUPPORTED_ATTRS 0
-#define FATTR4_TYPE 1
-#define FATTR4_FH_EXPIRE_TYPE 2
-#define FATTR4_CHANGE 3
-#define FATTR4_SIZE 4
-#define FATTR4_LINK_SUPPORT 5
-#define FATTR4_SYMLINK_SUPPORT 6
-#define FATTR4_NAMED_ATTR 7
-#define FATTR4_FSID 8
-#define FATTR4_UNIQUE_HANDLES 9
-#define FATTR4_LEASE_TIME 10
-#define FATTR4_RDATTR_ERROR 11
-#define FATTR4_FILEHANDLE 19
+const uint32_t FATTR4_SUPPORTED_ATTRS {0};
+const uint32_t FATTR4_TYPE {1};
+const uint32_t FATTR4_FH_EXPIRE_TYPE {2};
+const uint32_t FATTR4_CHANGE {3};
+const uint32_t FATTR4_SIZE {4};
+const uint32_t FATTR4_LINK_SUPPORT {5};
+const uint32_t FATTR4_SYMLINK_SUPPORT {6};
+const uint32_t FATTR4_NAMED_ATTR {7};
+const uint32_t FATTR4_FSID {8};
+const uint32_t FATTR4_UNIQUE_HANDLES {9};
+const uint32_t FATTR4_LEASE_TIME {10};
+const uint32_t FATTR4_RDATTR_ERROR {11};
+const uint32_t FATTR4_FILEHANDLE {19};
 /* new to NFSV4.1 */
-#define FATTR4_SUPPATTR_EXCLCREAT 75
+const uint32_t FATTR4_SUPPATTR_EXCLCREAT {75};
 /*
  * RECOMMENDED Attributes
  */
-#define FATTR4_ACL 12
-#define FATTR4_ACLSUPPORT 13
-#define FATTR4_ARCHIVE 14
-#define FATTR4_CANSETTIME 15
-#define FATTR4_CASE_INSENSITIVE 16
-#define FATTR4_CASE_PRESERVING 17
-#define FATTR4_CHOWN_RESTRICTED 18
-#define FATTR4_FILEID 20
-#define FATTR4_FILES_AVAIL 21
-#define FATTR4_FILES_FREE 22
-#define FATTR4_FILES_TOTAL 23
-#define FATTR4_FS_LOCATIONS 24
-#define FATTR4_HIDDEN 25
-#define FATTR4_HOMOGENEOUS 26
-#define FATTR4_MAXFILESIZE 27
-#define FATTR4_MAXLINK 28
-#define FATTR4_MAXNAME 29
-#define FATTR4_MAXREAD 30
-#define FATTR4_MAXWRITE 31
-#define FATTR4_MIMETYPE 32
-#define FATTR4_MODE 33
-#define FATTR4_NO_TRUNC 34
-#define FATTR4_NUMLINKS 35
-#define FATTR4_OWNER 36
-#define FATTR4_OWNER_GROUP 37
-#define FATTR4_QUOTA_AVAIL_HARD 38
-#define FATTR4_QUOTA_AVAIL_SOFT 39
-#define FATTR4_QUOTA_USED 40
-#define FATTR4_RAWDEV 41
-#define FATTR4_SPACE_AVAIL 42
-#define FATTR4_SPACE_FREE 43
-#define FATTR4_SPACE_TOTAL 44
-#define FATTR4_SPACE_USED 45
-#define FATTR4_SYSTEM 46
-#define FATTR4_TIME_ACCESS 47
-#define FATTR4_TIME_ACCESS_SET 48
-#define FATTR4_TIME_BACKUP 49
-#define FATTR4_TIME_CREATE 50
-#define FATTR4_TIME_DELTA 51
-#define FATTR4_TIME_METADATA 52
-#define FATTR4_TIME_MODIFY 53
-#define FATTR4_TIME_MODIFY_SET 54
-#define FATTR4_MOUNTED_ON_FILEID 55
+const uint32_t FATTR4_ACL {12};
+const uint32_t FATTR4_ACLSUPPORT {13};
+const uint32_t FATTR4_ARCHIVE {14};
+const uint32_t FATTR4_CANSETTIME {15};
+const uint32_t FATTR4_CASE_INSENSITIVE {16};
+const uint32_t FATTR4_CASE_PRESERVING {17};
+const uint32_t FATTR4_CHOWN_RESTRICTED {18};
+const uint32_t FATTR4_FILEID {20};
+const uint32_t FATTR4_FILES_AVAIL {21};
+const uint32_t FATTR4_FILES_FREE {22};
+const uint32_t FATTR4_FILES_TOTAL {23};
+const uint32_t FATTR4_FS_LOCATIONS {24};
+const uint32_t FATTR4_HIDDEN {25};
+const uint32_t FATTR4_HOMOGENEOUS {26};
+const uint32_t FATTR4_MAXFILESIZE {27};
+const uint32_t FATTR4_MAXLINK {28};
+const uint32_t FATTR4_MAXNAME {29};
+const uint32_t FATTR4_MAXREAD {30};
+const uint32_t FATTR4_MAXWRITE {31};
+const uint32_t FATTR4_MIMETYPE {32};
+const uint32_t FATTR4_MODE {33};
+const uint32_t FATTR4_NO_TRUNC {34};
+const uint32_t FATTR4_NUMLINKS {35};
+const uint32_t FATTR4_OWNER {36};
+const uint32_t FATTR4_OWNER_GROUP {37};
+const uint32_t FATTR4_QUOTA_AVAIL_HARD {38};
+const uint32_t FATTR4_QUOTA_AVAIL_SOFT {39};
+const uint32_t FATTR4_QUOTA_USED {40};
+const uint32_t FATTR4_RAWDEV {41};
+const uint32_t FATTR4_SPACE_AVAIL {42};
+const uint32_t FATTR4_SPACE_FREE {43};
+const uint32_t FATTR4_SPACE_TOTAL {44};
+const uint32_t FATTR4_SPACE_USED {45};
+const uint32_t FATTR4_SYSTEM {46};
+const uint32_t FATTR4_TIME_ACCESS {47};
+const uint32_t FATTR4_TIME_ACCESS_SET {48};
+const uint32_t FATTR4_TIME_BACKUP {49};
+const uint32_t FATTR4_TIME_CREATE {50};
+const uint32_t FATTR4_TIME_DELTA {51};
+const uint32_t FATTR4_TIME_METADATA {52};
+const uint32_t FATTR4_TIME_MODIFY {53};
+const uint32_t FATTR4_TIME_MODIFY_SET {54};
+const uint32_t FATTR4_MOUNTED_ON_FILEID {55};
 
 /* new to NFSV4.1 */
 
-#define FATTR4_DIR_NOTIF_DELAY 56
-#define FATTR4_DIRENT_NOTIF_DELAY 57
-#define FATTR4_DACL 58
-#define FATTR4_SACL 59
-#define FATTR4_CHANGE_POLICY 60
-#define FATTR4_FS_STATUS 61
-#define FATTR4_FS_LAYOUT_TYPES 62
-#define FATTR4_LAYOUT_HINT 63
-#define FATTR4_LAYOUT_TYPES 64
-#define FATTR4_LAYOUT_BLKSIZE 65
-#define FATTR4_LAYOUT_ALIGNMENT 66
-#define FATTR4_FS_LOCATIONS_INFO 67
-#define FATTR4_MDSTHRESHOLD 68
-#define FATTR4_RETENTION_GET 69
-#define FATTR4_RETENTION_SET 70
-#define FATTR4_RETENTEVT_GET 71
-#define FATTR4_RETENTEVT_SET 72
-#define FATTR4_RETENTION_HOLD 73
-#define FATTR4_MODE_SET_MASKED 74
-#define FATTR4_FS_CHARSET_CAP 76
+const uint32_t FATTR4_DIR_NOTIF_DELAY {56};
+const uint32_t FATTR4_DIRENT_NOTIF_DELAY {57};
+const uint32_t FATTR4_DACL {58};
+const uint32_t FATTR4_SACL {59};
+const uint32_t FATTR4_CHANGE_POLICY {60};
+const uint32_t FATTR4_FS_STATUS {61};
+const uint32_t FATTR4_FS_LAYOUT_TYPES {62};
+const uint32_t FATTR4_LAYOUT_HINT {63};
+const uint32_t FATTR4_LAYOUT_TYPES {64};
+const uint32_t FATTR4_LAYOUT_BLKSIZE {65};
+const uint32_t FATTR4_LAYOUT_ALIGNMENT {66};
+const uint32_t FATTR4_FS_LOCATIONS_INFO {67};
+const uint32_t FATTR4_MDSTHRESHOLD {68};
+const uint32_t FATTR4_RETENTION_GET {69};
+const uint32_t FATTR4_RETENTION_SET {70};
+const uint32_t FATTR4_RETENTEVT_GET {71};
+const uint32_t FATTR4_RETENTEVT_SET {72};
+const uint32_t FATTR4_RETENTION_HOLD {73};
+const uint32_t FATTR4_MODE_SET_MASKED {74};
+const uint32_t FATTR4_FS_CHARSET_CAP {76};
 
 struct fattr4 {
 	bitmap4 attrmask;
@@ -973,24 +976,24 @@ struct fs_locations_server4 {
 	utf8str_cis fls_server;
 };
 typedef struct fs_locations_server4 fs_locations_server4;
-#define FSLI4BX_GFLAGS 0
-#define FSLI4BX_TFLAGS 1
-#define FSLI4BX_CLSIMUL 2
-#define FSLI4BX_CLHANDLE 3
-#define FSLI4BX_CLFILEID 4
-#define FSLI4BX_CLWRITEVER 5
-#define FSLI4BX_CLCHANGE 6
-#define FSLI4BX_CLREADDIR 7
-#define FSLI4BX_READRANK 8
-#define FSLI4BX_WRITERANK 9
-#define FSLI4BX_READORDER 10
-#define FSLI4BX_WRITEORDER 11
-#define FSLI4GF_WRITABLE 0x01
-#define FSLI4GF_CUR_REQ 0x02
-#define FSLI4GF_ABSENT 0x04
-#define FSLI4GF_GOING 0x08
-#define FSLI4GF_SPLIT 0x10
-#define FSLI4TF_RDMA 0x01
+const uint32_t FSLI4BX_GFLAGS {0};
+const uint32_t FSLI4BX_TFLAGS {1};
+const uint32_t FSLI4BX_CLSIMUL {2};
+const uint32_t FSLI4BX_CLHANDLE {3};
+const uint32_t FSLI4BX_CLFILEID {4};
+const uint32_t FSLI4BX_CLWRITEVER {5};
+const uint32_t FSLI4BX_CLCHANGE {6};
+const uint32_t FSLI4BX_CLREADDIR {7};
+const uint32_t FSLI4BX_READRANK {8};
+const uint32_t FSLI4BX_WRITERANK {9};
+const uint32_t FSLI4BX_READORDER {10};
+const uint32_t FSLI4BX_WRITEORDER {11};
+const uint32_t FSLI4GF_WRITABLE {0x01};
+const uint32_t FSLI4GF_CUR_REQ {0x02};
+const uint32_t FSLI4GF_ABSENT {0x04};
+const uint32_t FSLI4GF_GOING {0x08};
+const uint32_t FSLI4GF_SPLIT {0x10};
+const uint32_t FSLI4TF_RDMA {0x01};
 
 struct fs_locations_item4 {
 	struct {
@@ -1011,13 +1014,13 @@ struct fs_locations_info4 {
 	} fli_items;
 };
 typedef struct fs_locations_info4 fs_locations_info4;
-#define FSLI4IF_VAR_SUB 0x00000001
+const uint32_t FSLI4IF_VAR_SUB {0x00000001};
 
 typedef fs_locations_info4 fattr4_fs_locations_info;
-#define NFL4_UFLG_MASK 0x0000003F
-#define NFL4_UFLG_DENSE 0x00000001
-#define NFL4_UFLG_COMMIT_THRU_MDS 0x00000002
-#define NFL4_UFLG_STRIPE_UNIT_SIZE_MASK 0xFFFFFFC0
+const uint32_t NFL4_UFLG_MASK {0x0000003F};
+const uint32_t NFL4_UFLG_DENSE {0x00000001};
+const uint32_t NFL4_UFLG_COMMIT_THRU_MDS {0x00000002};
+const uint32_t NFL4_UFLG_STRIPE_UNIT_SIZE_MASK {0xFFFFFFC0};
 
 typedef uint32_t nfl_util4;
 
@@ -1093,12 +1096,12 @@ typedef struct nfsv4_1_file_layout4 nfsv4_1_file_layout4;
  *      Nothing. lrf_body is a zero length array of bytes.
  */
 
-#define ACCESS4_READ 0x00000001
-#define ACCESS4_LOOKUP 0x00000002
-#define ACCESS4_MODIFY 0x00000004
-#define ACCESS4_EXTEND 0x00000008
-#define ACCESS4_DELETE 0x00000010
-#define ACCESS4_EXECUTE 0x00000020
+const uint32_t ACCESS4_READ {0x00000001};
+const uint32_t ACCESS4_LOOKUP {0x00000002};
+const uint32_t ACCESS4_MODIFY {0x00000004};
+const uint32_t ACCESS4_EXTEND {0x00000008};
+const uint32_t ACCESS4_DELETE {0x00000010};
+const uint32_t ACCESS4_EXECUTE {0x00000020};
 
 struct ACCESS4args {
 	uint32_t access;
@@ -1421,22 +1424,22 @@ struct nfs_space_limit4 {
 	} nfs_space_limit4_u;
 };
 typedef struct nfs_space_limit4 nfs_space_limit4;
-#define OPEN4_SHARE_ACCESS_READ 0x00000001
-#define OPEN4_SHARE_ACCESS_WRITE 0x00000002
-#define OPEN4_SHARE_ACCESS_BOTH 0x00000003
-#define OPEN4_SHARE_DENY_NONE 0x00000000
-#define OPEN4_SHARE_DENY_READ 0x00000001
-#define OPEN4_SHARE_DENY_WRITE 0x00000002
-#define OPEN4_SHARE_DENY_BOTH 0x00000003
-#define OPEN4_SHARE_ACCESS_WANT_DELEG_MASK 0xFF00
-#define OPEN4_SHARE_ACCESS_WANT_NO_PREFERENCE 0x0000
-#define OPEN4_SHARE_ACCESS_WANT_READ_DELEG 0x0100
-#define OPEN4_SHARE_ACCESS_WANT_WRITE_DELEG 0x0200
-#define OPEN4_SHARE_ACCESS_WANT_ANY_DELEG 0x0300
-#define OPEN4_SHARE_ACCESS_WANT_NO_DELEG 0x0400
-#define OPEN4_SHARE_ACCESS_WANT_CANCEL 0x0500
-#define OPEN4_SHARE_ACCESS_WANT_SIGNAL_DELEG_WHEN_RESRC_AVAIL 0x10000
-#define OPEN4_SHARE_ACCESS_WANT_PUSH_DELEG_WHEN_UNCONTENDED 0x20000
+const uint32_t OPEN4_SHARE_ACCESS_READ {0x00000001};
+const uint32_t OPEN4_SHARE_ACCESS_WRITE {0x00000002};
+const uint32_t OPEN4_SHARE_ACCESS_BOTH {0x00000003};
+const uint32_t OPEN4_SHARE_DENY_NONE {0x00000000};
+const uint32_t OPEN4_SHARE_DENY_READ {0x00000001};
+const uint32_t OPEN4_SHARE_DENY_WRITE {0x00000002};
+const uint32_t OPEN4_SHARE_DENY_BOTH {0x00000003};
+const uint32_t OPEN4_SHARE_ACCESS_WANT_DELEG_MASK {0xFF00};
+const uint32_t OPEN4_SHARE_ACCESS_WANT_NO_PREFERENCE {0x0000};
+const uint32_t OPEN4_SHARE_ACCESS_WANT_READ_DELEG {0x0100};
+const uint32_t OPEN4_SHARE_ACCESS_WANT_WRITE_DELEG {0x0200};
+const uint32_t OPEN4_SHARE_ACCESS_WANT_ANY_DELEG {0x0300};
+const uint32_t OPEN4_SHARE_ACCESS_WANT_NO_DELEG {0x0400};
+const uint32_t OPEN4_SHARE_ACCESS_WANT_CANCEL {0x0500};
+const uint32_t OPEN4_SHARE_ACCESS_WANT_SIGNAL_DELEG_WHEN_RESRC_AVAIL {0x10000};
+const uint32_t OPEN4_SHARE_ACCESS_WANT_PUSH_DELEG_WHEN_UNCONTENDED {0x20000};
 
 enum open_delegation_type4 {
 	OPEN_DELEGATE_NONE = 0,
@@ -1531,10 +1534,10 @@ struct open_delegation4 {
 	} open_delegation4_u;
 };
 typedef struct open_delegation4 open_delegation4;
-#define OPEN4_RESULT_CONFIRM 0x00000002
-#define OPEN4_RESULT_LOCKTYPE_POSIX 0x00000004
-#define OPEN4_RESULT_PRESERVE_UNLINKED 0x00000008
-#define OPEN4_RESULT_MAY_NOTIFY_LOCK 0x00000020
+const uint32_t OPEN4_RESULT_CONFIRM {0x00000002};
+const uint32_t OPEN4_RESULT_LOCKTYPE_POSIX {0x00000004};
+const uint32_t OPEN4_RESULT_PRESERVE_UNLINKED {0x00000008};
+const uint32_t OPEN4_RESULT_MAY_NOTIFY_LOCK {0x00000020};
 
 struct OPEN4resok {
 	stateid4 stateid;
@@ -1969,15 +1972,15 @@ struct BIND_CONN_TO_SESSION4res {
 	} BIND_CONN_TO_SESSION4res_u;
 };
 typedef struct BIND_CONN_TO_SESSION4res BIND_CONN_TO_SESSION4res;
-#define EXCHGID4_FLAG_SUPP_MOVED_REFER 0x00000001
-#define EXCHGID4_FLAG_SUPP_MOVED_MIGR 0x00000002
-#define EXCHGID4_FLAG_BIND_PRINC_STATEID 0x00000100
-#define EXCHGID4_FLAG_USE_NON_PNFS 0x00010000
-#define EXCHGID4_FLAG_USE_PNFS_MDS 0x00020000
-#define EXCHGID4_FLAG_USE_PNFS_DS 0x00040000
-#define EXCHGID4_FLAG_MASK_PNFS 0x00070000
-#define EXCHGID4_FLAG_UPD_CONFIRMED_REC_A 0x40000000
-#define EXCHGID4_FLAG_CONFIRMED_R 0x80000000
+const uint32_t EXCHGID4_FLAG_SUPP_MOVED_REFER {0x00000001};
+const uint32_t EXCHGID4_FLAG_SUPP_MOVED_MIGR {0x00000002};
+const uint32_t EXCHGID4_FLAG_BIND_PRINC_STATEID {0x00000100};
+const uint32_t EXCHGID4_FLAG_USE_NON_PNFS {0x00010000};
+const uint32_t EXCHGID4_FLAG_USE_PNFS_MDS {0x00020000};
+const uint32_t EXCHGID4_FLAG_USE_PNFS_DS {0x00040000};
+const uint32_t EXCHGID4_FLAG_MASK_PNFS {0x00070000};
+const uint32_t EXCHGID4_FLAG_UPD_CONFIRMED_REC_A {0x40000000};
+const uint32_t EXCHGID4_FLAG_CONFIRMED_R {0x80000000};
 
 struct state_protect_ops4 {
 	bitmap4 spo_must_enforce;
@@ -2087,9 +2090,9 @@ struct channel_attrs4 {
 	} ca_rdma_ird;
 };
 typedef struct channel_attrs4 channel_attrs4;
-#define CREATE_SESSION4_FLAG_PERSIST 0x00000001
-#define CREATE_SESSION4_FLAG_CONN_BACK_CHAN 0x00000002
-#define CREATE_SESSION4_FLAG_CONN_RDMA 0x00000004
+const uint32_t CREATE_SESSION4_FLAG_PERSIST {0x00000001};
+const uint32_t CREATE_SESSION4_FLAG_CONN_BACK_CHAN {0x00000002};
+const uint32_t CREATE_SESSION4_FLAG_CONN_RDMA {0x00000004};
 
 struct CREATE_SESSION4args {
 	clientid4 csa_clientid;
@@ -2357,19 +2360,19 @@ struct SEQUENCE4args {
 	bool_t sa_cachethis;
 };
 typedef struct SEQUENCE4args SEQUENCE4args;
-#define SEQ4_STATUS_CB_PATH_DOWN 0x00000001
-#define SEQ4_STATUS_CB_GSS_CONTEXTS_EXPIRING 0x00000002
-#define SEQ4_STATUS_CB_GSS_CONTEXTS_EXPIRED 0x00000004
-#define SEQ4_STATUS_EXPIRED_ALL_STATE_REVOKED 0x00000008
-#define SEQ4_STATUS_EXPIRED_SOME_STATE_REVOKED 0x00000010
-#define SEQ4_STATUS_ADMIN_STATE_REVOKED 0x00000020
-#define SEQ4_STATUS_RECALLABLE_STATE_REVOKED 0x00000040
-#define SEQ4_STATUS_LEASE_MOVED 0x00000080
-#define SEQ4_STATUS_RESTART_RECLAIM_NEEDED 0x00000100
-#define SEQ4_STATUS_CB_PATH_DOWN_SESSION 0x00000200
-#define SEQ4_STATUS_BACKCHANNEL_FAULT 0x00000400
-#define SEQ4_STATUS_DEVID_CHANGED 0x00000800
-#define SEQ4_STATUS_DEVID_DELETED 0x00001000
+const uint32_t SEQ4_STATUS_CB_PATH_DOWN {0x00000001};
+const uint32_t SEQ4_STATUS_CB_GSS_CONTEXTS_EXPIRING {0x00000002};
+const uint32_t SEQ4_STATUS_CB_GSS_CONTEXTS_EXPIRED {0x00000004};
+const uint32_t SEQ4_STATUS_EXPIRED_ALL_STATE_REVOKED {0x00000008};
+const uint32_t SEQ4_STATUS_EXPIRED_SOME_STATE_REVOKED {0x00000010};
+const uint32_t SEQ4_STATUS_ADMIN_STATE_REVOKED {0x00000020};
+const uint32_t SEQ4_STATUS_RECALLABLE_STATE_REVOKED {0x00000040};
+const uint32_t SEQ4_STATUS_LEASE_MOVED {0x00000080};
+const uint32_t SEQ4_STATUS_RESTART_RECLAIM_NEEDED {0x00000100};
+const uint32_t SEQ4_STATUS_CB_PATH_DOWN_SESSION {0x00000200};
+const uint32_t SEQ4_STATUS_BACKCHANNEL_FAULT {0x00000400};
+const uint32_t SEQ4_STATUS_DEVID_CHANGED {0x00000800};
+const uint32_t SEQ4_STATUS_DEVID_DELETED {0x00001000};
 
 struct SEQUENCE4resok {
 	sessionid4 sr_sessionid;
@@ -2869,15 +2872,15 @@ struct CB_PUSH_DELEG4res {
 	nfsstat4 cpdr_status;
 };
 typedef struct CB_PUSH_DELEG4res CB_PUSH_DELEG4res;
-#define RCA4_TYPE_MASK_RDATA_DLG 0
-#define RCA4_TYPE_MASK_WDATA_DLG 1
-#define RCA4_TYPE_MASK_DIR_DLG 2
-#define RCA4_TYPE_MASK_FILE_LAYOUT 3
-#define RCA4_TYPE_MASK_BLK_LAYOUT 4
-#define RCA4_TYPE_MASK_OBJ_LAYOUT_MIN 8
-#define RCA4_TYPE_MASK_OBJ_LAYOUT_MAX 9
-#define RCA4_TYPE_MASK_OTHER_LAYOUT_MIN 12
-#define RCA4_TYPE_MASK_OTHER_LAYOUT_MAX 15
+const uint32_t RCA4_TYPE_MASK_RDATA_DLG {0};
+const uint32_t RCA4_TYPE_MASK_WDATA_DLG {1};
+const uint32_t RCA4_TYPE_MASK_DIR_DLG {2};
+const uint32_t RCA4_TYPE_MASK_FILE_LAYOUT {3};
+const uint32_t RCA4_TYPE_MASK_BLK_LAYOUT {4};
+const uint32_t RCA4_TYPE_MASK_OBJ_LAYOUT_MIN {8};
+const uint32_t RCA4_TYPE_MASK_OBJ_LAYOUT_MAX {9};
+const uint32_t RCA4_TYPE_MASK_OTHER_LAYOUT_MIN {12};
+const uint32_t RCA4_TYPE_MASK_OTHER_LAYOUT_MAX {15};
 
 struct CB_RECALL_ANY4args {
 	uint32_t craa_objects_to_keep;
@@ -3085,17 +3088,16 @@ struct CB_COMPOUND4res {
 };
 typedef struct CB_COMPOUND4res CB_COMPOUND4res;
 
-#define NFS4_PROGRAM 100003
-#define NFS_V4 4
+const uint32_t NFS4_PROGRAM {100003};
 
-#define NFSPROC4_NULL 0
-#define NFSPROC4_COMPOUND 1
+const uint32_t NFSPROC4_NULL {0};
+const uint32_t NFSPROC4_COMPOUND {1};
 
-#define NFS4_CALLBACK 0x40000000
-#define NFS_CB 1
+const uint32_t NFS4_CALLBACK {0x40000000};
+const uint32_t NFS_CB {1};
 
-#define CB_NULL 0
-#define CB_COMPOUND 1
+const uint32_t CB_NULL {0};
+const uint32_t CB_COMPOUND {1};
 
 /* the xdr functions */
 
