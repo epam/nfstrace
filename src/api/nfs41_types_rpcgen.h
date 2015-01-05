@@ -46,8 +46,8 @@ extern "C" {
 
 #ifndef _AUTH_SYS_DEFINE_FOR_NFSv41
 #define _AUTH_SYS_DEFINE_FOR_NFSv41
-#include <rpc/auth_sys.h>
-typedef struct authsys_parms authsys_parms;
+#include <rpc/auth_unix.h>
+typedef struct authunix_parms authsys_parms;
 #endif /* _AUTH_SYS_DEFINE_FOR_NFSv41 */
 #define NFS4_FHSIZE 128
 #define NFS4_VERIFIER_SIZE 8
