@@ -37,6 +37,7 @@ using namespace NST::protocols::NFS4; // NFSv4 helpers
 
 namespace
 {
+using namespace rpcgen;
 
 bool print_procedure(std::ostream& out, const struct RPCProcedure* proc)
 {
