@@ -23,7 +23,6 @@
 #ifndef NFS41_TYPES_RPCGEN_H
 #define NFS41_TYPES_RPCGEN_H
 //------------------------------------------------------------------------------
-#include <rpc/auth_unix.h>
 #include <rpc/rpc.h>
 //------------------------------------------------------------------------------
 namespace rpcgen

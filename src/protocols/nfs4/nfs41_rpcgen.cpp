@@ -19,16 +19,12 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <rpc/auth_unix.h>
-
 #include "api/nfs41_types_rpcgen.h"
 //------------------------------------------------------------------------------
 namespace rpcgen
 {
 namespace NFS41
 {
-
-typedef struct authunix_parms authsys_parms;
 
 bool_t
 xdr_nfs_ftype4 (XDR *xdrs, nfs_ftype4 *objp)
