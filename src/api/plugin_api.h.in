@@ -29,6 +29,7 @@
 #include "nfs_types.h"
 #include "nfs3_types_rpcgen.h"
 #include "nfs4_types_rpcgen.h"
+#include "nfs41_types_rpcgen.h"
 //------------------------------------------------------------------------------
 #define NST_PUBLIC __attribute__ ((visibility("default")))
 #define NST_PLUGIN_ENTRY_POINTS(U, C, D)            \

@@ -46,10 +46,10 @@ OFDWSAnalyzer::~OFDWSAnalyzer()
 }
 
 void OFDWSAnalyzer::read3(const struct RPCProcedure*,
-                          const struct rpcgen::READ3args* args,
-                          const struct rpcgen::READ3res*  res)
+                          const struct NFS3::READ3args* args,
+                          const struct NFS3::READ3res*  res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         read_total += res->READ3res_u.resok.count;
 
@@ -59,10 +59,10 @@ void OFDWSAnalyzer::read3(const struct RPCProcedure*,
 }
 
 void OFDWSAnalyzer::write3(const struct RPCProcedure*,
-                           const struct rpcgen::WRITE3args* args,
-                           const struct rpcgen::WRITE3res*  res)
+                           const struct NFS3::WRITE3args* args,
+                           const struct NFS3::WRITE3res*  res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         write_total += res->WRITE3res_u.resok.count;
 
@@ -156,7 +156,7 @@ void OFDWSAnalyzer::print_file_ranked(std::ostream& out) const
         out << v[j-1]->first << ' ' << v[j-1]->second->get_read_total() << ' ' << v[j-1]->second->get_write_total() << '\n';
 }
 
-OFDWSAnalyzer::Iterator OFDWSAnalyzer::get_file_rw_op(const rpcgen::nfs_fh3& key)
+OFDWSAnalyzer::Iterator OFDWSAnalyzer::get_file_rw_op(const NFS3::nfs_fh3& key)
 {
     Iterator i = ofdws_stat.find(key);
     if(i == ofdws_stat.end())

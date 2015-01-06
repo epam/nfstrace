@@ -38,168 +38,168 @@ public:
     }
 
     void null(const struct RPCProcedure* /*proc*/,
-                      const struct rpcgen::NULL3args* /*args*/,
-                      const struct rpcgen::NULL3res* /*res*/) override final
+                      const struct NFS3::NULL3args* /*args*/,
+                      const struct NFS3::NULL3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::null()" << std::endl;
     }
 
     void getattr3(const struct RPCProcedure* /*proc*/,
-                          const struct rpcgen::GETATTR3args* /*args*/,
-                          const struct rpcgen::GETATTR3res* /*res*/) override final
+                          const struct NFS3::GETATTR3args* /*args*/,
+                          const struct NFS3::GETATTR3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::getattr3()" << std::endl;
     }
 
     void setattr3(const struct RPCProcedure* /*proc*/,
-                          const struct rpcgen::SETATTR3args* /*args*/,
-                          const struct rpcgen::SETATTR3res* /*res*/) override final
+                          const struct NFS3::SETATTR3args* /*args*/,
+                          const struct NFS3::SETATTR3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::setattr3()" << std::endl;
     }
 
     void lookup3(const struct RPCProcedure* /*proc*/,
-                         const struct rpcgen::LOOKUP3args* /*args*/,
-                         const struct rpcgen::LOOKUP3res* /*res*/) override final
+                         const struct NFS3::LOOKUP3args* /*args*/,
+                         const struct NFS3::LOOKUP3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::lookup3()" << std::endl;
     }
 
     void access3(const struct RPCProcedure* /*proc*/,
-                         const struct rpcgen::ACCESS3args* /*args*/,
-                         const struct rpcgen::ACCESS3res* /*res*/) override final
+                         const struct NFS3::ACCESS3args* /*args*/,
+                         const struct NFS3::ACCESS3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::access3()" << std::endl;
     }
 
     void readlink3(const struct RPCProcedure* /*proc*/,
-                           const struct rpcgen::READLINK3args* /*args*/,
-                           const struct rpcgen::READLINK3res* /*res*/) override final
+                           const struct NFS3::READLINK3args* /*args*/,
+                           const struct NFS3::READLINK3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::readlink3()" << std::endl;
     }
 
     void read3(const struct RPCProcedure* /*proc*/,
-                       const struct rpcgen::READ3args* /*args*/,
-                       const struct rpcgen::READ3res* /*res*/) override final
+                       const struct NFS3::READ3args* /*args*/,
+                       const struct NFS3::READ3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::read3()" << std::endl;
     }
 
     void write3(const struct RPCProcedure* /*proc*/,
-                        const struct rpcgen::WRITE3args* /*args*/,
-                        const struct rpcgen::WRITE3res* /*res*/) override final
+                        const struct NFS3::WRITE3args* /*args*/,
+                        const struct NFS3::WRITE3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::write3()" << std::endl;
     }
 
     void create3(const struct RPCProcedure* /*proc*/,
-                         const struct rpcgen::CREATE3args* /*args*/,
-                         const struct rpcgen::CREATE3res* /*res*/) override final
+                         const struct NFS3::CREATE3args* /*args*/,
+                         const struct NFS3::CREATE3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::create3()" << std::endl;
     }
 
     void mkdir3(const struct RPCProcedure* /*proc*/,
-                        const struct rpcgen::MKDIR3args* /*args*/,
-                        const struct rpcgen::MKDIR3res* /*res*/) override final
+                        const struct NFS3::MKDIR3args* /*args*/,
+                        const struct NFS3::MKDIR3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::mkdir3()" << std::endl;
     }
 
     void symlink3(const struct RPCProcedure* /*proc*/,
-                          const struct rpcgen::SYMLINK3args* /*args*/,
-                          const struct rpcgen::SYMLINK3res* /*res*/) override final
+                          const struct NFS3::SYMLINK3args* /*args*/,
+                          const struct NFS3::SYMLINK3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::symlink3()" << std::endl;
     }
 
     void mknod3(const struct RPCProcedure* /*proc*/,
-                        const struct rpcgen::MKNOD3args* /*args*/,
-                        const struct rpcgen::MKNOD3res* /*res*/) override final
+                        const struct NFS3::MKNOD3args* /*args*/,
+                        const struct NFS3::MKNOD3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::mknod3()" << std::endl;
     }
 
     void remove3(const struct RPCProcedure* /*proc*/,
-                         const struct rpcgen::REMOVE3args* /*args*/,
-                         const struct rpcgen::REMOVE3res* /*res*/) override final
+                         const struct NFS3::REMOVE3args* /*args*/,
+                         const struct NFS3::REMOVE3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::remove3()" << std::endl;
     }
 
     void rmdir3(const struct RPCProcedure* /*proc*/,
-                        const struct rpcgen::RMDIR3args* /*args*/,
-                        const struct rpcgen::RMDIR3res* /*res*/) override final
+                        const struct NFS3::RMDIR3args* /*args*/,
+                        const struct NFS3::RMDIR3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::rmdir3()" << std::endl;
     }
 
     void rename3(const struct RPCProcedure* /*proc*/,
-                         const struct rpcgen::RENAME3args* /*args*/,
-                         const struct rpcgen::RENAME3res* /*res*/) override final
+                         const struct NFS3::RENAME3args* /*args*/,
+                         const struct NFS3::RENAME3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::rename3()" << std::endl;
     }
 
     void link3(const struct RPCProcedure* /*proc*/,
-                       const struct rpcgen::LINK3args* /*args*/,
-                       const struct rpcgen::LINK3res* /*res*/) override final
+                       const struct NFS3::LINK3args* /*args*/,
+                       const struct NFS3::LINK3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::link3()" << std::endl;
     }
 
     void readdir3(const struct RPCProcedure* /*proc*/,
-                          const struct rpcgen::READDIR3args* /*args*/,
-                          const struct rpcgen::READDIR3res* /*res*/) override final
+                          const struct NFS3::READDIR3args* /*args*/,
+                          const struct NFS3::READDIR3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::readdir3()" << std::endl;
     }
 
     void readdirplus3(const struct RPCProcedure* /*proc*/,
-                              const struct rpcgen::READDIRPLUS3args* /*args*/,
-                              const struct rpcgen::READDIRPLUS3res* /*res*/) override final
+                              const struct NFS3::READDIRPLUS3args* /*args*/,
+                              const struct NFS3::READDIRPLUS3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::readdirplus3()" << std::endl;
     }
 
     void fsstat3(const struct RPCProcedure* /*proc*/,
-                         const struct rpcgen::FSSTAT3args* /*args*/,
-                         const struct rpcgen::FSSTAT3res* /*res*/) override final
+                         const struct NFS3::FSSTAT3args* /*args*/,
+                         const struct NFS3::FSSTAT3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::fsstat3()" << std::endl;
     }
 
     void fsinfo3(const struct RPCProcedure* /*proc*/,
-                         const struct rpcgen::FSINFO3args* /*args*/,
-                         const struct rpcgen::FSINFO3res* /*res*/) override final
+                         const struct NFS3::FSINFO3args* /*args*/,
+                         const struct NFS3::FSINFO3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::fsinfo3()" << std::endl;
     }
 
     void pathconf3(const struct RPCProcedure* /*proc*/,
-                           const struct rpcgen::PATHCONF3args* /*args*/,
-                           const struct rpcgen::PATHCONF3res* /*res*/) override final
+                           const struct NFS3::PATHCONF3args* /*args*/,
+                           const struct NFS3::PATHCONF3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::pathconf3()" << std::endl;
     }
 
     void commit3(const struct RPCProcedure* /*proc*/,
-                         const struct rpcgen::COMMIT3args* /*args*/,
-                         const struct rpcgen::COMMIT3res* /*res*/) override final
+                         const struct NFS3::COMMIT3args* /*args*/,
+                         const struct NFS3::COMMIT3res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::commit3()" << std::endl;
     }
 
     void null(const struct RPCProcedure* /*proc*/,
-              const struct rpcgen::NULL4args* /*args*/,
-              const struct rpcgen::NULL4res* /*res*/) override final
+              const struct NFS4::NULL4args* /*args*/,
+              const struct NFS4::NULL4res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::null()" << std::endl;
     }
     void compound4(const struct RPCProcedure* /*proc*/,
-                           const struct rpcgen::COMPOUND4args* /*args*/,
-                           const struct rpcgen::COMPOUND4res* /*res*/) override final
+                           const struct NFS4::COMPOUND4args* /*args*/,
+                           const struct NFS4::COMPOUND4res* /*res*/) override final
     {
         std::cout << "TestAnalyzer::compound4()" << std::endl;
     }
