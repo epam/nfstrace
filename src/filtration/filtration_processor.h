@@ -48,6 +48,9 @@ namespace filtration
 {
 
 using namespace NST::protocols::rpc;
+using ProcEnumNFS3  = API::ProcEnumNFS3;
+using NFS3Validator = NST::protocols::NFS3::Validator;
+using NFS4Validator = NST::protocols::NFS4::Validator;
 
 /*
  *  uint32_t: Message XID (Call or Reply)
@@ -83,19 +86,19 @@ public:
                 auto call = static_cast<const CallHeader*const>(msg);
                 if(RPCValidator::check(call))
                 {
-                    if (NFS3::Validator::check(call))
+                    if (NFS3Validator::check(call))
                     {
                         uint32_t proc {call->proc()};
-                        if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
+                        if (ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
                             hdr_len = (nfs3_rw_hdr_max < info.dlen ? nfs3_rw_hdr_max : info.dlen);
                         else
                         {
-                            if (API::ProcEnumNFS3::READ == proc)
+                            if (ProcEnumNFS3::READ == proc)
                                 nfs3_read_match.insert(call->xid());
                             hdr_len = info.dlen;
                         }
                     }
-                    else if (NFS4::Validator::check(call))
+                    else if (NFS4Validator::check(call))
                     {
                         hdr_len = info.dlen; // fully collect NFSv4 messages
                     }
@@ -595,20 +598,20 @@ public:
                 if(RPCValidator::check(call))
                 {
                     msg_len = len;   // length of current RPC message
-                    if(NFS3::Validator::check(call))
+                    if(NFS3Validator::check(call))
                     {
                         uint32_t proc {call->proc()};
-                        if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
+                        if (ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
                             hdr_len = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
                         else
                         {
-                            if (API::ProcEnumNFS3::READ == proc)
+                            if (ProcEnumNFS3::READ == proc)
                                 nfs3_read_match.insert(call->xid());
                             hdr_len = msg_len;
                         }
                         //TRACE("%p| MATCH RPC Call  xid:%u len: %u procedure: %u", this, call->xid(), msg_len, call->proc());
                     }
-                    else if (NFS4::Validator::check(call))
+                    else if (NFS4Validator::check(call))
                     {
                         hdr_len = msg_len;  // fully collect of NFSv4 messages
                     }

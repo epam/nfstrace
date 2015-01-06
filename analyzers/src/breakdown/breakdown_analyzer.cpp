@@ -236,78 +236,78 @@ public:
     virtual ~BreakdownAnalyzer() { }
 
     void null(const struct RPCProcedure* proc,
-              const struct rpcgen::NULL3args*,
-              const struct rpcgen::NULL3res*) override final { account(proc); }
+              const struct NFS3::NULL3args*,
+              const struct NFS3::NULL3res*) override final { account(proc); }
     void getattr3(const struct RPCProcedure* proc,
-                  const struct rpcgen::GETATTR3args*,
-                  const struct rpcgen::GETATTR3res*) override final { account(proc); }
+                  const struct NFS3::GETATTR3args*,
+                  const struct NFS3::GETATTR3res*) override final { account(proc); }
     void setattr3(const struct RPCProcedure* proc,
-                  const struct rpcgen::SETATTR3args*,
-                  const struct rpcgen::SETATTR3res*) override final { account(proc); }
+                  const struct NFS3::SETATTR3args*,
+                  const struct NFS3::SETATTR3res*) override final { account(proc); }
     void lookup3(const struct RPCProcedure* proc,
-                 const struct rpcgen::LOOKUP3args*,
-                 const struct rpcgen::LOOKUP3res*) override final { account(proc); }
+                 const struct NFS3::LOOKUP3args*,
+                 const struct NFS3::LOOKUP3res*) override final { account(proc); }
     void access3(const struct RPCProcedure* proc,
-                 const struct rpcgen::ACCESS3args*,
-                 const struct rpcgen::ACCESS3res*) override final { account(proc); }
+                 const struct NFS3::ACCESS3args*,
+                 const struct NFS3::ACCESS3res*) override final { account(proc); }
     void readlink3(const struct RPCProcedure* proc,
-                   const struct rpcgen::READLINK3args*,
-                   const struct rpcgen::READLINK3res*) override final { account(proc); }
+                   const struct NFS3::READLINK3args*,
+                   const struct NFS3::READLINK3res*) override final { account(proc); }
     void read3(const struct RPCProcedure* proc,
-               const struct rpcgen::READ3args*,
-               const struct rpcgen::READ3res*) override final { account(proc); }
+               const struct NFS3::READ3args*,
+               const struct NFS3::READ3res*) override final { account(proc); }
     void write3(const struct RPCProcedure* proc,
-                const struct rpcgen::WRITE3args*,
-                const struct rpcgen::WRITE3res*) override final { account(proc); }
+                const struct NFS3::WRITE3args*,
+                const struct NFS3::WRITE3res*) override final { account(proc); }
     void create3(const struct RPCProcedure* proc,
-                 const struct rpcgen::CREATE3args*,
-                 const struct rpcgen::CREATE3res*) override final { account(proc); }
+                 const struct NFS3::CREATE3args*,
+                 const struct NFS3::CREATE3res*) override final { account(proc); }
     void mkdir3(const struct RPCProcedure* proc,
-                const struct rpcgen::MKDIR3args*,
-                const struct rpcgen::MKDIR3res*) override final { account(proc); }
+                const struct NFS3::MKDIR3args*,
+                const struct NFS3::MKDIR3res*) override final { account(proc); }
     void symlink3(const struct RPCProcedure* proc,
-                 const struct rpcgen::SYMLINK3args*,
-                 const struct rpcgen::SYMLINK3res*) override final { account(proc); }
+                 const struct NFS3::SYMLINK3args*,
+                 const struct NFS3::SYMLINK3res*) override final { account(proc); }
     void mknod3(const struct RPCProcedure* proc,
-                const struct rpcgen::MKNOD3args*,
-                const struct rpcgen::MKNOD3res*) override final { account(proc); }
+                const struct NFS3::MKNOD3args*,
+                const struct NFS3::MKNOD3res*) override final { account(proc); }
     void remove3(const struct RPCProcedure* proc,
-                 const struct rpcgen::REMOVE3args*,
-                 const struct rpcgen::REMOVE3res*) override final { account(proc); }
+                 const struct NFS3::REMOVE3args*,
+                 const struct NFS3::REMOVE3res*) override final { account(proc); }
     void rmdir3(const struct RPCProcedure* proc,
-                const struct rpcgen::RMDIR3args*,
-                const struct rpcgen::RMDIR3res*) override final { account(proc); }
+                const struct NFS3::RMDIR3args*,
+                const struct NFS3::RMDIR3res*) override final { account(proc); }
     void rename3(const struct RPCProcedure* proc,
-                 const struct rpcgen::RENAME3args*,
-                 const struct rpcgen::RENAME3res*) override final { account(proc); }
+                 const struct NFS3::RENAME3args*,
+                 const struct NFS3::RENAME3res*) override final { account(proc); }
     void link3(const struct RPCProcedure* proc,
-               const struct rpcgen::LINK3args*,
-               const struct rpcgen::LINK3res*) override final { account(proc); }
+               const struct NFS3::LINK3args*,
+               const struct NFS3::LINK3res*) override final { account(proc); }
     void readdir3(const struct RPCProcedure* proc,
-                  const struct rpcgen::READDIR3args*,
-                  const struct rpcgen::READDIR3res*) override final { account(proc); }
+                  const struct NFS3::READDIR3args*,
+                  const struct NFS3::READDIR3res*) override final { account(proc); }
     void readdirplus3(const struct RPCProcedure* proc,
-                      const struct rpcgen::READDIRPLUS3args*,
-                      const struct rpcgen::READDIRPLUS3res*) override final { account(proc); }
+                      const struct NFS3::READDIRPLUS3args*,
+                      const struct NFS3::READDIRPLUS3res*) override final { account(proc); }
     void fsstat3(const struct RPCProcedure* proc,
-                 const struct rpcgen::FSSTAT3args*,
-                 const struct rpcgen::FSSTAT3res*) override final { account(proc); }
+                 const struct NFS3::FSSTAT3args*,
+                 const struct NFS3::FSSTAT3res*) override final { account(proc); }
     void fsinfo3(const struct RPCProcedure* proc,
-                 const struct rpcgen::FSINFO3args*,
-                 const struct rpcgen::FSINFO3res*) override final { account(proc); }
+                 const struct NFS3::FSINFO3args*,
+                 const struct NFS3::FSINFO3res*) override final { account(proc); }
     void pathconf3(const struct RPCProcedure* proc,
-                   const struct rpcgen::PATHCONF3args*,
-                   const struct rpcgen::PATHCONF3res*) override final { account(proc); }
+                   const struct NFS3::PATHCONF3args*,
+                   const struct NFS3::PATHCONF3res*) override final { account(proc); }
     void commit3(const struct RPCProcedure* proc,
-                 const struct rpcgen::COMMIT3args*,
-                 const struct rpcgen::COMMIT3res*) override final { account(proc); }
+                 const struct NFS3::COMMIT3args*,
+                 const struct NFS3::COMMIT3res*) override final { account(proc); }
 
     void null(const struct RPCProcedure* proc,
-              const struct rpcgen::NULL4args*,
-              const struct rpcgen::NULL4res*) override final { account(proc); }
+              const struct NFS4::NULL4args*,
+              const struct NFS4::NULL4res*) override final { account(proc); }
     void compound4(const struct RPCProcedure*  proc,
-                   const struct rpcgen::COMPOUND4args*,
-                   const struct rpcgen::COMPOUND4res*  res) override final { account(proc, res); }
+                   const struct NFS4::COMPOUND4args*,
+                   const struct NFS4::COMPOUND4res*  res) override final { account(proc, res); }
 
     virtual void flush_statistics()
     {
@@ -502,7 +502,7 @@ public:
 
 private:
     void account(const struct RPCProcedure* proc,
-                 const struct rpcgen::COMPOUND4res* res = nullptr)
+                 const struct NFS4::COMPOUND4res* res = nullptr)
     {
         typename PerOpStat::iterator i;
         const u_int nfs_proc = proc->rpc_call.ru.RM_cmb.cb_proc;
@@ -529,7 +529,7 @@ private:
             {
                 nfs4_ops_total += res->resarray.resarray_len;
 
-                rpcgen::nfs_resop4* current_el = res->resarray.resarray_val;
+                NFS4::nfs_resop4* current_el = res->resarray.resarray_val;
                 for(unsigned j=0; j<(res->resarray.resarray_len); j++, current_el++)
                 {
                     // In all cases we suppose, that NFSv4 operation ILLEGAL(10044)

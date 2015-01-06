@@ -26,7 +26,6 @@
 #include <ostream>
 #include <cstring>
 
-#include "api/nfs3_types_rpcgen.h"
 #include "utils/out.h"
 //------------------------------------------------------------------------------
 namespace NST
