@@ -319,6 +319,9 @@ struct fs_locations4 {
  * Access Control Entries are supported.
  * Values for the fattr4_aclsupport attribute.
  */
+
+typedef uint32_t        fattr4_aclsupport;
+
 const ACL4_SUPPORT_ALLOW_ACL    = 0x00000001;
 const ACL4_SUPPORT_DENY_ACL     = 0x00000002;
 const ACL4_SUPPORT_AUDIT_ACL    = 0x00000004;
@@ -684,7 +687,6 @@ typedef bool            fattr4_unique_handles;
 typedef nfs_lease4      fattr4_lease_time;
 typedef nfsstat4        fattr4_rdattr_error;
 typedef nfsace4         fattr4_acl<>;
-typedef uint32_t        fattr4_aclsupport;
 typedef bool            fattr4_archive;
 typedef bool            fattr4_cansettime;
 typedef bool            fattr4_case_insensitive;

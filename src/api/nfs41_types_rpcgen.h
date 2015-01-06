@@ -25,12 +25,14 @@
 //------------------------------------------------------------------------------
 #include <rpc/rpc.h>
 //------------------------------------------------------------------------------
-namespace rpcgen
+namespace NST
+{
+namespace API
 {
 namespace NFS41
 {
 
-typedef struct authunix_parms authsys_parms;
+using authsys_parms = authunix_parms;
 
 #ifndef RPCSEC_GSS
 #define RPCSEC_GSS 6
@@ -1918,7 +1920,7 @@ typedef struct gss_cb_handles4 gss_cb_handles4;
 struct callback_sec_parms4 {
 	uint32_t cb_secflavor;
 	union {
-		authsys_parms cbsp_sys_cred;
+		authunix_parms cbsp_sys_cred;
 		gss_cb_handles4 cbsp_gss_handles;
 	} callback_sec_parms4_u;
 };
@@ -3515,7 +3517,8 @@ bool_t xdr_CB_COMPOUND4args (XDR *, CB_COMPOUND4args*);
 bool_t xdr_CB_COMPOUND4res (XDR *, CB_COMPOUND4res*);
 
 } // namespace NFS41
-} // namespace rpcgen
+} // namespace API
+} // namespace NST
 //------------------------------------------------------------------------------
 #endif //NFS41_TYPES_RPCGEN_H
 //------------------------------------------------------------------------------

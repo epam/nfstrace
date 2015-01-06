@@ -21,7 +21,11 @@
 //------------------------------------------------------------------------------
 #include "api/nfs3_types_rpcgen.h"
 //------------------------------------------------------------------------------
-namespace rpcgen
+namespace NST
+{
+namespace API
+{
+namespace NFS3
 {
 
 bool_t
@@ -1805,4 +1809,6 @@ xdr_COMMIT3res (XDR *xdrs, COMMIT3res *objp)
     return TRUE;
 }
 
-}// namespace rpcgen
+}// namespace NFS3
+}// namespace API
+}// namespace NST

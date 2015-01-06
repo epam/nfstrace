@@ -31,6 +31,10 @@ namespace NST
 namespace analysis
 {
 
+namespace NFS3  = NST::API::NFS3;
+namespace NFS4  = NST::API::NFS4;
+namespace NFS41 = NST::API::NFS41;
+
 class PrintAnalyzer : public IAnalyzer
 {
 public:
@@ -42,190 +46,190 @@ public:
     }
 
     void null(const struct RPCProcedure* proc,
-              const struct rpcgen::NULL3args*,
-              const struct rpcgen::NULL3res*) override final;
+              const struct NFS3::NULL3args*,
+              const struct NFS3::NULL3res*) override final;
     void getattr3(const struct RPCProcedure*         proc,
-                  const struct rpcgen::GETATTR3args* args,
-                  const struct rpcgen::GETATTR3res*  res) override final;
+                  const struct NFS3::GETATTR3args* args,
+                  const struct NFS3::GETATTR3res*  res) override final;
     void setattr3(const struct RPCProcedure*         proc,
-                  const struct rpcgen::SETATTR3args* args,
-                  const struct rpcgen::SETATTR3res*  res) override final;
+                  const struct NFS3::SETATTR3args* args,
+                  const struct NFS3::SETATTR3res*  res) override final;
     void lookup3(const struct RPCProcedure*        proc,
-                 const struct rpcgen::LOOKUP3args* args,
-                 const struct rpcgen::LOOKUP3res*  res) override final;
+                 const struct NFS3::LOOKUP3args* args,
+                 const struct NFS3::LOOKUP3res*  res) override final;
     void access3(const struct RPCProcedure*        proc,
-                 const struct rpcgen::ACCESS3args* args,
-                 const struct rpcgen::ACCESS3res*  res) override final;
+                 const struct NFS3::ACCESS3args* args,
+                 const struct NFS3::ACCESS3res*  res) override final;
     void readlink3(const struct RPCProcedure*          proc,
-                   const struct rpcgen::READLINK3args* args,
-                   const struct rpcgen::READLINK3res*  res) override final;
+                   const struct NFS3::READLINK3args* args,
+                   const struct NFS3::READLINK3res*  res) override final;
     void read3(const struct RPCProcedure*      proc,
-               const struct rpcgen::READ3args* args,
-               const struct rpcgen::READ3res*  res) override final;
+               const struct NFS3::READ3args* args,
+               const struct NFS3::READ3res*  res) override final;
     void write3(const struct RPCProcedure*       proc,
-                const struct rpcgen::WRITE3args* args,
-                const struct rpcgen::WRITE3res*  res) override final;
+                const struct NFS3::WRITE3args* args,
+                const struct NFS3::WRITE3res*  res) override final;
     void create3(const struct RPCProcedure*        proc,
-                 const struct rpcgen::CREATE3args* args,
-                 const struct rpcgen::CREATE3res*  res) override final;
+                 const struct NFS3::CREATE3args* args,
+                 const struct NFS3::CREATE3res*  res) override final;
     void mkdir3(const struct RPCProcedure*       proc,
-                const struct rpcgen::MKDIR3args* args,
-                const struct rpcgen::MKDIR3res*  res) override final;
+                const struct NFS3::MKDIR3args* args,
+                const struct NFS3::MKDIR3res*  res) override final;
     void symlink3(const struct RPCProcedure*         proc,
-                  const struct rpcgen::SYMLINK3args* args,
-                  const struct rpcgen::SYMLINK3res*  res) override final;
+                  const struct NFS3::SYMLINK3args* args,
+                  const struct NFS3::SYMLINK3res*  res) override final;
     void mknod3(const struct RPCProcedure*       proc,
-                const struct rpcgen::MKNOD3args* args,
-                const struct rpcgen::MKNOD3res*  res) override final;
+                const struct NFS3::MKNOD3args* args,
+                const struct NFS3::MKNOD3res*  res) override final;
     void remove3(const struct RPCProcedure*        proc,
-                 const struct rpcgen::REMOVE3args* args,
-                 const struct rpcgen::REMOVE3res*  res) override final;
+                 const struct NFS3::REMOVE3args* args,
+                 const struct NFS3::REMOVE3res*  res) override final;
     void rmdir3(const struct RPCProcedure*       proc,
-                const struct rpcgen::RMDIR3args* args,
-                const struct rpcgen::RMDIR3res*  res) override final;
+                const struct NFS3::RMDIR3args* args,
+                const struct NFS3::RMDIR3res*  res) override final;
     void rename3(const struct RPCProcedure*        proc,
-                 const struct rpcgen::RENAME3args* args,
-                 const struct rpcgen::RENAME3res*  res) override final;
+                 const struct NFS3::RENAME3args* args,
+                 const struct NFS3::RENAME3res*  res) override final;
     void link3(const struct RPCProcedure*      proc,
-               const struct rpcgen::LINK3args* args,
-               const struct rpcgen::LINK3res*  res) override final;
+               const struct NFS3::LINK3args* args,
+               const struct NFS3::LINK3res*  res) override final;
     void readdir3(const struct RPCProcedure*         proc,
-                  const struct rpcgen::READDIR3args* args,
-                  const struct rpcgen::READDIR3res*  res) override final;
+                  const struct NFS3::READDIR3args* args,
+                  const struct NFS3::READDIR3res*  res) override final;
     void readdirplus3(const struct RPCProcedure*             proc,
-                      const struct rpcgen::READDIRPLUS3args* args,
-                      const struct rpcgen::READDIRPLUS3res*  res) override final;
+                      const struct NFS3::READDIRPLUS3args* args,
+                      const struct NFS3::READDIRPLUS3res*  res) override final;
     void fsstat3(const struct RPCProcedure*        proc,
-                 const struct rpcgen::FSSTAT3args* args,
-                 const struct rpcgen::FSSTAT3res*  res) override final;
+                 const struct NFS3::FSSTAT3args* args,
+                 const struct NFS3::FSSTAT3res*  res) override final;
     void fsinfo3(const struct RPCProcedure*        proc,
-                 const struct rpcgen::FSINFO3args* args,
-                 const struct rpcgen::FSINFO3res*  res) override final;
+                 const struct NFS3::FSINFO3args* args,
+                 const struct NFS3::FSINFO3res*  res) override final;
     void pathconf3(const struct RPCProcedure*          proc,
-                   const struct rpcgen::PATHCONF3args* args,
-                   const struct rpcgen::PATHCONF3res*  res) override final;
+                   const struct NFS3::PATHCONF3args* args,
+                   const struct NFS3::PATHCONF3res*  res) override final;
     void commit3(const struct RPCProcedure*        proc,
-                 const struct rpcgen::COMMIT3args* args,
-                 const struct rpcgen::COMMIT3res*  res) override final;
+                 const struct NFS3::COMMIT3args* args,
+                 const struct NFS3::COMMIT3res*  res) override final;
 
     void null(const struct RPCProcedure*      proc,
-              const struct rpcgen::NULL4args* args,
-              const struct rpcgen::NULL4res*  res) override final;
+              const struct NFS4::NULL4args* args,
+              const struct NFS4::NULL4res*  res) override final;
     void compound4(const struct RPCProcedure*          proc,
-                   const struct rpcgen::COMPOUND4args* args,
-                   const struct rpcgen::COMPOUND4res*  res) override final;
+                   const struct NFS4::COMPOUND4args* args,
+                   const struct NFS4::COMPOUND4res*  res) override final;
 
-    void nfs4_operation(const struct rpcgen::nfs_argop4*                 op);
-    void nfs4_operation(const struct rpcgen::nfs_resop4*                 op);
+    void nfs4_operation(const struct NFS4::nfs_argop4*                 op);
+    void nfs4_operation(const struct NFS4::nfs_resop4*                 op);
 
-    void nfs4_operation(const struct rpcgen::ACCESS4args*              args);
-    void nfs4_operation(const struct rpcgen::ACCESS4res*               res );
+    void nfs4_operation(const struct NFS4::ACCESS4args*              args);
+    void nfs4_operation(const struct NFS4::ACCESS4res*               res );
 
-    void nfs4_operation(const struct rpcgen::CLOSE4args*               args);
-    void nfs4_operation(const struct rpcgen::CLOSE4res*                res );
+    void nfs4_operation(const struct NFS4::CLOSE4args*               args);
+    void nfs4_operation(const struct NFS4::CLOSE4res*                res );
 
-    void nfs4_operation(const struct rpcgen::COMMIT4args*              args);
-    void nfs4_operation(const struct rpcgen::COMMIT4res*               res );
+    void nfs4_operation(const struct NFS4::COMMIT4args*              args);
+    void nfs4_operation(const struct NFS4::COMMIT4res*               res );
 
-    void nfs4_operation(const struct rpcgen::CREATE4args*              args);
-    void nfs4_operation(const struct rpcgen::CREATE4res*               res );
+    void nfs4_operation(const struct NFS4::CREATE4args*              args);
+    void nfs4_operation(const struct NFS4::CREATE4res*               res );
 
-    void nfs4_operation(const struct rpcgen::DELEGPURGE4args*          args);
-    void nfs4_operation(const struct rpcgen::DELEGPURGE4res*           res );
+    void nfs4_operation(const struct NFS4::DELEGPURGE4args*          args);
+    void nfs4_operation(const struct NFS4::DELEGPURGE4res*           res );
 
-    void nfs4_operation(const struct rpcgen::DELEGRETURN4args*         args);
-    void nfs4_operation(const struct rpcgen::DELEGRETURN4res*          res );
+    void nfs4_operation(const struct NFS4::DELEGRETURN4args*         args);
+    void nfs4_operation(const struct NFS4::DELEGRETURN4res*          res );
 
-    void nfs4_operation(const struct rpcgen::GETATTR4args*             args);
-    void nfs4_operation(const struct rpcgen::GETATTR4res*              res );
+    void nfs4_operation(const struct NFS4::GETATTR4args*             args);
+    void nfs4_operation(const struct NFS4::GETATTR4res*              res );
 
-    void nfs4_operation(const struct rpcgen::LINK4args*                args);
-    void nfs4_operation(const struct rpcgen::LINK4res*                 res );
+    void nfs4_operation(const struct NFS4::LINK4args*                args);
+    void nfs4_operation(const struct NFS4::LINK4res*                 res );
 
-    void nfs4_operation(const struct rpcgen::LOCK4args*                args);
-    void nfs4_operation(const struct rpcgen::LOCK4res*                 res );
+    void nfs4_operation(const struct NFS4::LOCK4args*                args);
+    void nfs4_operation(const struct NFS4::LOCK4res*                 res );
 
-    void nfs4_operation(const struct rpcgen::LOCKT4args*               args);
-    void nfs4_operation(const struct rpcgen::LOCKT4res*                res );
+    void nfs4_operation(const struct NFS4::LOCKT4args*               args);
+    void nfs4_operation(const struct NFS4::LOCKT4res*                res );
 
-    void nfs4_operation(const struct rpcgen::LOCKU4args*               args);
-    void nfs4_operation(const struct rpcgen::LOCKU4res*                res );
+    void nfs4_operation(const struct NFS4::LOCKU4args*               args);
+    void nfs4_operation(const struct NFS4::LOCKU4res*                res );
 
-    void nfs4_operation(const struct rpcgen::LOOKUP4args*              args);
-    void nfs4_operation(const struct rpcgen::LOOKUP4res*               res );
+    void nfs4_operation(const struct NFS4::LOOKUP4args*              args);
+    void nfs4_operation(const struct NFS4::LOOKUP4res*               res );
 
-    void nfs4_operation(const struct rpcgen::NVERIFY4args*             args);
-    void nfs4_operation(const struct rpcgen::NVERIFY4res*              res );
+    void nfs4_operation(const struct NFS4::NVERIFY4args*             args);
+    void nfs4_operation(const struct NFS4::NVERIFY4res*              res );
 
-    void nfs4_operation(const struct rpcgen::OPEN4args*                args);
-    void nfs4_operation(const struct rpcgen::OPEN4res*                 res );
+    void nfs4_operation(const struct NFS4::OPEN4args*                args);
+    void nfs4_operation(const struct NFS4::OPEN4res*                 res );
 
-    void nfs4_operation(const struct rpcgen::OPENATTR4args*            args);
-    void nfs4_operation(const struct rpcgen::OPENATTR4res*             res );
+    void nfs4_operation(const struct NFS4::OPENATTR4args*            args);
+    void nfs4_operation(const struct NFS4::OPENATTR4res*             res );
 
-    void nfs4_operation(const struct rpcgen::OPEN_CONFIRM4args*        args);
-    void nfs4_operation(const struct rpcgen::OPEN_CONFIRM4res*         res );
+    void nfs4_operation(const struct NFS4::OPEN_CONFIRM4args*        args);
+    void nfs4_operation(const struct NFS4::OPEN_CONFIRM4res*         res );
 
-    void nfs4_operation(const struct rpcgen::OPEN_DOWNGRADE4args*      args);
-    void nfs4_operation(const struct rpcgen::OPEN_DOWNGRADE4res*       res );
+    void nfs4_operation(const struct NFS4::OPEN_DOWNGRADE4args*      args);
+    void nfs4_operation(const struct NFS4::OPEN_DOWNGRADE4res*       res );
 
-    void nfs4_operation(const struct rpcgen::PUTFH4args*               args);
-    void nfs4_operation(const struct rpcgen::PUTFH4res*                res );
+    void nfs4_operation(const struct NFS4::PUTFH4args*               args);
+    void nfs4_operation(const struct NFS4::PUTFH4res*                res );
 
-    void nfs4_operation(const struct rpcgen::READ4args*                args);
-    void nfs4_operation(const struct rpcgen::READ4res*                 res );
+    void nfs4_operation(const struct NFS4::READ4args*                args);
+    void nfs4_operation(const struct NFS4::READ4res*                 res );
 
-    void nfs4_operation(const struct rpcgen::READDIR4args*             args);
-    void nfs4_operation(const struct rpcgen::READDIR4res*              res );
+    void nfs4_operation(const struct NFS4::READDIR4args*             args);
+    void nfs4_operation(const struct NFS4::READDIR4res*              res );
 
-    void nfs4_operation(const struct rpcgen::REMOVE4args*              args);
-    void nfs4_operation(const struct rpcgen::REMOVE4res*               res );
+    void nfs4_operation(const struct NFS4::REMOVE4args*              args);
+    void nfs4_operation(const struct NFS4::REMOVE4res*               res );
 
-    void nfs4_operation(const struct rpcgen::RENAME4args*              args);
-    void nfs4_operation(const struct rpcgen::RENAME4res*               res );
+    void nfs4_operation(const struct NFS4::RENAME4args*              args);
+    void nfs4_operation(const struct NFS4::RENAME4res*               res );
 
-    void nfs4_operation(const struct rpcgen::RENEW4args*               args);
-    void nfs4_operation(const struct rpcgen::RENEW4res*                res );
+    void nfs4_operation(const struct NFS4::RENEW4args*               args);
+    void nfs4_operation(const struct NFS4::RENEW4res*                res );
 
-    void nfs4_operation(const struct rpcgen::SECINFO4args*             args);
-    void nfs4_operation(const struct rpcgen::SECINFO4res*              res );
+    void nfs4_operation(const struct NFS4::SECINFO4args*             args);
+    void nfs4_operation(const struct NFS4::SECINFO4res*              res );
 
-    void nfs4_operation(const struct rpcgen::SETATTR4args*             args);
-    void nfs4_operation(const struct rpcgen::SETATTR4res*              res );
+    void nfs4_operation(const struct NFS4::SETATTR4args*             args);
+    void nfs4_operation(const struct NFS4::SETATTR4res*              res );
 
-    void nfs4_operation(const struct rpcgen::SETCLIENTID4args*         args);
-    void nfs4_operation(const struct rpcgen::SETCLIENTID4res*          res );
+    void nfs4_operation(const struct NFS4::SETCLIENTID4args*         args);
+    void nfs4_operation(const struct NFS4::SETCLIENTID4res*          res );
 
-    void nfs4_operation(const struct rpcgen::SETCLIENTID_CONFIRM4args* args);
-    void nfs4_operation(const struct rpcgen::SETCLIENTID_CONFIRM4res*  res );
+    void nfs4_operation(const struct NFS4::SETCLIENTID_CONFIRM4args* args);
+    void nfs4_operation(const struct NFS4::SETCLIENTID_CONFIRM4res*  res );
 
-    void nfs4_operation(const struct rpcgen::VERIFY4args*              args);
-    void nfs4_operation(const struct rpcgen::VERIFY4res*               res );
+    void nfs4_operation(const struct NFS4::VERIFY4args*              args);
+    void nfs4_operation(const struct NFS4::VERIFY4res*               res );
 
-    void nfs4_operation(const struct rpcgen::WRITE4args*               args);
-    void nfs4_operation(const struct rpcgen::WRITE4res*                res );
+    void nfs4_operation(const struct NFS4::WRITE4args*               args);
+    void nfs4_operation(const struct NFS4::WRITE4res*                res );
 
-    void nfs4_operation(const struct rpcgen::RELEASE_LOCKOWNER4args*   args);
-    void nfs4_operation(const struct rpcgen::RELEASE_LOCKOWNER4res*    res );
+    void nfs4_operation(const struct NFS4::RELEASE_LOCKOWNER4args*   args);
+    void nfs4_operation(const struct NFS4::RELEASE_LOCKOWNER4res*    res );
 
-    void nfs4_operation(const struct rpcgen::GET_DIR_DELEGATION4args*  args);
-    void nfs4_operation(const struct rpcgen::GET_DIR_DELEGATION4res*   res );
+    void nfs4_operation(const struct NFS4::GET_DIR_DELEGATION4args*  args);
+    void nfs4_operation(const struct NFS4::GET_DIR_DELEGATION4res*   res );
 
-    void nfs4_operation(const struct rpcgen::GETFH4res*                 res);
+    void nfs4_operation(const struct NFS4::GETFH4res*                 res);
 
-    void nfs4_operation(const struct rpcgen::LOOKUPP4res*               res);
+    void nfs4_operation(const struct NFS4::LOOKUPP4res*               res);
 
-    void nfs4_operation(const struct rpcgen::PUTPUBFH4res*              res);
+    void nfs4_operation(const struct NFS4::PUTPUBFH4res*              res);
 
-    void nfs4_operation(const struct rpcgen::PUTROOTFH4res*             res);
+    void nfs4_operation(const struct NFS4::PUTROOTFH4res*             res);
 
-    void nfs4_operation(const struct rpcgen::READLINK4res*              res);
+    void nfs4_operation(const struct NFS4::READLINK4res*              res);
 
-    void nfs4_operation(const struct rpcgen::RESTOREFH4res*             res);
+    void nfs4_operation(const struct NFS4::RESTOREFH4res*             res);
 
-    void nfs4_operation(const struct rpcgen::SAVEFH4res*                res);
+    void nfs4_operation(const struct NFS4::SAVEFH4res*                res);
 
-    void nfs4_operation(const struct rpcgen::ILLEGAL4res*               res);
+    void nfs4_operation(const struct NFS4::ILLEGAL4res*               res);
 
     void flush_statistics() override final;
 
