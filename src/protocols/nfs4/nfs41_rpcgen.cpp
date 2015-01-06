@@ -21,7 +21,9 @@
 //------------------------------------------------------------------------------
 #include "api/nfs41_types_rpcgen.h"
 //------------------------------------------------------------------------------
-namespace rpcgen
+namespace NST
+{
+namespace API
 {
 namespace NFS41
 {
@@ -5098,4 +5100,5 @@ xdr_CB_COMPOUND4res (XDR *xdrs, CB_COMPOUND4res *objp)
 }
 
 }// namespace NFS41
-}// namespace rpcgen
+}// namespace API
+}// namespace NST

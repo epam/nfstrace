@@ -25,10 +25,12 @@
 //------------------------------------------------------------------------------
 #include <rpc/rpc.h>
 //------------------------------------------------------------------------------
-namespace rpcgen
+namespace NST
 {
-
-extern "C" {
+namespace API
+{
+namespace NFS4
+{
 
 #ifndef RPCSEC_GSS
 #define RPCSEC_GSS 6
@@ -1840,9 +1842,10 @@ bool_t xdr_nfs_cb_argop4 (XDR *, nfs_cb_argop4*);
 bool_t xdr_nfs_cb_resop4 (XDR *, nfs_cb_resop4*);
 bool_t xdr_CB_COMPOUND4args (XDR *, CB_COMPOUND4args*);
 bool_t xdr_CB_COMPOUND4res (XDR *, CB_COMPOUND4res*);
-}
 
-} // namespace rpcgen
+} // namespace NFS4
+} // namespace API
+} // namespace NST
 //------------------------------------------------------------------------------
 #endif //NFS4_TYPES_RPCGEN_H
 //------------------------------------------------------------------------------
