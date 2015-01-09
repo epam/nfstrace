@@ -1605,6 +1605,18 @@ xdr_nfsv4_1_file_layout4 (XDR *xdrs, nfsv4_1_file_layout4 *objp)
  *      Nothing. lrf_body is a zero length array of bytes.
  */
 
+//for compatibility
+bool_t
+xdr_NULL4args(XDR*, NULL4args*)
+{
+    return TRUE;
+}
+
+bool_t
+xdr_NULL4res(XDR*, NULL4res*)
+{
+    return TRUE;
+}
 
 bool_t
 xdr_ACCESS4args (XDR *xdrs, ACCESS4args *objp)
