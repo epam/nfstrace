@@ -1107,6 +1107,20 @@ const uint32_t ACCESS4_EXTEND {0x00000008};
 const uint32_t ACCESS4_DELETE {0x00000010};
 const uint32_t ACCESS4_EXECUTE {0x00000020};
 
+// for compatibility
+struct NULL4args
+{
+    bool t {};
+};
+typedef struct NULL4args NULL4args;
+
+// for compatibility
+struct NULL4res
+{
+    bool t {};
+};
+typedef struct NULL4res NULL4res;
+
 struct ACCESS4args {
 	uint32_t access;
 };
