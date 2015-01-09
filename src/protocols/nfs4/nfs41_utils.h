@@ -26,8 +26,6 @@
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/rpc/rpc_header.h"
 //------------------------------------------------------------------------------
-using namespace NST::API::NFS41;
-//------------------------------------------------------------------------------
 namespace NST
 {
 namespace protocols
@@ -35,36 +33,38 @@ namespace protocols
 namespace NFS41
 {
 
+namespace NFS41 = NST::API::NFS41;
+
 using ProcEnumNFS41 = API::ProcEnumNFS41;
 
 using Validator = rpc::RPCProgramValidator
                 <
-                    100003,                 // SunRPC/NFS program
-                    4,                      // v4
-                    ProcEnumNFS4::NFS_NULL, // NFSPROC4RPCGEN_NULL     (0)
-                    ProcEnumNFS4::COMPOUND  // NFSPROC4RPCGEN_COMPOUND (1)
+                    100003,                  // SunRPC/NFS program
+                    4,                       // v4
+                    ProcEnumNFS41::NFS_NULL, // NFSPROC41RPCGEN_NULL     (0)
+                    ProcEnumNFS41::COMPOUND  // NFSPROC41RPCGEN_COMPOUND (1)
                 >;
 
 // Procedure 0: NULL - Do nothing
-inline auto proc_t_of(NULL4args&)->decltype(&xdr_NULL4args)
+inline auto proc_t_of(NFS41::NULL4args&)->decltype(&NFS41::xdr_NULL4args)
 {
-    return &xdr_NULL4args;
+    return &NFS41::xdr_NULL4args;
 }
 
-inline auto proc_t_of(NULL4res&)->decltype(&xdr_NULL4res)
+inline auto proc_t_of(NFS41::NULL4res&)->decltype(&NFS41::xdr_NULL4res)
 {
-    return &xdr_NULL4res;
+    return &NFS41::xdr_NULL4res;
 }
 
 // Procedure 1: COMPOUND
-inline auto proc_t_of(COMPOUND4args&)->decltype(&xdr_COMPOUND4args)
+inline auto proc_t_of(NFS41::COMPOUND4args&)->decltype(&NFS41::xdr_COMPOUND4args)
 {
-    return &xdr_COMPOUND4args;
+    return &NFS41::xdr_COMPOUND4args;
 }
 
-inline auto proc_t_of(COMPOUND4res&)->decltype(&xdr_COMPOUND4res)
+inline auto proc_t_of(NFS41::COMPOUND4res&)->decltype(&NFS41::xdr_COMPOUND4res)
 {
-    return &xdr_COMPOUND4res;
+    return &NFS41::xdr_COMPOUND4res;
 }
 
 } // namespace NFS41
