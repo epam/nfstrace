@@ -25,6 +25,7 @@
 #include "protocols/xdr/xdr_decoder.h"
 #include "utils/log.h"
 //------------------------------------------------------------------------------
+using namespace NST::protocols::xdr;
 //------------------------------------------------------------------------------
 namespace NST
 {

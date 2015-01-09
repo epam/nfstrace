@@ -24,14 +24,15 @@
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
 //------------------------------------------------------------------------------
+using namespace NST::API::NFS4;
+using namespace NST::protocols::NFS;  // NFS helpers
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace protocols
 {
 namespace NFS4
 {
-
-using namespace NST::protocols::NFS;  // NFS helpers
 
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc)
 {
