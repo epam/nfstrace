@@ -22,6 +22,7 @@
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/nfs3/nfs3_utils.h"
 //------------------------------------------------------------------------------
+using namespace NST::API::NFS3;
 using namespace NST::protocols::NFS;
 using namespace NST::protocols::xdr;
 //------------------------------------------------------------------------------
