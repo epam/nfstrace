@@ -48,20 +48,12 @@ SKIP_SCAN_BUILD=false
 SKIP_MEMCHECK=false
 SKIP_PACKAGING=false
 
-CLI_ARGS=$(getopt -o csmp -l skip-cppcheck,skip-scan-build,skip-memcheck,skip-packaging -n "`basename $0`" -- "$@")
-if [ $? -ne 0 ] ; then
-    echo ">>> Parsing CLI parameters error"
-    exit 1
-fi
-eval set -- "$CLI_ARGS"
-while true ; do
-    case "$1" in
-        -c|--skip-cppcheck) SKIP_CPPCHECK=true ; shift ;;
-        -s|--skip-scan-build) SKIP_SCAN_BUILD=true ; shift ;;
-        -m|--skip-memcheck) SKIP_MEMCHECK=true ; shift ;;
-        -p|--skip-packaging) SKIP_PACKAGING=true ; shift ;;
-        --) shift ; break ;;
-        *) echo ">>> Internal error!" ; exit 1 ;;
+for CLI_OPT in "$@" ; do
+    case $CLI_OPT in
+        --skip-cppcheck) SKIP_CPPCHECK=true ;;
+        --skip-scan-build) SKIP_SCAN_BUILD=true ;;
+        --skip-memcheck) SKIP_MEMCHECK=true ;;
+        --skip-packaging) SKIP_PACKAGING=true ;; 
     esac
 done
 
@@ -250,29 +242,29 @@ else
     
     echo ">>> Generating valgrind/memcheck report for NFSv3 in 'drain' mode"
     valgrind --tool=memcheck --leak-check=full --show-reachable=yes \
-    	--undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
-    	--trace-children=no --xml=yes --xml-file=./nfstrace.%p.drain.nfsv3.memcheck.xml \
-    	./nfstrace --mode=drain -b 20 -Q 4096 -M 512 -I ./eth-ipv4-tcp-nfsv3.pcap
+        --undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
+        --trace-children=no --xml=yes --xml-file=./nfstrace.%p.drain.nfsv3.memcheck.xml \
+        ./nfstrace --mode=drain -b 20 -Q 4096 -M 512 -I ./eth-ipv4-tcp-nfsv3.pcap
     if [ $? -ne 0 ] ; then
         echo ">>> Error generating valgrind/memcheck report for NFSv3 in 'drain' mode"
         exit 1
     fi
     echo ">>> Generating valgrind/memcheck report for NFSv3 in 'stat' mode"
     valgrind --tool=memcheck --leak-check=full --show-reachable=yes \
-    	--undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
-    	--trace-children=no --xml=yes --xml-file=./nfstrace.%p.stat.nfsv3.memcheck.xml \
-    	./nfstrace --mode=stat -a ./analyzers/libbreakdown.so -b 20 -Q 4096 -M 512 \
-    	-I ./eth-ipv4-tcp-nfsv3.pcap
+        --undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
+        --trace-children=no --xml=yes --xml-file=./nfstrace.%p.stat.nfsv3.memcheck.xml \
+        ./nfstrace --mode=stat -a ./analyzers/libbreakdown.so -b 20 -Q 4096 -M 512 \
+        -I ./eth-ipv4-tcp-nfsv3.pcap
     if [ $? -ne 0 ] ; then
         echo ">>> Error generating valgrind/memcheck report for NFSv3 in 'stat' mode"
         exit 1
     fi
     echo ">>> Generating valgrind/memcheck report for NFSv4 in 'stat' mode"
     valgrind --tool=memcheck --leak-check=full --show-reachable=yes \
-    	--undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
-    	--trace-children=no --xml=yes --xml-file=./nfstrace.%p.stat.nfsv4.memcheck.xml \
-    	./nfstrace --mode=stat -a ./analyzers/libbreakdown.so -b 20 -Q 4096 -M 512 \
-    	-I ./eth-ipv4-tcp-nfsv4.pcap
+        --undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
+        --trace-children=no --xml=yes --xml-file=./nfstrace.%p.stat.nfsv4.memcheck.xml \
+        ./nfstrace --mode=stat -a ./analyzers/libbreakdown.so -b 20 -Q 4096 -M 512 \
+        -I ./eth-ipv4-tcp-nfsv4.pcap
     if [ $? -ne 0 ] ; then
         echo ">>> Error generating valgrind/memcheck report for NFSv4 in 'stat' mode"
         exit 1
