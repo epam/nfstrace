@@ -25,6 +25,7 @@
 //------------------------------------------------------------------------------
 #include "cifs_filtrator.h"
 #include "rpc_filtrator.h"
+#include "utils/log.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -108,7 +109,7 @@ public:
         // it is Unknown message
         else
         {
-            //LOG("Unknown packet")
+            LOG("Unknown packet");
         }
     }
 };// Filtrators
