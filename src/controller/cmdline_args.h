@@ -56,7 +56,6 @@ struct Args
         ArgQSize,
         ArgTrace,
         ArgDropRoot,
-        ArgProtocol,
         ArgVerbose,
         ArgHelp,
         num
@@ -66,10 +65,6 @@ struct Args
     static const char* const dumping_mode;
     static const char* const analysis_mode;
     static const char* const draining_mode;
-
-    static const char* const CIFS_protocol;//!< CIFS protocol to be analyzed
-    static const char* const NFS_protocol;//!< NFS protocol to be analyzed
-
 private:
     static Opt options[num];
 

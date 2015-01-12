@@ -84,8 +84,7 @@ Controller::Controller(const Parameters& params) try
             analysis.reset(new AnalysisManager{status, params});
 
             filtration->add_offline_analysis(params.input_file(),
-                                             analysis->get_queue(),
-                                             params);
+                                             analysis->get_queue());
         }
         break;
         case RunningMode::Draining:

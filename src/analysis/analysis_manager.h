@@ -56,7 +56,6 @@ private:
     std::unique_ptr<Analyzers> analysiss;
     std::unique_ptr<FilteredDataQueue> queue;
     std::unique_ptr<ParserThread<Parsers>> parser_thread;
-    const NST::controller::NetProtocol protocol;
 };
 
 } // namespace analysis
