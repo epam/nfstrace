@@ -33,20 +33,23 @@ CIFSParser::CIFSParser(Analyzers& a) :
 {
 }
 
-void CIFSParser::parse_data(NST::utils::FilteredDataQueue::Ptr&& data)
+bool CIFSParser::parse_data(utils::FilteredDataQueue::Ptr& data)
 {
     if (const CIFSv1::MessageHeader* request = CIFSv1::get_header(data->data))
     {
         parse_packet(request, std::move(data));
+        return true;
     }
     else if (const CIFSv2::MessageHeader* request = CIFSv2::get_header(data->data))
     {
         parse_packet(request, std::move(data));
+        return true;
     }
     else
     {
         LOG("Got non-CIFS message!");
     }
+    return false;
 }
 
 void CIFSParser::parse_packet(const CIFSv1::MessageHeader* request, NST::utils::FilteredDataQueue::Ptr&& ptr)
@@ -82,7 +85,7 @@ void CIFSParser::parse_packet(const CIFSv1::MessageHeader* request, NST::utils::
     }
 }
 
-void CIFSParser::parse_packet(const CIFSv2::MessageHeader* request, NST::utils::FilteredDataQueue::Ptr&& ptr)
+void CIFSParser::parse_packet(const CIFSv2::MessageHeader* request, utils::FilteredDataQueue::Ptr&& ptr)
 {
     using namespace NST::API::SMBv2;
     using namespace NST::protocols::CIFSv2;

@@ -29,8 +29,7 @@
 #include "controller/parameters.h"
 #include "controller/running_status.h"
 #include "utils/filtered_data.h"
-#include "analysis/nfs_parser.h"
-#include "analysis/cifs_parser.h"
+#include "analysis/parsers.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -56,8 +55,7 @@ public:
 private:
     std::unique_ptr<Analyzers> analysiss;
     std::unique_ptr<FilteredDataQueue> queue;
-    std::unique_ptr<ParserThread<NFSParser>> nfs_parser_thread;
-    std::unique_ptr<ParserThread<CIFSParser>> cifs_parser_thread;
+    std::unique_ptr<ParserThread<Parsers>> parser_thread;
     const NST::controller::NetProtocol protocol;
 };
 
