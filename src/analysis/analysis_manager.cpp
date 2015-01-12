@@ -30,7 +30,6 @@ AnalysisManager::AnalysisManager(RunningStatus& status, const Parameters& params
                                  : analysiss    {nullptr}
                                  , queue        {nullptr}
                                  , parser_thread{nullptr}
-                                 , protocol(params.protocol())
 {
     analysiss.reset(new Analyzers(params));
 
