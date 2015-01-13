@@ -118,7 +118,7 @@ void CIFSParser::parse_packet(const CIFSv2::MessageHeader* request, utils::Filte
     }
 }
 
-void CIFSParser::analyse_operation(Session *session,
+void CIFSParser::analyse_operation(Session* session,
                                    const CIFSv1::MessageHeader* request,
                                    const CIFSv1::MessageHeader* /*response*/,
                                    NST::utils::FilteredDataQueue::Ptr&& requestData,
@@ -286,7 +286,7 @@ void CIFSParser::analyse_operation(Session *session,
 }
 
 
-void CIFSParser::analyse_operation(Session *session,
+void CIFSParser::analyse_operation(Session* session,
                                    const CIFSv2::MessageHeader* request,
                                    const CIFSv2::MessageHeader* /*response*/,
                                    NST::utils::FilteredDataQueue::Ptr&& requestData,

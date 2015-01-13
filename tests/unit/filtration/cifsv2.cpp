@@ -34,7 +34,8 @@ using ::testing::AtLeast;
 using ::testing::_;
 //------------------------------------------------------------------------------
 
-namespace {
+namespace
+{
 
 class Writer
 {
@@ -42,7 +43,7 @@ public:
 
     class Collection
     {
-        Collection *pImpl = nullptr;
+        Collection* pImpl = nullptr;
     public:
         void set(Writer& w, NST::utils::NetworkSession* /*session_ptr*/)
         {
@@ -86,7 +87,7 @@ public:
             return true;
         }
 
-        virtual const uint8_t * data()
+        virtual const uint8_t* data()
         {
             if (pImpl)
             {
@@ -126,7 +127,7 @@ public:
     public:
         MOCK_METHOD0(reset, void());
         MOCK_METHOD2(push, void(PacketInfo&, size_t));
-        MOCK_METHOD0(data, const uint8_t *());
+        MOCK_METHOD0(data, const uint8_t* ());
         MOCK_METHOD0(data_size, size_t());
         MOCK_METHOD0(capacity, size_t());
         MOCK_METHOD0(allocate, void());
@@ -145,7 +146,7 @@ TEST(Filtration, CIFSFiltratorReset)
     // Set conditions
     Writer mock;
     EXPECT_CALL(mock.collection, reset())
-        .Times(1);
+    .Times(1);
 
     CIFSFiltrator<Writer> f;
     f.set_writer(nullptr, &mock, 0);
@@ -158,7 +159,7 @@ TEST(Filtration, filtratorsResets)
     // Set conditions
     Writer mock;
     EXPECT_CALL(mock.collection, reset())
-        .Times(2);
+    .Times(2);
 
     Filtrators<Writer> f;
     f.set_writer(nullptr, &mock, 0);
@@ -174,21 +175,22 @@ TEST(Filtration, pushRPCheader)
     const uint8_t packet[] = {0x80, 0x00, 0x00, 0x84,
                               0xec, 0x8a, 0x42, 0xcb,
                               0x00, 0x00, 0x00, 0x00,
-                              0x00, 0x00, 0x00, 0x02};
+                              0x00, 0x00, 0x00, 0x02
+                             };
     PacketInfo info(&header, packet, 0);
 
     Writer mock;
     EXPECT_CALL(mock.collection, data())
-        .WillRepeatedly(Return(packet));
+    .WillRepeatedly(Return(packet));
     EXPECT_CALL(mock.collection, data_size())
-        .WillOnce(Return(0))
-        .WillOnce(Return(0))
-        .WillRepeatedly(Return(sizeof(packet)));
+    .WillOnce(Return(0))
+    .WillOnce(Return(0))
+    .WillRepeatedly(Return(sizeof(packet)));
     EXPECT_CALL(mock.collection, capacity())
-        .WillRepeatedly(Return(1000000));
+    .WillRepeatedly(Return(1000000));
     // Set conditions
     EXPECT_CALL(mock.collection, push(_, _))
-        .Times(AtLeast(1));
+    .Times(AtLeast(1));
 
     Filtrators<Writer> f;
     f.set_writer(nullptr, &mock, 0);
@@ -204,21 +206,22 @@ TEST(Filtration, pushCIFSheader)
     const uint8_t packet[] = {0x00, 0x00, 0x00, 0x68,
                               0xfe, 0x53, 0x4d, 0x42,
                               0x00, 0x00, 0x00, 0x00,
-                              0x00, 0x00, 0x00, 0x00};
+                              0x00, 0x00, 0x00, 0x00
+                             };
     PacketInfo info(&header, packet, 0);
 
     Writer mock;
     EXPECT_CALL(mock.collection, data())
-        .WillRepeatedly(Return(packet));
+    .WillRepeatedly(Return(packet));
     EXPECT_CALL(mock.collection, data_size())
-        .WillOnce(Return(0))
-        .WillOnce(Return(0))
-        .WillRepeatedly(Return(sizeof(packet)));
+    .WillOnce(Return(0))
+    .WillOnce(Return(0))
+    .WillRepeatedly(Return(sizeof(packet)));
     EXPECT_CALL(mock.collection, capacity())
-        .WillRepeatedly(Return(1000000));
+    .WillRepeatedly(Return(1000000));
     // Set conditions
     EXPECT_CALL(mock.collection, push(_, _))
-        .Times(AtLeast(1));
+    .Times(AtLeast(1));
 
     Filtrators<Writer> f;
     f.set_writer(nullptr, &mock, 0);
