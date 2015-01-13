@@ -61,6 +61,7 @@ public:
 
     inline bool inProgress(PacketInfo& info)
     {
+        //FIXME: Code has been dublicated
         static const size_t header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
 
         if (msg_len || to_be_copied)
@@ -115,6 +116,7 @@ public:
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
+        //FIXME: Code has been dublicated
         if (msg_len != 0)
         {
             if (to_be_copied == 0 && msg_len >= n)
@@ -136,6 +138,7 @@ public:
 
     void push(PacketInfo& info)
     {
+        //FIXME: Code has been dublicated
         assert(info.dlen != 0);
 
         while (info.dlen) // loop over data in packet
