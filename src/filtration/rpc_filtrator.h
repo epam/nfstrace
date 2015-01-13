@@ -72,22 +72,45 @@ public:
         nfs3_rw_hdr_max = max_rpc_hdr;
     }
 
-    inline bool inProgress(PacketInfo& info) const
+    inline bool inProgress(PacketInfo& info)
     {
+        static const size_t header_len = sizeof(RecordMark) + sizeof(MessageHeader);
+
         if (msg_len || hdr_len)
         {
             return true;
         }
 
-        static const size_t header_len = sizeof(RecordMark) + sizeof(MessageHeader);
-        if (info.dlen >= header_len)
+        if (!collection) // collection isn't allocated
         {
-            const RecordMark* rm {reinterpret_cast<const RecordMark*>(info.data)};
+            collection.allocate(); // allocate new collection from writer
+        }
+        const size_t data_size = collection.data_size();
+
+        if (data_size + info.dlen > header_len)
+        {
+            static uint8_t buffer[header_len];
+            const uint8_t* header = info.data;
+
+            if (data_size > 0)
+            {
+                memcpy(buffer, collection.data(), data_size);
+                memcpy(buffer + data_size, info.data, header_len - data_size);
+                header = buffer;
+            }
+
+            const RecordMark* rm {reinterpret_cast<const RecordMark*>(header)};
             if ((rm->fragment()->type() == MsgType::REPLY ) || (rm->fragment()->type() == MsgType::CALL ))
             {
                 return true;
             }
+            reset();
         }
+        else
+        {
+            collection.push(info, info.dlen);
+        }
+
         return false;
     }
 
