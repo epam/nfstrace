@@ -181,6 +181,8 @@ TEST(Filtration, pushRPCheader)
     EXPECT_CALL(mock.collection, data())
         .WillRepeatedly(Return(packet));
     EXPECT_CALL(mock.collection, data_size())
+        .WillOnce(Return(0))
+        .WillOnce(Return(0))
         .WillRepeatedly(Return(sizeof(packet)));
     EXPECT_CALL(mock.collection, capacity())
         .WillRepeatedly(Return(1000000));
@@ -209,6 +211,8 @@ TEST(Filtration, pushCIFSheader)
     EXPECT_CALL(mock.collection, data())
         .WillRepeatedly(Return(packet));
     EXPECT_CALL(mock.collection, data_size())
+        .WillOnce(Return(0))
+        .WillOnce(Return(0))
         .WillRepeatedly(Return(sizeof(packet)));
     EXPECT_CALL(mock.collection, capacity())
         .WillRepeatedly(Return(1000000));

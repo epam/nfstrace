@@ -59,28 +59,51 @@ public:
         collection.reset(); // data in external memory freed
     }
 
-    inline bool inProgress(PacketInfo& info) const
+    inline bool inProgress(PacketInfo& info)
     {
+        static const size_t header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
+
         if (msg_len || to_be_copied)
         {
             return true;
         }
 
-        static const size_t header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
-        if (info.dlen >= header_len)
+        if (!collection) // collection isn't allocated
         {
-            if (NetBIOS::get_header(info.data))
+            collection.allocate(); // allocate new collection from writer
+        }
+        const size_t data_size = collection.data_size();
+
+        if (data_size + info.dlen > header_len)
+        {
+            static uint8_t buffer[header_len];
+            const uint8_t* header = info.data;
+
+            if (data_size > 0)
             {
-                if (CIFSv1::get_header(info.data + sizeof(NetBIOS::MessageHeader)))
+                memcpy(buffer, collection.data(), data_size);
+                memcpy(buffer + data_size, info.data, header_len - data_size);
+                header = buffer;
+            }
+
+            if (NetBIOS::get_header(header))
+            {
+                if (CIFSv1::get_header(header + sizeof(NetBIOS::MessageHeader)))
                 {
                     return true;
                 }
-                else if (CIFSv2::get_header(info.data + sizeof(NetBIOS::MessageHeader)))
+                else if (CIFSv2::get_header(header + sizeof(NetBIOS::MessageHeader)))
                 {
                     return true;
                 }
             }
+            reset();
         }
+        else
+        {
+            collection.push(info, info.dlen);
+        }
+
         return false;
     }
 
