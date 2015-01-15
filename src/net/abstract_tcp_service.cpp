@@ -88,9 +88,9 @@ void AbstractTcpService::start()
     // Creating threads for thread-pool
     for (auto & thr : _threadPool)
     {
-        thr = std::thread{[this]() { this->runWorker(); }};
+        thr = std::thread{&AbstractTcpService::runWorker, this};
     }
-    _listenerThread = std::thread{[this]() { this->runListener(); }};
+    _listenerThread = std::thread{&AbstractTcpService::runListener, this};
 }
 
 void AbstractTcpService::stop()
