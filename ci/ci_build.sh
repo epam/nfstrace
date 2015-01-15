@@ -195,7 +195,9 @@ if [ $? -ne 0 ] ; then
     exit 1
 fi
 cd $DEBUG_BUILD_DIR
-cmake -Dgtest_disable_pthreads=ON -DCMAKE_BUILD_TYPE=Debug -DGMOCK_SOURCE_DIR="$HOME/gmock-1.7.0" ../
+
+cmake -DCMAKE_BUILD_TYPE=Debug -DGMOCK_SOURCE_DIR="$HOME/gmock-1.7.0" ../
+
 if [ $? -ne 0 ] ; then
     echo ">>> Debug build configuration error"
     exit 1
@@ -287,7 +289,9 @@ if [ $? -ne 0 ] ; then
     exit 1
 fi
 cd $RELEASE_BUILD_DIR
-cmake -Dgtest_disable_pthreads=ON -DCMAKE_BUILD_TYPE=Release -DGMOCK_SOURCE_DIR="$HOME/gmock-1.7.0" ../
+
+cmake -DCMAKE_BUILD_TYPE=Release -DGMOCK_SOURCE_DIR="$HOME/gmock-1.7.0" ../
+
 if [ $? -ne 0 ] ; then
     echo ">>> Release build configuration error"
     exit 1
