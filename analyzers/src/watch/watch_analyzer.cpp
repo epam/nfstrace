@@ -23,6 +23,7 @@
 #include <string>
 
 #include <unistd.h>
+#include <signal.h>
 
 #include "watch_analyzer.h"
 //------------------------------------------------------------------------------
@@ -134,6 +135,13 @@ void WatchAnalyzer::compound4(const struct RPCProcedure*  proc,
 
 void WatchAnalyzer::flush_statistics()
 {
+}
+
+void WatchAnalyzer::on_unix_signal(int signo)
+{
+    if (signo == SIGWINCH) {
+        pl.enableResize();
+    }
 }
 
 void WatchAnalyzer::account(const struct RPCProcedure* proc,

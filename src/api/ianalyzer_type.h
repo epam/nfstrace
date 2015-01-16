@@ -408,6 +408,7 @@ class IAnalyzer : public INFSv3rpcgen, public INFSv4rpcgen, public INFSv41rpcgen
 public:
     virtual ~IAnalyzer() {};
     virtual void flush_statistics() = 0;
+    virtual void on_unix_signal(int /*signo*/) {}
 };
 
 } // namespace API

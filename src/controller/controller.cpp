@@ -125,6 +125,10 @@ int Controller::run()
                 {
                     glog.reopen();
                 }
+                else if(s.signal_number == SIGWINCH)
+                {
+                    analysis->on_unix_signal(s.signal_number);
+                }
                 else if(s.signal_number == SIGINT)
                 {
                     throw ProcessingDone{std::string{"Interrupted by user."}};
