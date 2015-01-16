@@ -34,9 +34,9 @@ namespace NST
 {
 namespace protocols
 {
-using namespace NFS3;
-using namespace NFS4;
-using namespace NFS41;
+using NFS3::proc_t_of;
+using NFS4::proc_t_of;
+using NFS41::proc_t_of;
 
 template
 <
