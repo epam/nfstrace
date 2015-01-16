@@ -139,8 +139,8 @@ void WatchAnalyzer::flush_statistics()
 void WatchAnalyzer::account(const RPCProcedure* proc,
                 const struct NFS4::COMPOUND4res* res)
 {
-    const u_int nfs_proc = proc->rpc_call.ru.RM_cmb.cb_proc;
-    const u_int nfs_vers = proc->rpc_call.ru.RM_cmb.cb_vers;
+    const u_int nfs_proc = proc->call.ru.RM_cmb.cb_proc;
+    const u_int nfs_vers = proc->call.ru.RM_cmb.cb_vers;
 
     for(uint16_t i = 0; i < max_read; i++)
     {

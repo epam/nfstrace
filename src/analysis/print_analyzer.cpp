@@ -46,7 +46,7 @@ bool print_procedure(std::ostream& out, const RPCProcedure* proc)
     bool result {false};
     NST::utils::operator<<(out, *(proc->session));
 
-    auto& call = proc->rpc_call;
+    auto& call = proc->call;
     const unsigned long nfs_version {call.ru.RM_cmb.cb_vers};
     if(out_all())
     {
@@ -66,7 +66,7 @@ bool print_procedure(std::ostream& out, const RPCProcedure* proc)
     }
 
     // check procedure reply
-    auto& reply = proc->rpc_reply;
+    auto& reply = proc->reply;
     if(reply.ru.RM_rmb.rp_stat == reply_stat::MSG_ACCEPTED)
     {
         switch(reply.ru.RM_rmb.ru.RP_ar.ar_stat)
