@@ -505,8 +505,8 @@ private:
                  const struct NFS4::COMPOUND4res* res = nullptr)
     {
         typename PerOpStat::iterator i;
-        const u_int nfs_proc = proc->rpc_call.ru.RM_cmb.cb_proc;
-        const u_int nfs_vers = proc->rpc_call.ru.RM_cmb.cb_vers;
+        const u_int nfs_proc = proc->call.ru.RM_cmb.cb_proc;
+        const u_int nfs_vers = proc->call.ru.RM_cmb.cb_vers;
         timeval latency{0,0};
 
         // diff between 'reply' and 'call' timestamps
