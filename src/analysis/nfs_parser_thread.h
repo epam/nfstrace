@@ -55,6 +55,8 @@ private:
                                FilteredDataQueue::Ptr&& reply,
                                RPCSession* session);
 
+    uint32_t get_minor_version(FilteredDataQueue::Ptr& call);
+
     RunningStatus& status;
     Analyzers& analyzers;
     FilteredDataQueue& queue;

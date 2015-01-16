@@ -27,6 +27,7 @@
 #include "api/rpc_procedure.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
+#include "protocols/nfs4/nfs41_utils.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -35,6 +36,7 @@ namespace protocols
 {
 using namespace NFS3;
 using namespace NFS4;
+using namespace NFS41;
 
 template
 <
@@ -153,10 +155,16 @@ using NFSPROC3RPCGEN_COMMIT      = NFSProcedure <NFS3::COMMIT3args,      NFS3::C
 
 namespace NFS4
 {
-
 namespace NFS4 = NST::API::NFS4;
-using NFSPROC4RPCGEN_NULL        = NFSProcedure <NFS4::NULL4args,     NFS4::NULL4res>;
-using NFSPROC4RPCGEN_COMPOUND    = NFSProcedure <NFS4::COMPOUND4args, NFS4::COMPOUND4res>;
+using NFSPROC4RPCGEN_NULL     = NFSProcedure <NFS4::NULL4args,     NFS4::NULL4res>;
+using NFSPROC4RPCGEN_COMPOUND = NFSProcedure <NFS4::COMPOUND4args, NFS4::COMPOUND4res>;
+}
+
+namespace NFS41
+{
+namespace NFS41 = NST::API::NFS41;
+using NFSPROC41RPCGEN_NULL     = NFSProcedure <NFS41::NULL4args,     NFS41::NULL4res>;
+using NFSPROC41RPCGEN_COMPOUND = NFSProcedure <NFS41::COMPOUND4args, NFS41::COMPOUND4res>;
 }
 
 } // namespace protocols
