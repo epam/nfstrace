@@ -22,6 +22,7 @@
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/nfs3/nfs3_utils.h"
 //------------------------------------------------------------------------------
+using namespace NST::API::NFS3;
 using namespace NST::protocols::NFS;
 using namespace NST::protocols::xdr;
 //------------------------------------------------------------------------------
@@ -63,7 +64,7 @@ enum
     S_IXOTH = 0x00001  // Search in directory
 };
 
-void print_mode3(std::ostream& out, const rpcgen::uint32 val)
+void print_mode3(std::ostream& out, const uint32 val)
 {
     if (val & S_ISUID) out << "USER_ID_EXEC ";
     if (val & S_ISGID) out << "GROUP_ID_EXEC ";
@@ -79,116 +80,116 @@ void print_mode3(std::ostream& out, const rpcgen::uint32 val)
     if (val & S_IXOTH) out << "OTHER_EXEC";
 }
 
-void print_access3(std::ostream& out, const rpcgen::uint32 val)
+void print_access3(std::ostream& out, const uint32 val)
 {
-    if (val & rpcgen::ACCESS3_READ)    out << "READ ";
-    if (val & rpcgen::ACCESS3_LOOKUP)  out << "LOOKUP ";
-    if (val & rpcgen::ACCESS3_MODIFY)  out << "MODIFY ";
-    if (val & rpcgen::ACCESS3_EXTEND)  out << "EXTEND ";
-    if (val & rpcgen::ACCESS3_DELETE)  out << "DELETE ";
-    if (val & rpcgen::ACCESS3_EXECUTE) out << "EXECUTE ";
+    if (val & ACCESS3_READ)    out << "READ ";
+    if (val & ACCESS3_LOOKUP)  out << "LOOKUP ";
+    if (val & ACCESS3_MODIFY)  out << "MODIFY ";
+    if (val & ACCESS3_EXTEND)  out << "EXTEND ";
+    if (val & ACCESS3_DELETE)  out << "DELETE ";
+    if (val & ACCESS3_EXECUTE) out << "EXECUTE ";
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfsstat3& obj)
+std::ostream& operator<<(std::ostream& out, const nfsstat3& obj)
 {
     switch(obj)
     {
-    case rpcgen::nfsstat3::NFS3_OK:
+    case nfsstat3::NFS3_OK:
         return out << "OK";
-    case rpcgen::nfsstat3::NFS3ERR_PERM:
+    case nfsstat3::NFS3ERR_PERM:
         return out << "ERR_PERM";
-    case rpcgen::nfsstat3::NFS3ERR_NOENT:
+    case nfsstat3::NFS3ERR_NOENT:
         return out << "ERR_NOENT";
-    case rpcgen::nfsstat3::NFS3ERR_IO:
+    case nfsstat3::NFS3ERR_IO:
         return out << "ERR_IO";
-    case rpcgen::nfsstat3::NFS3ERR_NXIO:
+    case nfsstat3::NFS3ERR_NXIO:
         return out << "ERR_NXIO";
-    case rpcgen::nfsstat3::NFS3ERR_ACCES:
+    case nfsstat3::NFS3ERR_ACCES:
         return out << "ERR_ACCES";
-    case rpcgen::nfsstat3::NFS3ERR_EXIST:
+    case nfsstat3::NFS3ERR_EXIST:
         return out << "ERR_EXIST";
-    case rpcgen::nfsstat3::NFS3ERR_XDEV:
+    case nfsstat3::NFS3ERR_XDEV:
         return out << "ERR_XDEV";
-    case rpcgen::nfsstat3::NFS3ERR_NODEV:
+    case nfsstat3::NFS3ERR_NODEV:
         return out << "ERR_NODEV";
-    case rpcgen::nfsstat3::NFS3ERR_NOTDIR:
+    case nfsstat3::NFS3ERR_NOTDIR:
         return out << "ERR_NOTDIR";
-    case rpcgen::nfsstat3::NFS3ERR_ISDIR:
+    case nfsstat3::NFS3ERR_ISDIR:
         return out << "ERR_ISDIR";
-    case rpcgen::nfsstat3::NFS3ERR_INVAL:
+    case nfsstat3::NFS3ERR_INVAL:
         return out << "ERR_INVAL";
-    case rpcgen::nfsstat3::NFS3ERR_FBIG:
+    case nfsstat3::NFS3ERR_FBIG:
         return out << "ERR_FBIG";
-    case rpcgen::nfsstat3::NFS3ERR_NOSPC:
+    case nfsstat3::NFS3ERR_NOSPC:
         return out << "ERR_NOSPC";
-    case rpcgen::nfsstat3::NFS3ERR_ROFS:
+    case nfsstat3::NFS3ERR_ROFS:
         return out << "ERR_ROFS";
-    case rpcgen::nfsstat3::NFS3ERR_MLINK:
+    case nfsstat3::NFS3ERR_MLINK:
         return out << "ERR_MLINK";
-    case rpcgen::nfsstat3::NFS3ERR_NAMETOOLONG:
+    case nfsstat3::NFS3ERR_NAMETOOLONG:
         return out << "ERR_NAMETOOLONG";
-    case rpcgen::nfsstat3::NFS3ERR_NOTEMPTY:
+    case nfsstat3::NFS3ERR_NOTEMPTY:
         return out << "ERR_NOTEMPTY";
-    case rpcgen::nfsstat3::NFS3ERR_DQUOT:
+    case nfsstat3::NFS3ERR_DQUOT:
         return out << "ERR_DQUOT";
-    case rpcgen::nfsstat3::NFS3ERR_STALE:
+    case nfsstat3::NFS3ERR_STALE:
         return out << "ERR_STALE";
-    case rpcgen::nfsstat3::NFS3ERR_REMOTE:
+    case nfsstat3::NFS3ERR_REMOTE:
         return out << "ERR_REMOTE";
-    case rpcgen::nfsstat3::NFS3ERR_BADHANDLE:
+    case nfsstat3::NFS3ERR_BADHANDLE:
         return out << "ERR_BADHANDLE";
-    case rpcgen::nfsstat3::NFS3ERR_NOT_SYNC:
+    case nfsstat3::NFS3ERR_NOT_SYNC:
         return out << "ERR_NOT_SYNC";
-    case rpcgen::nfsstat3::NFS3ERR_BAD_COOKIE:
+    case nfsstat3::NFS3ERR_BAD_COOKIE:
         return out << "ERR_BAD_COOKIE";
-    case rpcgen::nfsstat3::NFS3ERR_NOTSUPP:
+    case nfsstat3::NFS3ERR_NOTSUPP:
         return out << "ERR_NOTSUPP";
-    case rpcgen::nfsstat3::NFS3ERR_TOOSMALL:
+    case nfsstat3::NFS3ERR_TOOSMALL:
         return out << "ERR_TOOSMALL";
-    case rpcgen::nfsstat3::NFS3ERR_SERVERFAULT:
+    case nfsstat3::NFS3ERR_SERVERFAULT:
         return out << "ERR_SERVERFAULT";
-    case rpcgen::nfsstat3::NFS3ERR_BADTYPE:
+    case nfsstat3::NFS3ERR_BADTYPE:
         return out << "ERR_BADTYPE";
-    case rpcgen::nfsstat3::NFS3ERR_JUKEBOX:
+    case nfsstat3::NFS3ERR_JUKEBOX:
         return out << "ERR_JUKEBOX";
     }
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::ftype3& obj)
+std::ostream& operator<<(std::ostream& out, const ftype3& obj)
 {
     switch(obj)
     {
-    case rpcgen::ftype3::NF3REG:  return out << "REG";
-    case rpcgen::ftype3::NF3DIR:  return out << "DIR";
-    case rpcgen::ftype3::NF3BLK:  return out << "BLK";
-    case rpcgen::ftype3::NF3CHR:  return out << "CHR";
-    case rpcgen::ftype3::NF3LNK:  return out << "LNK";
-    case rpcgen::ftype3::NF3SOCK: return out << "SOCK";
-    case rpcgen::ftype3::NF3FIFO: return out << "FIFO";
+    case ftype3::NF3REG:  return out << "REG";
+    case ftype3::NF3DIR:  return out << "DIR";
+    case ftype3::NF3BLK:  return out << "BLK";
+    case ftype3::NF3CHR:  return out << "CHR";
+    case ftype3::NF3LNK:  return out << "LNK";
+    case ftype3::NF3SOCK: return out << "SOCK";
+    case ftype3::NF3FIFO: return out << "FIFO";
     }
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::specdata3& obj)
+std::ostream& operator<<(std::ostream& out, const specdata3& obj)
 {
     return out << " specdata1: " << obj.specdata1
                << " specdata2: " << obj.specdata2;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_fh3& obj)
+std::ostream& operator<<(std::ostream& out, const nfs_fh3& obj)
 {
     NFS::print_nfs_fh(out, obj.data.data_val, obj.data.data_len);
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime3& obj)
+std::ostream& operator<<(std::ostream& out, const nfstime3& obj)
 {
     return out << "seconds: "   << obj.seconds
                << " nseconds: " << obj.nseconds << ' ';
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::fattr3& obj)
+std::ostream& operator<<(std::ostream& out, const fattr3& obj)
 {
     out << " type: " << obj.type
         << " mode: ";
@@ -209,90 +210,90 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::fattr3& obj)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::post_op_attr& obj)
+std::ostream& operator<<(std::ostream& out, const post_op_attr& obj)
 {
     if(obj.attributes_follow) return out << obj.post_op_attr_u.attributes;
     else                      return out << " void ";
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::wcc_attr& obj)
+std::ostream& operator<<(std::ostream& out, const wcc_attr& obj)
 {
     return out << " size: "  << obj.size
                << " mtime: " << obj.mtime
                << " ctime: " << obj.ctime;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::pre_op_attr& obj)
+std::ostream& operator<<(std::ostream& out, const pre_op_attr& obj)
 {
     if(obj.attributes_follow) return out << obj.pre_op_attr_u.attributes;
     else                      return out << " void ";
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::wcc_data& obj)
+std::ostream& operator<<(std::ostream& out, const wcc_data& obj)
 {
     return out << " before: " << obj.before << "after: " << obj.after;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::post_op_fh3& obj)
+std::ostream& operator<<(std::ostream& out, const post_op_fh3& obj)
 {
     if(obj.handle_follows) return out << " handle: "
                                       << obj.post_op_fh3_u.handle;
     else                   return out << " void ";
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::time_how& obj)
+std::ostream& operator<<(std::ostream& out, const time_how& obj)
 {
     switch(obj)
     {
-    case rpcgen::time_how::DONT_CHANGE:
+    case time_how::DONT_CHANGE:
         return out << "DONT_CHANGE";
-    case rpcgen::time_how::SET_TO_SERVER_TIME:
+    case time_how::SET_TO_SERVER_TIME:
         return out << "SET_TO_SERVER_TIME";
-    case rpcgen::time_how::SET_TO_CLIENT_TIME:
+    case time_how::SET_TO_CLIENT_TIME:
         return out << "SET_TO_CLIENT_TIME";
     }
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::set_mode3& obj)
+std::ostream& operator<<(std::ostream& out, const set_mode3& obj)
 {
     if(obj.set_it) return out << obj.set_mode3_u.mode;
     else           return out << " void ";
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::set_uid3& obj)
+std::ostream& operator<<(std::ostream& out, const set_uid3& obj)
 {
     if(obj.set_it) return out << obj.set_uid3_u.uid;
     else           return out << " void ";
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::set_gid3& obj)
+std::ostream& operator<<(std::ostream& out, const set_gid3& obj)
 {
     if(obj.set_it) return out << obj.set_gid3_u.gid;
     else           return out << " void ";
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::set_size3& obj)
+std::ostream& operator<<(std::ostream& out, const set_size3& obj)
 {
     if(obj.set_it) return out << obj.set_size3_u.size;
     else           return out << " void ";
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::set_atime& obj)
+std::ostream& operator<<(std::ostream& out, const set_atime& obj)
 {
-    if(obj.set_it == rpcgen::time_how::SET_TO_CLIENT_TIME)
+    if(obj.set_it == time_how::SET_TO_CLIENT_TIME)
          return out << obj.set_it << " " << obj.set_atime_u.atime;
     else return out << obj.set_it;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::set_mtime& obj)
+std::ostream& operator<<(std::ostream& out, const set_mtime& obj)
 {
-    if(obj.set_it == rpcgen::time_how::SET_TO_CLIENT_TIME)
+    if(obj.set_it == time_how::SET_TO_CLIENT_TIME)
          return out << obj.set_it << " " << obj.set_mtime_u.mtime;
     else return out << obj.set_it;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::sattr3& obj)
+std::ostream& operator<<(std::ostream& out, const sattr3& obj)
 {
     if(obj.mode.set_it)
     {
@@ -303,94 +304,94 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::sattr3& obj)
     if(obj.uid.set_it)   out << " uid: "   << obj.uid.set_uid3_u.uid;
     if(obj.gid.set_it)   out << " gid: "   << obj.gid.set_gid3_u.gid;
     if(obj.size.set_it)  out << " size: "  << obj.size.set_size3_u.size;
-    if(obj.atime.set_it == rpcgen::time_how::SET_TO_CLIENT_TIME)
+    if(obj.atime.set_it == time_how::SET_TO_CLIENT_TIME)
         out << " atime: " << obj.atime.set_atime_u.atime;
-    if(obj.mtime.set_it == rpcgen::time_how::SET_TO_CLIENT_TIME)
+    if(obj.mtime.set_it == time_how::SET_TO_CLIENT_TIME)
         out << " atime: " << obj.mtime.set_mtime_u.mtime;
 
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::diropargs3& obj)
+std::ostream& operator<<(std::ostream& out, const diropargs3& obj)
 {
     return out << " dir: "   << obj.dir
                << " name: " << obj.name;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::sattrguard3& obj)
+std::ostream& operator<<(std::ostream& out, const sattrguard3& obj)
 {
     if(obj.check) return out << " obj_ctime: " << obj.sattrguard3_u.obj_ctime; 
     else          return out << " void ";
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::stable_how& obj)
+std::ostream& operator<<(std::ostream& out, const stable_how& obj)
 {
     switch(obj)
     {
-    case rpcgen::stable_how::UNSTABLE:  return out << "UNSTABLE";
-    case rpcgen::stable_how::DATA_SYNC: return out << "DATA_SYNC";
-    case rpcgen::stable_how::FILE_SYNC: return out << "FILE_SYNC";
+    case stable_how::UNSTABLE:  return out << "UNSTABLE";
+    case stable_how::DATA_SYNC: return out << "DATA_SYNC";
+    case stable_how::FILE_SYNC: return out << "FILE_SYNC";
     }
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::createmode3& obj)
+std::ostream& operator<<(std::ostream& out, const createmode3& obj)
 {
     switch(obj)
     {
-    case rpcgen::createmode3::UNCHECKED: return out << "UNCHECKED";
-    case rpcgen::createmode3::GUARDED:   return out << "GUARDED";
-    case rpcgen::createmode3::EXCLUSIVE: return out << "EXCLUSIVE";
+    case createmode3::UNCHECKED: return out << "UNCHECKED";
+    case createmode3::GUARDED:   return out << "GUARDED";
+    case createmode3::EXCLUSIVE: return out << "EXCLUSIVE";
     }
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::createhow3& obj)
+std::ostream& operator<<(std::ostream& out, const createhow3& obj)
 {
     switch(obj.mode)
     {
-    case rpcgen::createmode3::UNCHECKED:
-    case rpcgen::createmode3::GUARDED:
+    case createmode3::UNCHECKED:
+    case createmode3::GUARDED:
         return out << obj.mode << " obj attributes: "
                    << obj.createhow3_u.obj_attributes;
-    case rpcgen::createmode3::EXCLUSIVE:
+    case createmode3::EXCLUSIVE:
         out << obj.mode << " verf: ";
-        print_hex(out, obj.createhow3_u.verf, rpcgen::NFS3_COOKIEVERFSIZE);
+        print_hex(out, obj.createhow3_u.verf, NFS3_COOKIEVERFSIZE);
         break;
     }
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::symlinkdata3& obj)
+std::ostream& operator<<(std::ostream& out, const symlinkdata3& obj)
 {
     return out << " symlink_attributes: " << obj.symlink_attributes
                << " symlink_data: "       << obj.symlink_data;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::devicedata3& obj)
+std::ostream& operator<<(std::ostream& out, const devicedata3& obj)
 {
     return out << " dev_attributes: " << obj.dev_attributes
                << " spec: "           << obj.spec;
 }
 
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::mknoddata3& obj)
+std::ostream& operator<<(std::ostream& out, const mknoddata3& obj)
 {
     out << " type: " << obj.type;
     switch(obj.type)
     {
-    case rpcgen::ftype3::NF3CHR:
-    case rpcgen::ftype3::NF3BLK:
+    case ftype3::NF3CHR:
+    case ftype3::NF3BLK:
         return out << " device: "          << obj.mknoddata3_u.device;
-    case rpcgen::ftype3::NF3SOCK:
-    case rpcgen::ftype3::NF3FIFO:
+    case ftype3::NF3SOCK:
+    case ftype3::NF3FIFO:
         return out << " pipe_attributes: " << obj.mknoddata3_u.pipe_attributes;
     default: break;
     }
     return out; 
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::entry3& obj)
+std::ostream& operator<<(std::ostream& out, const entry3& obj)
 {
     out << " file id: "   <<  obj.fileid
         << " name: "      <<  obj.name
@@ -399,14 +400,14 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::entry3& obj)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::dirlist3& obj)
+std::ostream& operator<<(std::ostream& out, const dirlist3& obj)
 {
     out << " eof: "     <<  obj.eof;
     if(obj.entries) out << *obj.entries;
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::entryplus3& obj)
+std::ostream& operator<<(std::ostream& out, const entryplus3& obj)
 {
     out << " file id: "         << obj.fileid
         << " name: "            << obj.name
@@ -417,7 +418,7 @@ std::ostream& operator<<(std::ostream& out, const rpcgen::entryplus3& obj)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rpcgen::dirlistplus3& obj)
+std::ostream& operator<<(std::ostream& out, const dirlistplus3& obj)
 {
     out << " eof: " << obj.eof;
     if(obj.entries) out << *obj.entries;

@@ -290,7 +290,7 @@ public:
                 if(RPCValidator::check(call))
                 {
                     msg_len = len;   // length of current RPC message
-                    if(NFS3::Validator::check(call))
+                    if(protocols::NFS3::Validator::check(call))
                     {
                         uint32_t proc {call->proc()};
                         if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
@@ -303,7 +303,7 @@ public:
                         }
                         //TRACE("%p| MATCH RPC Call  xid:%u len: %u procedure: %u", this, call->xid(), msg_len, call->proc());
                     }
-                    else if (NFS4::Validator::check(call))
+                    else if (protocols::NFS4::Validator::check(call))
                     {
                         hdr_len = msg_len;  // fully collect of NFSv4 messages
                     }

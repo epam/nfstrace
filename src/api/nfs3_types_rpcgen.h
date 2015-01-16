@@ -24,10 +24,12 @@
 //------------------------------------------------------------------------------
 #include <rpc/rpc.h>
 //------------------------------------------------------------------------------
-namespace rpcgen
+namespace NST
 {
-
-extern "C" {
+namespace API
+{
+namespace NFS3
+{
 
 const uint32_t NFS3_FHSIZE         {64};
 const uint32_t NFS3_COOKIEVERFSIZE {8};
@@ -1082,9 +1084,10 @@ bool_t xdr_COMMIT3args (XDR *, COMMIT3args*);
 bool_t xdr_COMMIT3resok (XDR *, COMMIT3resok*);
 bool_t xdr_COMMIT3resfail (XDR *, COMMIT3resfail*);
 bool_t xdr_COMMIT3res (XDR *, COMMIT3res*);
-}
 
-} // namespace rpcgen
+} // namespace NFS3
+} // namespace API
+} // namespace NST
 //------------------------------------------------------------------------------
 #endif //NFS3_TYPES_RPCGEN_H
 //------------------------------------------------------------------------------
