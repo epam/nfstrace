@@ -317,7 +317,7 @@ public:
              << nfs3_proc_total
              << ". Per procedure:"
              << std::endl;
-         for(int i = 0; i < ProcEnumNFS3::count ; ++i)
+         for(unsigned int i = 0; i < ProcEnumNFS3::count ; ++i)
          {
               out.width(12);
               out << std::left
@@ -343,7 +343,7 @@ public:
              {
                  const Breakdown& current = it.second;
                  uint64_t s_total_proc {0};
-                 for(int i = 0; i < ProcEnumNFS3::count; ++i)
+                 for(unsigned int i = 0; i < ProcEnumNFS3::count; ++i)
                  {
                      s_total_proc += current[i].get_count();
                  }
@@ -359,7 +359,7 @@ public:
             << nfs4_proc_total
             << ". Per procedure:"
             << std::endl;
-        for(int i = 0; i < ProcEnumNFS4::count; ++i)
+        for(unsigned int i = 0; i < ProcEnumNFS4::count; ++i)
         {
             if(i == ProcEnumNFS4::count_proc)
                 out << "NFSv4 total operations: "
@@ -392,9 +392,9 @@ public:
                 const Breakdown& current = it.second;
                 uint64_t s_total_proc {0};
                 uint64_t s_total_ops  {0};
-                for(int i = 0; i < ProcEnumNFS4::count_proc; ++i)
+                for(unsigned int i = 0; i < ProcEnumNFS4::count_proc; ++i)
                     s_total_proc += current[i].get_count();
-                for(int i = ProcEnumNFS4::count_proc; i < ProcEnumNFS4::count; ++i)
+                for(unsigned int i = ProcEnumNFS4::count_proc; i < ProcEnumNFS4::count; ++i)
                     s_total_ops += current[i].get_count();
                 session.str("");
                 print_session(session, it.first);
