@@ -284,7 +284,7 @@ void Plotter::designPlot()
         tmp++;
     }
 
-    for(int i = 0; i < ProcEnumNFS3::count; i++)
+    for(unsigned int i = 0; i < ProcEnumNFS3::count; i++)
     {
         if(nfsv3_proc.max_y + scroll_shift > tmp &&  tmp > scroll_shift)
             mvwprintw(f_win, tmp - scroll_shift, 2, "%s", print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i)));
@@ -310,7 +310,7 @@ void Plotter::designPlot()
         mvwprintw(f_win, tmp - scroll_shift, 2, "Per procedure:");
         tmp++;
     }
-    for(int i = 0; i < ProcEnumNFS4::count_proc; i++)
+    for(unsigned int i = 0; i < ProcEnumNFS4::count_proc; i++)
     {
         if(nfsv4_proc.max_y + scroll_shift> tmp && tmp > scroll_shift)
         {
@@ -333,7 +333,7 @@ void Plotter::designPlot()
         mvwprintw(s_win, tmp - scroll_shift, 2, "Per operation:");
         tmp++;
     }
-    for(int i = ProcEnumNFS4::count_proc ; i < ProcEnumNFS4::count; i++)
+    for(unsigned int i = ProcEnumNFS4::count_proc ; i < ProcEnumNFS4::count; i++)
     {
         if(nfsv4_oper.max_y + scroll_shift> tmp && tmp > scroll_shift)
         {

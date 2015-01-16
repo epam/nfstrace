@@ -19,6 +19,9 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#ifndef NFS41_UTILS_H
+#define NFS41_UTILS_H
+//------------------------------------------------------------------------------
 #include <ostream>
 
 #include "api/nfs_types.h"
