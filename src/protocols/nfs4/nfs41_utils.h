@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // Author: Alexey Costroma
 // Description: Helpers for parsing NFS structures.
-// Copyright (c) 2014 EPAM Systems
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,46 +19,57 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
-#ifndef NFS_UTILS_H
-#define NFS_UTILS_H
-//------------------------------------------------------------------------------
 #include <ostream>
-#include <cstring>
 
-#include "utils/out.h"
+#include "api/nfs_types.h"
+#include "api/nfs41_types_rpcgen.h"
+#include "protocols/nfs/nfs_utils.h"
+#include "protocols/rpc/rpc_header.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace protocols
 {
-namespace NFS
+namespace NFS41
 {
 
-inline bool out_all()
-{
-    using Out = NST::utils::Out;
+namespace NFS41 = NST::API::NFS41;
 
-    return Out::Global::get_level() == Out::Level::All;
+using ProcEnumNFS41 = API::ProcEnumNFS41;
+
+using Validator = rpc::RPCProgramValidator
+                <
+                    100003,                  // SunRPC/NFS program
+                    4,                       // v4
+                    ProcEnumNFS41::NFS_NULL, // NFSPROC41RPCGEN_NULL     (0)
+                    ProcEnumNFS41::COMPOUND  // NFSPROC41RPCGEN_COMPOUND (1)
+                >;
+
+// Procedure 0: NULL - Do nothing
+inline auto proc_t_of(NFS41::NULL4args&)->decltype(&NFS41::xdr_NULL4args)
+{
+    return &NFS41::xdr_NULL4args;
 }
 
-void print_hex(std::ostream& out,
-       const uint32_t* const val,
-              const uint32_t len);
+inline auto proc_t_of(NFS41::NULL4res&)->decltype(&NFS41::xdr_NULL4res)
+{
+    return &NFS41::xdr_NULL4res;
+}
 
-void print_hex(std::ostream& out,
-           const char* const val,
-              const uint32_t len);
+// Procedure 1: COMPOUND
+inline auto proc_t_of(NFS41::COMPOUND4args&)->decltype(&NFS41::xdr_COMPOUND4args)
+{
+    return &NFS41::xdr_COMPOUND4args;
+}
 
-extern "C"
-NST_PUBLIC
-void print_nfs_fh(std::ostream& out,
-              const char* const val,
-                 const uint32_t len);
+inline auto proc_t_of(NFS41::COMPOUND4res&)->decltype(&NFS41::xdr_COMPOUND4res)
+{
+    return &NFS41::xdr_COMPOUND4res;
+}
 
-} // namespace NFS
+} // namespace NFS41
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS_UTILS_H
+#endif//NFS41_UTILS_H
 //------------------------------------------------------------------------------
