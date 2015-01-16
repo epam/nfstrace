@@ -1,16 +1,53 @@
 /*
- * This file was machine generated for
- *  draft-ietf-nfsv4-minorversion1-21
- * Last updated Mon Feb 25 16:16:21 CST 2008
+ * Copyright (c) 2010 IETF Trust and the persons identified
+ * as the document authors.  All rights reserved.
+ *
+ * The document authors are identified in RFC 3530 and
+ * RFC 5661.
+ *
+ * Redistribution and use in source and binary forms, with
+ * or without modification, are permitted provided that the
+ * following conditions are met:
+ *
+ * - Redistributions of source code must retain the above
+ *   copyright notice, this list of conditions and the
+ *   following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above
+ *   copyright notice, this list of conditions and the
+ *   following disclaimer in the documentation and/or other
+ *   materials provided with the distribution.
+ *
+ * - Neither the name of Internet Society, IETF or IETF
+ *   Trust, nor the names of specific contributors, may be
+ *   used to endorse or promote products derived from this
+ *   software without specific prior written permission.
+ *
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS
+ *   AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ *   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ *   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *   FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
+ *   EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ *   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ *   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ *   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ *   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ *   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ *   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /*
- *  Copyright (C) The IETF Trust (2007-2008)
- *  All Rights Reserved.
+ * This code was derived from RFC 3530.  Please
+ * reproduce this note if possible.
  *
- *  Copyright (C) The Internet Society (1998-2006).
- *  All Rights Reserved.
+ * This code was derived from RFC 5661.  Please
+ * reproduce this note if possible.
+ *
+ * This file was machine generated from RFC 5662.
  */
-
 /*
  *      nfs4_prot.x
  */
@@ -19,34 +56,18 @@
 %#define _AUTH_SYS_DEFINE_FOR_NFSv41
 %#include <rpc/auth_sys.h>
 %typedef struct authsys_parms authsys_parms;
-%#endif _AUTH_SYS_DEFINE_FOR_NFSv41
+%#endif /* _AUTH_SYS_DEFINE_FOR_NFSv41 */
 
 /*
  * Basic typedefs for RFC 1832 data type definitions
  */
 
-typedef int         int32_t;
-typedef unsigned int        uint32_t;
-typedef hyper           int64_t;
-typedef unsigned hyper      uint64_t;
-
 /*
- * FRED - added missing referents
+ * typedef int                  int32_t;
+ * typedef unsigned int         uint32_t;
+ * typedef hyper                int64_t;
+ * typedef unsigned hyper       uint64_t;
  */
-const FALSE = 0;
-const TRUE = 1;
-
-const AUTH_NONE  = 0;
-const AUTH_SYS   = 1;
-const RPCSEC_GSS = 6;
-
-struct authsys_parms {
-    unsigned int stamp;
-    string machinename<255>;
-    unsigned int uid;
-    unsigned int gid;
-    unsigned int gids<16>;
-};
 
 /*
  * Sizes
@@ -94,7 +115,13 @@ enum nfsstat4 {
  NFS4ERR_ACCESS         = 13,   /* access denied           */
  NFS4ERR_EXIST          = 17,   /* file already exists     */
  NFS4ERR_XDEV           = 18,   /* different filesystems   */
- /* Unused/reserved       19 */
+
+ /*
+  * Please do not allocate value 19; it was used in NFSv3
+  * and we do not want a value in NFSv3 to have a different
+  * meaning in NFSv4.x.
+  */
+
  NFS4ERR_NOTDIR         = 20,   /* should be a directory   */
  NFS4ERR_ISDIR          = 21,   /* should not be directory */
  NFS4ERR_INVAL          = 22,   /* invalid argument        */
@@ -173,7 +200,7 @@ enum nfsstat4 {
  NFS4ERR_NOMATCHING_LAYOUT = 10060,
  NFS4ERR_RECALLCONFLICT = 10061,
  NFS4ERR_UNKNOWN_LAYOUTTYPE = 10062,
- NFS4ERR_SEQ_MISORDERED = 10063,/* unexpected seq.id in req*/
+ NFS4ERR_SEQ_MISORDERED = 10063,/* unexpected seq.ID in req*/
  NFS4ERR_SEQUENCE_POS   = 10064,/* [CB_]SEQ. op not 1st op */
  NFS4ERR_REQ_TOO_BIG    = 10065,/* request too big         */
  NFS4ERR_REP_TOO_BIG    = 10066,/* reply too big           */
@@ -183,7 +210,7 @@ enum nfsstat4 {
  NFS4ERR_TOO_MANY_OPS   = 10070,/*too many ops in [CB_]COMP*/
  NFS4ERR_OP_NOT_IN_SESSION =10071,/* op needs [CB_]SEQ. op */
  NFS4ERR_HASH_ALG_UNSUPP = 10072, /* hash alg. not supp.   */
- NFS4ERR_CONN_BINDING_NOT_ENFORCED =10073,/* SET_SSV not OK*/
+                                /* Error 10073 is unused.  */
  NFS4ERR_CLIENTID_BUSY  = 10074,/* clientid has state      */
  NFS4ERR_PNFS_IO_HOLE   = 10075,/* IO to _SPARSE file hole */
  NFS4ERR_SEQ_FALSE_RETRY= 10076,/* Retry != original req.  */
@@ -194,9 +221,10 @@ enum nfsstat4 {
  NFS4ERR_NOT_ONLY_OP    = 10081,/* addl ops not allowed    */
  NFS4ERR_WRONG_CRED     = 10082,/* op done by wrong cred   */
  NFS4ERR_WRONG_TYPE     = 10083,/* op on wrong type object */
- NFS4ERR_DIRDELEG_UNAVAIL= 10084,/* delegation not avail.  */
+ NFS4ERR_DIRDELEG_UNAVAIL=10084,/* delegation not avail.   */
  NFS4ERR_REJECT_DELEG   = 10085,/* cb rejected delegation  */
- NFS4ERR_RETURNCONFLICT = 10086 /* layout get before return*/
+ NFS4ERR_RETURNCONFLICT = 10086,/* layout get before return*/
+ NFS4ERR_DELEG_REVOKED  = 10087 /* deleg./layout revoked   */
 };
 
 /*
@@ -291,6 +319,9 @@ struct fs_locations4 {
  * Access Control Entries are supported.
  * Values for the fattr4_aclsupport attribute.
  */
+
+typedef uint32_t        fattr4_aclsupport;
+
 const ACL4_SUPPORT_ALLOW_ACL    = 0x00000001;
 const ACL4_SUPPORT_DENY_ACL     = 0x00000002;
 const ACL4_SUPPORT_AUDIT_ACL    = 0x00000004;
@@ -426,6 +457,7 @@ struct nfsacl41 {
         nfsace4         na41_aces<>;
 };
 
+
 /*
  * Field definitions for the fattr4_mode
  * and fattr4_mode_set_masked attributes.
@@ -514,12 +546,12 @@ struct layout_content4 {
 
 
 %/*
-%/* LAYOUT4_OSD2_OBJECTS loc_body description
+% * LAYOUT4_OSD2_OBJECTS loc_body description
 % * is in a separate .x file
 % */
 %
 %/*
-%/* LAYOUT4_BLOCK_VOLUME loc_body description
+% * LAYOUT4_BLOCK_VOLUME loc_body description
 % * is in a separate .x file
 % */
 
@@ -643,7 +675,6 @@ typedef uint32_t        fs_charset_cap4;
  * NFSv4.1 attributes
  */
 typedef bitmap4         fattr4_supported_attrs;
-typedef bitmap4         fattr4_suppattr_exclcreat;
 typedef nfs_ftype4      fattr4_type;
 typedef uint32_t        fattr4_fh_expire_type;
 typedef changeid4       fattr4_change;
@@ -656,7 +687,6 @@ typedef bool            fattr4_unique_handles;
 typedef nfs_lease4      fattr4_lease_time;
 typedef nfsstat4        fattr4_rdattr_error;
 typedef nfsace4         fattr4_acl<>;
-typedef uint32_t        fattr4_aclsupport;
 typedef bool            fattr4_archive;
 typedef bool            fattr4_cansettime;
 typedef bool            fattr4_case_insensitive;
@@ -703,16 +733,16 @@ typedef settime4        fattr4_time_modify_set;
 /*
  * attributes new to NFSv4.1
  */
+typedef bitmap4         fattr4_suppattr_exclcreat;
 typedef nfstime4        fattr4_dir_notif_delay;
 typedef nfstime4        fattr4_dirent_notif_delay;
-typedef bool            fattr4_absent;
-typedef layouttype4     fattr4_fs_layout_type<>; /* FRED */
+typedef layouttype4     fattr4_fs_layout_types<>;
 typedef fs4_status      fattr4_fs_status;
-typedef fs_charset_cap4 fattr4_fs_charset_cap4;
+typedef fs_charset_cap4 fattr4_fs_charset_cap;
 typedef uint32_t        fattr4_layout_alignment;
 typedef uint32_t        fattr4_layout_blksize;
 typedef layouthint4     fattr4_layout_hint;
-typedef layouttype4     fattr4_layout_type<>; /* FRED */
+typedef layouttype4     fattr4_layout_types<>;
 typedef mdsthreshold4   fattr4_mdsthreshold;
 typedef retention_get4  fattr4_retention_get;
 typedef retention_set4  fattr4_retention_set;
@@ -721,11 +751,11 @@ typedef retention_set4  fattr4_retentevt_set;
 typedef uint64_t        fattr4_retention_hold;
 typedef nfsacl41        fattr4_dacl;
 typedef nfsacl41        fattr4_sacl;
+typedef change_policy4  fattr4_change_policy;
 
-
-/*
- * Mandatory Attributes
- */
+%/*
+% * REQUIRED Attributes
+% */
 const FATTR4_SUPPORTED_ATTRS    = 0;
 const FATTR4_TYPE               = 1;
 const FATTR4_FH_EXPIRE_TYPE     = 2;
@@ -739,11 +769,12 @@ const FATTR4_UNIQUE_HANDLES     = 9;
 const FATTR4_LEASE_TIME         = 10;
 const FATTR4_RDATTR_ERROR       = 11;
 const FATTR4_FILEHANDLE         = 19;
+%/* new to NFSV4.1 */
 const FATTR4_SUPPATTR_EXCLCREAT = 75;
 
-/*
- * Recommended Attributes
- */
+%/*
+% * RECOMMENDED Attributes
+% */
 const FATTR4_ACL                = 12;
 const FATTR4_ACLSUPPORT         = 13;
 const FATTR4_ARCHIVE            = 14;
@@ -787,15 +818,18 @@ const FATTR4_TIME_METADATA      = 52;
 const FATTR4_TIME_MODIFY        = 53;
 const FATTR4_TIME_MODIFY_SET    = 54;
 const FATTR4_MOUNTED_ON_FILEID  = 55;
+%
+%/* new to NFSV4.1 */
+%
 const FATTR4_DIR_NOTIF_DELAY    = 56;
 const FATTR4_DIRENT_NOTIF_DELAY = 57;
 const FATTR4_DACL               = 58;
 const FATTR4_SACL               = 59;
 const FATTR4_CHANGE_POLICY      = 60;
 const FATTR4_FS_STATUS          = 61;
-const FATTR4_FS_LAYOUT_TYPE     = 62;
+const FATTR4_FS_LAYOUT_TYPES    = 62;
 const FATTR4_LAYOUT_HINT        = 63;
-const FATTR4_LAYOUT_TYPE        = 64;
+const FATTR4_LAYOUT_TYPES       = 64;
 const FATTR4_LAYOUT_BLKSIZE     = 65;
 const FATTR4_LAYOUT_ALIGNMENT   = 66;
 const FATTR4_FS_LOCATIONS_INFO  = 67;
@@ -844,7 +878,7 @@ struct nfs_client_id4 {
 };
 
 /*
- * NFSv4.1 Client Owner (aka long hand client id)
+ * NFSv4.1 Client Owner (aka long hand client ID)
  */
 struct client_owner4 {
         verifier4       co_verifier;
@@ -1018,7 +1052,7 @@ enum filelayout_hint_care4 {
         NFLH4_CARE_STRIPE_COUNT = 0x00000080
 };
 %
-%/* Encoded in the loh_body field of type layouthint4: */
+%/* Encoded in the loh_body field of data type layouthint4: */
 %
 struct nfsv4_1_file_layouthint4 {
         uint32_t        nflh_care;
@@ -1031,7 +1065,10 @@ struct nfsv4_1_file_layouthint4 {
 %
 typedef netaddr4 multipath_list4<>;
 %
-%/* Encoded in the da_addr_body field of type device_addr4: */
+%/*
+% * Encoded in the da_addr_body field of
+% * data type device_addr4:
+% */
 struct nfsv4_1_file_layout_ds_addr4 {
         uint32_t        nflda_stripe_indices<>;
         multipath_list4 nflda_multipath_ds_list<>;
@@ -1040,7 +1077,10 @@ struct nfsv4_1_file_layout_ds_addr4 {
 %
 
 %
-%/* Encoded in the loc_body field of type layout_content4: */
+%/*
+% * Encoded in the loc_body field of
+% * data type layout_content4:
+% */
 struct nfsv4_1_file_layout4 {
          deviceid4      nfl_deviceid;
          nfl_util4      nfl_util;
@@ -1052,11 +1092,17 @@ struct nfsv4_1_file_layout4 {
 %
 
 %/*
-% * Encoded in the lou_body field of type layoutupdate4:
-% *      Nothing. lou_body is a zero length array of octets.
+% * Encoded in the lou_body field of data type layoutupdate4:
+% *      Nothing. lou_body is a zero length array of bytes.
 % */
 %
 
+%/*
+% * Encoded in the lrf_body field of
+% * data type layoutreturn_file4:
+% *      Nothing. lrf_body is a zero length array of bytes.
+% */
+%
 
 
 const ACCESS4_READ      = 0x00000001;
@@ -1498,8 +1544,8 @@ union open_claim4 switch (open_claim_type4 claim) {
         component4      file_delegate_prev;
 
  /*
-  * Like CLAIM_NULL. No special rights
-  * to file. Ordinary OPEN of the
+  * Like CLAIM_NULL.  No special rights
+  * to file.  Ordinary OPEN of the
   * specified file by current filehandle.
   */
  case CLAIM_FH: /* new to v4.1 */
@@ -1507,7 +1553,7 @@ union open_claim4 switch (open_claim_type4 claim) {
         void;
 
  /*
-  * Like CLAIM_DELEGATE_PREV. Right to file based on a
+  * Like CLAIM_DELEGATE_PREV.  Right to file based on a
   * delegation granted to a previous boot
   * instance of the client.  File is identified by
   * by filehandle.
@@ -1517,7 +1563,7 @@ union open_claim4 switch (open_claim_type4 claim) {
         void;
 
  /*
-  * Like CLAIM_DELEGATE_CUR. Right to file based on
+  * Like CLAIM_DELEGATE_CUR.  Right to file based on
   * a delegation granted by the server.
   * File is identified by filehandle.
   */
@@ -1579,7 +1625,7 @@ enum why_no_delegation4 { /* new to v4.1 */
         WND4_WRITE_DELEG_NOT_SUPP_FTYPE = 4,
         WND4_NOT_SUPP_UPGRADE   = 5,
         WND4_NOT_SUPP_DOWNGRADE = 6,
-        WND4_CANCELED           = 7,
+        WND4_CANCELLED          = 7,
         WND4_IS_DIR             = 8
 };
 
@@ -2455,11 +2501,12 @@ union TEST_STATEID4res switch (nfsstat4 tsr_status) {
 
 union deleg_claim4 switch (open_claim_type4 dc_claim) {
 /*
- * No special rights to object. Ordinary delegation
- * request of the specified object. Object identified
+ * No special rights to object.  Ordinary delegation
+ * request of the specified object.  Object identified
  * by filehandle.
  */
 case CLAIM_FH: /* new to v4.1 */
+        /* CURRENT_FH: object being delegated */
         void;
 
 /*
@@ -2689,7 +2736,7 @@ union nfs_argop4 switch (nfs_opnum4 argop) {
  case OP_ILLEGAL:       void;
 };
 
-union nfs_resop4 switch (nfs_opnum4 resop){
+union nfs_resop4 switch (nfs_opnum4 resop) {
  case OP_ACCESS:        ACCESS4res opaccess;
  case OP_CLOSE:         CLOSE4res opclose;
  case OP_COMMIT:        COMMIT4res opcommit;
@@ -2995,10 +3042,9 @@ const RCA4_TYPE_MASK_RDATA_DLG          = 0;
 const RCA4_TYPE_MASK_WDATA_DLG          = 1;
 const RCA4_TYPE_MASK_DIR_DLG            = 2;
 const RCA4_TYPE_MASK_FILE_LAYOUT        = 3;
-const RCA4_TYPE_MASK_BLK_LAYOUT_MIN     = 4;
-const RCA4_TYPE_MASK_BLK_LAYOUT_MAX     = 7;
+const RCA4_TYPE_MASK_BLK_LAYOUT         = 4;
 const RCA4_TYPE_MASK_OBJ_LAYOUT_MIN     = 8;
-const RCA4_TYPE_MASK_OBJ_LAYOUT_MAX     = 11;
+const RCA4_TYPE_MASK_OBJ_LAYOUT_MAX     = 9;
 const RCA4_TYPE_MASK_OTHER_LAYOUT_MIN   = 12;
 const RCA4_TYPE_MASK_OTHER_LAYOUT_MAX   = 15;
 
@@ -3128,7 +3174,7 @@ enum nfs_cb_opnum4 {
         OP_CB_ILLEGAL           = 10044
 };
 
-union nfs_cb_argop4 switch (nfs_cb_opnum4 argop) { /* FRED */
+union nfs_cb_argop4 switch (unsigned argop) {
  case OP_CB_GETATTR:
       CB_GETATTR4args           opcbgetattr;
  case OP_CB_RECALL:
@@ -3156,7 +3202,7 @@ union nfs_cb_argop4 switch (nfs_cb_opnum4 argop) { /* FRED */
  case OP_CB_ILLEGAL:            void;
 };
 
-union nfs_cb_resop4 switch (nfs_cb_opnum4 resop){ /* FRED */
+union nfs_cb_resop4 switch (unsigned resop) {
  case OP_CB_GETATTR:    CB_GETATTR4res  opcbgetattr;
  case OP_CB_RECALL:     CB_RECALL4res   opcbrecall;
 

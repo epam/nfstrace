@@ -37,6 +37,8 @@ namespace protocols
 namespace NFS4
 {
 
+namespace NFS4 = NST::API::NFS4;
+
 using ProcEnumNFS4 = API::ProcEnumNFS4;
 
 using Validator = rpc::RPCProgramValidator
@@ -48,25 +50,25 @@ using Validator = rpc::RPCProgramValidator
                 >;
 
 // Procedure 0: NULL - Do nothing
-inline auto proc_t_of(rpcgen::NULL4args&)->decltype(&rpcgen::xdr_NULL4args)
+inline auto proc_t_of(NFS4::NULL4args&)->decltype(&NFS4::xdr_NULL4args)
 {
-    return &rpcgen::xdr_NULL4args;
+    return &NFS4::xdr_NULL4args;
 }
 
-inline auto proc_t_of(rpcgen::NULL4res&)->decltype(&rpcgen::xdr_NULL4res)
+inline auto proc_t_of(NFS4::NULL4res&)->decltype(&NFS4::xdr_NULL4res)
 {
-    return &rpcgen::xdr_NULL4res;
+    return &NFS4::xdr_NULL4res;
 }
 
 // Procedure 1: COMPOUND
-inline auto proc_t_of(rpcgen::COMPOUND4args&)->decltype(&rpcgen::xdr_COMPOUND4args)
+inline auto proc_t_of(NFS4::COMPOUND4args&)->decltype(&NFS4::xdr_COMPOUND4args)
 {
-    return &rpcgen::xdr_COMPOUND4args;
+    return &NFS4::xdr_COMPOUND4args;
 }
 
-inline auto proc_t_of(rpcgen::COMPOUND4res&)->decltype(&rpcgen::xdr_COMPOUND4res)
+inline auto proc_t_of(NFS4::COMPOUND4res&)->decltype(&NFS4::xdr_COMPOUND4res)
 {
-    return &rpcgen::xdr_COMPOUND4res;
+    return &NFS4::xdr_COMPOUND4res;
 }
 
 extern"C"
@@ -74,57 +76,57 @@ NST_PUBLIC
 const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc);
 
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc);
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_ftype4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfsstat4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::bitmap4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::utf8string& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::pathname4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::sec_oid4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfstime4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::time_how4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::settime4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_fh4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::fsid4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::fs_location4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::fs_locations4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfsace4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::specdata4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::fattr4_acl& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::attrlist4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::fattr4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::change_info4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::clientaddr4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::cb_client4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::stateid4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_client_id4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::open_owner4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::lock_owner4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_lock_type4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::createtype4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::dir_delegation_status4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::open_to_lock_owner4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::exist_lock_owner4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::locker4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::createmode4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::opentype4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::limit_by4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::open_delegation_type4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::open_claim_type4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::rpc_gss_svc_t& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::stable_how4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::createhow4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::openflag4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_modified_limit4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::nfs_space_limit4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::open_claim_delegate_cur4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::open_claim4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::open_read_delegation4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::open_write_delegation4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::open_delegation4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::entry4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::dirlist4& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::rpcsec_gss_info& obj);
-std::ostream& operator<<(std::ostream& out, const rpcgen::secinfo4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::nfs_ftype4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::nfsstat4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::bitmap4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::utf8string& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::pathname4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::sec_oid4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::nfstime4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::time_how4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::settime4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::nfs_fh4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::fsid4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::fs_location4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::fs_locations4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::nfsace4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::specdata4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::fattr4_acl& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::attrlist4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::fattr4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::change_info4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::clientaddr4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::cb_client4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::stateid4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::nfs_client_id4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::open_owner4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::lock_owner4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::nfs_lock_type4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::createtype4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::dir_delegation_status4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::open_to_lock_owner4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::exist_lock_owner4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::locker4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::createmode4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::opentype4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::limit_by4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::open_delegation_type4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::open_claim_type4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::rpc_gss_svc_t& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::stable_how4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::createhow4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::openflag4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::nfs_modified_limit4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::nfs_space_limit4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::open_claim_delegate_cur4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::open_claim4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::open_read_delegation4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::open_write_delegation4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::open_delegation4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::entry4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::dirlist4& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::rpcsec_gss_info& obj);
+std::ostream& operator<<(std::ostream& out, const NFS4::secinfo4& obj);
 
 } // namespace NFS4
 } // namespace protocols

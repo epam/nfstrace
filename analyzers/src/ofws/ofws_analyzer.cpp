@@ -36,10 +36,10 @@ OFWSAnalyzer::~OFWSAnalyzer()
 }
 
 void OFWSAnalyzer::getattr3(const RPCProcedure*,
-                            const struct rpcgen::GETATTR3args* args,
-                            const struct rpcgen::GETATTR3res* res)
+                            const struct NFS3::GETATTR3args* args,
+                            const struct NFS3::GETATTR3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->object);
         (*i->second).inc(ProcEnumNFS3::GETATTR);
@@ -47,10 +47,10 @@ void OFWSAnalyzer::getattr3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::setattr3(const RPCProcedure*,
-                            const struct rpcgen::SETATTR3args* args,
-                            const struct rpcgen::SETATTR3res* res)
+                            const struct NFS3::SETATTR3args* args,
+                            const struct NFS3::SETATTR3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->object);
         (*i->second).inc(ProcEnumNFS3::SETATTR);
@@ -58,10 +58,10 @@ void OFWSAnalyzer::setattr3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::lookup3(const RPCProcedure*,
-                           const struct rpcgen::LOOKUP3args*,
-                           const struct rpcgen::LOOKUP3res* res)
+                           const struct NFS3::LOOKUP3args*,
+                           const struct NFS3::LOOKUP3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(res->LOOKUP3res_u.resok.object);
         (*i->second).inc(ProcEnumNFS3::LOOKUP);
@@ -69,10 +69,10 @@ void OFWSAnalyzer::lookup3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::access3(const RPCProcedure*,
-                           const struct rpcgen::ACCESS3args* args,
-                           const struct rpcgen::ACCESS3res* res)
+                           const struct NFS3::ACCESS3args* args,
+                           const struct NFS3::ACCESS3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->object);
         (*i->second).inc(ProcEnumNFS3::ACCESS);
@@ -80,10 +80,10 @@ void OFWSAnalyzer::access3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::readlink3(const RPCProcedure*,
-                             const struct rpcgen::READLINK3args* args,
-                             const struct rpcgen::READLINK3res* res)
+                             const struct NFS3::READLINK3args* args,
+                             const struct NFS3::READLINK3res* res)
 {
-    if(res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->symlink);
         (*i->second).inc(ProcEnumNFS3::READLINK);
@@ -91,10 +91,10 @@ void OFWSAnalyzer::readlink3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::read3(const RPCProcedure*,
-                         const struct rpcgen::READ3args* args,
-                         const struct rpcgen::READ3res* res)
+                         const struct NFS3::READ3args* args,
+                         const struct NFS3::READ3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->file);
         (*i->second).inc(ProcEnumNFS3::READ);
@@ -102,10 +102,10 @@ void OFWSAnalyzer::read3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::write3(const RPCProcedure*,
-                          const struct rpcgen::WRITE3args* args,
-                          const struct rpcgen::WRITE3res* res)
+                          const struct NFS3::WRITE3args* args,
+                          const struct NFS3::WRITE3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->file);
         (*i->second).inc(ProcEnumNFS3::WRITE);
@@ -113,10 +113,10 @@ void OFWSAnalyzer::write3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::create3(const RPCProcedure*,
-                           const struct rpcgen::CREATE3args*,
-                           const struct rpcgen::CREATE3res* res)
+                           const struct NFS3::CREATE3args*,
+                           const struct NFS3::CREATE3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         if(res->CREATE3res_u.resok.obj.handle_follows)
         {
@@ -127,10 +127,10 @@ void OFWSAnalyzer::create3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::mkdir3(const RPCProcedure*,
-                          const struct rpcgen::MKDIR3args*,
-                          const struct rpcgen::MKDIR3res* res)
+                          const struct NFS3::MKDIR3args*,
+                          const struct NFS3::MKDIR3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         if(res->MKDIR3res_u.resok.obj.handle_follows)
         {
@@ -141,10 +141,10 @@ void OFWSAnalyzer::mkdir3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::symlink3(const RPCProcedure*,
-                            const struct rpcgen::SYMLINK3args*,
-                            const struct rpcgen::SYMLINK3res* res)
+                            const struct NFS3::SYMLINK3args*,
+                            const struct NFS3::SYMLINK3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         if(res->SYMLINK3res_u.resok.obj.handle_follows)
         {
@@ -155,10 +155,10 @@ void OFWSAnalyzer::symlink3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::mknod3(const RPCProcedure*,
-                          const struct rpcgen::MKNOD3args*,
-                          const struct rpcgen::MKNOD3res* res)
+                          const struct NFS3::MKNOD3args*,
+                          const struct NFS3::MKNOD3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         if(res->MKNOD3res_u.resok.obj.handle_follows)
         {
@@ -169,10 +169,10 @@ void OFWSAnalyzer::mknod3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::remove3(const RPCProcedure*,
-                           const struct rpcgen::REMOVE3args* args,
-                           const struct rpcgen::REMOVE3res* res)
+                           const struct NFS3::REMOVE3args* args,
+                           const struct NFS3::REMOVE3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->object.dir);
         (*i->second).inc(ProcEnumNFS3::REMOVE);
@@ -180,10 +180,10 @@ void OFWSAnalyzer::remove3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::rmdir3(const RPCProcedure*,
-                          const struct rpcgen::RMDIR3args* args,
-                          const struct rpcgen::RMDIR3res* res)
+                          const struct NFS3::RMDIR3args* args,
+                          const struct NFS3::RMDIR3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->object.dir);
         (*i->second).inc(ProcEnumNFS3::RMDIR);
@@ -191,10 +191,10 @@ void OFWSAnalyzer::rmdir3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::rename3(const RPCProcedure*,
-                           const struct rpcgen::RENAME3args* args,
-                           const struct rpcgen::RENAME3res* res)
+                           const struct NFS3::RENAME3args* args,
+                           const struct NFS3::RENAME3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->from.dir);
         (*i->second).inc(ProcEnumNFS3::RENAME);
@@ -202,10 +202,10 @@ void OFWSAnalyzer::rename3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::link3(const RPCProcedure*,
-                         const struct rpcgen::LINK3args* args,
-                         const struct rpcgen::LINK3res* res)
+                         const struct NFS3::LINK3args* args,
+                         const struct NFS3::LINK3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->file);
         (*i->second).inc(ProcEnumNFS3::LINK);
@@ -213,10 +213,10 @@ void OFWSAnalyzer::link3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::readdir3(const RPCProcedure*,
-                            const struct rpcgen::READDIR3args* args,
-                            const struct rpcgen::READDIR3res* res)
+                            const struct NFS3::READDIR3args* args,
+                            const struct NFS3::READDIR3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->dir);
         (*i->second).inc(ProcEnumNFS3::READDIR);
@@ -224,10 +224,10 @@ void OFWSAnalyzer::readdir3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::readdirplus3(const RPCProcedure*,
-                                const struct rpcgen::READDIRPLUS3args* args,
-                                const struct rpcgen::READDIRPLUS3res* res)
+                                const struct NFS3::READDIRPLUS3args* args,
+                                const struct NFS3::READDIRPLUS3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->dir);
         (*i->second).inc(ProcEnumNFS3::READDIRPLUS);
@@ -235,10 +235,10 @@ void OFWSAnalyzer::readdirplus3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::fsstat3(const RPCProcedure*,
-                           const struct rpcgen::FSSTAT3args* args,
-                           const struct rpcgen::FSSTAT3res* res)
+                           const struct NFS3::FSSTAT3args* args,
+                           const struct NFS3::FSSTAT3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->fsroot);
         (*i->second).inc(ProcEnumNFS3::FSSTAT);
@@ -246,10 +246,10 @@ void OFWSAnalyzer::fsstat3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::fsinfo3(const RPCProcedure*,
-                           const struct rpcgen::FSINFO3args* args,
-                           const struct rpcgen::FSINFO3res* res)
+                           const struct NFS3::FSINFO3args* args,
+                           const struct NFS3::FSINFO3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->fsroot);
         (*i->second).inc(ProcEnumNFS3::FSINFO);
@@ -257,10 +257,10 @@ void OFWSAnalyzer::fsinfo3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::pathconf3(const RPCProcedure*,
-                             const struct rpcgen::PATHCONF3args* args,
-                             const struct rpcgen::PATHCONF3res* res)
+                             const struct NFS3::PATHCONF3args* args,
+                             const struct NFS3::PATHCONF3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->object);
         (*i->second).inc(ProcEnumNFS3::PATHCONF);
@@ -268,10 +268,10 @@ void OFWSAnalyzer::pathconf3(const RPCProcedure*,
 }
 
 void OFWSAnalyzer::commit3(const RPCProcedure*,
-                           const struct rpcgen::COMMIT3args* args,
-                           const struct rpcgen::COMMIT3res* res)
+                           const struct NFS3::COMMIT3args* args,
+                           const struct NFS3::COMMIT3res* res)
 {
-    if(res && res->status == rpcgen::nfsstat3::NFS3_OK)
+    if(res && res->status == NFS3::nfsstat3::NFS3_OK)
     {
         Iterator i = find_or_create_op_counter(args->file);
         (*i->second).inc(ProcEnumNFS3::COMMIT);
@@ -313,7 +313,7 @@ void OFWSAnalyzer::flush_statistics()
     }
 }
 
-OFWSAnalyzer::Iterator OFWSAnalyzer::find_or_create_op_counter(const rpcgen::nfs_fh3& key)
+OFWSAnalyzer::Iterator OFWSAnalyzer::find_or_create_op_counter(const NFS3::nfs_fh3& key)
 {
     Iterator i = ofws_stat.find(key);
     if(i == ofws_stat.end())
