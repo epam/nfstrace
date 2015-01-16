@@ -66,6 +66,13 @@ public:
         }
     }
 
+    inline void on_unix_signal(int signo)
+    {
+        for(const auto a : modules)
+        {
+            a->on_unix_signal(signo);
+        }
+    }
 private:
     Storage  modules; // pointers to all modules (plugins and builtins)
     Plugins  plugins;
