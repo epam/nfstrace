@@ -293,7 +293,7 @@ void OFWSAnalyzer::flush_statistics()
     out << "###  Overall File Working Set (OFWS) analyzer  ###" << std::endl;
     out << "Total number of files accessed: " << size << std::endl;
     out << "FileHandle" << ",NFS Ops";
-    for(int32_t j = 0; j < ProcEnumNFS3::count; ++j)
+    for(unsigned int j = 0; j < ProcEnumNFS3::count; ++j)
     {
         out << ',' << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(j));
     }
@@ -305,7 +305,7 @@ void OFWSAnalyzer::flush_statistics()
         const OpCounter* opcounter = iterator->second;
 
         out << iterator->first << ',' << opcounter->get_total();
-        for(int32_t j = 0; j < ProcEnumNFS3::count; ++j)
+        for(unsigned int j = 0; j < ProcEnumNFS3::count; ++j)
         {
             out << ',' << (*opcounter)[j];
         }
