@@ -55,7 +55,18 @@ private:
                                FilteredDataQueue::Ptr&& reply,
                                RPCSession* session);
 
-    uint32_t get_minor_version(FilteredDataQueue::Ptr& call);
+
+    //! Get NFSv4.x minor version
+    /*! This is a fast method. It doesn't call expensive XDR's mechanisms &
+    * doesn't create new objects. It simply moves pointer to a proper 
+    * place.
+    *
+    * According to NFSv4.0 & 4.1 RFC's it's possible to determine
+    * minor version ONLY in call COMPOUND(1) procedure.
+    * That's why only call can be passed here.
+    */
+
+    std::uint32_t get_nfs4_compound_minor_version(const std::uint8_t* rpc_nfs4_call);
 
     RunningStatus& status;
     Analyzers& analyzers;

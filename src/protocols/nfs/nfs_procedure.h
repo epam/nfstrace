@@ -127,7 +127,6 @@ private:
 
 namespace NFS3
 {
-
 namespace NFS3 = NST::API::NFS3;
 using NFSPROC3RPCGEN_NULL        = NFSProcedure <NFS3::NULL3args,        NFS3::NULL3res>;
 using NFSPROC3RPCGEN_GETATTR     = NFSProcedure <NFS3::GETATTR3args,     NFS3::GETATTR3res>;
