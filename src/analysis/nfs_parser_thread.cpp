@@ -159,7 +159,7 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
     if(major_version == NFS_V4 &&
        procedure     == ProcEnumNFS4::COMPOUND)
     {
-        minor_version = get_minor_version(call);
+        minor_version = get_nfs4_compound_minor_version(call->data);
     }
 
     try
@@ -234,10 +234,10 @@ void NFSParserThread::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
     }
 }
 
-uint32_t NFSParserThread::get_minor_version(FilteredDataQueue::Ptr& call)
+uint32_t NFSParserThread::get_nfs4_compound_minor_version(const std::uint8_t* rpc_nfs4_call)
 {
     // get initial data
-    auto it = call->data;
+    auto* it = rpc_nfs4_call;
 
     // move to rpc's credentials length
     it += (sizeof(protocols::rpc::CallHeader) + sizeof(uint32_t));
@@ -256,7 +256,7 @@ uint32_t NFSParserThread::get_minor_version(FilteredDataQueue::Ptr& call)
 
     return ntohl(*(uint32_t*)it);
 }
- 
+
 } // namespace analysis
 } // namespace NST
 //------------------------------------------------------------------------------

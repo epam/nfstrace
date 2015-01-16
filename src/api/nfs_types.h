@@ -27,9 +27,10 @@ namespace NST
 namespace API
 {
 
-const uint32_t NFS_V40 {0};
-const uint32_t NFS_V41 {1};
+static const unsigned int NFS_V40 {0};
+static const unsigned int NFS_V41 {1};
 
+//! struct ProcEnumNFS3 - containts all NFSv3 procedures
 struct ProcEnumNFS3
 {
     enum NFSProcedure
@@ -57,9 +58,10 @@ struct ProcEnumNFS3
         PATHCONF    = 20,
         COMMIT      = 21
     };
-    static const int32_t count {22};
+    static const unsigned int count {22}; //!< amount of procedures
 };
 
+//! struct ProcEnumNFS4 - containts all NFSv4.0 procedures and operations
 struct ProcEnumNFS4
 {
     enum NFSProcedure
@@ -105,13 +107,14 @@ struct ProcEnumNFS4
         RELEASE_LOCKOWNER   = 39,
         GET_DIR_DELEGATION  = 40,
         ILLEGAL             = 10044
-        // Pleause, keep in mind that in all cases we suppose that NFSv4
+        // Pleause, keep in mind that in all cases we suppose that NFSv4.0
         // operation ILLEGAL(10044) has the second position in ProcEnumNFS4
     };
-    static const int32_t count      {41};
-    static const int32_t count_proc {2};
+    static const unsigned int count      {41}; //!< amount of procedures & operations together
+    static const unsigned int count_proc {2};  //!< amount of procedures
 };
 
+//! struct ProcEnumNFS41 - containts all NFSv4.1 procedures and operations
 struct ProcEnumNFS41
 {
     enum NFSProcedure
@@ -175,11 +178,11 @@ struct ProcEnumNFS41
         DESTROY_CLIENTID     = 57,
         RECLAIM_COMPLETE     = 58,
         ILLEGAL              = 10044
-        // Pleause, keep in mind that in all cases we suppose that NFSv41
+        // Pleause, keep in mind that in all cases we suppose that NFSv4.1
         // operation ILLEGAL(10044) has the second position in ProcEnumNFS41
     };
-    static const int32_t count      {59};
-    static const int32_t count_proc {2};
+    static const unsigned int count      {59}; //!< amount of procedures & operations together
+    static const unsigned int count_proc {2};  //!< amount of procedures
 };
 
 } // namespace API
