@@ -27,6 +27,9 @@ namespace NST
 namespace API
 {
 
+const uint32_t NFS_V40 {0};
+const uint32_t NFS_V41 {1};
+
 struct ProcEnumNFS3
 {
     enum NFSProcedure
@@ -106,6 +109,76 @@ struct ProcEnumNFS4
         // operation ILLEGAL(10044) has the second position in ProcEnumNFS4
     };
     static const int32_t count      {41};
+    static const int32_t count_proc {2};
+};
+
+struct ProcEnumNFS41
+{
+    enum NFSProcedure
+    {
+        NFS_NULL             = 0,
+        COMPOUND             = 1,
+        ACCESS               = 3,
+        CLOSE                = 4,
+        COMMIT               = 5,
+        CREATE               = 6,
+        DELEGPURGE           = 7,
+        DELEGRETURN          = 8,
+        GETATTR              = 9,
+        GETFH                = 10,
+        LINK                 = 11,
+        LOCK                 = 12,
+        LOCKT                = 13,
+        LOCKU                = 14,
+        LOOKUP               = 15,
+        LOOKUPP              = 16,
+        NVERIFY              = 17,
+        OPEN                 = 18,
+        OPENATTR             = 19,
+        OPEN_CONFIRM         = 20,
+        OPEN_DOWNGRADE       = 21,
+        PUTFH                = 22,
+        PUTPUBFH             = 23,
+        PUTROOTFH            = 24,
+        READ                 = 25,
+        READDIR              = 26,
+        READLINK             = 27,
+        REMOVE               = 28,
+        RENAME               = 29,
+        RENEW                = 30,
+        RESTOREFH            = 31,
+        SAVEFH               = 32,
+        SECINFO              = 33,
+        SETATTR              = 34,
+        SETCLIENTID          = 35,
+        SETCLIENTID_CONFIRM  = 36,
+        VERIFY               = 37,
+        WRITE                = 38,
+        RELEASE_LOCKOWNER    = 39,
+        BACKCHANNEL_CTL      = 40,
+        BIND_CONN_TO_SESSION = 41,
+        EXCHANGE_ID          = 42,
+        CREATE_SESSION       = 43,
+        DESTROY_SESSION      = 44,
+        FREE_STATEID         = 45,
+        GET_DIR_DELEGATION   = 46,
+        GETDEVICEINFO        = 47,
+        GETDEVICELIST        = 48,
+        LAYOUTCOMMIT         = 49,
+        LAYOUTGET            = 50,
+        LAYOUTRETURN         = 51,
+        SECINFO_NO_NAME      = 52,
+        SEQUENCE             = 53,
+        SET_SSV              = 54,
+        TEST_STATEID         = 55,
+        WANT_DELEGATION      = 56,
+        DESTROY_CLIENTID     = 57,
+        RECLAIM_COMPLETE     = 58,
+        ILLEGAL              = 10044
+        // Pleause, keep in mind that in all cases we suppose that NFSv41
+        // operation ILLEGAL(10044) has the second position in ProcEnumNFS41
+    };
+    static const int32_t count      {59};
     static const int32_t count_proc {2};
 };
 
