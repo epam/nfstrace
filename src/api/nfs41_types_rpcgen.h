@@ -3288,6 +3288,8 @@ bool_t xdr_nfsv4_1_file_layouthint4 (XDR *, nfsv4_1_file_layouthint4*);
 bool_t xdr_multipath_list4 (XDR *, multipath_list4*);
 bool_t xdr_nfsv4_1_file_layout_ds_addr4 (XDR *, nfsv4_1_file_layout_ds_addr4*);
 bool_t xdr_nfsv4_1_file_layout4 (XDR *, nfsv4_1_file_layout4*);
+bool_t xdr_NULL4args (XDR *, NULL4args*); // for compatibility
+bool_t xdr_NULL4res (XDR *, NULL4res*);   // for compatibility
 bool_t xdr_ACCESS4args (XDR *, ACCESS4args*);
 bool_t xdr_ACCESS4resok (XDR *, ACCESS4resok*);
 bool_t xdr_ACCESS4res (XDR *, ACCESS4res*);
