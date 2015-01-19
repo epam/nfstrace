@@ -23,7 +23,8 @@
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFSv2;
-union SMBCode {
+union SMBCode
+{
     uint8_t codes[4];
     uint32_t code;
 };

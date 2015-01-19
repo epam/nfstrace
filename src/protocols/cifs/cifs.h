@@ -157,7 +157,8 @@ struct SecurityField
  */
 struct RawMessageHeader
 {
-    union {
+    union
+    {
         MessageHeaderHead head;//!< Head of header
         uint32_t head_code;//!< For fast checking
     };

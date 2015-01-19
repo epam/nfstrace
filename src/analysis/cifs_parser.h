@@ -86,8 +86,9 @@ public:
 
     /*! Function which will be called by ParserThread class
      * \param data - raw packet
+     * \return True, if it is CIFS packet and False in other case
      */
-    void parse_data(FilteredDataQueue::Ptr&& data);
+    bool parse_data(FilteredDataQueue::Ptr& data);
 };
 
 } // analysis

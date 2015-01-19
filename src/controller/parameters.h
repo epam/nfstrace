@@ -86,12 +86,6 @@ public:
     const CaptureParams capture_params() const;
     const DumpingParams dumping_params() const;
     const std::vector<AParams>& analysis_modules() const;
-
-    /*! Network protocol to analysis (CIFS or NFS, for example)
-     * \return Protocol name
-     */
-    NetProtocol protocol() const;
-
     static unsigned short rpcmsg_limit();
 };
 

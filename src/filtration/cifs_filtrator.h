@@ -23,27 +23,15 @@
 #ifndef CIFS_FILTRATOR_H
 #define CIFS_FILTRATOR_H
 //------------------------------------------------------------------------------
-#include <algorithm>
 #include <cassert>
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
 
 #include <pcap/pcap.h>
 
-#include "controller/parameters.h"
 #include "filtration/packet.h"
-#include "filtration/sessions_hash.h"
 #include "protocols/cifs/cifs.h"
 #include "protocols/cifs2/cifs2.h"
-#include "protocols/nfs3/nfs3_utils.h"
-#include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/netbios/netbios.h"
-#include "protocols/rpc/rpc_header.h"
 #include "utils/log.h"
-#include "utils/out.h"
-#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -71,6 +59,55 @@ public:
         collection.reset(); // data in external memory freed
     }
 
+    inline bool inProgress(PacketInfo& info)
+    {
+        //FIXME: Code has been dublicated
+        static const size_t header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
+
+        if (msg_len || to_be_copied)
+        {
+            return true;
+        }
+
+        if (!collection) // collection isn't allocated
+        {
+            collection.allocate(); // allocate new collection from writer
+        }
+        const size_t data_size = collection.data_size();
+
+        if (data_size + info.dlen > header_len)
+        {
+            static uint8_t buffer[header_len];
+            const uint8_t* header = info.data;
+
+            if (data_size > 0)
+            {
+                memcpy(buffer, collection.data(), data_size);
+                memcpy(buffer + data_size, info.data, header_len - data_size);
+                header = buffer;
+            }
+
+            if (NetBIOS::get_header(header))
+            {
+                if (CIFSv1::get_header(header + sizeof(NetBIOS::MessageHeader)))
+                {
+                    return true;
+                }
+                else if (CIFSv2::get_header(header + sizeof(NetBIOS::MessageHeader)))
+                {
+                    return true;
+                }
+            }
+            reset();
+        }
+        else
+        {
+            collection.push(info, info.dlen);
+        }
+
+        return false;
+    }
+
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t /*max_rpc_hdr*/)
     {
         assert(w);
@@ -79,6 +116,7 @@ public:
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
+        //FIXME: Code has been dublicated
         if (msg_len != 0)
         {
             if (to_be_copied == 0 && msg_len >= n)
@@ -100,6 +138,7 @@ public:
 
     void push(PacketInfo& info)
     {
+        //FIXME: Code has been dublicated
         assert(info.dlen != 0);
 
         while (info.dlen) // loop over data in packet
@@ -210,7 +249,7 @@ public:
         assert(msg_len >= collection.data_size());
         assert(to_be_copied <= msg_len);
 
-        const uint32_t written {collection.data_size()};
+        const size_t written {collection.data_size()};
         msg_len -= written; // substract how written (if written)
         to_be_copied -= std::min(to_be_copied, written);
         if (0 == to_be_copied)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
@@ -254,8 +293,8 @@ public:
     }
 
 private:
-    uint32_t msg_len;  // length of current RPC message + RM
-    uint32_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
+    size_t msg_len;  // length of current RPC message + RM
+    size_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
 
     typename Writer::Collection collection;// storage for collection packet data
 };
