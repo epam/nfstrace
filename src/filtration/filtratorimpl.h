@@ -36,9 +36,15 @@ class FiltratorImpl
     FiltratorImpl(const FiltratorImpl&)            = delete;
     FiltratorImpl& operator=(const FiltratorImpl&) = delete;
 public:
-    FiltratorImpl() {}
+    FiltratorImpl()
+    {}
 
     using IsRightHeader = bool(const uint8_t* header);
+
+    template<typename Writer>
+    inline void setWriterImpl(utils::NetworkSession* session_ptr, Writer* w, uint32_t /*max_rpc_hdr*/)
+    {
+    }
 
     /*!
      * Implementation of checking, does the filtrator work now?
@@ -208,6 +214,50 @@ public:
                 info.dlen = 0;
                 return copied >= replyHeaderLen;
             }
+        }
+        return true;
+    }
+
+    // Find next message in packet info
+    template<typename Writer, typename Filtrator>
+    void find_message(PacketInfo& info, Writer& collection, Filtrator* filtrator, size_t& to_be_copied, size_t& msg_len)
+    {
+        assert(msg_len == 0);   // Message still undetected
+
+        if (!filtrator->collect_header(info))
+        {
+            return ;
+        }
+
+        assert(collection);     // collection must be initialized
+
+        if (filtrator->find_and_read_message(info))
+        {
+            return;
+        }
+
+        assert(msg_len == 0);   // message is not found
+        assert(to_be_copied == 0);   // header should be skipped
+        collection.reset();     // skip collected data
+        //[ Optimization ] skip data of current packet at all
+        info.dlen = 0;
+    }
+
+    template<typename Writer, typename Filtrator>
+    bool read_message(PacketInfo& info, Writer& collection, Filtrator* filtrator, size_t& to_be_copied, size_t& msg_len)
+    {
+        assert(msg_len != 0);   // message is found
+        assert(msg_len >= collection.data_size());
+        assert(to_be_copied <= msg_len);
+
+        const size_t written {collection.data_size()};
+        msg_len -= written; // substract how written (if written)
+        to_be_copied -= std::min(to_be_copied, written);
+        if (0 == to_be_copied)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
+            // Next find message call will finding next message
+        {
+            collection.skip_first(filtrator->lengthOfFirstSkipedPart());
+            collection.complete(info);
         }
         return true;
     }
