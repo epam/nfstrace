@@ -50,7 +50,6 @@ class CIFSFiltrator : private FiltratorImpl
 public:
     CIFSFiltrator()
         : FiltratorImpl()
-        , collection {}
     {
         reset();
     }
@@ -59,7 +58,13 @@ public:
     {
         msg_len = 0;
         to_be_copied = 0;
-        collection.reset(); // data in external memory freed
+        collection.reset();
+    }
+
+    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t )
+    {
+        assert(w);
+        collection.set(*w, session_ptr);
     }
 
     inline constexpr static size_t lengthOfBaseHeader()
@@ -97,12 +102,6 @@ public:
         return FiltratorImpl::inProgressImpl<lengthOfBaseHeader(), isRightHeader>(info, collection, this);
     }
 
-    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t /*max_rpc_hdr*/)
-    {
-        assert(w);
-        collection.set(*w, session_ptr);
-    }
-
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
         return FiltratorImpl::lost(n, this, to_be_copied, msg_len);
@@ -118,57 +117,29 @@ public:
         return FiltratorImpl::collect_header<lengthOfBaseHeader(),lengthOfBaseHeader()>(info, collection);
     }
 
-    template<typename Header>
-    void read_message(const NetBIOS::MessageHeader* nb_header, const Header*, PacketInfo& info)
+    inline void find_message(PacketInfo& info)
     {
-        msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
-        to_be_copied = msg_len;//(sizeof(NetBIOS::MessageHeader) + sizeof(Header) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(Header) : msg_len);
-
-        assert(msg_len != 0);   // message is found
-        assert(msg_len >= collection.data_size());
-        assert(to_be_copied <= msg_len);
-
-        const size_t written {collection.data_size()};
-        msg_len -= written; // substract how written (if written)
-        to_be_copied -= std::min(to_be_copied, written);
-        if (0 == to_be_copied)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
-            // Next find message call will finding next message
-        {
-            collection.skip_first(sizeof(NetBIOS::MessageHeader));
-            collection.complete(info);
-        }
-
+        return FiltratorImpl::find_message(info, collection, this, to_be_copied, msg_len);
     }
 
-    // Find next message in packet info
-    void find_message(PacketInfo& info)
+    inline bool find_and_read_message(PacketInfo& info)
     {
-        assert(msg_len == 0);   // Message still undetected
-
-        if (!collect_header(info))
-        {
-            return ;
-        }
-
-        assert(collection);     // collection must be initialized
-
         if (const NetBIOS::MessageHeader* nb_header = NetBIOS::get_header(collection.data()))
         {
-            if (const CIFSv1::MessageHeader* header = CIFSv1::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            if (CIFSv1::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
-                return read_message(nb_header, header, info);
+                msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
+                to_be_copied = msg_len;//(sizeof(NetBIOS::MessageHeader) + sizeof(Header) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(Header) : msg_len);
+                return read_message(info, collection, this, to_be_copied, msg_len);
             }
-            else if (const CIFSv2::MessageHeader* header = CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            else if (CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
-                return read_message(nb_header, header, info);
+                msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
+                to_be_copied = msg_len;//(sizeof(NetBIOS::MessageHeader) + sizeof(Header) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(Header) : msg_len);
+                return read_message(info, collection, this, to_be_copied, msg_len);
             }
         }
-
-        assert(msg_len == 0);   // message is not found
-        assert(to_be_copied == 0);   // header should be skipped
-        collection.reset();     // skip collected data
-        //[ Optimization ] skip data of current packet at all
-        info.dlen = 0;
+        return false;
     }
 
 };

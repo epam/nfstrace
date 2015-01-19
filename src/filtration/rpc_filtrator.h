@@ -48,6 +48,7 @@ namespace filtration
 template<typename Writer>
 class RPCFiltrator : private FiltratorImpl
 {
+    typename Writer::Collection collection;// storage for collection packet data
 public:
     RPCFiltrator()
     : collection{}
@@ -63,7 +64,7 @@ public:
     {
         msg_len = 0;
         to_be_copied = 0;
-        collection.reset(); // data in external memory freed
+        collection.reset();
     }
 
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
@@ -127,48 +128,27 @@ public:
         return FiltratorImpl::collect_header<lengthOfCallHeader(), lengthOfReplyHeader()>(info, collection);
     }
 
-    // Find next message in packet info
-    inline void find_message(PacketInfo& info)
+    inline bool find_and_read_message(PacketInfo& info)
     {
-        assert(msg_len == 0);   // RPC Message still undetected
-
-        if (!collect_header(info))
-        {
-            return;
-        }
-
-        assert(collection);     // collection must be initialized
-
         const RecordMark* rm {reinterpret_cast<const RecordMark*>(collection.data())};
         //if(rm->is_last()); // TODO: handle sequence field of record mark
         if(collection.data_size() < (sizeof(CallHeader) + sizeof(RecordMark)) && (rm->fragment())->type() != MsgType::REPLY ) // if message not Reply, try collect the rest for Call
         {
-            return;
+            return true;
         }
         if(rm->fragment_len() >= sizeof(ReplyHeader)) // incorrect fragment len, not valid rpc message
         {
             if(validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
             {
-                assert(msg_len != 0);   // message is found
-                assert(msg_len >= collection.data_size());
-                assert(to_be_copied <= msg_len);
-                const size_t written {collection.data_size()};
-                msg_len -= written; // substract how written (if written)
-                to_be_copied -= std::min(to_be_copied, written);
-                if (0 == to_be_copied)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
-                                    // Next find message call will finding next message
-                {
-                    collection.skip_first(sizeof(RecordMark));
-                    collection.complete(info);
-                }
-                return;
+                return FiltratorImpl::read_message(info, collection, this, to_be_copied, msg_len);
             }
         }
-        assert(msg_len == 0);   // message is not found
-        assert(to_be_copied == 0);   // header should be skipped
-        collection.reset();     // skip collected data
-        //[ Optimization ] skip data of current packet at all
-        info.dlen = 0;
+        return false;
+    }
+
+    inline void find_message(PacketInfo& info)
+    {
+        return FiltratorImpl::find_message(info, collection, this, to_be_copied, msg_len);
     }
 
     inline bool validate_header(const MessageHeader*const msg, const uint32_t len)
@@ -252,7 +232,6 @@ private:
     size_t msg_len;  // length of current RPC message + RM
     size_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
 
-    typename Writer::Collection collection;// storage for collection packet data
     MessageSet nfs3_read_match;
 };
 
