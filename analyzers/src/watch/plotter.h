@@ -53,7 +53,7 @@ public:
                     const std::vector<int> &nfs4_pr_count);
 
     uint16_t inputData();
-    static void enableResize(int);
+    void enableResize();
     inline void keyboard_thread();
 
     const static time_t start_time;
@@ -68,7 +68,7 @@ private:
     void initPlot();
     void updateAll();
 
-    static int resize;
+    int resize;
     std::atomic_flag monitor_running;
     std::thread keyboard_proc;
 
