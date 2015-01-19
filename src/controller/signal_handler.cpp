@@ -95,10 +95,11 @@ SignalHandler::SignalHandler(RunningStatus& s)
 
     sigset_t mask;
     ::sigemptyset(&mask);
-    ::sigaddset(&mask, SIGINT);  // correct exit from program by Ctrl-C
-    ::sigaddset(&mask, SIGTERM); // correct exit when SIGTERM has been received
-    ::sigaddset(&mask, SIGCHLD); // stop sigwait-thread and wait children
-    ::sigaddset(&mask, SIGHUP);  // signal for losing terminal
+    ::sigaddset(&mask, SIGINT);    // correct exit from program by Ctrl-C
+    ::sigaddset(&mask, SIGTERM);   // correct exit when SIGTERM has been received
+    ::sigaddset(&mask, SIGCHLD);   // stop sigwait-thread and wait children
+    ::sigaddset(&mask, SIGHUP);    // signal for losing terminal
+    ::sigaddset(&mask, SIGWINCH);  // signal for changing terminal size
     const int err = ::pthread_sigmask(SIG_BLOCK, &mask, nullptr);
     if(err != 0)
     {
