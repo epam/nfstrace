@@ -28,6 +28,7 @@
 #include <pcap/pcap.h>
 
 #include "filtration/packet.h"
+#include "filtration/filtratorimpl.h"
 #include "protocols/cifs/cifs.h"
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/netbios/netbios.h"
@@ -39,18 +40,20 @@ namespace filtration
 {
 
 template<typename Writer>
-class CIFSFiltrator
+class CIFSFiltrator : private FiltratorImpl
 {
+    size_t msg_len;  // length of current RPC message + RM
+    size_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
+
+    typename Writer::Collection collection;// storage for collection packet data
+
 public:
     CIFSFiltrator()
-        : collection {}
+        : FiltratorImpl()
+        , collection {}
     {
         reset();
     }
-
-    CIFSFiltrator(CIFSFiltrator&&)                 = delete;
-    CIFSFiltrator(const CIFSFiltrator&)            = delete;
-    CIFSFiltrator& operator=(const CIFSFiltrator&) = delete;
 
     inline void reset()
     {
@@ -59,59 +62,34 @@ public:
         collection.reset(); // data in external memory freed
     }
 
+    inline constexpr static size_t lengthOfBaseHeader()
+    {
+        return sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
+    }
+
+    inline static bool isRightHeader(const uint8_t* header)
+    {
+        if (NetBIOS::get_header(header))
+        {
+            if (CIFSv1::get_header(header + sizeof(NetBIOS::MessageHeader)))
+            {
+                return true;
+            }
+            else if (CIFSv2::get_header(header + sizeof(NetBIOS::MessageHeader)))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     inline bool inProgress(PacketInfo& info)
     {
-        //FIXME: Code has been dublicated
-        static const size_t header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
-
         if (msg_len || to_be_copied)
         {
             return true;
         }
-
-        if (!collection) // collection isn't allocated
-        {
-            collection.allocate(); // allocate new collection from writer
-        }
-        const size_t data_size = collection.data_size();
-
-        if (data_size + info.dlen > header_len)
-        {
-            static uint8_t buffer[header_len];
-            const uint8_t* header = info.data;
-
-            if (data_size > 0)
-            {
-                memcpy(buffer, collection.data(), data_size);
-                memcpy(buffer + data_size, info.data, header_len - data_size);
-                header = buffer;
-            }
-
-            if (NetBIOS::get_header(header))
-            {
-                if (CIFSv1::get_header(header + sizeof(NetBIOS::MessageHeader)))
-                {
-                    return true;
-                }
-                else if (CIFSv2::get_header(header + sizeof(NetBIOS::MessageHeader)))
-                {
-                    return true;
-                }
-            }
-            reset();
-        }
-        else
-        {
-            collection.push(info, info.dlen);
-        }
-
-        return false;
-    }
-
-    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t /*max_rpc_hdr*/)
-    {
-        assert(w);
-        collection.set(*w, session_ptr);
+        return FiltratorImpl::inProgressImpl<lengthOfBaseHeader(), isRightHeader>(info, collection, this);
     }
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
@@ -136,6 +114,12 @@ public:
         }
     }
 
+    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t /*max_rpc_hdr*/)
+    {
+        assert(w);
+        collection.set(*w, session_ptr);
+    }
+
     void push(PacketInfo& info)
     {
         //FIXME: Code has been dublicated
@@ -152,8 +136,8 @@ public:
                     {
                         //TRACE("got new part of header (not the all!)");
                         collection.push(info, info.dlen);
-                        to_be_copied     -= info.dlen;
-                        msg_len     -= info.dlen;
+                        to_be_copied -= info.dlen;
+                        msg_len -= info.dlen;
                         info.dlen = 0;  // return from while
                     }
                     else // hdr_len <= dlen, current message will be complete, also we have some additional data
@@ -198,7 +182,7 @@ public:
 
     bool collect_header(PacketInfo& info)
     {
-        static const size_t header_len = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
+        static const size_t header_len = lengthOfBaseHeader();
         if (collection && (collection.data_size() > 0)) // collection is allocated
         {
 
@@ -292,11 +276,6 @@ public:
         info.dlen = 0;
     }
 
-private:
-    size_t msg_len;  // length of current RPC message + RM
-    size_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
-
-    typename Writer::Collection collection;// storage for collection packet data
 };
 
 } // filtration
