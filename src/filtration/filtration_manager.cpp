@@ -21,10 +21,10 @@
 //------------------------------------------------------------------------------
 #include <sys/stat.h>
 
-#include "filtration/cifs_filtrator.h"
 #include "filtration/dumping.h"
 #include "filtration/filtration_manager.h"
 #include "filtration/filtration_processor.h"
+#include "filtration/filtrators.h"
 #include "filtration/pcap/capture_reader.h"
 #include "filtration/pcap/file_reader.h"
 #include "filtration/processing_thread.h"
@@ -53,26 +53,15 @@ template
 >
 class FiltrationImpl : public ProcessingThread
 {
-    using RPCProcessor = FiltrationProcessor<Reader, Writer, RPCFiltrator< Writer >>;
-    using CIFSProcessor = FiltrationProcessor<Reader, Writer, CIFSFiltrator< Writer >>;
+    using Processor = FiltrationProcessor<Reader, Writer, Filtrators< Writer >>;
 public:
     explicit FiltrationImpl(std::unique_ptr<Reader>& reader,
                             std::unique_ptr<Writer>& writer,
-                            RunningStatus& status,
-                            NST::controller::NetProtocol p)
+                            RunningStatus& status)
     : ProcessingThread {status}
-    , rpc_processor{}
-    , cifs_processor{}
-    , protocol(p)
+    , processor{}
     {
-        if (protocol == NST::controller::NetProtocol::CIFS)
-        {
-            cifs_processor.reset(new CIFSProcessor{reader, writer});
-        }
-        else
-        {
-            rpc_processor.reset(new RPCProcessor{reader, writer});
-        }
+        processor.reset(new Processor{reader, writer});
     }
     ~FiltrationImpl() = default;
     FiltrationImpl(const FiltrationImpl&)            = delete;
@@ -80,14 +69,7 @@ public:
 
     virtual void stop() override final
     {
-        if (protocol == NST::controller::NetProtocol::CIFS)
-        {
-            cifs_processor->stop();
-        }
-        else
-        {
-            rpc_processor->stop();
-        }
+        processor->stop();
     }
 private:
 
@@ -95,14 +77,7 @@ private:
     {
         try
         {
-            if (protocol == NST::controller::NetProtocol::CIFS)
-            {
-                cifs_processor->run();
-            }
-            else
-            {
-                rpc_processor->run();
-            }
+            processor->run();
         }
         catch(...)
         {
@@ -110,9 +85,7 @@ private:
         }
     }
 
-    std::unique_ptr<RPCProcessor> rpc_processor;
-    std::unique_ptr<CIFSProcessor> cifs_processor;
-    const NST::controller::NetProtocol protocol;
+    std::unique_ptr<Processor> processor;
 };
 
 // create Filtration thread emplaced in unique_ptr
@@ -123,13 +96,12 @@ template
 >
 static auto create_thread(std::unique_ptr<Reader>& reader,
                           std::unique_ptr<Writer>& writer,
-                          RunningStatus& status,
-                          NST::controller::NetProtocol protocol)
+                          RunningStatus& status)
         -> std::unique_ptr<FiltrationImpl<Reader, Writer>>
 {
     using Thread = FiltrationImpl<Reader, Writer>;
 
-    return std::unique_ptr<Thread>{new Thread{reader, writer, status, protocol}};
+    return std::unique_ptr<Thread>{new Thread{reader, writer, status}};
 }
 
 
@@ -158,7 +130,7 @@ void FiltrationManager::add_online_dumping(const Parameters& params)
         message << dumping_params;
     }
     std::unique_ptr<Dumping> writer { new Dumping{ reader->get_handle(), dumping_params } };
-    threads.emplace_back(create_thread(reader, writer, status, params.protocol()));
+    threads.emplace_back(create_thread(reader, writer, status));
 }
 
 //capture data from input file or cin to destination file
@@ -193,7 +165,7 @@ void FiltrationManager::add_offline_dumping (const Parameters& params)
                                                        }
                                           };
 
-    threads.emplace_back(create_thread(reader, writer, status, params.protocol()));
+    threads.emplace_back(create_thread(reader, writer, status));
 }
 
 // capture from network interface and pass to queue - OnlineAnalysis(Profiling)
@@ -203,13 +175,12 @@ void FiltrationManager::add_online_analysis(const Parameters& params,
     std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
     std::unique_ptr<Queueing>      writer { new Queueing{queue}           };
 
-    threads.emplace_back(create_thread(reader, writer, status, params.protocol()));
+    threads.emplace_back(create_thread(reader, writer, status));
 }
 
 // read from file and pass to queue - OfflineAnalysis(Analysis)
 void FiltrationManager::add_offline_analysis(const std::string& ifile,
-                                             FilteredDataQueue& queue,
-                                             const Parameters &params)
+                                             FilteredDataQueue& queue)
 {
     std::unique_ptr<FileReader> reader { new FileReader{ifile} };
     if(utils::Out message{}) // print parameters to user
@@ -218,7 +189,7 @@ void FiltrationManager::add_offline_analysis(const std::string& ifile,
     }
     std::unique_ptr<Queueing>   writer { new Queueing{queue}   };
 
-    threads.emplace_back(create_thread(reader, writer, status, params.protocol()));
+    threads.emplace_back(create_thread(reader, writer, status));
 }
 
 FiltrationManager::FiltrationManager(RunningStatus& s)

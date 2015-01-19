@@ -101,7 +101,8 @@ private:
 
             do
             {
-                parser.parse_data(list.get_current());
+                FilteredDataQueue::Ptr data = list.get_current();
+                parser.parse_data(data);
             }
             while(list);
         }

@@ -75,7 +75,8 @@ enum class Commands : uint16_t
  */
 struct RawMessageHeader
 {
-    union {
+    union
+    {
         CIFSv1::MessageHeaderHead head;//!< Head of header
         uint32_t head_code;//!< For fast checking
     };

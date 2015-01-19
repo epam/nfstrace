@@ -1,7 +1,8 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Parser of filtrated NFSv3 Procedures.
-// Copyright (c) 2013 EPAM Systems
+// Author: Andrey Kuznetsov
+// Description: Composite parser which parses both CIFS&NFS
+// TODO: THIS CODE MUST BE TOTALLY REFACTORED!
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,45 +20,55 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef NFS_PARSER_H
-#define NFS_PARSER_H
+#ifndef PARSERS_H
+#define PARSERS_H
 //------------------------------------------------------------------------------
-#include "analysis/analyzers.h"
-#include "analysis/rpc_sessions.h"
-#include "utils/filtered_data.h"
+#include "cifs_parser.h"
+#include "nfs_parser.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis
 {
 
-/*! \class It is class which can parse NFS messages and it called by ParserThread
+/*!
+ * Composite parser which parses both CIFS&NFS
  */
-class NFSParser
+class Parsers
 {
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
-
-    Analyzers& analyzers;
-    Sessions<Session> sessions;
+    CIFSParser parser_cifs;//!< CIFS parser
+    NFSParser parser_nfs;//!< NFS parser
 public:
 
-    NFSParser(Analyzers& a) : analyzers(a) {}
-    NFSParser(NFSParser& c) : analyzers(c.analyzers) {}
+    Parsers(Analyzers& a)
+        : parser_cifs(a)
+        , parser_nfs(a)
+    {}
+
+    Parsers(Parsers& c)
+        : parser_cifs(c.parser_cifs)
+        , parser_nfs(c.parser_nfs)
+    {}
 
     /*! Function which will be called by ParserThread class
-     * \param data - RPC packet
-     * \return True, if it is RPC(NFS) packet and False in other case
+     * \param data - packet
      */
-    bool parse_data(FilteredDataQueue::Ptr& data);
-
-    void analyze_nfs_operation(FilteredDataQueue::Ptr&& call,
-                               FilteredDataQueue::Ptr&& reply,
-                               Session* session);
+    inline void parse_data(FilteredDataQueue::Ptr& data)
+    {
+        if (!parser_nfs.parse_data(data))
+        {
+            if (!parser_cifs.parse_data(data))
+            {
+                LOG("Unknown packet to analysis");
+            }
+        }
+    }
 
 };
 
 } // analysis
 } // NST
 //------------------------------------------------------------------------------
-#endif // NFS_PARSER_H
+#endif // PARSERS_H
 //------------------------------------------------------------------------------

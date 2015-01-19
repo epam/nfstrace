@@ -1061,7 +1061,7 @@ enum class CtlCodes : uint32_t
 /*!
  * A Flags field indicating how to process the operation
  */
-enum class IoCtlOpFlags: uint32_t
+enum class IoCtlOpFlags : uint32_t
 {
     NONE           = 0x00000000,                 //!< If Flags is set to this value
     IOCTL_IS_FSCTL = 0x00000001,                 //!< If Flags is set to this value

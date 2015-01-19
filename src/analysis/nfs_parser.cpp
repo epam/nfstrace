@@ -31,18 +31,25 @@ namespace analysis
 {
 
 
-void NFSParser::parse_data(FilteredDataQueue::Ptr&& ptr)
+bool NFSParser::parse_data(FilteredDataQueue::Ptr& ptr)
 {
     using namespace NST::protocols::rpc;
 
     // TODO: refactor and generalize this code
-    if(ptr->dlen < sizeof(MessageHeader)) return;
+    if(ptr->dlen < sizeof(MessageHeader))
+    {
+        return false;
+    }
     auto msg = reinterpret_cast<const MessageHeader*>(ptr->data);
     switch(msg->type())
     {
     case MsgType::CALL:
     {
-        if(ptr->dlen < sizeof(CallHeader)) return;
+        if(ptr->dlen < sizeof(CallHeader))
+        {
+            return false;
+        }
+
         auto call = static_cast<const CallHeader*>(msg);
 
         if(RPCValidator::check(call) && (protocols::NFS4::Validator::check(call) ||
@@ -53,15 +60,22 @@ void NFSParser::parse_data(FilteredDataQueue::Ptr&& ptr)
             {
                 session->save_call_data(call->xid(), std::move(ptr));
             }
+            return true;
         }
     }
     break;
     case MsgType::REPLY:
     {
-        if(ptr->dlen < sizeof(ReplyHeader)) return;
+        if(ptr->dlen < sizeof(ReplyHeader))
+        {
+            return false;
+        }
         auto reply = static_cast<const ReplyHeader*>(msg);
 
-        if(!RPCValidator::check(reply)) return;
+        if(!RPCValidator::check(reply))
+        {
+            return false;
+        }
 
         Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY);
         if(session)
@@ -71,10 +85,11 @@ void NFSParser::parse_data(FilteredDataQueue::Ptr&& ptr)
             {
                 analyze_nfs_operation(std::move(call_data), std::move(ptr), session);
             }
+            return true;
         }
     }
-    break;
     }
+    return false;
 }
 
 void NFSParser::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
