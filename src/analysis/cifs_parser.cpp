@@ -33,7 +33,7 @@ CIFSParser::CIFSParser(Analyzers& a) :
 {
 }
 
-bool CIFSParser::parse_data(utils::FilteredDataQueue::Ptr& data)
+bool CIFSParser::parse_data(FilteredDataQueue::Ptr& data)
 {
     if (const CIFSv1::MessageHeader* request = CIFSv1::get_header(data->data))
     {
