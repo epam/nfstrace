@@ -67,6 +67,11 @@ public:
         return sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
     }
 
+    inline constexpr static size_t lengthOfFirstSkipedPart()
+    {
+        return sizeof(NetBIOS::MessageHeader);
+    }
+
     inline static bool isRightHeader(const uint8_t* header)
     {
         if (NetBIOS::get_header(header))
@@ -92,135 +97,25 @@ public:
         return FiltratorImpl::inProgressImpl<lengthOfBaseHeader(), isRightHeader>(info, collection, this);
     }
 
-    inline void lost(const uint32_t n) // we are lost n bytes in sequence
-    {
-        //FIXME: Code has been dublicated
-        if (msg_len != 0)
-        {
-            if (to_be_copied == 0 && msg_len >= n)
-            {
-                TRACE("We are lost %u bytes of payload marked for discard", n);
-                msg_len -= n;
-            }
-            else
-            {
-                TRACE("We are lost %u bytes of useful data. lost:%u msg_len:%u", n - msg_len, n, msg_len);
-                reset();
-            }
-        }
-        else
-        {
-            TRACE("We are lost %u bytes of unknown payload", n);
-        }
-    }
-
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t /*max_rpc_hdr*/)
     {
         assert(w);
         collection.set(*w, session_ptr);
     }
 
-    void push(PacketInfo& info)
+    inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
-        //FIXME: Code has been dublicated
-        assert(info.dlen != 0);
-
-        while (info.dlen) // loop over data in packet
-        {
-            if (msg_len)   // we are on-stream and we are looking to some message
-            {
-                if (to_be_copied)
-                {
-                    // hdr_len != 0, readout a part of header of current message
-                    if (to_be_copied > info.dlen) // got new part of header (not the all!)
-                    {
-                        //TRACE("got new part of header (not the all!)");
-                        collection.push(info, info.dlen);
-                        to_be_copied -= info.dlen;
-                        msg_len -= info.dlen;
-                        info.dlen = 0;  // return from while
-                    }
-                    else // hdr_len <= dlen, current message will be complete, also we have some additional data
-                    {
-                        //TRACE("current message will be complete, also we have some additional data");
-                        collection.push(info, to_be_copied);
-                        info.dlen   -= to_be_copied;
-                        info.data   += to_be_copied;
-
-                        msg_len -= to_be_copied;
-                        to_be_copied = 0;
-
-                        collection.skip_first(sizeof(NetBIOS::MessageHeader));
-                        collection.complete(info);    // push complete message to queue
-                    }
-                }
-                else
-                {
-                    // message header is readout, discard the unused tail of message
-                    if (msg_len >= info.dlen) // discard whole new packet
-                    {
-                        //TRACE("discard whole new packet");
-                        msg_len -= info.dlen;
-                        return; //info.dlen = 0;  // return from while
-                    }
-                    else  // discard only a part of packet payload related to current message
-                    {
-                        //TRACE("discard only a part of packet payload related to current message");
-                        info.dlen -= msg_len;
-                        info.data += msg_len;
-                        msg_len = 0;
-                        find_message(info); // <- optimization
-                    }
-                }
-            }
-            else // msg_len == 0, no one message is on reading, try to find next message
-            {
-                find_message(info);
-            }
-        }
+        return FiltratorImpl::lost(n, this, to_be_copied, msg_len);
     }
 
-    bool collect_header(PacketInfo& info)
+    inline void push(PacketInfo& info)
     {
-        static const size_t header_len = lengthOfBaseHeader();
-        if (collection && (collection.data_size() > 0)) // collection is allocated
-        {
+        return FiltratorImpl::push(info, collection, this, to_be_copied, msg_len);
+    }
 
-            assert(collection.capacity() >= header_len);
-            const size_t tocopy {header_len - collection.data_size()};
-            assert(tocopy != 0);
-            if (info.dlen < tocopy)
-            {
-                collection.push(info, info.dlen);
-                info.data += info.dlen;//   optimization
-                info.dlen = 0;
-                return false;
-            }
-            else // info.dlen >= tocopy
-            {
-                collection.push(info, tocopy); // collection.data_size <= header_len
-                info.dlen -= tocopy;
-                info.data += tocopy;
-            }
-        }
-        else // collection is empty
-        {
-            collection.allocate(); // allocate new collection from writer
-            if (info.dlen >= header_len) // is data enough to message validation?
-            {
-                collection.push(info, header_len); // probability that message will be rejected / probability of valid message
-                info.data += header_len;
-                info.dlen -= header_len;
-            }
-            else // (info.dlen < header_len)
-            {
-                collection.push(info, info.dlen);
-                info.data += info.dlen;//   optimization
-                info.dlen = 0;
-                return false;
-            }
-        }
-        return true;
+    inline bool collect_header(PacketInfo& info)
+    {
+        return FiltratorImpl::collect_header<lengthOfBaseHeader(),lengthOfBaseHeader()>(info, collection);
     }
 
     template<typename Header>
