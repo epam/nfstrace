@@ -1115,11 +1115,11 @@ class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
     };
 
     Statistic smbv2;//!< Statistic
-    Representer<Statistic, SMBv2Commands> representer;//!< Class for statistic representation
+    Representer<Statistic, SMBv2Commands> cifs2Representer;//!< Class for statistic representation
 public:
     CIFSv2BreakdownAnalyzer(std::ostream& o = std::cout)
         : CIFSBreakdownAnalyzer(o)
-        , representer(o)
+        , cifs2Representer(o)
     {
     }
 
@@ -1221,7 +1221,7 @@ public:
     void flush_statistics()
     {
         CIFSBreakdownAnalyzer::flush_statistics();//FIXME: use observer
-        representer.flush_statistics(smbv2);
+        cifs2Representer.flush_statistics(smbv2);
     }
 
 };
