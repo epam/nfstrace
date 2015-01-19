@@ -169,7 +169,7 @@ enum class SMBv1Commands
     SMB_COM_WRITE_BULK_DATA,        //!< Reserved
     SMB_COM_INVALID,                //!< As the name suggests
     SMB_COM_NO_ANDX_COMMAND,        //!<  Also known as the NIL command. It identifies the end of an AndX Chain
-    COUNT
+    CMD_COUNT
 };
 
 /*! CIFS v2 commands list
@@ -195,7 +195,7 @@ enum class SMBv2Commands
     QUERY_INFO,
     SET_INFO,
     OPLOCK_BREAK,
-    COUNT
+    CMD_COUNT
 };
 
 static const std::string commandDescription(SMBv2Commands cmd_code)
@@ -589,7 +589,7 @@ public:
     {
         file << "Session: " << session << std::endl;
 
-        for (unsigned i = 0; i < static_cast<int>(SMBCommands::COUNT); ++i)
+        for (unsigned i = 0; i < static_cast<int>(SMBCommands::CMD_COUNT); ++i)
         {
             file << commandName(static_cast<SMBCommands>(i));
             file << ' ' << breakdown[i].get_count() << ' ';
@@ -610,7 +610,7 @@ public:
 
         out << "Total procedures: " << s_total_proc
             << ". Per procedure:"   << std::endl;
-        for (unsigned i = 0; i < static_cast<int>(SMBCommands::COUNT); ++i)
+        for (unsigned i = 0; i < static_cast<int>(SMBCommands::CMD_COUNT); ++i)
         {
             out.width(22);
             out << std::left
@@ -692,7 +692,7 @@ private:
      */
     struct Statistic
     {
-        using Breakdown = BreakdownCounter<long double, OnlineVariance, static_cast<int>(SMBv1Commands::COUNT)>;
+        using Breakdown = BreakdownCounter<long double, OnlineVariance, static_cast<int>(SMBv1Commands::CMD_COUNT)>;
         using PerOpStat = std::map<Session, Breakdown, Less>;
         using ProceduresCount = std::map<SMBv1Commands, int>;
 
@@ -1103,7 +1103,7 @@ class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
      */
     struct Statistic
     {
-        using Breakdown = BreakdownCounter<long double, OnlineVariance, static_cast<int>(SMBv2Commands::COUNT)>;
+        using Breakdown = BreakdownCounter<long double, OnlineVariance, static_cast<int>(SMBv2Commands::CMD_COUNT)>;
         using PerOpStat = std::map<Session, Breakdown, Less>;
         using ProceduresCount = std::map<SMBv2Commands, int>;
 
