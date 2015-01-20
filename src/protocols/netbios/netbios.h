@@ -53,7 +53,15 @@ struct MessageHeader : private RawMessageHeader
  * \param data - raw packet data
  * \return pointer to input data which is casted to header structure or nullptr (if it is not valid header)
  */
-const struct MessageHeader* get_header(const uint8_t* data);
+inline const struct MessageHeader* get_header(const uint8_t* data)
+{
+    const MessageHeader* header (reinterpret_cast<const MessageHeader*>(data));
+    if (header->start() == 0x00)
+    {
+        return header;
+    }
+    return nullptr;
+}
 
 } // NetBIOS
 } // protocols

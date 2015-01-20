@@ -34,14 +34,3 @@ size_t MessageHeader::len() const
 {
     return htons(length);
 }
-
-const struct MessageHeader* NST::protocols::NetBIOS::get_header(const uint8_t* data)
-{
-    const MessageHeader* header (reinterpret_cast<const MessageHeader*>(data));
-    if (header->start() == 0x00)
-    {
-        return header;
-    }
-    return nullptr;
-}
-
