@@ -56,11 +56,6 @@ protected:
 
     using IsRightHeader = bool(const uint8_t* header);
 
-    template<typename Writer>
-    inline void setWriterImpl(utils::NetworkSession* session_ptr, Writer* w, uint32_t /*max_rpc_hdr*/)
-    {
-    }
-
     inline void resetImpl()
     {
         msg_len = 0;
@@ -246,7 +241,7 @@ protected:
 
     // Find next message in packet info
     template<typename Writer, typename Filtrator>
-    void find_message(PacketInfo& info, Writer& collection, Filtrator* filtrator)
+    inline void find_message(PacketInfo& info, Writer& collection, Filtrator* filtrator)
     {
         assert(msg_len == 0);   // Message still undetected
 
@@ -270,7 +265,7 @@ protected:
     }
 
     template<typename Writer, typename Filtrator>
-    bool read_message(PacketInfo& info, Writer& collection, Filtrator* filtrator)
+    inline bool read_message(PacketInfo& info, Writer& collection, Filtrator* filtrator)
     {
         assert(msg_len != 0);   // message is found
         assert(msg_len >= collection.data_size());
