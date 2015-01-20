@@ -21,37 +21,17 @@
 //------------------------------------------------------------------------------
 #include "api/nfs4_types_rpcgen.h"
 //------------------------------------------------------------------------------
-namespace rpcgen
+namespace NST
+{
+namespace API
+{
+namespace NFS4
 {
 
 bool_t
 xdr_int32_t (XDR *xdrs, int32_t *objp)
 {
      if (!xdr_int (xdrs, objp))
-         return FALSE;
-    return TRUE;
-}
-
-bool_t
-xdr_uint32_t (XDR *xdrs, uint32_t *objp)
-{
-     if (!xdr_u_int (xdrs, objp))
-         return FALSE;
-    return TRUE;
-}
-
-bool_t
-xdr_int64_t (XDR *xdrs, int64_t *objp)
-{
-     if (!xdr_longlong_t (xdrs, objp))
-         return FALSE;
-    return TRUE;
-}
-
-bool_t
-xdr_uint64_t (XDR *xdrs, uint64_t *objp)
-{
-     if (!xdr_u_longlong_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -84,7 +64,7 @@ xdr_bitmap4 (XDR *xdrs, bitmap4 *objp)
 bool_t
 xdr_offset4 (XDR *xdrs, offset4 *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -92,7 +72,7 @@ xdr_offset4 (XDR *xdrs, offset4 *objp)
 bool_t
 xdr_count4 (XDR *xdrs, count4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -100,7 +80,7 @@ xdr_count4 (XDR *xdrs, count4 *objp)
 bool_t
 xdr_length4 (XDR *xdrs, length4 *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -108,7 +88,7 @@ xdr_length4 (XDR *xdrs, length4 *objp)
 bool_t
 xdr_clientid4 (XDR *xdrs, clientid4 *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -116,7 +96,7 @@ xdr_clientid4 (XDR *xdrs, clientid4 *objp)
 bool_t
 xdr_seqid4 (XDR *xdrs, seqid4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -173,7 +153,7 @@ xdr_pathname4 (XDR *xdrs, pathname4 *objp)
 bool_t
 xdr_nfs_lockid4 (XDR *xdrs, nfs_lockid4 *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -181,7 +161,7 @@ xdr_nfs_lockid4 (XDR *xdrs, nfs_lockid4 *objp)
 bool_t
 xdr_nfs_cookie4 (XDR *xdrs, nfs_cookie4 *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -205,7 +185,7 @@ xdr_sec_oid4 (XDR *xdrs, sec_oid4 *objp)
 bool_t
 xdr_qop4 (XDR *xdrs, qop4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -213,7 +193,7 @@ xdr_qop4 (XDR *xdrs, qop4 *objp)
 bool_t
 xdr_mode4 (XDR *xdrs, mode4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -221,7 +201,7 @@ xdr_mode4 (XDR *xdrs, mode4 *objp)
 bool_t
 xdr_changeid4 (XDR *xdrs, changeid4 *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -237,9 +217,9 @@ xdr_verifier4 (XDR *xdrs, verifier4 objp)
 bool_t
 xdr_nfstime4 (XDR *xdrs, nfstime4 *objp)
 {
-     if (!rpcgen::xdr_int64_t (xdrs, &objp->seconds))
+     if (!xdr_int64_t (xdrs, &objp->seconds))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->nseconds))
+     if (!xdr_uint32_t (xdrs, &objp->nseconds))
          return FALSE;
     return TRUE;
 }
@@ -279,9 +259,9 @@ xdr_nfs_fh4 (XDR *xdrs, nfs_fh4 *objp)
 bool_t
 xdr_fsid4 (XDR *xdrs, fsid4 *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, &objp->major))
+     if (!xdr_uint64_t (xdrs, &objp->major))
          return FALSE;
-     if (!rpcgen::xdr_uint64_t (xdrs, &objp->minor))
+     if (!xdr_uint64_t (xdrs, &objp->minor))
          return FALSE;
     return TRUE;
 }
@@ -311,7 +291,7 @@ xdr_fs_locations4 (XDR *xdrs, fs_locations4 *objp)
 bool_t
 xdr_acetype4 (XDR *xdrs, acetype4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -319,7 +299,7 @@ xdr_acetype4 (XDR *xdrs, acetype4 *objp)
 bool_t
 xdr_aceflag4 (XDR *xdrs, aceflag4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -327,7 +307,7 @@ xdr_aceflag4 (XDR *xdrs, aceflag4 *objp)
 bool_t
 xdr_acemask4 (XDR *xdrs, acemask4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -349,9 +329,9 @@ xdr_nfsace4 (XDR *xdrs, nfsace4 *objp)
 bool_t
 xdr_specdata4 (XDR *xdrs, specdata4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->specdata1))
+     if (!xdr_uint32_t (xdrs, &objp->specdata1))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->specdata2))
+     if (!xdr_uint32_t (xdrs, &objp->specdata2))
          return FALSE;
     return TRUE;
 }
@@ -375,7 +355,7 @@ xdr_fattr4_type (XDR *xdrs, fattr4_type *objp)
 bool_t
 xdr_fattr4_fh_expire_type (XDR *xdrs, fattr4_fh_expire_type *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -391,7 +371,7 @@ xdr_fattr4_change (XDR *xdrs, fattr4_change *objp)
 bool_t
 xdr_fattr4_size (XDR *xdrs, fattr4_size *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -439,7 +419,7 @@ xdr_fattr4_unique_handles (XDR *xdrs, fattr4_unique_handles *objp)
 bool_t
 xdr_fattr4_lease_time (XDR *xdrs, fattr4_lease_time *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -464,7 +444,7 @@ xdr_fattr4_acl (XDR *xdrs, fattr4_acl *objp)
 bool_t
 xdr_fattr4_aclsupport (XDR *xdrs, fattr4_aclsupport *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -512,7 +492,7 @@ xdr_fattr4_chown_restricted (XDR *xdrs, fattr4_chown_restricted *objp)
 bool_t
 xdr_fattr4_fileid (XDR *xdrs, fattr4_fileid *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -520,7 +500,7 @@ xdr_fattr4_fileid (XDR *xdrs, fattr4_fileid *objp)
 bool_t
 xdr_fattr4_files_avail (XDR *xdrs, fattr4_files_avail *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -536,7 +516,7 @@ xdr_fattr4_filehandle (XDR *xdrs, fattr4_filehandle *objp)
 bool_t
 xdr_fattr4_files_free (XDR *xdrs, fattr4_files_free *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -544,7 +524,7 @@ xdr_fattr4_files_free (XDR *xdrs, fattr4_files_free *objp)
 bool_t
 xdr_fattr4_files_total (XDR *xdrs, fattr4_files_total *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -576,7 +556,7 @@ xdr_fattr4_homogeneous (XDR *xdrs, fattr4_homogeneous *objp)
 bool_t
 xdr_fattr4_maxfilesize (XDR *xdrs, fattr4_maxfilesize *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -584,7 +564,7 @@ xdr_fattr4_maxfilesize (XDR *xdrs, fattr4_maxfilesize *objp)
 bool_t
 xdr_fattr4_maxlink (XDR *xdrs, fattr4_maxlink *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -592,7 +572,7 @@ xdr_fattr4_maxlink (XDR *xdrs, fattr4_maxlink *objp)
 bool_t
 xdr_fattr4_maxname (XDR *xdrs, fattr4_maxname *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -600,7 +580,7 @@ xdr_fattr4_maxname (XDR *xdrs, fattr4_maxname *objp)
 bool_t
 xdr_fattr4_maxread (XDR *xdrs, fattr4_maxread *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -608,7 +588,7 @@ xdr_fattr4_maxread (XDR *xdrs, fattr4_maxread *objp)
 bool_t
 xdr_fattr4_maxwrite (XDR *xdrs, fattr4_maxwrite *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -632,7 +612,7 @@ xdr_fattr4_mode (XDR *xdrs, fattr4_mode *objp)
 bool_t
 xdr_fattr4_mounted_on_fileid (XDR *xdrs, fattr4_mounted_on_fileid *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -648,7 +628,7 @@ xdr_fattr4_no_trunc (XDR *xdrs, fattr4_no_trunc *objp)
 bool_t
 xdr_fattr4_numlinks (XDR *xdrs, fattr4_numlinks *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, objp))
+     if (!xdr_uint32_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -672,7 +652,7 @@ xdr_fattr4_owner_group (XDR *xdrs, fattr4_owner_group *objp)
 bool_t
 xdr_fattr4_quota_avail_hard (XDR *xdrs, fattr4_quota_avail_hard *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -680,7 +660,7 @@ xdr_fattr4_quota_avail_hard (XDR *xdrs, fattr4_quota_avail_hard *objp)
 bool_t
 xdr_fattr4_quota_avail_soft (XDR *xdrs, fattr4_quota_avail_soft *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -688,7 +668,7 @@ xdr_fattr4_quota_avail_soft (XDR *xdrs, fattr4_quota_avail_soft *objp)
 bool_t
 xdr_fattr4_quota_used (XDR *xdrs, fattr4_quota_used *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -704,7 +684,7 @@ xdr_fattr4_rawdev (XDR *xdrs, fattr4_rawdev *objp)
 bool_t
 xdr_fattr4_space_avail (XDR *xdrs, fattr4_space_avail *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -712,7 +692,7 @@ xdr_fattr4_space_avail (XDR *xdrs, fattr4_space_avail *objp)
 bool_t
 xdr_fattr4_space_free (XDR *xdrs, fattr4_space_free *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -720,7 +700,7 @@ xdr_fattr4_space_free (XDR *xdrs, fattr4_space_free *objp)
 bool_t
 xdr_fattr4_space_total (XDR *xdrs, fattr4_space_total *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -728,7 +708,7 @@ xdr_fattr4_space_total (XDR *xdrs, fattr4_space_total *objp)
 bool_t
 xdr_fattr4_space_used (XDR *xdrs, fattr4_space_used *objp)
 {
-     if (!rpcgen::xdr_uint64_t (xdrs, objp))
+     if (!xdr_uint64_t (xdrs, objp))
          return FALSE;
     return TRUE;
 }
@@ -848,7 +828,7 @@ xdr_clientaddr4 (XDR *xdrs, clientaddr4 *objp)
 bool_t
 xdr_cb_client4 (XDR *xdrs, cb_client4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->cb_program))
+     if (!xdr_uint32_t (xdrs, &objp->cb_program))
          return FALSE;
      if (!xdr_clientaddr4 (xdrs, &objp->cb_location))
          return FALSE;
@@ -858,7 +838,7 @@ xdr_cb_client4 (XDR *xdrs, cb_client4 *objp)
 bool_t
 xdr_stateid4 (XDR *xdrs, stateid4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->seqid))
+     if (!xdr_uint32_t (xdrs, &objp->seqid))
          return FALSE;
      if (!xdr_opaque (xdrs, objp->other, 12))
          return FALSE;
@@ -919,7 +899,7 @@ xdr_NULL4res(XDR*, NULL4res*)
 bool_t
 xdr_ACCESS4args (XDR *xdrs, ACCESS4args *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->access))
+     if (!xdr_uint32_t (xdrs, &objp->access))
          return FALSE;
     return TRUE;
 }
@@ -927,9 +907,9 @@ xdr_ACCESS4args (XDR *xdrs, ACCESS4args *objp)
 bool_t
 xdr_ACCESS4resok (XDR *xdrs, ACCESS4resok *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->supported))
+     if (!xdr_uint32_t (xdrs, &objp->supported))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->access))
+     if (!xdr_uint32_t (xdrs, &objp->access))
          return FALSE;
     return TRUE;
 }
@@ -1533,9 +1513,9 @@ xdr_limit_by4 (XDR *xdrs, limit_by4 *objp)
 bool_t
 xdr_nfs_modified_limit4 (XDR *xdrs, nfs_modified_limit4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->num_blocks))
+     if (!xdr_uint32_t (xdrs, &objp->num_blocks))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->bytes_per_block))
+     if (!xdr_uint32_t (xdrs, &objp->bytes_per_block))
          return FALSE;
     return TRUE;
 }
@@ -1547,7 +1527,7 @@ xdr_nfs_space_limit4 (XDR *xdrs, nfs_space_limit4 *objp)
          return FALSE;
     switch (objp->limitby) {
     case NFS_LIMIT_SIZE:
-         if (!rpcgen::xdr_uint64_t (xdrs, &objp->nfs_space_limit4_u.filesize))
+         if (!xdr_uint64_t (xdrs, &objp->nfs_space_limit4_u.filesize))
              return FALSE;
         break;
     case NFS_LIMIT_BLOCKS:
@@ -1619,9 +1599,9 @@ xdr_OPEN4args (XDR *xdrs, OPEN4args *objp)
 {
      if (!xdr_seqid4 (xdrs, &objp->seqid))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->share_access))
+     if (!xdr_uint32_t (xdrs, &objp->share_access))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->share_deny))
+     if (!xdr_uint32_t (xdrs, &objp->share_deny))
          return FALSE;
      if (!xdr_open_owner4 (xdrs, &objp->owner))
          return FALSE;
@@ -1687,7 +1667,7 @@ xdr_OPEN4resok (XDR *xdrs, OPEN4resok *objp)
          return FALSE;
      if (!xdr_change_info4 (xdrs, &objp->cinfo))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->rflags))
+     if (!xdr_uint32_t (xdrs, &objp->rflags))
          return FALSE;
      if (!xdr_bitmap4 (xdrs, &objp->attrset))
          return FALSE;
@@ -1769,9 +1749,9 @@ xdr_OPEN_DOWNGRADE4args (XDR *xdrs, OPEN_DOWNGRADE4args *objp)
          return FALSE;
      if (!xdr_seqid4 (xdrs, &objp->seqid))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->share_access))
+     if (!xdr_uint32_t (xdrs, &objp->share_access))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->share_deny))
+     if (!xdr_uint32_t (xdrs, &objp->share_deny))
          return FALSE;
     return TRUE;
 }
@@ -2091,7 +2071,7 @@ xdr_rpcsec_gss_info (XDR *xdrs, rpcsec_gss_info *objp)
 bool_t
 xdr_secinfo4 (XDR *xdrs, secinfo4 *objp)
 {
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->flavor))
+     if (!xdr_uint32_t (xdrs, &objp->flavor))
          return FALSE;
     switch (objp->flavor) {
     case RPCSEC_GSS:
@@ -2156,7 +2136,7 @@ xdr_SETCLIENTID4args (XDR *xdrs, SETCLIENTID4args *objp)
          return FALSE;
      if (!xdr_cb_client4 (xdrs, &objp->callback))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->callback_ident))
+     if (!xdr_uint32_t (xdrs, &objp->callback_ident))
          return FALSE;
     return TRUE;
 }
@@ -2632,7 +2612,7 @@ xdr_COMPOUND4args (XDR *xdrs, COMPOUND4args *objp)
 {
      if (!xdr_utf8str_cs (xdrs, &objp->tag))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->minorversion))
+     if (!xdr_uint32_t (xdrs, &objp->minorversion))
          return FALSE;
      if (!xdr_array (xdrs, (char **)&objp->argarray.argarray_val, (u_int *) &objp->argarray.argarray_len, ~0,
         sizeof (nfs_argop4), (xdrproc_t) xdr_nfs_argop4))
@@ -2774,9 +2754,9 @@ xdr_CB_COMPOUND4args (XDR *xdrs, CB_COMPOUND4args *objp)
 {
      if (!xdr_utf8str_cs (xdrs, &objp->tag))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->minorversion))
+     if (!xdr_uint32_t (xdrs, &objp->minorversion))
          return FALSE;
-     if (!rpcgen::xdr_uint32_t (xdrs, &objp->callback_ident))
+     if (!xdr_uint32_t (xdrs, &objp->callback_ident))
          return FALSE;
      if (!xdr_array (xdrs, (char **)&objp->argarray.argarray_val, (u_int *) &objp->argarray.argarray_len, ~0,
         sizeof (nfs_cb_argop4), (xdrproc_t) xdr_nfs_cb_argop4))
@@ -2797,4 +2777,6 @@ xdr_CB_COMPOUND4res (XDR *xdrs, CB_COMPOUND4res *objp)
     return TRUE;
 }
 
-}// namespace rpcgen
+}// namespace NFS4
+}// namespace API
+}// namespace NST

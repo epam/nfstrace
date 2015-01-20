@@ -35,7 +35,7 @@ time.sleep(AWAIT_TIMEOUT)
 
 # Playing trace file
 bzcatProcess = subprocess.Popen(["bzcat", "${CMAKE_SOURCE_DIR}/tests/functional/json-analyzer/trace.pcap.bz2"], stdout=subprocess.PIPE)
-replayProcess = subprocess.Popen(["tcpreplay", "-i", "${IF_NAME}", "-"], stdin=bzcatProcess.stdout, stdout=subprocess.PIPE)
+replayProcess = subprocess.Popen(["${TCPREPLAY_PATH}", "-i", "${IF_NAME}", "-"], stdin=bzcatProcess.stdout, stdout=subprocess.PIPE)
 bzcatProcess.wait()
 bzcatProcess.stdout.close()
 replayProcess.wait();

@@ -25,6 +25,8 @@
 #include "protocols/xdr/xdr_decoder.h"
 #include "utils/log.h"
 //------------------------------------------------------------------------------
+using namespace NST::protocols::xdr;
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis
@@ -92,6 +94,8 @@ bool NFSParser::parse_data(FilteredDataQueue::Ptr& ptr)
     return false;
 }
 
+static uint32_t get_nfs4_compound_minor_version(const std::uint8_t* rpc_nfs4_call);
+
 void NFSParser::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
                                              FilteredDataQueue::Ptr&& reply,
                                              Session* session)
@@ -99,23 +103,44 @@ void NFSParser::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
     using namespace NST::protocols::rpc;
     using namespace NST::protocols::NFS3;
     using namespace NST::protocols::NFS4;
+    using namespace NST::protocols::NFS41;
 
     auto header = reinterpret_cast<const CallHeader*>(call->data);
-    const uint32_t procedure {header->proc()};
-    const uint32_t version   {header->vers()};
+    const uint32_t procedure     {header->proc()};
+    const uint32_t major_version {header->vers()};
+    uint32_t minor_version {0};
+
+    if(major_version == NFS_V4 &&
+       procedure     == ProcEnumNFS4::COMPOUND)
+    {
+        minor_version = get_nfs4_compound_minor_version(call->data);
+    }
+
     try
     {
         XDRDecoder c {std::move(call) };
         XDRDecoder r {std::move(reply)};
         const Session* s {session->get_session()};
 
-        switch(version)
+        switch(major_version)
         {
         case NFS_V4:
-            switch(procedure)
+            switch(minor_version)
             {
-            case ProcEnumNFS4::NFS_NULL:    return analyzers(&IAnalyzer::INFSv4rpcgen::null,        NFSPROC4RPCGEN_NULL         {c,r,s});
-            case ProcEnumNFS4::COMPOUND:    return analyzers(&IAnalyzer::INFSv4rpcgen::compound4,   NFSPROC4RPCGEN_COMPOUND     {c,r,s});
+            case NFS_V40:
+                switch(procedure)
+                {
+                case ProcEnumNFS4::NFS_NULL:    return analyzers(&IAnalyzer::INFSv4rpcgen::null,      NFSPROC4RPCGEN_NULL     {c,r,s});
+                case ProcEnumNFS4::COMPOUND:    return analyzers(&IAnalyzer::INFSv4rpcgen::compound4, NFSPROC4RPCGEN_COMPOUND {c,r,s});
+                }
+            break;
+            case NFS_V41:
+                switch(procedure)
+                {
+                case ProcEnumNFS41::NFS_NULL:    return analyzers(&IAnalyzer::INFSv41rpcgen::null41,     NFSPROC41RPCGEN_NULL     {c,r,s});
+                case ProcEnumNFS41::COMPOUND:    return analyzers(&IAnalyzer::INFSv41rpcgen::compound41, NFSPROC41RPCGEN_COMPOUND {c,r,s});
+                }
+            break;
             }
         break;
         case NFS_V3:
@@ -150,7 +175,7 @@ void NFSParser::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
     catch(XDRDecoderError& e)
     {
         const char* procedure_name{"Unknown procedure"};
-        switch(version)
+        switch(major_version)
         {
         case NFS_V4:
             procedure_name = print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(procedure));
@@ -161,6 +186,38 @@ void NFSParser::analyze_nfs_operation( FilteredDataQueue::Ptr&& call,
         }
         LOG("Some data of NFS operation %s %s(%u) was not parsed: %s", session->str().c_str(), procedure_name, procedure, e.what());
     }
+}
+
+//! Get NFSv4.x minor version
+/*! This is a fast method. It doesn't call expensive XDR's mechanisms &
+* doesn't create new objects. It simply moves pointer to a proper 
+* place.
+*
+* According to NFSv4.0 & 4.1 RFC's it's possible to determine
+* minor version ONLY in call COMPOUND(1) procedure.
+* That's why only call can be passed here.
+*/
+static uint32_t get_nfs4_compound_minor_version(const std::uint8_t* rpc_nfs4_call)
+{
+    // get initial data
+    auto* it = rpc_nfs4_call;
+
+    // move to rpc's credentials length
+    it += (sizeof(protocols::rpc::CallHeader) + sizeof(uint32_t));
+    size_t rpc_cred_length = ntohl(*(uint32_t*)it);
+
+    // skip credentials & move to rpc's verifier length
+    it += (rpc_cred_length * sizeof(uint8_t) + sizeof(uint32_t));
+    size_t rpc_verf_length = ntohl(*(uint32_t*)it);
+
+    // skip verifier & move to nfsv4's tag length
+    it += (rpc_verf_length * sizeof(uint8_t) + sizeof(uint32_t));
+    size_t rpc_tag_length = ntohl(*(uint32_t*)it);
+
+    // skip tag & move to nfsv4's minor version
+    it += (rpc_tag_length * sizeof(uint8_t) + 2 * sizeof(uint32_t));
+
+    return ntohl(*(uint32_t*)it);
 }
 
 } // namespace analysis

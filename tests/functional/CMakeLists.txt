@@ -13,9 +13,9 @@ foreach (trace ${traces})
     set (result ${CMAKE_BINARY_DIR}/Testing/Temporary/${name}.res)
     set (reference ${path}/references/${name}.ref)
 
-    add_test (NAME stat:${name} COMMAND sh ${CHECK_TRACE_SCRIPT} ${trace} ${result} ${reference})
-    add_test (NAME drain:${name} COMMAND sh ${CHECK_DRANE_SCRIPT} ${trace} ${result} ${reference})
-    add_test (NAME out:${name} COMMAND sh ${CHECK_OUTPUT_SCRIPT} ${trace})
+    add_test (NAME functional_stat:${name} COMMAND sh ${CHECK_TRACE_SCRIPT} ${trace} ${result} ${reference})
+    add_test (NAME functional_drain:${name} COMMAND sh ${CHECK_DRANE_SCRIPT} ${trace} ${result} ${reference})
+    add_test (NAME functional_out:${name} COMMAND sh ${CHECK_OUTPUT_SCRIPT} ${trace})
 endforeach ()
 
 add_subdirectory (json-analyzer)
