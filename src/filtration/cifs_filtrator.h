@@ -42,11 +42,7 @@ namespace filtration
 template<typename Writer>
 class CIFSFiltrator : private FiltratorImpl
 {
-    size_t msg_len;  // length of current RPC message + RM
-    size_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
-
     typename Writer::Collection collection;// storage for collection packet data
-
 public:
     CIFSFiltrator()
         : FiltratorImpl()
@@ -56,8 +52,7 @@ public:
 
     inline void reset()
     {
-        msg_len = 0;
-        to_be_copied = 0;
+        FiltratorImpl::resetImpl();
         collection.reset();
     }
 
@@ -95,21 +90,17 @@ public:
 
     inline bool inProgress(PacketInfo& info)
     {
-        if (msg_len || to_be_copied)
-        {
-            return true;
-        }
         return FiltratorImpl::inProgressImpl<lengthOfBaseHeader(), isRightHeader>(info, collection, this);
     }
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
-        return FiltratorImpl::lost(n, this, to_be_copied, msg_len);
+        return FiltratorImpl::lost(n, this);
     }
 
     inline void push(PacketInfo& info)
     {
-        return FiltratorImpl::push(info, collection, this, to_be_copied, msg_len);
+        return FiltratorImpl::push(info, collection, this);
     }
 
     inline bool collect_header(PacketInfo& info)
@@ -119,7 +110,7 @@ public:
 
     inline void find_message(PacketInfo& info)
     {
-        return FiltratorImpl::find_message(info, collection, this, to_be_copied, msg_len);
+        return FiltratorImpl::find_message(info, collection, this);
     }
 
     inline bool find_and_read_message(PacketInfo& info)
@@ -128,15 +119,15 @@ public:
         {
             if (CIFSv1::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
-                msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
-                to_be_copied = msg_len;//(sizeof(NetBIOS::MessageHeader) + sizeof(Header) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(Header) : msg_len);
-                return read_message(info, collection, this, to_be_copied, msg_len);
+                setMsgLen(nb_header->len() + sizeof(NetBIOS::MessageHeader));
+                setToBeCopied(nb_header->len() + sizeof(NetBIOS::MessageHeader));//FIXME: restrict msg
+                return read_message(info, collection, this);
             }
             else if (CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
-                msg_len = nb_header->len() + sizeof(NetBIOS::MessageHeader);
-                to_be_copied = msg_len;//(sizeof(NetBIOS::MessageHeader) + sizeof(Header) < msg_len ? sizeof(NetBIOS::MessageHeader) + sizeof(Header) : msg_len);
-                return read_message(info, collection, this, to_be_copied, msg_len);
+                setMsgLen(nb_header->len() + sizeof(NetBIOS::MessageHeader));
+                setToBeCopied(nb_header->len() + sizeof(NetBIOS::MessageHeader));//FIXME: restrict msg
+                return read_message(info, collection, this);
             }
         }
         return false;

@@ -62,8 +62,7 @@ public:
 
     inline void reset()
     {
-        msg_len = 0;
-        to_be_copied = 0;
+        FiltratorImpl::resetImpl();
         collection.reset();
     }
 
@@ -101,16 +100,12 @@ public:
 
     inline bool inProgress(PacketInfo& info)
     {
-        if (msg_len || to_be_copied)
-        {
-            return true;
-        }
         return FiltratorImpl::inProgressImpl<lengthOfBaseHeader(), isRightHeader>(info, collection, this);
     }
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
-        return FiltratorImpl::lost(n, this, to_be_copied, msg_len);
+        return FiltratorImpl::lost(n, this);
     }
 
     inline constexpr static size_t lengthOfFirstSkipedPart()
@@ -120,7 +115,7 @@ public:
 
     inline void push(PacketInfo& info)
     {
-        return FiltratorImpl::push(info, collection, this, to_be_copied, msg_len);
+        return FiltratorImpl::push(info, collection, this);
     }
 
     inline bool collect_header(PacketInfo& info)
@@ -140,7 +135,7 @@ public:
         {
             if(validate_header(rm->fragment(), rm->fragment_len() + sizeof(RecordMark) ) )
             {
-                return FiltratorImpl::read_message(info, collection, this, to_be_copied, msg_len);
+                return FiltratorImpl::read_message(info, collection, this);
             }
         }
         return false;
@@ -148,7 +143,7 @@ public:
 
     inline void find_message(PacketInfo& info)
     {
-        return FiltratorImpl::find_message(info, collection, this, to_be_copied, msg_len);
+        return FiltratorImpl::find_message(info, collection, this);
     }
 
     inline bool validate_header(const MessageHeader*const msg, const uint32_t len)
@@ -160,28 +155,28 @@ public:
                 auto call = static_cast<const CallHeader*const>(msg);
                 if(RPCValidator::check(call))
                 {
-                    msg_len = len;   // length of current RPC message
+                    FiltratorImpl::setMsgLen(len);   // length of current RPC message
                     if(protocols::NFS3::Validator::check(call))
                     {
                         uint32_t proc {call->proc()};
                         if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
-                            to_be_copied = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
+                            FiltratorImpl::setToBeCopied(nfs3_rw_hdr_max < len ? nfs3_rw_hdr_max : len);
                         else
                         {
                             if (API::ProcEnumNFS3::READ == proc)
                                 nfs3_read_match.insert(call->xid());
-                            to_be_copied = msg_len;
+                            FiltratorImpl::setToBeCopied(len);
                         }
                         //TRACE("%p| MATCH RPC Call  xid:%u len: %u procedure: %u", this, call->xid(), msg_len, call->proc());
                     }
                     else if (protocols::NFS4::Validator::check(call))
                     {
-                        to_be_copied = msg_len;  // fully collect of NFSv4 messages
+                        FiltratorImpl::setToBeCopied(len);
                     }
                     else
                     {
                         //* RPC call message must be read out ==> msg_len !=0
-                        to_be_copied = 0; // don't collect headers of unknown calls
+                        FiltratorImpl::setToBeCopied(0);// don't collect headers of unknown calls
                         //TRACE("Unknown RPC call of program: %u version: %u procedure: %u", call->prog(), call->vers(), call->proc());
                     }
                     return true;
@@ -197,22 +192,24 @@ public:
                 auto reply = static_cast<const ReplyHeader*const>(msg);
                 if(RPCValidator::check(reply))
                 {
-                    msg_len = len;
+                    FiltratorImpl::setMsgLen(len);   // length of current RPC message
                     // Truncate NFSv3 READ reply message to NFSv3-RW-limit
                     //* Collect fully if reply received before matching call
                     if (nfs3_read_match.erase(reply->xid()) > 0)
                     {
-                        to_be_copied = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
+                        FiltratorImpl::setToBeCopied(nfs3_rw_hdr_max < len ? nfs3_rw_hdr_max : len);
                     }
                     else
-                        to_be_copied = msg_len; // length of current RPC message
+                    {
+                        FiltratorImpl::setToBeCopied(len);// length of current RPC message
+                    }
                     //TRACE("%p| MATCH RPC Reply xid:%u len: %u", this, reply->xid(), msg_len);
                     return true;
                 }
                 else // isn't RPC reply, stream is corrupt
                 {
-                    msg_len = 0;
-                    to_be_copied = 0;
+                    FiltratorImpl::setMsgLen(0);
+                    FiltratorImpl::setToBeCopied(0);
                     return false;
                 }
             }
@@ -229,9 +226,6 @@ public:
 
 private:
     size_t nfs3_rw_hdr_max {512}; // limit for NFSv3 to truncate WRITE call and READ reply messages
-    size_t msg_len;  // length of current RPC message + RM
-    size_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
-
     MessageSet nfs3_read_match;
 };
 
