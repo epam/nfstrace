@@ -32,18 +32,39 @@ namespace filtration
 
 class FiltratorImpl
 {
+    size_t msg_len;  // length of current RPC message + RM
+    size_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
+
     FiltratorImpl(FiltratorImpl&&)                 = delete;
     FiltratorImpl(const FiltratorImpl&)            = delete;
     FiltratorImpl& operator=(const FiltratorImpl&) = delete;
 public:
     FiltratorImpl()
-    {}
+    {
+        resetImpl();
+    }
+protected:
+    inline void setMsgLen(size_t value)
+    {
+        msg_len = value;
+    }
+
+    inline void setToBeCopied(size_t value)
+    {
+        to_be_copied = value;
+    }
 
     using IsRightHeader = bool(const uint8_t* header);
 
     template<typename Writer>
     inline void setWriterImpl(utils::NetworkSession* session_ptr, Writer* w, uint32_t /*max_rpc_hdr*/)
     {
+    }
+
+    inline void resetImpl()
+    {
+        msg_len = 0;
+        to_be_copied = 0;
     }
 
     /*!
@@ -53,8 +74,13 @@ public:
      * \param filtrator - pointer to observer
      */
     template<size_t callHeaderLen, IsRightHeader isRightHeader,typename Writer, typename Filtrator>
-    inline static bool inProgressImpl(PacketInfo& info, Writer& collection, Filtrator* filtrator)
+    inline bool inProgressImpl(PacketInfo& info, Writer& collection, Filtrator* filtrator)
     {
+        if (msg_len || to_be_copied)
+        {
+            return true;
+        }
+
         if (!collection) // collection isn't allocated
         {
             collection.allocate(); // allocate new collection from writer
@@ -91,7 +117,7 @@ public:
     }
 
     template<typename Filtrator>
-    inline void lost(const uint32_t n, Filtrator* filtrator, size_t& to_be_copied, size_t& msg_len) // we are lost n bytes in sequence
+    inline void lost(const uint32_t n, Filtrator* filtrator) // we are lost n bytes in sequence
     {
         //FIXME: Code has been dublicated
         if (msg_len != 0)
@@ -114,7 +140,7 @@ public:
     }
 
     template<typename Writer, typename Filtrator>
-    void push(PacketInfo& info, Writer& collection, Filtrator* filtrator, size_t& to_be_copied, size_t& msg_len)
+    inline void push(PacketInfo& info, Writer& collection, Filtrator* filtrator)
     {
         //FIXME: Code has been dublicated
         assert(info.dlen != 0);
@@ -175,7 +201,7 @@ public:
     }
 
     template<size_t callHeaderLen, size_t replyHeaderLen, typename Writer>
-    bool collect_header(PacketInfo& info, Writer& collection)
+    inline bool collect_header(PacketInfo& info, Writer& collection)
     {
         if (collection && (collection.data_size() > 0)) // collection is allocated
         {
@@ -220,7 +246,7 @@ public:
 
     // Find next message in packet info
     template<typename Writer, typename Filtrator>
-    void find_message(PacketInfo& info, Writer& collection, Filtrator* filtrator, size_t& to_be_copied, size_t& msg_len)
+    void find_message(PacketInfo& info, Writer& collection, Filtrator* filtrator)
     {
         assert(msg_len == 0);   // Message still undetected
 
@@ -244,7 +270,7 @@ public:
     }
 
     template<typename Writer, typename Filtrator>
-    bool read_message(PacketInfo& info, Writer& collection, Filtrator* filtrator, size_t& to_be_copied, size_t& msg_len)
+    bool read_message(PacketInfo& info, Writer& collection, Filtrator* filtrator)
     {
         assert(msg_len != 0);   // message is found
         assert(msg_len >= collection.data_size());
