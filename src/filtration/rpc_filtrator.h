@@ -27,6 +27,7 @@
 #include <pcap/pcap.h>
 
 #include "filtration/packet.h"
+#include "filtration/filtratorimpl.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/netbios/netbios.h"
@@ -45,7 +46,7 @@ namespace filtration
     TODO: add matching Calls and replies by XID of message
 */
 template<typename Writer>
-class RPCFiltrator
+class RPCFiltrator : private FiltratorImpl
 {
 public:
     RPCFiltrator()
@@ -61,7 +62,7 @@ public:
     inline void reset()
     {
         msg_len = 0;
-        hdr_len = 0;
+        to_be_copied = 0;
         collection.reset(); // data in external memory freed
     }
 
@@ -72,53 +73,35 @@ public:
         nfs3_rw_hdr_max = max_rpc_hdr;
     }
 
-    inline bool inProgress(PacketInfo& info)
+    inline constexpr static size_t lengthOfBaseHeader()
     {
-        static const size_t header_len = sizeof(RecordMark) + sizeof(MessageHeader);
+        return sizeof(RecordMark) + sizeof(MessageHeader);
+    }
 
-        if (msg_len || hdr_len)
+    inline static bool isRightHeader(const uint8_t* header)
+    {
+        const RecordMark* rm {reinterpret_cast<const RecordMark*>(header)};
+        if ((rm->fragment()->type() == MsgType::REPLY ) || (rm->fragment()->type() == MsgType::CALL ))
         {
             return true;
         }
-
-        if (!collection) // collection isn't allocated
-        {
-            collection.allocate(); // allocate new collection from writer
-        }
-        const size_t data_size = collection.data_size();
-
-        if (data_size + info.dlen > header_len)
-        {
-            static uint8_t buffer[header_len];
-            const uint8_t* header = info.data;
-
-            if (data_size > 0)
-            {
-                memcpy(buffer, collection.data(), data_size);
-                memcpy(buffer + data_size, info.data, header_len - data_size);
-                header = buffer;
-            }
-
-            const RecordMark* rm {reinterpret_cast<const RecordMark*>(header)};
-            if ((rm->fragment()->type() == MsgType::REPLY ) || (rm->fragment()->type() == MsgType::CALL ))
-            {
-                return true;
-            }
-            reset();
-        }
-        else
-        {
-            collection.push(info, info.dlen);
-        }
-
         return false;
+    }
+
+    inline bool inProgress(PacketInfo& info)
+    {
+        if (msg_len || to_be_copied)
+        {
+            return true;
+        }
+        return FiltratorImpl::inProgressImpl<lengthOfBaseHeader(), isRightHeader>(info, collection, this);
     }
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
         if(msg_len != 0)
         {
-            if(hdr_len == 0 && msg_len >= n)
+            if(to_be_copied == 0 && msg_len >= n)
             {
                 TRACE("We are lost %u bytes of payload marked for discard", n);
                 msg_len -= n;
@@ -142,7 +125,7 @@ public:
         {
             if(msg_len)    // we are on-stream and we are looking to some message
             {
-                if(!hdr_len)    // message header is readout, discard the unused tail of message
+                if(!to_be_copied)    // message header is readout, discard the unused tail of message
                 {
                     if(msg_len >= info.dlen) // discard whole new packet
                     {
@@ -161,23 +144,23 @@ public:
                 }
                 else // hdr_len != 0, readout a part of header of current message
                 {
-                    if(hdr_len > info.dlen) // got new part of header (not the all!)
+                    if(to_be_copied > info.dlen) // got new part of header (not the all!)
                     {
                         //TRACE("got new part of header (not the all!)");
                         collection.push(info, info.dlen);
-                        hdr_len     -= info.dlen;
+                        to_be_copied     -= info.dlen;
                         msg_len     -= info.dlen;
                         info.dlen = 0;  // return from while
                     }
                     else // hdr_len <= dlen, current message will be complete, also we have some additional data
                     {
                         //TRACE("current message will be complete, also we have some additional data");
-                        collection.push(info, hdr_len);
-                        info.dlen   -= hdr_len;
-                        info.data   += hdr_len;
+                        collection.push(info, to_be_copied);
+                        info.dlen   -= to_be_copied;
+                        info.data   += to_be_copied;
 
-                        msg_len -= hdr_len;
-                        hdr_len = 0;
+                        msg_len -= to_be_copied;
+                        to_be_copied = 0;
 
                         // we should remove RM(uin32_t) from collected data
                         collection.skip_first(sizeof(RecordMark));
@@ -260,11 +243,11 @@ public:
             {
                 assert(msg_len != 0);   // message is found
                 assert(msg_len >= collection.data_size());
-                assert(hdr_len <= msg_len);
+                assert(to_be_copied <= msg_len);
                 const size_t written {collection.data_size()};
                 msg_len -= written; // substract how written (if written)
-                hdr_len -= std::min(hdr_len, written);
-                if (0 == hdr_len)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
+                to_be_copied -= std::min(to_be_copied, written);
+                if (0 == to_be_copied)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
                                     // Next find message call will finding next message
                 {
                     collection.skip_first(sizeof(RecordMark));
@@ -274,7 +257,7 @@ public:
             }
         }
         assert(msg_len == 0);   // message is not found
-        assert(hdr_len == 0);   // header should be skipped
+        assert(to_be_copied == 0);   // header should be skipped
         collection.reset();     // skip collected data
         //[ Optimization ] skip data of current packet at all
         info.dlen = 0;
@@ -290,27 +273,27 @@ public:
                 if(RPCValidator::check(call))
                 {
                     msg_len = len;   // length of current RPC message
-                    if(NFS3::Validator::check(call))
+                    if(protocols::NFS3::Validator::check(call))
                     {
                         uint32_t proc {call->proc()};
                         if (API::ProcEnumNFS3::WRITE == proc) // truncate NFSv3 WRITE call message to NFSv3-RW-limit
-                            hdr_len = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
+                            to_be_copied = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
                         else
                         {
                             if (API::ProcEnumNFS3::READ == proc)
                                 nfs3_read_match.insert(call->xid());
-                            hdr_len = msg_len;
+                            to_be_copied = msg_len;
                         }
                         //TRACE("%p| MATCH RPC Call  xid:%u len: %u procedure: %u", this, call->xid(), msg_len, call->proc());
                     }
-                    else if (NFS4::Validator::check(call))
+                    else if (protocols::NFS4::Validator::check(call))
                     {
-                        hdr_len = msg_len;  // fully collect of NFSv4 messages
+                        to_be_copied = msg_len;  // fully collect of NFSv4 messages
                     }
                     else
                     {
                         //* RPC call message must be read out ==> msg_len !=0
-                        hdr_len = 0; // don't collect headers of unknown calls
+                        to_be_copied = 0; // don't collect headers of unknown calls
                         //TRACE("Unknown RPC call of program: %u version: %u procedure: %u", call->prog(), call->vers(), call->proc());
                     }
                     return true;
@@ -331,17 +314,17 @@ public:
                     //* Collect fully if reply received before matching call
                     if (nfs3_read_match.erase(reply->xid()) > 0)
                     {
-                        hdr_len = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
+                        to_be_copied = (nfs3_rw_hdr_max < msg_len ? nfs3_rw_hdr_max : msg_len);
                     }
                     else
-                        hdr_len = msg_len; // length of current RPC message
+                        to_be_copied = msg_len; // length of current RPC message
                     //TRACE("%p| MATCH RPC Reply xid:%u len: %u", this, reply->xid(), msg_len);
                     return true;
                 }
                 else // isn't RPC reply, stream is corrupt
                 {
                     msg_len = 0;
-                    hdr_len = 0;
+                    to_be_copied = 0;
                     return false;
                 }
             }
@@ -359,7 +342,7 @@ public:
 private:
     size_t nfs3_rw_hdr_max {512}; // limit for NFSv3 to truncate WRITE call and READ reply messages
     size_t msg_len;  // length of current RPC message + RM
-    size_t hdr_len;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
+    size_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
 
     typename Writer::Collection collection;// storage for collection packet data
     MessageSet nfs3_read_match;

@@ -34,8 +34,8 @@ namespace API
 template<typename ProcedureType>
 struct Procedure
 {
-    ProcedureType rpc_call;
-    ProcedureType rpc_reply;
+    ProcedureType call;
+    ProcedureType reply;
 
     const struct Session* session;
     const struct timeval* ctimestamp;

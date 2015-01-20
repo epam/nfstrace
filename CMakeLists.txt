@@ -90,16 +90,30 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     if (GCOVR_PATH)
         add_custom_target (coverage
                            COMMAND ${GCOVR_PATH} --xml -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.xml 2>&1 >/dev/null
-                           WORKING_DIRECTORY ${CMAKE_PROJECT_DIR})
+                           WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+        add_custom_target (coverage-html
+                           COMMAND ${GCOVR_PATH} --html --html-details -r \"${CMAKE_SOURCE_DIR}\" --object-directory \"${CMAKE_BINARY_DIR}\" -o coverage.html 2>&1 >/dev/null
+                           WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    else ()
+        message (WARNING "'gcovr' executable not found - coverage report is not available.")
     endif ()
 endif ()
 
 # documentation ================================================================
-
 find_program (DOXYGEN_PATH doxygen)
 
 if (DOXYGEN_PATH)
     add_custom_target (documentation
                        COMMAND ${DOXYGEN_PATH} Doxyfile
+                       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+endif ()
+
+# code style ===================================================================
+find_program (ASTYLE_PATH astyle)
+
+if (ASTYLE_PATH)
+    add_custom_target (codestyle
+                       COMMAND find analyzers src tests -name '*.h' -o -name '*.cpp' |
+                               xargs ${ASTYLE_PATH} --options=${CMAKE_SOURCE_DIR}/astyle.cfg
                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif ()
