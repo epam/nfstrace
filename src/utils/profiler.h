@@ -29,7 +29,7 @@
 #include <sys/time.h>
 //------------------------------------------------------------------------------
 #ifdef PROFILING
-#define PROF Profiler<0> p(__func__)
+#define PROF Profiler<__COUNTER__> p(__func__)
 #else
 #define PROF
 #endif
