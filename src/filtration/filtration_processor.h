@@ -41,6 +41,7 @@
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
+#include "../tests/unit/profiler.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -440,6 +441,7 @@ public:
 
     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
     {
+        PROF;// Calc how much time was spent in this func
         auto processor = reinterpret_cast<FiltrationProcessor*>(user);
 
         PacketInfo info(pkthdr, packet, processor->datalink);

@@ -14,6 +14,8 @@ else ()
     message (WARNING "Compilation by ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} isn't tested")
 endif ()
 
+include(cmake/options.cmake)
+
 find_package(Threads REQUIRED) # POSIX Threads
 
 find_path(PCAP_ROOT_DIR

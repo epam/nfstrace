@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
 // Description: Profiler class.
-// Copyright (c) 2014 EPAM Systems
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -22,23 +22,33 @@
 #ifndef PROFILER_H
 #define PROFILER_H
 //------------------------------------------------------------------------------
-#include <vector>
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 #include <sys/time.h>
 //------------------------------------------------------------------------------
+#ifdef PROFILING
+#define PROF Profiler<0> p(__func__)
+#else
+#define PROF
+#endif
+//------------------------------------------------------------------------------
 /*! \class Profiler class. Just for profiling, it is not production!
+ * \param id - identificator of profiler. For different functions we have to use different id
  * How to use? You have to insert this class in the begining of only 1 function (callback?)
  * ...
  * void function() {
- *     Profiler p(__func__);
+ *     Profiler<__COUNTER__> p(__func__);
+ *     // or just
+ *     PROF;
  * ...
  */
+template<int id>
 class Profiler {
     const char* name = "";//!< Name of function
     const static size_t reservedBytes = 50 * 1000;//!< Reserved - calls count
-    struct timespec tm1;//!< Timestamp of start function
+    struct timespec startTime;//!< Timestamp of start function
 
     class Local
     {
@@ -53,8 +63,8 @@ class Profiler {
 
         ~Local()
         {
-            int sum = std::accumulate(values.begin(), values.end(), 0, std::plus<std::uint64_t>());
-            std::cout << name << ": sum=" << sum << ", count=" << values.size() << ", avg=" << sum/values.size() << " nanosecs" << std::endl;
+            std::uint64_t sum = std::accumulate(values.begin(), values.end(), 0, std::plus<std::uint64_t>());
+            std::cout << name << "(" << id << "): calls count=" << values.size() << ", avg time=" << sum/values.size() << " nanosecs" << std::endl;
         }
     };
 public:
@@ -65,16 +75,19 @@ public:
     Profiler(const char* name)
         : name(name)
     {
-        clock_gettime(CLOCK_REALTIME, &tm1);
+        clock_gettime(CLOCK_REALTIME, &startTime);
     }
 
     ~Profiler()
     {
-        static Local local(name);
-        struct timespec tm2;
-        clock_gettime(CLOCK_REALTIME, &tm2);
-        local.values.push_back(tm2.tv_nsec - tm1.tv_nsec);// Assume, that time < 1 second!
+        struct timespec stopTime;
+        clock_gettime(CLOCK_REALTIME, &stopTime);
+
+        static Local local(name);// Time of vector initialization is not included into statistic
+
+        local.values.push_back(stopTime.tv_nsec - startTime.tv_nsec);// Assume, that time < 1 second!
     }
+
 };
 //------------------------------------------------------------------------------
 #endif // PROFILER_H
