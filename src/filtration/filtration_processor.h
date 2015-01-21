@@ -35,13 +35,13 @@
 #include "utils/log.h"
 #include "utils/out.h"
 #include "utils/sessions.h"
+#include "utils/profiler.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
 #include "filtration/sessions_hash.h"
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
-#include "../tests/unit/profiler.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
