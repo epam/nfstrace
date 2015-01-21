@@ -83,7 +83,7 @@ public:
 
     inline bool collect_header(PacketInfo& info)
     {
-        return BaseImpl::collect_header(info, lengthOfBaseHeader(),lengthOfBaseHeader());
+        return BaseImpl::collect_header(info, lengthOfBaseHeader(), lengthOfBaseHeader());
     }
 
     inline bool find_and_read_message(PacketInfo& info, typename Writer::Collection& collection)

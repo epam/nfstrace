@@ -46,7 +46,8 @@
  * ...
  */
 template<int id>
-class Profiler {
+class Profiler
+{
     const char* name = "";//!< Name of function
     const static size_t reservedBytes = 50 * 1000;//!< Reserved - calls count
     struct timespec startTime;//!< Timestamp of start function
@@ -65,7 +66,7 @@ class Profiler {
         ~Local()
         {
             std::uint64_t sum = std::accumulate(values.begin(), values.end(), 0, std::plus<std::uint64_t>());
-            std::cout << name << "(" << id << "): calls count=" << values.size() << ", avg time=" << sum/values.size() << " nanosecs" << std::endl;
+            std::cout << name << "(" << id << "): calls count=" << values.size() << ", avg time=" << sum / values.size() << " nanosecs" << std::endl;
         }
     };
 public:
