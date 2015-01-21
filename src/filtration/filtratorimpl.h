@@ -73,7 +73,7 @@ public:
     inline bool inProgress(PacketInfo& info)
     {
         Filtrator* filtrator = static_cast<Filtrator* >(this);
-        const size_t callHeaderLen = filtrator->lengthOfBaseHeader();
+        constexpr size_t callHeaderLen = Filtrator::lengthOfBaseHeader();
         if (msg_len || to_be_copied)
         {
             return true;
@@ -175,7 +175,7 @@ public:
                         msg_len -= to_be_copied;
                         to_be_copied = 0;
 
-                        collection.skip_first(filtrator->lengthOfFirstSkipedPart());
+                        collection.skip_first(Filtrator::lengthOfFirstSkipedPart());
                         collection.complete(info);    // push complete message to queue
                     }
                 }
