@@ -73,7 +73,7 @@ public:
     inline bool inProgress(PacketInfo& info)
     {
         Filtrator* filtrator = static_cast<Filtrator* >(this);
-        const size_t callHeaderLen = filtrator->lengthOfBaseHeader();
+        constexpr const size_t callHeaderLen = filtrator->lengthOfBaseHeader();
         if (msg_len || to_be_copied)
         {
             return true;
