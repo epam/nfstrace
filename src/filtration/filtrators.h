@@ -100,8 +100,7 @@ public:
             filtratorCIFS.push (info);
         }
         // is it RPC message?
-        else
-        if (currentFiltrator == FiltratorTypes::RPC || filtratorRPC.inProgress(info))
+        else if (currentFiltrator == FiltratorTypes::RPC || filtratorRPC.inProgress(info))
         {
             currentFiltrator = FiltratorTypes::RPC;
             filtratorRPC.push (info);
