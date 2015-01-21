@@ -2,7 +2,7 @@
 // Author: Andrey Kuznetsov
 // Description: Abstract impementation of filtrator class
 // TODO: THIS CODE MUST BE TOTALLY REFACTORED!
-// Copyright (c) 2014 EPAM Systems
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -29,15 +29,16 @@ namespace filtration
 {
 /*!
  * Filtering TCP stream strategy (implementation)
- * Implemented via Curiously recurring template pattern, (see http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern)
+ * Implemented via CRTP - Curiously recurring template pattern,
+ * (see http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern)
  */
 template<typename Filtrator, typename Writer>
 class FiltratorImpl
 {
-    size_t msg_len;  // length of current RPC message + RM
-    size_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
-    using Collection = typename Writer::Collection;
-    Collection collection;// storage for collection packet data
+    size_t msg_len;  //!< length of current message
+    size_t to_be_copied;  //!<  length of readable piece of message. Initially msg_len or 0 in case of unknown msg
+    using Collection = typename Writer::Collection; //!< Type of collection
+    Collection collection;//!< storage for collection packet data
 
     FiltratorImpl(FiltratorImpl&&)                 = delete;
     FiltratorImpl(const FiltratorImpl&)            = delete;
@@ -46,8 +47,18 @@ public:
     FiltratorImpl()
     {
         reset();
+
+        static_assert(std::is_function<decltype(Filtrator::lengthOfBaseHeader)>::value, "You have to define static function with signature 'size_t lengthOfBaseHeader()' in inhereted class");
+        static_assert(std::is_function<decltype(Filtrator::lengthOfFirstSkipedPart)>::value, "You have to define static function with signature 'size_t lengthOfFirstSkipedPart()' in inhereted class");
+        static_assert(std::is_function<decltype(Filtrator::isRightHeader)>::value, "You have to define static function with signature 'bool isRightHeader(const uint8_t* header)' in inhereted class");
+
+        static_assert(std::is_member_function_pointer<decltype(&Filtrator::collect_header)>::value, "You have to define static function with signature 'bool collect_header(PacketInfo& info)' in inhereted class");
+        static_assert(std::is_member_function_pointer<decltype(&Filtrator::find_and_read_message)>::value, "You have to define static function with signature 'bool find_and_read_message(PacketInfo& info, typename Writer::Collection& collection)' in inhereted class");
     }
 
+    /*!
+     * Resets state of the filtrator
+     */
     inline void reset()
     {
         msg_len = 0;
@@ -56,10 +67,8 @@ public:
     }
 
     /*!
-     * Implementation of checking, does the filtrator work now?
+     * Checks, does the filtrator in work now?
      * \param info - packet
-     * \param collection - link to collection class
-     * \param filtrator - pointer to observer
      */
     inline bool inProgress(PacketInfo& info)
     {
@@ -105,6 +114,10 @@ public:
         return false;
     }
 
+    /*!
+     * Handles lost bytes event
+     * \param n - lost bytes count
+     */
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
         Filtrator* filtrator = static_cast<Filtrator* >(this);
@@ -127,6 +140,10 @@ public:
         }
     }
 
+    /*!
+     * Handles next data part
+     * \param info - part of stream
+     */
     inline void push(PacketInfo& info)
     {
         Filtrator* filtrator = static_cast<Filtrator* >(this);
@@ -188,7 +205,10 @@ public:
         }
     }
 
-    // Find next message in packet info
+    /*!
+     * Find next message in packet info
+     * \param info - part of data
+     */
     inline void find_message(PacketInfo& info)
     {
         assert(msg_len == 0);   // Message still undetected
