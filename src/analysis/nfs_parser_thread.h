@@ -82,45 +82,17 @@ private:
                                 NFS41CompoundType>(nfs41_compound_procedure);
     }
 
-    // NFSv4.0
-
     //! Internal function for proper passing NFSv4.0's operations to analyzers
     //! It's supposed to be used inside analyze_nfs4_operations only
     void nfs4_ops_switch(const RPCProcedure* rpc_procedure,
                          const NST::API::NFS4::nfs_argop4* arg,
                          const NST::API::NFS4::nfs_resop4* res);
 
-    inline void nfs4_ops_switch(const RPCProcedure* rpc_procedure,
-                                const NST::API::NFS4::nfs_argop4* arg)
-    {
-        nfs4_ops_switch(rpc_procedure, arg, nullptr);
-    }
-
-    inline void nfs4_ops_switch(const RPCProcedure* rpc_procedure,
-                                const NST::API::NFS4::nfs_resop4* res)
-    {
-        nfs4_ops_switch(rpc_procedure, nullptr, res);
-    }
-
-    // NFSv4.1
-
     //! Internal function for proper passing NFSv4.1's operations to analyzers
     //! It's supposed to be used inside analyze_nfs4_operations only
     void nfs4_ops_switch(const RPCProcedure* rpc_procedure,
                          const NST::API::NFS41::nfs_argop4* arg,
                          const NST::API::NFS41::nfs_resop4* res);
-
-    inline void nfs4_ops_switch(const RPCProcedure* rpc_procedure,
-                                const NST::API::NFS41::nfs_argop4* arg)
-    {
-        nfs4_ops_switch(rpc_procedure, arg, nullptr);
-    }
-
-    inline void nfs4_ops_switch(const RPCProcedure* rpc_procedure,
-                                const NST::API::NFS41::nfs_resop4* res)
-    {
-        nfs4_ops_switch(rpc_procedure, nullptr, res);
-    }
 
     RunningStatus& status;
     Analyzers& analyzers;
