@@ -87,7 +87,7 @@ public:
 
         if (data_size + info.dlen > callHeaderLen)
         {
-            static uint8_t buffer[callHeaderLen];
+            uint8_t buffer[callHeaderLen];
             const uint8_t* header = info.data;
 
             if (data_size > 0)
