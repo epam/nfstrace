@@ -55,12 +55,12 @@ public:
         BaseImpl::setWriterImpl(session_ptr, w, max_rpc_hdr);
     }
 
-    inline constexpr static size_t lengthOfBaseHeader()
+    constexpr static size_t lengthOfBaseHeader()
     {
         return sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
     }
 
-    inline constexpr static size_t lengthOfFirstSkipedPart()
+    constexpr static size_t lengthOfFirstSkipedPart()
     {
         return sizeof(NetBIOS::MessageHeader);
     }
