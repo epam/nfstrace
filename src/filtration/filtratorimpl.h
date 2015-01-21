@@ -23,17 +23,21 @@
 #ifndef IFILTRATOR_H
 #define IFILTRATOR_H
 //------------------------------------------------------------------------------
-//#include "filtration/packet.h"
-//------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
-
+/*!
+ * Filtering TCP stream strategy (implementation)
+ * Implemented via Curiously recurring template pattern, (see http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern)
+ */
+template<typename Filtrator, typename Writer>
 class FiltratorImpl
 {
     size_t msg_len;  // length of current RPC message + RM
     size_t to_be_copied;  // length of readable piece of RPC message. Initially msg_len or 0 in case of unknown msg
+    using Collection = typename Writer::Collection;
+    Collection collection;// storage for collection packet data
 
     FiltratorImpl(FiltratorImpl&&)                 = delete;
     FiltratorImpl(const FiltratorImpl&)            = delete;
@@ -41,25 +45,14 @@ class FiltratorImpl
 public:
     FiltratorImpl()
     {
-        resetImpl();
-    }
-protected:
-    inline void setMsgLen(size_t value)
-    {
-        msg_len = value;
+        reset();
     }
 
-    inline void setToBeCopied(size_t value)
-    {
-        to_be_copied = value;
-    }
-
-    using IsRightHeader = bool(const uint8_t* header);
-
-    inline void resetImpl()
+    inline void reset()
     {
         msg_len = 0;
         to_be_copied = 0;
+        collection.reset();
     }
 
     /*!
@@ -68,9 +61,10 @@ protected:
      * \param collection - link to collection class
      * \param filtrator - pointer to observer
      */
-    template<size_t callHeaderLen, IsRightHeader isRightHeader,typename Writer, typename Filtrator>
-    inline bool inProgressImpl(PacketInfo& info, Writer& collection, Filtrator* filtrator)
+    inline bool inProgress(PacketInfo& info)
     {
+        Filtrator* filtrator = static_cast<Filtrator* >(this);
+        const size_t callHeaderLen = filtrator->lengthOfBaseHeader();
         if (msg_len || to_be_copied)
         {
             return true;
@@ -96,7 +90,7 @@ protected:
             }
 
             // It is right header
-            if (isRightHeader(header))
+            if (filtrator->isRightHeader(header))
             {
                 return true;
             }
@@ -111,10 +105,9 @@ protected:
         return false;
     }
 
-    template<typename Filtrator>
-    inline void lost(const uint32_t n, Filtrator* filtrator) // we are lost n bytes in sequence
+    inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
-        //FIXME: Code has been dublicated
+        Filtrator* filtrator = static_cast<Filtrator* >(this);
         if (msg_len != 0)
         {
             if (to_be_copied == 0 && msg_len >= n)
@@ -134,9 +127,9 @@ protected:
         }
     }
 
-    template<typename Writer, typename Filtrator>
-    inline void push(PacketInfo& info, Writer& collection, Filtrator* filtrator)
+    inline void push(PacketInfo& info)
     {
+        Filtrator* filtrator = static_cast<Filtrator* >(this);
         //FIXME: Code has been dublicated
         assert(info.dlen != 0);
 
@@ -195,8 +188,49 @@ protected:
         }
     }
 
-    template<size_t callHeaderLen, size_t replyHeaderLen, typename Writer>
-    inline bool collect_header(PacketInfo& info, Writer& collection)
+    // Find next message in packet info
+    inline void find_message(PacketInfo& info)
+    {
+        assert(msg_len == 0);   // Message still undetected
+        Filtrator* filtrator = static_cast<Filtrator* >(this);
+
+        if (!filtrator->collect_header(info))
+        {
+            return ;
+        }
+
+        assert(collection);     // collection must be initialized
+
+        if (filtrator->find_and_read_message(info, collection))
+        {
+            return;
+        }
+
+        assert(msg_len == 0);   // message is not found
+        assert(to_be_copied == 0);   // header should be skipped
+        collection.reset();     // skip collected data
+        //[ Optimization ] skip data of current packet at all
+        info.dlen = 0;
+    }
+
+protected:
+    inline void setMsgLen(size_t value)
+    {
+        msg_len = value;
+    }
+
+    inline void setToBeCopied(size_t value)
+    {
+        to_be_copied = value;
+    }
+
+    inline void setWriterImpl(utils::NetworkSession* session_ptr,  Writer* w, uint32_t )
+    {
+        assert(w);
+        collection.set(*w, session_ptr);
+    }
+
+    inline bool collect_header(PacketInfo& info, size_t callHeaderLen, size_t replyHeaderLen)
     {
         if (collection && (collection.data_size() > 0)) // collection is allocated
         {
@@ -239,37 +273,12 @@ protected:
         return true;
     }
 
-    // Find next message in packet info
-    template<typename Writer, typename Filtrator>
-    inline void find_message(PacketInfo& info, Writer& collection, Filtrator* filtrator)
-    {
-        assert(msg_len == 0);   // Message still undetected
-
-        if (!filtrator->collect_header(info))
-        {
-            return ;
-        }
-
-        assert(collection);     // collection must be initialized
-
-        if (filtrator->find_and_read_message(info))
-        {
-            return;
-        }
-
-        assert(msg_len == 0);   // message is not found
-        assert(to_be_copied == 0);   // header should be skipped
-        collection.reset();     // skip collected data
-        //[ Optimization ] skip data of current packet at all
-        info.dlen = 0;
-    }
-
-    template<typename Writer, typename Filtrator>
-    inline bool read_message(PacketInfo& info, Writer& collection, Filtrator* filtrator)
+    inline bool read_message(PacketInfo& info)
     {
         assert(msg_len != 0);   // message is found
         assert(msg_len >= collection.data_size());
         assert(to_be_copied <= msg_len);
+        Filtrator* filtrator = static_cast<Filtrator* >(this);
 
         const size_t written {collection.data_size()};
         msg_len -= written; // substract how written (if written)
