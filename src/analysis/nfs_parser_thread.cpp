@@ -325,27 +325,17 @@ void NFSParserThread::analyze_nfs4_operations(NFS4CompoundType& nfs4_compound_pr
     // Traversing through ALL COMPOUND procedure's operations
     for(uint32_t i {0}; i < total_ops_count; i++)
     {
-        if(arg && res)
+        if((arg && res)&&(arg->argop != res->resop))
         {
-            if(arg->argop == res->resop)
-            {
-                // Passing each operation to analyzers using the helper's function
-                nfs4_ops_switch(&nfs4_compound_procedure, arg, res);
-            }
-            else
-            {
-                nfs4_ops_switch(&nfs4_compound_procedure, arg);
-                nfs4_ops_switch(&nfs4_compound_procedure, res);
-            }
+            // Passing each operation to analyzers using the helper's function
+            nfs4_ops_switch(&nfs4_compound_procedure, arg, nullptr);
+            nfs4_ops_switch(&nfs4_compound_procedure, nullptr, res);
         }
-        else if(arg)
+        else
         {
-            nfs4_ops_switch(&nfs4_compound_procedure, arg);
+            nfs4_ops_switch(&nfs4_compound_procedure, arg, res);
         }
-        else if(res)
-        {
-            nfs4_ops_switch(&nfs4_compound_procedure, res);
-        }
+
         if(arg && i < (arg_ops_count-1)) arg++; else arg = nullptr;
         if(res && i < (res_ops_count-1)) res++; else res = nullptr;
     }
