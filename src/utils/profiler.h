@@ -22,8 +22,9 @@
 #ifndef PROFILER_H
 #define PROFILER_H
 //------------------------------------------------------------------------------
-#include <algorithm>
+#include <functional>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 #include <sys/time.h>
