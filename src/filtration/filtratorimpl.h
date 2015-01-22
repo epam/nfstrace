@@ -175,7 +175,7 @@ public:
                         msg_len -= to_be_copied;
                         to_be_copied = 0;
 
-                        collection.skip_first(filtrator->lengthOfFirstSkipedPart());
+                        collection.skip_first(Filtrator::lengthOfFirstSkipedPart());
                         collection.complete(info);    // push complete message to queue
                     }
                 }
