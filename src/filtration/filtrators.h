@@ -93,17 +93,17 @@ public:
      */
     inline void push(PacketInfo& info)
     {
-        // is it CIFS message?
-        if (currentFiltrator == FiltratorTypes::CIFS || filtratorCIFS.inProgress(info))
-        {
-            currentFiltrator = FiltratorTypes::CIFS;
-            filtratorCIFS.push (info);
-        }
         // is it RPC message?
-        else if (currentFiltrator == FiltratorTypes::RPC || filtratorRPC.inProgress(info))
+        if (currentFiltrator == FiltratorTypes::RPC || filtratorRPC.inProgress(info))
         {
             currentFiltrator = FiltratorTypes::RPC;
             filtratorRPC.push (info);
+        }
+        // is it CIFS message?
+        else if (currentFiltrator == FiltratorTypes::CIFS || filtratorCIFS.inProgress(info))
+        {
+            currentFiltrator = FiltratorTypes::CIFS;
+            filtratorCIFS.push (info);
         }
         // it is Unknown message
         else

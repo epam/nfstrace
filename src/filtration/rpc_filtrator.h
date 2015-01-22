@@ -62,17 +62,17 @@ public:
         BaseImpl::setWriterImpl(session_ptr, w, max_rpc_hdr);
     }
 
-    inline constexpr static size_t lengthOfBaseHeader()
+    constexpr static size_t lengthOfBaseHeader()
     {
         return sizeof(RecordMark) + sizeof(MessageHeader);
     }
 
-    inline constexpr static size_t lengthOfReplyHeader()
+    constexpr static size_t lengthOfReplyHeader()
     {
         return sizeof(RecordMark) + sizeof(ReplyHeader);
     }
 
-    inline constexpr static size_t lengthOfCallHeader()
+    constexpr static size_t lengthOfCallHeader()
     {
         return sizeof(RecordMark) + sizeof(CallHeader);
     }
@@ -80,9 +80,14 @@ public:
     inline static bool isRightHeader(const uint8_t* header)
     {
         const RecordMark* rm {reinterpret_cast<const RecordMark*>(header)};
-        if ((rm->fragment()->type() == MsgType::REPLY ) || (rm->fragment()->type() == MsgType::CALL ))
+        const MessageHeader* const msg = rm->fragment();
+        if (msg->type() == MsgType::REPLY)
         {
-            return true;
+            return RPCValidator::check(static_cast<const ReplyHeader* const>(msg));
+        }
+        if (msg->type() == MsgType::CALL)
+        {
+            return RPCValidator::check(static_cast<const CallHeader* const>(msg));
         }
         return false;
     }
