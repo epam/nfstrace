@@ -40,34 +40,27 @@ namespace filtration
 {
 
 template<typename Writer>
-class CIFSFiltrator : private FiltratorImpl
+class CIFSFiltrator : public FiltratorImpl<CIFSFiltrator<Writer>, Writer>
 {
-    typename Writer::Collection collection;// storage for collection packet data
+    using BaseImpl = FiltratorImpl<CIFSFiltrator<Writer>, Writer>;
 public:
+
     CIFSFiltrator()
-        : FiltratorImpl()
+        : BaseImpl()
     {
-        reset();
     }
 
-    inline void reset()
+    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {
-        FiltratorImpl::resetImpl();
-        collection.reset();
+        BaseImpl::setWriterImpl(session_ptr, w, max_rpc_hdr);
     }
 
-    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t )
-    {
-        assert(w);
-        collection.set(*w, session_ptr);
-    }
-
-    inline constexpr static size_t lengthOfBaseHeader()
+    constexpr static size_t lengthOfBaseHeader()
     {
         return sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::MessageHeaderHead);
     }
 
-    inline constexpr static size_t lengthOfFirstSkipedPart()
+    constexpr static size_t lengthOfFirstSkipedPart()
     {
         return sizeof(NetBIOS::MessageHeader);
     }
@@ -88,46 +81,26 @@ public:
         return false;
     }
 
-    inline bool inProgress(PacketInfo& info)
-    {
-        return FiltratorImpl::inProgressImpl<lengthOfBaseHeader(), isRightHeader>(info, collection, this);
-    }
-
-    inline void lost(const uint32_t n) // we are lost n bytes in sequence
-    {
-        return FiltratorImpl::lost(n, this);
-    }
-
-    inline void push(PacketInfo& info)
-    {
-        return FiltratorImpl::push(info, collection, this);
-    }
-
     inline bool collect_header(PacketInfo& info)
     {
-        return FiltratorImpl::collect_header<lengthOfBaseHeader(),lengthOfBaseHeader()>(info, collection);
+        return BaseImpl::collect_header(info, lengthOfBaseHeader(), lengthOfBaseHeader());
     }
 
-    inline void find_message(PacketInfo& info)
-    {
-        return FiltratorImpl::find_message(info, collection, this);
-    }
-
-    inline bool find_and_read_message(PacketInfo& info)
+    inline bool find_and_read_message(PacketInfo& info, typename Writer::Collection& collection)
     {
         if (const NetBIOS::MessageHeader* nb_header = NetBIOS::get_header(collection.data()))
         {
             if (CIFSv1::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
-                setMsgLen(nb_header->len() + sizeof(NetBIOS::MessageHeader));
-                setToBeCopied(nb_header->len() + sizeof(NetBIOS::MessageHeader));//FIXME: restrict msg
-                return read_message(info, collection, this);
+                BaseImpl::setMsgLen(nb_header->len() + sizeof(NetBIOS::MessageHeader));
+                BaseImpl::setToBeCopied(nb_header->len() + sizeof(NetBIOS::MessageHeader));//FIXME: restrict msg
+                return BaseImpl::read_message(info);
             }
             else if (CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
-                setMsgLen(nb_header->len() + sizeof(NetBIOS::MessageHeader));
-                setToBeCopied(nb_header->len() + sizeof(NetBIOS::MessageHeader));//FIXME: restrict msg
-                return read_message(info, collection, this);
+                BaseImpl::setMsgLen(nb_header->len() + sizeof(NetBIOS::MessageHeader));
+                BaseImpl::setToBeCopied(nb_header->len() + sizeof(NetBIOS::MessageHeader));//FIXME: restrict msg
+                return BaseImpl::read_message(info);
             }
         }
         return false;
