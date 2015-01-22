@@ -142,7 +142,49 @@ void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
     }
 }
 
+// ----------------------------------------------------------------------------
+// Forward declarations of internal functions used inside analyze_nfs_procedure
+// They're supposed to be used inside analyze_nfs_procedure only
+// ----------------------------------------------------------------------------
+
 static uint32_t get_nfs4_compound_minor_version(const std::uint8_t* rpc_nfs4_call);
+
+using NFS40CompoundType = NST::protocols::NFS4::NFSPROC4RPCGEN_COMPOUND;
+using NFS41CompoundType = NST::protocols::NFS41::NFSPROC41RPCGEN_COMPOUND;
+
+template
+<
+    typename ArgOpType,
+    typename ResOpType,
+    typename NFS4CompoundType
+>
+void analyze_nfs4_operations(Analyzers& analyzers, NFS4CompoundType& nfs4_compound_procedure);
+
+inline void analyze_nfs40_operations(Analyzers& analyzers, NFS40CompoundType& nfs40_compound_procedure)
+{
+    analyze_nfs4_operations<NST::API::NFS4::nfs_argop4,
+                            NST::API::NFS4::nfs_resop4,
+                            NFS40CompoundType>(analyzers, nfs40_compound_procedure);
+}
+
+inline void analyze_nfs41_operations(Analyzers& analyzers, NFS41CompoundType& nfs41_compound_procedure)
+{
+    analyze_nfs4_operations<NST::API::NFS41::nfs_argop4,
+                            NST::API::NFS41::nfs_resop4,
+                            NFS41CompoundType>(analyzers, nfs41_compound_procedure);
+}
+
+void nfs4_ops_switch(Analyzers& analyzers,
+                     const RPCProcedure* rpc_procedure,
+                     const NST::API::NFS4::nfs_argop4* arg,
+                     const NST::API::NFS4::nfs_resop4* res);
+
+void nfs4_ops_switch(Analyzers& analyzers,
+                     const RPCProcedure* rpc_procedure,
+                     const NST::API::NFS41::nfs_argop4* arg,
+                     const NST::API::NFS41::nfs_resop4* res);
+
+// ----------------------------------------------------------------------------
 
 void NFSParserThread::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
                                              FilteredDataQueue::Ptr&& reply,
@@ -184,7 +226,7 @@ void NFSParserThread::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
                     {
                     NFSPROC4RPCGEN_COMPOUND compound {c,r,s};
                     analyzers(&IAnalyzer::INFSv4rpcgen::compound4, compound);
-                    analyze_nfs40_operations(compound);
+                    analyze_nfs40_operations(analyzers, compound);
                     break;
                     }
                 }
@@ -197,7 +239,7 @@ void NFSParserThread::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
                     {
                     NFSPROC41RPCGEN_COMPOUND compound {c,r,s};
                     analyzers(&IAnalyzer::INFSv41rpcgen::compound41, compound);
-                    analyze_nfs41_operations(compound);
+                    analyze_nfs41_operations(analyzers, compound);
                     break;
                     }
                 }
@@ -281,13 +323,15 @@ static uint32_t get_nfs4_compound_minor_version(const std::uint8_t* rpc_nfs4_cal
     return ntohl(*(uint32_t*)it);
 }
 
+//! Common internal function for parsing NFSv4.x's COMPOUND procedure
+//! It's supposed to be used inside analyze_nfs_procedure only
 template
 <
     typename ArgOpType,       // Type of arguments(call part of nfs's procedure)
     typename ResOpType,       // Type of results(reply part of nfs's procedure)
     typename NFS4CompoundType // Type of NFSv4.x COMPOUND procedure. Can be 4.0 or 4.1
 >
-void NFSParserThread::analyze_nfs4_operations(NFS4CompoundType& nfs4_compound_procedure)
+void analyze_nfs4_operations(Analyzers& analyzers, NFS4CompoundType& nfs4_compound_procedure)
 {
     ArgOpType* arg {nullptr};
     ResOpType* res {nullptr};
@@ -328,12 +372,12 @@ void NFSParserThread::analyze_nfs4_operations(NFS4CompoundType& nfs4_compound_pr
         if((arg && res)&&(arg->argop != res->resop))
         {
             // Passing each operation to analyzers using the helper's function
-            nfs4_ops_switch(&nfs4_compound_procedure, arg, nullptr);
-            nfs4_ops_switch(&nfs4_compound_procedure, nullptr, res);
+            nfs4_ops_switch(analyzers, &nfs4_compound_procedure, arg, nullptr);
+            nfs4_ops_switch(analyzers, &nfs4_compound_procedure, nullptr, res);
         }
         else
         {
-            nfs4_ops_switch(&nfs4_compound_procedure, arg, res);
+            nfs4_ops_switch(analyzers, &nfs4_compound_procedure, arg, res);
         }
 
         if(arg && i < (arg_ops_count-1)) arg++; else arg = nullptr;
@@ -341,9 +385,12 @@ void NFSParserThread::analyze_nfs4_operations(NFS4CompoundType& nfs4_compound_pr
     }
 }
 
-void NFSParserThread::nfs4_ops_switch(const RPCProcedure* rpc_procedure,
-                                      const NST::API::NFS4::nfs_argop4* arg,
-                                      const NST::API::NFS4::nfs_resop4* res)
+//! Internal function for proper passing NFSv4.0's operations to analyzers
+//! It's supposed to be used inside analyze_nfs4_operations only
+void nfs4_ops_switch(Analyzers& analyzers,
+                     const RPCProcedure* rpc_procedure,
+                     const NST::API::NFS4::nfs_argop4* arg,
+                     const NST::API::NFS4::nfs_resop4* res)
 {
     uint32_t nfs_op_num = arg ? arg->argop : res->resop;
     switch(nfs_op_num)
@@ -539,9 +586,12 @@ void NFSParserThread::nfs4_ops_switch(const RPCProcedure* rpc_procedure,
     }
 }
 
-void NFSParserThread::nfs4_ops_switch(const RPCProcedure* rpc_procedure,
-                                      const NST::API::NFS41::nfs_argop4* arg,
-                                      const NST::API::NFS41::nfs_resop4* res)
+//! Internal function for proper passing NFSv4.1's operations to analyzers
+//! It's supposed to be used inside analyze_nfs4_operations only
+void nfs4_ops_switch(Analyzers& analyzers,
+                     const RPCProcedure* rpc_procedure,
+                     const NST::API::NFS41::nfs_argop4* arg,
+                     const NST::API::NFS41::nfs_resop4* res)
 {
     uint32_t nfs_op_num = arg ? arg->argop : res->resop;
     switch(nfs_op_num)
