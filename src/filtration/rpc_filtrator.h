@@ -64,7 +64,7 @@ public:
 
     constexpr static size_t lengthOfBaseHeader()
     {
-        return sizeof(RecordMark) + sizeof(MessageHeader);
+        return sizeof(RecordMark) + sizeof(ReplyHeader);// Minimum of replay&call headers
     }
 
     constexpr static size_t lengthOfReplyHeader()
