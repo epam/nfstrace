@@ -35,6 +35,7 @@
 #include "utils/log.h"
 #include "utils/out.h"
 #include "utils/sessions.h"
+#include "utils/profiler.h"
 #include "controller/parameters.h"
 #include "filtration/packet.h"
 #include "filtration/sessions_hash.h"
@@ -440,6 +441,7 @@ public:
 
     static void callback(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char* packet)
     {
+        PROF;// Calc how much time was spent in this func
         auto processor = reinterpret_cast<FiltrationProcessor*>(user);
 
         PacketInfo info(pkthdr, packet, processor->datalink);
