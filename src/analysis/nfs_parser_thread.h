@@ -62,8 +62,8 @@ private:
     //! It's supposed to be used inside analyze_nfs_procedure only
     template
     <
-        typename ArgopType,
-        typename ResopType,
+        typename ArgOpType,
+        typename ResOpType,
         typename NFS4CompoundType
     >
     void analyze_nfs4_operations(NFS4CompoundType& nfs4_compound_procedure);

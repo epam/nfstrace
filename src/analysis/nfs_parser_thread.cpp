@@ -283,14 +283,14 @@ static uint32_t get_nfs4_compound_minor_version(const std::uint8_t* rpc_nfs4_cal
 
 template
 <
-    typename ArgopType,       // Type of arguments(call part of nfs's procedure)
-    typename ResopType,       // Type of results(reply part of nfs's procedure)
+    typename ArgOpType,       // Type of arguments(call part of nfs's procedure)
+    typename ResOpType,       // Type of results(reply part of nfs's procedure)
     typename NFS4CompoundType // Type of NFSv4.x COMPOUND procedure. Can be 4.0 or 4.1
 >
 void NFSParserThread::analyze_nfs4_operations(NFS4CompoundType& nfs4_compound_procedure)
 {
-    ArgopType* arg {nullptr};
-    ResopType* res {nullptr};
+    ArgOpType* arg {nullptr};
+    ResOpType* res {nullptr};
 
     uint32_t arg_ops_count  {0}; // Amount of NFS operations (call part)
     uint32_t res_ops_count  {0}; // Amount of NFS operations (reply part)
@@ -543,8 +543,7 @@ void NFSParserThread::nfs4_ops_switch(const RPCProcedure* rpc_procedure,
                                       const NST::API::NFS41::nfs_argop4* arg,
                                       const NST::API::NFS41::nfs_resop4* res)
 {
-    uint32_t nfs_op_num;
-    nfs_op_num = arg ? arg->argop : res->resop;
+    uint32_t nfs_op_num = arg ? arg->argop : res->resop;
     switch(nfs_op_num)
     {
     case ProcEnumNFS41::ACCESS:
