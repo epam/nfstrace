@@ -73,7 +73,7 @@ public:
     inline bool inProgress(PacketInfo& info)
     {
         Filtrator* filtrator = static_cast<Filtrator* >(this);
-        constexpr size_t callHeaderLen = Filtrator::lengthOfReplyHeader() > Filtrator::lengthOfCallHeader() ? Filtrator::lengthOfReplyHeader() : Filtrator::lengthOfCallHeader();
+        constexpr size_t callHeaderLen = Filtrator::lengthOfBaseHeader();
         if (msg_len || to_be_copied)
         {
             return true;
@@ -87,7 +87,7 @@ public:
 
         if (data_size + info.dlen > callHeaderLen)
         {
-            uint8_t buffer[callHeaderLen];
+            static uint8_t buffer[callHeaderLen];
             const uint8_t* header = info.data;
 
             if (data_size > 0)
@@ -147,7 +147,6 @@ public:
     inline void push(PacketInfo& info)
     {
         Filtrator* filtrator = static_cast<Filtrator* >(this);
-        //FIXME: Code has been dublicated
         assert(info.dlen != 0);
 
         while (info.dlen) // loop over data in packet
