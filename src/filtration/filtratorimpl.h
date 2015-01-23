@@ -147,7 +147,6 @@ public:
     inline void push(PacketInfo& info)
     {
         Filtrator* filtrator = static_cast<Filtrator* >(this);
-        //FIXME: Code has been dublicated
         assert(info.dlen != 0);
 
         while (info.dlen) // loop over data in packet

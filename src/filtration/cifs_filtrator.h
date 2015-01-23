@@ -50,6 +50,16 @@ public:
     {
     }
 
+    constexpr static size_t lengthOfReplyHeader()
+    {
+        return lengthOfBaseHeader();
+    }
+
+    constexpr static size_t lengthOfCallHeader()
+    {
+        return lengthOfBaseHeader();
+    }
+
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {
         BaseImpl::setWriterImpl(session_ptr, w, max_rpc_hdr);
