@@ -34,7 +34,8 @@ public:
     WatchAnalyzer(const char* opts);
     ~WatchAnalyzer();
 
-   void flush_statistics() override final;
+    void flush_statistics() override final;
+    void on_unix_signal(int signo) override final;
 
     void null(const RPCProcedure* proc,
               const struct NFS3::NULL3args*,

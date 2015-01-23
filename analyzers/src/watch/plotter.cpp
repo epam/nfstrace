@@ -24,8 +24,6 @@
 #include <system_error>
 
 #include <unistd.h>
-#include <signal.h>
-#include <time.h>
 
 #include <api/plugin_api.h>
 #include "plotter.h"
@@ -34,8 +32,6 @@ const time_t   Plotter::start_time = time(NULL);
 const uint32_t Plotter::SECINMIN   = 60;
 const uint32_t Plotter::SECINHOUR  = 60*60;
 const uint32_t Plotter::SECINDAY   = 60*60*24;
-
-int Plotter::resize = 0;
 
 operation_data nfsv3_total   {1, 1, NULL, 28 , 2, 10 ,0 , 0, 0};
 operation_data nfsv3_proc    {1, 3, NULL, 18 , 2, 10 ,0 , 0, 0};
@@ -49,7 +45,8 @@ operation_data el_time       {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
 operation_data packets       {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
 //------------------------------------------------------------------------------
 Plotter::Plotter()
-: all_windows(3, NULL)
+: resize(0)
+, all_windows(3, NULL)
 , scroll_shift {0}
 , column_shift {0}
 {
@@ -59,7 +56,6 @@ Plotter::Plotter()
         std::cout << "\n\n";
         initPlot();
         designPlot();
-        signal(SIGWINCH, enableResize);
         keyboard_proc = std::thread(&Plotter::keyboard_thread, this);
     }
     catch (std::runtime_error& err)
@@ -165,9 +161,9 @@ uint16_t Plotter::inputData()
     return (c == KEY_UP || c == KEY_DOWN) ? c : 0;
 }
 
-void Plotter::enableResize(int)
+void Plotter::enableResize()
 {
-    resize ++;
+    resize++;
 }
 
 void Plotter::keyboard_thread()
