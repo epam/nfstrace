@@ -52,6 +52,10 @@ public:
     void start();
     void stop();
 
+    inline void on_unix_signal(int signo)
+    {
+        analysiss->on_unix_signal(signo);
+    }
 private:
     std::unique_ptr<Analyzers> analysiss;
     std::unique_ptr<FilteredDataQueue> queue;
