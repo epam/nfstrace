@@ -24,6 +24,9 @@
 #ifndef IANALYZER_TYPE_H
 #define IANALYZER_TYPE_H
 //------------------------------------------------------------------------------
+
+#include <iostream>
+
 #include "nfs_types.h"
 #include "nfs3_types_rpcgen.h"
 #include "nfs4_types_rpcgen.h"
@@ -118,7 +121,7 @@ public:
 
     virtual void access40(const struct RPCProcedure*,
             const struct NFS4::ACCESS4args*,
-            const struct NFS4::ACCESS4res*) {}
+            const struct NFS4::ACCESS4res*) {std::cout << "\n\n\n111111111111\n\n\n";}
     virtual void close40(const struct RPCProcedure*,
             const struct NFS4::CLOSE4args*,
             const struct NFS4::CLOSE4res*) {}
