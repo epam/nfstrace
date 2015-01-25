@@ -353,18 +353,7 @@ void analyze_nfs4_operations(Analyzers& analyzers, NFS4CompoundType& nfs4_compou
     }
 
     // Determing which part of COMPOUND has the biggest amount of operations.
-    if(arg && res)
-    {
-        total_ops_count = arg_ops_count > res_ops_count ? arg_ops_count : res_ops_count;
-    }
-    else if(arg)
-    {
-        total_ops_count = arg_ops_count;
-    }
-    else if(res)
-    {
-        total_ops_count = res_ops_count;
-    }
+    total_ops_count = arg_ops_count > res_ops_count ? arg_ops_count : res_ops_count;
 
     // Traversing through ALL COMPOUND procedure's operations
     for(uint32_t i {0}; i < total_ops_count; i++)
@@ -385,6 +374,47 @@ void analyze_nfs4_operations(Analyzers& analyzers, NFS4CompoundType& nfs4_compou
     }
 }
 
+//! Internal function for proper passing NFSv4.x's arg + res operations to analyzers
+//! It's supposed to be used inside nfs4_ops_switch only
+template
+<
+    typename nfs_argop4_t,
+    typename nfs_resop4_t,
+    typename IAnalyzer_func_t,
+    typename nfs_argop_member_t,
+    typename nfs_resop_member_t
+>
+inline void analyze(Analyzers& analyzers,
+                    const RPCProcedure* rpc_procedure,
+                    const nfs_argop4_t* arg,
+                    const nfs_resop4_t* res,
+                    IAnalyzer_func_t&& IAnalyzer_function,
+                    nfs_argop_member_t arg_operation,
+                    nfs_resop_member_t res_operation)
+{
+    analyzers(IAnalyzer_function, rpc_procedure,
+              arg == nullptr ? nullptr : &(arg->nfs_argop4_u.*arg_operation),
+              res == nullptr ? nullptr : &(res->nfs_resop4_u.*res_operation));
+}
+
+//! Internal function for proper passing NFSv4.x's res-only operations to analyzers
+//! It's supposed to be used inside nfs4_ops_switch only
+template
+<
+    typename nfs_resop4_t,
+    typename IAnalyzer_func_t,
+    typename nfs_resop_member_t
+>
+inline void analyze(Analyzers& analyzers,
+                    const RPCProcedure* rpc_procedure,
+                    const nfs_resop4_t* res,
+                    IAnalyzer_func_t&& IAnalyzer_function,
+                    nfs_resop_member_t res_operation)
+{
+    analyzers(IAnalyzer_function, rpc_procedure,
+              res == nullptr ? nullptr : &(res->nfs_resop4_u.*res_operation));
+}
+
 //! Internal function for proper passing NFSv4.0's operations to analyzers
 //! It's supposed to be used inside analyze_nfs4_operations only
 void nfs4_ops_switch(Analyzers& analyzers,
@@ -392,195 +422,238 @@ void nfs4_ops_switch(Analyzers& analyzers,
                      const NST::API::NFS4::nfs_argop4* arg,
                      const NST::API::NFS4::nfs_resop4* res)
 {
+    using INFSv40 = NST::API::IAnalyzer::INFSv4rpcgen;
+    using arg_t   = NST::API::NFS4::nfs_argop4_u_t;
+    using res_t   = NST::API::NFS4::nfs_resop4_u_t;
+
     uint32_t nfs_op_num = arg ? arg->argop : res->resop;
     switch(nfs_op_num)
     {
     case ProcEnumNFS4::ACCESS:
-        analyzers(&IAnalyzer::INFSv4rpcgen::access40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opaccess : nullptr,
-                  res ? &res->nfs_resop4_u.opaccess : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::access40,
+                &arg_t::opaccess,
+                &res_t::opaccess);
         break;
     case ProcEnumNFS4::CLOSE:
-        analyzers(&IAnalyzer::INFSv4rpcgen::close40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opclose : nullptr,
-                  res ? &res->nfs_resop4_u.opclose : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::close40,
+                &arg_t::opclose,
+                &res_t::opclose);
         break;
     case ProcEnumNFS4::COMMIT:
-        analyzers(&IAnalyzer::INFSv4rpcgen::commit40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opcommit : nullptr,
-                  res ? &res->nfs_resop4_u.opcommit : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::commit40,
+                &arg_t::opcommit,
+                &res_t::opcommit);
         break;
     case ProcEnumNFS4::CREATE:
-        analyzers(&IAnalyzer::INFSv4rpcgen::create40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opcreate : nullptr,
-                  res ? &res->nfs_resop4_u.opcreate : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::create40,
+                &arg_t::opcreate,
+                &res_t::opcreate);
         break;
     case ProcEnumNFS4::DELEGPURGE:
-        analyzers(&IAnalyzer::INFSv4rpcgen::delegpurge40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opdelegpurge : nullptr,
-                  res ? &res->nfs_resop4_u.opdelegpurge : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::delegpurge40,
+                &arg_t::opdelegpurge,
+                &res_t::opdelegpurge);
         break;
     case ProcEnumNFS4::DELEGRETURN:
-        analyzers(&IAnalyzer::INFSv4rpcgen::delegreturn40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opdelegreturn : nullptr,
-                  res ? &res->nfs_resop4_u.opdelegreturn : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::delegreturn40,
+                &arg_t::opdelegreturn,
+                &res_t::opdelegreturn);
         break;
     case ProcEnumNFS4::GETATTR:
-        analyzers(&IAnalyzer::INFSv4rpcgen::getattr40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opgetattr : nullptr,
-                  res ? &res->nfs_resop4_u.opgetattr : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::getattr40,
+                &arg_t::opgetattr,
+                &res_t::opgetattr);
         break;
     case ProcEnumNFS4::GETFH:
-        analyzers(&IAnalyzer::INFSv4rpcgen::getfh40, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opgetfh : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv40::getfh40,
+                &res_t::opgetfh);
         break;
     case ProcEnumNFS4::LINK:
-        analyzers(&IAnalyzer::INFSv4rpcgen::link40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplink : nullptr,
-                  res ? &res->nfs_resop4_u.oplink : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::link40,
+                &arg_t::oplink,
+                &res_t::oplink);
         break;
     case ProcEnumNFS4::LOCK:
-        analyzers(&IAnalyzer::INFSv4rpcgen::lock40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplock : nullptr,
-                  res ? &res->nfs_resop4_u.oplock : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::lock40,
+                &arg_t::oplock,
+                &res_t::oplock);
         break;
     case ProcEnumNFS4::LOCKT:
-        analyzers(&IAnalyzer::INFSv4rpcgen::lockt40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplockt : nullptr,
-                  res ? &res->nfs_resop4_u.oplockt : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::lockt40,
+                &arg_t::oplockt,
+                &res_t::oplockt);
         break;
     case ProcEnumNFS4::LOCKU:
-        analyzers(&IAnalyzer::INFSv4rpcgen::locku40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplocku : nullptr,
-                  res ? &res->nfs_resop4_u.oplocku : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::locku40,
+                &arg_t::oplocku,
+                &res_t::oplocku);
         break;
     case ProcEnumNFS4::LOOKUP:
-        analyzers(&IAnalyzer::INFSv4rpcgen::lookup40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplookup : nullptr,
-                  res ? &res->nfs_resop4_u.oplookup : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::lookup40,
+                &arg_t::oplookup,
+                &res_t::oplookup);
         break;
     case ProcEnumNFS4::LOOKUPP:
-        analyzers(&IAnalyzer::INFSv4rpcgen::lookupp40, rpc_procedure,
-                  res ? &res->nfs_resop4_u.oplookupp : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv40::lookupp40,
+                &res_t::oplookupp);
         break;
     case ProcEnumNFS4::NVERIFY:
-        analyzers(&IAnalyzer::INFSv4rpcgen::nverify40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opnverify : nullptr,
-                  res ? &res->nfs_resop4_u.opnverify : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::nverify40,
+                &arg_t::opnverify,
+                &res_t::opnverify);
         break;
     case ProcEnumNFS4::OPEN:
-        analyzers(&IAnalyzer::INFSv4rpcgen::open40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opopen : nullptr,
-                  res ? &res->nfs_resop4_u.opopen : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::open40,
+                &arg_t::opopen,
+                &res_t::opopen);
         break;
     case ProcEnumNFS4::OPENATTR:
-        analyzers(&IAnalyzer::INFSv4rpcgen::openattr40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opopenattr : nullptr,
-                  res ? &res->nfs_resop4_u.opopenattr : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::openattr40,
+                &arg_t::opopenattr,
+                &res_t::opopenattr);
         break;
     case ProcEnumNFS4::OPEN_CONFIRM:
-        analyzers(&IAnalyzer::INFSv4rpcgen::open_confirm40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opopen_confirm : nullptr,
-                  res ? &res->nfs_resop4_u.opopen_confirm : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::open_confirm40,
+                &arg_t::opopen_confirm,
+                &res_t::opopen_confirm);
         break;
     case ProcEnumNFS4::OPEN_DOWNGRADE:
-        analyzers(&IAnalyzer::INFSv4rpcgen::open_downgrade40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opopen_downgrade : nullptr,
-                  res ? &res->nfs_resop4_u.opopen_downgrade : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::open_downgrade40,
+                &arg_t::opopen_downgrade,
+                &res_t::opopen_downgrade);
         break;
     case ProcEnumNFS4::PUTFH:
-        analyzers(&IAnalyzer::INFSv4rpcgen::putfh40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opputfh : nullptr,
-                  res ? &res->nfs_resop4_u.opputfh : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::putfh40,
+                &arg_t::opputfh,
+                &res_t::opputfh);
         break;
     case ProcEnumNFS4::PUTPUBFH:
-        analyzers(&IAnalyzer::INFSv4rpcgen::putpubfh40, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opputpubfh : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv40::putpubfh40,
+                &res_t::opputpubfh);
         break;
     case ProcEnumNFS4::PUTROOTFH:
-        analyzers(&IAnalyzer::INFSv4rpcgen::putrootfh40, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opputrootfh : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv40::putrootfh40,
+                &res_t::opputrootfh);
         break;
     case ProcEnumNFS4::READ:
-        analyzers(&IAnalyzer::INFSv4rpcgen::read40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opread : nullptr,
-                  res ? &res->nfs_resop4_u.opread : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::read40,
+                &arg_t::opread,
+                &res_t::opread);
         break;
     case ProcEnumNFS4::READDIR:
-        analyzers(&IAnalyzer::INFSv4rpcgen::readdir40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opreaddir : nullptr,
-                  res ? &res->nfs_resop4_u.opreaddir : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::readdir40,
+                &arg_t::opreaddir,
+                &res_t::opreaddir);
         break;
     case ProcEnumNFS4::READLINK:
-        analyzers(&IAnalyzer::INFSv4rpcgen::readlink40, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opreadlink : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv40::readlink40,
+                &res_t::opreadlink);
         break;
     case ProcEnumNFS4::REMOVE:
-        analyzers(&IAnalyzer::INFSv4rpcgen::remove40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opremove : nullptr,
-                  res ? &res->nfs_resop4_u.opremove : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::remove40,
+                &arg_t::opremove,
+                &res_t::opremove);
         break;
     case ProcEnumNFS4::RENAME:
-        analyzers(&IAnalyzer::INFSv4rpcgen::rename40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oprename : nullptr,
-                  res ? &res->nfs_resop4_u.oprename : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::rename40,
+                &arg_t::oprename,
+                &res_t::oprename);
         break;
     case ProcEnumNFS4::RENEW:
-        analyzers(&IAnalyzer::INFSv4rpcgen::renew40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oprenew : nullptr,
-                  res ? &res->nfs_resop4_u.oprenew : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::renew40,
+                &arg_t::oprenew,
+                &res_t::oprenew);
         break;
     case ProcEnumNFS4::RESTOREFH:
-        analyzers(&IAnalyzer::INFSv4rpcgen::restorefh40, rpc_procedure,
-                  res ? &res->nfs_resop4_u.oprestorefh : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv40::restorefh40,
+                &res_t::oprestorefh);
         break;
     case ProcEnumNFS4::SAVEFH:
-        analyzers(&IAnalyzer::INFSv4rpcgen::savefh40, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opsavefh : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv40::savefh40,
+                &res_t::opsavefh);
         break;
     case ProcEnumNFS4::SECINFO:
-        analyzers(&IAnalyzer::INFSv4rpcgen::secinfo40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opsecinfo : nullptr,
-                  res ? &res->nfs_resop4_u.opsecinfo : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::secinfo40,
+                &arg_t::opsecinfo,
+                &res_t::opsecinfo);
         break;
     case ProcEnumNFS4::SETATTR:
-        analyzers(&IAnalyzer::INFSv4rpcgen::setattr40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opsetattr : nullptr,
-                  res ? &res->nfs_resop4_u.opsetattr : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::setattr40,
+                &arg_t::opsetattr,
+                &res_t::opsetattr);
         break;
     case ProcEnumNFS4::SETCLIENTID:
-        analyzers(&IAnalyzer::INFSv4rpcgen::setclientid40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opsetclientid : nullptr,
-                  res ? &res->nfs_resop4_u.opsetclientid : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::setclientid40,
+                &arg_t::opsetclientid,
+                &res_t::opsetclientid);
         break;
     case ProcEnumNFS4::SETCLIENTID_CONFIRM:
-        analyzers(&IAnalyzer::INFSv4rpcgen::setclientid_confirm40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opsetclientid_confirm : nullptr,
-                  res ? &res->nfs_resop4_u.opsetclientid_confirm : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::setclientid_confirm40,
+                &arg_t::opsetclientid_confirm,
+                &res_t::opsetclientid_confirm);
         break;
     case ProcEnumNFS4::VERIFY:
-        analyzers(&IAnalyzer::INFSv4rpcgen::verify40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opverify : nullptr,
-                  res ? &res->nfs_resop4_u.opverify : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::verify40,
+                &arg_t::opverify,
+                &res_t::opverify);
         break;
     case ProcEnumNFS4::WRITE:
-        analyzers(&IAnalyzer::INFSv4rpcgen::write40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opwrite : nullptr,
-                  res ? &res->nfs_resop4_u.opwrite : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::write40,
+                &arg_t::opwrite,
+                &res_t::opwrite);
         break;
     case ProcEnumNFS4::RELEASE_LOCKOWNER:
-        analyzers(&IAnalyzer::INFSv4rpcgen::release_lockowner40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oprelease_lockowner : nullptr,
-                  res ? &res->nfs_resop4_u.oprelease_lockowner : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::release_lockowner40,
+                &arg_t::oprelease_lockowner,
+                &res_t::oprelease_lockowner);
         break;
     case ProcEnumNFS4::GET_DIR_DELEGATION:
-        analyzers(&IAnalyzer::INFSv4rpcgen::get_dir_delegation40, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opget_dir_delegation : nullptr,
-                  res ? &res->nfs_resop4_u.opget_dir_delegation : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv40::get_dir_delegation40,
+                &arg_t::opget_dir_delegation,
+                &res_t::opget_dir_delegation);
         break;
     case ProcEnumNFS4::ILLEGAL:
-        analyzers(&IAnalyzer::INFSv4rpcgen::illegal40, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opillegal : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv40::illegal40,
+                &res_t::opillegal);
         break;
     default: break;
     }
@@ -593,285 +666,345 @@ void nfs4_ops_switch(Analyzers& analyzers,
                      const NST::API::NFS41::nfs_argop4* arg,
                      const NST::API::NFS41::nfs_resop4* res)
 {
+    using INFSv41 = NST::API::IAnalyzer::INFSv41rpcgen;
+    using arg_t   = NST::API::NFS41::nfs_argop4_u_t;
+    using res_t   = NST::API::NFS41::nfs_resop4_u_t;
+
     uint32_t nfs_op_num = arg ? arg->argop : res->resop;
     switch(nfs_op_num)
     {
     case ProcEnumNFS41::ACCESS:
-        analyzers(&IAnalyzer::INFSv41rpcgen::access41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opaccess : nullptr,
-                  res ? &res->nfs_resop4_u.opaccess : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::access41,
+                &arg_t::opaccess,
+                &res_t::opaccess);
         break;
     case ProcEnumNFS41::CLOSE:
-        analyzers(&IAnalyzer::INFSv41rpcgen::close41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opclose : nullptr,
-                  res ? &res->nfs_resop4_u.opclose : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::close41,
+                &arg_t::opclose,
+                &res_t::opclose);
         break;
     case ProcEnumNFS41::COMMIT:
-        analyzers(&IAnalyzer::INFSv41rpcgen::commit41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opcommit : nullptr,
-                  res ? &res->nfs_resop4_u.opcommit : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::commit41,
+                &arg_t::opcommit,
+                &res_t::opcommit);
         break;
     case ProcEnumNFS41::CREATE:
-        analyzers(&IAnalyzer::INFSv41rpcgen::create41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opcreate : nullptr,
-                  res ? &res->nfs_resop4_u.opcreate : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::create41,
+                &arg_t::opcreate,
+                &res_t::opcreate);
         break;
     case ProcEnumNFS41::DELEGPURGE:
-        analyzers(&IAnalyzer::INFSv41rpcgen::delegpurge41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opdelegpurge : nullptr,
-                  res ? &res->nfs_resop4_u.opdelegpurge : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::delegpurge41,
+                &arg_t::opdelegpurge,
+                &res_t::opdelegpurge);
         break;
     case ProcEnumNFS41::DELEGRETURN:
-        analyzers(&IAnalyzer::INFSv41rpcgen::delegreturn41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opdelegreturn : nullptr,
-                  res ? &res->nfs_resop4_u.opdelegreturn : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::delegreturn41,
+                &arg_t::opdelegreturn,
+                &res_t::opdelegreturn);
         break;
     case ProcEnumNFS41::GETATTR:
-        analyzers(&IAnalyzer::INFSv41rpcgen::getattr41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opgetattr : nullptr,
-                  res ? &res->nfs_resop4_u.opgetattr : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::getattr41,
+                &arg_t::opgetattr,
+                &res_t::opgetattr);
         break;
     case ProcEnumNFS41::GETFH:
-        analyzers(&IAnalyzer::INFSv41rpcgen::getfh41, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opgetfh : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv41::getfh41,
+                &res_t::opgetfh);
         break;
     case ProcEnumNFS41::LINK:
-        analyzers(&IAnalyzer::INFSv41rpcgen::link41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplink : nullptr,
-                  res ? &res->nfs_resop4_u.oplink : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::link41,
+                &arg_t::oplink,
+                &res_t::oplink);
         break;
     case ProcEnumNFS41::LOCK:
-        analyzers(&IAnalyzer::INFSv41rpcgen::lock41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplock : nullptr,
-                  res ? &res->nfs_resop4_u.oplock : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::lock41,
+                &arg_t::oplock,
+                &res_t::oplock);
         break;
     case ProcEnumNFS41::LOCKT:
-        analyzers(&IAnalyzer::INFSv41rpcgen::lockt41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplockt : nullptr,
-                  res ? &res->nfs_resop4_u.oplockt : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::lockt41,
+                &arg_t::oplockt,
+                &res_t::oplockt);
         break;
     case ProcEnumNFS41::LOCKU:
-        analyzers(&IAnalyzer::INFSv41rpcgen::locku41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplocku : nullptr,
-                  res ? &res->nfs_resop4_u.oplocku : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::locku41,
+                &arg_t::oplocku,
+                &res_t::oplocku);
         break;
     case ProcEnumNFS41::LOOKUP:
-        analyzers(&IAnalyzer::INFSv41rpcgen::lookup41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplookup : nullptr,
-                  res ? &res->nfs_resop4_u.oplookup : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::lookup41,
+                &arg_t::oplookup,
+                &res_t::oplookup);
         break;
     case ProcEnumNFS41::LOOKUPP:
-        analyzers(&IAnalyzer::INFSv41rpcgen::lookupp41, rpc_procedure,
-                  res ? &res->nfs_resop4_u.oplookupp : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv41::lookupp41,
+                &res_t::oplookupp);
         break;
     case ProcEnumNFS41::NVERIFY:
-        analyzers(&IAnalyzer::INFSv41rpcgen::nverify41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opnverify : nullptr,
-                  res ? &res->nfs_resop4_u.opnverify : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::nverify41,
+                &arg_t::opnverify,
+                &res_t::opnverify);
         break;
     case ProcEnumNFS41::OPEN:
-        analyzers(&IAnalyzer::INFSv41rpcgen::open41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opopen : nullptr,
-                  res ? &res->nfs_resop4_u.opopen : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::open41,
+                &arg_t::opopen,
+                &res_t::opopen);
         break;
     case ProcEnumNFS41::OPENATTR:
-        analyzers(&IAnalyzer::INFSv41rpcgen::openattr41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opopenattr : nullptr,
-                  res ? &res->nfs_resop4_u.opopenattr : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::openattr41,
+                &arg_t::opopenattr,
+                &res_t::opopenattr);
         break;
     case ProcEnumNFS41::OPEN_CONFIRM:
-        analyzers(&IAnalyzer::INFSv41rpcgen::open_confirm41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opopen_confirm : nullptr,
-                  res ? &res->nfs_resop4_u.opopen_confirm : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::open_confirm41,
+                &arg_t::opopen_confirm,
+                &res_t::opopen_confirm);
         break;
     case ProcEnumNFS41::OPEN_DOWNGRADE:
-        analyzers(&IAnalyzer::INFSv41rpcgen::open_downgrade41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opopen_downgrade : nullptr,
-                  res ? &res->nfs_resop4_u.opopen_downgrade : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::open_downgrade41,
+                &arg_t::opopen_downgrade,
+                &res_t::opopen_downgrade);
         break;
     case ProcEnumNFS41::PUTFH:
-        analyzers(&IAnalyzer::INFSv41rpcgen::putfh41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opputfh : nullptr,
-                  res ? &res->nfs_resop4_u.opputfh : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::putfh41,
+                &arg_t::opputfh,
+                &res_t::opputfh);
         break;
     case ProcEnumNFS41::PUTPUBFH:
-        analyzers(&IAnalyzer::INFSv41rpcgen::putpubfh41, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opputpubfh : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv41::putpubfh41,
+                &res_t::opputpubfh);
         break;
     case ProcEnumNFS41::PUTROOTFH:
-        analyzers(&IAnalyzer::INFSv41rpcgen::putrootfh41, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opputrootfh : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv41::putrootfh41,
+                &res_t::opputrootfh);
         break;
     case ProcEnumNFS41::READ:
-        analyzers(&IAnalyzer::INFSv41rpcgen::read41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opread : nullptr,
-                  res ? &res->nfs_resop4_u.opread : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::read41,
+                &arg_t::opread,
+                &res_t::opread);
         break;
     case ProcEnumNFS41::READDIR:
-        analyzers(&IAnalyzer::INFSv41rpcgen::readdir41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opreaddir : nullptr,
-                  res ? &res->nfs_resop4_u.opreaddir : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::readdir41,
+                &arg_t::opreaddir,
+                &res_t::opreaddir);
         break;
     case ProcEnumNFS41::READLINK:
-        analyzers(&IAnalyzer::INFSv41rpcgen::readlink41, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opreadlink : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv41::readlink41,
+                &res_t::opreadlink);
         break;
     case ProcEnumNFS41::REMOVE:
-        analyzers(&IAnalyzer::INFSv41rpcgen::remove41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opremove : nullptr,
-                  res ? &res->nfs_resop4_u.opremove : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::remove41,
+                &arg_t::opremove,
+                &res_t::opremove);
         break;
     case ProcEnumNFS41::RENAME:
-        analyzers(&IAnalyzer::INFSv41rpcgen::rename41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oprename : nullptr,
-                  res ? &res->nfs_resop4_u.oprename : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::rename41,
+                &arg_t::oprename,
+                &res_t::oprename);
         break;
     case ProcEnumNFS41::RENEW:
-        analyzers(&IAnalyzer::INFSv41rpcgen::renew41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oprenew : nullptr,
-                  res ? &res->nfs_resop4_u.oprenew : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::renew41,
+                &arg_t::oprenew,
+                &res_t::oprenew);
         break;
     case ProcEnumNFS41::RESTOREFH:
-        analyzers(&IAnalyzer::INFSv41rpcgen::restorefh41, rpc_procedure,
-                  res ? &res->nfs_resop4_u.oprestorefh : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv41::restorefh41,
+                &res_t::oprestorefh);
         break;
     case ProcEnumNFS41::SAVEFH:
-        analyzers(&IAnalyzer::INFSv41rpcgen::savefh41, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opsavefh : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv41::savefh41,
+                &res_t::opsavefh);
         break;
     case ProcEnumNFS41::SECINFO:
-        analyzers(&IAnalyzer::INFSv41rpcgen::secinfo41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opsecinfo : nullptr,
-                  res ? &res->nfs_resop4_u.opsecinfo : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::secinfo41,
+                &arg_t::opsecinfo,
+                &res_t::opsecinfo);
         break;
     case ProcEnumNFS41::SETATTR:
-        analyzers(&IAnalyzer::INFSv41rpcgen::setattr41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opsetattr : nullptr,
-                  res ? &res->nfs_resop4_u.opsetattr : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::setattr41,
+                &arg_t::opsetattr,
+                &res_t::opsetattr);
         break;
     case ProcEnumNFS41::SETCLIENTID:
-        analyzers(&IAnalyzer::INFSv41rpcgen::setclientid41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opsetclientid : nullptr,
-                  res ? &res->nfs_resop4_u.opsetclientid : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::setclientid41,
+                &arg_t::opsetclientid,
+                &res_t::opsetclientid);
         break;
     case ProcEnumNFS41::SETCLIENTID_CONFIRM:
-        analyzers(&IAnalyzer::INFSv41rpcgen::setclientid_confirm41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opsetclientid_confirm : nullptr,
-                  res ? &res->nfs_resop4_u.opsetclientid_confirm : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::setclientid_confirm41,
+                &arg_t::opsetclientid_confirm,
+                &res_t::opsetclientid_confirm);
         break;
     case ProcEnumNFS41::VERIFY:
-        analyzers(&IAnalyzer::INFSv41rpcgen::verify41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opverify : nullptr,
-                  res ? &res->nfs_resop4_u.opverify : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::verify41,
+                &arg_t::opverify,
+                &res_t::opverify);
         break;
     case ProcEnumNFS41::WRITE:
-        analyzers(&IAnalyzer::INFSv41rpcgen::write41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opwrite : nullptr,
-                  res ? &res->nfs_resop4_u.opwrite : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::write41,
+                &arg_t::opwrite,
+                &res_t::opwrite);
         break;
     case ProcEnumNFS41::RELEASE_LOCKOWNER:
-        analyzers(&IAnalyzer::INFSv41rpcgen::release_lockowner41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oprelease_lockowner : nullptr,
-                  res ? &res->nfs_resop4_u.oprelease_lockowner : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::release_lockowner41,
+                &arg_t::oprelease_lockowner,
+                &res_t::oprelease_lockowner);
         break;
     case ProcEnumNFS41::BACKCHANNEL_CTL:
-        analyzers(&IAnalyzer::INFSv41rpcgen::backchannel_ctl41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opbackchannel_ctl : nullptr,
-                  res ? &res->nfs_resop4_u.opbackchannel_ctl : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::backchannel_ctl41,
+                &arg_t::opbackchannel_ctl,
+                &res_t::opbackchannel_ctl);
         break;
     case ProcEnumNFS41::BIND_CONN_TO_SESSION:
-        analyzers(&IAnalyzer::INFSv41rpcgen::bind_conn_to_session41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opbind_conn_to_session : nullptr,
-                  res ? &res->nfs_resop4_u.opbind_conn_to_session : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::bind_conn_to_session41,
+                &arg_t::opbind_conn_to_session,
+                &res_t::opbind_conn_to_session);
         break;
     case ProcEnumNFS41::EXCHANGE_ID:
-        analyzers(&IAnalyzer::INFSv41rpcgen::exchange_id41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opexchange_id : nullptr,
-                  res ? &res->nfs_resop4_u.opexchange_id : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::exchange_id41,
+                &arg_t::opexchange_id,
+                &res_t::opexchange_id);
         break;
     case ProcEnumNFS41::CREATE_SESSION:
-        analyzers(&IAnalyzer::INFSv41rpcgen::create_session41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opcreate_session : nullptr,
-                  res ? &res->nfs_resop4_u.opcreate_session : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::create_session41,
+                &arg_t::opcreate_session,
+                &res_t::opcreate_session);
         break;
     case ProcEnumNFS41::DESTROY_SESSION:
-        analyzers(&IAnalyzer::INFSv41rpcgen::destroy_session41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opdestroy_session : nullptr,
-                  res ? &res->nfs_resop4_u.opdestroy_session : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::destroy_session41,
+                &arg_t::opdestroy_session,
+                &res_t::opdestroy_session);
         break;
     case ProcEnumNFS41::FREE_STATEID:
-        analyzers(&IAnalyzer::INFSv41rpcgen::free_stateid41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opfree_stateid : nullptr,
-                  res ? &res->nfs_resop4_u.opfree_stateid : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::free_stateid41,
+                &arg_t::opfree_stateid,
+                &res_t::opfree_stateid);
         break;
     case ProcEnumNFS41::GET_DIR_DELEGATION:
-        analyzers(&IAnalyzer::INFSv41rpcgen::get_dir_delegation41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opget_dir_delegation : nullptr,
-                  res ? &res->nfs_resop4_u.opget_dir_delegation : nullptr);
-        break;
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::get_dir_delegation41,
+                &arg_t::opget_dir_delegation,
+                &res_t::opget_dir_delegation);
     case ProcEnumNFS41::GETDEVICEINFO:
-        analyzers(&IAnalyzer::INFSv41rpcgen::getdeviceinfo41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opgetdeviceinfo : nullptr,
-                  res ? &res->nfs_resop4_u.opgetdeviceinfo : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::getdeviceinfo41,
+                &arg_t::opgetdeviceinfo,
+                &res_t::opgetdeviceinfo);
         break;
     case ProcEnumNFS41::GETDEVICELIST:
-        analyzers(&IAnalyzer::INFSv41rpcgen::getdevicelist41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opgetdevicelist : nullptr,
-                  res ? &res->nfs_resop4_u.opgetdevicelist : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::getdevicelist41,
+                &arg_t::opgetdevicelist,
+                &res_t::opgetdevicelist);
         break;
     case ProcEnumNFS41::LAYOUTCOMMIT:
-        analyzers(&IAnalyzer::INFSv41rpcgen::layoutcommit41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplayoutcommit : nullptr,
-                  res ? &res->nfs_resop4_u.oplayoutcommit : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::layoutcommit41,
+                &arg_t::oplayoutcommit,
+                &res_t::oplayoutcommit);
         break;
     case ProcEnumNFS41::LAYOUTGET:
-        analyzers(&IAnalyzer::INFSv41rpcgen::layoutget41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplayoutget : nullptr,
-                  res ? &res->nfs_resop4_u.oplayoutget : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::layoutget41,
+                &arg_t::oplayoutget,
+                &res_t::oplayoutget);
         break;
     case ProcEnumNFS41::LAYOUTRETURN:
-        analyzers(&IAnalyzer::INFSv41rpcgen::layoutreturn41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.oplayoutreturn : nullptr,
-                  res ? &res->nfs_resop4_u.oplayoutreturn : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::layoutreturn41,
+                &arg_t::oplayoutreturn,
+                &res_t::oplayoutreturn);
         break;
     case ProcEnumNFS41::SECINFO_NO_NAME:
-        analyzers(&IAnalyzer::INFSv41rpcgen::secinfo_no_name41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opsecinfo_no_name : nullptr,
-                  res ? &res->nfs_resop4_u.opsecinfo_no_name : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::secinfo_no_name41,
+                &arg_t::opsecinfo_no_name,
+                &res_t::opsecinfo_no_name);
         break;
     case ProcEnumNFS41::SEQUENCE:
-        analyzers(&IAnalyzer::INFSv41rpcgen::sequence41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opsequence : nullptr,
-                  res ? &res->nfs_resop4_u.opsequence : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::sequence41,
+                &arg_t::opsequence,
+                &res_t::opsequence);
         break;
     case ProcEnumNFS41::SET_SSV:
-        analyzers(&IAnalyzer::INFSv41rpcgen::set_ssv41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opset_ssv : nullptr,
-                  res ? &res->nfs_resop4_u.opset_ssv : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::set_ssv41,
+                &arg_t::opset_ssv,
+                &res_t::opset_ssv);
         break;
     case ProcEnumNFS41::TEST_STATEID:
-        analyzers(&IAnalyzer::INFSv41rpcgen::test_stateid41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.optest_stateid : nullptr,
-                  res ? &res->nfs_resop4_u.optest_stateid : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::test_stateid41,
+                &arg_t::optest_stateid,
+                &res_t::optest_stateid);
         break;
     case ProcEnumNFS41::WANT_DELEGATION:
-        analyzers(&IAnalyzer::INFSv41rpcgen::want_delegation41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opwant_delegation : nullptr,
-                  res ? &res->nfs_resop4_u.opwant_delegation : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::want_delegation41,
+                &arg_t::opwant_delegation,
+                &res_t::opwant_delegation);
         break;
     case ProcEnumNFS41::DESTROY_CLIENTID:
-        analyzers(&IAnalyzer::INFSv41rpcgen::destroy_clientid41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opdestroy_clientid : nullptr,
-                  res ? &res->nfs_resop4_u.opdestroy_clientid : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::destroy_clientid41,
+                &arg_t::opdestroy_clientid,
+                &res_t::opdestroy_clientid);
         break;
     case ProcEnumNFS41::RECLAIM_COMPLETE:
-        analyzers(&IAnalyzer::INFSv41rpcgen::reclaim_complete41, rpc_procedure,
-                  arg ? &arg->nfs_argop4_u.opreclaim_complete : nullptr,
-                  res ? &res->nfs_resop4_u.opreclaim_complete : nullptr);
+        analyze(analyzers, rpc_procedure, arg, res,
+                &INFSv41::reclaim_complete41,
+                &arg_t::opreclaim_complete,
+                &res_t::opreclaim_complete);
         break;
     case ProcEnumNFS41::ILLEGAL:
-        analyzers(&IAnalyzer::INFSv41rpcgen::illegal41, rpc_procedure,
-                  res ? &res->nfs_resop4_u.opillegal : nullptr);
+        analyze(analyzers, rpc_procedure, res,
+                &INFSv41::illegal41,
+                &res_t::opillegal);
         break;
     default: break;
     }
