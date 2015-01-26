@@ -24,6 +24,8 @@
 //------------------------------------------------------------------------------
 #include "analysis/analyzers.h"
 #include "analysis/rpc_sessions.h"
+#include "controller/running_status.h"
+#include "protocols/nfs/nfs_procedure.h"
 #include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -50,8 +52,9 @@ public:
      */
     bool parse_data(FilteredDataQueue::Ptr& data);
 
-    void analyze_nfs_operation(FilteredDataQueue::Ptr&& call,
-                               FilteredDataQueue::Ptr&& reply,
+    void parse_data(FilteredDataQueue::Ptr&& data);
+    void analyze_nfs_procedure(FilteredDataQueue::Ptr &&call,
+                               FilteredDataQueue::Ptr &&reply,
                                Session* session);
 
 };

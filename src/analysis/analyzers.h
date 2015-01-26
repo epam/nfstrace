@@ -45,6 +45,7 @@ public:
     Analyzers(const Analyzers&)            = delete;
     Analyzers& operator=(const Analyzers&) = delete;
 
+    //! This function is used for passing ALL possible procedures to analyzers
     template
     <
         typename Handle,
@@ -55,6 +56,35 @@ public:
         for(const auto a : modules)
         {
             (a->*handle)(&proc, proc.parg, proc.pres);
+        }
+    }
+
+    //! This function is used for passing args- or res-only NFS4.x operations (ex. NFSv4 ILLEGAL) to analyzers
+    template
+    <
+        typename Handle,
+        typename ArgOrResType
+    >
+    inline void operator()(Handle handle, const RPCProcedure* rpc, ArgOrResType* arg_or_res)
+    {
+        for(const auto a : modules)
+        {
+            (a->*handle)(rpc, arg_or_res);
+        }
+    }
+
+    //! This function is used for passing args + res NFS4.x operations (ex. NFSv4.x ACCESS) to analyzers
+    template
+    <
+        typename Handle,
+        typename ArgopType,
+        typename ResopType
+    >
+    inline void operator()(Handle handle, const RPCProcedure* rpc, ArgopType* arg, ResopType* res)
+    {
+        for(const auto a : modules)
+        {
+            (a->*handle)(rpc, arg, res);
         }
     }
 
