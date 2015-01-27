@@ -35,7 +35,8 @@ AnalysisManager::AnalysisManager(RunningStatus& status, const Parameters& params
 
     queue.reset(new FilteredDataQueue(params.queue_capacity(), 1));
 
-    parser_thread.reset(new NFSParserThread(*queue, *analysiss, status));
+    Parsers parser(*analysiss);
+    parser_thread.reset(new ParserThread<Parsers>(parser, *queue, status));
 }
 
 void AnalysisManager::start()
@@ -46,7 +47,6 @@ void AnalysisManager::start()
 void AnalysisManager::stop()
 {
     parser_thread->stop();
-
     analysiss->flush_statistics();
 }
 

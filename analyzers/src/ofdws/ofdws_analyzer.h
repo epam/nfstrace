@@ -127,10 +127,10 @@ public:
                   int32_t bu_size);
     virtual ~OFDWSAnalyzer();
 
-    void read3(const struct RPCProcedure* proc,
+    void read3(const RPCProcedure* proc,
             const struct NFS3::READ3args* args,
             const struct NFS3::READ3res* res) override final;
-    void write3(const struct RPCProcedure* proc,
+    void write3(const RPCProcedure* proc,
             const struct NFS3::WRITE3args* args,
             const struct NFS3::WRITE3res* res) override final;
 

@@ -23,25 +23,16 @@
 #define RPC_PROCEDURE_H
 //------------------------------------------------------------------------------
 #include <rpc/rpc_msg.h>
-#include <sys/time.h>
 
+#include "procedure.h"
 #include "rpc_types.h"
-#include "session.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace API
 {
 
-struct RPCProcedure
-{
-    struct rpc_msg rpc_call;
-    struct rpc_msg rpc_reply;
-
-    const struct Session* session;
-    const struct timeval* ctimestamp;
-    const struct timeval* rtimestamp;
-};
+using RPCProcedure = Procedure<struct rpc_msg>;
 
 } // namespace API
 } // namespace NST

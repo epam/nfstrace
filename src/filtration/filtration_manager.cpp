@@ -24,6 +24,7 @@
 #include "filtration/dumping.h"
 #include "filtration/filtration_manager.h"
 #include "filtration/filtration_processor.h"
+#include "filtration/filtrators.h"
 #include "filtration/pcap/capture_reader.h"
 #include "filtration/pcap/file_reader.h"
 #include "filtration/processing_thread.h"
@@ -52,13 +53,15 @@ template
 >
 class FiltrationImpl : public ProcessingThread
 {
+    using Processor = FiltrationProcessor<Reader, Writer, Filtrators< Writer >>;
 public:
     explicit FiltrationImpl(std::unique_ptr<Reader>& reader,
                             std::unique_ptr<Writer>& writer,
                             RunningStatus& status)
     : ProcessingThread {status}
-    , processor{reader, writer}
+    , processor{}
     {
+        processor.reset(new Processor{reader, writer});
     }
     ~FiltrationImpl() = default;
     FiltrationImpl(const FiltrationImpl&)            = delete;
@@ -66,7 +69,7 @@ public:
 
     virtual void stop() override final
     {
-        processor.stop();
+        processor->stop();
     }
 private:
 
@@ -74,7 +77,7 @@ private:
     {
         try
         {
-            processor.run();
+            processor->run();
         }
         catch(...)
         {
@@ -82,7 +85,7 @@ private:
         }
     }
 
-    FiltrationProcessor<Reader, Writer> processor;
+    std::unique_ptr<Processor> processor;
 };
 
 // create Filtration thread emplaced in unique_ptr
@@ -126,11 +129,7 @@ void FiltrationManager::add_online_dumping(const Parameters& params)
     {
         message << dumping_params;
     }
-    std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),
-                                                         dumping_params
-                                                       }
-                                          };
-
+    std::unique_ptr<Dumping> writer { new Dumping{ reader->get_handle(), dumping_params } };
     threads.emplace_back(create_thread(reader, writer, status));
 }
 

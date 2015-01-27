@@ -45,7 +45,7 @@ OFDWSAnalyzer::~OFDWSAnalyzer()
         delete i->second;
 }
 
-void OFDWSAnalyzer::read3(const struct RPCProcedure*,
+void OFDWSAnalyzer::read3(const RPCProcedure*,
                           const struct NFS3::READ3args* args,
                           const struct NFS3::READ3res*  res)
 {
@@ -58,7 +58,7 @@ void OFDWSAnalyzer::read3(const struct RPCProcedure*,
     }
 }
 
-void OFDWSAnalyzer::write3(const struct RPCProcedure*,
+void OFDWSAnalyzer::write3(const RPCProcedure*,
                            const struct NFS3::WRITE3args* args,
                            const struct NFS3::WRITE3res*  res)
 {
@@ -198,24 +198,24 @@ IAnalyzer* create(const char* optarg)
     {
         int supopt = getsubopt((char**)&optarg, (char**)token, &value);
         if(value == NULL)
-            return NULL;
+            return nullptr;
 
         switch(supopt)
         {
             case bu_size:
                 bucket_size = atoi(value);
                 if(bucket_size < 1 || block_size > 32767)
-                    return NULL;
+                    return nullptr;
                 break;
 
             case bl_size:
                 block_size = atoi(value);
                 if(block_size < 1 || block_size > 31)
-                    return NULL;
+                    return nullptr;
                 break;
 
             default:
-                return NULL;
+                return nullptr;
         }
         value = NULL;
     }

@@ -50,6 +50,14 @@ struct AParams
     const std::string args;
 };
 
+/*! Protocol to analysis
+ */
+enum class NetProtocol
+{
+    NFS    = 0x01, //!< NFS protocol
+    CIFS   = 0x02  //!< CIFS protocol
+};
+
 class Parameters
 {
     using CaptureParams = filtration::pcap::CaptureReader::Params;
@@ -78,7 +86,6 @@ public:
     const CaptureParams capture_params() const;
     const DumpingParams dumping_params() const;
     const std::vector<AParams>& analysis_modules() const;
-
     static unsigned short rpcmsg_limit();
 };
 

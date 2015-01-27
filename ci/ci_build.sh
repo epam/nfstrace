@@ -195,6 +195,7 @@ if [ $? -ne 0 ] ; then
     exit 1
 fi
 cd $DEBUG_BUILD_DIR
+
 cmake -DCMAKE_BUILD_TYPE=Debug -DGMOCK_SOURCE_DIR="$HOME/gmock-1.7.0" ../
 if [ $? -ne 0 ] ; then
     echo ">>> Debug build configuration error"
@@ -237,8 +238,8 @@ elif [ "$LINUX_DISTRO" = "ALT Linux" ] ; then
     # TODO: Jenkins causes error on ALT Linux on publish valgrind report phase
     echo ">>> Valgrind/memcheck report generation is not supported on ALT Linux"
 else
-    bzcat $WORKSPACE/traces/eth-ipv4-tcp-nfsv3.pcap.bz2 > ./eth-ipv4-tcp-nfsv3.pcap
-    bzcat $WORKSPACE/traces/eth-ipv4-tcp-nfsv4.pcap.bz2 > ./eth-ipv4-tcp-nfsv4.pcap
+    bzcat $WORKSPACE/traces/breakdown/eth-ipv4-tcp-nfsv3.pcap.bz2 > ./eth-ipv4-tcp-nfsv3.pcap
+    bzcat $WORKSPACE/traces/breakdown/eth-ipv4-tcp-nfsv4.pcap.bz2 > ./eth-ipv4-tcp-nfsv4.pcap
     
     echo ">>> Generating valgrind/memcheck report for NFSv3 in 'drain' mode"
     valgrind --tool=memcheck --leak-check=full --show-reachable=yes \
