@@ -19,7 +19,6 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
 #ifndef NFS41_UTILS_H
 #define NFS41_UTILS_H
 //------------------------------------------------------------------------------
@@ -70,6 +69,8 @@ inline auto proc_t_of(NFS41::COMPOUND4res&)->decltype(&NFS41::xdr_COMPOUND4res)
 {
     return &NFS41::xdr_COMPOUND4res;
 }
+
+#define NST_PUBLIC __attribute__ ((visibility("default")))
 
 extern"C"
 NST_PUBLIC
