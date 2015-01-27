@@ -513,7 +513,7 @@ TREE DISCONNECT        Count:    1 (  1.11%) Min: 0.001 Max: 0.001 Avg: 0.001 St
 CREATE                 Count:   20 ( 22.22%) Min: 0.001 Max: 0.079 Avg: 0.005 StDev: 0.01761051
 CLOSE                  Count:   20 ( 22.22%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00008486
 FLUSH                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-READ                   Count:    4 (  4.44%) Min: 0.060 Max: 0.092 Avg: 0.072 StDev: 0.01417401
+READ                   Count:    4 (  4.44%) Min: 0.057 Max: 0.092 Avg: 0.071 StDev: 0.01505799
 WRITE                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 LOCK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 IOCTL                  Count:    1 (  1.11%) Min: 0.003 Max: 0.003 Avg: 0.003 StDev: 0.00000000
