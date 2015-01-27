@@ -76,146 +76,146 @@ protected:
         // Setting up analyzer (NFSv3)
         for (int i = 0; i < NfsV3NullOpsAmount; ++i)
         {
-            analyzer->null(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->null(static_cast<const RPCProcedure*>(nullptr),
                            static_cast<const struct NFS3::NULL3args*>(nullptr),
                            static_cast<const struct NFS3::NULL3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3GetattrOpsAmount; ++i)
         {
-            analyzer->getattr3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->getattr3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS3::GETATTR3args*>(nullptr),
                                static_cast<const struct NFS3::GETATTR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3SetattrOpsAmount; ++i)
         {
-            analyzer->setattr3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->setattr3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS3::SETATTR3args*>(nullptr),
                                static_cast<const struct NFS3::SETATTR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3LookupOpsAmount; ++i)
         {
-            analyzer->lookup3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->lookup3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::LOOKUP3args*>(nullptr),
                               static_cast<const struct NFS3::LOOKUP3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3AccessOpsAmount; ++i)
         {
-            analyzer->access3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->access3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::ACCESS3args*>(nullptr),
                               static_cast<const struct NFS3::ACCESS3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReadlinkOpsAmount; ++i)
         {
-            analyzer->readlink3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readlink3(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS3::READLINK3args*>(nullptr),
                                 static_cast<const struct NFS3::READLINK3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReadOpsAmount; ++i)
         {
-            analyzer->read3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->read3(static_cast<const RPCProcedure*>(nullptr),
                             static_cast<const struct NFS3::READ3args*>(nullptr),
                             static_cast<const struct NFS3::READ3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3WriteOpsAmount; ++i)
         {
-            analyzer->write3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->write3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS3::WRITE3args*>(nullptr),
                              static_cast<const struct NFS3::WRITE3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3CreateOpsAmount; ++i)
         {
-            analyzer->create3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->create3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::CREATE3args*>(nullptr),
                               static_cast<const struct NFS3::CREATE3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3MkdirOpsAmount; ++i)
         {
-            analyzer->mkdir3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->mkdir3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS3::MKDIR3args*>(nullptr),
                              static_cast<const struct NFS3::MKDIR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3SymlinkOpsAmount; ++i)
         {
-            analyzer->symlink3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->symlink3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS3::SYMLINK3args*>(nullptr),
                                static_cast<const struct NFS3::SYMLINK3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3MknodOpsAmount; ++i)
         {
-            analyzer->mknod3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->mknod3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS3::MKNOD3args*>(nullptr),
                              static_cast<const struct NFS3::MKNOD3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3RemoveOpsAmount; ++i)
         {
-            analyzer->remove3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->remove3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::REMOVE3args*>(nullptr),
                               static_cast<const struct NFS3::REMOVE3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3RmdirOpsAmount; ++i)
         {
-            analyzer->rmdir3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->rmdir3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS3::RMDIR3args*>(nullptr),
                              static_cast<const struct NFS3::RMDIR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3RenameOpsAmount; ++i)
         {
-            analyzer->rename3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->rename3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::RENAME3args*>(nullptr),
                               static_cast<const struct NFS3::RENAME3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3LinkOpsAmount; ++i)
         {
-            analyzer->link3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->link3(static_cast<const RPCProcedure*>(nullptr),
                             static_cast<const struct NFS3::LINK3args*>(nullptr),
                             static_cast<const struct NFS3::LINK3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReaddirOpsAmount; ++i)
         {
-            analyzer->readdir3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readdir3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS3::READDIR3args*>(nullptr),
                                static_cast<const struct NFS3::READDIR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReaddirplusOpsAmount; ++i)
         {
-            analyzer->readdirplus3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readdirplus3(static_cast<const RPCProcedure*>(nullptr),
                                    static_cast<const struct NFS3::READDIRPLUS3args*>(nullptr),
                                    static_cast<const struct NFS3::READDIRPLUS3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3FsstatOpsAmount; ++i)
         {
-            analyzer->fsstat3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->fsstat3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::FSSTAT3args*>(nullptr),
                               static_cast<const struct NFS3::FSSTAT3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3FsinfoOpsAmount; ++i)
         {
-            analyzer->fsinfo3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->fsinfo3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::FSINFO3args*>(nullptr),
                               static_cast<const struct NFS3::FSINFO3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3PathconfOpsAmount; ++i)
         {
-            analyzer->pathconf3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->pathconf3(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS3::PATHCONF3args*>(nullptr),
                                 static_cast<const struct NFS3::PATHCONF3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3CommitOpsAmount; ++i)
         {
-            analyzer->commit3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->commit3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::COMMIT3args*>(nullptr),
                               static_cast<const struct NFS3::COMMIT3res*>(nullptr));
         }
         // Setting up analyzer (NFSv4)
         for (int i = 0; i < NfsV4NullOpsAmount; ++i)
         {
-            analyzer->null(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->null(static_cast<const RPCProcedure*>(nullptr),
                            static_cast<const struct NFS4::NULL4args*>(nullptr),
                            static_cast<const struct NFS4::NULL4res*>(nullptr));
         }
         for (int i = 0; i < NfsV4CompoundOpsAmount; ++i)
         {
-            analyzer->compound4(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->compound4(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS4::COMPOUND4args*>(nullptr),
                                 static_cast<const struct NFS4::COMPOUND4res*>(nullptr));
         }

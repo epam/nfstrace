@@ -35,167 +35,167 @@ JsonAnalyzer::~JsonAnalyzer()
     _jsonTcpService.stop();
 }
 
-void JsonAnalyzer::null(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::null(const RPCProcedure* /*proc*/,
                         const struct NFS3::NULL3args* /*args*/,
                         const struct NFS3::NULL3res* /*res*/)
 {
     _nfsV3Stat.nullOpsAmount++;
 }
 
-void JsonAnalyzer::getattr3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::getattr3(const RPCProcedure* /*proc*/,
                             const struct NFS3::GETATTR3args* /*args*/,
                             const struct NFS3::GETATTR3res* /*res*/)
 {
     _nfsV3Stat.getattrOpsAmount++;
 }
 
-void JsonAnalyzer::setattr3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::setattr3(const RPCProcedure* /*proc*/,
                             const struct NFS3::SETATTR3args* /*args*/,
                             const struct NFS3::SETATTR3res* /*res*/)
 {
     _nfsV3Stat.setattrOpsAmount++;
 }
 
-void JsonAnalyzer::lookup3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::lookup3(const RPCProcedure* /*proc*/,
                            const struct NFS3::LOOKUP3args* /*args*/,
                            const struct NFS3::LOOKUP3res* /*res*/)
 {
     _nfsV3Stat.lookupOpsAmount++;
 }
 
-void JsonAnalyzer::access3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::access3(const RPCProcedure* /*proc*/,
                            const struct NFS3::ACCESS3args* /*args*/,
                            const struct NFS3::ACCESS3res* /*res*/)
 {
     _nfsV3Stat.accessOpsAmount++;
 }
 
-void JsonAnalyzer::readlink3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::readlink3(const RPCProcedure* /*proc*/,
                              const struct NFS3::READLINK3args* /*args*/,
                              const struct NFS3::READLINK3res* /*res*/)
 {
     _nfsV3Stat.readlinkOpsAmount++;
 }
 
-void JsonAnalyzer::read3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::read3(const RPCProcedure* /*proc*/,
                          const struct NFS3::READ3args* /*args*/,
                          const struct NFS3::READ3res* /*res*/)
 {
     _nfsV3Stat.readOpsAmount++;
 }
 
-void JsonAnalyzer::write3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::write3(const RPCProcedure* /*proc*/,
                           const struct NFS3::WRITE3args* /*args*/,
                           const struct NFS3::WRITE3res* /*res*/)
 {
     _nfsV3Stat.writeOpsAmount++;
 }
 
-void JsonAnalyzer::create3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::create3(const RPCProcedure* /*proc*/,
                            const struct NFS3::CREATE3args* /*args*/,
                            const struct NFS3::CREATE3res* /*res*/)
 {
     _nfsV3Stat.createOpsAmount++;
 }
 
-void JsonAnalyzer::mkdir3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::mkdir3(const RPCProcedure* /*proc*/,
                           const struct NFS3::MKDIR3args* /*args*/,
                           const struct NFS3::MKDIR3res* /*res*/)
 {
     _nfsV3Stat.mkdirOpsAmount++;
 }
 
-void JsonAnalyzer::symlink3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::symlink3(const RPCProcedure* /*proc*/,
                             const struct NFS3::SYMLINK3args* /*args*/,
                             const struct NFS3::SYMLINK3res* /*res*/)
 {
     _nfsV3Stat.symlinkOpsAmount++;
 }
 
-void JsonAnalyzer::mknod3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::mknod3(const RPCProcedure* /*proc*/,
                           const struct NFS3::MKNOD3args* /*args*/,
                           const struct NFS3::MKNOD3res* /*res*/)
 {
     _nfsV3Stat.mknodOpsAmount++;
 }
 
-void JsonAnalyzer::remove3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::remove3(const RPCProcedure* /*proc*/,
                            const struct NFS3::REMOVE3args* /*args*/,
                            const struct NFS3::REMOVE3res* /*res*/)
 {
     _nfsV3Stat.removeOpsAmount++;
 }
 
-void JsonAnalyzer::rmdir3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::rmdir3(const RPCProcedure* /*proc*/,
                           const struct NFS3::RMDIR3args* /*args*/,
                           const struct NFS3::RMDIR3res* /*res*/)
 {
     _nfsV3Stat.rmdirOpsAmount++;
 }
 
-void JsonAnalyzer::rename3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::rename3(const RPCProcedure* /*proc*/,
                            const struct NFS3::RENAME3args* /*args*/,
                            const struct NFS3::RENAME3res* /*res*/)
 {
     _nfsV3Stat.renameOpsAmount++;
 }
 
-void JsonAnalyzer::link3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::link3(const RPCProcedure* /*proc*/,
                          const struct NFS3::LINK3args* /*args*/,
                          const struct NFS3::LINK3res* /*res*/)
 {
     _nfsV3Stat.linkOpsAmount++;
 }
 
-void JsonAnalyzer::readdir3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::readdir3(const RPCProcedure* /*proc*/,
                             const struct NFS3::READDIR3args* /*args*/,
                             const struct NFS3::READDIR3res* /*res*/)
 {
     _nfsV3Stat.readdirOpsAmount++;
 }
 
-void JsonAnalyzer::readdirplus3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::readdirplus3(const RPCProcedure* /*proc*/,
                                 const struct NFS3::READDIRPLUS3args* /*args*/,
                                 const struct NFS3::READDIRPLUS3res* /*res*/)
 {
     _nfsV3Stat.readdirplusOpsAmount++;
 }
 
-void JsonAnalyzer::fsstat3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::fsstat3(const RPCProcedure* /*proc*/,
                            const struct NFS3::FSSTAT3args* /*args*/,
                            const struct NFS3::FSSTAT3res* /*res*/)
 {
     _nfsV3Stat.fsstatOpsAmount++;
 }
 
-void JsonAnalyzer::fsinfo3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::fsinfo3(const RPCProcedure* /*proc*/,
                            const struct NFS3::FSINFO3args* /*args*/,
                            const struct NFS3::FSINFO3res* /*res*/)
 {
     _nfsV3Stat.fsinfoOpsAmount++;
 }
 
-void JsonAnalyzer::pathconf3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::pathconf3(const RPCProcedure* /*proc*/,
                              const struct NFS3::PATHCONF3args* /*args*/,
                              const struct NFS3::PATHCONF3res* /*res*/)
 {
     _nfsV3Stat.pathconfOpsAmount++;
 }
 
-void JsonAnalyzer::commit3(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::commit3(const RPCProcedure* /*proc*/,
                            const struct NFS3::COMMIT3args* /*args*/,
                            const struct NFS3::COMMIT3res* /*res*/)
 {
     _nfsV3Stat.commitOpsAmount++;
 }
 
-void JsonAnalyzer::null(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::null(const RPCProcedure* /*proc*/,
                         const struct NFS4::NULL4args* /*args*/,
                         const struct NFS4::NULL4res* /*res*/)
 {
     _nfsV4Stat.nullOpsAmount++;
 }
-void JsonAnalyzer::compound4(const struct RPCProcedure* /*proc*/,
+void JsonAnalyzer::compound4(const RPCProcedure* /*proc*/,
                              const struct NFS4::COMPOUND4args* /*args*/,
                              const struct NFS4::COMPOUND4res* /*res*/)
 {

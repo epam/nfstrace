@@ -65,15 +65,15 @@ CaptureReader::CaptureReader(const Params& params) : BaseReader{params.interface
         throw PcapError("pcap_activate", pcap_statustostr(status));
     }
 
-    pcap_direction_t diection {PCAP_D_INOUT};
+    pcap_direction_t direction {PCAP_D_INOUT};
     switch(params.direction)
     {
         using Direction = CaptureReader::Direction;
-        case Direction::IN   : diection = PCAP_D_IN;    break;
-        case Direction::OUT  : diection = PCAP_D_OUT;   break;
-        case Direction::INOUT: diection = PCAP_D_INOUT; break;
+        case Direction::IN   : direction = PCAP_D_IN;    break;
+        case Direction::OUT  : direction = PCAP_D_OUT;   break;
+        case Direction::INOUT: direction = PCAP_D_INOUT; break;
     }
-    if(int status {pcap_setdirection(handle, diection)})
+    if(int status {pcap_setdirection(handle, direction)})
     {
         throw PcapError("pcap_setdirection", pcap_statustostr(status));
     }

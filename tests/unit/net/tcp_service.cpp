@@ -85,7 +85,7 @@ private:
             ASSERT_GT(writeDescriptorsCount, 0);
             ASSERT_TRUE(FD_ISSET(socket(), &writeDescriptiorsSet));
             ssize_t bytesSent = send(socket(), TestResponse, strlen(TestResponse), MSG_NOSIGNAL);
-            EXPECT_EQ(strlen(TestResponse), bytesSent);
+            EXPECT_EQ(static_cast<ssize_t>(strlen(TestResponse)), bytesSent);
         }
     private:
         TestTcpService& _service;
@@ -106,7 +106,7 @@ TEST(TestTcpService, requestResponse)
 {
     taskExecuteCallsCount = 0;
     TestTcpService service;
-    for (int i = 0; i < StartStopCyclesAmount; ++i) {
+    for (size_t i = 0; i < StartStopCyclesAmount; ++i) {
         EXPECT_NO_THROW(service.start());
         std::this_thread::sleep_for(std::chrono::milliseconds{AwaitForServiceStartupMs});
         int s = socket(PF_INET, SOCK_STREAM, 0);
@@ -114,14 +114,14 @@ TEST(TestTcpService, requestResponse)
         IpEndpoint endpoint{ListenHost, ListenPort};
         ASSERT_EQ(0, connect(s, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen));
         ssize_t bytesSent = send(s, TestRequest, strlen(TestRequest), MSG_NOSIGNAL);
-        EXPECT_EQ(strlen(TestRequest), bytesSent);
+        EXPECT_EQ(strlen(TestRequest), static_cast<size_t>(bytesSent));
         char receiveBuffer[ReceiveBufferSize];
         ssize_t bytesReceived = recv(s, receiveBuffer, sizeof(receiveBuffer), 0);
         EXPECT_EQ(TestResponse, std::string(receiveBuffer, bytesReceived));
         EXPECT_EQ(0, close(s));
         EXPECT_NO_THROW(service.stop());
     }
-    EXPECT_EQ(StartStopCyclesAmount, taskExecuteCallsCount.load());
+    EXPECT_EQ(StartStopCyclesAmount, static_cast<size_t>(taskExecuteCallsCount.load()));
 }
 
 TEST(TestTcpService, multipleRequestResponse)
@@ -144,7 +144,7 @@ TEST(TestTcpService, multipleRequestResponse)
     for (auto & s : sockets)
     {
         ssize_t bytesSent = send(s, TestRequest, strlen(TestRequest), MSG_NOSIGNAL);
-        EXPECT_EQ(strlen(TestRequest), bytesSent);
+        EXPECT_EQ(static_cast<ssize_t>(strlen(TestRequest)), bytesSent);
     }
     char receiveBuffer[ReceiveBufferSize];
     for (auto & s : sockets)
@@ -156,7 +156,7 @@ TEST(TestTcpService, multipleRequestResponse)
     {
         EXPECT_EQ(0, close(s));
     }
-    EXPECT_EQ(sockets.size(), taskExecuteCallsCount.load());
+    EXPECT_EQ(sockets.size(), static_cast<size_t>(taskExecuteCallsCount.load()));
     EXPECT_NO_THROW(service.stop());
 }
 
