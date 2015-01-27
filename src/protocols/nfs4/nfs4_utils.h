@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // Author: Alexey Costroma
 // Description: Helpers for parsing NFS structures.
-// Copyright (c) 2014 EPAM Systems
+// Copyright (c) 2014-2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
