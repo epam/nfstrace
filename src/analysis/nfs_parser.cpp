@@ -19,7 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "analysis/nfs_parser_thread.h"
+#include "analysis/nfs_parser.h"
 #include "protocols/nfs/nfs_procedure.h"
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/xdr/xdr_decoder.h"
@@ -32,114 +32,66 @@ namespace NST
 namespace analysis
 {
 
-NFSParserThread::NFSParserThread(FilteredDataQueue& q, Analyzers& a, RunningStatus& s)
-: status   (s)
-, analyzers(a)
-, queue    (q)
-, running  {ATOMIC_FLAG_INIT} // false
-{
-}
 
-NFSParserThread::~NFSParserThread()
-{
-    if (parsing.joinable()) stop();
-}
-
-void NFSParserThread::start()
-{
-    if(running.test_and_set()) return;
-    parsing = std::thread(&NFSParserThread::thread, this);
-}
-
-void NFSParserThread::stop()
-{
-    running.clear();
-    parsing.join();
-}
-
-inline void NFSParserThread::thread()
-{
-    try
-    {
-        while(running.test_and_set())
-        {
-            // process all available items from queue
-            process_queue();
-
-            // then sleep this thread
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-        process_queue(); // flush data from queue
-    }
-    catch(...)
-    {
-        status.push_current_exception();
-    }
-}
-
-inline void NFSParserThread::process_queue()
-{
-    while(true)
-    {
-        // take all items from the queue
-        FilteredDataQueue::List list{queue};
-        if(!list)
-        {
-            return; // list from queue is empty, break infinity loop
-        }
-
-        do
-        {
-            parse_data(list.get_current());
-        }
-        while(list);
-    }
-}
-
-void NFSParserThread::parse_data(FilteredDataQueue::Ptr&& ptr)
+bool NFSParser::parse_data(FilteredDataQueue::Ptr& ptr)
 {
     using namespace NST::protocols::rpc;
 
     // TODO: refactor and generalize this code
-    if(ptr->dlen < sizeof(MessageHeader)) return;
+    if(ptr->dlen < sizeof(MessageHeader))
+    {
+        return false;
+    }
     auto msg = reinterpret_cast<const MessageHeader*>(ptr->data);
     switch(msg->type())
     {
     case MsgType::CALL:
     {
-        if(ptr->dlen < sizeof(CallHeader)) return;
+        if(ptr->dlen < sizeof(CallHeader))
+        {
+            return false;
+        }
+
         auto call = static_cast<const CallHeader*>(msg);
 
         if(RPCValidator::check(call) && (protocols::NFS4::Validator::check(call) ||
                                          protocols::NFS3::Validator::check(call)))
         {
-            RPCSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL);
+            Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL);
             if(session)
             {
-                session->save_nfs_call_data(call->xid(), std::move(ptr));
+                session->save_call_data(call->xid(), std::move(ptr));
             }
+            return true;
         }
     }
     break;
     case MsgType::REPLY:
     {
-        if(ptr->dlen < sizeof(ReplyHeader)) return;
+        if(ptr->dlen < sizeof(ReplyHeader))
+        {
+            return false;
+        }
         auto reply = static_cast<const ReplyHeader*>(msg);
 
-        if(!RPCValidator::check(reply)) return;
+        if(!RPCValidator::check(reply))
+        {
+            return false;
+        }
 
-        RPCSession* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY);
+        Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY);
         if(session)
         {
-            FilteredDataQueue::Ptr&& call_data = session->get_nfs_call_data(reply->xid());
+            FilteredDataQueue::Ptr&& call_data = session->get_call_data(reply->xid());
             if(call_data)
             {
                 analyze_nfs_procedure(std::move(call_data), std::move(ptr), session);
             }
+            return true;
         }
     }
-    break;
     }
+    return false;
 }
 
 // ----------------------------------------------------------------------------
@@ -186,9 +138,9 @@ void nfs4_ops_switch(Analyzers& analyzers,
 
 // ----------------------------------------------------------------------------
 
-void NFSParserThread::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
-                                             FilteredDataQueue::Ptr&& reply,
-                                             RPCSession* session)
+void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
+                                       FilteredDataQueue::Ptr&& reply,
+                                       Session* session)
 {
     using namespace NST::protocols::rpc;
     using namespace NST::protocols::NFS3;

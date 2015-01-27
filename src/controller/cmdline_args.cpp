@@ -25,6 +25,10 @@
 #define DUMP  "dump"
 #define STAT  "stat"
 #define DRAIN "drain"
+
+//! protocols
+#define CIFS  "CIFS"
+#define NFS   "NFS"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -59,7 +63,7 @@ Opt Args::options[Args::num] =
     {'M', "msg-header", Opt::REQ, "512",                 "Truncate RPC messages to this limit (specified in bytes) before passing to a pluggable analysis module", "1..4000", nullptr, false},
     {'Q', "qcapacity",  Opt::REQ, "4096",                "set the initial capacity of the queue with RPC messages",                                   "1..65535", nullptr, false},
     {'T', "trace",      Opt::NOA, "false",               "print collected NFSv3 or NFSv4 procedures, true if no modules were passed with -a option",  nullptr,    nullptr, false},
-    {'Z', "droproot",   Opt::REQ, "",                    "drop root privileges after opening the capture device",                                     "username", nullptr, false},
+    {'Z', "droproot",   Opt::REQ, "",                    "drop root privileges after opening the capture device",                                    "username", nullptr, false},
     {'v', "verbose",    Opt::REQ, "1",                   "specify verbosity level",                                                                   "0|1|2",    nullptr, false},
     {'h', "help",       Opt::NOA, "false",               "print help message and usage for modules passed with -a options, then exit",                nullptr,    nullptr, false}
 };

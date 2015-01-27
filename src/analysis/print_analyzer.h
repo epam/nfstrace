@@ -45,77 +45,77 @@ public:
     {
     }
 
-    void null(const struct RPCProcedure* proc,
+    void null(const RPCProcedure* proc,
               const struct NFS3::NULL3args*,
               const struct NFS3::NULL3res*) override final;
-    void getattr3(const struct RPCProcedure*         proc,
+    void getattr3(const RPCProcedure*              proc,
                   const struct NFS3::GETATTR3args* args,
                   const struct NFS3::GETATTR3res*  res) override final;
-    void setattr3(const struct RPCProcedure*         proc,
+    void setattr3(const RPCProcedure*              proc,
                   const struct NFS3::SETATTR3args* args,
                   const struct NFS3::SETATTR3res*  res) override final;
-    void lookup3(const struct RPCProcedure*        proc,
+    void lookup3(const RPCProcedure*             proc,
                  const struct NFS3::LOOKUP3args* args,
                  const struct NFS3::LOOKUP3res*  res) override final;
-    void access3(const struct RPCProcedure*        proc,
+    void access3(const RPCProcedure*             proc,
                  const struct NFS3::ACCESS3args* args,
                  const struct NFS3::ACCESS3res*  res) override final;
-    void readlink3(const struct RPCProcedure*          proc,
+    void readlink3(const RPCProcedure*               proc,
                    const struct NFS3::READLINK3args* args,
                    const struct NFS3::READLINK3res*  res) override final;
-    void read3(const struct RPCProcedure*      proc,
+    void read3(const RPCProcedure*           proc,
                const struct NFS3::READ3args* args,
                const struct NFS3::READ3res*  res) override final;
-    void write3(const struct RPCProcedure*       proc,
+    void write3(const RPCProcedure*            proc,
                 const struct NFS3::WRITE3args* args,
                 const struct NFS3::WRITE3res*  res) override final;
-    void create3(const struct RPCProcedure*        proc,
+    void create3(const RPCProcedure*             proc,
                  const struct NFS3::CREATE3args* args,
                  const struct NFS3::CREATE3res*  res) override final;
-    void mkdir3(const struct RPCProcedure*       proc,
+    void mkdir3(const RPCProcedure*            proc,
                 const struct NFS3::MKDIR3args* args,
                 const struct NFS3::MKDIR3res*  res) override final;
-    void symlink3(const struct RPCProcedure*         proc,
+    void symlink3(const RPCProcedure*              proc,
                   const struct NFS3::SYMLINK3args* args,
                   const struct NFS3::SYMLINK3res*  res) override final;
-    void mknod3(const struct RPCProcedure*       proc,
+    void mknod3(const RPCProcedure*            proc,
                 const struct NFS3::MKNOD3args* args,
                 const struct NFS3::MKNOD3res*  res) override final;
-    void remove3(const struct RPCProcedure*        proc,
+    void remove3(const RPCProcedure*             proc,
                  const struct NFS3::REMOVE3args* args,
                  const struct NFS3::REMOVE3res*  res) override final;
-    void rmdir3(const struct RPCProcedure*       proc,
+    void rmdir3(const RPCProcedure*            proc,
                 const struct NFS3::RMDIR3args* args,
                 const struct NFS3::RMDIR3res*  res) override final;
-    void rename3(const struct RPCProcedure*        proc,
+    void rename3(const RPCProcedure*             proc,
                  const struct NFS3::RENAME3args* args,
                  const struct NFS3::RENAME3res*  res) override final;
-    void link3(const struct RPCProcedure*      proc,
+    void link3(const RPCProcedure*           proc,
                const struct NFS3::LINK3args* args,
                const struct NFS3::LINK3res*  res) override final;
-    void readdir3(const struct RPCProcedure*         proc,
+    void readdir3(const RPCProcedure*              proc,
                   const struct NFS3::READDIR3args* args,
                   const struct NFS3::READDIR3res*  res) override final;
-    void readdirplus3(const struct RPCProcedure*             proc,
+    void readdirplus3(const RPCProcedure*                  proc,
                       const struct NFS3::READDIRPLUS3args* args,
                       const struct NFS3::READDIRPLUS3res*  res) override final;
-    void fsstat3(const struct RPCProcedure*        proc,
+    void fsstat3(const RPCProcedure*             proc,
                  const struct NFS3::FSSTAT3args* args,
                  const struct NFS3::FSSTAT3res*  res) override final;
-    void fsinfo3(const struct RPCProcedure*        proc,
+    void fsinfo3(const RPCProcedure*             proc,
                  const struct NFS3::FSINFO3args* args,
                  const struct NFS3::FSINFO3res*  res) override final;
-    void pathconf3(const struct RPCProcedure*          proc,
+    void pathconf3(const RPCProcedure*               proc,
                    const struct NFS3::PATHCONF3args* args,
                    const struct NFS3::PATHCONF3res*  res) override final;
-    void commit3(const struct RPCProcedure*        proc,
+    void commit3(const RPCProcedure*             proc,
                  const struct NFS3::COMMIT3args* args,
                  const struct NFS3::COMMIT3res*  res) override final;
 
-    void null(const struct RPCProcedure*      proc,
+    void null(const RPCProcedure*           proc,
               const struct NFS4::NULL4args* args,
               const struct NFS4::NULL4res*  res) override final;
-    void compound4(const struct RPCProcedure*          proc,
+    void compound4(const RPCProcedure*               proc,
                    const struct NFS4::COMPOUND4args* args,
                    const struct NFS4::COMPOUND4res*  res) override final;
 
