@@ -1,7 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
 // Description: Generic processor for filtration raw pcap packets.
-// TODO: THIS CODE MUST BE TOTALLY REFACTORED!
 // Copyright (c) 2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -23,6 +22,7 @@
 #ifndef CIFS_FILTRATOR_H
 #define CIFS_FILTRATOR_H
 //------------------------------------------------------------------------------
+#include <algorithm>
 #include <cassert>
 
 #include <pcap/pcap.h>
@@ -43,6 +43,7 @@ template<typename Writer>
 class CIFSFiltrator : public FiltratorImpl<CIFSFiltrator<Writer>, Writer>
 {
     using BaseImpl = FiltratorImpl<CIFSFiltrator<Writer>, Writer>;
+    size_t rw_hdr_max {512}; // limit for SMB header to truncate messages
 public:
 
     CIFSFiltrator()
@@ -60,9 +61,10 @@ public:
         return lengthOfBaseHeader();
     }
 
-    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
+    inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_hdr)
     {
-        BaseImpl::setWriterImpl(session_ptr, w, max_rpc_hdr);
+        rw_hdr_max = max_hdr;
+        BaseImpl::setWriterImpl(session_ptr, w, max_hdr);
     }
 
     constexpr static size_t lengthOfBaseHeader()
@@ -100,20 +102,40 @@ public:
     {
         if (const NetBIOS::MessageHeader* nb_header = NetBIOS::get_header(collection.data()))
         {
-            if (CIFSv1::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            const size_t length = nb_header->len() + sizeof(NetBIOS::MessageHeader);
+            if (const CIFSv1::MessageHeader* header = CIFSv1::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
-                BaseImpl::setMsgLen(nb_header->len() + sizeof(NetBIOS::MessageHeader));
-                BaseImpl::setToBeCopied(nb_header->len() + sizeof(NetBIOS::MessageHeader));//FIXME: restrict msg
+                BaseImpl::setMsgLen(length);
+                set_msg_size(header, length);
                 return BaseImpl::read_message(info);
             }
-            else if (CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            else if (const CIFSv2::MessageHeader* header = CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
-                BaseImpl::setMsgLen(nb_header->len() + sizeof(NetBIOS::MessageHeader));
-                BaseImpl::setToBeCopied(nb_header->len() + sizeof(NetBIOS::MessageHeader));//FIXME: restrict msg
+                BaseImpl::setMsgLen(length);
+                set_msg_size(header, length);
                 return BaseImpl::read_message(info);
             }
         }
         return false;
+    }
+
+private:
+    inline void set_msg_size(const CIFSv1::MessageHeader* header, const size_t length)
+    {
+        if ((header->cmd_code == CIFSv1::Commands::READ) || (header->cmd_code == CIFSv1::Commands::WRITE))
+        {
+            return BaseImpl::setToBeCopied(std::min(length, rw_hdr_max));
+        }
+        BaseImpl::setToBeCopied(length);
+    }
+
+    inline void set_msg_size(const CIFSv2::MessageHeader* header, const size_t length)
+    {
+        if ((header->cmd_code == CIFSv2::Commands::READ) || (header->cmd_code == CIFSv2::Commands::WRITE))
+        {
+            return BaseImpl::setToBeCopied(std::min(length, rw_hdr_max));
+        }
+        BaseImpl::setToBeCopied(length);
     }
 
 };

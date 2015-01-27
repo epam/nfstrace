@@ -22,6 +22,7 @@
 #ifndef RPC_FILTRATOR_H
 #define RPC_FILTRATOR_H
 //------------------------------------------------------------------------------
+#include <algorithm>
 #include <cassert>
 
 #include <pcap/pcap.h>
@@ -120,7 +121,7 @@ public:
         return false;
     }
 
-    inline bool validate_header(const MessageHeader* const msg, const uint32_t len)
+    inline bool validate_header(const MessageHeader* const msg, const size_t len)
     {
         switch (msg->type())
         {
@@ -175,7 +176,7 @@ public:
                 //* Collect fully if reply received before matching call
                 if (nfs3_read_match.erase(reply->xid()) > 0)
                 {
-                    BaseImpl::setToBeCopied(nfs3_rw_hdr_max < len ? nfs3_rw_hdr_max : len);
+                    BaseImpl::setToBeCopied(std::min(nfs3_rw_hdr_max, len));
                 }
                 else
                 {
