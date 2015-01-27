@@ -19,39 +19,38 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef DYNAMIC_LOAD_H
-#define DYNAMIC_LOAD_H
-//------------------------------------------------------------------------------
-#include <stdexcept>
+#include <dlfcn.h>
 
-#include "api/plugin_api.h"
+#include "dynamic_load.h"
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace utils
-{
+using namespace NST::utils;
+//------------------------------------------------------------------------------
 
-class DynamicLoad
+DynamicLoad::DynamicLoad(const std::string &file)
 {
-public:
-    class DLException : public std::runtime_error
+    handle = dlopen(file.c_str(), RTLD_LAZY);
+    if(handle == nullptr)
     {
-    public:
-        explicit DLException(const std::string& msg) : std::runtime_error{msg} { }
-    };
+        throw DLException{std::string{"Loading dynamic module: "} + file + " failed with error:" + dlerror()};
+    }
+}
 
-protected:
-    explicit DynamicLoad(const std::string& file);
-    ~DynamicLoad();
+DynamicLoad::~DynamicLoad()
+{
+    dlclose(handle);
+}
 
-    void load_address_of(const std::string& name, plugin_get_entry_points_func& address);
+void DynamicLoad::load_address_of(const std::string &name, plugin_get_entry_points_func &address)
+{
+    static_assert(sizeof(void*) == sizeof(plugin_get_entry_points_func), "object pointer and function pointer sizes must be equal");
 
-private:
-    void* handle;
-};
+    // suppression warning: ISO C++ forbids casting between pointer-to-function and pointer-to-object
+    using hook_dlsym_t = plugin_get_entry_points_func (*)(void *, const char *);
 
-} // namespace utils
-} // namespace NST
-//------------------------------------------------------------------------------
-#endif//DYNAMIC_LOAD_H
+    address = reinterpret_cast<hook_dlsym_t>(dlsym)(handle, name.c_str());
+    if(address == nullptr)
+    {
+        throw DLException{std::string{"Loading symbol "} + name + " failed with error:" + dlerror()};
+    }
+}
 //------------------------------------------------------------------------------
