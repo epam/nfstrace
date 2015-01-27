@@ -231,6 +231,178 @@ public:
 
     void nfs4_operation(const struct NFS4::ILLEGAL4res*               res);
 
+    void null41(const RPCProcedure*          proc,
+              const struct NFS41::NULL4args* args,
+              const struct NFS41::NULL4res*  res) override final;
+    void compound41(const RPCProcedure*               proc,
+                   const struct NFS41::COMPOUND4args* args,
+                   const struct NFS41::COMPOUND4res*  res) override final;
+
+    void nfs41_operation(const struct NFS41::nfs_argop4*                  op);
+    void nfs41_operation(const struct NFS41::nfs_resop4*                  op);
+
+    void nfs41_operation(const struct NFS41::ACCESS4args*               args);
+    void nfs41_operation(const struct NFS41::ACCESS4res*                res );
+
+    void nfs41_operation(const struct NFS41::CLOSE4args*                args);
+    void nfs41_operation(const struct NFS41::CLOSE4res*                 res );
+
+    void nfs41_operation(const struct NFS41::COMMIT4args*               args);
+    void nfs41_operation(const struct NFS41::COMMIT4res*                res );
+
+    void nfs41_operation(const struct NFS41::CREATE4args*               args);
+    void nfs41_operation(const struct NFS41::CREATE4res*                res );
+
+    void nfs41_operation(const struct NFS41::DELEGPURGE4args*           args);
+    void nfs41_operation(const struct NFS41::DELEGPURGE4res*            res );
+
+    void nfs41_operation(const struct NFS41::DELEGRETURN4args*          args);
+    void nfs41_operation(const struct NFS41::DELEGRETURN4res*           res );
+
+    void nfs41_operation(const struct NFS41::GETATTR4args*              args);
+    void nfs41_operation(const struct NFS41::GETATTR4res*               res );
+
+    void nfs41_operation(const struct NFS41::LINK4args*                 args);
+    void nfs41_operation(const struct NFS41::LINK4res*                  res );
+
+    void nfs41_operation(const struct NFS41::LOCK4args*                 args);
+    void nfs41_operation(const struct NFS41::LOCK4res*                  res );
+
+    void nfs41_operation(const struct NFS41::LOCKT4args*                args);
+    void nfs41_operation(const struct NFS41::LOCKT4res*                 res );
+
+    void nfs41_operation(const struct NFS41::LOCKU4args*                args);
+    void nfs41_operation(const struct NFS41::LOCKU4res*                 res );
+
+    void nfs41_operation(const struct NFS41::LOOKUP4args*               args);
+    void nfs41_operation(const struct NFS41::LOOKUP4res*                res );
+
+    void nfs41_operation(const struct NFS41::NVERIFY4args*              args);
+    void nfs41_operation(const struct NFS41::NVERIFY4res*               res );
+
+    void nfs41_operation(const struct NFS41::OPEN4args*                 args);
+    void nfs41_operation(const struct NFS41::OPEN4res*                  res );
+
+    void nfs41_operation(const struct NFS41::OPENATTR4args*             args);
+    void nfs41_operation(const struct NFS41::OPENATTR4res*              res );
+
+    void nfs41_operation(const struct NFS41::OPEN_CONFIRM4args*         args);
+    void nfs41_operation(const struct NFS41::OPEN_CONFIRM4res*          res );
+
+    void nfs41_operation(const struct NFS41::OPEN_DOWNGRADE4args*       args);
+    void nfs41_operation(const struct NFS41::OPEN_DOWNGRADE4res*        res );
+
+    void nfs41_operation(const struct NFS41::PUTFH4args*                args);
+    void nfs41_operation(const struct NFS41::PUTFH4res*                 res );
+
+    void nfs41_operation(const struct NFS41::READ4args*                 args);
+    void nfs41_operation(const struct NFS41::READ4res*                  res );
+
+    void nfs41_operation(const struct NFS41::READDIR4args*              args);
+    void nfs41_operation(const struct NFS41::READDIR4res*               res );
+
+    void nfs41_operation(const struct NFS41::REMOVE4args*               args);
+    void nfs41_operation(const struct NFS41::REMOVE4res*                res );
+
+    void nfs41_operation(const struct NFS41::RENAME4args*               args);
+    void nfs41_operation(const struct NFS41::RENAME4res*                res );
+
+    void nfs41_operation(const struct NFS41::RENEW4args*                args);
+    void nfs41_operation(const struct NFS41::RENEW4res*                 res );
+
+    void nfs41_operation(const struct NFS41::SECINFO4args*              args);
+    void nfs41_operation(const struct NFS41::SECINFO4res*               res );
+
+    void nfs41_operation(const struct NFS41::SETATTR4args*              args);
+    void nfs41_operation(const struct NFS41::SETATTR4res*               res );
+
+    void nfs41_operation(const struct NFS41::SETCLIENTID4args*          args);
+    void nfs41_operation(const struct NFS41::SETCLIENTID4res*           res );
+
+    void nfs41_operation(const struct NFS41::SETCLIENTID_CONFIRM4args*  args);
+    void nfs41_operation(const struct NFS41::SETCLIENTID_CONFIRM4res*   res );
+
+    void nfs41_operation(const struct NFS41::VERIFY4args*               args);
+    void nfs41_operation(const struct NFS41::VERIFY4res*                res );
+
+    void nfs41_operation(const struct NFS41::WRITE4args*                args);
+    void nfs41_operation(const struct NFS41::WRITE4res*                 res );
+
+    void nfs41_operation(const struct NFS41::RELEASE_LOCKOWNER4args*    args);
+    void nfs41_operation(const struct NFS41::RELEASE_LOCKOWNER4res*     res );
+
+    void nfs41_operation(const struct NFS41::BACKCHANNEL_CTL4args*      args);
+    void nfs41_operation(const struct NFS41::BACKCHANNEL_CTL4res*       res );
+
+    void nfs41_operation(const struct NFS41::BIND_CONN_TO_SESSION4args* args);
+    void nfs41_operation(const struct NFS41::BIND_CONN_TO_SESSION4res*  res );
+
+    void nfs41_operation(const struct NFS41::EXCHANGE_ID4args*          args);
+    void nfs41_operation(const struct NFS41::EXCHANGE_ID4res*           res );
+
+    void nfs41_operation(const struct NFS41::CREATE_SESSION4args*       args);
+    void nfs41_operation(const struct NFS41::CREATE_SESSION4res*        res );
+
+    void nfs41_operation(const struct NFS41::DESTROY_SESSION4args*      args);
+    void nfs41_operation(const struct NFS41::DESTROY_SESSION4res*       res );
+
+    void nfs41_operation(const struct NFS41::FREE_STATEID4args*         args);
+    void nfs41_operation(const struct NFS41::FREE_STATEID4res*          res );
+
+    void nfs41_operation(const struct NFS41::GET_DIR_DELEGATION4args*   args);
+    void nfs41_operation(const struct NFS41::GET_DIR_DELEGATION4res*    res );
+
+    void nfs41_operation(const struct NFS41::GETDEVICEINFO4args*        args);
+    void nfs41_operation(const struct NFS41::GETDEVICEINFO4res*         res );
+
+    void nfs41_operation(const struct NFS41::GETDEVICELIST4args*        args);
+    void nfs41_operation(const struct NFS41::GETDEVICELIST4res*         res );
+
+    void nfs41_operation(const struct NFS41::LAYOUTCOMMIT4args*         args);
+    void nfs41_operation(const struct NFS41::LAYOUTCOMMIT4res*          res );
+
+    void nfs41_operation(const struct NFS41::LAYOUTGET4args*            args);
+    void nfs41_operation(const struct NFS41::LAYOUTGET4res*             res );
+
+    void nfs41_operation(const struct NFS41::LAYOUTRETURN4args*         args);
+    void nfs41_operation(const struct NFS41::LAYOUTRETURN4res*          res );
+
+    void nfs41_operation(const enum NFS41::secinfo_style4*              args);
+
+    void nfs41_operation(const struct NFS41::SEQUENCE4args*             args);
+    void nfs41_operation(const struct NFS41::SEQUENCE4res*              res );
+
+    void nfs41_operation(const struct NFS41::SET_SSV4args*              args);
+    void nfs41_operation(const struct NFS41::SET_SSV4res*               res );
+
+    void nfs41_operation(const struct NFS41::TEST_STATEID4args*         args);
+    void nfs41_operation(const struct NFS41::TEST_STATEID4res*          res );
+
+    void nfs41_operation(const struct NFS41::WANT_DELEGATION4args*      args);
+    void nfs41_operation(const struct NFS41::WANT_DELEGATION4res*       res );
+
+    void nfs41_operation(const struct NFS41::DESTROY_CLIENTID4args*     args);
+    void nfs41_operation(const struct NFS41::DESTROY_CLIENTID4res*      res );
+
+    void nfs41_operation(const struct NFS41::RECLAIM_COMPLETE4args*     args);
+    void nfs41_operation(const struct NFS41::RECLAIM_COMPLETE4res*      res );
+
+    void nfs41_operation(const struct NFS41::GETFH4res*                 res);
+
+    void nfs41_operation(const struct NFS41::LOOKUPP4res*               res);
+
+    void nfs41_operation(const struct NFS41::PUTPUBFH4res*              res);
+
+    void nfs41_operation(const struct NFS41::PUTROOTFH4res*             res);
+
+    void nfs41_operation(const struct NFS41::READLINK4res*              res);
+
+    void nfs41_operation(const struct NFS41::RESTOREFH4res*             res);
+
+    void nfs41_operation(const struct NFS41::SAVEFH4res*                res);
+
+    void nfs41_operation(const struct NFS41::ILLEGAL4res*               res);
+
     void flush_statistics() override final;
 
 private:
