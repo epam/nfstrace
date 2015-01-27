@@ -22,6 +22,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <arpa/inet.h>
+
 #include "analysis/analyzers.h"
 #include "analysis/cifs_parser.h"
 #include "api/cifs_types.h"
@@ -42,24 +44,22 @@ namespace
 class PluginMock : public IAnalyzer
 {
 public:
-
-
     // ISMBv2 interface
-public:
     MOCK_METHOD3(readSMBv2, void(const SMBv2::ReadCommand *, const NST::API::SMBv2::ReadRequest *, const NST::API::SMBv2::ReadResponse *));
 
     // IAnalyzer interface
-public:
     void flush_statistics() {}
 };
 
-}
 
+PluginMock* pluginMock;// pointer to mock
+}
+//------------------------------------------------------------------------------
 Analyzers::Analyzers(const controller::Parameters& /*params*/)
 {
-    //this->modules.push_back(&mock);
+    this->modules.push_back(pluginMock);
 }
-
+//------------------------------------------------------------------------------
 Parameters::Parameters(int /*argc*/, char** /*argv*/) {}
 
 Parameters::~Parameters() {}
@@ -74,42 +74,42 @@ bool Parameters::show_enum() const
     return false;
 }
 
-const std::string&  Parameters::program_name() const
+const std::string& Parameters::program_name() const
 {
     static std::string s("");
     return s;
 }
 
-RunningMode         Parameters::running_mode() const
+RunningMode Parameters::running_mode() const
 {
     return RunningMode::Analysis;
 }
 
-std::string         Parameters::input_file() const
+std::string Parameters::input_file() const
 {
     return "";
 }
 
-const std::string   Parameters::dropuser() const
+const std::string Parameters::dropuser() const
 {
     return "";
 }
 
-const std::string   Parameters::log_path() const
+const std::string Parameters::log_path() const
 {
     return "";
 }
 
-unsigned short      Parameters::queue_capacity() const
+unsigned short Parameters::queue_capacity() const
 {
     return 0;
 }
 
-bool                Parameters::trace() const
+bool Parameters::trace() const
 {
     return false;
 }
-int                 Parameters::verbose_level() const
+int Parameters::verbose_level() const
 {
     return 0;
 }
@@ -155,11 +155,37 @@ PluginInstance::~PluginInstance() {}
 //------------------------------------------------------------------------------
 TEST(Parser, CIFSAsyncParser)
 {
+    pluginMock = new PluginMock;
+
     NST::controller::Parameters params(0, nullptr);
     Analyzers analyzers(params);
 
+    NST::utils::FilteredDataQueue queue(1, 1);
+    NST::utils::FilteredData* data = queue.allocate();
+    NetworkSession s;
+    data->session = &s;
+    queue.push(data);
+    NST::utils::FilteredDataQueue::List list(queue);
+    NST::utils::FilteredDataQueue::Ptr el = list.get_current();
+
+    CIFSv2::MessageHeader header;
+    header.head_code =  0x424d53fe;// Protocol's marker
+    header.cmd_code = CIFSv2::Commands::READ;
+    header.flags = static_cast<uint32_t>(CIFSv2::Flags::ASYNC_COMMAND);
+
+    el->data = reinterpret_cast<uint8_t*>(&header);
+    el->dlen = sizeof(header);
+
     CIFSParser parser(analyzers);
+
     // Set conditions
+    EXPECT_CALL(*pluginMock, readSMBv2(_, _, _))
+    .Times(1);
+
+    // Do
+    parser.parse_data(el);
+
+    delete pluginMock;
 }
 //------------------------------------------------------------------------------
 
