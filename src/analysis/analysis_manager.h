@@ -25,10 +25,11 @@
 #include <memory>
 
 #include "analysis/analyzers.h"
-#include "analysis/nfs_parser_thread.h"
+#include "analysis/parser_thread.h"
 #include "controller/parameters.h"
 #include "controller/running_status.h"
 #include "utils/filtered_data.h"
+#include "analysis/parsers.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -58,7 +59,7 @@ public:
 private:
     std::unique_ptr<Analyzers> analysiss;
     std::unique_ptr<FilteredDataQueue> queue;
-    std::unique_ptr<NFSParserThread> parser_thread;
+    std::unique_ptr<ParserThread<Parsers>> parser_thread;
 };
 
 } // namespace analysis

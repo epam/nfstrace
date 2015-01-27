@@ -182,133 +182,133 @@ protected:
         // Setting up analyzer (NFSv3)
         for (int i = 0; i < NfsV3NullProcsAmount; ++i)
         {
-            analyzer->null(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->null(static_cast<const RPCProcedure*>(nullptr),
                            static_cast<const struct NFS3::NULL3args*>(nullptr),
                            static_cast<const struct NFS3::NULL3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3GetattrProcsAmount; ++i)
         {
-            analyzer->getattr3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->getattr3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS3::GETATTR3args*>(nullptr),
                                static_cast<const struct NFS3::GETATTR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3SetattrProcsAmount; ++i)
         {
-            analyzer->setattr3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->setattr3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS3::SETATTR3args*>(nullptr),
                                static_cast<const struct NFS3::SETATTR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3LookupProcsAmount; ++i)
         {
-            analyzer->lookup3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->lookup3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::LOOKUP3args*>(nullptr),
                               static_cast<const struct NFS3::LOOKUP3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3AccessProcsAmount; ++i)
         {
-            analyzer->access3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->access3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::ACCESS3args*>(nullptr),
                               static_cast<const struct NFS3::ACCESS3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReadlinkProcsAmount; ++i)
         {
-            analyzer->readlink3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readlink3(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS3::READLINK3args*>(nullptr),
                                 static_cast<const struct NFS3::READLINK3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReadProcsAmount; ++i)
         {
-            analyzer->read3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->read3(static_cast<const RPCProcedure*>(nullptr),
                             static_cast<const struct NFS3::READ3args*>(nullptr),
                             static_cast<const struct NFS3::READ3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3WriteProcsAmount; ++i)
         {
-            analyzer->write3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->write3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS3::WRITE3args*>(nullptr),
                              static_cast<const struct NFS3::WRITE3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3CreateProcsAmount; ++i)
         {
-            analyzer->create3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->create3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::CREATE3args*>(nullptr),
                               static_cast<const struct NFS3::CREATE3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3MkdirProcsAmount; ++i)
         {
-            analyzer->mkdir3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->mkdir3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS3::MKDIR3args*>(nullptr),
                              static_cast<const struct NFS3::MKDIR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3SymlinkProcsAmount; ++i)
         {
-            analyzer->symlink3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->symlink3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS3::SYMLINK3args*>(nullptr),
                                static_cast<const struct NFS3::SYMLINK3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3MknodProcsAmount; ++i)
         {
-            analyzer->mknod3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->mknod3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS3::MKNOD3args*>(nullptr),
                              static_cast<const struct NFS3::MKNOD3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3RemoveProcsAmount; ++i)
         {
-            analyzer->remove3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->remove3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::REMOVE3args*>(nullptr),
                               static_cast<const struct NFS3::REMOVE3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3RmdirProcsAmount; ++i)
         {
-            analyzer->rmdir3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->rmdir3(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS3::RMDIR3args*>(nullptr),
                              static_cast<const struct NFS3::RMDIR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3RenameProcsAmount; ++i)
         {
-            analyzer->rename3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->rename3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::RENAME3args*>(nullptr),
                               static_cast<const struct NFS3::RENAME3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3LinkProcsAmount; ++i)
         {
-            analyzer->link3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->link3(static_cast<const RPCProcedure*>(nullptr),
                             static_cast<const struct NFS3::LINK3args*>(nullptr),
                             static_cast<const struct NFS3::LINK3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReaddirProcsAmount; ++i)
         {
-            analyzer->readdir3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readdir3(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS3::READDIR3args*>(nullptr),
                                static_cast<const struct NFS3::READDIR3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3ReaddirplusProcsAmount; ++i)
         {
-            analyzer->readdirplus3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readdirplus3(static_cast<const RPCProcedure*>(nullptr),
                                    static_cast<const struct NFS3::READDIRPLUS3args*>(nullptr),
                                    static_cast<const struct NFS3::READDIRPLUS3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3FsstatProcsAmount; ++i)
         {
-            analyzer->fsstat3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->fsstat3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::FSSTAT3args*>(nullptr),
                               static_cast<const struct NFS3::FSSTAT3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3FsinfoProcsAmount; ++i)
         {
-            analyzer->fsinfo3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->fsinfo3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::FSINFO3args*>(nullptr),
                               static_cast<const struct NFS3::FSINFO3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3PathconfProcsAmount; ++i)
         {
-            analyzer->pathconf3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->pathconf3(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS3::PATHCONF3args*>(nullptr),
                                 static_cast<const struct NFS3::PATHCONF3res*>(nullptr));
         }
         for (int i = 0; i < NfsV3CommitProcsAmount; ++i)
         {
-            analyzer->commit3(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->commit3(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS3::COMMIT3args*>(nullptr),
                               static_cast<const struct NFS3::COMMIT3res*>(nullptr));
         }
@@ -316,13 +316,13 @@ protected:
         // Setting up analyzer (NFSv4.0 procedures)
         for (int i = 0; i < NfsV40NullProcsAmount; ++i)
         {
-            analyzer->null(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->null(static_cast<const RPCProcedure*>(nullptr),
                            static_cast<const struct NFS4::NULL4args*>(nullptr),
                            static_cast<const struct NFS4::NULL4res*>(nullptr));
         }
         for (int i = 0; i < NfsV40CompoundProcsAmount; ++i)
         {
-            analyzer->compound4(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->compound4(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS4::COMPOUND4args*>(nullptr),
                                 static_cast<const struct NFS4::COMPOUND4res*>(nullptr));
         }
@@ -331,279 +331,279 @@ protected:
         const struct NFS4::ACCESS4res access40 {};
         for (int i = 0; i < NfsV40accessOpsAmount; ++i)
         {
-            analyzer->access40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->access40(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS4::ACCESS4args*>(nullptr),
                                &access40);
         }
         const struct NFS4::CLOSE4res close40 {};
         for (int i = 0; i < NfsV40closeOpsAmount; ++i)
         {
-            analyzer->close40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->close40(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS4::CLOSE4args*>(nullptr),
                               &close40);
         }
         const struct NFS4::COMMIT4res commit40 {};
         for (int i = 0; i < NfsV40commitOpsAmount; ++i)
         {
-            analyzer->commit40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->commit40(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS4::COMMIT4args*>(nullptr),
                                &commit40);
         }
         const struct NFS4::CREATE4res create40 {};
         for (int i = 0; i < NfsV40createOpsAmount; ++i)
         {
-            analyzer->create40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->create40(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS4::CREATE4args*>(nullptr),
                                &create40);
         }
         const struct NFS4::DELEGPURGE4res delegpurge40 {};
         for (int i = 0; i < NfsV40delegpurgeOpsAmount; ++i)
         {
-            analyzer->delegpurge40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->delegpurge40(static_cast<const RPCProcedure*>(nullptr),
                                    static_cast<const struct NFS4::DELEGPURGE4args*>(nullptr),
                                    &delegpurge40);
         }
         const struct NFS4::DELEGRETURN4res delegreturn40 {};
         for (int i = 0; i < NfsV40delegreturnOpsAmount; ++i)
         {
-            analyzer->delegreturn40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->delegreturn40(static_cast<const RPCProcedure*>(nullptr),
                                     static_cast<const struct NFS4::DELEGRETURN4args*>(nullptr),
                                     &delegreturn40);
         }
         const struct NFS4::GETATTR4res getattr40 {};
         for (int i = 0; i < NfsV40getattrOpsAmount; ++i)
         {
-            analyzer->getattr40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->getattr40(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS4::GETATTR4args*>(nullptr),
                                 &getattr40);
         }
         const struct NFS4::GETFH4res getfh40 {};
         for (int i = 0; i < NfsV40getfhOpsAmount; ++i)
         {
-            analyzer->getfh40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->getfh40(static_cast<const RPCProcedure*>(nullptr),
                               &getfh40);
         }
         const struct NFS4::LINK4res link40 {};
         for (int i = 0; i < NfsV40linkOpsAmount; ++i)
         {
-            analyzer->link40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->link40(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS4::LINK4args*>(nullptr),
                              &link40);
         }
         const struct NFS4::LOCK4res lock40 {};
         for (int i = 0; i < NfsV40lockOpsAmount; ++i)
         {
-            analyzer->lock40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->lock40(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS4::LOCK4args*>(nullptr),
                              &lock40);
         }
         const struct NFS4::LOCKT4res lockt40 {};
         for (int i = 0; i < NfsV40locktOpsAmount; ++i)
         {
-            analyzer->lockt40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->lockt40(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS4::LOCKT4args*>(nullptr),
                               &lockt40);
         }
         const struct NFS4::LOCKU4res locku40 {};
         for (int i = 0; i < NfsV40lockuOpsAmount; ++i)
         {
-            analyzer->locku40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->locku40(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS4::LOCKU4args*>(nullptr),
                               &locku40);
         }
         const struct NFS4::LOOKUP4res lookup40 {};
         for (int i = 0; i < NfsV40lookupOpsAmount; ++i)
         {
-            analyzer->lookup40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->lookup40(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS4::LOOKUP4args*>(nullptr),
                                &lookup40);
         }
         const struct NFS4::LOOKUPP4res lookupp40 {};
         for (int i = 0; i < NfsV40lookuppOpsAmount; ++i)
         {
-            analyzer->lookupp40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->lookupp40(static_cast<const RPCProcedure*>(nullptr),
                                 &lookupp40);
         }
         const struct NFS4::NVERIFY4res nverify40 {};
         for (int i = 0; i < NfsV40nverifyOpsAmount; ++i)
         {
-            analyzer->nverify40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->nverify40(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS4::NVERIFY4args*>(nullptr),
                                 &nverify40);
         }
         const struct NFS4::OPEN4res open40 {};
         for (int i = 0; i < NfsV40openOpsAmount; ++i)
         {
-            analyzer->open40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->open40(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS4::OPEN4args*>(nullptr),
                              &open40);
         }
         const struct NFS4::OPENATTR4res openattr40 {};
         for (int i = 0; i < NfsV40openattrOpsAmount; ++i)
         {
-            analyzer->openattr40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->openattr40(static_cast<const RPCProcedure*>(nullptr),
                                  static_cast<const struct NFS4::OPENATTR4args*>(nullptr),
                                  &openattr40);
         }
         const struct NFS4::OPEN_CONFIRM4res open_confirm40 {};
         for (int i = 0; i < NfsV40open_confirmOpsAmount; ++i)
         {
-            analyzer->open_confirm40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->open_confirm40(static_cast<const RPCProcedure*>(nullptr),
                                      static_cast<const struct NFS4::OPEN_CONFIRM4args*>(nullptr),
                                      &open_confirm40);
         }
         const struct NFS4::OPEN_DOWNGRADE4res open_downgrade40 {};
         for (int i = 0; i < NfsV40open_downgradeOpsAmount; ++i)
         {
-            analyzer->open_downgrade40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->open_downgrade40(static_cast<const RPCProcedure*>(nullptr),
                                        static_cast<const struct NFS4::OPEN_DOWNGRADE4args*>(nullptr),
                                        &open_downgrade40);
         }
         const struct NFS4::PUTFH4res putfh40 {};
         for (int i = 0; i < NfsV40putfhOpsAmount; ++i)
         {
-            analyzer->putfh40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->putfh40(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS4::PUTFH4args*>(nullptr),
                               &putfh40);
         }
         const struct NFS4::PUTPUBFH4res putpubfh40 {};
         for (int i = 0; i < NfsV40putpubfhOpsAmount; ++i)
         {
-            analyzer->putpubfh40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->putpubfh40(static_cast<const RPCProcedure*>(nullptr),
                                  &putpubfh40);
         }
         const struct NFS4::PUTROOTFH4res putrootfh40 {};
         for (int i = 0; i < NfsV40putrootfhOpsAmount; ++i)
         {
-            analyzer->putrootfh40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->putrootfh40(static_cast<const RPCProcedure*>(nullptr),
                                   &putrootfh40);
         }
         const struct NFS4::READ4res read40 {};
         for (int i = 0; i < NfsV40readOpsAmount; ++i)
         {
-            analyzer->read40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->read40(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS4::READ4args*>(nullptr),
                              &read40);
         }
         const struct NFS4::READDIR4res readdir40 {};
         for (int i = 0; i < NfsV40readdirOpsAmount; ++i)
         {
-            analyzer->readdir40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readdir40(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS4::READDIR4args*>(nullptr),
                                 &readdir40);
         }
         const struct NFS4::READLINK4res readlink40 {};
         for (int i = 0; i < NfsV40readlinkOpsAmount; ++i)
         {
-            analyzer->readlink40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readlink40(static_cast<const RPCProcedure*>(nullptr),
                                  &readlink40);
         }
         const struct NFS4::REMOVE4res remove40 {};
         for (int i = 0; i < NfsV40removeOpsAmount; ++i)
         {
-            analyzer->remove40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->remove40(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS4::REMOVE4args*>(nullptr),
                                &remove40);
         }
         const struct NFS4::RENAME4res rename40 {};
         for (int i = 0; i < NfsV40renameOpsAmount; ++i)
         {
-            analyzer->rename40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->rename40(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS4::RENAME4args*>(nullptr),
                                &rename40);
         }
         const struct NFS4::RENEW4res renew40 {};
         for (int i = 0; i < NfsV40renewOpsAmount; ++i)
         {
-            analyzer->renew40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->renew40(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS4::RENEW4args*>(nullptr),
                               &renew40);
         }
         const struct NFS4::RESTOREFH4res restorefh40 {};
         for (int i = 0; i < NfsV40restorefhOpsAmount; ++i)
         {
-            analyzer->restorefh40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->restorefh40(static_cast<const RPCProcedure*>(nullptr),
                               &restorefh40);
         }
         const struct NFS4::SAVEFH4res savefh40 {};
         for (int i = 0; i < NfsV40savefhOpsAmount; ++i)
         {
-            analyzer->savefh40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->savefh40(static_cast<const RPCProcedure*>(nullptr),
                                &savefh40);
         }
         const struct NFS4::SECINFO4res secinfo40 {};
         for (int i = 0; i < NfsV40secinfoOpsAmount; ++i)
         {
-            analyzer->secinfo40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->secinfo40(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS4::SECINFO4args*>(nullptr),
                                 &secinfo40);
         }
         const struct NFS4::SETATTR4res setattr40 {};
         for (int i = 0; i < NfsV40setattrOpsAmount; ++i)
         {
-            analyzer->setattr40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->setattr40(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS4::SETATTR4args*>(nullptr),
                                 &setattr40);
         }
         const struct NFS4::SETCLIENTID4res setclientid40 {};
         for (int i = 0; i < NfsV40setclientidOpsAmount; ++i)
         {
-            analyzer->setclientid40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->setclientid40(static_cast<const RPCProcedure*>(nullptr),
                                     static_cast<const struct NFS4::SETCLIENTID4args*>(nullptr),
                                     &setclientid40);
         }
         const struct NFS4::SETCLIENTID_CONFIRM4res setclientid_confirm40 {};
         for (int i = 0; i < NfsV40setclientid_confirmOpsAmount; ++i)
         {
-            analyzer->setclientid_confirm40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->setclientid_confirm40(static_cast<const RPCProcedure*>(nullptr),
                                             static_cast<const struct NFS4::SETCLIENTID_CONFIRM4args*>(nullptr),
                                             &setclientid_confirm40);
         }
         const struct NFS4::VERIFY4res verify40 {};
         for (int i = 0; i < NfsV40verifyOpsAmount; ++i)
         {
-            analyzer->verify40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->verify40(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS4::VERIFY4args*>(nullptr),
                                &verify40);
         }
         const struct NFS4::WRITE4res write40 {};
         for (int i = 0; i < NfsV40writeOpsAmount; ++i)
         {
-            analyzer->write40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->write40(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS4::WRITE4args*>(nullptr),
                               &write40);
         }
         const struct NFS4::RELEASE_LOCKOWNER4res release_lockowner40 {};
         for (int i = 0; i < NfsV40release_lockownerOpsAmount; ++i)
         {
-            analyzer->release_lockowner40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->release_lockowner40(static_cast<const RPCProcedure*>(nullptr),
                                           static_cast<const struct NFS4::RELEASE_LOCKOWNER4args*>(nullptr),
                                           &release_lockowner40);
         }
         const struct NFS4::GET_DIR_DELEGATION4res get_dir_delegation40 {};
         for (int i = 0; i < NfsV40get_dir_delegationOpsAmount; ++i)
         {
-            analyzer->get_dir_delegation40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->get_dir_delegation40(static_cast<const RPCProcedure*>(nullptr),
                                            static_cast<const struct NFS4::GET_DIR_DELEGATION4args*>(nullptr),
                                            &get_dir_delegation40);
         }
         const struct NFS4::ILLEGAL4res illegal40 {};
         for (int i = 0; i < NfsV40illegalOpsAmount; ++i)
         {
-            analyzer->illegal40(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->illegal40(static_cast<const RPCProcedure*>(nullptr),
                                 &illegal40);
         }
 
         // Setting up analyzer (NFSv4.1 procedures)
         for (int i = 0; i < NfsV41NullProcsAmount; ++i)
         {
-            analyzer->null41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->null41(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS41::NULL4args*>(nullptr),
                              static_cast<const struct NFS41::NULL4res*>(nullptr));
         }
         for (int i = 0; i < NfsV41CompoundProcsAmount; ++i)
         {
-            analyzer->compound41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->compound41(static_cast<const RPCProcedure*>(nullptr),
                                  static_cast<const struct NFS41::COMPOUND4args*>(nullptr),
                                  static_cast<const struct NFS41::COMPOUND4res*>(nullptr));
         }
@@ -612,392 +612,392 @@ protected:
         const struct NFS41::ACCESS4res access41 {};
         for (int i = 0; i < NfsV41accessOpsAmount; ++i)
         {
-            analyzer->access41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->access41(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS41::ACCESS4args*>(nullptr),
                                &access41);
         }
         const struct NFS41::CLOSE4res close41 {};
         for (int i = 0; i < NfsV41closeOpsAmount; ++i)
         {
-            analyzer->close41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->close41(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS41::CLOSE4args*>(nullptr),
                               &close41);
         }
         const struct NFS41::COMMIT4res commit41 {};
         for (int i = 0; i < NfsV41commitOpsAmount; ++i)
         {
-            analyzer->commit41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->commit41(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS41::COMMIT4args*>(nullptr),
                                &commit41);
         }
         const struct NFS41::CREATE4res create41 {};
         for (int i = 0; i < NfsV41createOpsAmount; ++i)
         {
-            analyzer->create41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->create41(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS41::CREATE4args*>(nullptr),
                                &create41);
         }
         const struct NFS41::DELEGPURGE4res delegpurge41 {};
         for (int i = 0; i < NfsV41delegpurgeOpsAmount; ++i)
         {
-            analyzer->delegpurge41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->delegpurge41(static_cast<const RPCProcedure*>(nullptr),
                                    static_cast<const struct NFS41::DELEGPURGE4args*>(nullptr),
                                    &delegpurge41);
         }
         const struct NFS41::DELEGRETURN4res delegreturn41 {};
         for (int i = 0; i < NfsV41delegreturnOpsAmount; ++i)
         {
-            analyzer->delegreturn41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->delegreturn41(static_cast<const RPCProcedure*>(nullptr),
                                     static_cast<const struct NFS41::DELEGRETURN4args*>(nullptr),
                                     &delegreturn41);
         }
         const struct NFS41::GETATTR4res getattr41 {};
         for (int i = 0; i < NfsV41getattrOpsAmount; ++i)
         {
-            analyzer->getattr41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->getattr41(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS41::GETATTR4args*>(nullptr),
                                 &getattr41);
         }
         const struct NFS41::GETFH4res getfh41 {};
         for (int i = 0; i < NfsV41getfhOpsAmount; ++i)
         {
-            analyzer->getfh41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->getfh41(static_cast<const RPCProcedure*>(nullptr),
                               &getfh41);
         }
         const struct NFS41::LINK4res link41 {};
         for (int i = 0; i < NfsV41linkOpsAmount; ++i)
         {
-            analyzer->link41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->link41(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS41::LINK4args*>(nullptr),
                              &link41);
         }
         const struct NFS41::LOCK4res lock41 {};
         for (int i = 0; i < NfsV41lockOpsAmount; ++i)
         {
-            analyzer->lock41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->lock41(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS41::LOCK4args*>(nullptr),
                              &lock41);
         }
         const struct NFS41::LOCKT4res lockt41 {};
         for (int i = 0; i < NfsV41locktOpsAmount; ++i)
         {
-            analyzer->lockt41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->lockt41(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS41::LOCKT4args*>(nullptr),
                               &lockt41);
         }
         const struct NFS41::LOCKU4res locku41 {};
         for (int i = 0; i < NfsV41lockuOpsAmount; ++i)
         {
-            analyzer->locku41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->locku41(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS41::LOCKU4args*>(nullptr),
                               &locku41);
         }
         const struct NFS41::LOOKUP4res lookup41 {};
         for (int i = 0; i < NfsV41lookupOpsAmount; ++i)
         {
-            analyzer->lookup41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->lookup41(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS41::LOOKUP4args*>(nullptr),
                                &lookup41);
         }
         const struct NFS41::LOOKUPP4res lookupp41 {};
         for (int i = 0; i < NfsV41lookuppOpsAmount; ++i)
         {
-            analyzer->lookupp41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->lookupp41(static_cast<const RPCProcedure*>(nullptr),
                                 &lookupp41);
         }
         const struct NFS41::NVERIFY4res nverify41 {};
         for (int i = 0; i < NfsV41nverifyOpsAmount; ++i)
         {
-            analyzer->nverify41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->nverify41(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS41::NVERIFY4args*>(nullptr),
                                 &nverify41);
         }
         const struct NFS41::OPEN4res open41 {};
         for (int i = 0; i < NfsV41openOpsAmount; ++i)
         {
-            analyzer->open41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->open41(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS41::OPEN4args*>(nullptr),
                              &open41);
         }
         const struct NFS41::OPENATTR4res openattr41 {};
         for (int i = 0; i < NfsV41openattrOpsAmount; ++i)
         {
-            analyzer->openattr41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->openattr41(static_cast<const RPCProcedure*>(nullptr),
                                  static_cast<const struct NFS41::OPENATTR4args*>(nullptr),
                                  &openattr41);
         }
         const struct NFS41::OPEN_CONFIRM4res open_confirm41 {};
         for (int i = 0; i < NfsV41open_confirmOpsAmount; ++i)
         {
-            analyzer->open_confirm41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->open_confirm41(static_cast<const RPCProcedure*>(nullptr),
                                      static_cast<const struct NFS41::OPEN_CONFIRM4args*>(nullptr),
                                      &open_confirm41);
         }
         const struct NFS41::OPEN_DOWNGRADE4res open_downgrade41 {};
         for (int i = 0; i < NfsV41open_downgradeOpsAmount; ++i)
         {
-            analyzer->open_downgrade41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->open_downgrade41(static_cast<const RPCProcedure*>(nullptr),
                                        static_cast<const struct NFS41::OPEN_DOWNGRADE4args*>(nullptr),
                                        &open_downgrade41);
         }
         const struct NFS41::PUTFH4res putfh41 {};
         for (int i = 0; i < NfsV41putfhOpsAmount; ++i)
         {
-            analyzer->putfh41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->putfh41(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS41::PUTFH4args*>(nullptr),
                               &putfh41);
         }
         const struct NFS41::PUTPUBFH4res putpubfh41 {};
         for (int i = 0; i < NfsV41putpubfhOpsAmount; ++i)
         {
-            analyzer->putpubfh41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->putpubfh41(static_cast<const RPCProcedure*>(nullptr),
                                  &putpubfh41);
         }
         const struct NFS41::PUTROOTFH4res putrootfh41 {};
         for (int i = 0; i < NfsV41putrootfhOpsAmount; ++i)
         {
-            analyzer->putrootfh41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->putrootfh41(static_cast<const RPCProcedure*>(nullptr),
                                   &putrootfh41);
         }
         const struct NFS41::READ4res read41 {};
         for (int i = 0; i < NfsV41readOpsAmount; ++i)
         {
-            analyzer->read41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->read41(static_cast<const RPCProcedure*>(nullptr),
                              static_cast<const struct NFS41::READ4args*>(nullptr),
                              &read41);
         }
         const struct NFS41::READDIR4res readdir41 {};
         for (int i = 0; i < NfsV41readdirOpsAmount; ++i)
         {
-            analyzer->readdir41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readdir41(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS41::READDIR4args*>(nullptr),
                                 &readdir41);
         }
         const struct NFS41::READLINK4res readlink41 {};
         for (int i = 0; i < NfsV41readlinkOpsAmount; ++i)
         {
-            analyzer->readlink41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->readlink41(static_cast<const RPCProcedure*>(nullptr),
                                  &readlink41);
         }
         const struct NFS41::REMOVE4res remove41 {};
         for (int i = 0; i < NfsV41removeOpsAmount; ++i)
         {
-            analyzer->remove41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->remove41(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS41::REMOVE4args*>(nullptr),
                                &remove41);
         }
         const struct NFS41::RENAME4res rename41 {};
         for (int i = 0; i < NfsV41renameOpsAmount; ++i)
         {
-            analyzer->rename41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->rename41(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS41::RENAME4args*>(nullptr),
                                &rename41);
         }
         const struct NFS41::RENEW4res renew41 {};
         for (int i = 0; i < NfsV41renewOpsAmount; ++i)
         {
-            analyzer->renew41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->renew41(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS41::RENEW4args*>(nullptr),
                               &renew41);
         }
         const struct NFS41::RESTOREFH4res restorefh41 {};
         for (int i = 0; i < NfsV41restorefhOpsAmount; ++i)
         {
-            analyzer->restorefh41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->restorefh41(static_cast<const RPCProcedure*>(nullptr),
                               &restorefh41);
         }
         const struct NFS41::SAVEFH4res savefh41 {};
         for (int i = 0; i < NfsV41savefhOpsAmount; ++i)
         {
-            analyzer->savefh41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->savefh41(static_cast<const RPCProcedure*>(nullptr),
                                &savefh41);
         }
         const struct NFS41::SECINFO4res secinfo41 {};
         for (int i = 0; i < NfsV41secinfoOpsAmount; ++i)
         {
-            analyzer->secinfo41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->secinfo41(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS41::SECINFO4args*>(nullptr),
                                 &secinfo41);
         }
         const struct NFS41::SETATTR4res setattr41 {};
         for (int i = 0; i < NfsV41setattrOpsAmount; ++i)
         {
-            analyzer->setattr41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->setattr41(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS41::SETATTR4args*>(nullptr),
                                 &setattr41);
         }
         const struct NFS41::SETCLIENTID4res setclientid41 {};
         for (int i = 0; i < NfsV41setclientidOpsAmount; ++i)
         {
-            analyzer->setclientid41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->setclientid41(static_cast<const RPCProcedure*>(nullptr),
                                     static_cast<const struct NFS41::SETCLIENTID4args*>(nullptr),
                                     &setclientid41);
         }
         const struct NFS41::SETCLIENTID_CONFIRM4res setclientid_confirm41 {};
         for (int i = 0; i < NfsV41setclientid_confirmOpsAmount; ++i)
         {
-            analyzer->setclientid_confirm41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->setclientid_confirm41(static_cast<const RPCProcedure*>(nullptr),
                                             static_cast<const struct NFS41::SETCLIENTID_CONFIRM4args*>(nullptr),
                                             &setclientid_confirm41);
         }
         const struct NFS41::VERIFY4res verify41 {};
         for (int i = 0; i < NfsV41verifyOpsAmount; ++i)
         {
-            analyzer->verify41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->verify41(static_cast<const RPCProcedure*>(nullptr),
                                static_cast<const struct NFS41::VERIFY4args*>(nullptr),
                                &verify41);
         }
         const struct NFS41::WRITE4res write41 {};
         for (int i = 0; i < NfsV41writeOpsAmount; ++i)
         {
-            analyzer->write41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->write41(static_cast<const RPCProcedure*>(nullptr),
                               static_cast<const struct NFS41::WRITE4args*>(nullptr),
                               &write41);
         }
         const struct NFS41::RELEASE_LOCKOWNER4res release_lockowner41 {};
         for (int i = 0; i < NfsV41release_lockownerOpsAmount; ++i)
         {
-            analyzer->release_lockowner41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->release_lockowner41(static_cast<const RPCProcedure*>(nullptr),
                                           static_cast<const struct NFS41::RELEASE_LOCKOWNER4args*>(nullptr),
                                           &release_lockowner41);
         }
         const struct NFS41::BACKCHANNEL_CTL4res backchannel_ctl41 {};
         for (int i = 0; i < NfsV41backchannel_ctlOpsAmount; ++i)
         {
-            analyzer->backchannel_ctl41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->backchannel_ctl41(static_cast<const RPCProcedure*>(nullptr),
                                         static_cast<const struct NFS41::BACKCHANNEL_CTL4args*>(nullptr),
                                         &backchannel_ctl41);
         }
         const struct NFS41::BIND_CONN_TO_SESSION4res bind_conn_to_session41 {};
         for (int i = 0; i < NfsV41bind_conn_to_sessionOpsAmount; ++i)
         {
-            analyzer->bind_conn_to_session41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->bind_conn_to_session41(static_cast<const RPCProcedure*>(nullptr),
                                              static_cast<const struct NFS41::BIND_CONN_TO_SESSION4args*>(nullptr),
                                              &bind_conn_to_session41);
         }
         const struct NFS41::EXCHANGE_ID4res exchange_id41 {};
         for (int i = 0; i < NfsV41exchange_idOpsAmount; ++i)
         {
-            analyzer->exchange_id41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->exchange_id41(static_cast<const RPCProcedure*>(nullptr),
                                     static_cast<const struct NFS41::EXCHANGE_ID4args*>(nullptr),
                                     &exchange_id41);
         }
         const struct NFS41::CREATE_SESSION4res create_session41 {};
         for (int i = 0; i < NfsV41create_sessionOpsAmount; ++i)
         {
-            analyzer->create_session41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->create_session41(static_cast<const RPCProcedure*>(nullptr),
                                        static_cast<const struct NFS41::CREATE_SESSION4args*>(nullptr),
                                        &create_session41);
         }
         const struct NFS41::DESTROY_SESSION4res destroy_session41 {};
         for (int i = 0; i < NfsV41destroy_sessionOpsAmount; ++i)
         {
-            analyzer->destroy_session41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->destroy_session41(static_cast<const RPCProcedure*>(nullptr),
                                         static_cast<const struct NFS41::DESTROY_SESSION4args*>(nullptr),
                                         &destroy_session41);
         }
         const struct NFS41::FREE_STATEID4res free_stateid41 {};
         for (int i = 0; i < NfsV41free_stateidOpsAmount; ++i)
         {
-            analyzer->free_stateid41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->free_stateid41(static_cast<const RPCProcedure*>(nullptr),
                                      static_cast<const struct NFS41::FREE_STATEID4args*>(nullptr),
                                      &free_stateid41);
         }
         const struct NFS41::GET_DIR_DELEGATION4res get_dir_delegation41 {};
         for (int i = 0; i < NfsV41get_dir_delegationOpsAmount; ++i)
         {
-            analyzer->get_dir_delegation41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->get_dir_delegation41(static_cast<const RPCProcedure*>(nullptr),
                                            static_cast<const struct NFS41::GET_DIR_DELEGATION4args*>(nullptr),
                                            &get_dir_delegation41);
         }
         const struct NFS41::GETDEVICEINFO4res getdeviceinfo41 {};
         for (int i = 0; i < NfsV41getdeviceinfoOpsAmount; ++i)
         {
-            analyzer->getdeviceinfo41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->getdeviceinfo41(static_cast<const RPCProcedure*>(nullptr),
                                       static_cast<const struct NFS41::GETDEVICEINFO4args*>(nullptr),
                                       &getdeviceinfo41);
         }
         const struct NFS41::GETDEVICELIST4res getdevicelist41 {};
         for (int i = 0; i < NfsV41getdevicelistOpsAmount; ++i)
         {
-            analyzer->getdevicelist41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->getdevicelist41(static_cast<const RPCProcedure*>(nullptr),
                                       static_cast<const struct NFS41::GETDEVICELIST4args*>(nullptr),
                                       &getdevicelist41);
         }
         const struct NFS41::LAYOUTCOMMIT4res layoutcommit41 {};
         for (int i = 0; i < NfsV41layoutcommitOpsAmount; ++i)
         {
-            analyzer->layoutcommit41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->layoutcommit41(static_cast<const RPCProcedure*>(nullptr),
                                      static_cast<const struct NFS41::LAYOUTCOMMIT4args*>(nullptr),
                                      &layoutcommit41);
         }
         const struct NFS41::LAYOUTGET4res layoutget41 {};
         for (int i = 0; i < NfsV41layoutgetOpsAmount; ++i)
         {
-            analyzer->layoutget41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->layoutget41(static_cast<const RPCProcedure*>(nullptr),
                                   static_cast<const struct NFS41::LAYOUTGET4args*>(nullptr),
                                   &layoutget41);
         }
         const struct NFS41::LAYOUTRETURN4res layoutreturn41 {};
         for (int i = 0; i < NfsV41layoutreturnOpsAmount; ++i)
         {
-            analyzer->layoutreturn41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->layoutreturn41(static_cast<const RPCProcedure*>(nullptr),
                                      static_cast<const struct NFS41::LAYOUTRETURN4args*>(nullptr),
                                      &layoutreturn41);
         }
         const NFS41::SECINFO_NO_NAME4res secinfo_no_name41 {};
         for (int i = 0; i < NfsV41secinfo_no_nameOpsAmount; ++i)
         {
-            analyzer->secinfo_no_name41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->secinfo_no_name41(static_cast<const RPCProcedure*>(nullptr),
                                         static_cast<const NFS41::SECINFO_NO_NAME4args*>(nullptr),
                                         &secinfo_no_name41);
         }
         const struct NFS41::SEQUENCE4res sequence41 {};
         for (int i = 0; i < NfsV41sequenceOpsAmount; ++i)
         {
-            analyzer->sequence41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->sequence41(static_cast<const RPCProcedure*>(nullptr),
                                  static_cast<const struct NFS41::SEQUENCE4args*>(nullptr),
                                  &sequence41);
         }
         const struct NFS41::SET_SSV4res set_ssv41 {};
         for (int i = 0; i < NfsV41set_ssvOpsAmount; ++i)
         {
-            analyzer->set_ssv41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->set_ssv41(static_cast<const RPCProcedure*>(nullptr),
                                 static_cast<const struct NFS41::SET_SSV4args*>(nullptr),
                                 &set_ssv41);
         }
         const struct NFS41::TEST_STATEID4res test_stateid41 {};
         for (int i = 0; i < NfsV41test_stateidOpsAmount; ++i)
         {
-            analyzer->test_stateid41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->test_stateid41(static_cast<const RPCProcedure*>(nullptr),
                                      static_cast<const struct NFS41::TEST_STATEID4args*>(nullptr),
                                      &test_stateid41);
         }
         const struct NFS41::WANT_DELEGATION4res want_delegation41 {};
         for (int i = 0; i < NfsV41want_delegationOpsAmount; ++i)
         {
-            analyzer->want_delegation41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->want_delegation41(static_cast<const RPCProcedure*>(nullptr),
                                         static_cast<const struct NFS41::WANT_DELEGATION4args*>(nullptr),
                                         &want_delegation41);
         }
         const struct NFS41::DESTROY_CLIENTID4res destroy_clientid41 {};
         for (int i = 0; i < NfsV41destroy_clientidOpsAmount; ++i)
         {
-            analyzer->destroy_clientid41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->destroy_clientid41(static_cast<const RPCProcedure*>(nullptr),
                                          static_cast<const struct NFS41::DESTROY_CLIENTID4args*>(nullptr),
                                          &destroy_clientid41);
         }
         const struct NFS41::RECLAIM_COMPLETE4res reclaim_complete41 {};
         for (int i = 0; i < NfsV41reclaim_completeOpsAmount; ++i)
         {
-            analyzer->reclaim_complete41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->reclaim_complete41(static_cast<const RPCProcedure*>(nullptr),
                                          static_cast<const struct NFS41::RECLAIM_COMPLETE4args*>(nullptr),
                                          &reclaim_complete41);
         }
         const struct NFS41::ILLEGAL4res illegal41 {};
         for (int i = 0; i < NfsV41illegalOpsAmount; ++i)
         {
-            analyzer->illegal41(static_cast<const struct RPCProcedure*>(nullptr),
+            analyzer->illegal41(static_cast<const RPCProcedure*>(nullptr),
                                 &illegal41);
         }
  

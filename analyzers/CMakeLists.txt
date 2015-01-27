@@ -6,7 +6,9 @@ add_library (ofws         MODULE src/ofws/ofws_analyzer.cpp)
 add_library (ofdws        MODULE src/ofdws/ofdws_analyzer.cpp
                                  src/ofdws/file_rw_op.cpp)
 add_library (testanalyzer MODULE src/test/test_analyzer.cpp)
-set_target_properties (breakdown ofws ofdws testanalyzer
+add_library (cifs         MODULE src/cifs/cifs_analyzer.cpp)
+
+set_target_properties (breakdown ofws ofdws testanalyzer cifs
                        PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/analyzers"
                        NO_SONAME ON)
 add_subdirectory (src/watch)

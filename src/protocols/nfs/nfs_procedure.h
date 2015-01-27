@@ -50,15 +50,15 @@ public:
     : parg{&arg}    // set pointer to argument
     , pres{&res}    // set pointer to result
     {
-        memset(&rpc_call, 0,sizeof(rpc_call ));
-        memset(&rpc_reply,0,sizeof(rpc_reply));
+        memset(&call, 0,sizeof(call ));
+        memset(&reply,0,sizeof(reply));
         memset(&arg,      0,sizeof(arg      ));
         memset(&res,      0,sizeof(res      ));
 
         // fill call
-        if(!xdr_callmsg(c.xdr(), &rpc_call))
+        if(!xdr_callmsg(c.xdr(), &call))
         {
-            xdr_free((xdrproc_t)xdr_callmsg, (char*)&rpc_call);
+            xdr_free((xdrproc_t)xdr_callmsg, (char*)&call);
             throw xdr::XDRDecoderError{"XDRDecoder: cann't read call data"};
         }
 
@@ -66,31 +66,31 @@ public:
         if(!proc_t_of(arg)(c.xdr(),&arg))
         {
             xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg     );
-            xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call);
+            xdr_free((xdrproc_t)xdr_callmsg,    (char*)&call);
             throw xdr::XDRDecoderError{"XDRDecoder: cann't read call arguments"};
         }
 
-        rpc_reply.ru.RM_rmb.ru.RP_ar.ru.AR_results.proc = &return_true;
+        reply.ru.RM_rmb.ru.RP_ar.ru.AR_results.proc = &return_true;
 
         // fill reply
-        if(!xdr_replymsg (r.xdr(), &rpc_reply))
+        if(!xdr_replymsg (r.xdr(), &reply))
         {
-            xdr_free((xdrproc_t)xdr_replymsg,  (char*)&rpc_reply);
+            xdr_free((xdrproc_t)xdr_replymsg,  (char*)&reply);
             xdr_free((xdrproc_t)proc_t_of(arg),(char*)&arg      );
-            xdr_free((xdrproc_t)xdr_callmsg,   (char*)&rpc_call );
+            xdr_free((xdrproc_t)xdr_callmsg,   (char*)&call );
             throw xdr::XDRDecoderError{"XDRDecoder: cann't read reply data"};
         }
   
-        if(rpc_reply.ru.RM_rmb.rp_stat == reply_stat::MSG_ACCEPTED &&
-           rpc_reply.ru.RM_rmb.ru.RP_ar.ar_stat == accept_stat::SUCCESS)
+        if(reply.ru.RM_rmb.rp_stat == reply_stat::MSG_ACCEPTED &&
+           reply.ru.RM_rmb.ru.RP_ar.ar_stat == accept_stat::SUCCESS)
         {
             // fill reply results
             if(!proc_t_of(res)(r.xdr(),&res))
             {
                 xdr_free((xdrproc_t)proc_t_of(res), (char*)&res      );
-                xdr_free((xdrproc_t)xdr_replymsg,   (char*)&rpc_reply);
+                xdr_free((xdrproc_t)xdr_replymsg,   (char*)&reply);
                 xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg      );
-                xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call );
+                xdr_free((xdrproc_t)xdr_callmsg,    (char*)&call );
                 throw xdr::XDRDecoderError{"XDRDecoder: cann't read reply results"};
             }
         }
@@ -108,9 +108,9 @@ public:
     inline ~NFSProcedure()
     {
         if(pres) xdr_free((xdrproc_t)proc_t_of(res), (char*)&res      );
-                 xdr_free((xdrproc_t)xdr_replymsg,   (char*)&rpc_reply);
+                 xdr_free((xdrproc_t)xdr_replymsg,   (char*)&reply);
                  xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg      );
-                 xdr_free((xdrproc_t)xdr_callmsg,    (char*)&rpc_call );
+                 xdr_free((xdrproc_t)xdr_callmsg,    (char*)&call );
     }
 
     // pointers to procedure specific argument and result

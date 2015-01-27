@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Ilya Storozhilov
-// Description: Network tests executable
-// Copyright (c) 2013-2014 EPAM Systems
+// Author: Andrey Kuznetsov
+// Description: Abstraction of operation (CIFS or NFS)
+// Copyright (c) 2013 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,12 +19,31 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
+#ifndef PROCEDURE_H
+#define PROCEDURE_H
 //------------------------------------------------------------------------------
-int main(int argc, char** argv)
+#include <sys/time.h>
+
+#include "session.h"
+//------------------------------------------------------------------------------
+namespace NST
 {
-    setenv("LANG", "C", 1);
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+namespace API
+{
+
+template<typename ProcedureType>
+struct Procedure
+{
+    ProcedureType call;
+    ProcedureType reply;
+
+    const struct Session* session;
+    const struct timeval* ctimestamp;
+    const struct timeval* rtimestamp;
+};
+
+} // namespace API
+} // namespace NST
+//------------------------------------------------------------------------------
+#endif // PROCEDURE_H
+//------------------------------------------------------------------------------

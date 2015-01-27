@@ -177,390 +177,390 @@ public:
 
     // NFSv3 procedures
 
-    void null(const struct RPCProcedure* /*proc*/,
+    void null(const RPCProcedure* /*proc*/,
               const struct NFS3::NULL3args* /*args*/,
               const struct NFS3::NULL3res* /*res*/) override final;
 
-    void getattr3(const struct RPCProcedure* /*proc*/,
+    void getattr3(const RPCProcedure* /*proc*/,
                   const struct NFS3::GETATTR3args* /*args*/,
                   const struct NFS3::GETATTR3res* /*res*/) override final;
 
-    void setattr3(const struct RPCProcedure* /*proc*/,
+    void setattr3(const RPCProcedure* /*proc*/,
                   const struct NFS3::SETATTR3args* /*args*/,
                   const struct NFS3::SETATTR3res* /*res*/) override final;
 
-    void lookup3(const struct RPCProcedure* /*proc*/,
+    void lookup3(const RPCProcedure* /*proc*/,
                  const struct NFS3::LOOKUP3args* /*args*/,
                  const struct NFS3::LOOKUP3res* /*res*/) override final;
 
-    void access3(const struct RPCProcedure* /*proc*/,
+    void access3(const RPCProcedure* /*proc*/,
                  const struct NFS3::ACCESS3args* /*args*/,
                  const struct NFS3::ACCESS3res* /*res*/) override final;
 
-    void readlink3(const struct RPCProcedure* /*proc*/,
+    void readlink3(const RPCProcedure* /*proc*/,
                    const struct NFS3::READLINK3args* /*args*/,
                    const struct NFS3::READLINK3res* /*res*/) override final;
 
-    void read3(const struct RPCProcedure* /*proc*/,
+    void read3(const RPCProcedure* /*proc*/,
                const struct NFS3::READ3args* /*args*/,
                const struct NFS3::READ3res* /*res*/) override final;
 
-    void write3(const struct RPCProcedure* /*proc*/,
+    void write3(const RPCProcedure* /*proc*/,
                 const struct NFS3::WRITE3args* /*args*/,
                 const struct NFS3::WRITE3res* /*res*/) override final;
 
-    void create3(const struct RPCProcedure* /*proc*/,
+    void create3(const RPCProcedure* /*proc*/,
                  const struct NFS3::CREATE3args* /*args*/,
                  const struct NFS3::CREATE3res* /*res*/) override final;
 
-    void mkdir3(const struct RPCProcedure* /*proc*/,
+    void mkdir3(const RPCProcedure* /*proc*/,
                 const struct NFS3::MKDIR3args* /*args*/,
                 const struct NFS3::MKDIR3res* /*res*/) override final;
 
-    void symlink3(const struct RPCProcedure* /*proc*/,
+    void symlink3(const RPCProcedure* /*proc*/,
                   const struct NFS3::SYMLINK3args* /*args*/,
                   const struct NFS3::SYMLINK3res* /*res*/) override final;
 
-    void mknod3(const struct RPCProcedure* /*proc*/,
+    void mknod3(const RPCProcedure* /*proc*/,
                 const struct NFS3::MKNOD3args* /*args*/,
                 const struct NFS3::MKNOD3res* /*res*/) override final;
 
-    void remove3(const struct RPCProcedure* /*proc*/,
+    void remove3(const RPCProcedure* /*proc*/,
                  const struct NFS3::REMOVE3args* /*args*/,
                  const struct NFS3::REMOVE3res* /*res*/) override final;
 
-    void rmdir3(const struct RPCProcedure* /*proc*/,
+    void rmdir3(const RPCProcedure* /*proc*/,
                 const struct NFS3::RMDIR3args* /*args*/,
                 const struct NFS3::RMDIR3res* /*res*/) override final;
 
-    void rename3(const struct RPCProcedure* /*proc*/,
+    void rename3(const RPCProcedure* /*proc*/,
                  const struct NFS3::RENAME3args* /*args*/,
                  const struct NFS3::RENAME3res* /*res*/) override final;
 
-    void link3(const struct RPCProcedure* /*proc*/,
+    void link3(const RPCProcedure* /*proc*/,
                const struct NFS3::LINK3args* /*args*/,
                const struct NFS3::LINK3res* /*res*/) override final;
 
-    void readdir3(const struct RPCProcedure* /*proc*/,
+    void readdir3(const RPCProcedure* /*proc*/,
                   const struct NFS3::READDIR3args* /*args*/,
                   const struct NFS3::READDIR3res* /*res*/) override final;
 
-    void readdirplus3(const struct RPCProcedure* /*proc*/,
+    void readdirplus3(const RPCProcedure* /*proc*/,
                       const struct NFS3::READDIRPLUS3args* /*args*/,
                       const struct NFS3::READDIRPLUS3res* /*res*/) override final;
 
-    void fsstat3(const struct RPCProcedure* /*proc*/,
+    void fsstat3(const RPCProcedure* /*proc*/,
                  const struct NFS3::FSSTAT3args* /*args*/,
                  const struct NFS3::FSSTAT3res* /*res*/) override final;
 
-    void fsinfo3(const struct RPCProcedure* /*proc*/,
+    void fsinfo3(const RPCProcedure* /*proc*/,
                  const struct NFS3::FSINFO3args* /*args*/,
                  const struct NFS3::FSINFO3res* /*res*/) override final;
 
-    void pathconf3(const struct RPCProcedure* /*proc*/,
+    void pathconf3(const RPCProcedure* /*proc*/,
                    const struct NFS3::PATHCONF3args* /*args*/,
                    const struct NFS3::PATHCONF3res* /*res*/) override final;
 
-    void commit3(const struct RPCProcedure* /*proc*/,
+    void commit3(const RPCProcedure* /*proc*/,
                  const struct NFS3::COMMIT3args* /*args*/,
                  const struct NFS3::COMMIT3res* /*res*/) override final;
 
     // NFS4.0 procedures
  
-    void null(const struct RPCProcedure* /*proc*/,
+    void null(const RPCProcedure* /*proc*/,
               const struct NFS4::NULL4args* /*args*/,
               const struct NFS4::NULL4res* /*res*/) override final;
 
-    void compound4(const struct RPCProcedure* /*proc*/,
+    void compound4(const RPCProcedure* /*proc*/,
                    const struct NFS4::COMPOUND4args* /*args*/,
                    const struct NFS4::COMPOUND4res* /*res*/) override final;
 
     // NFS4.0 operations
 
-    void access40(const struct RPCProcedure* /* proc */,
+    void access40(const RPCProcedure* /* proc */,
                   const struct NFS4::ACCESS4args* /* args */,
                   const struct NFS4::ACCESS4res* res) override final;
-    void close40(const struct RPCProcedure* /* proc */,
+    void close40(const RPCProcedure* /* proc */,
                   const struct NFS4::CLOSE4args* /* args */,
                   const struct NFS4::CLOSE4res* res) override final;
-    void commit40(const struct RPCProcedure* /* proc */,
+    void commit40(const RPCProcedure* /* proc */,
                   const struct NFS4::COMMIT4args* /* args */,
                   const struct NFS4::COMMIT4res* res) override final;
-    void create40(const struct RPCProcedure* /* proc */,
+    void create40(const RPCProcedure* /* proc */,
                   const struct NFS4::CREATE4args* /* args */,
                   const struct NFS4::CREATE4res* res) override final;
-    void delegpurge40(const struct RPCProcedure* /* proc */,
+    void delegpurge40(const RPCProcedure* /* proc */,
                       const struct NFS4::DELEGPURGE4args* /* args */,
                       const struct NFS4::DELEGPURGE4res* res) override final;
-    void delegreturn40(const struct RPCProcedure* /* proc */,
+    void delegreturn40(const RPCProcedure* /* proc */,
                        const struct NFS4::DELEGRETURN4args* /* args */,
                        const struct NFS4::DELEGRETURN4res* res) override final;
-    void getattr40(const struct RPCProcedure* /* proc */,
+    void getattr40(const RPCProcedure* /* proc */,
                    const struct NFS4::GETATTR4args* /* args */,
                    const struct NFS4::GETATTR4res* res) override final;
-    void getfh40(const struct RPCProcedure* /* proc */,
+    void getfh40(const RPCProcedure* /* proc */,
                  const struct NFS4::GETFH4res* res) override final;
-    void link40(const struct RPCProcedure* /* proc */,
+    void link40(const RPCProcedure* /* proc */,
                 const struct NFS4::LINK4args* /* args */,
                 const struct NFS4::LINK4res* res) override final;
-    void lock40(const struct RPCProcedure* /* proc */,
+    void lock40(const RPCProcedure* /* proc */,
                 const struct NFS4::LOCK4args* /* args */,
                 const struct NFS4::LOCK4res* res) override final;
-    void lockt40(const struct RPCProcedure* /* proc */,
+    void lockt40(const RPCProcedure* /* proc */,
                  const struct NFS4::LOCKT4args* /* args */,
                  const struct NFS4::LOCKT4res* res) override final;
-    void locku40(const struct RPCProcedure* /* proc */,
+    void locku40(const RPCProcedure* /* proc */,
                  const struct NFS4::LOCKU4args* /* args */,
                  const struct NFS4::LOCKU4res* res) override final;
-    void lookup40(const struct RPCProcedure* /* proc */,
+    void lookup40(const RPCProcedure* /* proc */,
                   const struct NFS4::LOOKUP4args* /* args */,
                   const struct NFS4::LOOKUP4res* res) override final;
-    void lookupp40(const struct RPCProcedure* /* proc */,
+    void lookupp40(const RPCProcedure* /* proc */,
                    const struct NFS4::LOOKUPP4res* res) override final;
-    void nverify40(const struct RPCProcedure* /* proc */,
+    void nverify40(const RPCProcedure* /* proc */,
                    const struct NFS4::NVERIFY4args* /* args */,
                    const struct NFS4::NVERIFY4res* res) override final;
-    void open40(const struct RPCProcedure* /* proc */,
+    void open40(const RPCProcedure* /* proc */,
                 const struct NFS4::OPEN4args* /* args */,
                 const struct NFS4::OPEN4res* res) override final;
-    void openattr40(const struct RPCProcedure* /* proc */,
+    void openattr40(const RPCProcedure* /* proc */,
                     const struct NFS4::OPENATTR4args* /* args */,
                     const struct NFS4::OPENATTR4res* res) override final;
-    void open_confirm40(const struct RPCProcedure* /* proc */,
+    void open_confirm40(const RPCProcedure* /* proc */,
                         const struct NFS4::OPEN_CONFIRM4args* /* args */,
                         const struct NFS4::OPEN_CONFIRM4res* res) override final;
-    void open_downgrade40(const struct RPCProcedure* /* proc */,
+    void open_downgrade40(const RPCProcedure* /* proc */,
                           const struct NFS4::OPEN_DOWNGRADE4args* /* args */,
                           const struct NFS4::OPEN_DOWNGRADE4res* res) override final;
-    void putfh40(const struct RPCProcedure* /* proc */,
+    void putfh40(const RPCProcedure* /* proc */,
                  const struct NFS4::PUTFH4args* /* args */,
                  const struct NFS4::PUTFH4res* res) override final;
-    void putpubfh40(const struct RPCProcedure* /* proc */,
+    void putpubfh40(const RPCProcedure* /* proc */,
                     const struct NFS4::PUTPUBFH4res* res) override final;
-    void putrootfh40(const struct RPCProcedure* /* proc */,
+    void putrootfh40(const RPCProcedure* /* proc */,
                      const struct NFS4::PUTROOTFH4res* res) override final;
-    void read40(const struct RPCProcedure* /* proc */,
+    void read40(const RPCProcedure* /* proc */,
                 const struct NFS4::READ4args* /* args */,
                 const struct NFS4::READ4res* res) override final;
-    void readdir40(const struct RPCProcedure* /* proc */,
+    void readdir40(const RPCProcedure* /* proc */,
                    const struct NFS4::READDIR4args* /* args */,
                    const struct NFS4::READDIR4res* res) override final;
-    void readlink40(const struct RPCProcedure* /* proc */,
+    void readlink40(const RPCProcedure* /* proc */,
                     const struct NFS4::READLINK4res* res) override final;
-    void remove40(const struct RPCProcedure* /* proc */,
+    void remove40(const RPCProcedure* /* proc */,
                   const struct NFS4::REMOVE4args* /* args */,
                   const struct NFS4::REMOVE4res* res) override final;
-    void rename40(const struct RPCProcedure* /* proc */,
+    void rename40(const RPCProcedure* /* proc */,
                   const struct NFS4::RENAME4args* /* args */,
                   const struct NFS4::RENAME4res* res) override final;
-    void renew40(const struct RPCProcedure* /* proc */,
+    void renew40(const RPCProcedure* /* proc */,
                  const struct NFS4::RENEW4args* /* args */,
                  const struct NFS4::RENEW4res* res) override final;
-    void restorefh40(const struct RPCProcedure* /* proc */,
+    void restorefh40(const RPCProcedure* /* proc */,
                      const struct NFS4::RESTOREFH4res* res) override final;
-    void savefh40(const struct RPCProcedure* /* proc */,
+    void savefh40(const RPCProcedure* /* proc */,
                   const struct NFS4::SAVEFH4res* res) override final;
-    void secinfo40(const struct RPCProcedure* /* proc */,
+    void secinfo40(const RPCProcedure* /* proc */,
                    const struct NFS4::SECINFO4args* /* args */,
                    const struct NFS4::SECINFO4res* res) override final;
-    void setattr40(const struct RPCProcedure* /* proc */,
+    void setattr40(const RPCProcedure* /* proc */,
                    const struct NFS4::SETATTR4args* /* args */,
                    const struct NFS4::SETATTR4res* res) override final;
-    void setclientid40(const struct RPCProcedure* /* proc */,
+    void setclientid40(const RPCProcedure* /* proc */,
                        const struct NFS4::SETCLIENTID4args* /* args */,
                        const struct NFS4::SETCLIENTID4res* res) override final;
-    void setclientid_confirm40(const struct RPCProcedure* /* proc */,
+    void setclientid_confirm40(const RPCProcedure* /* proc */,
                                const struct NFS4::SETCLIENTID_CONFIRM4args* /* args */,
                                const struct NFS4::SETCLIENTID_CONFIRM4res* res) override final;
-    void verify40(const struct RPCProcedure* /* proc */,
+    void verify40(const RPCProcedure* /* proc */,
                   const struct NFS4::VERIFY4args* /* args */,
                   const struct NFS4::VERIFY4res* res) override final;
-    void write40(const struct RPCProcedure* /* proc */,
+    void write40(const RPCProcedure* /* proc */,
                  const struct NFS4::WRITE4args* /* args */,
                  const struct NFS4::WRITE4res* res) override final;
-    void release_lockowner40(const struct RPCProcedure* /* proc */,
+    void release_lockowner40(const RPCProcedure* /* proc */,
                              const struct NFS4::RELEASE_LOCKOWNER4args* /* args */,
                              const struct NFS4::RELEASE_LOCKOWNER4res* res) override final;
-    void get_dir_delegation40(const struct RPCProcedure* /* proc */,
+    void get_dir_delegation40(const RPCProcedure* /* proc */,
                               const struct NFS4::GET_DIR_DELEGATION4args* /* args */,
                               const struct NFS4::GET_DIR_DELEGATION4res* res) override final;
-    void illegal40(const struct RPCProcedure* /* proc */,
+    void illegal40(const RPCProcedure* /* proc */,
                    const struct NFS4::ILLEGAL4res* res) override final;
 
     // NFSv4.1 procedures
  
-    void null41(const struct RPCProcedure* /*proc*/,
+    void null41(const RPCProcedure* /*proc*/,
                 const struct NFS41::NULL4args* /*args*/,
                 const struct NFS41::NULL4res* /*res*/) override final;
 
-    void compound41(const struct RPCProcedure* /*proc*/,
+    void compound41(const RPCProcedure* /*proc*/,
                     const struct NFS41::COMPOUND4args* /*args*/,
                     const struct NFS41::COMPOUND4res* /*res*/) override final;
 
     // NFSv4.1 operations
 
-    void access41(const struct RPCProcedure* /* proc */,
+    void access41(const RPCProcedure* /* proc */,
                   const struct NFS41::ACCESS4args* /* args */,
                   const struct NFS41::ACCESS4res* res) override final;
-    void close41(const struct RPCProcedure* /* proc */,
+    void close41(const RPCProcedure* /* proc */,
                   const struct NFS41::CLOSE4args* /* args */,
                   const struct NFS41::CLOSE4res* res) override final;
-    void commit41(const struct RPCProcedure* /* proc */,
+    void commit41(const RPCProcedure* /* proc */,
                   const struct NFS41::COMMIT4args* /* args */,
                   const struct NFS41::COMMIT4res* res) override final;
-    void create41(const struct RPCProcedure* /* proc */,
+    void create41(const RPCProcedure* /* proc */,
                   const struct NFS41::CREATE4args* /* args */,
                   const struct NFS41::CREATE4res* res) override final;
-    void delegpurge41(const struct RPCProcedure* /* proc */,
+    void delegpurge41(const RPCProcedure* /* proc */,
                       const struct NFS41::DELEGPURGE4args* /* args */,
                       const struct NFS41::DELEGPURGE4res* res) override final;
-    void delegreturn41(const struct RPCProcedure* /* proc */,
+    void delegreturn41(const RPCProcedure* /* proc */,
                        const struct NFS41::DELEGRETURN4args* /* args */,
                        const struct NFS41::DELEGRETURN4res* res) override final;
-    void getattr41(const struct RPCProcedure* /* proc */,
+    void getattr41(const RPCProcedure* /* proc */,
                    const struct NFS41::GETATTR4args* /* args */,
                    const struct NFS41::GETATTR4res* res) override final;
-    void getfh41(const struct RPCProcedure* /* proc */,
+    void getfh41(const RPCProcedure* /* proc */,
                  const struct NFS41::GETFH4res* res) override final;
-    void link41(const struct RPCProcedure* /* proc */,
+    void link41(const RPCProcedure* /* proc */,
                 const struct NFS41::LINK4args* /* args */,
                 const struct NFS41::LINK4res* res) override final;
-    void lock41(const struct RPCProcedure* /* proc */,
+    void lock41(const RPCProcedure* /* proc */,
                 const struct NFS41::LOCK4args* /* args */,
                 const struct NFS41::LOCK4res* res) override final;
-    void lockt41(const struct RPCProcedure* /* proc */,
+    void lockt41(const RPCProcedure* /* proc */,
                  const struct NFS41::LOCKT4args* /* args */,
                  const struct NFS41::LOCKT4res* res) override final;
-    void locku41(const struct RPCProcedure* /* proc */,
+    void locku41(const RPCProcedure* /* proc */,
                  const struct NFS41::LOCKU4args* /* args */,
                  const struct NFS41::LOCKU4res* res) override final;
-    void lookup41(const struct RPCProcedure* /* proc */,
+    void lookup41(const RPCProcedure* /* proc */,
                   const struct NFS41::LOOKUP4args* /* args */,
                   const struct NFS41::LOOKUP4res* res) override final;
-    void lookupp41(const struct RPCProcedure* /* proc */,
+    void lookupp41(const RPCProcedure* /* proc */,
                    const struct NFS41::LOOKUPP4res* res) override final;
-    void nverify41(const struct RPCProcedure* /* proc */,
+    void nverify41(const RPCProcedure* /* proc */,
                    const struct NFS41::NVERIFY4args* /* args */,
                    const struct NFS41::NVERIFY4res* res) override final;
-    void open41(const struct RPCProcedure* /* proc */,
+    void open41(const RPCProcedure* /* proc */,
                 const struct NFS41::OPEN4args* /* args */,
                 const struct NFS41::OPEN4res* res) override final;
-    void openattr41(const struct RPCProcedure* /* proc */,
+    void openattr41(const RPCProcedure* /* proc */,
                     const struct NFS41::OPENATTR4args* /* args */,
                     const struct NFS41::OPENATTR4res* res) override final;
-    void open_confirm41(const struct RPCProcedure* /* proc */,
+    void open_confirm41(const RPCProcedure* /* proc */,
                         const struct NFS41::OPEN_CONFIRM4args* /* args */,
                         const struct NFS41::OPEN_CONFIRM4res* res) override final;
-    void open_downgrade41(const struct RPCProcedure* /* proc */,
+    void open_downgrade41(const RPCProcedure* /* proc */,
                           const struct NFS41::OPEN_DOWNGRADE4args* /* args */,
                           const struct NFS41::OPEN_DOWNGRADE4res* res) override final;
-    void putfh41(const struct RPCProcedure* /* proc */,
+    void putfh41(const RPCProcedure* /* proc */,
                  const struct NFS41::PUTFH4args* /* args */,
                  const struct NFS41::PUTFH4res* res) override final;
-    void putpubfh41(const struct RPCProcedure* /* proc */,
+    void putpubfh41(const RPCProcedure* /* proc */,
                     const struct NFS41::PUTPUBFH4res* res) override final;
-    void putrootfh41(const struct RPCProcedure* /* proc */,
+    void putrootfh41(const RPCProcedure* /* proc */,
                      const struct NFS41::PUTROOTFH4res* res) override final;
-    void read41(const struct RPCProcedure* /* proc */,
+    void read41(const RPCProcedure* /* proc */,
                 const struct NFS41::READ4args* /* args */,
                 const struct NFS41::READ4res* res) override final;
-    void readdir41(const struct RPCProcedure* /* proc */,
+    void readdir41(const RPCProcedure* /* proc */,
                    const struct NFS41::READDIR4args* /* args */,
                    const struct NFS41::READDIR4res* res) override final;
-    void readlink41(const struct RPCProcedure* /* proc */,
+    void readlink41(const RPCProcedure* /* proc */,
                     const struct NFS41::READLINK4res* res) override final;
-    void remove41(const struct RPCProcedure* /* proc */,
+    void remove41(const RPCProcedure* /* proc */,
                   const struct NFS41::REMOVE4args* /* args */,
                   const struct NFS41::REMOVE4res* res) override final;
-    void rename41(const struct RPCProcedure* /* proc */,
+    void rename41(const RPCProcedure* /* proc */,
                   const struct NFS41::RENAME4args* /* args */,
                   const struct NFS41::RENAME4res* res) override final;
-    void renew41(const struct RPCProcedure* /* proc */,
+    void renew41(const RPCProcedure* /* proc */,
                  const struct NFS41::RENEW4args* /* args */,
                  const struct NFS41::RENEW4res* res) override final;
-    void restorefh41(const struct RPCProcedure* /* proc */,
+    void restorefh41(const RPCProcedure* /* proc */,
                      const struct NFS41::RESTOREFH4res* res) override final;
-    void savefh41(const struct RPCProcedure* /* proc */,
+    void savefh41(const RPCProcedure* /* proc */,
                   const struct NFS41::SAVEFH4res* res) override final;
-    void secinfo41(const struct RPCProcedure* /* proc */,
+    void secinfo41(const RPCProcedure* /* proc */,
                    const struct NFS41::SECINFO4args* /* args */,
                    const struct NFS41::SECINFO4res* res) override final;
-    void setattr41(const struct RPCProcedure* /* proc */,
+    void setattr41(const RPCProcedure* /* proc */,
                    const struct NFS41::SETATTR4args* /* args */,
                    const struct NFS41::SETATTR4res* res) override final;
-    void setclientid41(const struct RPCProcedure* /* proc */,
+    void setclientid41(const RPCProcedure* /* proc */,
                        const struct NFS41::SETCLIENTID4args* /* args */,
                        const struct NFS41::SETCLIENTID4res* res) override final;
-    void setclientid_confirm41(const struct RPCProcedure* /* proc */,
+    void setclientid_confirm41(const RPCProcedure* /* proc */,
                                const struct NFS41::SETCLIENTID_CONFIRM4args* /* args */,
                                const struct NFS41::SETCLIENTID_CONFIRM4res* res) override final;
-    void verify41(const struct RPCProcedure* /* proc */,
+    void verify41(const RPCProcedure* /* proc */,
                   const struct NFS41::VERIFY4args* /* args */,
                   const struct NFS41::VERIFY4res* res) override final;
-    void write41(const struct RPCProcedure* /* proc */,
+    void write41(const RPCProcedure* /* proc */,
                  const struct NFS41::WRITE4args* /* args */,
                  const struct NFS41::WRITE4res* res) override final;
-    void release_lockowner41(const struct RPCProcedure* /* proc */,
+    void release_lockowner41(const RPCProcedure* /* proc */,
                              const struct NFS41::RELEASE_LOCKOWNER4args* /* args */,
                              const struct NFS41::RELEASE_LOCKOWNER4res* res) override final;
-    void backchannel_ctl41(const struct RPCProcedure* /* proc */,
+    void backchannel_ctl41(const RPCProcedure* /* proc */,
                            const struct NFS41::BACKCHANNEL_CTL4args* /* args */,
                            const struct NFS41::BACKCHANNEL_CTL4res* res) override final;
-    void bind_conn_to_session41(const struct RPCProcedure* /* proc */,
+    void bind_conn_to_session41(const RPCProcedure* /* proc */,
                                 const struct NFS41::BIND_CONN_TO_SESSION4args* /* args */, 
                                 const struct NFS41::BIND_CONN_TO_SESSION4res* res) override final;
-    void exchange_id41(const struct RPCProcedure* /* proc */,
+    void exchange_id41(const RPCProcedure* /* proc */,
                        const struct NFS41::EXCHANGE_ID4args* /* args */,
                        const struct NFS41::EXCHANGE_ID4res* res) override final;
-    void create_session41(const struct RPCProcedure* /* proc */,
+    void create_session41(const RPCProcedure* /* proc */,
                           const struct NFS41::CREATE_SESSION4args* /* args */,
                           const struct NFS41::CREATE_SESSION4res* res) override final;
-    void destroy_session41(const struct RPCProcedure* /* proc */,
+    void destroy_session41(const RPCProcedure* /* proc */,
                            const struct NFS41::DESTROY_SESSION4args* /* args */,
                            const struct NFS41::DESTROY_SESSION4res* res) override final;
-    void free_stateid41(const struct RPCProcedure* /* proc */,
+    void free_stateid41(const RPCProcedure* /* proc */,
                         const struct NFS41::FREE_STATEID4args* /* args */,
                         const struct NFS41::FREE_STATEID4res* res) override final;
-    void get_dir_delegation41(const struct RPCProcedure* /* proc */,
+    void get_dir_delegation41(const RPCProcedure* /* proc */,
                               const struct NFS41::GET_DIR_DELEGATION4args* /* args */,
                               const struct NFS41::GET_DIR_DELEGATION4res* res) override final;
-    void getdeviceinfo41(const struct RPCProcedure* /* proc */,
+    void getdeviceinfo41(const RPCProcedure* /* proc */,
                          const struct NFS41::GETDEVICEINFO4args* /* args */,
                          const struct NFS41::GETDEVICEINFO4res* res) override final;
-    void getdevicelist41(const struct RPCProcedure* /* proc */,
+    void getdevicelist41(const RPCProcedure* /* proc */,
                          const struct NFS41::GETDEVICELIST4args* /* args */,
                          const struct NFS41::GETDEVICELIST4res* res) override final;
-    void layoutcommit41(const struct RPCProcedure* /* proc */,
+    void layoutcommit41(const RPCProcedure* /* proc */,
                         const struct NFS41::LAYOUTCOMMIT4args* /* args */,
                         const struct NFS41::LAYOUTCOMMIT4res* res) override final;
-    void layoutget41(const struct RPCProcedure* /* proc */,
+    void layoutget41(const RPCProcedure* /* proc */,
                      const struct NFS41::LAYOUTGET4args* /* args */,
                      const struct NFS41::LAYOUTGET4res* res) override final;
-    void layoutreturn41(const struct RPCProcedure* /* proc */,
+    void layoutreturn41(const RPCProcedure* /* proc */,
                         const struct NFS41::LAYOUTRETURN4args* /* args */,
                         const struct NFS41::LAYOUTRETURN4res* res) override final;
-    void secinfo_no_name41(const struct RPCProcedure* /* proc */,
+    void secinfo_no_name41(const RPCProcedure* /* proc */,
                               const NFS41::SECINFO_NO_NAME4args* /* args */,
                               const NFS41::SECINFO_NO_NAME4res* res) override final;
-    void sequence41(const struct RPCProcedure* /* proc */,
+    void sequence41(const RPCProcedure* /* proc */,
                     const struct NFS41::SEQUENCE4args* /* args */,
                     const struct NFS41::SEQUENCE4res* res) override final;
-    void set_ssv41(const struct RPCProcedure* /* proc */,
+    void set_ssv41(const RPCProcedure* /* proc */,
                    const struct NFS41::SET_SSV4args* /* args */,
                    const struct NFS41::SET_SSV4res* res) override final;
-    void test_stateid41(const struct RPCProcedure* /* proc */,
+    void test_stateid41(const RPCProcedure* /* proc */,
                         const struct NFS41::TEST_STATEID4args* /* args */,
                         const struct NFS41::TEST_STATEID4res* res) override final;
-    void want_delegation41(const struct RPCProcedure* /* proc */,
+    void want_delegation41(const RPCProcedure* /* proc */,
                            const struct NFS41::WANT_DELEGATION4args* /* args */,
                            const struct NFS41::WANT_DELEGATION4res* res) override final;
-    void destroy_clientid41(const struct RPCProcedure* /* proc */,
+    void destroy_clientid41(const RPCProcedure* /* proc */,
                             const struct NFS41::DESTROY_CLIENTID4args* /* args */,
                             const struct NFS41::DESTROY_CLIENTID4res* res) override final;
-    void reclaim_complete41(const struct RPCProcedure* /* proc */,
+    void reclaim_complete41(const RPCProcedure* /* proc */,
                             const struct NFS41::RECLAIM_COMPLETE4args* /* args */,
                             const struct NFS41::RECLAIM_COMPLETE4res* res) override final;
-    void illegal41(const struct RPCProcedure* /* proc */,
+    void illegal41(const RPCProcedure* /* proc */,
                    const struct NFS41::ILLEGAL4res* res) override final;
 
     void flush_statistics() override final;
