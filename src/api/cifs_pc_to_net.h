@@ -24,7 +24,18 @@
 //------------------------------------------------------------------------------
 #include <cstdint>
 
+#ifdef __linux__
 #include <endian.h>
+#define NFSTRACE_BYTE_ORDER __BYTE_ORDER
+#define NFSTRACE_BIG_ENDIAN __BIG_ENDIAN
+#define NFSTRACE_LITTLE_ENDIAN __LITTLE_ENDIAN
+#else
+#include <sys/param.h>
+#include <machine/endian.h>
+#define NFSTRACE_BYTE_ORDER BYTE_ORDER
+#define NFSTRACE_BIG_ENDIAN BIG_ENDIAN
+#define NFSTRACE_LITTLE_ENDIAN LITTLE_ENDIAN
+#endif
 //------------------------------------------------------------------------------
 
 namespace NST
@@ -34,7 +45,7 @@ namespace API
 namespace SMBv2
 {
 
-# if __BYTE_ORDER == __BIG_ENDIAN
+# if NFSTRACE_BYTE_ORDER == NFSTRACE_BIG_ENDIAN
 
 /*!
  * Converter. Not very fast,
@@ -83,7 +94,7 @@ constexpr uint16_t pc_to_net(uint16_t t)
 }
 
 # else
-#  if __BYTE_ORDER == __LITTLE_ENDIAN
+#  if NFSTRACE_BYTE_ORDER == NFSTRACE_LITTLE_ENDIAN
 
 /*!
  * Does nothing for Intel
