@@ -22,10 +22,8 @@
 #ifndef CIFSv2_HEADER_H
 #define CIFSv2_HEADER_H
 //------------------------------------------------------------------------------
-#include <cstdint>
-
-#include "protocols/cifs/cifs.h"
 #include "api/cifs_pc_to_net.h"
+#include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 namespace NST
 {

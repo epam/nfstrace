@@ -22,6 +22,11 @@
 #ifndef PC_TO_NET_H
 #define PC_TO_NET_H
 //------------------------------------------------------------------------------
+#include <cstdint>
+
+#include <endian.h>
+//------------------------------------------------------------------------------
+
 namespace NST
 {
 namespace API
@@ -32,27 +37,14 @@ namespace SMBv2
 # if __BYTE_ORDER == __BIG_ENDIAN
 
 /*!
- * Run-time converter. Not very fast, try to not use
+ * Converter. Not very fast,
+ * try to not use
  */
 template<class T>
-inline T pc_to_net(T t)
+constexpr T pc_to_net(T t)
 {
-    T res = 0;
-
-    union Data
-    {
-        char f[sizeof(T)];
-        T t;
-    } d;
-
-    d.t = 0;
-    d.f[0] = 0xff;
-
-    for (int i = 0; i < sizeof(T); ++i)
-    {
-        res |= (((t >> i*8) & d.t) << (sizeof(T)*8 - 8)) >> i*8;
-    }
-    return res;
+    static_assert(false, "try to not use pc_to_net w/o specialization");
+    return t;
 }
 
 /*!
@@ -85,7 +77,7 @@ constexpr uint32_t pc_to_net(uint32_t t)
  * \return converted number
  */
 template<>
-constexpr uint16_t pc_to_net( uint16_t t)
+constexpr uint16_t pc_to_net(uint16_t t)
 {
     return switch_1_byte<0>(t) | switch_1_byte<1>(t);
 }
