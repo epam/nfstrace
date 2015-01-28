@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // Author: Dzianis Huznou (Alexey Costroma)
 // Description: Created for demonstration purpose only.
-// Copyright (c) 2013,2014 EPAM Systems
+// Copyright (c) 2013-2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -25,15 +25,17 @@
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
+#include "protocols/nfs4/nfs41_utils.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis
 {
 
-using namespace NST::protocols::NFS;  // NFS helpers
-using namespace NST::protocols::NFS3; // NFSv3 helpers
-using namespace NST::protocols::NFS4; // NFSv4 helpers
+using namespace NST::protocols::NFS;   // NFS helpers
+using namespace NST::protocols::NFS3;  // NFSv3 helpers
+using namespace NST::protocols::NFS4;  // NFSv4.0 helpers
+using namespace NST::protocols::NFS41; // NFSv4.1 helpers
 namespace NFS3  = NST::API::NFS3;
 namespace NFS4  = NST::API::NFS4;
 namespace NFS41 = NST::API::NFS41;
@@ -61,7 +63,7 @@ bool print_procedure(std::ostream& out, const RPCProcedure* proc)
         out << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(call.ru.RM_cmb.cb_proc));
         break;
     case NFS_V4:
-        out << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(call.ru.RM_cmb.cb_proc));
+        out << print_nfs41_procedures(static_cast<ProcEnumNFS41::NFSProcedure>(call.ru.RM_cmb.cb_proc));
         break;
     }
 
@@ -1732,6 +1734,1444 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::ILLEGAL4res* res)
 {
     if(res) out << "status: " << res->status;
 }
+
+// Print NFSv4.1 procedures
+// 1st line - PRC information: src and dst hosts, status of RPC procedure
+// 2nd line - <tabulation>related RPC procedure-specific arguments
+// 3rd line - <tabulation>related NFSv4-operations
+// 4th line - <tabulation>related RPC procedure-specific results
+// 5rd line - <tabulation>related NFSv4-operations
+
+void PrintAnalyzer::null41(const RPCProcedure* proc,
+                           const struct NFS41::NULL4args*,
+                           const struct NFS41::NULL4res*)
+{
+    if(!print_procedure(out, proc)) return;
+
+    out << "\tCALL  []\n\tREPLY []\n";
+}
+
+void PrintAnalyzer::compound41(const RPCProcedure*                proc,
+                               const struct NFS41::COMPOUND4args* args,
+                               const struct NFS41::COMPOUND4res*  res)
+{
+    if(!print_procedure(out, proc)) return;
+
+    const u_int* array_len {};
+    if(args)
+    {
+        array_len = &args->argarray.argarray_len;
+        out << "\tCALL  [ operations: " << *array_len
+            << " tag: "                 << args->tag
+            << " minor version: "       << args->minorversion;
+
+        if(*array_len)
+        {
+            NFS41::nfs_argop4* current_el {args->argarray.argarray_val};
+            for(u_int i {0}; i<*array_len; i++, current_el++)
+            {
+                out << "\n\t\t[ ";
+                nfs41_operation(current_el);
+                out << " ] ";
+            }
+            out << " ]\n";
+        }
+    }
+    if(res)
+    {
+        array_len = &res->resarray.resarray_len;
+        out << "\tREPLY [  operations: " << *array_len
+            << " status: "               << res->status
+            << " tag: "                  << res->tag;
+        if(*array_len)
+        {
+            NFS41::nfs_resop4* current_el {res->resarray.resarray_val};
+            for(u_int i {0}; i<*array_len; i++, current_el++)
+            {
+                out << "\n\t\t[ ";
+                nfs41_operation(current_el);
+                out << " ] ";
+            }
+            out << " ]\n";
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::nfs_argop4* op)
+{
+    if(op)
+    {
+    out << print_nfs41_procedures(static_cast<ProcEnumNFS41::NFSProcedure>(op->argop))
+        << '(' << op->argop << ") [ ";
+        switch(op->argop)
+        {
+        case NFS41::OP_ACCESS:
+             return nfs41_operation(&op->nfs_argop4_u.opaccess);
+        case NFS41::OP_CLOSE:
+             return nfs41_operation(&op->nfs_argop4_u.opclose);
+        case NFS41::OP_COMMIT:
+             return nfs41_operation(&op->nfs_argop4_u.opcommit);
+        case NFS41::OP_CREATE:
+             return nfs41_operation(&op->nfs_argop4_u.opcreate);
+        case NFS41::OP_DELEGPURGE:
+             return nfs41_operation(&op->nfs_argop4_u.opdelegpurge);
+        case NFS41::OP_DELEGRETURN:
+             return nfs41_operation(&op->nfs_argop4_u.opdelegreturn);
+        case NFS41::OP_GETATTR:
+             return nfs41_operation(&op->nfs_argop4_u.opgetattr);
+        case NFS41::OP_GETFH:
+             break;
+        case NFS41::OP_LINK:
+             return nfs41_operation(&op->nfs_argop4_u.oplink);
+        case NFS41::OP_LOCK:
+             return nfs41_operation(&op->nfs_argop4_u.oplock);
+        case NFS41::OP_LOCKT:
+             return nfs41_operation(&op->nfs_argop4_u.oplockt);
+        case NFS41::OP_LOCKU:
+             return nfs41_operation(&op->nfs_argop4_u.oplocku);
+        case NFS41::OP_LOOKUP:
+             return nfs41_operation(&op->nfs_argop4_u.oplookup);
+        case NFS41::OP_LOOKUPP:
+             break;
+        case NFS41::OP_NVERIFY:
+             return nfs41_operation(&op->nfs_argop4_u.opnverify);
+        case NFS41::OP_OPEN:
+             return nfs41_operation(&op->nfs_argop4_u.opopen);
+        case NFS41::OP_OPENATTR:
+             return nfs41_operation(&op->nfs_argop4_u.opopenattr);
+        case NFS41::OP_OPEN_CONFIRM:
+             return nfs41_operation(&op->nfs_argop4_u.opopen_confirm);
+        case NFS41::OP_OPEN_DOWNGRADE:
+             return nfs41_operation(&op->nfs_argop4_u.opopen_downgrade);
+        case NFS41::OP_PUTFH:
+             return nfs41_operation(&op->nfs_argop4_u.opputfh);
+        case NFS41::OP_PUTPUBFH:
+             break;
+        case NFS41::OP_PUTROOTFH:
+             break;
+        case NFS41::OP_READ:
+             return nfs41_operation(&op->nfs_argop4_u.opread);
+        case NFS41::OP_READDIR:
+             return nfs41_operation(&op->nfs_argop4_u.opreaddir);
+        case NFS41::OP_READLINK:
+             break;
+        case NFS41::OP_REMOVE:
+             return nfs41_operation(&op->nfs_argop4_u.opremove);
+        case NFS41::OP_RENAME:
+             return nfs41_operation(&op->nfs_argop4_u.oprename);
+        case NFS41::OP_RENEW:
+             return nfs41_operation(&op->nfs_argop4_u.oprenew);
+        case NFS41::OP_RESTOREFH:
+             break;
+        case NFS41::OP_SAVEFH:
+             break;
+        case NFS41::OP_SECINFO:
+             return nfs41_operation(&op->nfs_argop4_u.opsecinfo);
+        case NFS41::OP_SETATTR:
+             return nfs41_operation(&op->nfs_argop4_u.opsetattr);
+        case NFS41::OP_SETCLIENTID:
+             return nfs41_operation(&op->nfs_argop4_u.opsetclientid);
+        case NFS41::OP_SETCLIENTID_CONFIRM:
+             return nfs41_operation(&op->nfs_argop4_u.opsetclientid_confirm);
+        case NFS41::OP_VERIFY:
+             return nfs41_operation(&op->nfs_argop4_u.opverify);
+        case NFS41::OP_WRITE:
+             return nfs41_operation(&op->nfs_argop4_u.opwrite);
+        case NFS41::OP_RELEASE_LOCKOWNER:
+             return nfs41_operation(&op->nfs_argop4_u.oprelease_lockowner);
+        case NFS41::OP_BACKCHANNEL_CTL:
+             return nfs41_operation(&op->nfs_argop4_u.opbackchannel_ctl);
+        case NFS41::OP_BIND_CONN_TO_SESSION:
+             return nfs41_operation(&op->nfs_argop4_u.opbind_conn_to_session);
+        case NFS41::OP_EXCHANGE_ID:
+             return nfs41_operation(&op->nfs_argop4_u.opexchange_id);
+        case NFS41::OP_CREATE_SESSION:
+             return nfs41_operation(&op->nfs_argop4_u.opcreate_session);
+        case NFS41::OP_DESTROY_SESSION:
+             return nfs41_operation(&op->nfs_argop4_u.opdestroy_session);
+        case NFS41::OP_FREE_STATEID:
+             return nfs41_operation(&op->nfs_argop4_u.opfree_stateid);
+        case NFS41::OP_GET_DIR_DELEGATION:
+             return nfs41_operation(&op->nfs_argop4_u.opget_dir_delegation);
+        case NFS41::OP_GETDEVICEINFO:
+             return nfs41_operation(&op->nfs_argop4_u.opgetdeviceinfo);
+        case NFS41::OP_GETDEVICELIST:
+             return nfs41_operation(&op->nfs_argop4_u.opgetdevicelist);
+        case NFS41::OP_LAYOUTCOMMIT:
+             return nfs41_operation(&op->nfs_argop4_u.oplayoutcommit);
+        case NFS41::OP_LAYOUTGET:
+             return nfs41_operation(&op->nfs_argop4_u.oplayoutget);
+        case NFS41::OP_LAYOUTRETURN:
+             return nfs41_operation(&op->nfs_argop4_u.oplayoutreturn);
+        case NFS41::OP_SECINFO_NO_NAME:
+             return nfs41_operation(&op->nfs_argop4_u.opsecinfo_no_name);
+        case NFS41::OP_SEQUENCE:
+             return nfs41_operation(&op->nfs_argop4_u.opsequence);
+        case NFS41::OP_SET_SSV:
+             return nfs41_operation(&op->nfs_argop4_u.opset_ssv);
+        case NFS41::OP_TEST_STATEID:
+             return nfs41_operation(&op->nfs_argop4_u.optest_stateid);
+        case NFS41::OP_WANT_DELEGATION:
+             return nfs41_operation(&op->nfs_argop4_u.opwant_delegation);
+        case NFS41::OP_DESTROY_CLIENTID:
+             return nfs41_operation(&op->nfs_argop4_u.opdestroy_clientid);
+        case NFS41::OP_RECLAIM_COMPLETE:
+             return nfs41_operation(&op->nfs_argop4_u.opreclaim_complete);
+        case NFS41::OP_ILLEGAL:
+             break;
+        default: break;
+        }
+    out << " ]";
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::nfs_resop4* op)
+{
+    if(op)
+    {
+    out << print_nfs41_procedures(static_cast<ProcEnumNFS41::NFSProcedure>(op->resop))
+        << '(' << op->resop << ") [ ";
+        switch(op->resop)
+        {
+        case NFS41::OP_ACCESS:
+             return nfs41_operation(&op->nfs_resop4_u.opaccess);
+        case NFS41::OP_CLOSE:
+             return nfs41_operation(&op->nfs_resop4_u.opclose);
+        case NFS41::OP_COMMIT:
+             return nfs41_operation(&op->nfs_resop4_u.opcommit);
+        case NFS41::OP_CREATE:
+             return nfs41_operation(&op->nfs_resop4_u.opcreate);
+        case NFS41::OP_DELEGPURGE:
+             return nfs41_operation(&op->nfs_resop4_u.opdelegpurge);
+        case NFS41::OP_DELEGRETURN:
+             return nfs41_operation(&op->nfs_resop4_u.opdelegreturn);
+        case NFS41::OP_GETATTR:
+             return nfs41_operation(&op->nfs_resop4_u.opgetattr);
+        case NFS41::OP_GETFH:
+             return nfs41_operation(&op->nfs_resop4_u.opgetfh);
+        case NFS41::OP_LINK:
+             return nfs41_operation(&op->nfs_resop4_u.oplink);
+        case NFS41::OP_LOCK:
+             return nfs41_operation(&op->nfs_resop4_u.oplock);
+        case NFS41::OP_LOCKT:
+             return nfs41_operation(&op->nfs_resop4_u.oplockt);
+        case NFS41::OP_LOCKU:
+             return nfs41_operation(&op->nfs_resop4_u.oplocku);
+        case NFS41::OP_LOOKUP:
+             return nfs41_operation(&op->nfs_resop4_u.oplookup);
+        case NFS41::OP_LOOKUPP:
+             return nfs41_operation(&op->nfs_resop4_u.oplookupp);
+        case NFS41::OP_NVERIFY:
+             return nfs41_operation(&op->nfs_resop4_u.opnverify);
+        case NFS41::OP_OPEN:
+             return nfs41_operation(&op->nfs_resop4_u.opopen);
+        case NFS41::OP_OPENATTR:
+             return nfs41_operation(&op->nfs_resop4_u.opopenattr);
+        case NFS41::OP_OPEN_CONFIRM:
+             return nfs41_operation(&op->nfs_resop4_u.opopen_confirm);
+        case NFS41::OP_OPEN_DOWNGRADE:
+             return nfs41_operation(&op->nfs_resop4_u.opopen_downgrade);
+        case NFS41::OP_PUTFH:
+             return nfs41_operation(&op->nfs_resop4_u.opputfh);
+        case NFS41::OP_PUTPUBFH:
+             return nfs41_operation(&op->nfs_resop4_u.opputpubfh);
+        case NFS41::OP_PUTROOTFH:
+             return nfs41_operation(&op->nfs_resop4_u.opputrootfh);
+        case NFS41::OP_READ:
+             return nfs41_operation(&op->nfs_resop4_u.opread);
+        case NFS41::OP_READDIR:
+             return nfs41_operation(&op->nfs_resop4_u.opreaddir);
+        case NFS41::OP_READLINK:
+             return nfs41_operation(&op->nfs_resop4_u.opreadlink);
+        case NFS41::OP_REMOVE:
+             return nfs41_operation(&op->nfs_resop4_u.opremove);
+        case NFS41::OP_RENAME:
+             return nfs41_operation(&op->nfs_resop4_u.oprename);
+        case NFS41::OP_RENEW:
+             return nfs41_operation(&op->nfs_resop4_u.oprenew);
+        case NFS41::OP_RESTOREFH:
+             return nfs41_operation(&op->nfs_resop4_u.oprestorefh);
+        case NFS41::OP_SAVEFH:
+             return nfs41_operation(&op->nfs_resop4_u.opsavefh);
+        case NFS41::OP_SECINFO:
+             return nfs41_operation(&op->nfs_resop4_u.opsecinfo);
+        case NFS41::OP_SETATTR:
+             return nfs41_operation(&op->nfs_resop4_u.opsetattr);
+        case NFS41::OP_SETCLIENTID:
+             return nfs41_operation(&op->nfs_resop4_u.opsetclientid);
+        case NFS41::OP_SETCLIENTID_CONFIRM:
+             return nfs41_operation(&op->nfs_resop4_u.opsetclientid_confirm);
+        case NFS41::OP_VERIFY:
+             return nfs41_operation(&op->nfs_resop4_u.opverify);
+        case NFS41::OP_WRITE:
+             return nfs41_operation(&op->nfs_resop4_u.opwrite);
+        case NFS41::OP_RELEASE_LOCKOWNER:
+             return nfs41_operation(&op->nfs_resop4_u.oprelease_lockowner);
+        case NFS41::OP_BACKCHANNEL_CTL:
+             return nfs41_operation(&op->nfs_resop4_u.opbackchannel_ctl);
+        case NFS41::OP_BIND_CONN_TO_SESSION:
+             return nfs41_operation(&op->nfs_resop4_u.opbind_conn_to_session);
+        case NFS41::OP_EXCHANGE_ID:
+             return nfs41_operation(&op->nfs_resop4_u.opexchange_id);
+        case NFS41::OP_CREATE_SESSION:
+             return nfs41_operation(&op->nfs_resop4_u.opcreate_session);
+        case NFS41::OP_DESTROY_SESSION:
+             return nfs41_operation(&op->nfs_resop4_u.opdestroy_session);
+        case NFS41::OP_FREE_STATEID:
+             return nfs41_operation(&op->nfs_resop4_u.opfree_stateid);
+        case NFS41::OP_GET_DIR_DELEGATION:
+             return nfs41_operation(&op->nfs_resop4_u.opget_dir_delegation);
+        case NFS41::OP_GETDEVICEINFO:
+             return nfs41_operation(&op->nfs_resop4_u.opgetdeviceinfo);
+        case NFS41::OP_GETDEVICELIST:
+             return nfs41_operation(&op->nfs_resop4_u.opgetdevicelist);
+        case NFS41::OP_LAYOUTCOMMIT:
+             return nfs41_operation(&op->nfs_resop4_u.oplayoutcommit);
+        case NFS41::OP_LAYOUTGET:
+             return nfs41_operation(&op->nfs_resop4_u.oplayoutget);
+        case NFS41::OP_LAYOUTRETURN:
+             return nfs41_operation(&op->nfs_resop4_u.oplayoutreturn);
+        case NFS41::OP_SECINFO_NO_NAME:
+             return nfs41_operation(&op->nfs_resop4_u.opsecinfo_no_name);
+        case NFS41::OP_SEQUENCE:
+             return nfs41_operation(&op->nfs_resop4_u.opsequence);
+        case NFS41::OP_SET_SSV:
+             return nfs41_operation(&op->nfs_resop4_u.opset_ssv);
+        case NFS41::OP_TEST_STATEID:
+             return nfs41_operation(&op->nfs_resop4_u.optest_stateid);
+        case NFS41::OP_WANT_DELEGATION:
+             return nfs41_operation(&op->nfs_resop4_u.opwant_delegation);
+        case NFS41::OP_DESTROY_CLIENTID:
+             return nfs41_operation(&op->nfs_resop4_u.opdestroy_clientid);
+        case NFS41::OP_RECLAIM_COMPLETE:
+             return nfs41_operation(&op->nfs_resop4_u.opreclaim_complete);
+        case NFS41::OP_ILLEGAL:
+             return nfs41_operation(&op->nfs_resop4_u.opillegal);
+        default: break;
+        }
+    out << " ]";
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::ACCESS4args* args)
+{
+    if(args)
+    {
+        if ((args->access) & NFS41::ACCESS4_READ)    out << "READ ";
+        if ((args->access) & NFS41::ACCESS4_LOOKUP)  out << "LOOKUP ";
+        if ((args->access) & NFS41::ACCESS4_MODIFY)  out << "MODIFY ";
+        if ((args->access) & NFS41::ACCESS4_EXTEND)  out << "EXTEND ";
+        if ((args->access) & NFS41::ACCESS4_DELETE)  out << "DELETE ";
+        if ((args->access) & NFS41::ACCESS4_EXECUTE) out << "EXECUTE ";
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::ACCESS4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " supported: ";
+            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_READ)
+                out << "READ ";
+            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_LOOKUP)
+                out << "LOOKUP ";
+            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_MODIFY)
+                out << "MODIFY ";
+            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_EXTEND)
+                out << "EXTEND ";
+            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_DELETE)
+                out << "DELETE ";
+            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_EXECUTE)
+                out << "EXECUTE ";
+            out << " access: ";
+            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_READ)
+                out << "READ ";
+            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_LOOKUP)
+                out << "LOOKUP ";
+            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_MODIFY)
+                out << "MODIFY ";
+            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_EXTEND)
+                out << "EXTEND ";
+            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_DELETE)
+                out << "DELETE ";
+            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_EXECUTE)
+                out << "EXECUTE ";
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::CLOSE4args* args)
+{
+    if(args) out <<  "seqid: "        << std::hex << args->seqid << std::dec
+                 << " open state id:" << args->open_stateid;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::CLOSE4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << " open state id:" << res->CLOSE4res_u.open_stateid;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::COMMIT4args* args)
+{
+    if(args) out <<  "offset: " << args->offset
+                 << " count: "  << args->count;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::COMMIT4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " write verifier: ";
+            print_hex(out,
+                      res->COMMIT4res_u.resok4.writeverf,
+                      NFS41::NFS4_VERIFIER_SIZE);
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE4args* args)
+{
+    if(args) out <<  "object type: "       << args->objtype
+                 << " object name: "       << args->objname
+                 << " create attributes: " << args->createattrs;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << res->CREATE4res_u.resok4.cinfo << ' '
+                << res->CREATE4res_u.resok4.attrset;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::DELEGPURGE4args* args)
+{
+    if(args) out << "client id: " << std::hex << args->clientid << std::dec;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::DELEGPURGE4res*  res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::DELEGRETURN4args* args)
+{
+    if(args) out << args->deleg_stateid;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::DELEGRETURN4res*  res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::GETATTR4args* args)
+{
+    if(args) out << args->attr_request;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::GETATTR4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << ' ' << res->GETATTR4res_u.resok4.obj_attributes;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LINK4args* args)
+{
+    if(args) out << "new name: " << args->newname;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LINK4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << ' ' << res->LINK4res_u.resok4.cinfo;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCK4args* args)
+{
+    if(args) out <<  "lock type: " << args->locktype
+                 << " reclaim: "   << args->reclaim
+                 << " offset: "    << args->offset
+                 << " length: "    << args->length
+                 << " locker: "    << args->locker;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCK4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all())
+        {
+            switch(res->status)
+            {
+            case NFS41::nfsstat4::NFS4_OK:
+                out << " lock stat id: "
+                    << res->LOCK4res_u.resok4.lock_stateid;
+                break;
+            case NFS41::nfsstat4::NFS4ERR_DENIED:
+                out << " offset: "    << res->LOCK4res_u.denied.offset
+                    << " length: "    << res->LOCK4res_u.denied.length
+                    << " lock type: " << res->LOCK4res_u.denied.locktype
+                    << " owner: "     << res->LOCK4res_u.denied.owner;
+                break;
+            default: break;
+            }
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCKT4args* args)
+{
+    if(args) out <<  "lock type: " << args->locktype
+                 << " offset: "    << args->offset
+                 << " length: "    << args->length
+                 << " owner: "     << args->owner;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCKT4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4ERR_DENIED)
+            out << " offset: "    << res->LOCKT4res_u.denied.offset
+                << " length: "    << res->LOCKT4res_u.denied.length
+                << " lock type: " << res->LOCKT4res_u.denied.locktype
+                << " owner: "     << res->LOCKT4res_u.denied.owner;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCKU4args* args)
+{
+    if(args) out <<  "lock type: "     << args->locktype
+                 << " seqid: "       << std::hex << args->seqid << std::dec
+                 << " lock state id: " << args->lock_stateid
+                 << " offset: "        << args->offset
+                 << " length: "        << args->length;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCKU4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << " lock state id: " << res->LOCKU4res_u.lock_stateid;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOOKUP4args* args)
+{
+    if(args) out << "object name: " << args->objname;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOOKUP4res*  res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::NVERIFY4args* args)
+{
+    if(args) out << "object attributes: " << args->obj_attributes;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::NVERIFY4res*  res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN4args* args)
+{
+    static const char* const open4_share_access[4] = {"",    "READ","WRITE","BOTH"};
+    static const char* const open4_share_deny[4]   = {"NONE","READ","WRITE","BOTH"};
+
+    if(args) out <<  "seqid: " << std::hex << args->seqid << std::dec
+                 << " share access: " << open4_share_access[args->share_access]
+                 << " share deny: "   << open4_share_deny[args->share_deny]
+                 << ' ' << args->owner
+                 << ' ' << args->openhow
+                 << ' ' << args->claim;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << res->OPEN4res_u.resok4.stateid
+                << res->OPEN4res_u.resok4.cinfo
+                << " results flags: "
+                << std::hex << res->OPEN4res_u.resok4.rflags << std::dec
+                << ' ' << res->OPEN4res_u.resok4.attrset
+                << ' ' << res->OPEN4res_u.resok4.delegation;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPENATTR4args* args)
+{
+    if(args) out << "create directory: " << args->createdir;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPENATTR4res*  res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_CONFIRM4args* args)
+{
+    if(args) out <<  "open state id:" << args->open_stateid
+                 << " seqid: "        << std::hex << args->seqid << std::dec;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_CONFIRM4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << " open state id:" << res->OPEN_CONFIRM4res_u.resok4.open_stateid;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_DOWNGRADE4args* args)
+{
+    if(args) out << " open state id: " << args->open_stateid
+                 << " seqid: "       << std::hex << args->seqid << std::dec
+                 << " share access: "  << args->share_access
+                 << " share deny: "    << args->share_deny;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_DOWNGRADE4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << ' ' << res->OPEN_DOWNGRADE4res_u.resok4.open_stateid;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::PUTFH4args* args)
+{
+    if(args)
+    {
+        out << "object: ";
+        print_nfs_fh(out, args->object.nfs_fh4_val, args->object.nfs_fh4_len);
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::PUTFH4res*  res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::READ4args* args)
+{
+    if(args) out << args->stateid
+                 << " offset: "   << args->offset
+                 << " count: "    << args->count;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::READ4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " eof: " << res->READ4res_u.resok4.eof;
+            if(res->READ4res_u.resok4.data.data_len)
+                out << " data: " << *res->READ4res_u.resok4.data.data_val;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::READDIR4args* args)
+{
+    if(args) out <<  "cookie: "             << args->cookie
+                 << " cookieverf: "         << args->cookieverf
+                 << " dir count: "          << args->dircount
+                 << " max count: "          << args->maxcount
+                 << " attributes request: " << args->attr_request;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::READDIR4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << " cookie verifier: " << res->READDIR4res_u.resok4.cookieverf
+                << " reply: "           << res->READDIR4res_u.resok4.reply;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::REMOVE4args* args)
+{
+    if(args) out << "target: " << args->target;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::REMOVE4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << ' ' << res->REMOVE4res_u.resok4.cinfo;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RENAME4args* args)
+{
+    if(args) out <<  "old name: " << args->oldname
+                 << " new name: " << args->newname;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RENAME4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << " source: "
+                << res->RENAME4res_u.resok4.source_cinfo
+                << " target: "
+                << res->RENAME4res_u.resok4.target_cinfo;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RENEW4args* args)
+{
+    if(args) out << "client id: "
+                 << std::hex << args->clientid << std::dec;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RENEW4res*  res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SECINFO4args* args)
+{
+    if(args) out << "name: " << args->name;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SECINFO4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        {
+            if(res->SECINFO4res_u.resok4.SECINFO4resok_len)
+                out << *res->SECINFO4res_u.resok4.SECINFO4resok_val;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SETATTR4args* args)
+{
+    if(args) out << "state id:" << args->stateid
+                         << ' ' << args->obj_attributes;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SETATTR4res*  res)
+{
+    if(res)
+    {
+        out <<  "status: " << res->status;
+        if(out_all()) out << ' ' << res->attrsset;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID4args* args)
+{
+    if(args) out << args->client
+                 << " callback: "
+                 << args->callback
+                 << " callback ident: "
+                 << std::hex << args->callback_ident << std::dec;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all())
+        {
+            switch(res->status)
+            {
+            case NFS41::nfsstat4::NFS4_OK:
+                out << " client id: "
+                    << std::hex << res->SETCLIENTID4res_u.resok4.clientid << std::dec
+                    << " verifier: ";
+                print_hex(out,
+                          res->SETCLIENTID4res_u.resok4.setclientid_confirm,
+                          NFS41::NFS4_VERIFIER_SIZE);
+                break;
+            case NFS41::nfsstat4::NFS4ERR_CLID_INUSE:
+                out << " client using: " << res->SETCLIENTID4res_u.client_using;
+                break;
+            default: break;
+            }
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID_CONFIRM4args* args)
+{
+    if(args)
+    {
+        out << " client id: " << std::hex << args->clientid << std::dec
+            << " verifier: ";
+        print_hex(out, args->setclientid_confirm, NFS41::NFS4_VERIFIER_SIZE);
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID_CONFIRM4res*  res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::VERIFY4args* args)
+{
+    if(args) out << "object attributes: " << args->obj_attributes;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::VERIFY4res*  res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::WRITE4args* args)
+{
+    if(args)
+    {
+        out << args->stateid
+            << " offset: "      << args->offset
+            << " stable: "      << args->stable
+            << " data length: " << args->data.data_len;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::WRITE4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " count: "          << res->WRITE4res_u.resok4.count
+                << " committed: "       << res->WRITE4res_u.resok4.committed
+                << " write verifier: ";
+            print_hex(out,
+                      res->WRITE4res_u.resok4.writeverf,
+                      NFS41::NFS4_VERIFIER_SIZE);
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RELEASE_LOCKOWNER4args* args)
+{
+    if(args) out << "lock owner: " << args->lock_owner;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RELEASE_LOCKOWNER4res*  res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::GETFH4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << " object: " << res->GETFH4res_u.resok4.object;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOOKUPP4res* res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::PUTPUBFH4res* res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::PUTROOTFH4res* res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::READLINK4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->status;
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+            out << " link: " << res->READLINK4res_u.resok4.link;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RESTOREFH4res* res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SAVEFH4res* res)
+{
+    if(res) out << "status: " << res->status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::GET_DIR_DELEGATION4args* args)
+{
+    if(args)
+        out <<  "signal delegation available: " << args->gdda_signal_deleg_avail
+            << " notification types: "          << args->gdda_notification_types
+            << " child attr delay: "            << args->gdda_child_attr_delay
+            << " dir attr delay: "              << args->gdda_dir_attr_delay
+            << " child child attributes: "      << args->gdda_child_attributes
+            << " child dir attributes: "        << args->gdda_dir_attributes;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::GET_DIR_DELEGATION4res*  res)
+{
+    if(res)
+    {
+        out << "status: " << res->gddr_status;
+        if(out_all() && res->gddr_status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " status: " << res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.gddrnf_status;
+            if(out_all() && res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.gddrnf_status == NFS41::gddrnf4_status::GDD4_OK)
+            {
+                out <<  " cookieverf: ";
+                print_hex(out,
+                          res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_cookieverf,
+                          NFS41::NFS4_VERIFIER_SIZE);
+                out << " stateid: "
+                    <<  res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_stateid
+                    << " notification: "
+                    <<  res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_notification
+                    << " child attributes: "
+                    <<  res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_child_attributes
+                    << " dir attributes: "
+                    <<  res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_dir_attributes;
+            }
+            else
+            {
+                out << " will signal deleg avail: "
+                    << res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_will_signal_deleg_avail;
+            }
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::BACKCHANNEL_CTL4args* args)
+{
+    if(args)
+    {
+        out <<  "program: " << args->bca_cb_program
+            << " sec parms: ";
+        NFS41::callback_sec_parms4* current_el {args->bca_sec_parms.bca_sec_parms_val};
+        for(u_int i {0}; i<args->bca_sec_parms.bca_sec_parms_len; i++, current_el++)
+        {
+            out << ' ' << current_el;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::BACKCHANNEL_CTL4res* res)
+{
+    if(res) out << "status: " << res->bcr_status;
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::BIND_CONN_TO_SESSION4args* args)
+{
+    if(args)
+    {
+        out <<  "sessid: ";
+        print_hex(out,
+                  args->bctsa_sessid,
+                  NFS41::NFS4_SESSIONID_SIZE);
+        out << " dir: "                   << args->bctsa_dir
+            << " use conn in rdma mode: " << args->bctsa_use_conn_in_rdma_mode;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::BIND_CONN_TO_SESSION4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->bctsr_status;
+        if(out_all() && res->bctsr_status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " sessid: ";
+            print_hex(out,
+                      res->BIND_CONN_TO_SESSION4res_u.bctsr_resok4.bctsr_sessid,
+                      NFS41::NFS4_SESSIONID_SIZE);
+            out << " dir: "
+                << res->BIND_CONN_TO_SESSION4res_u.bctsr_resok4.bctsr_dir
+                << " use conn in rdma mode: "
+                << res->BIND_CONN_TO_SESSION4res_u.bctsr_resok4.bctsr_use_conn_in_rdma_mode;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::EXCHANGE_ID4args* args)
+{
+    if(args)
+    {
+        out <<  "client owner: "  << args->eia_clientowner
+            << " flags: "         << args->eia_flags
+            << " state protect: " << args->eia_state_protect
+            << " client impl id: ";
+        NFS41::nfs_impl_id4* current_el {args->eia_client_impl_id.eia_client_impl_id_val};
+        for(u_int i {0}; i<args->eia_client_impl_id.eia_client_impl_id_len; i++, current_el++)
+        {
+            out << ' ' << current_el;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::EXCHANGE_ID4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->eir_status;
+        if(out_all() && res->eir_status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " clientid: "                 << res->EXCHANGE_ID4res_u.eir_resok4.eir_clientid
+                << " sequenceid: 0x" << std::hex << res->EXCHANGE_ID4res_u.eir_resok4.eir_sequenceid << std::dec
+                << " flags: "                    << res->EXCHANGE_ID4res_u.eir_resok4.eir_flags
+                << " state protect: "            << res->EXCHANGE_ID4res_u.eir_resok4.eir_state_protect
+                << " server owner: "             << res->EXCHANGE_ID4res_u.eir_resok4.eir_server_owner
+                << " server scope: ";
+            print_hex(out,
+                      res->EXCHANGE_ID4res_u.eir_resok4.eir_server_scope.eir_server_scope_val,
+                      res->EXCHANGE_ID4res_u.eir_resok4.eir_server_scope.eir_server_scope_len);
+            out << " server impl id:";
+            NFS41::nfs_impl_id4 *current_el {res->EXCHANGE_ID4res_u.eir_resok4.eir_server_impl_id.eir_server_impl_id_val};
+            for(u_int i {0}; i<res->EXCHANGE_ID4res_u.eir_resok4.eir_server_impl_id.eir_server_impl_id_len; i++, current_el++)
+            {
+                out << ' ' << current_el;
+            }
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE_SESSION4args* args)
+{
+    if(args)
+    {
+        out <<  "clientid: "                << args->csa_clientid
+            << " sequnceid: 0x" << std::hex << args->csa_sequence << std::dec
+            << " flags: "                   << args->csa_flags
+            << " fore chan attrs: "         << args->csa_fore_chan_attrs
+            << " fore back attrs: "         << args->csa_back_chan_attrs
+            << " cb program: "              << args->csa_cb_program
+            << " callback sec parms:";
+            NFS41::callback_sec_parms4 *current_el {args->csa_sec_parms.csa_sec_parms_val};
+            for(u_int i {0}; i<args->csa_sec_parms.csa_sec_parms_len; i++, current_el++)
+            {
+                out << ' ' << current_el;
+            }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE_SESSION4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->csr_status;
+        if(out_all() && res->csr_status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " session id: ";
+            print_hex(out,
+                      res->CREATE_SESSION4res_u.csr_resok4.csr_sessionid,
+                      NFS41::NFS4_SESSIONID_SIZE);
+            out << " sequenceid: 0x" << std::hex << res->CREATE_SESSION4res_u.csr_resok4.csr_sequence << std::dec
+                << " flags: "                    << res->CREATE_SESSION4res_u.csr_resok4.csr_flags
+                << " fore chan attrs: "          << res->CREATE_SESSION4res_u.csr_resok4.csr_fore_chan_attrs
+                << " fore back attrs: "          << res->CREATE_SESSION4res_u.csr_resok4.csr_back_chan_attrs;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_SESSION4args* args)
+{
+    if(args)
+    {
+        out << "session id: ";
+        print_hex(out,
+                  args->dsa_sessionid,
+                  NFS41::NFS4_SESSIONID_SIZE);
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_SESSION4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->dsr_status;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::FREE_STATEID4args* args)
+{
+    if(args)
+    {
+        out << "stateid: " << args->fsa_stateid;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::FREE_STATEID4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->fsr_status;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::GETDEVICEINFO4args* args)
+{
+    if(args)
+    {
+        out <<  "device id: "    << args->gdia_device_id
+            << " layout type: "  << args->gdia_layout_type
+            << " maxcount: "     << args->gdia_maxcount
+            << " notify types: " << args->gdia_notify_types;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::GETDEVICEINFO4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->gdir_status;
+        if(out_all())
+        {
+            if(res->gdir_status == NFS41::nfsstat4::NFS4_OK)
+            {
+                out << " device addr: "  << res->GETDEVICEINFO4res_u.gdir_resok4.gdir_device_addr
+                    << " notification: " << res->GETDEVICEINFO4res_u.gdir_resok4.gdir_notification;
+            }
+            if(res->gdir_status == NFS41::nfsstat4::NFS4ERR_TOOSMALL)
+            {
+                out << " min count: " << res->GETDEVICEINFO4res_u.gdir_mincount;
+            }
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::GETDEVICELIST4args* args)
+{
+    if(args)
+    {
+        out <<  "layout type: " << args->gdla_layout_type
+            << " max devices: " << args->gdla_maxdevices
+            << " cookie: "      << args->gdla_cookie
+            << " cookieverf: "  << args->gdla_cookieverf;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::GETDEVICELIST4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->gdlr_status;
+        if(out_all() && res->gdlr_status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " cookie: "      << res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_cookie
+                << " cookieverf: "  << res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_cookieverf
+                << " device id list: ";
+            NFS41::deviceid4 *current_el {res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_deviceid_list.gdlr_deviceid_list_val};
+            for(u_int i {0}; i<res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_deviceid_list.gdlr_deviceid_list_len; i++, current_el++)
+            {
+                out << ' ' << current_el;
+            }
+            out << " eof: "  << res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_eof;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTCOMMIT4args* args)
+{
+    if(args)
+    {
+        out <<  "offset: "             << args->loca_offset
+            << " length: "             << args->loca_length
+            << " reclaim: "            << args->loca_reclaim
+            << " stateid: "            << args->loca_stateid
+            << " last write offset: "  << args->loca_last_write_offset
+            << " time modify: "        << args->loca_time_modify
+            << " tayout update: "      << args->loca_layoutupdate;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTCOMMIT4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->locr_status;
+        if(out_all() && res->locr_status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " new size: " << res->LAYOUTCOMMIT4res_u.locr_resok4.locr_newsize;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTGET4args* args)
+{
+    if(args)
+    {
+        out <<  "signal layout avail: " << args->loga_signal_layout_avail
+            << " layout type: "         << args->loga_layout_type
+            << " iomode: "              << args->loga_iomode
+            << " offset: "              << args->loga_offset
+            << " length: "              << args->loga_length
+            << " minlength: "           << args->loga_minlength
+            << " stateid: "             << args->loga_stateid
+            << " maxcount: "            << args->loga_maxcount;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTGET4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->logr_status;
+        if(out_all())
+        {
+            if(res->logr_status == NFS41::nfsstat4::NFS4_OK)
+            {
+                out << " return on close: "
+                    << res->LAYOUTGET4res_u.logr_resok4.logr_return_on_close
+                    << " stateid: "
+                    << res->LAYOUTGET4res_u.logr_resok4.logr_stateid
+                    << " layout:x ";
+                NFS41::layout4* current_el = res->LAYOUTGET4res_u.logr_resok4.logr_layout.logr_layout_val;
+                for(u_int i {0}; i<res->LAYOUTGET4res_u.logr_resok4.logr_layout.logr_layout_len; i++, current_el++)
+                {
+                    out << ' ' << current_el;
+                }
+            }
+        }
+        if(res->logr_status == NFS41::nfsstat4::NFS4ERR_LAYOUTTRYLATER)
+        {
+            out << "will signal layout avail: "
+                << res->LAYOUTGET4res_u.logr_will_signal_layout_avail;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTRETURN4args* args)
+{
+    if(args)
+    {
+        out <<  "reclaim: "       << args->lora_reclaim
+            << " layout type: "   << args->lora_layout_type
+            << " iomode: "        << args->lora_iomode
+            << " layout return: " << args->lora_layoutreturn;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTRETURN4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->lorr_status;
+        if(out_all() && res->lorr_status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " stateid: " << res->LAYOUTRETURN4res_u.lorr_stateid;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SEQUENCE4args* args)
+{
+    if(args)
+    {
+        out <<  "sessionid: ";
+        print_hex(out,
+                  args->sa_sessionid,
+                  NFS41::NFS4_SESSIONID_SIZE);
+        out << " sequenceid: 0x" << std::hex << args->sa_sequenceid << std::dec
+            << " slotid: "       << args->sa_slotid
+            << " cache this: "   << args->sa_cachethis;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SEQUENCE4res* res)
+{
+    if(res)
+    {
+    out << "status: " << res->sr_status;
+        if(out_all() && res->sr_status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " session: ";
+            print_hex(out,
+                      res->SEQUENCE4res_u.sr_resok4.sr_sessionid,
+                      NFS41::NFS4_SESSIONID_SIZE);
+            out << " sequenceid: 0x" << std::hex << res->SEQUENCE4res_u.sr_resok4.sr_sequenceid << std::dec
+                << " slotid: "                   << res->SEQUENCE4res_u.sr_resok4.sr_slotid
+                << " highest slotid: "           << res->SEQUENCE4res_u.sr_resok4.sr_highest_slotid
+                << " target highest slotid: "    << res->SEQUENCE4res_u.sr_resok4.sr_target_highest_slotid
+                << " status flags: "             << res->SEQUENCE4res_u.sr_resok4.sr_status_flags;
+        }
+    }
+}
+
+//SECINFO_NO_NAME4args
+void PrintAnalyzer::nfs41_operation(const enum NFS41::secinfo_style4* args)
+{
+    if(args)
+    {
+        out << ' ' << *args;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SET_SSV4args* args)
+{
+    if(args)
+    {
+            out << "ssv: ";
+            out.write(args->ssa_ssv.ssa_ssv_val,
+                      args->ssa_ssv.ssa_ssv_len);
+            out << " digest: ";
+            out.write(args->ssa_digest.ssa_digest_val,
+                      args->ssa_digest.ssa_digest_len);
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SET_SSV4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->ssr_status;
+        if(out_all() && res->ssr_status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " digest: ";
+            out.write(res->SET_SSV4res_u.ssr_resok4.ssr_digest.ssr_digest_val,
+                      res->SET_SSV4res_u.ssr_resok4.ssr_digest.ssr_digest_len);
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::TEST_STATEID4args* args)
+{
+    if(args)
+    {
+        out << "stateids:";
+        NFS41::stateid4* current_el = args->ts_stateids.ts_stateids_val;
+        for(u_int i {0}; i<args->ts_stateids.ts_stateids_len; i++, current_el++)
+        {
+           out << ' ' << current_el;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::TEST_STATEID4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->tsr_status;
+        if(out_all() && res->tsr_status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << " status codes: ";
+            NFS41::nfsstat4* current_el = res->TEST_STATEID4res_u.tsr_resok4.tsr_status_codes.tsr_status_codes_val; 
+            for(u_int i {0}; i<res->TEST_STATEID4res_u.tsr_resok4.tsr_status_codes.tsr_status_codes_len; i++, current_el++)
+            {
+                out << ' ' << current_el;
+            }
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::WANT_DELEGATION4args* args)
+{
+    if(args)
+    {
+        out <<  "want: "  << args->wda_want
+            << " claim: " << args->wda_claim;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::WANT_DELEGATION4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->wdr_status;
+        if(out_all() && res->wdr_status == NFS41::nfsstat4::NFS4_OK)
+        {
+            out << res->WANT_DELEGATION4res_u.wdr_resok4;
+        }
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_CLIENTID4args* args)
+{
+    if(args)
+    {
+        out << "clientid: " << args->dca_clientid;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_CLIENTID4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->dcr_status;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RECLAIM_COMPLETE4args* args)
+{
+    if(args)
+    {
+        out << "one fs: " << args->rca_one_fs;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RECLAIM_COMPLETE4res* res)
+{
+    if(res)
+    {
+        out << "status: " << res->rcr_status;
+    }
+}
+
+void PrintAnalyzer::nfs41_operation(const struct NFS41::ILLEGAL4res* res)
+{
+    if(res) out << "status: " << res->status;
+}
+
 
 void PrintAnalyzer::flush_statistics()
 {
