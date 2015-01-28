@@ -334,7 +334,7 @@ So, say, in order to choose two-pass algorithm you have to pass
 to OB analyzer:
 .RS 4
 .PP
-.B nfstrace \-m stat \-a libreakdown.so#ACC
+.B $ nfstrace \-m stat \-a libreakdown.so#ACC
 .RE
 .PP
 OB analyzer produces
@@ -349,7 +349,25 @@ or
 (according to NFS version).
 .RS 4
 .PP
-.B nst.sh \-a breakdown_nfsv4.plt \-d . \-p 'breakdown_10.6.137.47:903*.dat'
+.B $ nst.sh \-a breakdown_nfsv4.plt \-d . \-p 'breakdown_10.6.137.47:903*.dat'
+.RE
+.SS Watch
+Watch plugin mimics old
+.B nfswatch
+utility: it monitors NFS traffic and displays it in terminal using ncurses. It
+supports NFSv3 and NFSv4.
+.PP
+.B Important:
+at the moment watch plugin's output conflicts with standard nfstrace's output.
+You have to run nfstrace with
+.B "-v 0"
+option so it will be silent and won't break ncurses output.
+.PP
+By default watch plugin will update its screen every 2 seconds, you can specify
+another timeout in milliseconds:
+.RS 4
+.PP
+.B $ nfstrace -v 0 -a libwatch.so#1000
 .RE
 .SS JSON Analyzer
 JSON analyzer calculates a total amount of each supported application protocol
