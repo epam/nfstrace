@@ -19,8 +19,6 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <arpa/inet.h>
-
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
@@ -57,5 +55,5 @@ const NST::protocols::CIFSv2::MessageHeader* NST::protocols::CIFSv2::get_header(
 
 bool MessageHeader::isFlag(const Flags flag) const
 {
-    return static_cast<uint32_t>(flag) & ntohl(flags);
+    return static_cast<uint32_t>(flag) & flags;
 }

@@ -27,6 +27,7 @@
 #include "analysis/analyzers.h"
 #include "analysis/cifs_parser.h"
 #include "api/cifs_types.h"
+#include "api/cifs_pc_to_net.h"
 //------------------------------------------------------------------------------
 using namespace NST::filtration;
 using namespace NST::analysis;
@@ -169,9 +170,9 @@ TEST(Parser, CIFSAsyncParser)
     NST::utils::FilteredDataQueue::Ptr el = list.get_current();
 
     CIFSv2::MessageHeader header;
-    header.head_code =  0x424d53fe;// Protocol's marker
+    header.head_code =  NST::API::SMBv2::pc_to_net<uint32_t>(0x424d53fe);// Protocol's marker
     header.cmd_code = CIFSv2::Commands::READ;
-    header.flags = ntohl(static_cast<uint32_t>(CIFSv2::Flags::ASYNC_COMMAND));
+    header.flags = static_cast<uint32_t>(CIFSv2::Flags::ASYNC_COMMAND);
 
     el->data = reinterpret_cast<uint8_t*>(&header);
     el->dlen = sizeof(header);
