@@ -25,6 +25,7 @@
 #include <cstdint>
 
 #ifdef __linux__
+//
 #include <endian.h>
 #define NFSTRACE_BYTE_ORDER __BYTE_ORDER
 #define NFSTRACE_BIG_ENDIAN __BIG_ENDIAN
@@ -54,7 +55,7 @@ namespace SMBv2
 template<class T>
 constexpr T pc_to_net(T t)
 {
-    static_assert(false, "try to not use pc_to_net w/o specialization");
+    static_assert(t == 0, "try to not use pc_to_net w/o specialization");
     return t;
 }
 
