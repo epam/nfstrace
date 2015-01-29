@@ -131,7 +131,7 @@ private:
 
     inline void set_msg_size(const CIFSv2::MessageHeader* header, const size_t length)
     {
-        if ((header->cmd_code == CIFSv2::Commands::READ) || (header->cmd_code == CIFSv2::Commands::WRITE))
+        if (((header->cmd_code == CIFSv2::Commands::READ) || (header->cmd_code == CIFSv2::Commands::WRITE)) && !header->nextCommand)
         {
             return BaseImpl::setToBeCopied(std::min(length, rw_hdr_max));
         }
