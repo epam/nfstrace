@@ -19,6 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <arpa/inet.h>
+
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
