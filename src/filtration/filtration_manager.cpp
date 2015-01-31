@@ -158,7 +158,7 @@ void FiltrationManager::add_offline_dumping (const Parameters& params)
 
     if(utils::Out message{}) // print parameters to user
     {
-        message << *reader.get();
+        message << *reader;
     }
     std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),
                                                          dumping_params
@@ -185,7 +185,7 @@ void FiltrationManager::add_offline_analysis(const std::string& ifile,
     std::unique_ptr<FileReader> reader { new FileReader{ifile} };
     if(utils::Out message{}) // print parameters to user
     {
-        message << *reader.get();
+        message << *reader;
     }
     std::unique_ptr<Queueing>   writer { new Queueing{queue}   };
 

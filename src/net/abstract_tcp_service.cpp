@@ -118,7 +118,7 @@ void AbstractTcpService::runWorker()
         std::unique_ptr<AbstractTask> pendingTask;
         {
             std::unique_lock<std::mutex> lock{_tasksQueueMutex};
-            while (pendingTask.get() == nullptr)
+            while (!pendingTask)
             {
                 if (!_isRunning.load())
                 {
