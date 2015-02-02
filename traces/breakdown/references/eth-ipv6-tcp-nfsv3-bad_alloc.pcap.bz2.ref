@@ -48,10 +48,10 @@ FSINFO                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 St
 PATHCONF               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 COMMIT                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 
-NFSv4 total procedures: 0. Per procedure:
+NFSv4.0 total procedures: 0. Per procedure:
 NULL                      0   0.00%
 COMPOUND                  0   0.00%
-NFSv4 total operations: 0. Per operation:
+NFSv4.0 total operations: 0. Per operation:
 ILLEGAL                   0   0.00%
 ACCESS                    0   0.00%
 CLOSE                     0   0.00%
@@ -91,3 +91,65 @@ VERIFY                    0   0.00%
 WRITE                     0   0.00%
 RELEASE_LOCKOWNER         0   0.00%
 GET_DIR_DELEGATION        0   0.00%
+
+NFSv4.1 total procedures: 0. Per procedure:
+NULL                      0   0.00%
+COMPOUND                  0   0.00%
+NFSv4.1 total operations: 0. Per operation:
+ILLEGAL                   0   0.00%
+ACCESS                    0   0.00%
+CLOSE                     0   0.00%
+COMMIT                    0   0.00%
+CREATE                    0   0.00%
+DELEGPURGE                0   0.00%
+DELEGRETURN               0   0.00%
+GETATTR                   0   0.00%
+GETFH                     0   0.00%
+LINK                      0   0.00%
+LOCK                      0   0.00%
+LOCKT                     0   0.00%
+LOCKU                     0   0.00%
+LOOKUP                    0   0.00%
+LOOKUPP                   0   0.00%
+NVERIFY                   0   0.00%
+OPEN                      0   0.00%
+OPENATTR                  0   0.00%
+OPEN_CONFIRM              0   0.00%
+OPEN_DOWNGRADE            0   0.00%
+PUTFH                     0   0.00%
+PUTPUBFH                  0   0.00%
+PUTROOTFH                 0   0.00%
+READ                      0   0.00%
+READDIR                   0   0.00%
+READLINK                  0   0.00%
+REMOVE                    0   0.00%
+RENAME                    0   0.00%
+RENEW                     0   0.00%
+RESTOREFH                 0   0.00%
+SAVEFH                    0   0.00%
+SECINFO                   0   0.00%
+SETATTR                   0   0.00%
+SETCLIENTID               0   0.00%
+SETCLIENTID_CONFIRM       0   0.00%
+VERIFY                    0   0.00%
+WRITE                     0   0.00%
+RELEASE_LOCKOWNER         0   0.00%
+BACKCHANNEL_CTL           0   0.00%
+BIND_CONN_TO_SESSION      0   0.00%
+EXCHANGE_ID               0   0.00%
+CREATE_SESSION            0   0.00%
+DESTROY_SESSION           0   0.00%
+FREE_STATEID              0   0.00%
+GET_DIR_DELEGATION        0   0.00%
+GETDEVICEINFO             0   0.00%
+GETDEVICELIST             0   0.00%
+LAYOUTCOMMIT              0   0.00%
+LAYOUTGET                 0   0.00%
+LAYOUTRETURN              0   0.00%
+SECINFO_NO_NAME           0   0.00%
+SEQUENCE                  0   0.00%
+SET_SSV                   0   0.00%
+TEST_STATEID              0   0.00%
+WANT_DELEGATION           0   0.00%
+DESTROY_CLIENTID          0   0.00%
+RECLAIM_COMPLETE          0   0.00%
