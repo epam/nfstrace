@@ -628,7 +628,7 @@ public:
               out << '%' << std::endl;
          }
 
-         if(nfs3_per_proc_stat.size())  // is not empty?
+         if(!nfs3_per_proc_stat.empty())  // is not empty?
          {
             out << "Per connection info: " << std::endl;
 
@@ -676,7 +676,7 @@ public:
             out << '%' << std::endl;
         }
 
-        if(nfs4_per_proc_stat.size())  // is not empty?
+        if(!nfs4_per_proc_stat.empty())  // is not empty?
         {
             out << "Per connection info: " << std::endl;
 
