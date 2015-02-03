@@ -24,7 +24,7 @@
 //------------------------------------------------------------------------------
 #include <stdexcept>
 
-#include "api/plugin_api.h"
+#include <dlfcn.h>
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -44,7 +44,20 @@ protected:
     explicit DynamicLoad(const std::string& file);
     ~DynamicLoad();
 
-    void load_address_of(const std::string& name, plugin_get_entry_points_func& address);
+    template<typename SymbolPtr>
+    void load_address_of(const std::string& name, SymbolPtr& address)
+    {
+        static_assert(sizeof(void*) == sizeof(SymbolPtr), "object pointer and function pointer sizes must be equal");
+
+        // suppression warning: ISO C++ forbids casting between pointer-to-function and pointer-to-object
+        using hook_dlsym_t = SymbolPtr (*)(void *, const char *);
+
+        address = reinterpret_cast<hook_dlsym_t>(dlsym)(handle, name.c_str());
+        if(address == nullptr)
+        {
+            throw DLException{std::string{"Loading symbol "} + name + " failed with error:" + dlerror()};
+        }
+    }
 
 private:
     void* handle;
