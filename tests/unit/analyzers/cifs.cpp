@@ -145,7 +145,9 @@ DynamicLoad::DynamicLoad(const std::string &/*file*/) {}
 
 DynamicLoad::~DynamicLoad() {}
 
-void DynamicLoad::load_address_of(const std::string &/*name*/, plugin_get_entry_points_func& /*address*/) {}
+template<typename plugin_get_entry_points_func>
+void load_address_of(const std::string& /*name*/, plugin_get_entry_points_func& /*address*/)
+{}
 
 Plugin::Plugin(const std::string& path) : DynamicLoad(path) {}
 
