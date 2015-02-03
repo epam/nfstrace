@@ -110,13 +110,22 @@ public:
 
     inline static std::string default_device()
     {
-        char errbuf[PCAP_ERRBUF_SIZE];
-        const char* default_device {pcap_lookupdev(errbuf)};
-        if(default_device == nullptr)
+        NST::filtration::pcap::NetworkInterfaces interfaces;
+
+        for(const auto& i : interfaces)
         {
-            throw PcapError("pcap_lookupdev", errbuf);
+            for(const auto& a : i)
+            {
+                // Do not compare string for appropriate IP4/IP6 address.
+                // If pointer to address is not null expect it has valid address.
+                if(a.address() != nullptr)
+                {
+                    return i.name();
+                }
+            }
         }
-        return default_device;
+
+        throw std::runtime_error{"there is no interface with ip address assigned"};
     }
 
     NetworkInterfaces(const NetworkInterfaces&)            = delete;
