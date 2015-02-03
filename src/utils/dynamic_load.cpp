@@ -21,6 +21,8 @@
 //------------------------------------------------------------------------------
 #include <string>
 
+#include <dlfcn.h>
+
 #include "utils/dynamic_load.h"
 //------------------------------------------------------------------------------
 using namespace NST::utils;
@@ -38,6 +40,17 @@ DynamicLoad::DynamicLoad(const std::string &file)
 DynamicLoad::~DynamicLoad()
 {
     dlclose(handle);
+}
+
+void* DynamicLoad::get_symbol(const std::string &name)
+{
+    void* address = (dlsym)(handle, name.c_str());
+    if(address == nullptr)
+    {
+        throw DLException{std::string{"Loading symbol "} + name + " failed with error:" + dlerror()};
+    }
+
+    return address;
 }
 
 //------------------------------------------------------------------------------
