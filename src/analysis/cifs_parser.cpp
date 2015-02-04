@@ -35,14 +35,14 @@ CIFSParser::CIFSParser(Analyzers& a) :
 
 bool CIFSParser::parse_data(FilteredDataQueue::Ptr& data)
 {
-    if (const CIFSv1::MessageHeader* request = CIFSv1::get_header(data->data))
+    if (const CIFSv1::MessageHeader* header = CIFSv1::get_header(data->data))
     {
-        parse_packet(request, std::move(data));
+        parse_packet(header, std::move(data));
         return true;
     }
-    else if (const CIFSv2::MessageHeader* request = CIFSv2::get_header(data->data))
+    else if (const CIFSv2::MessageHeader* header = CIFSv2::get_header(data->data))
     {
-        parse_packet(request, std::move(data));
+        parse_packet(header, std::move(data));
         return true;
     }
     else
@@ -52,22 +52,22 @@ bool CIFSParser::parse_data(FilteredDataQueue::Ptr& data)
     return false;
 }
 
-void CIFSParser::parse_packet(const CIFSv1::MessageHeader* request, NST::utils::FilteredDataQueue::Ptr&& ptr)
+void CIFSParser::parse_packet(const CIFSv1::MessageHeader* header, NST::utils::FilteredDataQueue::Ptr&& ptr)
 {
     using namespace NST::API::SMBv1;
     using namespace NST::protocols::CIFSv1;
 
-    if (request->isFlag(Flags::REPLY))
+    if (header->isFlag(Flags::REPLY))
     {
         // It is response
         if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY))
         {
-            FilteredDataQueue::Ptr&& requestData = session->get_call_data(request->sec.CID);
+            FilteredDataQueue::Ptr&& requestData = session->get_call_data(header->sec.CID);
             if (requestData)
             {
                 if (const MessageHeader* request = get_header(requestData->data))
                 {
-                    return analyse_operation(session, request, request, std::move(requestData), std::move(ptr));
+                    return analyse_operation(session, request, header, std::move(requestData), std::move(ptr));
                 }
                 LOG("Can't find request for response");
             }
@@ -79,28 +79,28 @@ void CIFSParser::parse_packet(const CIFSv1::MessageHeader* request, NST::utils::
         // It is request
         if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL))
         {
-            return session->save_call_data(request->sec.CID, std::move(ptr));
+            return session->save_call_data(header->sec.CID, std::move(ptr));
         }
         LOG("Can't get right CIFS session");
     }
 }
 
-void CIFSParser::parse_packet(const CIFSv2::MessageHeader* request, utils::FilteredDataQueue::Ptr&& ptr)
+void CIFSParser::parse_packet(const CIFSv2::MessageHeader* header, utils::FilteredDataQueue::Ptr&& ptr)
 {
     using namespace NST::API::SMBv2;
     using namespace NST::protocols::CIFSv2;
 
-    if (request->isFlag(Flags::SERVER_TO_REDIR))
+    if (header->isFlag(Flags::SERVER_TO_REDIR))
     {
         // It is response
         if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY))
         {
-            FilteredDataQueue::Ptr&& requestData = session->get_call_data(request->SessionId);
+            FilteredDataQueue::Ptr&& requestData = session->get_call_data(header->SessionId);
             if (requestData)
             {
                 if (const MessageHeader* request = get_header(requestData->data))
                 {
-                    return analyse_operation(session, request, request, std::move(requestData), std::move(ptr));
+                    return analyse_operation(session, request, header, std::move(requestData), std::move(ptr));
                 }
                 LOG("Can't find request for response");
             }
@@ -112,7 +112,12 @@ void CIFSParser::parse_packet(const CIFSv2::MessageHeader* request, utils::Filte
         // It is request
         if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL))
         {
-            return session->save_call_data(request->SessionId, std::move(ptr));
+            // It is async request
+            if (header->isFlag(Flags::ASYNC_COMMAND))
+            {
+                return analyse_operation(session, header, nullptr, std::move(ptr), std::move(nullptr));
+            }
+            return session->save_call_data(header->SessionId, std::move(ptr));
         }
         LOG("Can't get right CIFS session");
     }

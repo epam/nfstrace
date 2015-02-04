@@ -22,6 +22,9 @@
 #ifndef _SMBv2_COMMANDS_H
 #define _SMBv2_COMMANDS_H
 //------------------------------------------------------------------------------
+#include <cstdint>
+
+#include "cifs_pc_to_net.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -52,8 +55,8 @@ struct ErrResponse
  */
 enum class SecurityMode : uint16_t
 {
-    SIGNING_ENABLED   = 0x0001,                   //!< When set, indicates that security signatures are enabled on the client.
-    SIGNING_REQUIRED  = 0x0002                    //!< When set, indicates that security signatures are required by the client.
+    SIGNING_ENABLED   = pc_to_net<uint16_t>(0x0001),                   //!< When set, indicates that security signatures are enabled on the client.
+    SIGNING_REQUIRED  = pc_to_net<uint16_t>(0x0002)                    //!< When set, indicates that security signatures are required by the client.
 };
 
 /*!
@@ -74,13 +77,13 @@ enum class SecurityModeShort : uint8_t
  */
 enum class Capabilities : uint32_t
 {
-    DFS                 = 0x00000001,             //!< When set, indicates that the client supports the Distributed File System (DFS).
-    LEASING             = 0x00000002,             //!< When set, indicates that the client supports leasing.
-    LARGE_MTU           = 0x00000004,             //!< When set, indicates that the client supports multi-credit operations.
-    MULTI_CHANNEL       = 0x00000008,             //!< When set, indicates that the client supports establishing multiple channels for a single session.
-    PERSISTENT_HANDLES  = 0x00000010,             //!< When set, indicates that the client supports persistent handles.
-    DIRECTORY_LEASING   = 0x00000020,             //!< When set, indicates that the client supports directory leasing.
-    ENCRYPTION          = 0x00000040              //!< When set, indicates that the client supports encryption.
+    DFS                 = pc_to_net<uint32_t>(0x00000001),             //!< When set, indicates that the client supports the Distributed File System (DFS).
+    LEASING             = pc_to_net<uint32_t>(0x00000002),             //!< When set, indicates that the client supports leasing.
+    LARGE_MTU           = pc_to_net<uint32_t>(0x00000004),             //!< When set, indicates that the client supports multi-credit operations.
+    MULTI_CHANNEL       = pc_to_net<uint32_t>(0x00000008),             //!< When set, indicates that the client supports establishing multiple channels for a single session.
+    PERSISTENT_HANDLES  = pc_to_net<uint32_t>(0x00000010),             //!< When set, indicates that the client supports persistent handles.
+    DIRECTORY_LEASING   = pc_to_net<uint32_t>(0x00000020),             //!< When set, indicates that the client supports directory leasing.
+    ENCRYPTION          = pc_to_net<uint32_t>(0x00000040)              //!< When set, indicates that the client supports encryption.
 };
 
 /*!
@@ -88,10 +91,10 @@ enum class Capabilities : uint32_t
  */
 enum class Dialects : uint16_t
 {
-    SMB_2_002          = 0x0202,                  //!< SMB 2.002 dialect revision number.
-    SMB_2_1            = 0x0210,                  //!< SMB 2.1 dialect revision number.
-    SMB_3_0            = 0x0300,                  //!< SMB 3.0 dialect revision number.
-    SMB_3_02           = 0x0302                   //!< SMB 3.02 dialect revision number.
+    SMB_2_002          = pc_to_net<uint16_t>(0x0202),                  //!< SMB 2.002 dialect revision number.
+    SMB_2_1            = pc_to_net<uint16_t>(0x0210),                  //!< SMB 2.1 dialect revision number.
+    SMB_3_0            = pc_to_net<uint16_t>(0x0300),                  //!< SMB 3.0 dialect revision number.
+    SMB_3_02           = pc_to_net<uint16_t>(0x0302)                   //!< SMB 3.02 dialect revision number.
 };
 
 /*!
@@ -172,10 +175,10 @@ struct SessionSetupRequest
  */
 enum class SessionFlags : uint16_t
 {
-    NONE            = 0x0000,                     //!< Default
-    IS_GUEST        = 0x0001,                     //!< If set, the client has been authenticated as a guest user.
-    IS_NULL         = 0x0002,                     //!< If set, the client has been authenticated as an anonymous user.
-    IS_ENCRYPT_DATA = 0x0004                      //!< If set, the server requires encryption of messages on this session. This flag is only valid for the SMB 3.x dialect family.
+    NONE            = pc_to_net<uint16_t>(0x0000),                     //!< Default
+    IS_GUEST        = pc_to_net<uint16_t>(0x0001),                     //!< If set, the client has been authenticated as a guest user.
+    IS_NULL         = pc_to_net<uint16_t>(0x0002),                     //!< If set, the client has been authenticated as an anonymous user.
+    IS_ENCRYPT_DATA = pc_to_net<uint16_t>(0x0004)                      //!< If set, the server requires encryption of messages on this session. This flag is only valid for the SMB 3.x dialect family.
 };
 
 /*!
@@ -246,20 +249,20 @@ enum class ShareTypes : uint8_t
  */
 enum class ShareFlags : uint32_t
 {
-    MANUAL_CACHING               = 0x00000000,   //!< The client may cache files that are explicitly selected by the user for offline use.
-    AUTO_CACHING                 = 0x00000010,   //!< The client may automatically cache files that are used by the user for offline access.
-    VDO_CACHING                  = 0x00000020,   //!< The client may automatically cache files that are used by the user for offline access and may use those files in an offline mode even if the share is available.
-    NO_CACHING                   = 0x00000030,   //!< Offline caching MUST NOT occur.
-    DFS                          = 0x00000001,   //!< The specified share is present in a Distributed File System (DFS) tree structure.
-    DFS_ROOT                     = 0x00000002,   //!< The specified share is present in a DFS tree structure.
-    RESTRICT_EXCLUSIVE_OPENS     = 0x00000100,   //!< The specified share disallows exclusive file opens that deny reads to an open file.
-    FORCE_SHARED_DELETE          = 0x00000200,   //!< The specified share disallows clients from opening files on the share in an exclusive mode that prevents the file from being deleted until the client closes the file.
-    ALLOW_NAMESPACE_CACHING      = 0x00000400,   //!< The client MUST ignore this flag.
-    ACCESS_BASED_DIRECTORY_ENUM  = 0x00000800,   //!< The server will filter directory entries based on the access permissions of the client.
-    FORCE_LEVELII_OPLOCK         = 0x00001000,   //!< The server will not issue exclusive caching rights on this share.
-    ENABLE_HASH                  = 0x00002000,   //!< The share supports hash generation for branch cache retrieval of data. For more information, see section 2.2.31.2. This flag is not valid for the SMB 2.002 dialect.
-    ENABLE_HASH_2                = 0x00004000,   //!< The share supports v2 hash generation for branch cache retrieval of data. For more information, see section 2.2.31.2. This flag is not valid for the SMB 2.002 and SMB 2.1 dialects.
-    ENABLE_ENCRYPT_DATA          = 0x00008000    //!< The server requires encryption of remote file access messages on this share, per the conditions specified in section 3.3.5.2.11. This flag is only valid for the SMB 3.x dialect family.
+    MANUAL_CACHING               = pc_to_net<uint32_t>(0x00000000),   //!< The client may cache files that are explicitly selected by the user for offline use.
+    AUTO_CACHING                 = pc_to_net<uint32_t>(0x00000010),   //!< The client may automatically cache files that are used by the user for offline access.
+    VDO_CACHING                  = pc_to_net<uint32_t>(0x00000020),   //!< The client may automatically cache files that are used by the user for offline access and may use those files in an offline mode even if the share is available.
+    NO_CACHING                   = pc_to_net<uint32_t>(0x00000030),   //!< Offline caching MUST NOT occur.
+    DFS                          = pc_to_net<uint32_t>(0x00000001),   //!< The specified share is present in a Distributed File System (DFS) tree structure.
+    DFS_ROOT                     = pc_to_net<uint32_t>(0x00000002),   //!< The specified share is present in a DFS tree structure.
+    RESTRICT_EXCLUSIVE_OPENS     = pc_to_net<uint32_t>(0x00000100),   //!< The specified share disallows exclusive file opens that deny reads to an open file.
+    FORCE_SHARED_DELETE          = pc_to_net<uint32_t>(0x00000200),   //!< The specified share disallows clients from opening files on the share in an exclusive mode that prevents the file from being deleted until the client closes the file.
+    ALLOW_NAMESPACE_CACHING      = pc_to_net<uint32_t>(0x00000400),   //!< The client MUST ignore this flag.
+    ACCESS_BASED_DIRECTORY_ENUM  = pc_to_net<uint32_t>(0x00000800),   //!< The server will filter directory entries based on the access permissions of the client.
+    FORCE_LEVELII_OPLOCK         = pc_to_net<uint32_t>(0x00001000),   //!< The server will not issue exclusive caching rights on this share.
+    ENABLE_HASH                  = pc_to_net<uint32_t>(0x00002000),   //!< The share supports hash generation for branch cache retrieval of data. For more information), see section 2.2.31.2. This flag is not valid for the SMB 2.002 dialect.
+    ENABLE_HASH_2                = pc_to_net<uint32_t>(0x00004000),   //!< The share supports v2 hash generation for branch cache retrieval of data. For more information), see section 2.2.31.2. This flag is not valid for the SMB 2.002 and SMB 2.1 dialects.
+    ENABLE_ENCRYPT_DATA          = pc_to_net<uint32_t>(0x00008000)    //!< The server requires encryption of remote file access messages on this share), per the conditions specified in section 3.3.5.2.11. This flag is only valid for the SMB 3.x dialect family.
 };
 
 /*!
@@ -304,19 +307,19 @@ struct TreeDisconnectResponse
  */
 enum class FileAttributes : uint32_t
 {
-    READONLY            = 0x00000001,
-    HIDDEN              = 0x00000002,
-    SYSTEM              = 0x00000004,
-    DIRECTORY           = 0x00000010,
-    ARCHIVE             = 0x00000020,
-    NORMAL              = 0x00000080,
-    TEMPORARY           = 0x00000100,
-    SPARSE_FILE         = 0x00000200,
-    REPARSE_POINT       = 0x00000400,
-    COMPRESSED          = 0x00000800,
-    OFFLINE             = 0x00001000,
-    NOT_CONTENT_INDEXED = 0x00002000,
-    ENCRYPTED           = 0x00004000
+    READONLY            = pc_to_net<uint32_t>(0x00000001),
+    HIDDEN              = pc_to_net<uint32_t>(0x00000002),
+    SYSTEM              = pc_to_net<uint32_t>(0x00000004),
+    DIRECTORY           = pc_to_net<uint32_t>(0x00000010),
+    ARCHIVE             = pc_to_net<uint32_t>(0x00000020),
+    NORMAL              = pc_to_net<uint32_t>(0x00000080),
+    TEMPORARY           = pc_to_net<uint32_t>(0x00000100),
+    SPARSE_FILE         = pc_to_net<uint32_t>(0x00000200),
+    REPARSE_POINT       = pc_to_net<uint32_t>(0x00000400),
+    COMPRESSED          = pc_to_net<uint32_t>(0x00000800),
+    OFFLINE             = pc_to_net<uint32_t>(0x00001000),
+    NOT_CONTENT_INDEXED = pc_to_net<uint32_t>(0x00002000),
+    ENCRYPTED           = pc_to_net<uint32_t>(0x00004000)
 };
 
 /*!
@@ -335,25 +338,25 @@ enum class OplockLevels : uint8_t
  */
 enum class DesiredAccessFlags : uint32_t
 {
-    READ_DATA_LE              = (0x00000001),
-    WRITE_DATA_LE             = (0x00000002),
-    APPEND_DATA_LE            = (0x00000004),
-    READ_EA_LE                = (0x00000008),
-    WRITE_EA_LE               = (0x00000010),
-    EXECUTE_LE                = (0x00000020),
-    READ_ATTRIBUTES_LE        = (0x00000080),
-    WRITE_ATTRIBUTES_LE       = (0x00000100),
-    DELETE_LE                 = (0x00010000),
-    READ_CONTROL_LE           = (0x00020000),
-    WRITE_DAC_LE              = (0x00040000),
-    WRITE_OWNER_LE            = (0x00080000),
-    SYNCHRONIZE_LE            = (0x00100000),
-    ACCESS_SYSTEM_SECURITY_LE = (0x01000000),
-    MAXIMAL_ACCESS_LE         = (0x02000000),
-    GENERIC_ALL_LE            = (0x10000000),
-    GENERIC_EXECUTE_LE        = (0x20000000),
-    GENERIC_WRITE_LE          = (0x40000000),
-    GENERIC_READ_LE           = (0x80000000)
+    READ_DATA_LE              = pc_to_net<uint32_t>(0x00000001),
+    WRITE_DATA_LE             = pc_to_net<uint32_t>(0x00000002),
+    APPEND_DATA_LE            = pc_to_net<uint32_t>(0x00000004),
+    READ_EA_LE                = pc_to_net<uint32_t>(0x00000008),
+    WRITE_EA_LE               = pc_to_net<uint32_t>(0x00000010),
+    EXECUTE_LE                = pc_to_net<uint32_t>(0x00000020),
+    READ_ATTRIBUTES_LE        = pc_to_net<uint32_t>(0x00000080),
+    WRITE_ATTRIBUTES_LE       = pc_to_net<uint32_t>(0x00000100),
+    DELETE_LE                 = pc_to_net<uint32_t>(0x00010000),
+    READ_CONTROL_LE           = pc_to_net<uint32_t>(0x00020000),
+    WRITE_DAC_LE              = pc_to_net<uint32_t>(0x00040000),
+    WRITE_OWNER_LE            = pc_to_net<uint32_t>(0x00080000),
+    SYNCHRONIZE_LE            = pc_to_net<uint32_t>(0x00100000),
+    ACCESS_SYSTEM_SECURITY_LE = pc_to_net<uint32_t>(0x01000000),
+    MAXIMAL_ACCESS_LE         = pc_to_net<uint32_t>(0x02000000),
+    GENERIC_ALL_LE            = pc_to_net<uint32_t>(0x10000000),
+    GENERIC_EXECUTE_LE        = pc_to_net<uint32_t>(0x20000000),
+    GENERIC_WRITE_LE          = pc_to_net<uint32_t>(0x40000000),
+    GENERIC_READ_LE           = pc_to_net<uint32_t>(0x80000000)
 };
 
 /*!
@@ -361,10 +364,10 @@ enum class DesiredAccessFlags : uint32_t
  */
 enum ShareAccessFlags : uint32_t
 {
-    READ_LE     = (0x00000001),       //!< When set, indicates that other opens are allowed to read this file while this open is present.
-    WRITE_LE    = (0x00000002),       //!< When set, indicates that other opens are allowed to write this file while this open is present
-    DELETE_LE   = (0x00000004),       //!< When set, indicates that other opens are allowed to delete or rename this file while this open is present
-    ALL_LE      = (0x00000007)        //!< Combine
+    READ_LE     = pc_to_net<uint32_t>(0x00000001),       //!< When set, indicates that other opens are allowed to read this file while this open is present.
+    WRITE_LE    = pc_to_net<uint32_t>(0x00000002),       //!< When set, indicates that other opens are allowed to write this file while this open is present
+    DELETE_LE   = pc_to_net<uint32_t>(0x00000004),       //!< When set, indicates that other opens are allowed to delete or rename this file while this open is present
+    ALL_LE      = pc_to_net<uint32_t>(0x00000007)        //!< Combine
 };
 
 /*!
@@ -372,12 +375,12 @@ enum ShareAccessFlags : uint32_t
  */
 enum class CreateDisposition : uint32_t
 {
-    SUPERSEDE    = (0x00000000),      //!< If the file already exists, supersede it. Otherwise, create the file.
-    OPEN         = (0x00000001),      //!< If the file already exists, return success; otherwise, fail the operation.
-    CREATE       = (0x00000002),      //!< If the file already exists, fail the operation; otherwise, create the file.
-    OPEN_IF      = (0x00000003),      //!< Open the file if it already exists; otherwise, create the file.
-    OVERWRITE    = (0x00000004),      //!< Overwrite the file if it already exists; otherwise, fail the operation.
-    OVERWRITE_IF = (0x00000005)       //!< Overwrite the file if it already exists; otherwise, create the file.
+    SUPERSEDE    = pc_to_net<uint32_t>(0x00000000),      //!< If the file already exists, supersede it. Otherwise, create the file.
+    OPEN         = pc_to_net<uint32_t>(0x00000001),      //!< If the file already exists, return success; otherwise, fail the operation.
+    CREATE       = pc_to_net<uint32_t>(0x00000002),      //!< If the file already exists, fail the operation; otherwise, create the file.
+    OPEN_IF      = pc_to_net<uint32_t>(0x00000003),      //!< Open the file if it already exists; otherwise, create the file.
+    OVERWRITE    = pc_to_net<uint32_t>(0x00000004),      //!< Overwrite the file if it already exists; otherwise, fail the operation.
+    OVERWRITE_IF = pc_to_net<uint32_t>(0x00000005)       //!< Overwrite the file if it already exists; otherwise, create the file.
 };
 
 /*!
@@ -385,24 +388,24 @@ enum class CreateDisposition : uint32_t
  */
 enum CreateOptionsFlags : uint32_t
 {
-    DIRECTORY_FILE_LE             = (0x00000001), //!< The file being created or opened is a directory file.
-    WRITE_THROUGH_LE              = (0x00000002), //!< The server MUST propagate writes to this open to persistent storage before returning success to the client on write operations.
-    SEQUENTIAL_ONLY_LE            = (0x00000004), //!< This indicates that the application intends to read or write at sequential offsets using this handle, so the server SHOULD optimize for sequential access
-    NO_INTERMEDIATE_BUFFERRING_LE = (0x00000008), //!< The server or underlying object store SHOULD NOT cache data at intermediate layers and SHOULD allow it to flow through to persistent storage.
-    SYNCHRONOUS_IO_ALERT_LE       = (0x00000010), //!< This bit SHOULD be set to 0 and MUST be ignored by the server.<34>
-    SYNCHRONOUS_IO_NON_ALERT_LE   = (0x00000020), //!< This bit SHOULD be set to 0 and MUST be ignored by the server.<35>
-    NON_DIRECTORY_FILE_LE         = (0x00000040), //!< If the name of the file being created or opened matches with an existing directory file, the server MUST fail the request with STATUS_FILE_IS_A_DIRECTORY.
-    COMPLETE_IF_OPLOCKED_LE       = (0x00000100), //!< This bit SHOULD be set to 0 and MUST be ignored by the server
-    NO_EA_KNOWLEDGE_LE            = (0x00000200), //!< The caller does not understand how to handle extended attributes.
-    RANDOM_ACCESS_LE              = (0x00000800), //!< This indicates that the application intends to read or write at random offsets using this handle, so the server SHOULD optimize for random access.
-    DELETE_ON_CLOSE_LE            = (0x00001000), //!< The file MUST be automatically deleted when the last open request on this file is closed.
-    OPEN_BY_FILE_ID_LE            = (0x00002000), //!< This bit SHOULD be set to 0 and the server MUST fail the request with a STATUS_NOT_SUPPORTED error if this bit is set.<37>
-    OPEN_FOR_BACKUP_INTENT_LE     = (0x00004000), //!< The file is being opened for backup intent. That is, it is being opened or created for the purposes of either a backup or a restore operation
-    NO_COMPRESSION_LE             = (0x00008000), //!< The file cannot be compressed.
-    RESERVE_OPFILTER_LE           = (0x00100000), //!< This bit SHOULD be set to 0 and the server MUST fail the request with a STATUS_NOT_SUPPORTED error if this bit is set.<38>
-    OPEN_REPARSE_POINT_LE         = (0x00200000), //!< If the file or directory being opened is a reparse point, open the reparse point itself rather than the target that the reparse point references.
-    OPEN_NO_RECALL_LE             = (0x00400000), //!< In an HSM (Hierarchical Storage Management) environment, this flag means the file SHOULD NOT be recalled from tertiary storage such as tape. The recall can take several minutes. The caller can specify this flag to avoid those delays.
-    OPEN_FOR_FREE_SPACE_QUERY_LE  = (0x00800000)  //!< Open file to query for free space. The client SHOULD set this to 0 and the server MUST ignore it.<39>
+    DIRECTORY_FILE_LE             = pc_to_net<uint32_t>(0x00000001), //!< The file being created or opened is a directory file.
+    WRITE_THROUGH_LE              = pc_to_net<uint32_t>(0x00000002), //!< The server MUST propagate writes to this open to persistent storage before returning success to the client on write operations.
+    SEQUENTIAL_ONLY_LE            = pc_to_net<uint32_t>(0x00000004), //!< This indicates that the application intends to read or write at sequential offsets using this handle, so the server SHOULD optimize for sequential access
+    NO_INTERMEDIATE_BUFFERRING_LE = pc_to_net<uint32_t>(0x00000008), //!< The server or underlying object store SHOULD NOT cache data at intermediate layers and SHOULD allow it to flow through to persistent storage.
+    SYNCHRONOUS_IO_ALERT_LE       = pc_to_net<uint32_t>(0x00000010), //!< This bit SHOULD be set to 0 and MUST be ignored by the server.<34>
+    SYNCHRONOUS_IO_NON_ALERT_LE   = pc_to_net<uint32_t>(0x00000020), //!< This bit SHOULD be set to 0 and MUST be ignored by the server.<35>
+    NON_DIRECTORY_FILE_LE         = pc_to_net<uint32_t>(0x00000040), //!< If the name of the file being created or opened matches with an existing directory file, the server MUST fail the request with STATUS_FILE_IS_A_DIRECTORY.
+    COMPLETE_IF_OPLOCKED_LE       = pc_to_net<uint32_t>(0x00000100), //!< This bit SHOULD be set to 0 and MUST be ignored by the server
+    NO_EA_KNOWLEDGE_LE            = pc_to_net<uint32_t>(0x00000200), //!< The caller does not understand how to handle extended attributes.
+    RANDOM_ACCESS_LE              = pc_to_net<uint32_t>(0x00000800), //!< This indicates that the application intends to read or write at random offsets using this handle, so the server SHOULD optimize for random access.
+    DELETE_ON_CLOSE_LE            = pc_to_net<uint32_t>(0x00001000), //!< The file MUST be automatically deleted when the last open request on this file is closed.
+    OPEN_BY_FILE_ID_LE            = pc_to_net<uint32_t>(0x00002000), //!< This bit SHOULD be set to 0 and the server MUST fail the request with a STATUS_NOT_SUPPORTED error if this bit is set.<37>
+    OPEN_FOR_BACKUP_INTENT_LE     = pc_to_net<uint32_t>(0x00004000), //!< The file is being opened for backup intent. That is, it is being opened or created for the purposes of either a backup or a restore operation
+    NO_COMPRESSION_LE             = pc_to_net<uint32_t>(0x00008000), //!< The file cannot be compressed.
+    RESERVE_OPFILTER_LE           = pc_to_net<uint32_t>(0x00100000), //!< This bit SHOULD be set to 0 and the server MUST fail the request with a STATUS_NOT_SUPPORTED error if this bit is set.<38>
+    OPEN_REPARSE_POINT_LE         = pc_to_net<uint32_t>(0x00200000), //!< If the file or directory being opened is a reparse point, open the reparse point itself rather than the target that the reparse point references.
+    OPEN_NO_RECALL_LE             = pc_to_net<uint32_t>(0x00400000), //!< In an HSM (Hierarchical Storage Management) environment, this flag means the file SHOULD NOT be recalled from tertiary storage such as tape. The recall can take several minutes. The caller can specify this flag to avoid those delays.
+    OPEN_FOR_FREE_SPACE_QUERY_LE  = pc_to_net<uint32_t>(0x00800000)  //!< Open file to query for free space. The client SHOULD set this to 0 and the server MUST ignore it.<39>
 };
 
 /*!
@@ -410,10 +413,10 @@ enum CreateOptionsFlags : uint32_t
  */
 enum class CreateActions : uint32_t
 {
-    SUPERSEDED        = (0x00000000), //!< An existing file was deleted and a new file was created in its place.
-    OPENED            = (0x00000001), //!< An existing file was opened.
-    CREATED           = (0x00000002), //!< A new file was created.
-    FILE_OVERWRITTEN  = (0x00000003), //!< An existing file was overwritten.
+    SUPERSEDED        = pc_to_net<uint32_t>(0x00000000), //!< An existing file was deleted and a new file was created in its place.
+    OPENED            = pc_to_net<uint32_t>(0x00000001), //!< An existing file was opened.
+    CREATED           = pc_to_net<uint32_t>(0x00000002), //!< A new file was created.
+    FILE_OVERWRITTEN  = pc_to_net<uint32_t>(0x00000003), //!< An existing file was overwritten.
 };
 
 /*!
@@ -421,10 +424,10 @@ enum class CreateActions : uint32_t
  */
 enum class ImpersonationLevels : uint32_t
 {
-    ANONYMOUS      = (0x00000000),    //!< The application-requested impersonation level is Anonymous.
-    IDENTIFICATION = (0x00000001),    //!< The application-requested impersonation level is Identification.
-    IMPERSONATION  = (0x00000002),    //!< The application-requested impersonation level is Impersonation.
-    DELEGATE       = (0x00000003)     //!< The application-requested impersonation level is Delegate.
+    ANONYMOUS      = pc_to_net<uint32_t>(0x00000000),    //!< The application-requested impersonation level is Anonymous.
+    IDENTIFICATION = pc_to_net<uint32_t>(0x00000001),    //!< The application-requested impersonation level is Identification.
+    IMPERSONATION  = pc_to_net<uint32_t>(0x00000002),    //!< The application-requested impersonation level is Impersonation.
+    DELEGATE       = pc_to_net<uint32_t>(0x00000003)     //!< The application-requested impersonation level is Delegate.
 };
 
 /*!
@@ -485,7 +488,7 @@ struct CreateResponse
  */
 enum class CloseFlags : uint16_t
 {
-    POSTQUERY_ATTRIB = (0x0001)
+    POSTQUERY_ATTRIB = pc_to_net<uint16_t>(0x0001)
 };
 
 /*!
@@ -614,14 +617,14 @@ enum class QueryInfoLevels : uint8_t
  */
 enum class AdditionInfo : uint32_t
 {
-    OWNER_SECURITY_INFORMATION     = 0x00000001, //!< The client is querying the owner from the security descriptor of the file or named pipe.
-    GROUP_SECURITY_INFORMATION     = 0x00000002, //!< The client is querying the group from the security descriptor of the file or named pipe.
-    DACL_SECURITY_INFORMATION      = 0x00000004, //!< The client is querying the discretionary access control list from the security descriptor of the file or named pipe.
-    SACL_SECURITY_INFORMATION      = 0x00000008, //!< The client is querying the system access control list from the security descriptor of the file or named pipe.
-    LABEL_SECURITY_INFORMATION     = 0x00000010, //!< The client is querying the integrity label from the security descriptor of the file or named pipe.
-    ATTRIBUTE_SECURITY_INFORMATION = 0x00000020, //!< The client is querying the resource attribute from the security descriptor of the file or named pipe.
-    SCOPE_SECURITY_INFORMATION     = 0x00000040, //!< The client is querying the central access policy of the resource from the security descriptor of the file or named pipe.
-    BACKUP_SECURITY_INFORMATION    = 0x00010000  //!< The client is querying the security descriptor information used for backup operation.
+    OWNER_SECURITY_INFORMATION     = pc_to_net<uint32_t>(0x00000001), //!< The client is querying the owner from the security descriptor of the file or named pipe.
+    GROUP_SECURITY_INFORMATION     = pc_to_net<uint32_t>(0x00000002), //!< The client is querying the group from the security descriptor of the file or named pipe.
+    DACL_SECURITY_INFORMATION      = pc_to_net<uint32_t>(0x00000004), //!< The client is querying the discretionary access control list from the security descriptor of the file or named pipe.
+    SACL_SECURITY_INFORMATION      = pc_to_net<uint32_t>(0x00000008), //!< The client is querying the system access control list from the security descriptor of the file or named pipe.
+    LABEL_SECURITY_INFORMATION     = pc_to_net<uint32_t>(0x00000010), //!< The client is querying the integrity label from the security descriptor of the file or named pipe.
+    ATTRIBUTE_SECURITY_INFORMATION = pc_to_net<uint32_t>(0x00000020), //!< The client is querying the resource attribute from the security descriptor of the file or named pipe.
+    SCOPE_SECURITY_INFORMATION     = pc_to_net<uint32_t>(0x00000040), //!< The client is querying the central access policy of the resource from the security descriptor of the file or named pipe.
+    BACKUP_SECURITY_INFORMATION    = pc_to_net<uint32_t>(0x00010000)  //!< The client is querying the security descriptor information used for backup operation.
 };
 
 /*!
@@ -630,9 +633,9 @@ enum class AdditionInfo : uint32_t
  */
 enum FileFullEaInformation : uint32_t
 {
-    SL_RESTART_SCAN        = 0x00000001,         //!< Restart the scan for EAs from the beginning.
-    SL_RETURN_SINGLE_ENTRY = 0x00000002,         //!< Return a single EA entry in the response buffer.
-    SL_INDEX_SPECIFIED     = 0x00000004          //!< The caller has specified an EA index.
+    SL_RESTART_SCAN        = pc_to_net<uint32_t>(0x00000001),         //!< Restart the scan for EAs from the beginning.
+    SL_RETURN_SINGLE_ENTRY = pc_to_net<uint32_t>(0x00000002),         //!< Return a single EA entry in the response buffer.
+    SL_INDEX_SPECIFIED     = pc_to_net<uint32_t>(0x00000004)          //!< The caller has specified an EA index.
 };
 
 /*!
@@ -756,9 +759,9 @@ enum class BufferingFlags : uint8_t
  */
 enum class Channels : uint32_t
 {
-    SMB2_CHANNEL_NONE               = 0x00000000,//!< No channel information is present in the request. The ReadChannelInfoOffset and ReadChannelInfoLength fields MUST be set to 0 by the client and MUST be ignored by the server.
-    SMB2_CHANNEL_RDMA_V1            = 0x00000001,//!< One or more SMB_DIRECT_BUFFER_DESCRIPTOR_V1 structures as specified in [MS-SMBD] section 2.2.3.1 are present in the channel information specified by ReadChannelInfoOffset and ReadChannelInfoLength fields.
-    SMB2_CHANNEL_RDMA_V1_INVALIDATE = 0x00000002,//!< This value is valid only for the SMB 3.02 dialect. One or more SMB_DIRECT_BUFFER_DESCRIPTOR_V1 structures, as specified in [MS-SMBD] section 2.2.3.1, are present in the channel information specified by the ReadChannelInfoOffset and ReadChannelInfoLength fields. The server is requested to perform remote invalidation when responding to the request as specified in [MS-SMBD] section 3.1.4.2.
+    SMB2_CHANNEL_NONE               = pc_to_net<uint32_t>(0x00000000),//!< No channel information is present in the request. The ReadChannelInfoOffset and ReadChannelInfoLength fields MUST be set to 0 by the client and MUST be ignored by the server.
+    SMB2_CHANNEL_RDMA_V1            = pc_to_net<uint32_t>(0x00000001),//!< One or more SMB_DIRECT_BUFFER_DESCRIPTOR_V1 structures as specified in [MS-SMBD] section 2.2.3.1 are present in the channel information specified by ReadChannelInfoOffset and ReadChannelInfoLength fields.
+    SMB2_CHANNEL_RDMA_V1_INVALIDATE = pc_to_net<uint32_t>(0x00000002) //!< This value is valid only for the SMB 3.02 dialect. One or more SMB_DIRECT_BUFFER_DESCRIPTOR_V1 structures, as specified in [MS-SMBD] section 2.2.3.1, are present in the channel information specified by the ReadChannelInfoOffset and ReadChannelInfoLength fields. The server is requested to perform remote invalidation when responding to the request as specified in [MS-SMBD] section 3.1.4.2.
 };
 
 /*!
@@ -805,8 +808,8 @@ struct ReadResponse
  */
 enum class WriteFlags : uint32_t
 {
-    SMB2_WRITEFLAG_WRITE_THROUGH    = 0x00000001,//!< The write data should be written to persistent storage before the response is sent regardless of how the file was opened. This value is not valid for the SMB 2.002 dialect.
-    SMB2_WRITEFLAG_WRITE_UNBUFFERED = 0x00000002,//!< The server or underlying object store SHOULD NOT cache the write data at intermediate layers and SHOULD allow it to flow through to persistent storage. This bit is only valid for the SMB 3.02 dialect.
+    SMB2_WRITEFLAG_WRITE_THROUGH    = pc_to_net<uint32_t>(0x00000001),//!< The write data should be written to persistent storage before the response is sent regardless of how the file was opened. This value is not valid for the SMB 2.002 dialect.
+    SMB2_WRITEFLAG_WRITE_UNBUFFERED = pc_to_net<uint32_t>(0x00000002),//!< The server or underlying object store SHOULD NOT cache the write data at intermediate layers and SHOULD allow it to flow through to persistent storage. This bit is only valid for the SMB 3.02 dialect.
 };
 
 /*!
@@ -852,10 +855,10 @@ struct WriteResponse
  */
 enum class LockFlags : uint32_t
 {
-    SMB2_LOCKFLAG_SHARED_LOCK      = 0x00000001, //!< The range MUST be locked shared, allowing other opens to read from or take a shared lock on the range. All opens MUST NOT be allowed to write within the range. Other locks can be requested and taken on this range.
-    SMB2_LOCKFLAG_EXCLUSIVE_LOCK   = 0x00000002, //!< The range MUST be locked exclusive, not allowing other opens to read, write, or lock within the range.
-    SMB2_LOCKFLAG_UNLOCK           = 0x00000004, //!< The range MUST be unlocked from a previous lock taken on this range. The unlock range MUST be identical to the lock range. Sub-ranges cannot be unlocked.
-    SMB2_LOCKFLAG_FAIL_IMMEDIATELY = 0x00000010, //!< The lock operation MUST fail immediately if it conflicts with an existing lock, instead of waiting for the range to become available.
+    SMB2_LOCKFLAG_SHARED_LOCK      = pc_to_net<uint32_t>(0x00000001), //!< The range MUST be locked shared), allowing other opens to read from or take a shared lock on the range. All opens MUST NOT be allowed to write within the range. Other locks can be requested and taken on this range.
+    SMB2_LOCKFLAG_EXCLUSIVE_LOCK   = pc_to_net<uint32_t>(0x00000002), //!< The range MUST be locked exclusive), not allowing other opens to read), write), or lock within the range.
+    SMB2_LOCKFLAG_UNLOCK           = pc_to_net<uint32_t>(0x00000004), //!< The range MUST be unlocked from a previous lock taken on this range. The unlock range MUST be identical to the lock range. Sub-ranges cannot be unlocked.
+    SMB2_LOCKFLAG_FAIL_IMMEDIATELY = pc_to_net<uint32_t>(0x00000010), //!< The lock operation MUST fail immediately if it conflicts with an existing lock), instead of waiting for the range to become available.
 };
 
 /*!
@@ -928,18 +931,18 @@ enum class ChangeFlags : uint16_t
  */
 enum class Events : uint32_t
 {
-    FILE_NOTIFY_CHANGE_FILE_NAME    = 0x00000001,//!< The client is notified if a file-name changes.
-    FILE_NOTIFY_CHANGE_DIR_NAME     = 0x00000002,//!< The client is notified if a directory name changes.
-    FILE_NOTIFY_CHANGE_ATTRIBUTES   = 0x00000004,//!< The client is notified if a file's attributes change. Possible file attribute values are specified in [MS-FSCC] section 2.6.
-    FILE_NOTIFY_CHANGE_SIZE         = 0x00000008,//!< The client is notified if a file's size changes.
-    FILE_NOTIFY_CHANGE_LAST_WRITE   = 0x00000010,//!< The client is notified if the last write time of a file changes.
-    FILE_NOTIFY_CHANGE_LAST_ACCESS  = 0x00000020,//!< The client is notified if the last access time of a file changes.
-    FILE_NOTIFY_CHANGE_CREATION     = 0x00000040,//!< The client is notified if the creation time of a file changes.
-    FILE_NOTIFY_CHANGE_EA           = 0x00000080,//!< The client is notified if a file's extended attributes (EAs) change.
-    FILE_NOTIFY_CHANGE_SECURITY     = 0x00000100,//!< The client is notified of a file's access control list (ACL) settings change.
-    FILE_NOTIFY_CHANGE_STREAM_NAME  = 0x00000200,//!< The client is notified if a named stream is added to a file.
-    FILE_NOTIFY_CHANGE_STREAM_SIZE  = 0x00000400,//!< The client is notified if the size of a named stream is changed.
-    FILE_NOTIFY_CHANGE_STREAM_WRITE = 0x00000800,//!< The client is notified if a named stream is modified.
+    FILE_NOTIFY_CHANGE_FILE_NAME    = pc_to_net<uint32_t>(0x00000001),//!< The client is notified if a file-name changes.
+    FILE_NOTIFY_CHANGE_DIR_NAME     = pc_to_net<uint32_t>(0x00000002),//!< The client is notified if a directory name changes.
+    FILE_NOTIFY_CHANGE_ATTRIBUTES   = pc_to_net<uint32_t>(0x00000004),//!< The client is notified if a file's attributes change. Possible file attribute values are specified in [MS-FSCC] section 2.6.
+    FILE_NOTIFY_CHANGE_SIZE         = pc_to_net<uint32_t>(0x00000008),//!< The client is notified if a file's size changes.
+    FILE_NOTIFY_CHANGE_LAST_WRITE   = pc_to_net<uint32_t>(0x00000010),//!< The client is notified if the last write time of a file changes.
+    FILE_NOTIFY_CHANGE_LAST_ACCESS  = pc_to_net<uint32_t>(0x00000020),//!< The client is notified if the last access time of a file changes.
+    FILE_NOTIFY_CHANGE_CREATION     = pc_to_net<uint32_t>(0x00000040),//!< The client is notified if the creation time of a file changes.
+    FILE_NOTIFY_CHANGE_EA           = pc_to_net<uint32_t>(0x00000080),//!< The client is notified if a file's extended attributes (EAs) change.
+    FILE_NOTIFY_CHANGE_SECURITY     = pc_to_net<uint32_t>(0x00000100),//!< The client is notified of a file's access control list (ACL) settings change.
+    FILE_NOTIFY_CHANGE_STREAM_NAME  = pc_to_net<uint32_t>(0x00000200),//!< The client is notified if a named stream is added to a file.
+    FILE_NOTIFY_CHANGE_STREAM_SIZE  = pc_to_net<uint32_t>(0x00000400),//!< The client is notified if the size of a named stream is changed.
+    FILE_NOTIFY_CHANGE_STREAM_WRITE = pc_to_net<uint32_t>(0x00000800),//!< The client is notified if a named stream is modified.
 };
 
 /*!
@@ -963,15 +966,15 @@ struct ChangeNotifyRequest
  */
 enum class FileAction : uint32_t
 {
-    ADDED             = 0x00000001,              //!< The file was added to the directory.
-    REMOVED           = 0x00000002,              //!< The file was removed from the directory.
-    MODIFIED          = 0x00000003,              //!< The file was modified. This may be a change to the data or attributes of the file.
-    RENAMED_OLD_NAME  = 0x00000004,              //!< The file was renamed, and this is the old name. If the new name resides within the directory being monitored, the client will also receive the FILE_ACTION_RENAMED_NEW_NAME bit value as described in the next list item. If the new name resides outside of the directory being monitored, the client will not receive the FILE_ACTION_RENAMED_NEW_NAME bit value.
-    RENAMED_NEW_NAME  = 0x00000005,              //!< The file was renamed, and this is the new name. If the old name resides within the directory being monitored, the client will also receive the FILE_ACTION_RENAME_OLD_NAME bit value. If the old name resides outside of the directory being monitored, the client will not receive the FILE_ACTION_RENAME_OLD_NAME bit value.
-    ADDED_STREAM      = 0x00000006,              //!< The file was added to a named stream.
-    REMOVED_STREAM    = 0x00000007,              //!< The file was removed from the named stream.
-    MODIFIED_STREAM   = 0x00000008,              //!< The file was modified. This may be a change to the data or attributes of the file.
-    REMOVED_BY_DELETE = 0x00000009,              //!< The file was removed by delete.
+    ADDED             = pc_to_net<uint32_t>(0x00000001),              //!< The file was added to the directory.
+    REMOVED           = pc_to_net<uint32_t>(0x00000002),              //!< The file was removed from the directory.
+    MODIFIED          = pc_to_net<uint32_t>(0x00000003),              //!< The file was modified. This may be a change to the data or attributes of the file.
+    RENAMED_OLD_NAME  = pc_to_net<uint32_t>(0x00000004),              //!< The file was renamed), and this is the old name. If the new name resides within the directory being monitored), the client will also receive the FILE_ACTION_RENAMED_NEW_NAME bit value as described in the next list item. If the new name resides outside of the directory being monitored), the client will not receive the FILE_ACTION_RENAMED_NEW_NAME bit value.
+    RENAMED_NEW_NAME  = pc_to_net<uint32_t>(0x00000005),              //!< The file was renamed), and this is the new name. If the old name resides within the directory being monitored), the client will also receive the FILE_ACTION_RENAME_OLD_NAME bit value. If the old name resides outside of the directory being monitored), the client will not receive the FILE_ACTION_RENAME_OLD_NAME bit value.
+    ADDED_STREAM      = pc_to_net<uint32_t>(0x00000006),              //!< The file was added to a named stream.
+    REMOVED_STREAM    = pc_to_net<uint32_t>(0x00000007),              //!< The file was removed from the named stream.
+    MODIFIED_STREAM   = pc_to_net<uint32_t>(0x00000008),              //!< The file was modified. This may be a change to the data or attributes of the file.
+    REMOVED_BY_DELETE = pc_to_net<uint32_t>(0x00000009),              //!< The file was removed by delete.
 };
 
 /*!
@@ -1041,21 +1044,21 @@ struct OplockResponse
  */
 enum class CtlCodes : uint32_t
 {
-    SCTL_DFS_GET_REFERRALS             = 0x00060194,
-    FSCTL_PIPE_PEEK                    = 0x0011400C,
-    FSCTL_PIPE_WAIT                    = 0x00110018,
-    FSCTL_PIPE_TRANSCEIVE              = 0x0011C017,
-    FSCTL_SRV_COPYCHUNK                = 0x001440F2,
-    FSCTL_SRV_ENUMERATE_SNAPSHOTS      = 0x00144064,
-    FSCTL_SRV_REQUEST_RESUME_KEY       = 0x00140078,
-    FSCTL_SRV_READ_HASH                = 0x001441bb,
-    FSCTL_SRV_COPYCHUNK_WRITE          = 0x001480F2,
-    FSCTL_LMR_REQUEST_RESILIENCY       = 0x001401D4,
-    FSCTL_QUERY_NETWORK_INTERFACE_INFO = 0x001401FC,
-    FSCTL_SET_REPARSE_POINT            = 0x000900A4,
-    FSCTL_DFS_GET_REFERRALS_EX         = 0x000601B0,
-    FSCTL_FILE_LEVEL_TRIM              = 0x00098208,
-    FSCTL_VALIDATE_NEGOTIATE_INFO      = 0x00140204,
+    SCTL_DFS_GET_REFERRALS             = pc_to_net<uint32_t>(0x00060194),
+    FSCTL_PIPE_PEEK                    = pc_to_net<uint32_t>(0x0011400C),
+    FSCTL_PIPE_WAIT                    = pc_to_net<uint32_t>(0x00110018),
+    FSCTL_PIPE_TRANSCEIVE              = pc_to_net<uint32_t>(0x0011C017),
+    FSCTL_SRV_COPYCHUNK                = pc_to_net<uint32_t>(0x001440F2),
+    FSCTL_SRV_ENUMERATE_SNAPSHOTS      = pc_to_net<uint32_t>(0x00144064),
+    FSCTL_SRV_REQUEST_RESUME_KEY       = pc_to_net<uint32_t>(0x00140078),
+    FSCTL_SRV_READ_HASH                = pc_to_net<uint32_t>(0x001441bb),
+    FSCTL_SRV_COPYCHUNK_WRITE          = pc_to_net<uint32_t>(0x001480F2),
+    FSCTL_LMR_REQUEST_RESILIENCY       = pc_to_net<uint32_t>(0x001401D4),
+    FSCTL_QUERY_NETWORK_INTERFACE_INFO = pc_to_net<uint32_t>(0x001401FC),
+    FSCTL_SET_REPARSE_POINT            = pc_to_net<uint32_t>(0x000900A4),
+    FSCTL_DFS_GET_REFERRALS_EX         = pc_to_net<uint32_t>(0x000601B0),
+    FSCTL_FILE_LEVEL_TRIM              = pc_to_net<uint32_t>(0x00098208),
+    FSCTL_VALIDATE_NEGOTIATE_INFO      = pc_to_net<uint32_t>(0x00140204),
 };
 
 /*!
@@ -1063,8 +1066,8 @@ enum class CtlCodes : uint32_t
  */
 enum class IoCtlOpFlags : uint32_t
 {
-    NONE           = 0x00000000,                 //!< If Flags is set to this value
-    IOCTL_IS_FSCTL = 0x00000001,                 //!< If Flags is set to this value
+    NONE           = pc_to_net<uint32_t>(0x00000000),                 //!< If Flags is set to this value
+    IOCTL_IS_FSCTL = pc_to_net<uint32_t>(0x00000001),                 //!< If Flags is set to this value
 };
 
 /*!

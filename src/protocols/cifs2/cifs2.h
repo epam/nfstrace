@@ -22,8 +22,7 @@
 #ifndef CIFSv2_HEADER_H
 #define CIFSv2_HEADER_H
 //------------------------------------------------------------------------------
-#include <cstdint>
-
+#include "api/cifs_pc_to_net.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -37,38 +36,38 @@ namespace CIFSv2
  */
 enum class Flags : uint32_t
 {
-    SERVER_TO_REDIR      = 0x00000001, //!< When set, indicates the message is a response, rather than a request. This MUST be set on responses sent from the server to the client and MUST NOT be set on requests sent from the client to the server.
-    ASYNC_COMMAND        = 0x00000002, //!< When set, indicates that this is an ASYNC SMB2 header. This flag MUST NOT be set when using the SYNC SMB2 header.
-    RELATED_OPERATIONS   = 0x00000004, //!< When set in an SMB2 request, indicates that this request is a related operation in a compounded request chain. The use of this flag in an SMB2 request is as specified in 3.2.4.1.4.
+    SERVER_TO_REDIR      = API::SMBv2::pc_to_net<uint32_t>(0x00000001), //!< When set, indicates the message is a response, rather than a request. This MUST be set on responses sent from the server to the client and MUST NOT be set on requests sent from the client to the server.
+    ASYNC_COMMAND        = API::SMBv2::pc_to_net<uint32_t>(0x00000002), //!< When set, indicates that this is an ASYNC SMB2 header. This flag MUST NOT be set when using the SYNC SMB2 header.
+    RELATED_OPERATIONS   = API::SMBv2::pc_to_net<uint32_t>(0x00000004), //!< When set in an SMB2 request, indicates that this request is a related operation in a compounded request chain. The use of this flag in an SMB2 request is as specified in 3.2.4.1.4.
     //!< When set in an SMB2 compound response, indicates that the request corresponding to this response was part of a related operation in a compounded request chain. The use of this flag in an SMB2 response is as specified in 3.3.5.2.7.2.
-    SIGNED               = 0x00000008, //!< When set, indicates that this packet has been signed. The use of this flag is as specified in 3.1.5.1.
-    DFS_OPERATIONS       = 0x10000000, //!< When set, indicates that this command is a DFS operation. The use of this flag is as specified in 3.3.5.9.
-    REPLAY_OPERATION     = 0x20000000  //!< This flag is only valid for the SMB 3.x dialect family. When set, it indicates that this command is a replay operation. The client MUST ignore this bit on receipt.
+    SIGNED               = API::SMBv2::pc_to_net<uint32_t>(0x00000008), //!< When set, indicates that this packet has been signed. The use of this flag is as specified in 3.1.5.1.
+    DFS_OPERATIONS       = API::SMBv2::pc_to_net<uint32_t>(0x01000000), //!< When set, indicates that this command is a DFS operation. The use of this flag is as specified in 3.3.5.9.
+    REPLAY_OPERATION     = API::SMBv2::pc_to_net<uint32_t>(0x02000000)  //!< This flag is only valid for the SMB 3.x dialect family. When set, it indicates that this command is a replay operation. The client MUST ignore this bit on receipt.
 };
 
 /*! CIFS v2 commands
  */
 enum class Commands : uint16_t
 {
-    NEGOTIATE         = 0x0000,
-    SESSION_SETUP     = 0x0001,
-    LOGOFF            = 0x0002,
-    TREE_CONNECT      = 0x0003,
-    TREE_DISCONNECT   = 0x0004,
-    CREATE            = 0x0005,
-    CLOSE             = 0x0006,
-    FLUSH             = 0x0007,
-    READ              = 0x0008,
-    WRITE             = 0x0009,
-    LOCK              = 0x000A,
-    IOCTL             = 0x000B,
-    CANCEL            = 0x000C,
-    ECHO              = 0x000D,
-    QUERY_DIRECTORY   = 0x000E,
-    CHANGE_NOTIFY     = 0x000F,
-    QUERY_INFO        = 0x0010,
-    SET_INFO          = 0x0011,
-    OPLOCK_BREAK      = 0x0012
+    NEGOTIATE         = API::SMBv2::pc_to_net<uint16_t>(0x0000),
+    SESSION_SETUP     = API::SMBv2::pc_to_net<uint16_t>(0x0001),
+    LOGOFF            = API::SMBv2::pc_to_net<uint16_t>(0x0002),
+    TREE_CONNECT      = API::SMBv2::pc_to_net<uint16_t>(0x0003),
+    TREE_DISCONNECT   = API::SMBv2::pc_to_net<uint16_t>(0x0004),
+    CREATE            = API::SMBv2::pc_to_net<uint16_t>(0x0005),
+    CLOSE             = API::SMBv2::pc_to_net<uint16_t>(0x0006),
+    FLUSH             = API::SMBv2::pc_to_net<uint16_t>(0x0007),
+    READ              = API::SMBv2::pc_to_net<uint16_t>(0x0008),
+    WRITE             = API::SMBv2::pc_to_net<uint16_t>(0x0009),
+    LOCK              = API::SMBv2::pc_to_net<uint16_t>(0x000A),
+    IOCTL             = API::SMBv2::pc_to_net<uint16_t>(0x000B),
+    CANCEL            = API::SMBv2::pc_to_net<uint16_t>(0x000C),
+    ECHO              = API::SMBv2::pc_to_net<uint16_t>(0x000D),
+    QUERY_DIRECTORY   = API::SMBv2::pc_to_net<uint16_t>(0x000E),
+    CHANGE_NOTIFY     = API::SMBv2::pc_to_net<uint16_t>(0x000F),
+    QUERY_INFO        = API::SMBv2::pc_to_net<uint16_t>(0x0010),
+    SET_INFO          = API::SMBv2::pc_to_net<uint16_t>(0x0011),
+    OPLOCK_BREAK      = API::SMBv2::pc_to_net<uint16_t>(0x0012)
 };
 
 /*! \class Raw CIFS v2 message header
@@ -141,10 +140,10 @@ inline const Cmd command(Data& request, Data& response, Session* session)
     cmd.session = session;
     // Set time stamps
     cmd.ctimestamp = &request->timestamp;
-    cmd.rtimestamp = &response->timestamp;
+    cmd.rtimestamp = response ? &response->timestamp : &request->timestamp;
 
     cmd.parg = reinterpret_cast<const typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
-    cmd.pres = reinterpret_cast<const typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader));
+    cmd.pres = response ? reinterpret_cast<const typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader)) : nullptr;
 
     return cmd;
 }

@@ -41,21 +41,11 @@ public:
     };
 
 protected:
-    explicit DynamicLoad(const std::string& file)
-    {
-        handle = dlopen(file.c_str(), RTLD_LAZY);
-        if(handle == nullptr)
-        {
-            throw DLException{std::string{"Loading dynamic module: "} + file + " failed with error:" + dlerror()};
-        }
-    }
-    ~DynamicLoad()
-    {
-        dlclose(handle);
-    }
+    explicit DynamicLoad(const std::string& file);
+    ~DynamicLoad();
 
     template<typename SymbolPtr>
-    inline void load_address_of(const std::string& name, SymbolPtr& address)
+    void load_address_of(const std::string& name, SymbolPtr& address)
     {
         static_assert(sizeof(void*) == sizeof(SymbolPtr), "object pointer and function pointer sizes must be equal");
 
