@@ -54,7 +54,6 @@ private:
     void operator=(const OnlineVariance&) = delete;
 
     uint32_t count;
-    T st_dev;
     T avg;
     T m2;
 };
