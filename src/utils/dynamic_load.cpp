@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Andrey Kuznetsov
-// Description: Helpers for parsing NETBios structures.
-// Copyright (c) 2014 EPAM Systems
+// Author: Pavel Karneliuk
+// Description: Wrapper for dlopen and related functions
+// Copyright (c) 2013 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,18 +19,25 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <arpa/inet.h>
+#include <string>
 
-#include "protocols/netbios/netbios.h"
+#include "utils/dynamic_load.h"
 //------------------------------------------------------------------------------
-using namespace NST::protocols::NetBIOS;
+using namespace NST::utils;
+//------------------------------------------------------------------------------
 
-int8_t MessageHeader::start() const
+DynamicLoad::DynamicLoad(const std::string &file)
 {
-    return _start;
+    handle = dlopen(file.c_str(), RTLD_LAZY);
+    if(handle == nullptr)
+    {
+        throw DLException{std::string{"Loading dynamic module: "} + file + " failed with error:" + dlerror()};
+    }
 }
 
-size_t MessageHeader::len() const
+DynamicLoad::~DynamicLoad()
 {
-    return ntohs(length);
+    dlclose(handle);
 }
+
+//------------------------------------------------------------------------------
