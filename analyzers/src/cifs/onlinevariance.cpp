@@ -28,7 +28,6 @@ using namespace NST::breakdown;
 
 NST::breakdown::OnlineVariance::OnlineVariance()
     : count {0}
-    , st_dev {}
     , avg {}
     , m2 {}
 {}
