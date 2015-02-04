@@ -1,7 +1,7 @@
-///------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Operation CIFS analyzer. Identify clients that are busier than others.
-// Copyright (c) 2014 EPAM Systems
+// Description: Helpers for parsing CIFS v2 structures.
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,36 +19,61 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <api/plugin_api.h>
-
-#include "onlinevariance.h"
 #include "latencies.h"
-#include "cifs_commands.h"
-#include "cifs2_commands.h"
-#include "cifsv2breakdownanalyzer.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 
-extern "C"
+Latencies::Latencies()
 {
+    timerclear(&min);
+    timerclear(&max);
+}
 
-    const char* usage()
+void Latencies::add(const timeval &t)
+{
+    algorithm.add(t);
+    set_range(t);
+}
+
+uint64_t Latencies::get_count() const
+{
+    return algorithm.get_count();
+}
+
+long double Latencies::get_avg() const
+{
+    return algorithm.get_avg();
+}
+
+long double Latencies::get_st_dev() const
+{
+    return algorithm.get_st_dev();
+}
+
+const timeval &Latencies::get_min() const
+{
+    return min;
+}
+
+const timeval &Latencies::get_max() const
+{
+    return max;
+}
+
+void Latencies::set_range(const timeval &t)
+{
+    if (timercmp(&t, &min, < ))
     {
-        return "No options";
+        min = t;
     }
-
-    IAnalyzer* create(const char*)
+    if (min.tv_sec == 0 && min.tv_usec == 0)
     {
-        return new CIFSv2BreakdownAnalyzer();
+        min = t;
     }
-
-    void destroy(IAnalyzer* instance)
+    if (timercmp(&t, &max, > ))
     {
-        delete instance;
+        max = t;
     }
-
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
-
-}//extern "C"
+}
 //------------------------------------------------------------------------------

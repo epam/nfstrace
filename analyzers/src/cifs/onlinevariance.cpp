@@ -1,7 +1,7 @@
-///------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Operation CIFS analyzer. Identify clients that are busier than others.
-// Copyright (c) 2014 EPAM Systems
+// Description: Calculator of average timeouts
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,36 +19,46 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <api/plugin_api.h>
+#include <cmath>
 
 #include "onlinevariance.h"
-#include "latencies.h"
-#include "cifs_commands.h"
-#include "cifs2_commands.h"
-#include "cifsv2breakdownanalyzer.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 
-extern "C"
+NST::breakdown::OnlineVariance::OnlineVariance()
+    : count {0}
+    , st_dev {}
+    , avg {}
+    , m2 {}
+{}
+
+OnlineVariance::~OnlineVariance() {}
+
+void OnlineVariance::add(const timeval &t)
 {
+    T x = to_sec<T>(t);
+    T delta = x - avg;
+    avg += delta / (++count);
+    m2 += delta * (x - avg);
+}
 
-    const char* usage()
+uint32_t OnlineVariance::get_count() const
+{
+    return count;
+}
+
+OnlineVariance::T OnlineVariance::get_avg() const
+{
+    return avg;
+}
+
+OnlineVariance::T OnlineVariance::get_st_dev() const
+{
+    if (count < 2)
     {
-        return "No options";
+        return T();
     }
-
-    IAnalyzer* create(const char*)
-    {
-        return new CIFSv2BreakdownAnalyzer();
-    }
-
-    void destroy(IAnalyzer* instance)
-    {
-        delete instance;
-    }
-
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
-
-}//extern "C"
+    return sqrt(m2 / (count - 1));
+}
 //------------------------------------------------------------------------------
