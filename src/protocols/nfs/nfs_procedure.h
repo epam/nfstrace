@@ -24,7 +24,7 @@
 //------------------------------------------------------------------------------
 #include <rpc/rpc.h>
 
-#include "api/rpc_procedure.h"
+#include "api/rpc_types.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/nfs4/nfs41_utils.h"
