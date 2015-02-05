@@ -23,7 +23,6 @@
 #define CIFSV2BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
 #include "cifsbreakdownanalyzer.h"
-#include "cifs2_commands.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -48,7 +47,7 @@ class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
     };*/
 
     Statistic smbv2;//!< Statistic
-    Representer<SMBv2Commands> cifs2Representer;//!< Class for statistic representation
+    Representer cifs2Representer;//!< Class for statistic representation
 public:
     CIFSv2BreakdownAnalyzer(std::ostream& o = std::cout);
     void closeFileSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseRequest*, const SMBv2::CloseResponse*) override final;

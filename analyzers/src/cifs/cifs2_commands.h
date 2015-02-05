@@ -22,8 +22,6 @@
 #ifndef CIFS2_COMMANDS_H
 #define CIFS2_COMMANDS_H
 //------------------------------------------------------------------------------
-#include <string>
-
 #include "cifs_commands.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -33,7 +31,7 @@ namespace breakdown
 //------------------------------------------------------------------------------
 /*! CIFS v2 commands list
  */
-struct SMBv2Commands : Commands
+struct SMBv2Commands : CommandRepresenter
 {
     enum Commands
     {
@@ -62,6 +60,8 @@ struct SMBv2Commands : Commands
     const std::string commandDescription(int cmd_code);
 
     const std::string commandName(int cmd_code);
+
+    size_t commandsCount();
 };
 //------------------------------------------------------------------------------
 } // breakdown

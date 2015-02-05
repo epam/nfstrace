@@ -22,12 +22,8 @@
 #ifndef CIFSBREAKDOWNANALYZER_H
 #define CIFSBREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
-#include <map>
-
 #include <api/plugin_api.h>
 
-#include "breakdowncounter.h"
-#include "cifs_commands.h"
 #include "cifs_representer.h"
 #include "statistic.h"
 //------------------------------------------------------------------------------
@@ -41,7 +37,7 @@ namespace breakdown
 class CIFSBreakdownAnalyzer : public IAnalyzer
 {
     Statistic smbv1;//!< Statistic
-    Representer<SMBv1Commands> representer;//!< Class for statistic representation
+    Representer representer;//!< Class for statistic representation
 public:
     CIFSBreakdownAnalyzer(std::ostream& o = std::cout);
 

@@ -19,12 +19,13 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include "cifs_commands.h"
 #include "cifsbreakdownanalyzer.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 CIFSBreakdownAnalyzer::CIFSBreakdownAnalyzer(std::ostream &o)
-    : representer(o)
+    : representer(o, new SMBv1Commands())
 {
 }
 
