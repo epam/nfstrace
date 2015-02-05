@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: CIFS structures.
+// Description: Represents CIFS v1 commands
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -22,40 +22,15 @@
 #ifndef CIFS_COMMANDS_H
 #define CIFS_COMMANDS_H
 //------------------------------------------------------------------------------
-#include <string>
+#include "commandrepresenter.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace breakdown
 {
 //------------------------------------------------------------------------------
-struct CommandRepresenter
-{
-    /*!
-     * \brief commandDescription returns description of the command
-     * \param cmd_code command code
-     * \return description
-     */
-    virtual const std::string commandDescription(int cmd_code) = 0;
-
-    /*!
-     * \brief commandName returns name of the command
-     * \param cmd_code command code
-     * \return name
-     */
-    virtual const std::string commandName(int cmd_code) = 0;
-
-    /*!
-     * \brief commandName returns name of the command
-     * \param cmd_code command code
-     * \return name
-     */
-    virtual size_t commandsCount() = 0;
-
-    virtual ~CommandRepresenter() = 0;
-};
-
-/*! CIFS v1 commands list
+/*!
+ * Represents CIFS v1 commands
  */
 struct SMBv1Commands : public CommandRepresenter
 {
@@ -139,18 +114,8 @@ struct SMBv1Commands : public CommandRepresenter
         CMD_COUNT
     };
 
-    /*!
-    * \brief commandDescription returns description of the command
-    * \param cmd_code command code
-    * \return description
-    */
     const std::string commandDescription(int cmd_code);
 
-    /*!
-    * \brief commandName returns name of the command
-    * \param cmd_code command code
-    * \return name
-    */
     const std::string commandName(int cmd_code);
 
     size_t commandsCount();

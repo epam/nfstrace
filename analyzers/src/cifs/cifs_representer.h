@@ -25,7 +25,7 @@
 #include <memory>
 #include <ostream>
 
-#include "cifs_commands.h"
+#include "commandrepresenter.h"
 #include "breakdowncounter.h"
 #include "statistic.h"
 //------------------------------------------------------------------------------
