@@ -110,13 +110,22 @@ public:
 
     inline static std::string default_device()
     {
-        char errbuf[PCAP_ERRBUF_SIZE];
-        const char* default_device {pcap_lookupdev(errbuf)};
-        if(default_device == nullptr)
+        NST::filtration::pcap::NetworkInterfaces interfaces;
+
+        for(const auto& interface : interfaces)
         {
-            throw PcapError("pcap_lookupdev", errbuf);
+            for(const auto& address : interface)
+            {
+                // Do not compare string for appropriate IP4/IP6 address.
+                // If pointer to address is not null expect it has valid address.
+                if(address.address() != nullptr)
+                {
+                    return interface.name();
+                }
+            }
         }
-        return default_device;
+
+        throw std::runtime_error{"No suitable device found.\n Note: reading an ip address of a network device may require special privileges."};
     }
 
     NetworkInterfaces(const NetworkInterfaces&)            = delete;
