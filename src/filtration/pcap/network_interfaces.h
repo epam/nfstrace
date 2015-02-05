@@ -112,20 +112,20 @@ public:
     {
         NST::filtration::pcap::NetworkInterfaces interfaces;
 
-        for(const auto& i : interfaces)
+        for(const auto& interface : interfaces)
         {
-            for(const auto& a : i)
+            for(const auto& address : interface)
             {
                 // Do not compare string for appropriate IP4/IP6 address.
                 // If pointer to address is not null expect it has valid address.
-                if(a.address() != nullptr)
+                if(address.address() != nullptr)
                 {
-                    return i.name();
+                    return interface.name();
                 }
             }
         }
 
-        throw std::runtime_error{"there is no interface with ip address assigned"};
+        throw std::runtime_error{"No suitable device found.\n Note: reading an ip address of a network device may require special privileges."};
     }
 
     NetworkInterfaces(const NetworkInterfaces&)            = delete;
