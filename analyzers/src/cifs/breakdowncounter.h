@@ -23,43 +23,27 @@
 #ifndef BREAKDOWNCOUNTER_H
 #define BREAKDOWNCOUNTER_H
 //------------------------------------------------------------------------------
-#include <algorithm>
-#include <numeric>
+#include <map>
 
 #include "latencies.h"
 //------------------------------------------------------------------------------
-template
-<
-    typename T,
-    class Algorithm,
-    int COUNT
-    >
+/*! Counts and keeps breakdown statistic
+ */
 class BreakdownCounter
 {
 public:
-    BreakdownCounter() {}
-    ~BreakdownCounter() {}
-    const NST::breakdown::Latencies& operator[](int index) const
-    {
-        return latencies[index];
-    }
-    NST::breakdown::Latencies& operator[](int index)
-    {
-        return latencies[index];
-    }
+    BreakdownCounter();
+    ~BreakdownCounter();
 
-    uint64_t getTotalCount () const
-    {
-        return std::accumulate(std::begin(latencies), std::end(latencies), 0, [](int sum, const NST::breakdown::Latencies& latency)
-        {
-            return sum + latency.get_count();
-        });
-    }
+    const NST::breakdown::Latencies operator[](int index) const;
+
+    NST::breakdown::Latencies& operator[](int index);
+
+    uint64_t getTotalCount () const;
 
 private:
-    void operator=  (const BreakdownCounter&) = delete;
-
-    NST::breakdown::Latencies latencies[COUNT];
+    void operator= (const BreakdownCounter&) = delete;
+    std::map<int, NST::breakdown::Latencies> latencies;
 };
 
 
@@ -73,12 +57,12 @@ void account(const Cmd* proc, Code cmd_code, Stats& stats)
     timersub(proc->rtimestamp, proc->ctimestamp, &latency);
 
     ++stats.procedures_total_count;
-    ++stats.procedures_count[cmd_code];
+    ++stats.procedures_count[static_cast<int>(cmd_code)];
 
     i = stats.per_procedure_statistic.find(*proc->session);
     if (i == stats.per_procedure_statistic.end())
     {
-        auto session_res = stats.per_procedure_statistic.emplace(*proc->session, typename Stats::Breakdown {});
+        auto session_res = stats.per_procedure_statistic.emplace(*proc->session, BreakdownCounter {});
         if (session_res.second == false)
         {
             return;

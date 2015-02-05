@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: CIFS v2 structures.
+// Description: Statistic structure
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,54 +19,42 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef CIFS2_COMMANDS_H
-#define CIFS2_COMMANDS_H
+#ifndef STATISTIC_H
+#define STATISTIC_H
 //------------------------------------------------------------------------------
-#include <string>
+#include <api/plugin_api.h>
 
-#include "cifs_commands.h"
+#include "breakdowncounter.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace breakdown
 {
 //------------------------------------------------------------------------------
-/*! CIFS v2 commands list
+/*! \class Comparator for session
  */
-struct SMBv2Commands : Commands
+struct Less
 {
-    enum Commands
-    {
-        NEGOTIATE,
-        SESSION_SETUP,
-        LOGOFF,
-        TREE_CONNECT,
-        TREE_DISCONNECT,
-        CREATE,
-        CLOSE,
-        FLUSH,
-        READ,
-        WRITE,
-        LOCK,
-        IOCTL,
-        CANCEL,
-        ECHO,
-        QUERY_DIRECTORY,
-        CHANGE_NOTIFY,
-        QUERY_INFO,
-        SET_INFO,
-        OPLOCK_BREAK,
-        CMD_COUNT
-    };
+    bool operator() (const Session& a, const Session& b) const;
+};
 
-    const std::string commandDescription(int cmd_code);
+/*! \class All statistic data
+ */
+struct Statistic
+{
+    using PerOpStat = std::map<Session, BreakdownCounter, Less>;
+    using ProceduresCount = std::map<int, int>;
 
-    const std::string commandName(int cmd_code);
+    uint64_t procedures_total_count;//!< Total amount of procedures
+    ProceduresCount procedures_count;//!< Count of each procedure
+    PerOpStat per_procedure_statistic;//!< Statistic for each procedure
+
+    Statistic();
 };
 //------------------------------------------------------------------------------
 } // breakdown
 } // NST
 //------------------------------------------------------------------------------
-#endif // CIFS2_COMMANDS_H
+#endif // STATISTIC_H
 //------------------------------------------------------------------------------
 

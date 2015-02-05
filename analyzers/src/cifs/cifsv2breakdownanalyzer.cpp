@@ -130,6 +130,3 @@ void CIFSv2BreakdownAnalyzer::flush_statistics()
     cifs2Representer.flush_statistics(smbv2);
 }
 //------------------------------------------------------------------------------
-
-
-CIFSv2BreakdownAnalyzer::Statistic::Statistic() : procedures_total_count {0} {}
