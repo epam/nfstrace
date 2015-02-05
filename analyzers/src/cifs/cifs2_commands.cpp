@@ -26,59 +26,59 @@
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 
-const std::string NST::breakdown::commandName(NST::breakdown::SMBv2Commands cmd_code)
+const std::string NST::breakdown::SMBv2Commands::commandName(int cmd_code)
 {
-    static std::map<SMBv2Commands, std::string> cmdNames;
+    static std::map<Commands, std::string> cmdNames;
     if (cmdNames.empty())
     {
-        cmdNames[SMBv2Commands::NEGOTIATE]         = "NEGOTIATE";
-        cmdNames[SMBv2Commands::SESSION_SETUP]     = "SESSION SETUP";
-        cmdNames[SMBv2Commands::LOGOFF]            = "LOGOFF";
-        cmdNames[SMBv2Commands::TREE_CONNECT]      = "TREE CONNECT";
-        cmdNames[SMBv2Commands::TREE_DISCONNECT]   = "TREE DISCONNECT";
-        cmdNames[SMBv2Commands::CREATE]            = "CREATE";
-        cmdNames[SMBv2Commands::CLOSE]             = "CLOSE";
-        cmdNames[SMBv2Commands::FLUSH]             = "FLUSH";
-        cmdNames[SMBv2Commands::READ]              = "READ";
-        cmdNames[SMBv2Commands::WRITE]             = "WRITE";
-        cmdNames[SMBv2Commands::LOCK]              = "LOCK";
-        cmdNames[SMBv2Commands::IOCTL]             = "IOCTL";
-        cmdNames[SMBv2Commands::CANCEL]            = "CANCEL";
-        cmdNames[SMBv2Commands::ECHO]              = "ECHO";
-        cmdNames[SMBv2Commands::QUERY_DIRECTORY]   = "QUERY DIRECTORY";
-        cmdNames[SMBv2Commands::CHANGE_NOTIFY]     = "CHANGE NOTIFY";
-        cmdNames[SMBv2Commands::QUERY_INFO]        = "QUERY INFO";
-        cmdNames[SMBv2Commands::SET_INFO]          = "SET INFO";
-        cmdNames[SMBv2Commands::OPLOCK_BREAK]      = "OPLOCK BREAK";
+        cmdNames[Commands::NEGOTIATE]         = "NEGOTIATE";
+        cmdNames[Commands::SESSION_SETUP]     = "SESSION SETUP";
+        cmdNames[Commands::LOGOFF]            = "LOGOFF";
+        cmdNames[Commands::TREE_CONNECT]      = "TREE CONNECT";
+        cmdNames[Commands::TREE_DISCONNECT]   = "TREE DISCONNECT";
+        cmdNames[Commands::CREATE]            = "CREATE";
+        cmdNames[Commands::CLOSE]             = "CLOSE";
+        cmdNames[Commands::FLUSH]             = "FLUSH";
+        cmdNames[Commands::READ]              = "READ";
+        cmdNames[Commands::WRITE]             = "WRITE";
+        cmdNames[Commands::LOCK]              = "LOCK";
+        cmdNames[Commands::IOCTL]             = "IOCTL";
+        cmdNames[Commands::CANCEL]            = "CANCEL";
+        cmdNames[Commands::ECHO]              = "ECHO";
+        cmdNames[Commands::QUERY_DIRECTORY]   = "QUERY DIRECTORY";
+        cmdNames[Commands::CHANGE_NOTIFY]     = "CHANGE NOTIFY";
+        cmdNames[Commands::QUERY_INFO]        = "QUERY INFO";
+        cmdNames[Commands::SET_INFO]          = "SET INFO";
+        cmdNames[Commands::OPLOCK_BREAK]      = "OPLOCK BREAK";
     }
-    return cmdNames[cmd_code];
+    return cmdNames[static_cast<Commands>(cmd_code)];
 }
 
-const std::string NST::breakdown::commandDescription(SMBv2Commands cmd_code)
+const std::string NST::breakdown::SMBv2Commands::commandDescription(int cmd_code)
 {
-    static std::map<SMBv2Commands, std::string> cmdNames;
+    static std::map<Commands, std::string> cmdNames;
     if (cmdNames.empty())
     {
-        cmdNames[SMBv2Commands::NEGOTIATE]         = "SMB v2 NEGOTIATE";
-        cmdNames[SMBv2Commands::SESSION_SETUP]     = "SMB v2 SESSION_SETUP";
-        cmdNames[SMBv2Commands::LOGOFF]            = "SMB v2 LOGOFF";
-        cmdNames[SMBv2Commands::TREE_CONNECT]      = "SMB v2 TREE_CONNECT";
-        cmdNames[SMBv2Commands::TREE_DISCONNECT]   = "SMB v2 TREE_DISCONNECT";
-        cmdNames[SMBv2Commands::CREATE]            = "SMB v2 CREATE";
-        cmdNames[SMBv2Commands::CLOSE]             = "SMB v2 CLOSE";
-        cmdNames[SMBv2Commands::FLUSH]             = "SMB v2 FLUSH";
-        cmdNames[SMBv2Commands::READ]              = "SMB v2 READ";
-        cmdNames[SMBv2Commands::WRITE]             = "SMB v2 WRITE";
-        cmdNames[SMBv2Commands::LOCK]              = "SMB v2 LOCK";
-        cmdNames[SMBv2Commands::IOCTL]             = "SMB v2 IOCTL";
-        cmdNames[SMBv2Commands::CANCEL]            = "SMB v2 CANCEL";
-        cmdNames[SMBv2Commands::ECHO]              = "SMB v2 ECHO";
-        cmdNames[SMBv2Commands::QUERY_DIRECTORY]   = "SMB v2 QUERY_DIRECTORY";
-        cmdNames[SMBv2Commands::CHANGE_NOTIFY]     = "SMB v2 CHANGE_NOTIFY";
-        cmdNames[SMBv2Commands::QUERY_INFO]        = "SMB v2 QUERY_INFO";
-        cmdNames[SMBv2Commands::SET_INFO]          = "SMB v2 SET_INFO";
-        cmdNames[SMBv2Commands::OPLOCK_BREAK]      = "SMB v2 OPLOCK_BREAK";
+        cmdNames[Commands::NEGOTIATE]         = "SMB v2 NEGOTIATE";
+        cmdNames[Commands::SESSION_SETUP]     = "SMB v2 SESSION_SETUP";
+        cmdNames[Commands::LOGOFF]            = "SMB v2 LOGOFF";
+        cmdNames[Commands::TREE_CONNECT]      = "SMB v2 TREE_CONNECT";
+        cmdNames[Commands::TREE_DISCONNECT]   = "SMB v2 TREE_DISCONNECT";
+        cmdNames[Commands::CREATE]            = "SMB v2 CREATE";
+        cmdNames[Commands::CLOSE]             = "SMB v2 CLOSE";
+        cmdNames[Commands::FLUSH]             = "SMB v2 FLUSH";
+        cmdNames[Commands::READ]              = "SMB v2 READ";
+        cmdNames[Commands::WRITE]             = "SMB v2 WRITE";
+        cmdNames[Commands::LOCK]              = "SMB v2 LOCK";
+        cmdNames[Commands::IOCTL]             = "SMB v2 IOCTL";
+        cmdNames[Commands::CANCEL]            = "SMB v2 CANCEL";
+        cmdNames[Commands::ECHO]              = "SMB v2 ECHO";
+        cmdNames[Commands::QUERY_DIRECTORY]   = "SMB v2 QUERY_DIRECTORY";
+        cmdNames[Commands::CHANGE_NOTIFY]     = "SMB v2 CHANGE_NOTIFY";
+        cmdNames[Commands::QUERY_INFO]        = "SMB v2 QUERY_INFO";
+        cmdNames[Commands::SET_INFO]          = "SMB v2 SET_INFO";
+        cmdNames[Commands::OPLOCK_BREAK]      = "SMB v2 OPLOCK_BREAK";
     }
-    return cmdNames[cmd_code];
+    return cmdNames[static_cast<Commands>(cmd_code)];
 }
 //------------------------------------------------------------------------------

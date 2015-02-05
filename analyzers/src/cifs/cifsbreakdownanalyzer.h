@@ -29,6 +29,7 @@
 #include "breakdowncounter.h"
 #include "cifs_commands.h"
 #include "cifs_representer.h"
+#include "statistic.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -39,32 +40,8 @@ namespace breakdown
  */
 class CIFSBreakdownAnalyzer : public IAnalyzer
 {
-protected:
-    /*! \class Comparator for session
-     */
-    struct Less
-    {
-        bool operator() (const Session& a, const Session& b) const;
-    };
-
-private:
-    /*! \class All statistic data
-     */
-    struct Statistic
-    {
-        using Breakdown = BreakdownCounter<long double, OnlineVariance, static_cast<int>(SMBv1Commands::CMD_COUNT)>;
-        using PerOpStat = std::map<Session, Breakdown, Less>;
-        using ProceduresCount = std::map<SMBv1Commands, int>;
-
-        uint64_t procedures_total_count;//!< Total amount of procedures
-        ProceduresCount procedures_count;//!< Count of each procedure
-        PerOpStat per_procedure_statistic;//!< Statistic for each procedure
-
-        Statistic();
-    };
-
     Statistic smbv1;//!< Statistic
-    Representer<Statistic, SMBv1Commands> representer;//!< Class for statistic representation
+    Representer<SMBv1Commands> representer;//!< Class for statistic representation
 public:
     CIFSBreakdownAnalyzer(std::ostream& o = std::cout);
 

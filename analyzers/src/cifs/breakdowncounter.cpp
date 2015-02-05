@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: CIFS v2 structures.
+// Description: Statistic counter
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,54 +19,34 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef CIFS2_COMMANDS_H
-#define CIFS2_COMMANDS_H
-//------------------------------------------------------------------------------
-#include <string>
+#include <algorithm>
+#include <numeric>
 
-#include "cifs_commands.h"
+#include "breakdowncounter.h"
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace breakdown
-{
+using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-/*! CIFS v2 commands list
- */
-struct SMBv2Commands : Commands
+BreakdownCounter::BreakdownCounter() {}
+
+BreakdownCounter::~BreakdownCounter() {}
+
+Latencies &BreakdownCounter::operator[](int index)
 {
-    enum Commands
+    return latencies[index];
+}
+
+uint64_t BreakdownCounter::getTotalCount() const
+{
+    return std::accumulate(std::begin(latencies), std::end(latencies), 0, [](int sum, std::pair<int, NST::breakdown::Latencies> latency)
     {
-        NEGOTIATE,
-        SESSION_SETUP,
-        LOGOFF,
-        TREE_CONNECT,
-        TREE_DISCONNECT,
-        CREATE,
-        CLOSE,
-        FLUSH,
-        READ,
-        WRITE,
-        LOCK,
-        IOCTL,
-        CANCEL,
-        ECHO,
-        QUERY_DIRECTORY,
-        CHANGE_NOTIFY,
-        QUERY_INFO,
-        SET_INFO,
-        OPLOCK_BREAK,
-        CMD_COUNT
-    };
+        return sum + latency.second.get_count();
+    });
+}
 
-    const std::string commandDescription(int cmd_code);
-
-    const std::string commandName(int cmd_code);
-};
+const Latencies BreakdownCounter::operator[](int index) const
+{
+    if (latencies.find(index) != latencies.end())
+        return latencies.at(index);
+    return NST::breakdown::Latencies();
+}
 //------------------------------------------------------------------------------
-} // breakdown
-} // NST
-//------------------------------------------------------------------------------
-#endif // CIFS2_COMMANDS_H
-//------------------------------------------------------------------------------
-

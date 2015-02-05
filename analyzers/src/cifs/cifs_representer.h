@@ -24,10 +24,13 @@
 //------------------------------------------------------------------------------
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
+#include "breakdowncounter.h"
 #include "latencies.h"
 #include "cifs2_commands.h"
 #include "cifs_commands.h"
+#include "statistic.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -38,7 +41,6 @@ namespace breakdown
  */
 template
 <
-    typename Statistic,
     typename SMBCommands
     >
 class Representer
@@ -64,7 +66,7 @@ public:
             //FIXME: Sync primitives to be used
             out.width(12);
             out << std::left
-                << commandDescription(procedure.first);
+                << SMBCommands().commandDescription(procedure.first);
             out.width(5);
             out << std::right
                 << procedure.second;
@@ -84,7 +86,7 @@ public:
 
             for (auto& it : statistic.per_procedure_statistic)
             {
-                const typename Statistic::Breakdown& current = it.second;
+                const BreakdownCounter& current = it.second;
                 uint64_t s_total_proc = current.getTotalCount();
 
                 session.str("");
@@ -97,7 +99,7 @@ public:
     }
 
     void store_per_session(std::ostream& file,
-                           const typename Statistic::Breakdown& breakdown,
+                           const BreakdownCounter& breakdown,
                            const std::string& session,
                            uint64_t s_total_proc) const
     {
@@ -105,7 +107,7 @@ public:
 
         for (unsigned i = 0; i < static_cast<int>(SMBCommands::CMD_COUNT); ++i)
         {
-            file << commandName(static_cast<SMBCommands>(i));
+            file << SMBCommands().commandName(i);
             file << ' ' << breakdown[i].get_count() << ' ';
             file << (s_total_proc ? (((long double)(breakdown[i].get_count()) / s_total_proc) * 100) : 0);
             file << ' ' << to_sec<long double>(breakdown[i].get_min())
@@ -116,7 +118,7 @@ public:
         }
     }
 
-    void print_per_session(const typename Statistic::Breakdown& breakdown,
+    void print_per_session(const BreakdownCounter& breakdown,
                            const std::string& session,
                            uint64_t s_total_proc) const
     {
@@ -128,7 +130,7 @@ public:
         {
             out.width(22);
             out << std::left
-                << commandName(static_cast<SMBCommands>(i));
+                << SMBCommands().commandName(i);
             out.width(6);
             out << " Count:";
             out.width(5);

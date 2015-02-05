@@ -35,21 +35,20 @@ namespace breakdown
 class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
 {
     /*! \class All statistic data
-     */
+     *
     struct Statistic
     {
-        using Breakdown = BreakdownCounter<long double, OnlineVariance, static_cast<int>(SMBv2Commands::CMD_COUNT)>;
-        using PerOpStat = std::map<Session, Breakdown, Less>;
+        using PerOpStat = std::map<Session, BreakdownCounter, Less>;
         using ProceduresCount = std::map<SMBv2Commands, int>;
 
         uint64_t procedures_total_count;//!< Total amount of procedures
         ProceduresCount procedures_count;//!< Count of each procedure
         PerOpStat per_procedure_statistic;//!< Statistic for each procedure
         Statistic();
-    };
+    };*/
 
     Statistic smbv2;//!< Statistic
-    Representer<Statistic, SMBv2Commands> cifs2Representer;//!< Class for statistic representation
+    Representer<SMBv2Commands> cifs2Representer;//!< Class for statistic representation
 public:
     CIFSv2BreakdownAnalyzer(std::ostream& o = std::cout);
     void closeFileSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseRequest*, const SMBv2::CloseResponse*) override final;
