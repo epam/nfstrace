@@ -33,19 +33,6 @@ namespace breakdown
  */
 class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
 {
-    /*! \class All statistic data
-     *
-    struct Statistic
-    {
-        using PerOpStat = std::map<Session, BreakdownCounter, Less>;
-        using ProceduresCount = std::map<SMBv2Commands, int>;
-
-        uint64_t procedures_total_count;//!< Total amount of procedures
-        ProceduresCount procedures_count;//!< Count of each procedure
-        PerOpStat per_procedure_statistic;//!< Statistic for each procedure
-        Statistic();
-    };*/
-
     Statistic smbv2;//!< Statistic
     Representer cifs2Representer;//!< Class for statistic representation
 public:

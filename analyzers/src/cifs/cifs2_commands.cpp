@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: CIFS v2 structures.
+// Description: Represents CIFS v2 commands
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*

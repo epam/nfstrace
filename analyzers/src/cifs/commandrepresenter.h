@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Represents CIFS v2 commands
+// Description: Interface for command representers
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -18,11 +18,12 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 //------------------------------------------------------------------------------
-#ifndef CIFS2_COMMANDS_H
-#define CIFS2_COMMANDS_H
+#ifndef COMMANDREPRESENTER_H
+#define COMMANDREPRESENTER_H
 //------------------------------------------------------------------------------
-#include "commandrepresenter.h"
+#include <string>
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -30,44 +31,36 @@ namespace breakdown
 {
 //------------------------------------------------------------------------------
 /*!
- * Represents CIFS v2 commands
+ * \brief The CommandRepresenter struct represents interface for command representers
  */
-struct SMBv2Commands : CommandRepresenter
+struct CommandRepresenter
 {
-    enum Commands
-    {
-        NEGOTIATE,
-        SESSION_SETUP,
-        LOGOFF,
-        TREE_CONNECT,
-        TREE_DISCONNECT,
-        CREATE,
-        CLOSE,
-        FLUSH,
-        READ,
-        WRITE,
-        LOCK,
-        IOCTL,
-        CANCEL,
-        ECHO,
-        QUERY_DIRECTORY,
-        CHANGE_NOTIFY,
-        QUERY_INFO,
-        SET_INFO,
-        OPLOCK_BREAK,
-        CMD_COUNT
-    };
+    /*!
+     * \brief commandDescription returns description of the command
+     * \param cmd_code command code
+     * \return description
+     */
+    virtual const std::string commandDescription(int cmd_code) = 0;
 
-    const std::string commandDescription(int cmd_code);
+    /*!
+     * \brief commandName returns name of the command
+     * \param cmd_code command code
+     * \return name
+     */
+    virtual const std::string commandName(int cmd_code) = 0;
 
-    const std::string commandName(int cmd_code);
+    /*!
+     * \brief commandsCount returns total count of commands
+     * \return count
+     */
+    virtual size_t commandsCount() = 0;
 
-    size_t commandsCount();
+    virtual ~CommandRepresenter() {}
 };
 //------------------------------------------------------------------------------
 } // breakdown
 } // NST
 //------------------------------------------------------------------------------
-#endif // CIFS2_COMMANDS_H
+#endif // COMMANDREPRESENTER_H
 //------------------------------------------------------------------------------
 

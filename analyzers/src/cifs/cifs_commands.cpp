@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: CIFS commands
+// Description: Represents CIFS v1 commands
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
