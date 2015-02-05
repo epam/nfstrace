@@ -54,6 +54,11 @@ const std::string NST::breakdown::SMBv2Commands::commandName(int cmd_code)
     return cmdNames[static_cast<Commands>(cmd_code)];
 }
 
+size_t SMBv2Commands::commandsCount()
+{
+    return Commands::CMD_COUNT;
+}
+
 const std::string NST::breakdown::SMBv2Commands::commandDescription(int cmd_code)
 {
     static std::map<Commands, std::string> cmdNames;

@@ -20,12 +20,13 @@
 */
 //------------------------------------------------------------------------------
 #include "cifsv2breakdownanalyzer.h"
+#include "cifs2_commands.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 CIFSv2BreakdownAnalyzer::CIFSv2BreakdownAnalyzer(std::ostream &o)
     : CIFSBreakdownAnalyzer(o)
-    , cifs2Representer(o)
+    , cifs2Representer(o, new SMBv2Commands())
 {
 }
 

@@ -21,10 +21,6 @@
 //------------------------------------------------------------------------------
 #include <api/plugin_api.h>
 
-#include "onlinevariance.h"
-#include "latencies.h"
-#include "cifs_commands.h"
-#include "cifs2_commands.h"
 #include "cifsv2breakdownanalyzer.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
