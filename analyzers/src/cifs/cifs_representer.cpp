@@ -27,13 +27,13 @@
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-NST::breakdown::Representer::Representer(std::ostream &o, NST::breakdown::CommandRepresenter *cmdRep)
+NST::breakdown::Representer::Representer(std::ostream& o, NST::breakdown::CommandRepresenter* cmdRep)
     : out(o)
     , cmdRepresenter(cmdRep)
 {
 }
 
-void Representer::flush_statistics(const Statistic &statistic)
+void Representer::flush_statistics(const Statistic& statistic)
 {
     out << "###  Breakdown analyzer  ###"
         << std::endl
@@ -79,7 +79,7 @@ void Representer::flush_statistics(const Statistic &statistic)
     }
 }
 
-void Representer::store_per_session(std::ostream &file, const BreakdownCounter &breakdown, const std::string &session, uint64_t s_total_proc) const
+void Representer::store_per_session(std::ostream& file, const BreakdownCounter& breakdown, const std::string& session, uint64_t s_total_proc) const
 {
     file << "Session: " << session << std::endl;
 
@@ -96,7 +96,7 @@ void Representer::store_per_session(std::ostream &file, const BreakdownCounter &
     }
 }
 
-void Representer::print_per_session(const BreakdownCounter &breakdown, const std::string &session, uint64_t s_total_proc) const
+void Representer::print_per_session(const BreakdownCounter& breakdown, const std::string& session, uint64_t s_total_proc) const
 {
     out << "Session: " << session << std::endl;
 

@@ -18,8 +18,6 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-
 //------------------------------------------------------------------------------
 #ifndef ONLINEVARIANCE_H
 #define ONLINEVARIANCE_H
@@ -28,7 +26,6 @@
 
 #include <sys/time.h>
 //------------------------------------------------------------------------------
-
 namespace NST
 {
 namespace breakdown

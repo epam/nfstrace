@@ -30,7 +30,7 @@ BreakdownCounter::BreakdownCounter() {}
 
 BreakdownCounter::~BreakdownCounter() {}
 
-Latencies &BreakdownCounter::operator[](int index)
+Latencies& BreakdownCounter::operator[](int index)
 {
     return latencies[index];
 }
@@ -46,7 +46,9 @@ uint64_t BreakdownCounter::getTotalCount() const
 const Latencies BreakdownCounter::operator[](int index) const
 {
     if (latencies.find(index) != latencies.end())
+    {
         return latencies.at(index);
+    }
     return NST::breakdown::Latencies();
 }
 //------------------------------------------------------------------------------

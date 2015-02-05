@@ -30,7 +30,7 @@ Latencies::Latencies()
     timerclear(&max);
 }
 
-void Latencies::add(const timeval &t)
+void Latencies::add(const timeval& t)
 {
     algorithm.add(t);
     set_range(t);
@@ -51,17 +51,17 @@ long double Latencies::get_st_dev() const
     return algorithm.get_st_dev();
 }
 
-const timeval &Latencies::get_min() const
+const timeval& Latencies::get_min() const
 {
     return min;
 }
 
-const timeval &Latencies::get_max() const
+const timeval& Latencies::get_max() const
 {
     return max;
 }
 
-void Latencies::set_range(const timeval &t)
+void Latencies::set_range(const timeval& t)
 {
     if (timercmp(&t, &min, < ))
     {
