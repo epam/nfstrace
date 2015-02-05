@@ -23,12 +23,15 @@
 #ifndef RPC_TYPES_H
 #define RPC_TYPES_H
 //------------------------------------------------------------------------------
+#include "procedure.h"
 #include "xdr_types.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace API
 {
+
+using RPCProcedure = Procedure<struct rpc_msg>;
 
 const uint32_t SUNRPC_MSG_VERSION = 2;
 

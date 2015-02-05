@@ -25,10 +25,6 @@
 #define DUMP  "dump"
 #define STAT  "stat"
 #define DRAIN "drain"
-
-//! protocols
-#define CIFS  "CIFS"
-#define NFS   "NFS"
 //------------------------------------------------------------------------------
 namespace NST
 {

@@ -29,7 +29,7 @@
 #include "nfs3_types_rpcgen.h"
 #include "nfs4_types_rpcgen.h"
 #include "nfs41_types_rpcgen.h"
-#include "rpc_procedure.h"
+#include "rpc_types.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
