@@ -25,7 +25,6 @@
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-
 const std::string NST::breakdown::SMBv1Commands::commandName(int cmd_code)
 {
     static std::map<Commands, const char*> cmdNames;

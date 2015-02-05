@@ -29,7 +29,8 @@ namespace NST
 namespace breakdown
 {
 //------------------------------------------------------------------------------
-struct CommandRepresenter {
+struct CommandRepresenter
+{
     /*!
      * \brief commandDescription returns description of the command
      * \param cmd_code command code
@@ -56,7 +57,8 @@ struct CommandRepresenter {
 
 /*! CIFS v1 commands list
  */
-struct SMBv1Commands : public CommandRepresenter {
+struct SMBv1Commands : public CommandRepresenter
+{
     enum Commands
     {
         CREATE_DIRECTORY,       //!< Create a new directory.
@@ -138,17 +140,17 @@ struct SMBv1Commands : public CommandRepresenter {
     };
 
     /*!
- * \brief commandDescription returns description of the command
- * \param cmd_code command code
- * \return description
- */
+    * \brief commandDescription returns description of the command
+    * \param cmd_code command code
+    * \return description
+    */
     const std::string commandDescription(int cmd_code);
 
     /*!
- * \brief commandName returns name of the command
- * \param cmd_code command code
- * \return name
- */
+    * \brief commandName returns name of the command
+    * \param cmd_code command code
+    * \return name
+    */
     const std::string commandName(int cmd_code);
 
     size_t commandsCount();

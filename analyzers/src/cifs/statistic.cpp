@@ -18,17 +18,15 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-
 //------------------------------------------------------------------------------
 #include "statistic.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-bool Less::operator()(const Session &a, const Session &b) const
+bool Less::operator()(const Session& a, const Session& b) const
 {
     return ((a.port[0] < b.port[0]) && (a.port[1] <= b.port[1])) ||
-            ((a.ip.v4.addr[0] < b.ip.v4.addr[0]) && (a.ip.v4.addr[1] <= b.ip.v4.addr[1]));
+           ((a.ip.v4.addr[0] < b.ip.v4.addr[0]) && (a.ip.v4.addr[1] <= b.ip.v4.addr[1]));
 }
 
 Statistic::Statistic() : procedures_total_count {0} {}

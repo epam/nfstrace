@@ -28,13 +28,13 @@ using namespace NST::breakdown;
 
 NST::breakdown::OnlineVariance::OnlineVariance()
     : count {0}
-    , avg {}
-    , m2 {}
+, avg {}
+, m2 {}
 {}
 
 OnlineVariance::~OnlineVariance() {}
 
-void OnlineVariance::add(const timeval &t)
+void OnlineVariance::add(const timeval& t)
 {
     T x = to_sec<T>(t);
     T delta = x - avg;

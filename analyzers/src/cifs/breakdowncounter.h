@@ -46,7 +46,6 @@ private:
     std::map<int, NST::breakdown::Latencies> latencies;
 };
 
-
 template<typename Cmd, typename Code, typename Stats>
 void account(const Cmd* proc, Code cmd_code, Stats& stats)
 {
@@ -72,7 +71,6 @@ void account(const Cmd* proc, Code cmd_code, Stats& stats)
 
     (i->second)[static_cast<int>(cmd_code)].add(latency);
 }
-
 //------------------------------------------------------------------------------
 #endif // BREAKDOWNCOUNTER_H
 //------------------------------------------------------------------------------
