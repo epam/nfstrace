@@ -30,6 +30,7 @@ namespace breakdown
 {
 /*! \class Analyzer for CIFS v2
  * Handles CIFS v2 commands
+ * Class is not inhereted or reimplement functions: it only extends it!
  */
 class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
 {
