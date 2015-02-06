@@ -18,7 +18,6 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 //------------------------------------------------------------------------------
 #ifndef COMMANDREPRESENTER_H
 #define COMMANDREPRESENTER_H
