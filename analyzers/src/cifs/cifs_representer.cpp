@@ -47,7 +47,7 @@ void Representer::flush_statistics(const Statistic& statistic)
         //FIXME: Sync primitives to be used
         out.width(12);
         out << std::left
-            << cmdRepresenter->commandDescription(procedure.first);
+            << cmdRepresenter->command_description(procedure.first);
         out.width(5);
         out << std::right
             << procedure.second;
@@ -68,7 +68,7 @@ void Representer::flush_statistics(const Statistic& statistic)
         for (auto& it : statistic.per_procedure_statistic)
         {
             const BreakdownCounter& current = it.second;
-            uint64_t s_total_proc = current.getTotalCount();
+            uint64_t s_total_proc = current.get_total_count();
 
             session.str("");
             //print_session(session, it.first);//FIXME: print session
@@ -83,13 +83,13 @@ void Representer::store_per_session(std::ostream& file, const BreakdownCounter& 
 {
     file << "Session: " << session << std::endl;
 
-    for (unsigned i = 0; i < cmdRepresenter->commandsCount(); ++i)
+    for (unsigned i = 0; i < cmdRepresenter->commands_count(); ++i)
     {
-        file << cmdRepresenter->commandName(i);
+        file << cmdRepresenter->command_name(i);
         file << ' ' << breakdown[i].get_count() << ' ';
         file << (s_total_proc ? (((long double)(breakdown[i].get_count()) / s_total_proc) * 100) : 0);
-        file << ' ' << to_sec<long double>(breakdown[i].get_min())
-             << ' ' << to_sec<long double>(breakdown[i].get_max())
+        file << ' ' << to_sec(breakdown[i].get_min())
+             << ' ' << to_sec(breakdown[i].get_max())
              << ' ' << breakdown[i].get_avg()
              << ' ' << breakdown[i].get_st_dev()
              << std::endl;
@@ -102,11 +102,11 @@ void Representer::print_per_session(const BreakdownCounter& breakdown, const std
 
     out << "Total procedures: " << s_total_proc
         << ". Per procedure:"   << std::endl;
-    for (unsigned i = 0; i < cmdRepresenter->commandsCount(); ++i)
+    for (unsigned i = 0; i < cmdRepresenter->commands_count(); ++i)
     {
         out.width(22);
         out << std::left
-            << cmdRepresenter->commandName(i);
+            << cmdRepresenter->command_name(i);
         out.width(6);
         out << " Count:";
         out.width(5);
@@ -121,10 +121,10 @@ void Representer::print_per_session(const BreakdownCounter& breakdown, const std
         out << "%) Min: ";
         out.precision(3);
         out << std::fixed
-            << to_sec<long double>(breakdown[i].get_min())
+            << to_sec(breakdown[i].get_min())
             << " Max: "
             << std::fixed
-            << to_sec<long double>(breakdown[i].get_max())
+            << to_sec(breakdown[i].get_max())
             << " Avg: "
             << std::fixed
             << breakdown[i].get_avg();

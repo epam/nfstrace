@@ -31,7 +31,6 @@ namespace NST
 {
 namespace breakdown
 {
-//------------------------------------------------------------------------------
 /*! \class Analyzer for CIFS v1
  */
 class CIFSBreakdownAnalyzer : public IAnalyzer
@@ -119,10 +118,8 @@ public:
     virtual void flush_statistics();
 protected:
 };
-//------------------------------------------------------------------------------
 } // breakdown
 } // NST
 //------------------------------------------------------------------------------
 #endif // CIFSBREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
-
