@@ -30,9 +30,13 @@ namespace breakdown
 {
 /*!
  * Represents CIFS v2 commands
+ * Converts commands to string
  */
 struct SMBv2Commands : CommandRepresenter
 {
+    /*!
+     * \brief The Commands enum commands codes
+     */
     enum Commands
     {
         NEGOTIATE,

@@ -27,7 +27,7 @@
 
 #include "latencies.h"
 //------------------------------------------------------------------------------
-/*! Counts and keeps breakdown statistic
+/*! Counts and keeps breakdown statistic for session
  */
 class BreakdownCounter
 {
@@ -35,10 +35,24 @@ public:
     BreakdownCounter();
     ~BreakdownCounter();
 
+    /*!
+     * \brief operator [] returns statistic by index (command number)
+     * \param index - command number
+     * \return statistic
+     */
     const NST::breakdown::Latencies operator[](int index) const;
 
+    /*!
+     * \brief operator [] returns statistic by index (command number)
+     * \param index - command number
+     * \return statistic
+     */
     NST::breakdown::Latencies& operator[](int index);
 
+    /*!
+     * \brief get_total_count returns total amount of commands
+     * \return commands count
+     */
     uint64_t get_total_count () const;
 
 private:
@@ -46,6 +60,12 @@ private:
     std::map<int, NST::breakdown::Latencies> latencies;
 };
 
+/*!
+ * Saves statistic on commands receive
+ * \param proc - command
+ * \param cmd_code - commands code
+ * \param stats - statistic
+ */
 template<typename Cmd, typename Code, typename Stats>
 void account(const Cmd* proc, Code cmd_code, Stats& stats)
 {

@@ -33,16 +33,12 @@ namespace NST
 {
 namespace breakdown
 {
-/*! \class Represents statistic
+/*! \class Represents statistic and sends it to screen
  */
 class Representer
 {
     std::ostream& out;
     std::unique_ptr<CommandRepresenter> cmdRepresenter;
-public:
-    Representer(std::ostream& o, CommandRepresenter* cmdRep);
-
-    virtual void flush_statistics(const Statistic& statistic);
 
     void store_per_session(std::ostream& file,
                            const BreakdownCounter& breakdown,
@@ -52,6 +48,14 @@ public:
     void print_per_session(const BreakdownCounter& breakdown,
                            const std::string& session,
                            uint64_t s_total_proc) const;
+public:
+    Representer(std::ostream& o, CommandRepresenter* cmdRep);
+
+    /*!
+     * \brief flush_statistics outs statistic on screen
+     * \param statistic - statistics data
+     */
+    void flush_statistics(const Statistic& statistic);
 };
 } // breakdown
 } // NST

@@ -30,7 +30,7 @@ namespace NST
 {
 namespace breakdown
 {
-/*! \brief Comparator for session
+/*! \brief Comparator for sessions
  */
 struct Less
 {
