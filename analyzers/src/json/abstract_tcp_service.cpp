@@ -27,7 +27,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "net/abstract_tcp_service.h"
+#include "abstract_tcp_service.h"
 #include "utils/log.h"
 //------------------------------------------------------------------------------
 namespace NST
