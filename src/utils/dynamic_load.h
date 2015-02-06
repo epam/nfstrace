@@ -23,8 +23,6 @@
 #define DYNAMIC_LOAD_H
 //------------------------------------------------------------------------------
 #include <stdexcept>
-
-#include <dlfcn.h>
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -41,33 +39,28 @@ public:
     };
 
 protected:
-    explicit DynamicLoad(const std::string& file)
-    {
-        handle = dlopen(file.c_str(), RTLD_LAZY);
-        if(handle == nullptr)
-        {
-            throw DLException{std::string{"Loading dynamic module: "} + file + " failed with error:" + dlerror()};
-        }
-    }
-    ~DynamicLoad()
-    {
-        dlclose(handle);
-    }
+    explicit DynamicLoad(const std::string& file);
+    ~DynamicLoad();
 
     template<typename SymbolPtr>
-    inline void load_address_of(const std::string& name, SymbolPtr& address)
+    void load_address_of(const std::string& name, SymbolPtr& address)
     {
         static_assert(sizeof(void*) == sizeof(SymbolPtr), "object pointer and function pointer sizes must be equal");
 
         // suppression warning: ISO C++ forbids casting between pointer-to-function and pointer-to-object
-        using hook_dlsym_t = SymbolPtr (*)(void *, const char *);
+        using hook_dlsym_t = SymbolPtr (DynamicLoad::*)(const std::string&);
 
-        address = reinterpret_cast<hook_dlsym_t>(dlsym)(handle, name.c_str());
-        if(address == nullptr)
-        {
-            throw DLException{std::string{"Loading symbol "} + name + " failed with error:" + dlerror()};
-        }
-    }
+        hook_dlsym_t get_symbol_func = reinterpret_cast<hook_dlsym_t>(&DynamicLoad::get_symbol);
+        address = (*this.*get_symbol_func)(name);
+     }
+
+    /*!
+     * Gets symbol by name from DLL
+     * Throws exception if fails
+     * \param name - name of symbol
+     * \return pointer to valid symbol
+     */
+    void* get_symbol(const std::string& name);
 
 private:
     void* handle;

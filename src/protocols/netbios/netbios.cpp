@@ -32,5 +32,5 @@ int8_t MessageHeader::start() const
 
 size_t MessageHeader::len() const
 {
-    return htons(length);
+    return ntohs(length);
 }

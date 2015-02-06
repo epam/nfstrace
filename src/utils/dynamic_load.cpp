@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Presentation info about ISO/OSI layers up to RPC protocol.
+// Author: Pavel Karneliuk
+// Description: Wrapper for dlopen and related functions
 // Copyright (c) 2013 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,23 +19,38 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef RPC_PROCEDURE_H
-#define RPC_PROCEDURE_H
-//------------------------------------------------------------------------------
-#include <rpc/rpc_msg.h>
+#include <string>
 
-#include "procedure.h"
-#include "rpc_types.h"
+#include <dlfcn.h>
+
+#include "utils/dynamic_load.h"
 //------------------------------------------------------------------------------
-namespace NST
+using namespace NST::utils;
+//------------------------------------------------------------------------------
+
+DynamicLoad::DynamicLoad(const std::string &file)
 {
-namespace API
+    handle = dlopen(file.c_str(), RTLD_LAZY);
+    if(handle == nullptr)
+    {
+        throw DLException{std::string{"Loading dynamic module: "} + file + " failed with error:" + dlerror()};
+    }
+}
+
+DynamicLoad::~DynamicLoad()
 {
+    dlclose(handle);
+}
 
-using RPCProcedure = Procedure<struct rpc_msg>;
+void* DynamicLoad::get_symbol(const std::string &name)
+{
+    void* address = (dlsym)(handle, name.c_str());
+    if(address == nullptr)
+    {
+        throw DLException{std::string{"Loading symbol "} + name + " failed with error:" + dlerror()};
+    }
 
-} // namespace API
-} // namespace NST
-//------------------------------------------------------------------------------
-#endif//RPC_PROCEDURE_H
+    return address;
+}
+
 //------------------------------------------------------------------------------

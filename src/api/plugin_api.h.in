@@ -25,7 +25,7 @@
 //------------------------------------------------------------------------------
 #include <iostream>
 
-#include "ianalyzer_type.h"
+#include "ianalyzer.h"
 #include "nfs_types.h"
 #include "nfs3_types_rpcgen.h"
 #include "nfs4_types_rpcgen.h"
