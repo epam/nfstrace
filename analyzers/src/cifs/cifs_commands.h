@@ -30,9 +30,13 @@ namespace breakdown
 {
 /*!
  * Represents CIFS v1 commands
+ * Converts commands to string
  */
 struct SMBv1Commands : public CommandRepresenter
 {
+    /*!
+     * \brief The Commands enum commands codes
+     */
     enum Commands
     {
         CREATE_DIRECTORY,       //!< Create a new directory.

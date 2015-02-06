@@ -31,6 +31,7 @@ namespace breakdown
 {
 /*!
  * \brief The CommandRepresenter struct represents interface for command representers
+ * Commands representer should be able to convert commands to string
  */
 struct CommandRepresenter
 {
