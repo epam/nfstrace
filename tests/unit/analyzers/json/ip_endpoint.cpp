@@ -24,7 +24,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "net/ip_endpoint.h"
+#include "../analyzers/src/json/ip_endpoint.h"
 //------------------------------------------------------------------------------
 using namespace NST::net;
 

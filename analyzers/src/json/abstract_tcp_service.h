@@ -29,7 +29,7 @@
 #include <thread>
 #include <vector>
 
-#include "net/ip_endpoint.h"
+#include "ip_endpoint.h"
 //------------------------------------------------------------------------------
 namespace NST
 {

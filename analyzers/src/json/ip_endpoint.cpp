@@ -24,7 +24,7 @@
 
 #include <sys/socket.h>
 
-#include "net/ip_endpoint.h"
+#include "ip_endpoint.h"
 //------------------------------------------------------------------------------
 namespace NST
 {

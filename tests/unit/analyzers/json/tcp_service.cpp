@@ -26,7 +26,7 @@
 #include <gtest/gtest.h>
 #include <sys/socket.h>
 
-#include "net/abstract_tcp_service.h"
+#include "../analyzers/src/json/abstract_tcp_service.h"
 //------------------------------------------------------------------------------
 using namespace NST::net;
 
