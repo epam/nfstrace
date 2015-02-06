@@ -1,7 +1,7 @@
-///------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Operation CIFS analyzer. Identify clients that are busier than others.
-// Copyright (c) 2014 EPAM Systems
+// Description: Represents NFS v4 commands
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -18,33 +18,32 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-//------------------------------------------------------------------------------
-#include <api/plugin_api.h>
 
-#include "nfsv4breakdownanalyzer.h"
 //------------------------------------------------------------------------------
-using namespace NST::breakdown;
+#ifndef NFSV4COMMANDS_H
+#define NFSV4COMMANDS_H
 //------------------------------------------------------------------------------
-
-extern "C"
+#include "commandrepresenter.h"
+//------------------------------------------------------------------------------
+namespace NST
 {
+namespace breakdown
+{
+/*!
+ * Represents NFS v 4.0 commands
+ * Converts commands to string
+ */
+class NFSv4Commands : public CommandRepresenter
+{
+public:
+    const std::string command_description(int cmd_code) override final;
+    const std::string command_name(int cmd_code) override final;
+    size_t commands_count() override final;
+};
 
-    const char* usage()
-    {
-        return "No options";
-    }
-
-    IAnalyzer* create(const char*)
-    {
-        return new NFSv4BreakdownAnalyzer();
-    }
-
-    void destroy(IAnalyzer* instance)
-    {
-        delete instance;
-    }
-
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
-
-}//extern "C"
+} // protocols
+} // NST
 //------------------------------------------------------------------------------
+#endif // NFSV4COMMANDS_H
+//------------------------------------------------------------------------------
+

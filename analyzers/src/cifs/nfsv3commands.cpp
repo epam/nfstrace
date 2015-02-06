@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Helpers for parsing CIFS v2 structures.
+// Description: Represents NFS v3 commands
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*

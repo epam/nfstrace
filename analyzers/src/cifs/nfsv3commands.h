@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Helpers for parsing CIFS v2 structures.
+// Description: Represents NFS v3 commands
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -28,12 +28,16 @@ namespace NST
 {
 namespace breakdown
 {
+/*!
+ * Represents NFS v3 commands
+ * Converts commands to string
+ */
 class NFSv3Commands : public CommandRepresenter
 {
 public:
-    const std::string command_description(int cmd_code);
-    const std::string command_name(int cmd_code);
-    size_t commands_count();
+    const std::string command_description(int cmd_code) override final;
+    const std::string command_name(int cmd_code) override final;
+    size_t commands_count() override final;
 };
 } // protocols
 } // NST
