@@ -28,7 +28,6 @@ namespace NST
 {
 namespace breakdown
 {
-//------------------------------------------------------------------------------
 /*!
  * Represents CIFS v1 commands
  */
@@ -114,16 +113,14 @@ struct SMBv1Commands : public CommandRepresenter
         CMD_COUNT
     };
 
-    const std::string commandDescription(int cmd_code);
+    const std::string command_description(int cmd_code) override final;
 
-    const std::string commandName(int cmd_code);
+    const std::string command_name(int cmd_code) override final;
 
-    size_t commandsCount();
+    size_t commands_count();
 };
-//------------------------------------------------------------------------------
 } // breakdown
 } // NST
 //------------------------------------------------------------------------------
 #endif // CIFS_COMMANDS_H
 //------------------------------------------------------------------------------
-

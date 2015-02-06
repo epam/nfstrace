@@ -29,7 +29,6 @@ namespace NST
 {
 namespace breakdown
 {
-//------------------------------------------------------------------------------
 /*!
  * \brief The CommandRepresenter struct represents interface for command representers
  */
@@ -40,27 +39,25 @@ struct CommandRepresenter
      * \param cmd_code command code
      * \return description
      */
-    virtual const std::string commandDescription(int cmd_code) = 0;
+    virtual const std::string command_description(int cmd_code) = 0;
 
     /*!
      * \brief commandName returns name of the command
      * \param cmd_code command code
      * \return name
      */
-    virtual const std::string commandName(int cmd_code) = 0;
+    virtual const std::string command_name(int cmd_code) = 0;
 
     /*!
      * \brief commandsCount returns total count of commands
      * \return count
      */
-    virtual size_t commandsCount() = 0;
+    virtual size_t commands_count() = 0;
 
     virtual ~CommandRepresenter() {}
 };
-//------------------------------------------------------------------------------
 } // breakdown
 } // NST
 //------------------------------------------------------------------------------
 #endif // COMMANDREPRESENTER_H
 //------------------------------------------------------------------------------
-

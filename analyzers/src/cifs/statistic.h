@@ -30,15 +30,14 @@ namespace NST
 {
 namespace breakdown
 {
-//------------------------------------------------------------------------------
-/*! \class Comparator for session
+/*! \brief Comparator for session
  */
 struct Less
 {
     bool operator() (const Session& a, const Session& b) const;
 };
 
-/*! \class All statistic data
+/*! \brief All statistic data
  */
 struct Statistic
 {
@@ -51,7 +50,6 @@ struct Statistic
 
     Statistic();
 };
-//------------------------------------------------------------------------------
 } // breakdown
 } // NST
 //------------------------------------------------------------------------------

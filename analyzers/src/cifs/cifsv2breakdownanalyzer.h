@@ -28,7 +28,6 @@ namespace NST
 {
 namespace breakdown
 {
-//------------------------------------------------------------------------------
 /*! \class Analyzer for CIFS v2
  */
 class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
@@ -58,10 +57,8 @@ public:
     void breakOplockSMBv2(const SMBv2::BreakOpLockCommand* cmd, const SMBv2::OplockAcknowledgment*, const SMBv2::OplockResponse*) override final;
     void flush_statistics();
 };
-//------------------------------------------------------------------------------
 } // breakdown
 } // NST
 //------------------------------------------------------------------------------
 #endif // CIFSV2BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
-

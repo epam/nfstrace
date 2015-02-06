@@ -19,12 +19,17 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <cmath>
+
 #include "latencies.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 
 Latencies::Latencies()
+    : count {0}
+, avg {}
+, m2 {}
 {
     timerclear(&min);
     timerclear(&max);
@@ -32,23 +37,31 @@ Latencies::Latencies()
 
 void Latencies::add(const timeval& t)
 {
-    algorithm.add(t);
+    long double x = to_sec(t);
+    long double delta = x - avg;
+    avg += delta / (++count);
+    m2 += delta * (x - avg);
+
     set_range(t);
 }
 
 uint64_t Latencies::get_count() const
 {
-    return algorithm.get_count();
+    return count;
 }
 
 long double Latencies::get_avg() const
 {
-    return algorithm.get_avg();
+    return avg;
 }
 
 long double Latencies::get_st_dev() const
 {
-    return algorithm.get_st_dev();
+    if (count < 2)
+    {
+        return 0;
+    }
+    return sqrt(m2 / (count - 1));
 }
 
 const timeval& Latencies::get_min() const
@@ -75,5 +88,10 @@ void Latencies::set_range(const timeval& t)
     {
         max = t;
     }
+}
+
+long double NST::breakdown::to_sec(const timeval &val)
+{
+    return (((long double)val.tv_sec) + ((long double)val.tv_usec) / 1000000.0);
 }
 //------------------------------------------------------------------------------

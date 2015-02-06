@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Statistic counter
+// Description: Statistics counter
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -39,7 +39,7 @@ public:
 
     NST::breakdown::Latencies& operator[](int index);
 
-    uint64_t getTotalCount () const;
+    uint64_t get_total_count () const;
 
 private:
     void operator= (const BreakdownCounter&) = delete;
@@ -49,7 +49,6 @@ private:
 template<typename Cmd, typename Code, typename Stats>
 void account(const Cmd* proc, Code cmd_code, Stats& stats)
 {
-    typename Stats::PerOpStat::iterator i;
     timeval latency {0, 0};
 
     // diff between 'reply' and 'call' timestamps
@@ -58,7 +57,7 @@ void account(const Cmd* proc, Code cmd_code, Stats& stats)
     ++stats.procedures_total_count;
     ++stats.procedures_count[static_cast<int>(cmd_code)];
 
-    i = stats.per_procedure_statistic.find(*proc->session);
+    auto i = stats.per_procedure_statistic.find(*proc->session);
     if (i == stats.per_procedure_statistic.end())
     {
         auto session_res = stats.per_procedure_statistic.emplace(*proc->session, BreakdownCounter {});
@@ -74,4 +73,3 @@ void account(const Cmd* proc, Code cmd_code, Stats& stats)
 //------------------------------------------------------------------------------
 #endif // BREAKDOWNCOUNTER_H
 //------------------------------------------------------------------------------
-
