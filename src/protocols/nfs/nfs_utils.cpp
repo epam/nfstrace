@@ -34,7 +34,7 @@ void print_hex(std::ostream& out, const uint32_t* const val, const uint32_t len)
 {
     if(len)
     {
-        out << std::hex << std::setfill('0');
+        out << std::hex << std::setfill('0') << "0x";
         for(uint32_t i {0}; i < len; i++)
         {
             out << std::setw(2) << val[i];
@@ -51,7 +51,7 @@ void print_hex(std::ostream& out, const char* const val, const uint32_t len)
 {
     if(len)
     {
-        out << std::hex << std::setfill('0');
+        out << std::hex << std::setfill('0') << "0x";
         for(uint32_t i {0}; i < len; i++)
         {
                 out << std::setw(2)
