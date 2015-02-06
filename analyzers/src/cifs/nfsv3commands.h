@@ -1,7 +1,7 @@
-///------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Operation CIFS analyzer. Identify clients that are busier than others.
-// Copyright (c) 2014 EPAM Systems
+// Description: Helpers for parsing CIFS v2 structures.
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,32 +19,25 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <api/plugin_api.h>
-
-#include "nfsv3breakdownanalyzer.h"
+#ifndef NFSV3COMMANDS_H
+#define NFSV3COMMANDS_H
 //------------------------------------------------------------------------------
-using namespace NST::breakdown;
+#include "commandrepresenter.h"
 //------------------------------------------------------------------------------
-
-extern "C"
+namespace NST
 {
-
-    const char* usage()
-    {
-        return "No options";
-    }
-
-    IAnalyzer* create(const char*)
-    {
-        return new NFSv3BreakdownAnalyzer();
-    }
-
-    void destroy(IAnalyzer* instance)
-    {
-        delete instance;
-    }
-
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
-
-}//extern "C"
+namespace breakdown
+{
+class NFSv3Commands : public CommandRepresenter
+{
+public:
+    const std::string command_description(int cmd_code);
+    const std::string command_name(int cmd_code);
+    size_t commands_count();
+};
+} // protocols
+} // NST
 //------------------------------------------------------------------------------
+#endif // NFSV3COMMANDS_H
+//------------------------------------------------------------------------------
+

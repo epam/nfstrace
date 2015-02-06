@@ -71,7 +71,7 @@ void Representer::flush_statistics(const Statistic& statistic)
             uint64_t s_total_proc = current.get_total_count();
 
             session.str("");
-            //print_session(session, it.first);//FIXME: print session
+            print_session(session, it.first);
             print_per_session(current, session.str(), s_total_proc);
             std::ofstream file(("breakdown_" + session.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
             store_per_session(file, current, session.str(), s_total_proc);

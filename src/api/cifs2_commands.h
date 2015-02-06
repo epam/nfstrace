@@ -914,6 +914,8 @@ struct CancelRequest
     uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
 }  __attribute__ ((__packed__));
 
+struct CancelResponce {} __attribute__ ((__packed__)); //!< Cancel command's results
+
 /*!
  * Flags indicating how the operation MUST be processed
  */
