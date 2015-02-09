@@ -26,10 +26,6 @@
 
 #include <netdb.h>
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace net
-{
 
 //! IP-endpoint (host:port) helper class to use in socket operations
 class IpEndpoint
@@ -59,9 +55,6 @@ public:
 private:
     struct addrinfo* _addrinfo;
 };
-
-} // namespace net
-} // namespace NST
 
 //------------------------------------------------------------------------------
 #endif // IP_ENDPOINT

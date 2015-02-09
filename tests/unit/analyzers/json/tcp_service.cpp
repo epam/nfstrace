@@ -28,7 +28,6 @@
 
 #include "../analyzers/src/json/abstract_tcp_service.h"
 //------------------------------------------------------------------------------
-using namespace NST::net;
 
 static constexpr std::size_t AwaitForServiceStartupMs = 250U;
 static constexpr std::size_t StartStopCyclesAmount = 5U;
