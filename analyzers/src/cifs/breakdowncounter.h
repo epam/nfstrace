@@ -23,7 +23,8 @@
 #ifndef BREAKDOWNCOUNTER_H
 #define BREAKDOWNCOUNTER_H
 //------------------------------------------------------------------------------
-#include <map>
+#include <cinttypes>
+#include <vector>
 
 #include "latencies.h"
 //------------------------------------------------------------------------------
@@ -32,7 +33,7 @@
 class BreakdownCounter
 {
 public:
-    BreakdownCounter();
+    BreakdownCounter(std::size_t count);
     ~BreakdownCounter();
 
     /*!
@@ -57,7 +58,7 @@ public:
 
 private:
     void operator= (const BreakdownCounter&) = delete;
-    std::map<int, NST::breakdown::Latencies> latencies;
+    std::vector<NST::breakdown::Latencies> latencies;
 };
 
 /*!
@@ -80,7 +81,7 @@ void account(const Cmd* proc, Code cmd_code, Stats& stats)
     auto i = stats.per_procedure_statistic.find(*proc->session);
     if (i == stats.per_procedure_statistic.end())
     {
-        auto session_res = stats.per_procedure_statistic.emplace(*proc->session, BreakdownCounter {});
+        auto session_res = stats.per_procedure_statistic.emplace(*proc->session, BreakdownCounter {stats.proc_types_count});
         if (session_res.second == false)
         {
             return;

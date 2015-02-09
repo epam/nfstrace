@@ -26,7 +26,10 @@
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-BreakdownCounter::BreakdownCounter() {}
+BreakdownCounter::BreakdownCounter(size_t count) : latencies(count, NST::breakdown::Latencies())
+{
+
+}
 
 BreakdownCounter::~BreakdownCounter() {}
 
@@ -37,20 +40,14 @@ Latencies& BreakdownCounter::operator[](int index)
 
 uint64_t BreakdownCounter::get_total_count() const
 {
-    using LatenciesMap = std::map<int, NST::breakdown::Latencies>;
-
-    return std::accumulate(std::begin(latencies), std::end(latencies), 0, [](int sum, LatenciesMap::value_type latency)
+    return std::accumulate(std::begin(latencies), std::end(latencies), 0, [](int sum, const NST::breakdown::Latencies& latency)
     {
-        return sum + latency.second.get_count();
+        return sum + latency.get_count();
     });
 }
 
 const Latencies BreakdownCounter::operator[](int index) const
 {
-    if (latencies.find(index) != latencies.end())
-    {
-        return latencies.at(index);
-    }
-    return NST::breakdown::Latencies();
+    return latencies[index];
 }
 //------------------------------------------------------------------------------

@@ -25,7 +25,10 @@
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-NFSv3BreakdownAnalyzer::NFSv3BreakdownAnalyzer(std::ostream &o) : representer(o, new NFSv3Commands())
+NFSv3BreakdownAnalyzer::NFSv3BreakdownAnalyzer(std::ostream &o)
+    : CIFSv2BreakdownAnalyzer(o)
+    , stats(NFSv3Commands().commands_count())
+    , representer(o, new NFSv3Commands())
 {
 
 }

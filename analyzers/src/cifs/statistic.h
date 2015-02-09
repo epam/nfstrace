@@ -22,6 +22,8 @@
 #ifndef STATISTIC_H
 #define STATISTIC_H
 //------------------------------------------------------------------------------
+#include <map>
+
 #include <api/plugin_api.h>
 
 #include "breakdowncounter.h"
@@ -42,13 +44,15 @@ struct Less
 struct Statistic
 {
     using PerOpStat = std::map<Session, BreakdownCounter, Less>;
-    using ProceduresCount = std::map<int, int>;
+    using ProceduresCount = std::vector<int>;
+
+    const size_t proc_types_count;
 
     uint64_t procedures_total_count;//!< Total amount of procedures
     ProceduresCount procedures_count;//!< Count of each procedure
     PerOpStat per_procedure_statistic;//!< Statistic for each procedure
 
-    Statistic();
+    Statistic(size_t proc_types_count);
 };
 } // breakdown
 } // NST
