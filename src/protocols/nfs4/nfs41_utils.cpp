@@ -1443,7 +1443,7 @@ std::ostream& operator<<(std::ostream& out, const state_protect4_r& obj)
 
 std::ostream& operator<<(std::ostream& out, const channel_attrs4& obj)
 {
-    out <<  "header pad size: "           << obj.ca_headerpadsize
+    out << "header pad size: "           << obj.ca_headerpadsize
         << "; max request size: "         << obj.ca_maxrequestsize
         << "; max response size: "        << obj.ca_maxresponsesize
         << "; max response size cached: " << obj.ca_maxresponsesize_cached
