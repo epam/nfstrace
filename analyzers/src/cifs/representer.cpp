@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Representer of CIFS messages
+// Description: Representer of statistic
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -37,14 +37,13 @@ void Representer::flush_statistics(const Statistic& statistic)
 {
     out << "###  Breakdown analyzer  ###"
         << std::endl
-        << "CIFS total procedures: "
+        << cmdRepresenter->protocol_name() << " total procedures: "
         << statistic.procedures_total_count
         << ". Per procedure:"
         << std::endl;
 
     for (const auto& procedure : statistic.procedures_count)
     {
-        //FIXME: Sync primitives to be used
         out.width(12);
         out << std::left
             << cmdRepresenter->command_description(procedure.first);

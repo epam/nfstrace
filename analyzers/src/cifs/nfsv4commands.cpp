@@ -40,3 +40,9 @@ size_t NST::breakdown::NFSv4Commands::commands_count()
 {
     return ProcEnumNFS4::count;
 }
+
+
+const std::string NST::breakdown::NFSv4Commands::protocol_name()
+{
+    return "NFS v4.0";
+}
