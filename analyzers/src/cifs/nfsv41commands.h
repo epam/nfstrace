@@ -1,7 +1,7 @@
-///------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Operation CIFS analyzer. Identify clients that are busier than others.
-// Copyright (c) 2014 EPAM Systems
+// Description: Represents NFS v4.1 commands
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,32 +19,30 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <api/plugin_api.h>
-
-#include "nfsv41breakdownanalyzer.h"
+#ifndef NFSV41COMMANDS_H
+#define NFSV41COMMANDS_H
 //------------------------------------------------------------------------------
-using namespace NST::breakdown;
+#include "commandrepresenter.h"
 //------------------------------------------------------------------------------
-
-extern "C"
+namespace NST
 {
+namespace breakdown
+{
+/*!
+ * Represents NFS v 4.0 commands
+ * Converts commands to string
+ */
+class NFSv41Commands : public CommandRepresenter
+{
+public:
+    const std::string command_description(int cmd_code);
+    const std::string command_name(int cmd_code);
+    const std::string protocol_name();
+    size_t commands_count();
+};
 
-    const char* usage()
-    {
-        return "No options";
-    }
-
-    IAnalyzer* create(const char*)
-    {
-        return new NFSv41BreakdownAnalyzer();
-    }
-
-    void destroy(IAnalyzer* instance)
-    {
-        delete instance;
-    }
-
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
-
-}//extern "C"
+} // breakdown
+} // NST
+//------------------------------------------------------------------------------
+#endif // NFSV41COMMANDS_H
 //------------------------------------------------------------------------------
