@@ -42,18 +42,19 @@ void Representer::flush_statistics(const Statistic& statistic)
         << ". Per procedure:"
         << std::endl;
 
-    for (const auto& procedure : statistic.procedures_count)
+    for (size_t procedure = 0; procedure < statistic.procedures_count.size(); ++procedure)
     {
+        size_t procedure_count = statistic.procedures_count[procedure];
         out.width(12);
         out << std::left
-            << cmdRepresenter->command_description(procedure.first);
+            << cmdRepresenter->command_name(procedure);
         out.width(5);
         out << std::right
-            << procedure.second;
+            << procedure_count;
         out.width(7);
         out.setf(std::ios::fixed, std::ios::floatfield);
         out.precision(2);
-        out << (statistic.procedures_total_count ? ((1.0 * procedure.second / statistic.procedures_total_count) * 100.0) : 0);
+        out << (statistic.procedures_total_count ? ((1.0 * procedure_count / statistic.procedures_total_count) * 100.0) : 0);
         out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
         out << '%' << std::endl;
     };
