@@ -35,18 +35,24 @@ namespace breakdown
 struct CommandRepresenter
 {
     /*!
-     * \brief commandDescription returns description of the command
+     * \brief returns description of the command
      * \param cmd_code command code
      * \return description
      */
     virtual const std::string command_description(int cmd_code) = 0;
 
     /*!
-     * \brief commandName returns name of the command
+     * \brief returns name of the command
      * \param cmd_code command code
      * \return name
      */
     virtual const std::string command_name(int cmd_code) = 0;
+
+    /*!
+     * \brief returns name of the protocol
+     * \return protocol
+     */
+    virtual const std::string protocol_name() = 0;
 
     /*!
      * \brief commandsCount returns total count of commands

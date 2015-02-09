@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Representer of CIFS messages
+// Description: Representer of statistic
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef CIFS_REPRESENTER_H
-#define CIFS_REPRESENTER_H
+#ifndef REPRESENTER_H
+#define REPRESENTER_H
 //------------------------------------------------------------------------------
 #include <memory>
 #include <ostream>
@@ -60,5 +60,5 @@ public:
 } // breakdown
 } // NST
 //------------------------------------------------------------------------------
-#endif // CIFS_REPRESENTER_H
+#endif // REPRESENTER_H
 //------------------------------------------------------------------------------

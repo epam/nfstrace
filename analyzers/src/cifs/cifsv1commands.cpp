@@ -197,4 +197,9 @@ const std::string NST::breakdown::SMBv1Commands::command_description(int cmd_cod
     }
     return cmdNames[static_cast<Commands>(cmd_code)];
 }
+
+const std::string NST::breakdown::SMBv1Commands::protocol_name()
+{
+    return "CIFS v1";
+}
 //------------------------------------------------------------------------------
