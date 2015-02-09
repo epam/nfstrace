@@ -22,7 +22,7 @@
 #ifndef CIFSV2BREAKDOWNANALYZER_H
 #define CIFSV2BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
-#include "cifsbreakdownanalyzer.h"
+#include "cifsv1breakdownanalyzer.h"
 //------------------------------------------------------------------------------
 namespace NST
 {

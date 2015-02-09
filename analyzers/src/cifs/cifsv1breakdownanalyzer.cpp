@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "cifs_commands.h"
-#include "cifsbreakdownanalyzer.h"
+#include "cifsv1commands.h"
+#include "cifsv1breakdownanalyzer.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------

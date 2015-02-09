@@ -24,7 +24,7 @@
 //------------------------------------------------------------------------------
 #include <api/plugin_api.h>
 
-#include "cifs_representer.h"
+#include "representer.h"
 #include "statistic.h"
 //------------------------------------------------------------------------------
 namespace NST
