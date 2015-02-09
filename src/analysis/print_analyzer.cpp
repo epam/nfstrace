@@ -2790,7 +2790,7 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE_SESSION4args* arg
 {
     if(args)
     {
-        out << "clientid: 0x" << std::hex      << args->csa_clientid
+        out <<   "clientid: 0x" << std::hex      << args->csa_clientid
             << "; seqid: 0x" << std::hex         << args->csa_sequence << std::dec
             << "; flags: "                       << args->csa_flags
             << "; fore chan attrs: [ "           << args->csa_fore_chan_attrs << " ] "
