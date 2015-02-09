@@ -25,8 +25,6 @@
 #include "abstract_tcp_service.h"
 //------------------------------------------------------------------------------
 
-using namespace NST::net;
-
 class JsonTcpService : public AbstractTcpService
 {
 public:
