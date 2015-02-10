@@ -28,10 +28,10 @@
 #include <api/plugin_api.h>
 #include "plotter.h"
 //------------------------------------------------------------------------------
-const time_t   Plotter::start_time = time(NULL);
-const uint32_t Plotter::SECINMIN   = 60;
-const uint32_t Plotter::SECINHOUR  = 60*60;
-const uint32_t Plotter::SECINDAY   = 60*60*24;
+const time_t   UserGUI::start_time = time(NULL);
+const uint32_t UserGUI::SECINMIN   = 60;
+const uint32_t UserGUI::SECINHOUR  = 60*60;
+const uint32_t UserGUI::SECINDAY   = 60*60*24;
 
 operation_data nfsv3_total   {1, 1, NULL, 28 , 2, 10 ,0 , 0, 0};
 operation_data nfsv3_proc    {1, 3, NULL, 18 , 2, 10 ,0 , 0, 0};
@@ -44,41 +44,48 @@ operation_data date_time     {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
 operation_data el_time       {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
 operation_data packets       {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
 //------------------------------------------------------------------------------
-Plotter::Plotter()
-: resize(0)
+UserGUI::UserGUI()
+: enableUpdate{false}
+, resize{0}
 , all_windows(3, NULL)
 , scroll_shift {0}
 , column_shift {0}
+, _run {ATOMIC_FLAG_INIT}
+, nfs3_procedure_total {0}
+, nfs3_count (ProcEnumNFS3::count, 0)
+, nfs4_procedure_total {0}
+, nfs4_operations_total  {0}
+, nfs4_count (ProcEnumNFS4::count, 0)
+, refresh_delta {2000}
+, max_read        {5}
+, read_counter    {0}
 {
-    try
-    {
-        std::cout << "\n\n";
-        initPlot();
-        designPlot();
-    }
-    catch (std::runtime_error& err)
-    {
-        destroyPlot();
-        std::cerr << "Error in libwatch plugin: " << err.what();
-        throw std::runtime_error("Error in Plotter screen initialization.");
-    }
+    _run.test_and_set();
+    gui_thread = std::thread(&UserGUI::thread, this);
 }
-Plotter::~Plotter()
+UserGUI::~UserGUI()
 {
+    if (gui_thread.joinable())
+    {
+        _run.clear();
+        gui_thread.join();
+    }
     destroyPlot();
 }
 
-void Plotter::updatePlot(const uint64_t &nfs3_total, const std::vector<int> &nfs3_pr_count,
+void UserGUI::updatePlot(const uint64_t &nfs3_total, const std::vector<int> &nfs3_pr_count,
                          const uint64_t &nfs4_ops_total, const uint64_t &nfs4_pr_total,
                          const std::vector<int> &nfs4_op_count)
 {
-    if(resize)
+    if(enableUpdate || resize > 0)
     {
         destroyPlot();
         initPlot();
-        designPlot();
-        if(resize > 0) resize--;
+//       designPlot();
+        enableUpdate = false;
+        if(resize) resize--;
     }
+
     uint16_t counter = nfsv3_total.start_y;
     if(nfsv3_total.max_y + scroll_shift > counter && counter > scroll_shift)
     {
@@ -149,18 +156,18 @@ void Plotter::updatePlot(const uint64_t &nfs3_total, const std::vector<int> &nfs
     updateAll();
 }
 
-uint16_t Plotter::inputData()
+uint16_t UserGUI::inputData()
 {
     int c = wgetch(all_windows[0]);
     return (c == KEY_UP || c == KEY_DOWN) ? c : 0;
 }
 
-void Plotter::enableResize()
+void UserGUI::enableResize()
 {
     resize++;
 }
 
-void Plotter::keyboard()
+void UserGUI::keyboard()
 {
     int key = inputData();
     if(key != 0 )
@@ -171,6 +178,7 @@ void Plotter::keyboard()
             {
                 scroll_shift--;
                 resize++;
+                enableUpdate = true;
             }
         }
         else if(key == KEY_DOWN)
@@ -179,12 +187,13 @@ void Plotter::keyboard()
             {
                 scroll_shift++;
                 resize++;
+                enableUpdate = true;
             }
         }
     }
 }
 
-void Plotter::chronoUpdate()
+void UserGUI::chronoUpdate()
 {
     time_t actual_time = time(NULL);
     tm* t = localtime(&actual_time);
@@ -195,7 +204,7 @@ void Plotter::chronoUpdate()
 //    mvprintw(packets.start_y, packets.start_x,"Total packets:  %lu(network)  %lu(to host)  %lu(dropped)", 999, 999 , 999);
 }
 
-void Plotter::designPlot()
+void UserGUI::designPlot()
 {
     char HOST_NAME[128];
     gethostname(HOST_NAME, 128);
@@ -329,7 +338,7 @@ void Plotter::designPlot()
     updateAll();
 }
 
-void Plotter::destroyPlot()
+void UserGUI::destroyPlot()
 {
     nocbreak();
     echo();
@@ -338,7 +347,7 @@ void Plotter::destroyPlot()
     endwin();
 }
 
-void Plotter::initPlot()
+void UserGUI::initPlot()
 {
     WINDOW *ww = initscr();
     all_windows[0] = ww;
@@ -355,12 +364,74 @@ void Plotter::initPlot()
 
     keypad(all_windows[0], true); // init keyboard
     timeout(200);                 // set keyboard timeout
+    designPlot();                 // print basic windows
 }
 
-void Plotter::updateAll()
+void UserGUI::updateAll()
 {
     for(auto i : all_windows)
     {
         wrefresh(i);
     }
+}
+
+void UserGUI::thread()
+{
+    try
+    {
+        initPlot();
+        // prepare for select
+        fd_set rfds;
+
+        /* Watch stdin (fd 0) to see when it has input. */
+        FD_ZERO(&rfds);
+        FD_SET(STDIN_FILENO, &rfds);
+
+        /* Wait up to five seconds. */
+        struct timeval tv;
+        tv.tv_sec = 0;
+        tv.tv_usec = refresh_delta;
+
+        int sel_rez;
+        while (_run.test_and_set())
+        {
+            UpRead();
+            uint64_t nfs3_procedure_total_copy(nfs3_procedure_total);
+            uint64_t nfs4_procedure_total_copy(nfs4_procedure_total);
+            uint64_t nfs4_operations_total_copy(nfs4_operations_total);
+            std::vector<int> nfs3_count_copy(nfs3_count);
+            std::vector<int> nfs4_count_copy(nfs4_count);
+            DownRead();
+
+            updatePlot(nfs3_procedure_total_copy, nfs3_count_copy, nfs4_operations_total_copy, nfs4_procedure_total_copy, nfs4_count_copy);
+            sel_rez = select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv);
+
+            if (sel_rez == -1)
+               break;
+            else
+                keyboard();
+            tv.tv_usec = refresh_delta;
+            if(enableUpdate)
+            {
+                enableResize();
+                enableUpdate = false;
+            }
+        }
+    } catch(...) {
+        DownRead();
+        std::cerr << "Watch plugin Unidentifying exception.";
+    }
+}
+void UserGUI::UpRead()
+{
+    std::unique_lock<std::mutex> lck(mut);
+    cv.wait(lck,[this](){ return read_counter < max_read;});
+    read_counter++;
+}
+
+void UserGUI::DownRead()
+{
+    std::unique_lock<std::mutex> lck(mut);
+    cv.wait(lck,[this](){ return read_counter > 0;});
+    read_counter--;
 }

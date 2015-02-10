@@ -126,16 +126,17 @@ private:
     uint64_t nfs4_ops_total;
     std::vector<int> nfs4_proc_count;
 
-    std::thread monitor_thread;
-    std::atomic_flag monitor_running;
+//    std::thread monitor_thread;
+//    std::atomic_flag monitor_running;
 
-    long int refresh_delta;
+//    long int refresh_delta;
 
     const uint16_t max_read;
     std::atomic<uint16_t> read_counter;
     std::condition_variable cv;
     std::mutex mut;
-    std::atomic<bool> enable_update;
+//    std::atomic<bool> enable_update;
+    UserGUI gui;
 };
 //------------------------------------------------------------------------------
 #endif //WATCH_ANALYZER_H

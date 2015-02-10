@@ -24,6 +24,7 @@
 //------------------------------------------------------------------------------
 #include <atomic>
 #include <cstdlib>
+#include <condition_variable>
 #include <vector>
 #include <thread>
 
@@ -43,11 +44,11 @@ struct operation_data
     uint16_t x_board_shift;
 };
 //------------------------------------------------------------------------------
-class Plotter
+class UserGUI
 {
 public:
-    Plotter();
-    virtual ~Plotter();
+    UserGUI();
+    virtual ~UserGUI();
     void updatePlot(const uint64_t &nfs3_total, const std::vector<int> &nfs3_pr_count,
                     const uint64_t &nfs4_ops_total, const uint64_t &nfs4_pr_total,
                     const std::vector<int> &nfs4_pr_count);
@@ -61,22 +62,44 @@ public:
     const static uint32_t SECINHOUR;
     const static uint32_t SECINDAY;
 
+    std::atomic<bool> enableUpdate;
+
 private:
     void chronoUpdate();
     void designPlot();
     void destroyPlot();
     void initPlot();
     void updateAll();
+    void thread();
 
     int resize;
 
+    void UpRead();
+    void DownRead();
+    std::condition_variable cv;
+    std::mutex mut;
+
     std::vector<WINDOW*> all_windows;
+    std::thread gui_thread;
+
     uint16_t scroll_shift;
     uint16_t x_max;
     uint16_t y_max;
 
     uint16_t column_shift;
+
+    std::atomic_flag _run;
+
+    uint64_t nfs3_procedure_total;
+    std::vector<int> nfs3_count;
+    uint64_t nfs4_procedure_total;
+    uint64_t nfs4_operations_total;
+    std::vector<int> nfs4_count;
+    long int refresh_delta;
+    const uint16_t max_read;
+    std::atomic<uint16_t> read_counter;
+
 };
 //------------------------------------------------------------------------------
-#endif // PLOTTER_H
+#endif // UserGUI_H
 //------------------------------------------------------------------------------
