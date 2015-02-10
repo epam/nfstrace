@@ -38,19 +38,19 @@ NFSv41BreakdownAnalyzer::NFSv41BreakdownAnalyzer(std::ostream &o)
 
 void NFSv41BreakdownAnalyzer::null41(const RPCProcedure *proc, const NFS41::NULL4args *, const NFS41::NULL4res *)
 {
-    account(proc, NFS_V41, compound_stats);
+    compound_stats.account(proc, NFS_V41);
 }
 
 void NFSv41BreakdownAnalyzer::compound41(const RPCProcedure *proc, const NFS41::COMPOUND4args *, const NFS41::COMPOUND4res *)
 {
-    account(proc, NFS_V41, compound_stats);
+    compound_stats.account(proc, NFS_V41);
 }
 
 void NFSv41BreakdownAnalyzer::access41(const RPCProcedure *proc, const NFS41::ACCESS4args *, const NFS41::ACCESS4res *res)
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::ACCESS, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::ACCESS);
     }
 }
 
@@ -58,7 +58,7 @@ void NFSv41BreakdownAnalyzer::close41(const RPCProcedure *proc, const NFS41::CLO
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::CLOSE, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::CLOSE);
     }
 }
 
@@ -66,7 +66,7 @@ void NFSv41BreakdownAnalyzer::commit41(const RPCProcedure *proc, const NFS41::CO
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::COMMIT, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::COMMIT);
     }
 }
 
@@ -74,7 +74,7 @@ void NFSv41BreakdownAnalyzer::create41(const RPCProcedure *proc, const NFS41::CR
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::CREATE, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::CREATE);
     }
 }
 
@@ -82,7 +82,7 @@ void NFSv41BreakdownAnalyzer::delegpurge41(const RPCProcedure *proc, const NFS41
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::DELEGPURGE, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::DELEGPURGE);
     }
 }
 
@@ -90,7 +90,7 @@ void NFSv41BreakdownAnalyzer::delegreturn41(const RPCProcedure *proc, const NFS4
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::DELEGRETURN, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::DELEGRETURN);
     }
 }
 
@@ -98,7 +98,7 @@ void NFSv41BreakdownAnalyzer::getattr41(const RPCProcedure *proc, const NFS41::G
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::GETATTR, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::GETATTR);
     }
 }
 
@@ -106,7 +106,7 @@ void NFSv41BreakdownAnalyzer::getfh41(const RPCProcedure *proc, const NFS41::GET
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::GETFH, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::GETFH);
     }
 }
 
@@ -114,7 +114,7 @@ void NFSv41BreakdownAnalyzer::link41(const RPCProcedure *proc, const NFS41::LINK
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::LINK, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::LINK);
     }
 }
 
@@ -122,7 +122,7 @@ void NFSv41BreakdownAnalyzer::lock41(const RPCProcedure *proc, const NFS41::LOCK
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::LOCK, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::LOCK);
     }
 }
 
@@ -130,7 +130,7 @@ void NFSv41BreakdownAnalyzer::lockt41(const RPCProcedure *proc, const NFS41::LOC
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::LOCKT, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::LOCKT);
     }
 }
 
@@ -138,7 +138,7 @@ void NFSv41BreakdownAnalyzer::locku41(const RPCProcedure *proc, const NFS41::LOC
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::LOCKU, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::LOCKU);
     }
 }
 
@@ -146,7 +146,7 @@ void NFSv41BreakdownAnalyzer::lookup41(const RPCProcedure *proc, const NFS41::LO
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::LOOKUP, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::LOOKUP);
     }
 }
 
@@ -154,7 +154,7 @@ void NFSv41BreakdownAnalyzer::lookupp41(const RPCProcedure *proc, const NFS41::L
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::LOOKUPP, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::LOOKUPP);
     }
 }
 
@@ -162,7 +162,7 @@ void NFSv41BreakdownAnalyzer::nverify41(const RPCProcedure *proc, const NFS41::N
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::NVERIFY, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::NVERIFY);
     }
 }
 
@@ -170,7 +170,7 @@ void NFSv41BreakdownAnalyzer::open41(const RPCProcedure *proc, const NFS41::OPEN
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::OPEN, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::OPEN);
     }
 }
 
@@ -178,7 +178,7 @@ void NFSv41BreakdownAnalyzer::openattr41(const RPCProcedure *proc, const NFS41::
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::OPENATTR, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::OPENATTR);
     }
 }
 
@@ -186,7 +186,7 @@ void NFSv41BreakdownAnalyzer::open_confirm41(const RPCProcedure *proc, const NFS
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::OPEN_CONFIRM, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::OPEN_CONFIRM);
     }
 }
 
@@ -194,7 +194,7 @@ void NFSv41BreakdownAnalyzer::open_downgrade41(const RPCProcedure *proc, const N
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::OPEN_DOWNGRADE, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::OPEN_DOWNGRADE);
     }
 }
 
@@ -202,7 +202,7 @@ void NFSv41BreakdownAnalyzer::putfh41(const RPCProcedure *proc, const NFS41::PUT
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::PUTFH, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::PUTFH);
     }
 }
 
@@ -210,7 +210,7 @@ void NFSv41BreakdownAnalyzer::putpubfh41(const RPCProcedure *proc, const NFS41::
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::PUTPUBFH, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::PUTPUBFH);
     }
 }
 
@@ -218,7 +218,7 @@ void NFSv41BreakdownAnalyzer::putrootfh41(const RPCProcedure *proc, const NFS41:
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::PUTROOTFH, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::PUTROOTFH);
     }
 }
 
@@ -226,7 +226,7 @@ void NFSv41BreakdownAnalyzer::read41(const RPCProcedure *proc, const NFS41::READ
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::READ, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::READ);
     }
 }
 
@@ -234,7 +234,7 @@ void NFSv41BreakdownAnalyzer::readdir41(const RPCProcedure *proc, const NFS41::R
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::READDIR, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::READDIR);
     }
 }
 
@@ -242,7 +242,7 @@ void NFSv41BreakdownAnalyzer::readlink41(const RPCProcedure *proc, const NFS41::
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::READLINK, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::READLINK);
     }
 }
 
@@ -250,7 +250,7 @@ void NFSv41BreakdownAnalyzer::remove41(const RPCProcedure *proc, const NFS41::RE
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::REMOVE, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::REMOVE);
     }
 }
 
@@ -258,7 +258,7 @@ void NFSv41BreakdownAnalyzer::rename41(const RPCProcedure *proc, const NFS41::RE
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::RENAME, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::RENAME);
     }
 }
 
@@ -266,7 +266,7 @@ void NFSv41BreakdownAnalyzer::renew41(const RPCProcedure *proc, const NFS41::REN
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::RENEW, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::RENEW);
     }
 }
 
@@ -274,7 +274,7 @@ void NFSv41BreakdownAnalyzer::restorefh41(const RPCProcedure *proc, const NFS41:
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::RESTOREFH, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::RESTOREFH);
     }
 }
 
@@ -282,7 +282,7 @@ void NFSv41BreakdownAnalyzer::savefh41(const RPCProcedure *proc, const NFS41::SA
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::SAVEFH, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::SAVEFH);
     }
 }
 
@@ -290,7 +290,7 @@ void NFSv41BreakdownAnalyzer::secinfo41(const RPCProcedure *proc, const NFS41::S
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::SECINFO, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::SECINFO);
     }
 }
 
@@ -298,7 +298,7 @@ void NFSv41BreakdownAnalyzer::setattr41(const RPCProcedure *proc, const NFS41::S
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::SETATTR, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::SETATTR);
     }
 }
 
@@ -306,7 +306,7 @@ void NFSv41BreakdownAnalyzer::setclientid41(const RPCProcedure *proc, const NFS4
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::SETCLIENTID, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::SETCLIENTID);
     }
 }
 
@@ -314,7 +314,7 @@ void NFSv41BreakdownAnalyzer::setclientid_confirm41(const RPCProcedure *proc, co
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::SETCLIENTID_CONFIRM, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::SETCLIENTID_CONFIRM);
     }
 }
 
@@ -322,7 +322,7 @@ void NFSv41BreakdownAnalyzer::verify41(const RPCProcedure *proc, const NFS41::VE
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::VERIFY, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::VERIFY);
     }
 }
 
@@ -330,7 +330,7 @@ void NFSv41BreakdownAnalyzer::write41(const RPCProcedure *proc, const NFS41::WRI
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::WRITE, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::WRITE);
     }
 }
 
@@ -338,7 +338,7 @@ void NFSv41BreakdownAnalyzer::release_lockowner41(const RPCProcedure *proc, cons
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::RELEASE_LOCKOWNER, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::RELEASE_LOCKOWNER);
     }
 }
 
@@ -346,7 +346,7 @@ void NFSv41BreakdownAnalyzer::backchannel_ctl41(const RPCProcedure *proc, const 
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::BACKCHANNEL_CTL, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::BACKCHANNEL_CTL);
     }
 }
 
@@ -354,7 +354,7 @@ void NFSv41BreakdownAnalyzer::bind_conn_to_session41(const RPCProcedure *proc, c
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::BIND_CONN_TO_SESSION, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::BIND_CONN_TO_SESSION);
     }
 }
 
@@ -362,7 +362,7 @@ void NFSv41BreakdownAnalyzer::exchange_id41(const RPCProcedure *proc, const NFS4
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::EXCHANGE_ID, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::EXCHANGE_ID);
     }
 }
 
@@ -370,7 +370,7 @@ void NFSv41BreakdownAnalyzer::create_session41(const RPCProcedure *proc, const N
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::CREATE_SESSION, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::CREATE_SESSION);
     }
 }
 
@@ -378,7 +378,7 @@ void NFSv41BreakdownAnalyzer::destroy_session41(const RPCProcedure *proc, const 
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::DESTROY_SESSION, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::DESTROY_SESSION);
     }
 }
 
@@ -386,7 +386,7 @@ void NFSv41BreakdownAnalyzer::free_stateid41(const RPCProcedure *proc, const NFS
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::FREE_STATEID, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::FREE_STATEID);
     }
 }
 
@@ -394,7 +394,7 @@ void NFSv41BreakdownAnalyzer::get_dir_delegation41(const RPCProcedure *proc, con
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::GET_DIR_DELEGATION, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::GET_DIR_DELEGATION);
     }
 }
 
@@ -402,7 +402,7 @@ void NFSv41BreakdownAnalyzer::getdeviceinfo41(const RPCProcedure *proc, const NF
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::GETDEVICEINFO, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::GETDEVICEINFO);
     }
 }
 
@@ -410,7 +410,7 @@ void NFSv41BreakdownAnalyzer::getdevicelist41(const RPCProcedure *proc, const NF
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::GETDEVICELIST, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::GETDEVICELIST);
     }
 }
 
@@ -418,7 +418,7 @@ void NFSv41BreakdownAnalyzer::layoutcommit41(const RPCProcedure *proc, const NFS
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::LAYOUTCOMMIT, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::LAYOUTCOMMIT);
     }
 }
 
@@ -426,7 +426,7 @@ void NFSv41BreakdownAnalyzer::layoutget41(const RPCProcedure *proc, const NFS41:
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::LAYOUTGET, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::LAYOUTGET);
     }
 }
 
@@ -434,7 +434,7 @@ void NFSv41BreakdownAnalyzer::layoutreturn41(const RPCProcedure *proc, const NFS
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::LAYOUTRETURN, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::LAYOUTRETURN);
     }
 }
 
@@ -442,7 +442,7 @@ void NFSv41BreakdownAnalyzer::secinfo_no_name41(const RPCProcedure *proc, const 
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::SECINFO_NO_NAME, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::SECINFO_NO_NAME);
     }
 }
 
@@ -450,7 +450,7 @@ void NFSv41BreakdownAnalyzer::sequence41(const RPCProcedure *proc, const NFS41::
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::SEQUENCE, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::SEQUENCE);
     }
 }
 
@@ -458,7 +458,7 @@ void NFSv41BreakdownAnalyzer::set_ssv41(const RPCProcedure *proc, const NFS41::S
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::SET_SSV, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::SET_SSV);
     }
 }
 
@@ -466,7 +466,7 @@ void NFSv41BreakdownAnalyzer::test_stateid41(const RPCProcedure *proc, const NFS
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::TEST_STATEID, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::TEST_STATEID);
     }
 }
 
@@ -474,7 +474,7 @@ void NFSv41BreakdownAnalyzer::want_delegation41(const RPCProcedure *proc, const 
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::WANT_DELEGATION, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::WANT_DELEGATION);
     }
 }
 
@@ -482,7 +482,7 @@ void NFSv41BreakdownAnalyzer::destroy_clientid41(const RPCProcedure *proc, const
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::DESTROY_CLIENTID, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::DESTROY_CLIENTID);
     }
 }
 
@@ -490,7 +490,7 @@ void NFSv41BreakdownAnalyzer::reclaim_complete41(const RPCProcedure *proc, const
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::RECLAIM_COMPLETE, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::RECLAIM_COMPLETE);
     }
 }
 
@@ -498,7 +498,7 @@ void NFSv41BreakdownAnalyzer::illegal41(const RPCProcedure *proc, const NFS41::I
 {
     if(res)
     {
-        account(proc, ProcEnumNFS41::NFSProcedure::ILLEGAL, stats);
+        stats.account(proc, ProcEnumNFS41::NFSProcedure::ILLEGAL);
     }
 }
 

@@ -59,37 +59,6 @@ private:
     void operator= (const BreakdownCounter&) = delete;
     std::vector<NST::breakdown::Latencies> latencies;
 };
-
-/*!
- * Saves statistic on commands receive
- * \param proc - command
- * \param cmd_code - commands code
- * \param stats - statistic
- */
-template<typename Cmd, typename Code, typename Stats>
-void account(const Cmd* proc, Code cmd_code, Stats& stats)
-{
-    timeval latency {0, 0};
-    const int cmd_index = static_cast<int>(cmd_code);
-
-    // diff between 'reply' and 'call' timestamps
-    timersub(proc->rtimestamp, proc->ctimestamp, &latency);
-
-    stats.counter[cmd_index].add(latency);
-
-    auto i = stats.per_session_statistic.find(*proc->session);
-    if (i == stats.per_session_statistic.end())
-    {
-        auto session_res = stats.per_session_statistic.emplace(*proc->session, BreakdownCounter {stats.proc_types_count});
-        if (session_res.second == false)
-        {
-            return;
-        }
-        i = session_res.first;
-    }
-
-    (i->second)[cmd_index].add(latency);
-}
 //------------------------------------------------------------------------------
 #endif // BREAKDOWNCOUNTER_H
 //------------------------------------------------------------------------------
