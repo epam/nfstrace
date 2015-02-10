@@ -29,18 +29,19 @@
 
 #include "watch_analyzer.h"
 //------------------------------------------------------------------------------
-WatchAnalyzer::WatchAnalyzer(const char* opts)
+WatchAnalyzer::WatchAnalyzer(const char* /*opts*/)
 : nfs3_proc_total {0}
 , nfs3_proc_count (ProcEnumNFS3::count, 0)
 , nfs4_proc_total {0}
 , nfs4_ops_total  {0}
 , nfs4_proc_count (ProcEnumNFS4::count, 0)
-, monitor_running {ATOMIC_FLAG_INIT}
-, refresh_delta   {2000000}
+//, monitor_running {ATOMIC_FLAG_INIT}
+//, refresh_delta   {2000000}
 , max_read        {5}
 , read_counter    {0}
 {
-    monitor_running.test_and_set();
+//    monitor_running.test_and_set();
+/*
     if(*opts != '\0') try
     {
         refresh_delta = std::stoul(opts);
@@ -49,16 +50,18 @@ WatchAnalyzer::WatchAnalyzer(const char* opts)
     {
         throw std::runtime_error{std::string{"Error in plugin options processing. OPTS: "} + opts + " Error: " + e.what()};
     }
-    monitor_thread = std::thread(&WatchAnalyzer::thread, this);
+*/
+//    monitor_thread = std::thread(&WatchAnalyzer::thread, this);
 }
 
 WatchAnalyzer::~WatchAnalyzer()
 {
-    if (monitor_thread.joinable())
+/*    if (monitor_thread.joinable())
     {
         monitor_running.clear();
         monitor_thread.join();
     }
+*/
 }
 
 void WatchAnalyzer::null(const RPCProcedure* proc,
@@ -142,7 +145,8 @@ void WatchAnalyzer::flush_statistics()
 void WatchAnalyzer::on_unix_signal(int signo)
 {
     if (signo == SIGWINCH) {
-        enable_update = true;
+        gui.enableUpdate = true;
+        gui.enableResize();
     }
 }
 
@@ -184,6 +188,7 @@ void WatchAnalyzer::account(const RPCProcedure* proc,
     {
         DownRead();
     }
+    gui.updatePlot(nfs3_proc_total, nfs3_proc_count, nfs4_ops_total, nfs4_proc_total, nfs4_proc_count);
 }
 
 void WatchAnalyzer::UpRead()
@@ -201,6 +206,7 @@ void WatchAnalyzer::DownRead()
 }
 
 //----------------------------------------------------------------------------
+/*
 inline void WatchAnalyzer::thread()
 {
     try
@@ -208,11 +214,11 @@ inline void WatchAnalyzer::thread()
         // prepare for select
         fd_set rfds;
 
-        /* Watch stdin (fd 0) to see when it has input. */
+//      Watch stdin (fd 0) to see when it has input.
         FD_ZERO(&rfds);
-        FD_SET(0, &rfds);
+        FD_SET(STDIN_FILENO, &rfds);
 
-        /* Wait up to five seconds. */
+//         Wait up to five seconds.
         struct timeval tv;
         tv.tv_sec = 0;
         tv.tv_usec = refresh_delta;
@@ -230,11 +236,11 @@ inline void WatchAnalyzer::thread()
             DownRead();
 
             pl.updatePlot(nfs3_proc_total_copy, nfs3_count_copy, nfs4_oper_total_copy, nfs4_proc_total_copy, nfs4_count_copy);
-            sel_rez = select(1, &rfds, NULL, NULL, &tv);
+            sel_rez = select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv);
 
             if (sel_rez == -1)
                break;
-            else if (sel_rez)
+            else
                 pl.keyboard();
             tv.tv_usec = refresh_delta;
             if(enable_update)
@@ -248,6 +254,7 @@ inline void WatchAnalyzer::thread()
         std::cerr << "Watch plugin Unidentifying exception.";
     }
 }
+*/
 //------------------------------------------------------------------------------
 extern "C"
 {
