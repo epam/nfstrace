@@ -51,6 +51,38 @@ struct Statistic
     BreakdownCounter counter;//!< Statistics for all sessions
     PerSessionStatistics per_session_statistic;//!< Statistics for each session
     Statistic(size_t proc_types_count);
+
+    /*!
+     * Saves statistic on commands receive
+     * \param proc - command
+     * \param cmd_code - commands code
+     * \param stats - statistic
+     */
+    template<typename Cmd, typename Code>
+    void account(const Cmd* proc, Code cmd_code)
+    {
+        timeval latency {0, 0};
+        const int cmd_index = static_cast<int>(cmd_code);
+
+        // diff between 'reply' and 'call' timestamps
+        timersub(proc->rtimestamp, proc->ctimestamp, &latency);
+
+        counter[cmd_index].add(latency);
+
+        auto i = per_session_statistic.find(*proc->session);
+        if (i == per_session_statistic.end())
+        {
+            auto session_res = per_session_statistic.emplace(*proc->session, BreakdownCounter {proc_types_count});
+            if (session_res.second == false)
+            {
+                return;
+            }
+            i = session_res.first;
+        }
+
+        (i->second)[cmd_index].add(latency);
+    }
+
 };
 } // breakdown
 } // NST
