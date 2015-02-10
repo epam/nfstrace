@@ -43,15 +43,13 @@ struct Less
  */
 struct Statistic
 {
-    using PerOpStat = std::map<Session, BreakdownCounter, Less>;
+    using PerSessionStatistics = std::map<Session, BreakdownCounter, Less>;
     using ProceduresCount = std::vector<int>;
 
-    const size_t proc_types_count;
+    const size_t proc_types_count;//!< Count of types of procedures
 
-    uint64_t procedures_total_count;//!< Total amount of procedures
-    ProceduresCount procedures_count;//!< Count of each procedure
-    PerOpStat per_procedure_statistic;//!< Statistic for each procedure
-
+    BreakdownCounter counter;//!< Statistics for all sessions
+    PerSessionStatistics per_session_statistic;//!< Statistics for each session
     Statistic(size_t proc_types_count);
 };
 } // breakdown

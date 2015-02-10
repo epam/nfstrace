@@ -18,7 +18,6 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 //------------------------------------------------------------------------------
 #ifndef BREAKDOWNCOUNTER_H
 #define BREAKDOWNCOUNTER_H
@@ -71,17 +70,17 @@ template<typename Cmd, typename Code, typename Stats>
 void account(const Cmd* proc, Code cmd_code, Stats& stats)
 {
     timeval latency {0, 0};
+    const int cmd_index = static_cast<int>(cmd_code);
 
     // diff between 'reply' and 'call' timestamps
     timersub(proc->rtimestamp, proc->ctimestamp, &latency);
 
-    ++stats.procedures_total_count;
-    ++stats.procedures_count[static_cast<int>(cmd_code)];
+    stats.counter[cmd_index].add(latency);
 
-    auto i = stats.per_procedure_statistic.find(*proc->session);
-    if (i == stats.per_procedure_statistic.end())
+    auto i = stats.per_session_statistic.find(*proc->session);
+    if (i == stats.per_session_statistic.end())
     {
-        auto session_res = stats.per_procedure_statistic.emplace(*proc->session, BreakdownCounter {stats.proc_types_count});
+        auto session_res = stats.per_session_statistic.emplace(*proc->session, BreakdownCounter {stats.proc_types_count});
         if (session_res.second == false)
         {
             return;
@@ -89,7 +88,7 @@ void account(const Cmd* proc, Code cmd_code, Stats& stats)
         i = session_res.first;
     }
 
-    (i->second)[static_cast<int>(cmd_code)].add(latency);
+    (i->second)[cmd_index].add(latency);
 }
 //------------------------------------------------------------------------------
 #endif // BREAKDOWNCOUNTER_H

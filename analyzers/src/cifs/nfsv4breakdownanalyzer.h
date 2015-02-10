@@ -34,6 +34,7 @@ namespace breakdown
  */
 class NFSv4BreakdownAnalyzer : public NFSv3BreakdownAnalyzer
 {
+    Statistic compound_stats;//!< Statistic
     Statistic stats;//!< Statistic
     Representer representer;//!< Class for statistic representation
 public:

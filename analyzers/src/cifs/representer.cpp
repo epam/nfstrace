@@ -39,13 +39,13 @@ void Representer::flush_statistics(const Statistic& statistic)
     out << "###  Breakdown analyzer  ###"
         << std::endl
         << cmdRepresenter->protocol_name() << " total procedures: "
-        << statistic.procedures_total_count
+        << statistic.counter.get_total_count()
         << ". Per procedure:"
         << std::endl;
 
-    for (size_t procedure = 0; procedure < statistic.procedures_count.size(); ++procedure)
+    for (size_t procedure = 0; procedure < statistic.proc_types_count; ++procedure)
     {
-        size_t procedure_count = statistic.procedures_count[procedure];
+        size_t procedure_count = statistic.counter[procedure].get_count();
         out.width(space_for_cmd_name);
         out << std::left
             << cmdRepresenter->command_name(procedure);
@@ -55,18 +55,18 @@ void Representer::flush_statistics(const Statistic& statistic)
         out.width(7);
         out.setf(std::ios::fixed, std::ios::floatfield);
         out.precision(2);
-        out << (statistic.procedures_total_count ? ((1.0 * procedure_count / statistic.procedures_total_count) * 100.0) : 0);
+        out << (statistic.counter.get_total_count() ? ((1.0 * procedure_count / statistic.counter.get_total_count()) * 100.0) : 0);
         out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
         out << '%' << std::endl;
     };
 
-    if (statistic.per_procedure_statistic.size())  // is not empty?
+    if (statistic.per_session_statistic.size())  // is not empty?
     {
         out << "Per connection info: " << std::endl;
 
         std::stringstream session;
 
-        for (auto& it : statistic.per_procedure_statistic)
+        for (auto& it : statistic.per_session_statistic)
         {
             const BreakdownCounter& current = it.second;
             uint64_t s_total_proc = current.get_total_count();
