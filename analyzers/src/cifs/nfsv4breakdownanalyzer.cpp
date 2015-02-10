@@ -28,6 +28,26 @@ using namespace NST::breakdown;
 static const size_t space_for_cmd_name = 22;
 static const size_t count_of_compounds = 2;
 //------------------------------------------------------------------------------
+
+NFSv4BreakdownAnalyzer::NFSv4Representer::NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name)
+    : Representer(o, cmdRep, space_for_cmd_name)
+{
+
+}
+
+void NFSv4BreakdownAnalyzer::NFSv4Representer::onProcedureInfoPrinted(std::ostream &o, const BreakdownCounter& breakdown, unsigned procedure) const
+{
+    if (procedure == 0)
+    {
+        o << "Procedures:" << std::endl;
+    }
+    if (procedure == count_of_compounds)
+    {
+        o << "Total operations: " << breakdown.get_total_count()
+          << ". Per operation:"   << std::endl;
+    }
+}
+
 NFSv4BreakdownAnalyzer::NFSv4BreakdownAnalyzer(std::ostream& o)
     : NFSv3BreakdownAnalyzer(o)
     , compound_stats(count_of_compounds)

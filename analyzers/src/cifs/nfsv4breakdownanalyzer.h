@@ -34,9 +34,20 @@ namespace breakdown
  */
 class NFSv4BreakdownAnalyzer : public NFSv3BreakdownAnalyzer
 {
+protected:
+    /**
+     * @brief The NFSv4Representer class
+     * Splits output into commands/operations lists
+     */
+    class NFSv4Representer : public Representer {
+    public:
+        NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name);
+        void onProcedureInfoPrinted(std::ostream &o, const BreakdownCounter& breakdown, unsigned procedure) const override final;
+    };
+private:
     Statistic compound_stats;//!< Statistic
     Statistic stats;//!< Statistic
-    Representer representer;//!< Class for statistic representation
+    NFSv4Representer representer;//!< stream to output
 public:
     NFSv4BreakdownAnalyzer(std::ostream& o = std::cout);
     ~NFSv4BreakdownAnalyzer();
