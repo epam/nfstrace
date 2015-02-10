@@ -38,7 +38,6 @@ bool Less::operator()(const Session& a, const Session& b) const
 
 Statistic::Statistic(size_t proc_types_count)
     : proc_types_count(proc_types_count)
-    , procedures_total_count {0}
-    , procedures_count(proc_types_count, 0)
+    , counter(proc_types_count)
 {}
 //------------------------------------------------------------------------------

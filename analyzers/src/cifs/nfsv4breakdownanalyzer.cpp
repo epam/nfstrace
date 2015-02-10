@@ -26,9 +26,11 @@
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 static const size_t space_for_cmd_name = 22;
+static const size_t count_of_compounds = 2;
 //------------------------------------------------------------------------------
 NFSv4BreakdownAnalyzer::NFSv4BreakdownAnalyzer(std::ostream& o)
     : NFSv3BreakdownAnalyzer(o)
+    , compound_stats(count_of_compounds)
     , stats(NFSv4Commands().commands_count())
     , representer(o, new NFSv4Commands(), space_for_cmd_name)
 {
@@ -42,12 +44,12 @@ NFSv4BreakdownAnalyzer::~NFSv4BreakdownAnalyzer()
 
 void NFSv4BreakdownAnalyzer::null(const RPCProcedure* proc, const NFS4::NULL4args*, const NFS4::NULL4res*)
 {
-    account(proc, NFS_V40, stats);
+    account(proc, NFS_V40, compound_stats);
 }
 
 void NFSv4BreakdownAnalyzer::compound4(const RPCProcedure* proc, const NFS4::COMPOUND4args*, const NFS4::COMPOUND4res*)
 {
-    account(proc, NFS_V40, stats);
+    account(proc, NFS_V40, compound_stats);
 }
 
 void NFSv4BreakdownAnalyzer::access40(const RPCProcedure* proc, const NFS4::ACCESS4args*, const NFS4::ACCESS4res* res)
