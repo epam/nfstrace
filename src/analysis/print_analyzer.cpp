@@ -2790,13 +2790,13 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE_SESSION4args* arg
 {
     if(args)
     {
-        out <<  "clientid: "                << args->csa_clientid
-            << " sequnceid: 0x" << std::hex << args->csa_sequence << std::dec
-            << " flags: "                   << args->csa_flags
-            << " fore chan attrs: "         << args->csa_fore_chan_attrs
-            << " fore back attrs: "         << args->csa_back_chan_attrs
-            << " cb program: "              << args->csa_cb_program
-            << " callback sec parms:";
+        out << "clientid: 0x" << std::hex        << args->csa_clientid
+            << "; seqid: 0x" << std::hex         << args->csa_sequence << std::dec
+            << "; flags: "                       << args->csa_flags
+            << "; fore chan attrs: [ "           << args->csa_fore_chan_attrs << " ] "
+            << "; fore back attrs: [ "           << args->csa_back_chan_attrs << " ] "
+            << "; cb program: 0x" << std::hex    << args->csa_cb_program << std::dec
+            << "; callback sec parms:";
             NFS41::callback_sec_parms4 *current_el {args->csa_sec_parms.csa_sec_parms_val};
             for(u_int i {0}; i<args->csa_sec_parms.csa_sec_parms_len; i++, current_el++)
             {
