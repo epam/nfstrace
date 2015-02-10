@@ -135,8 +135,7 @@ private:
     std::atomic<uint16_t> read_counter;
     std::condition_variable cv;
     std::mutex mut;
-
-    Plotter pl;
+    std::atomic<bool> enable_update;
 };
 //------------------------------------------------------------------------------
 #endif //WATCH_ANALYZER_H

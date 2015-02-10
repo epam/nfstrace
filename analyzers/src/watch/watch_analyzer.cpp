@@ -24,6 +24,8 @@
 
 #include <unistd.h>
 #include <signal.h>
+#include <sys/time.h>
+#include <sys/types.h>
 
 #include "watch_analyzer.h"
 //------------------------------------------------------------------------------
@@ -34,7 +36,7 @@ WatchAnalyzer::WatchAnalyzer(const char* opts)
 , nfs4_ops_total  {0}
 , nfs4_proc_count (ProcEnumNFS4::count, 0)
 , monitor_running {ATOMIC_FLAG_INIT}
-, refresh_delta   {2000}
+, refresh_delta   {2000000}
 , max_read        {5}
 , read_counter    {0}
 {
@@ -140,7 +142,7 @@ void WatchAnalyzer::flush_statistics()
 void WatchAnalyzer::on_unix_signal(int signo)
 {
     if (signo == SIGWINCH) {
-        pl.enableResize();
+        enable_update = true;
     }
 }
 
@@ -203,6 +205,20 @@ inline void WatchAnalyzer::thread()
 {
     try
     {
+        // prepare for select
+        fd_set rfds;
+
+        /* Watch stdin (fd 0) to see when it has input. */
+        FD_ZERO(&rfds);
+        FD_SET(0, &rfds);
+
+        /* Wait up to five seconds. */
+        struct timeval tv;
+        tv.tv_sec = 0;
+        tv.tv_usec = refresh_delta;
+
+        int sel_rez;
+        Plotter pl;
         while (monitor_running.test_and_set())
         {
             UpRead();
@@ -212,8 +228,20 @@ inline void WatchAnalyzer::thread()
             std::vector<int> nfs3_count_copy(nfs3_proc_count);
             std::vector<int> nfs4_count_copy(nfs4_proc_count);
             DownRead();
+
             pl.updatePlot(nfs3_proc_total_copy, nfs3_count_copy, nfs4_oper_total_copy, nfs4_proc_total_copy, nfs4_count_copy);
-            std::this_thread::sleep_for(std::chrono::milliseconds(refresh_delta));
+            sel_rez = select(1, &rfds, NULL, NULL, &tv);
+
+            if (sel_rez == -1)
+               break;
+            else if (sel_rez)
+                pl.keyboard();
+            tv.tv_usec = refresh_delta;
+            if(enable_update)
+            {
+                pl.enableResize();
+                enable_update = false;
+            }
         }
     } catch(...) {
         DownRead();

@@ -54,7 +54,7 @@ public:
 
     uint16_t inputData();
     void enableResize();
-    inline void keyboard_thread();
+    void keyboard();
 
     const static time_t start_time;
     const static uint32_t SECINMIN;
@@ -69,8 +69,6 @@ private:
     void updateAll();
 
     int resize;
-    std::atomic_flag monitor_running;
-    std::thread keyboard_proc;
 
     std::vector<WINDOW*> all_windows;
     uint16_t scroll_shift;
