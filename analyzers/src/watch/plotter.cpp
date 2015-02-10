@@ -52,16 +52,12 @@ Plotter::Plotter()
 {
     try
     {
-        monitor_running.test_and_set();
         std::cout << "\n\n";
         initPlot();
         designPlot();
-        keyboard_proc = std::thread(&Plotter::keyboard_thread, this);
     }
     catch (std::runtime_error& err)
     {
-        monitor_running.clear();
-        keyboard_proc.join();
         destroyPlot();
         std::cerr << "Error in libwatch plugin: " << err.what();
         throw std::runtime_error("Error in Plotter screen initialization.");
@@ -69,8 +65,6 @@ Plotter::Plotter()
 }
 Plotter::~Plotter()
 {
-    monitor_running.clear();
-    keyboard_proc.join();
     destroyPlot();
 }
 
@@ -166,32 +160,27 @@ void Plotter::enableResize()
     resize++;
 }
 
-void Plotter::keyboard_thread()
+void Plotter::keyboard()
 {
-    while(monitor_running.test_and_set())
+    int key = inputData();
+    if(key != 0 )
     {
-        int key = inputData();
-
-        if(key != 0 )
+        if(key == KEY_UP)
         {
-            if(key == KEY_UP)
+            if(scroll_shift > 0)
             {
-                if(scroll_shift > 0)
-                {
-                    scroll_shift--;
-                    resize++;
-                }
-            }
-            else if(key == KEY_DOWN)
-            {
-                if(scroll_shift < 25)
-                {
-                    scroll_shift++;
-                    resize++;
-                }
+                scroll_shift--;
+                resize++;
             }
         }
-        sleep(1);
+        else if(key == KEY_DOWN)
+        {
+            if(scroll_shift < 25)
+            {
+                scroll_shift++;
+                resize++;
+            }
+        }
     }
 }
 
@@ -200,7 +189,7 @@ void Plotter::chronoUpdate()
     time_t actual_time = time(NULL);
     tm* t = localtime(&actual_time);
     time_t shift_time = actual_time - start_time;
-    mvprintw(date_time.start_y, date_time.start_x,"Date: \t %d.%d.%d \t Time: %d:%d:%d",t->tm_mday, t->tm_mon + 1, t->tm_year + 1900,t->tm_hour, t->tm_min, t->tm_sec);
+    mvprintw(date_time.start_y, date_time.start_x,"Date: \t %d.%d.%d \t Time: %d:%d:%d  ",t->tm_mday, t->tm_mon + 1, t->tm_year + 1900,t->tm_hour, t->tm_min, t->tm_sec);
     mvprintw(el_time.start_y, el_time.start_x,"Elapsed time:  \t %d days; %d:%d:%d times",
              shift_time/SECINDAY, shift_time%SECINDAY/SECINHOUR, shift_time%SECINHOUR/SECINMIN, shift_time%SECINMIN);
 //    mvprintw(packets.start_y, packets.start_x,"Total packets:  %lu(network)  %lu(to host)  %lu(dropped)", 999, 999 , 999);
