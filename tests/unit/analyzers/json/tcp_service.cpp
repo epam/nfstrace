@@ -26,7 +26,7 @@
 #include <gtest/gtest.h>
 #include <sys/socket.h>
 
-#include "../analyzers/src/json/abstract_tcp_service.h"
+#include "abstract_tcp_service.h"
 //------------------------------------------------------------------------------
 
 static constexpr std::size_t AwaitForServiceStartupMs = 250U;
