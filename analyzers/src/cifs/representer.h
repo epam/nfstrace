@@ -49,6 +49,14 @@ class Representer
     void print_per_session(const BreakdownCounter& breakdown,
                            const std::string& session,
                            uint64_t s_total_proc) const;
+protected:
+    /**
+     * @brief handler of one procedure output event
+     * @param o - stream
+     * @param breakdown - current counter
+     * @param procedure - procedure ID
+     */
+    virtual void onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const;
 public:
     Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name = 12);
 

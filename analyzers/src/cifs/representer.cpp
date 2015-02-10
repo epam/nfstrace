@@ -38,13 +38,13 @@ void Representer::flush_statistics(const Statistic& statistic)
 {
     out << "###  Breakdown analyzer  ###"
         << std::endl
-        << cmdRepresenter->protocol_name() << " total procedures: "
-        << statistic.counter.get_total_count()
-        << ". Per procedure:"
+        << cmdRepresenter->protocol_name()
+        << " protocol"
         << std::endl;
 
     for (size_t procedure = 0; procedure < statistic.proc_types_count; ++procedure)
     {
+        onProcedureInfoPrinted(out, statistic.counter, procedure);
         size_t procedure_count = statistic.counter[procedure].get_count();
         out.width(space_for_cmd_name);
         out << std::left
@@ -101,10 +101,9 @@ void Representer::print_per_session(const BreakdownCounter& breakdown, const std
 {
     out << "Session: " << session << std::endl;
 
-    out << "Total procedures: " << s_total_proc
-        << ". Per procedure:"   << std::endl;
     for (unsigned i = 0; i < cmdRepresenter->commands_count(); ++i)
     {
+        onProcedureInfoPrinted(out, breakdown, i);
         out.width(22);
         out << std::left
             << cmdRepresenter->command_name(i);
@@ -134,6 +133,15 @@ void Representer::print_per_session(const BreakdownCounter& breakdown, const std
             << std::fixed
             << breakdown[i].get_st_dev()
             << std::endl;
+    }
+}
+
+void Representer::onProcedureInfoPrinted(std::ostream &o, const BreakdownCounter& breakdown, unsigned procedure) const
+{
+    if (procedure == 0)
+    {
+        o << "Total operations: " << breakdown.get_total_count()
+          << ". Per operation:"   << std::endl;
     }
 }
 //------------------------------------------------------------------------------
