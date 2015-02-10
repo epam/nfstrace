@@ -25,17 +25,17 @@
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-const std::string NST::breakdown::NFSv41Commands::command_description(int cmd_code)
+const char* NST::breakdown::NFSv41Commands::command_description(int cmd_code)
 {
     return print_nfs41_procedures(static_cast<ProcEnumNFS41::NFSProcedure>(cmd_code));
 }
 
-const std::string NST::breakdown::NFSv41Commands::command_name(int cmd_code)
+const char* NST::breakdown::NFSv41Commands::command_name(int cmd_code)
 {
     return print_nfs41_procedures(static_cast<ProcEnumNFS41::NFSProcedure>(cmd_code));
 }
 
-const std::string NST::breakdown::NFSv41Commands::protocol_name()
+const char* NST::breakdown::NFSv41Commands::protocol_name()
 {
     return "NFS v4.1";
 }

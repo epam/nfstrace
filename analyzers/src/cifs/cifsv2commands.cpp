@@ -26,9 +26,9 @@
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 
-const std::string NST::breakdown::SMBv2Commands::command_name(int cmd_code)
+const char* NST::breakdown::SMBv2Commands::command_name(int cmd_code)
 {
-    static std::map<Commands, std::string> cmdNames;
+    static std::map<Commands, const char*> cmdNames;
     if (cmdNames.empty())
     {
         cmdNames[Commands::NEGOTIATE]         = "NEGOTIATE";
@@ -59,37 +59,37 @@ size_t SMBv2Commands::commands_count()
     return Commands::CMD_COUNT;
 }
 
-const std::string NST::breakdown::SMBv2Commands::command_description(int cmd_code)
+const char* NST::breakdown::SMBv2Commands::command_description(int cmd_code)
 {
-    static std::map<Commands, std::string> cmdNames;
+    static std::map<Commands, const char*> cmdNames;
     if (cmdNames.empty())
     {
-        cmdNames[Commands::NEGOTIATE]         = "SMB v2 NEGOTIATE";
-        cmdNames[Commands::SESSION_SETUP]     = "SMB v2 SESSION_SETUP";
-        cmdNames[Commands::LOGOFF]            = "SMB v2 LOGOFF";
-        cmdNames[Commands::TREE_CONNECT]      = "SMB v2 TREE_CONNECT";
-        cmdNames[Commands::TREE_DISCONNECT]   = "SMB v2 TREE_DISCONNECT";
-        cmdNames[Commands::CREATE]            = "SMB v2 CREATE";
-        cmdNames[Commands::CLOSE]             = "SMB v2 CLOSE";
-        cmdNames[Commands::FLUSH]             = "SMB v2 FLUSH";
-        cmdNames[Commands::READ]              = "SMB v2 READ";
-        cmdNames[Commands::WRITE]             = "SMB v2 WRITE";
-        cmdNames[Commands::LOCK]              = "SMB v2 LOCK";
-        cmdNames[Commands::IOCTL]             = "SMB v2 IOCTL";
-        cmdNames[Commands::CANCEL]            = "SMB v2 CANCEL";
-        cmdNames[Commands::ECHO]              = "SMB v2 ECHO";
-        cmdNames[Commands::QUERY_DIRECTORY]   = "SMB v2 QUERY_DIRECTORY";
-        cmdNames[Commands::CHANGE_NOTIFY]     = "SMB v2 CHANGE_NOTIFY";
-        cmdNames[Commands::QUERY_INFO]        = "SMB v2 QUERY_INFO";
-        cmdNames[Commands::SET_INFO]          = "SMB v2 SET_INFO";
-        cmdNames[Commands::OPLOCK_BREAK]      = "SMB v2 OPLOCK_BREAK";
+        cmdNames[Commands::NEGOTIATE]         = "NEGOTIATE";
+        cmdNames[Commands::SESSION_SETUP]     = "SESSION_SETUP";
+        cmdNames[Commands::LOGOFF]            = "LOGOFF";
+        cmdNames[Commands::TREE_CONNECT]      = "TREE_CONNECT";
+        cmdNames[Commands::TREE_DISCONNECT]   = "TREE_DISCONNECT";
+        cmdNames[Commands::CREATE]            = "CREATE";
+        cmdNames[Commands::CLOSE]             = "CLOSE";
+        cmdNames[Commands::FLUSH]             = "FLUSH";
+        cmdNames[Commands::READ]              = "READ";
+        cmdNames[Commands::WRITE]             = "WRITE";
+        cmdNames[Commands::LOCK]              = "LOCK";
+        cmdNames[Commands::IOCTL]             = "IOCTL";
+        cmdNames[Commands::CANCEL]            = "CANCEL";
+        cmdNames[Commands::ECHO]              = "ECHO";
+        cmdNames[Commands::QUERY_DIRECTORY]   = "QUERY_DIRECTORY";
+        cmdNames[Commands::CHANGE_NOTIFY]     = "CHANGE_NOTIFY";
+        cmdNames[Commands::QUERY_INFO]        = "QUERY_INFO";
+        cmdNames[Commands::SET_INFO]          = "SET_INFO";
+        cmdNames[Commands::OPLOCK_BREAK]      = "OPLOCK_BREAK";
     }
     return cmdNames[static_cast<Commands>(cmd_code)];
 }
 //------------------------------------------------------------------------------
 
 
-const std::string NST::breakdown::SMBv2Commands::protocol_name()
+const char* NST::breakdown::SMBv2Commands::protocol_name()
 {
     return "CIFS v2";
 }

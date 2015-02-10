@@ -117,13 +117,13 @@ struct SMBv1Commands : public CommandRepresenter
         CMD_COUNT
     };
 
-    const std::string command_description(int cmd_code) override final;
+    const char* command_description(int cmd_code) override final;
 
-    const std::string command_name(int cmd_code) override final;
+    const char* command_name(int cmd_code) override final;
 
     size_t commands_count();
 
-    const std::string protocol_name();
+    const char* protocol_name();
 };
 } // breakdown
 } // NST

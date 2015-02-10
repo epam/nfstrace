@@ -35,9 +35,9 @@ namespace breakdown
 class NFSv41Commands : public CommandRepresenter
 {
 public:
-    const std::string command_description(int cmd_code);
-    const std::string command_name(int cmd_code);
-    const std::string protocol_name();
+    const char* command_description(int cmd_code);
+    const char* command_name(int cmd_code);
+    const char* protocol_name();
     size_t commands_count();
 };
 

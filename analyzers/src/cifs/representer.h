@@ -39,6 +39,7 @@ class Representer
 {
     std::ostream& out;
     std::unique_ptr<CommandRepresenter> cmdRepresenter;
+    size_t space_for_cmd_name;
 
     void store_per_session(std::ostream& file,
                            const BreakdownCounter& breakdown,
@@ -49,7 +50,7 @@ class Representer
                            const std::string& session,
                            uint64_t s_total_proc) const;
 public:
-    Representer(std::ostream& o, CommandRepresenter* cmdRep);
+    Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name = 12);
 
     /*!
      * \brief flush_statistics outs statistic on screen

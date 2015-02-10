@@ -25,12 +25,12 @@
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-const std::string NFSv3Commands::command_description(int cmd_code)
+const char* NFSv3Commands::command_description(int cmd_code)
 {
     return print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(cmd_code));
 }
 
-const std::string NFSv3Commands::command_name(int cmd_code)
+const char* NFSv3Commands::command_name(int cmd_code)
 {
     return print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(cmd_code));
 }
@@ -41,7 +41,7 @@ size_t NFSv3Commands::commands_count()
 }
 
 
-const std::string NST::breakdown::NFSv3Commands::protocol_name()
+const char* NST::breakdown::NFSv3Commands::protocol_name()
 {
     return "NFS v3";
 }
