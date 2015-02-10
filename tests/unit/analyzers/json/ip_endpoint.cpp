@@ -24,7 +24,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "../analyzers/src/json/ip_endpoint.h"
+#include "ip_endpoint.h"
 //------------------------------------------------------------------------------
 
 static constexpr const char* ValidHost = IpEndpoint::LoopbackAddress;
