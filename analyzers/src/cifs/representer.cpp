@@ -27,9 +27,10 @@
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-NST::breakdown::Representer::Representer(std::ostream& o, NST::breakdown::CommandRepresenter* cmdRep)
+NST::breakdown::Representer::Representer(std::ostream& o, NST::breakdown::CommandRepresenter* cmdRep, size_t space_for_cmd_name)
     : out(o)
     , cmdRepresenter(cmdRep)
+    , space_for_cmd_name(space_for_cmd_name)
 {
 }
 
@@ -45,7 +46,7 @@ void Representer::flush_statistics(const Statistic& statistic)
     for (size_t procedure = 0; procedure < statistic.procedures_count.size(); ++procedure)
     {
         size_t procedure_count = statistic.procedures_count[procedure];
-        out.width(12);
+        out.width(space_for_cmd_name);
         out << std::left
             << cmdRepresenter->command_name(procedure);
         out.width(5);

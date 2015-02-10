@@ -24,9 +24,11 @@
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
+static const size_t space_for_cmd_name = 22;
+//------------------------------------------------------------------------------
 CIFSBreakdownAnalyzer::CIFSBreakdownAnalyzer(std::ostream& o)
     : stats(SMBv1Commands().commands_count())
-    , representer(o, new SMBv1Commands())
+    , representer(o, new SMBv1Commands(), space_for_cmd_name)
 {
 }
 

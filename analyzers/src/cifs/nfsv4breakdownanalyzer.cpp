@@ -25,10 +25,12 @@
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
+static const size_t space_for_cmd_name = 22;
+//------------------------------------------------------------------------------
 NFSv4BreakdownAnalyzer::NFSv4BreakdownAnalyzer(std::ostream& o)
     : NFSv3BreakdownAnalyzer(o)
     , stats(NFSv4Commands().commands_count())
-    , representer(o, new NFSv4Commands())
+    , representer(o, new NFSv4Commands(), space_for_cmd_name)
 {
 
 }

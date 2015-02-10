@@ -39,20 +39,20 @@ struct CommandRepresenter
      * \param cmd_code command code
      * \return description
      */
-    virtual const std::string command_description(int cmd_code) = 0;
+    virtual const char* command_description(int cmd_code) = 0;
 
     /*!
      * \brief returns name of the command
      * \param cmd_code command code
      * \return name
      */
-    virtual const std::string command_name(int cmd_code) = 0;
+    virtual const char* command_name(int cmd_code) = 0;
 
     /*!
      * \brief returns name of the protocol
      * \return protocol
      */
-    virtual const std::string protocol_name() = 0;
+    virtual const char* protocol_name() = 0;
 
     /*!
      * \brief commandsCount returns total count of commands
