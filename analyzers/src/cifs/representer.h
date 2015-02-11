@@ -42,9 +42,9 @@ class Representer
     size_t space_for_cmd_name;
 
     void store_per_session(std::ostream& file,
-                           const Statistic &statistic,
-                           const Session &session,
-                           const std::string &ssession) const;
+                           const Statistic& statistic,
+                           const Session& session,
+                           const std::string& ssession) const;
 
     void print_per_session(const Statistic& statistic, const Session& session, const std::string& ssession) const;
 protected:

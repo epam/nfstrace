@@ -86,10 +86,9 @@ const char* NST::breakdown::SMBv2Commands::command_description(int cmd_code)
     }
     return cmdNames[static_cast<Commands>(cmd_code)];
 }
-//------------------------------------------------------------------------------
-
 
 const char* NST::breakdown::SMBv2Commands::protocol_name()
 {
     return "CIFS v2";
 }
+//------------------------------------------------------------------------------

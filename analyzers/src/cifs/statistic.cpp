@@ -30,18 +30,18 @@ bool Less::operator()(const Session& a, const Session& b) const
            ( ntohs(a.port[1]) < ntohs(b.port[1])                     ) || // compare Destination(server) ports
 
            ( (a.ip_type == Session::IPType::v4) ? // compare IPv4
-                ((ntohl(a.ip.v4.addr[0]) < ntohl(b.ip.v4.addr[0])) || (ntohl(a.ip.v4.addr[1]) < ntohl(b.ip.v4.addr[1])))
+             ((ntohl(a.ip.v4.addr[0]) < ntohl(b.ip.v4.addr[0])) || (ntohl(a.ip.v4.addr[1]) < ntohl(b.ip.v4.addr[1])))
              :
-                (memcmp(&a.ip.v6, &b.ip.v6, sizeof(a.ip.v6)) < 0 )
+             (memcmp(&a.ip.v6, &b.ip.v6, sizeof(a.ip.v6)) < 0 )
            );
 }
 
 Statistic::Statistic(size_t proc_types_count)
     : proc_types_count(proc_types_count)
     , counter(proc_types_count)
-    {}
+{}
 
-void Statistic::for_each_procedure(std::function<void (const BreakdownCounter &, size_t)> on_procedure) const
+void Statistic::for_each_procedure(std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
 {
     for (size_t procedure = 0; procedure < proc_types_count; ++procedure)
     {
@@ -49,7 +49,7 @@ void Statistic::for_each_procedure(std::function<void (const BreakdownCounter &,
     }
 }
 
-void Statistic::for_each_session(std::function<void (const Session &)> on_session) const
+void Statistic::for_each_session(std::function<void (const Session&)> on_session) const
 {
     for (auto& it : per_session_statistic)
     {
@@ -57,7 +57,7 @@ void Statistic::for_each_session(std::function<void (const Session &)> on_sessio
     }
 }
 
-void Statistic::for_each_procedure_in_session(const Session &session, std::function<void (const BreakdownCounter &, size_t)> on_procedure) const
+void Statistic::for_each_procedure_in_session(const Session& session, std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
 {
     const BreakdownCounter& current = per_session_statistic.at(session);
     for (size_t procedure = 0; procedure < proc_types_count; ++procedure)
