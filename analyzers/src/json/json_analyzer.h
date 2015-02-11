@@ -267,9 +267,9 @@ public:
 
     // NFS4.0 procedures
  
-    void null(const RPCProcedure* /*proc*/,
-              const struct NFS4::NULL4args* /*args*/,
-              const struct NFS4::NULL4res* /*res*/) override final;
+    void null4(const RPCProcedure* /*proc*/,
+               const struct NFS4::NULL4args* /*args*/,
+               const struct NFS4::NULL4res* /*res*/) override final;
 
     void compound4(const RPCProcedure* /*proc*/,
                    const struct NFS4::COMPOUND4args* /*args*/,

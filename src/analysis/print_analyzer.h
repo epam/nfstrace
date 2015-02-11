@@ -112,9 +112,9 @@ public:
                  const struct NFS3::COMMIT3args* args,
                  const struct NFS3::COMMIT3res*  res) override final;
 
-    void null(const RPCProcedure*           proc,
-              const struct NFS4::NULL4args* args,
-              const struct NFS4::NULL4res*  res) override final;
+    void null4(const RPCProcedure*           proc,
+               const struct NFS4::NULL4args* args,
+               const struct NFS4::NULL4res*  res) override final;
     void compound4(const RPCProcedure*               proc,
                    const struct NFS4::COMPOUND4args* args,
                    const struct NFS4::COMPOUND4res*  res) override final;

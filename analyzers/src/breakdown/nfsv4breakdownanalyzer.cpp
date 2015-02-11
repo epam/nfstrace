@@ -65,7 +65,7 @@ NFSv4BreakdownAnalyzer::~NFSv4BreakdownAnalyzer()
 
 }
 
-void NFSv4BreakdownAnalyzer::null(const RPCProcedure* proc, const NFS4::NULL4args*, const NFS4::NULL4res*)
+void NFSv4BreakdownAnalyzer::null4(const RPCProcedure* proc, const NFS4::NULL4args*, const NFS4::NULL4res*)
 {
     compound_stats.account(proc, ProcEnumNFS4::NFSProcedure::NFS_NULL);
 }

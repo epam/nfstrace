@@ -110,7 +110,7 @@ public:
 class INFSv4rpcgen
 {
 public:
-    virtual void null(const RPCProcedure*,
+    virtual void null4(const RPCProcedure*,
             const struct NFS4::NULL4args*,
             const struct NFS4::NULL4res*) {}
     virtual void compound4(const RPCProcedure*,
