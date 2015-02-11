@@ -761,7 +761,7 @@ std::ostream& operator<<(std::ostream& out, const server_owner4& obj)
 
 std::ostream& operator<<(std::ostream& out, const state_owner4& obj)
 {
-    out <<  "client id: " << std::hex << obj.clientid << " owner: ";
+    out <<  "client id: 0x" << std::hex << obj.clientid << " owner: 0x";
     print_hex(out,
               obj.owner.owner_val,
               obj.owner.owner_len);
@@ -1443,13 +1443,13 @@ std::ostream& operator<<(std::ostream& out, const state_protect4_r& obj)
 
 std::ostream& operator<<(std::ostream& out, const channel_attrs4& obj)
 {
-    out <<  "header pad size: "          << obj.ca_headerpadsize
-        << " max request size: "         << obj.ca_maxrequestsize
-        << " max response size: "        << obj.ca_maxresponsesize
-        << " max response size cached: " << obj.ca_maxresponsesize_cached
-        << " max operations: "           << obj.ca_maxoperations
-        << " max requests: "             << obj.ca_maxrequests
-        << " rdma ird: ";
+    out << "header pad size: "            << obj.ca_headerpadsize
+        << "; max request size: "         << obj.ca_maxrequestsize
+        << "; max response size: "        << obj.ca_maxresponsesize
+        << "; max response size cached: " << obj.ca_maxresponsesize_cached
+        << "; max operations: "           << obj.ca_maxoperations
+        << "; max requests: "             << obj.ca_maxrequests
+        << "; rdma ird: ";
     print_hex(out,
               obj.ca_rdma_ird.ca_rdma_ird_val,
               obj.ca_rdma_ird.ca_rdma_ird_len);
