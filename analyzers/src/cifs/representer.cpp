@@ -42,7 +42,7 @@ void Representer::flush_statistics(const Statistic& statistic)
         << " protocol"
         << std::endl;
 
-    statistic.for_each_procedure([&](const BreakdownCounter& breakdown, size_t procedure)
+    statistic.for_each_procedure([&](const BreakdownCounter & breakdown, size_t procedure)
     {
         onProcedureInfoPrinted(out, breakdown, procedure);
         size_t procedure_count = breakdown[procedure].get_count();
@@ -64,12 +64,12 @@ void Representer::flush_statistics(const Statistic& statistic)
     {
         out << "Per connection info: " << std::endl;
 
-        statistic.for_each_session([&](const Session& session)
+        statistic.for_each_session([&](const Session & session)
         {
             std::stringstream ssession;
             print_session(ssession, session);
             print_per_session(statistic, session, ssession.str());
-            std::ofstream file(("breakdown_" + ssession.str() + ".dat").c_str(), std::ios::out | std::ios::trunc);
+            std::ofstream file("breakdown_" + ssession.str() + ".dat", std::ios::out | std::ios::trunc);
             store_per_session(file, statistic, session, ssession.str());
         });
     }
@@ -80,7 +80,7 @@ void Representer::store_per_session(std::ostream& file, const Statistic& statist
     //TODO: does it make sense to join store_per_session & print_per_session?
     file << "Session: " << ssession << std::endl;
 
-    statistic.for_each_procedure_in_session(session, [&](const BreakdownCounter& breakdown, size_t procedure)
+    statistic.for_each_procedure_in_session(session, [&](const BreakdownCounter & breakdown, size_t procedure)
     {
         uint64_t s_total_proc = breakdown.get_total_count();
         file << cmdRepresenter->command_name(procedure);
@@ -98,7 +98,7 @@ void Representer::print_per_session(const Statistic& statistic, const Session& s
 {
     out << "Session: " << ssession << std::endl;
 
-    statistic.for_each_procedure_in_session(session, [&](const BreakdownCounter& breakdown, size_t procedure)
+    statistic.for_each_procedure_in_session(session, [&](const BreakdownCounter & breakdown, size_t procedure)
     {
         uint64_t s_total_proc = breakdown.get_total_count();
         onProcedureInfoPrinted(out, breakdown, procedure);
@@ -115,7 +115,7 @@ void Representer::print_per_session(const Statistic& statistic, const Session& s
         out << '(';
         out.width(6);
         out << std::fixed
-            << (s_total_proc ? (((long double)(breakdown[procedure].get_count()) / s_total_proc) * 100) : 0);
+            << (s_total_proc ? (static_cast<long double>(breakdown[procedure].get_count()) * 100 / s_total_proc) : 0);
         out << "%) Min: ";
         out.precision(3);
         out << std::fixed
@@ -134,7 +134,7 @@ void Representer::print_per_session(const Statistic& statistic, const Session& s
     });
 }
 
-void Representer::onProcedureInfoPrinted(std::ostream &o, const BreakdownCounter& breakdown, unsigned procedure) const
+void Representer::onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const
 {
     if (procedure == 0)
     {

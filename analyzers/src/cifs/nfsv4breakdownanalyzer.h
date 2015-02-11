@@ -39,10 +39,11 @@ protected:
      * @brief The NFSv4Representer class
      * Splits output into commands/operations lists
      */
-    class NFSv4Representer : public Representer {
+    class NFSv4Representer : public Representer
+    {
     public:
         NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name);
-        void onProcedureInfoPrinted(std::ostream &o, const BreakdownCounter& breakdown, unsigned procedure) const override final;
+        void onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const override final;
     };
 
     /**
