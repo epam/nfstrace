@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Statistic structure
+// Description: Statistics structure
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -39,16 +39,16 @@ struct Less
 
 /*! \brief All statistic data
  */
-struct Statistic
+struct Statistics
 {
     using PerOpStat = std::map<Session, BreakdownCounter, Less>;
     using ProceduresCount = std::map<int, int>;
 
     uint64_t procedures_total_count;//!< Total amount of procedures
     ProceduresCount procedures_count;//!< Count of each procedure
-    PerOpStat per_procedure_statistic;//!< Statistic for each procedure
+    PerOpStat per_procedure_statistics;//!< Statistic for each procedure
 
-    Statistic();
+    Statistics();
 };
 } // breakdown
 } // NST

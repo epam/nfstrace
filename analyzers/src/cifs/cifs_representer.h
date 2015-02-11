@@ -55,7 +55,7 @@ public:
      * \brief flush_statistics outs statistic on screen
      * \param statistic - statistics data
      */
-    void flush_statistics(const Statistic& statistic);
+    void flush_statistics(const Statistics& statistic);
 };
 } // breakdown
 } // NST
