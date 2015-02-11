@@ -1,5 +1,106 @@
 ###  Breakdown analyzer  ###
-NFSv3 total procedures: 0. Per procedure:
+CIFS v1 protocol
+Total operations: 0. Per operation:
+CREATE_DIRECTORY          0   0.00%
+DELETE_DIRECTORY          0   0.00%
+OPEN                      0   0.00%
+CREATE                    0   0.00%
+CLOSE                     0   0.00%
+FLUSH                     0   0.00%
+DELETE                    0   0.00%
+RENAME                    0   0.00%
+QUERY_INFORMATION         0   0.00%
+SET_INFORMATION           0   0.00%
+READ                      0   0.00%
+WRITE                     0   0.00%
+LOCK_BYTE_RANGE           0   0.00%
+UNLOCK_BYTE_RANGE         0   0.00%
+CREATE_TEMPORARY          0   0.00%
+CREATE_NEW                0   0.00%
+CHECK_DIRECTORY           0   0.00%
+PROCESS_EXIT              0   0.00%
+SEEK                      0   0.00%
+LOCK_AND_READ             0   0.00%
+WRITE_AND_UNLOCK          0   0.00%
+READ_RAW                  0   0.00%
+READ_MPX                  0   0.00%
+READ_MPX_SECONDARY        0   0.00%
+WRITE_RAW                 0   0.00%
+WRITE_MPX                 0   0.00%
+WRITE_MPX_SECONDARY       0   0.00%
+WRITE_COMPLETE            0   0.00%
+QUERY_SERVER              0   0.00%
+SET_INFORMATION2          0   0.00%
+QUERY_INFORMATION2        0   0.00%
+LOCKING_ANDX              0   0.00%
+TRANSACTION               0   0.00%
+TRANSACTION_SECONDARY     0   0.00%
+IOCTL                     0   0.00%
+IOCTL_SECONDARY           0   0.00%
+COPY                      0   0.00%
+MOVE                      0   0.00%
+ECHO                      0   0.00%
+WRITE_AND_CLOSE           0   0.00%
+OPEN_ANDX                 0   0.00%
+READ_ANDX                 0   0.00%
+WRITE_ANDX                0   0.00%
+NEW_FILE_SIZE             0   0.00%
+CLOSE_AND_TREE_DISC       0   0.00%
+TRANSACTION2              0   0.00%
+TRANSACTION2_SECONDARY    0   0.00%
+FIND_CLOSE2               0   0.00%
+FIND_NOTIFY_CLOSE         0   0.00%
+TREE_CONNECT              0   0.00%
+TREE_DISCONNECT           0   0.00%
+NEGOTIATE                 0   0.00%
+SESSION_SETUP_ANDX        0   0.00%
+LOGOFF_ANDX               0   0.00%
+TREE_CONNECT_ANDX         0   0.00%
+SECURITY_PACKAGE_ANDX     0   0.00%
+QUERY_INFORMATION_DISK    0   0.00%
+SEARCH                    0   0.00%
+FIND                      0   0.00%
+FIND_UNIQUE               0   0.00%
+FIND_CLOSE                0   0.00%
+NT_TRANSACT               0   0.00%
+NT_TRANSACT_SECONDARY     0   0.00%
+NT_CREATE_ANDX            0   0.00%
+NT_CANCEL                 0   0.00%
+NT_RENAME                 0   0.00%
+OPEN_PRINT_FILE           0   0.00%
+WRITE_PRINT_FILE          0   0.00%
+CLOSE_PRINT_FILE          0   0.00%
+GET_PRINT_QUEUE           0   0.00%
+READ_BULK                 0   0.00%
+WRITE_BULK                0   0.00%
+WRITE_BULK_DATA           0   0.00%
+INVALID                   0   0.00%
+NO_ANDX_COMMAND           0   0.00%
+###  Breakdown analyzer  ###
+CIFS v2 protocol
+Total operations: 0. Per operation:
+NEGOTIATE                 0   0.00%
+SESSION SETUP             0   0.00%
+LOGOFF                    0   0.00%
+TREE CONNECT              0   0.00%
+TREE DISCONNECT           0   0.00%
+CREATE                    0   0.00%
+CLOSE                     0   0.00%
+FLUSH                     0   0.00%
+READ                      0   0.00%
+WRITE                     0   0.00%
+LOCK                      0   0.00%
+IOCTL                     0   0.00%
+CANCEL                    0   0.00%
+ECHO                      0   0.00%
+QUERY DIRECTORY           0   0.00%
+CHANGE NOTIFY             0   0.00%
+QUERY INFO                0   0.00%
+SET INFO                  0   0.00%
+OPLOCK BREAK              0   0.00%
+###  Breakdown analyzer  ###
+NFS v3 protocol
+Total operations: 0. Per operation:
 NULL            0   0.00%
 GETATTR         0   0.00%
 SETATTR         0   0.00%
@@ -22,11 +123,12 @@ FSSTAT          0   0.00%
 FSINFO          0   0.00%
 PATHCONF        0   0.00%
 COMMIT          0   0.00%
-
-NFSv4.0 total procedures: 1. Per procedure:
+###  Breakdown analyzer  ###
+NFS v4.0 protocol
+Total procedures: 1. Per procedure:
 NULL                      1 100.00%
 COMPOUND                  0   0.00%
-NFSv4.0 total operations: 0. Per operation:
+Total operations: 0. Per operation:
 ILLEGAL                   0   0.00%
 ACCESS                    0   0.00%
 CLOSE                     0   0.00%
@@ -66,56 +168,12 @@ VERIFY                    0   0.00%
 WRITE                     0   0.00%
 RELEASE_LOCKOWNER         0   0.00%
 GET_DIR_DELEGATION        0   0.00%
-Per connection info: 
-Session: 10.6.136.104:909 --> 10.6.137.124:2049 [TCP]
-Total procedures: 1. Per procedure:
-NULL                   Count:    1 (100.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-COMPOUND               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-Total operations: 0. Per operation:
-ILLEGAL                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-ACCESS                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-CLOSE                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-COMMIT                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-CREATE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-DELEGPURGE             Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-DELEGRETURN            Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-GETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-GETFH                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-LINK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-LOCK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-LOCKT                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-LOCKU                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-LOOKUP                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-LOOKUPP                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-NVERIFY                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-OPEN                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-OPENATTR               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-OPEN_CONFIRM           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-OPEN_DOWNGRADE         Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-PUTFH                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-PUTPUBFH               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-PUTROOTFH              Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-READ                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-READDIR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-READLINK               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-REMOVE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-RENAME                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-RENEW                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-RESTOREFH              Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-SAVEFH                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-SECINFO                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-SETATTR                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-SETCLIENTID            Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-SETCLIENTID_CONFIRM    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-VERIFY                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-WRITE                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-RELEASE_LOCKOWNER      Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-GET_DIR_DELEGATION     Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-
-NFSv4.1 total procedures: 525. Per procedure:
+###  Breakdown analyzer  ###
+NFS v4.1 protocol
+Total procedures: 525. Per procedure:
 NULL                      0   0.00%
 COMPOUND                525 100.00%
-NFSv4.1 total operations: 1740. Per operation:
+Total operations: 1740. Per operation:
 ILLEGAL                   0   0.00%
 ACCESS                   51   2.93%
 CLOSE                    19   1.09%
