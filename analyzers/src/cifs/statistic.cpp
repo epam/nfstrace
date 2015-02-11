@@ -39,5 +39,30 @@ bool Less::operator()(const Session& a, const Session& b) const
 Statistic::Statistic(size_t proc_types_count)
     : proc_types_count(proc_types_count)
     , counter(proc_types_count)
-{}
+    {}
+
+void Statistic::for_each_procedure(std::function<void (const BreakdownCounter &, size_t)> on_procedure) const
+{
+    for (size_t procedure = 0; procedure < proc_types_count; ++procedure)
+    {
+        on_procedure(counter, procedure);
+    }
+}
+
+void Statistic::for_each_session(std::function<void (const Session &)> on_session) const
+{
+    for (auto& it : per_session_statistic)
+    {
+        on_session(it.first);
+    }
+}
+
+void Statistic::for_each_procedure_in_session(const Session &session, std::function<void (const BreakdownCounter &, size_t)> on_procedure) const
+{
+    const BreakdownCounter& current = per_session_statistic.at(session);
+    for (size_t procedure = 0; procedure < proc_types_count; ++procedure)
+    {
+        on_procedure(current, procedure);
+    }
+}
 //------------------------------------------------------------------------------
