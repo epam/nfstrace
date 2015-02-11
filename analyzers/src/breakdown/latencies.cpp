@@ -26,10 +26,7 @@
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 
-Latencies::Latencies()
-    : count {0}
-, avg {}
-, m2 {}
+Latencies::Latencies() : count {0}, avg {0}, m2 {0}
 {
     timerclear(&min);
     timerclear(&max);
