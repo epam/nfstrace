@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 #include <api/plugin_api.h>
-#include "UserGUI.h"
+#include "user_gui.h"
 //------------------------------------------------------------------------------
 const time_t   UserGUI::start_time = time(NULL);
 const uint32_t UserGUI::SECINMIN   = 60;
@@ -205,6 +205,7 @@ void UserGUI::keyboard()
             {
                 scroll_shift--;
                 enableUpdate = true;
+                do key = getch(); while ((key != EOF) && (key != '\n') && (key != ' '));
             }
         }
         else if(key == KEY_DOWN)
@@ -213,8 +214,11 @@ void UserGUI::keyboard()
             {
                 scroll_shift++;
                 enableUpdate = true;
+                do key = getch(); while ((key != EOF) && (key != '\n') && (key != ' '));
             }
         }
+        else
+            do key = getch(); while ((key != EOF) && (key != '\n') && (key != ' '));
     }
 }
 
@@ -437,6 +441,7 @@ void UserGUI::thread()
         std::cerr << "Watch plugin error: " << e.what();
     }
 }
+
 void UserGUI::UpRead()
 {
     std::unique_lock<std::mutex> lck(mut);
@@ -450,3 +455,4 @@ void UserGUI::DownRead()
     cv.wait(lck,[this](){ return read_counter > 0;});
     read_counter--;
 }
+//------------------------------------------------------------------------------

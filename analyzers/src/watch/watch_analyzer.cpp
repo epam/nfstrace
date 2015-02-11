@@ -27,7 +27,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-#include "WatchAnalyzer.h"
+#include "watch_analyzer.h"
 //------------------------------------------------------------------------------
 WatchAnalyzer::WatchAnalyzer(const char* opts)
 : gui {opts}
