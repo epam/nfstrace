@@ -32,6 +32,7 @@ const time_t   UserGUI::start_time = time(NULL);
 const uint32_t UserGUI::SECINMIN   = 60;
 const uint32_t UserGUI::SECINHOUR  = 60*60;
 const uint32_t UserGUI::SECINDAY   = 60*60*24;
+const uint32_t UserGUI::MSEC       = 1000000;
 
 operation_data nfsv3_total   {1, 1, NULL, 28 , 2, 10 ,0 , 0, 0};
 operation_data nfsv3_proc    {1, 3, NULL, 18 , 2, 10 ,0 , 0, 0};
@@ -44,9 +45,8 @@ operation_data date_time     {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
 operation_data el_time       {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
 operation_data packets       {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
 //------------------------------------------------------------------------------
-UserGUI::UserGUI()
+UserGUI::UserGUI(const char *opts)
 : enableUpdate{false}
-, resize{0}
 , all_windows(3, NULL)
 , scroll_shift {0}
 , column_shift {0}
@@ -56,10 +56,19 @@ UserGUI::UserGUI()
 , nfs4_procedure_total {0}
 , nfs4_operations_total  {0}
 , nfs4_count (ProcEnumNFS4::count, 0)
-, refresh_delta {2000}
+, refresh_delta {900000}
 , max_read        {5}
 , read_counter    {0}
 {
+    if(opts != nullptr && *opts != '\0' ) try
+    {
+        refresh_delta = std::stoul(opts);
+    }
+    catch(std::exception& e)
+    {
+        throw std::runtime_error{std::string{"Error in plugin options processing. OPTS: "} + opts + " Error: " + e.what()};
+    }
+
     _run.test_and_set();
     gui_thread = std::thread(&UserGUI::thread, this);
 }
@@ -73,23 +82,26 @@ UserGUI::~UserGUI()
     destroyPlot();
 }
 
-void UserGUI::updatePlot(const uint64_t &nfs3_total, const std::vector<int> &nfs3_pr_count,
-                         const uint64_t &nfs4_ops_total, const uint64_t &nfs4_pr_total,
-                         const std::vector<int> &nfs4_op_count)
+void UserGUI::updatePlot()
 {
-    if(enableUpdate || resize > 0)
+    if(enableUpdate)
     {
         destroyPlot();
         initPlot();
-//       designPlot();
         enableUpdate = false;
-        if(resize) resize--;
     }
 
+    UpRead();
+    uint64_t nfs3_procedure_total_copy = nfs3_procedure_total;
+    std::vector<int> nfs3_count_copy = nfs3_count;
+    uint64_t nfs4_procedure_total_copy = nfs4_procedure_total;
+    uint64_t nfs4_operations_total_copy = nfs4_operations_total;
+    std::vector<int> nfs4_count_copy = nfs4_count;
+    DownRead();
     uint16_t counter = nfsv3_total.start_y;
     if(nfsv3_total.max_y + scroll_shift > counter && counter > scroll_shift)
     {
-        mvwprintw( nfsv3_total.my_win, counter - scroll_shift, nfsv3_total.mod_pos, "%lu", nfs3_total);
+        mvwprintw( nfsv3_total.my_win, counter - scroll_shift, nfsv3_total.mod_pos, "%lu ", nfs3_procedure_total_copy);
         counter++;
     }
 
@@ -97,74 +109,89 @@ void UserGUI::updatePlot(const uint64_t &nfs3_total, const std::vector<int> &nfs
     if(counter > scroll_shift)
         counter++;
 
-    for(auto i : nfs3_pr_count)
+    for(auto i : nfs3_count_copy)
     {
         if(nfsv3_proc.max_y + scroll_shift > counter && counter > scroll_shift)
-            mvwprintw(nfsv3_proc.my_win, counter - scroll_shift, nfsv3_proc.mod_pos  ,"%lu", i);
+            mvwprintw(nfsv3_proc.my_win, counter - scroll_shift, nfsv3_proc.mod_pos  ,"%lu ", i);
         if(nfsv3_proc.max_y + scroll_shift > counter && counter > scroll_shift)
-            mvwprintw(nfsv3_proc.my_win, counter - scroll_shift, nfsv3_proc.mod_pos + nfsv3_proc.st_colum ,"%s", "       ");
-        if(nfsv3_proc.max_y + scroll_shift > counter && counter > scroll_shift)
-            mvwprintw(nfsv3_proc.my_win, counter -scroll_shift, nfsv3_proc.mod_pos + nfsv3_proc.st_colum ,"%-3.2f%%",
-                     (double) (nfs3_total > 0 ? (double)i / (double)nfs3_total * 100 : 0));
+            mvwprintw(nfsv3_proc.my_win, counter -scroll_shift, nfsv3_proc.mod_pos + nfsv3_proc.st_colum ,"%-3.2f%% ",
+                     (double) (nfs3_procedure_total_copy > 0 ? (double)i / (double)nfs3_procedure_total_copy * 100 : 0));
         counter++;
     }
 
     counter = nfsv4_pr_total.start_y;
     if(nfsv4_pr_total.max_y + scroll_shift > counter && counter > scroll_shift)
     {
-        mvwprintw(nfsv4_pr_total.my_win, counter - scroll_shift, nfsv4_pr_total.mod_pos ,"%lu",nfs4_pr_total);
+        mvwprintw(nfsv4_pr_total.my_win, counter - scroll_shift, nfsv4_pr_total.mod_pos ,"%lu ",nfs4_procedure_total_copy);
         counter++;
     }
 
     if(counter > scroll_shift)
         counter++;
 
-    for(uint16_t i = 0; i < ProcEnumNFS4::count_proc && i <= nfs4_op_count.size(); i++)
+    for(uint16_t i = 0; i < ProcEnumNFS4::count_proc && i <= nfs4_count_copy.size(); i++)
     {
         if(nfsv4_proc.max_y + scroll_shift > counter && counter > scroll_shift )
-            mvwprintw(nfsv4_proc.my_win, counter - scroll_shift, nfsv4_proc.mod_pos ,"%lu",nfs4_op_count[i]);
-        if(nfsv4_proc.max_y + scroll_shift > counter && counter > scroll_shift)
-            mvwprintw(nfsv4_proc.my_win, counter - scroll_shift, nfsv4_proc.mod_pos + nfsv4_proc.st_colum ,"%s", "       ");
+            mvwprintw(nfsv4_proc.my_win, counter - scroll_shift, nfsv4_proc.mod_pos ,"%lu ",nfs4_count_copy[i]);
         if(nfsv4_proc.max_y + scroll_shift> counter && counter > scroll_shift)
-            mvwprintw(nfsv4_proc.my_win, counter - scroll_shift,nfsv4_proc.mod_pos + nfsv4_proc.st_colum ,"%-3.2f%%",
-                     (double) (nfs4_pr_total > 0 ? (double)nfs4_op_count[i] / (double)nfs4_pr_total * 100 : 0) );
+            mvwprintw(nfsv4_proc.my_win, counter - scroll_shift,nfsv4_proc.mod_pos + nfsv4_proc.st_colum ,"%-3.2f%% ",
+                     (double) (nfs4_procedure_total_copy > 0 ? (double)nfs4_count_copy[i] / (double)nfs4_procedure_total_copy * 100 : 0) );
         counter++;
     }
 
     counter = nfsv4_op_total.start_y;
     if(nfsv4_op_total.max_y + scroll_shift> counter && counter > scroll_shift)
     {
-        mvwprintw(nfsv4_op_total.my_win, counter - scroll_shift, nfsv4_op_total.mod_pos ,"%lu", nfs4_ops_total);
+        mvwprintw(nfsv4_op_total.my_win, counter - scroll_shift, nfsv4_op_total.mod_pos ,"%lu ", nfs4_operations_total_copy);
         counter++;
     }
 
     if(counter > scroll_shift)
         counter++;
 
-    for(uint16_t i = ProcEnumNFS4::count_proc ; i < ProcEnumNFS4::count && i <= nfs4_op_count.size(); i++)
+    for(uint16_t i = ProcEnumNFS4::count_proc ; i < ProcEnumNFS4::count && i <= nfs4_count_copy.size(); i++)
     {
         if(nfsv4_proc.max_y + scroll_shift> counter && counter > scroll_shift)
-            mvwprintw(nfsv4_oper.my_win, counter - scroll_shift, nfsv4_oper.mod_pos ,"%lu",nfs4_op_count[i]);
+            mvwprintw(nfsv4_oper.my_win, counter - scroll_shift, nfsv4_oper.mod_pos ,"%lu ",nfs4_count_copy[i]);
         if(nfsv4_proc.max_y + scroll_shift> counter && counter > scroll_shift)
-            mvwprintw(nfsv4_oper.my_win, counter - scroll_shift, nfsv4_oper.mod_pos + nfsv4_proc.st_colum ,"%s", "       ");
-        if(nfsv4_proc.max_y + scroll_shift> counter && counter > scroll_shift)
-            mvwprintw(nfsv4_oper.my_win, counter - scroll_shift, nfsv4_oper.mod_pos + nfsv4_oper.st_colum ,"%-3.2f%%",
-                     (double) (nfs4_pr_total > 0 ? (double)nfs4_op_count[i] / (double)nfs4_pr_total * 100 : 0) );
+            mvwprintw(nfsv4_oper.my_win, counter - scroll_shift, nfsv4_oper.mod_pos + nfsv4_oper.st_colum ,"%-3.2f%% ",
+                     (double) (nfs4_procedure_total_copy > 0 ? (double)nfs4_count_copy[i] / (double)nfs4_procedure_total_copy * 100 : 0) );
         counter++;
     }
     chronoUpdate();
     updateAll();
 }
 
+void UserGUI::updateCounters(const uint64_t &nfs3_total, const std::vector<int> &nfs3_pr_count,
+                             const uint64_t &nfs4_ops_total, const uint64_t &nfs4_pr_total,
+                             const std::vector<int> &nfs4_op_count)
+{
+    for(auto i = 0; i < max_read; i++)
+        UpRead();
+
+    nfs3_procedure_total += nfs3_total;
+    std::vector<int>::const_iterator f;
+    std::vector<int>::iterator s;
+    for( f = nfs3_pr_count.begin(), s = nfs3_count.begin(); f != nfs3_pr_count.end() && s != nfs3_count.end(); f++, s++)
+    {
+        (*s) += (*f);
+    }
+
+    nfs4_procedure_total += nfs4_pr_total;
+    nfs4_operations_total += nfs4_ops_total;
+    for(f = nfs4_op_count.begin(), s = nfs4_count.begin(); f != nfs4_op_count.end() && s != nfs3_count.end(); f++, s++)
+    {
+        (*s) += (*f);
+    }
+
+    for(auto i = 0; i < max_read; i++)
+        DownRead();
+}
+
 uint16_t UserGUI::inputData()
 {
     int c = wgetch(all_windows[0]);
     return (c == KEY_UP || c == KEY_DOWN) ? c : 0;
-}
-
-void UserGUI::enableResize()
-{
-    resize++;
 }
 
 void UserGUI::keyboard()
@@ -177,7 +204,6 @@ void UserGUI::keyboard()
             if(scroll_shift > 0)
             {
                 scroll_shift--;
-                resize++;
                 enableUpdate = true;
             }
         }
@@ -186,7 +212,6 @@ void UserGUI::keyboard()
             if(scroll_shift < 25)
             {
                 scroll_shift++;
-                resize++;
                 enableUpdate = true;
             }
         }
@@ -201,7 +226,6 @@ void UserGUI::chronoUpdate()
     mvprintw(date_time.start_y, date_time.start_x,"Date: \t %d.%d.%d \t Time: %d:%d:%d  ",t->tm_mday, t->tm_mon + 1, t->tm_year + 1900,t->tm_hour, t->tm_min, t->tm_sec);
     mvprintw(el_time.start_y, el_time.start_x,"Elapsed time:  \t %d days; %d:%d:%d times",
              shift_time/SECINDAY, shift_time%SECINDAY/SECINHOUR, shift_time%SECINHOUR/SECINMIN, shift_time%SECINMIN);
-//    mvprintw(packets.start_y, packets.start_x,"Total packets:  %lu(network)  %lu(to host)  %lu(dropped)", 999, 999 , 999);
 }
 
 void UserGUI::designPlot()
@@ -389,33 +413,22 @@ void UserGUI::thread()
 
         /* Wait up to five seconds. */
         struct timeval tv;
-        tv.tv_sec = 0;
-        tv.tv_usec = refresh_delta;
+        tv.tv_sec = refresh_delta / MSEC;
+        tv.tv_usec = refresh_delta % MSEC;
 
         int sel_rez;
         while (_run.test_and_set())
         {
-            UpRead();
-            uint64_t nfs3_procedure_total_copy(nfs3_procedure_total);
-            uint64_t nfs4_procedure_total_copy(nfs4_procedure_total);
-            uint64_t nfs4_operations_total_copy(nfs4_operations_total);
-            std::vector<int> nfs3_count_copy(nfs3_count);
-            std::vector<int> nfs4_count_copy(nfs4_count);
-            DownRead();
-
-            updatePlot(nfs3_procedure_total_copy, nfs3_count_copy, nfs4_operations_total_copy, nfs4_procedure_total_copy, nfs4_count_copy);
+            updatePlot();
             sel_rez = select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv);
 
             if (sel_rez == -1)
                break;
             else
                 keyboard();
-            tv.tv_usec = refresh_delta;
-            if(enableUpdate)
-            {
-                enableResize();
-                enableUpdate = false;
-            }
+
+            tv.tv_sec = refresh_delta / MSEC;
+            tv.tv_usec = refresh_delta % MSEC;
         }
     } catch(...) {
         DownRead();
