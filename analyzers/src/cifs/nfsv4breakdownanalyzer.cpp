@@ -37,7 +37,7 @@ NFSv4BreakdownAnalyzer::NFSv4Representer::NFSv4Representer(std::ostream& o, Comm
 
 }
 
-void NFSv4BreakdownAnalyzer::NFSv4Representer::onProcedureInfoPrinted(std::ostream &o, const BreakdownCounter& breakdown, unsigned procedure) const
+void NFSv4BreakdownAnalyzer::NFSv4Representer::onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const
 {
     if (procedure == 0)
     {
@@ -407,7 +407,7 @@ void NFSv4BreakdownAnalyzer::StatisticsCompositor::for_each_procedure(std::funct
     }
 }
 
-void NFSv4BreakdownAnalyzer::StatisticsCompositor::for_each_procedure_in_session(const Session &session, std::function<void (const BreakdownCounter &, size_t)> on_procedure) const
+void NFSv4BreakdownAnalyzer::StatisticsCompositor::for_each_procedure_in_session(const Session& session, std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
 {
     auto it = procedures_stats.per_session_statistic.find(session);
     if (it != procedures_stats.per_session_statistic.end())

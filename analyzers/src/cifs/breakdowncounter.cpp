@@ -40,7 +40,7 @@ Latencies& BreakdownCounter::operator[](int index)
 
 uint64_t BreakdownCounter::get_total_count() const
 {
-    return std::accumulate(std::begin(latencies), std::end(latencies), 0, [](int sum, const NST::breakdown::Latencies& latency)
+    return std::accumulate(std::begin(latencies), std::end(latencies), 0, [](int sum, const NST::breakdown::Latencies & latency)
     {
         return sum + latency.get_count();
     });
