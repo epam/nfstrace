@@ -22,6 +22,7 @@
 #ifndef STATISTIC_H
 #define STATISTIC_H
 //------------------------------------------------------------------------------
+#include <functional>
 #include <map>
 
 #include <api/plugin_api.h>
@@ -51,6 +52,12 @@ struct Statistic
     BreakdownCounter counter;//!< Statistics for all sessions
     PerSessionStatistics per_session_statistic;//!< Statistics for each session
     Statistic(size_t proc_types_count);
+
+    virtual void for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const;
+
+    void for_each_session(std::function<void(const Session&)> on_session) const;
+
+    virtual void for_each_procedure_in_session(const Session& session, std::function<void(const BreakdownCounter&, size_t)> on_procedure) const;
 
     /*!
      * Saves statistic on commands receive

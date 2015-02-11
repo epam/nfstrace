@@ -42,13 +42,11 @@ class Representer
     size_t space_for_cmd_name;
 
     void store_per_session(std::ostream& file,
-                           const BreakdownCounter& breakdown,
-                           const std::string& session,
-                           uint64_t s_total_proc) const;
+                           const Statistic &statistic,
+                           const Session &session,
+                           const std::string &ssession) const;
 
-    void print_per_session(const BreakdownCounter& breakdown,
-                           const std::string& session,
-                           uint64_t s_total_proc) const;
+    void print_per_session(const Statistic& statistic, const Session& session, const std::string& ssession) const;
 protected:
     /**
      * @brief handler of one procedure output event

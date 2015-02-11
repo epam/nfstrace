@@ -44,6 +44,19 @@ protected:
         NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name);
         void onProcedureInfoPrinted(std::ostream &o, const BreakdownCounter& breakdown, unsigned procedure) const override final;
     };
+
+    /**
+     * @brief Composes 2 statistics: for procedures and functions
+     */
+    class StatisticsCompositor : public Statistic
+    {
+        Statistic& procedures_stats;
+    public:
+        StatisticsCompositor(Statistic& procedures_stats, Statistic& operations_stats);
+        void for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
+        void for_each_procedure_in_session(const Session& session, std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
+    };
+
 private:
     Statistic compound_stats;//!< Statistic
     Statistic stats;//!< Statistic

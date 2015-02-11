@@ -505,5 +505,6 @@ void NFSv41BreakdownAnalyzer::illegal41(const RPCProcedure *proc, const NFS41::I
 void NFSv41BreakdownAnalyzer::flush_statistics()
 {
     NFSv4BreakdownAnalyzer::flush_statistics();
-    representer.flush_statistics(stats);
+    StatisticsCompositor stat(compound_stats, stats);
+    representer.flush_statistics(stat);
 }
