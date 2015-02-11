@@ -19,14 +19,14 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef WATCHANALYZER_H
-#define WATCHANALYZER_H 
+#ifndef WATCH_ANALYZER_H
+#define WATCH_ANALYZER_H
 //------------------------------------------------------------------------------
 #include <atomic>
 #include <condition_variable>
 
 #include <api/plugin_api.h> // include plugin development definitions
-#include "UserGUI.h"
+#include "user_gui.h"
 //------------------------------------------------------------------------------
 class WatchAnalyzer : public IAnalyzer
 {
@@ -118,5 +118,5 @@ private:
     UserGUI gui;
 };
 //------------------------------------------------------------------------------
-#endif //WATCHANALYZER_H
+#endif //WATCH_ANALYZER_H
 //------------------------------------------------------------------------------
