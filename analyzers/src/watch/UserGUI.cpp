@@ -430,9 +430,11 @@ void UserGUI::thread()
             tv.tv_sec = refresh_delta / MSEC;
             tv.tv_usec = refresh_delta % MSEC;
         }
-    } catch(...) {
+    }
+    catch(std::exception& e)
+    {
         DownRead();
-        std::cerr << "Watch plugin Unidentifying exception.";
+        std::cerr << "Watch plugin error: " << e.what();
     }
 }
 void UserGUI::UpRead()
