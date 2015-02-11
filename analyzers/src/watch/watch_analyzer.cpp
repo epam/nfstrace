@@ -29,39 +29,13 @@
 
 #include "watch_analyzer.h"
 //------------------------------------------------------------------------------
-WatchAnalyzer::WatchAnalyzer(const char* /*opts*/)
-: nfs3_proc_total {0}
-, nfs3_proc_count (ProcEnumNFS3::count, 0)
-, nfs4_proc_total {0}
-, nfs4_ops_total  {0}
-, nfs4_proc_count (ProcEnumNFS4::count, 0)
-//, monitor_running {ATOMIC_FLAG_INIT}
-//, refresh_delta   {2000000}
-, max_read        {5}
-, read_counter    {0}
+WatchAnalyzer::WatchAnalyzer(const char* opts)
+: gui {opts}
 {
-//    monitor_running.test_and_set();
-/*
-    if(*opts != '\0') try
-    {
-        refresh_delta = std::stoul(opts);
-    }
-    catch(std::exception& e)
-    {
-        throw std::runtime_error{std::string{"Error in plugin options processing. OPTS: "} + opts + " Error: " + e.what()};
-    }
-*/
-//    monitor_thread = std::thread(&WatchAnalyzer::thread, this);
 }
 
 WatchAnalyzer::~WatchAnalyzer()
 {
-/*    if (monitor_thread.joinable())
-    {
-        monitor_running.clear();
-        monitor_thread.join();
-    }
-*/
 }
 
 void WatchAnalyzer::null(const RPCProcedure* proc,
@@ -146,7 +120,6 @@ void WatchAnalyzer::on_unix_signal(int signo)
 {
     if (signo == SIGWINCH) {
         gui.enableUpdate = true;
-        gui.enableResize();
     }
 }
 
@@ -156,10 +129,12 @@ void WatchAnalyzer::account(const RPCProcedure* proc,
     const u_int nfs_proc = proc->call.ru.RM_cmb.cb_proc;
     const u_int nfs_vers = proc->call.ru.RM_cmb.cb_vers;
 
-    for(uint16_t i = 0; i < max_read; i++)
-    {
-        UpRead();
-    }
+    uint64_t nfs3_proc_total = {0};
+    std::vector<int> nfs3_proc_count (ProcEnumNFS3::count, 0);
+
+    uint64_t nfs4_proc_total = {0};
+    uint64_t nfs4_ops_total = {0};
+    std::vector<int> nfs4_proc_count (ProcEnumNFS4::count, 0);
     if(nfs_vers == NFS_V4)
     {
         ++nfs4_proc_total;
@@ -184,77 +159,9 @@ void WatchAnalyzer::account(const RPCProcedure* proc,
         ++nfs3_proc_total;
         ++nfs3_proc_count[nfs_proc];
     }
-    for(uint16_t i = 0; i < max_read; i++)
-    {
-        DownRead();
-    }
-    gui.updatePlot(nfs3_proc_total, nfs3_proc_count, nfs4_ops_total, nfs4_proc_total, nfs4_proc_count);
+
+    gui.updateCounters(nfs3_proc_total, nfs3_proc_count, nfs4_proc_total, nfs4_ops_total, nfs4_proc_count);
 }
-
-void WatchAnalyzer::UpRead()
-{
-    std::unique_lock<std::mutex> lck(mut);
-    cv.wait(lck,[this](){ return read_counter < max_read;});
-    read_counter++;
-}
-
-void WatchAnalyzer::DownRead()
-{
-    std::unique_lock<std::mutex> lck(mut);
-    cv.wait(lck,[this](){ return read_counter > 0;});
-    read_counter--;
-}
-
-//----------------------------------------------------------------------------
-/*
-inline void WatchAnalyzer::thread()
-{
-    try
-    {
-        // prepare for select
-        fd_set rfds;
-
-//      Watch stdin (fd 0) to see when it has input.
-        FD_ZERO(&rfds);
-        FD_SET(STDIN_FILENO, &rfds);
-
-//         Wait up to five seconds.
-        struct timeval tv;
-        tv.tv_sec = 0;
-        tv.tv_usec = refresh_delta;
-
-        int sel_rez;
-        Plotter pl;
-        while (monitor_running.test_and_set())
-        {
-            UpRead();
-            uint64_t nfs3_proc_total_copy(nfs3_proc_total);
-            uint64_t nfs4_proc_total_copy(nfs4_ops_total);
-            uint64_t nfs4_oper_total_copy(nfs4_proc_total);
-            std::vector<int> nfs3_count_copy(nfs3_proc_count);
-            std::vector<int> nfs4_count_copy(nfs4_proc_count);
-            DownRead();
-
-            pl.updatePlot(nfs3_proc_total_copy, nfs3_count_copy, nfs4_oper_total_copy, nfs4_proc_total_copy, nfs4_count_copy);
-            sel_rez = select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv);
-
-            if (sel_rez == -1)
-               break;
-            else
-                pl.keyboard();
-            tv.tv_usec = refresh_delta;
-            if(enable_update)
-            {
-                pl.enableResize();
-                enable_update = false;
-            }
-        }
-    } catch(...) {
-        DownRead();
-        std::cerr << "Watch plugin Unidentifying exception.";
-    }
-}
-*/
 //------------------------------------------------------------------------------
 extern "C"
 {

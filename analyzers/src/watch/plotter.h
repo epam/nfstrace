@@ -47,20 +47,20 @@ struct operation_data
 class UserGUI
 {
 public:
-    UserGUI();
+    UserGUI(const char *);
     virtual ~UserGUI();
-    void updatePlot(const uint64_t &nfs3_total, const std::vector<int> &nfs3_pr_count,
-                    const uint64_t &nfs4_ops_total, const uint64_t &nfs4_pr_total,
-                    const std::vector<int> &nfs4_pr_count);
-
+    void updatePlot();
+    void updateCounters(const uint64_t &nfs3_total, const std::vector<int> &nfs3_pr_count,
+                        const uint64_t &nfs4_ops_total, const uint64_t &nfs4_pr_total,
+                        const std::vector<int> &nfs4_pr_count);
     uint16_t inputData();
-    void enableResize();
     void keyboard();
 
     const static time_t start_time;
     const static uint32_t SECINMIN;
     const static uint32_t SECINHOUR;
     const static uint32_t SECINDAY;
+    const static uint32_t MSEC;
 
     std::atomic<bool> enableUpdate;
 
@@ -71,21 +71,17 @@ private:
     void initPlot();
     void updateAll();
     void thread();
-
-    int resize;
-
     void UpRead();
     void DownRead();
+
     std::condition_variable cv;
     std::mutex mut;
-
     std::vector<WINDOW*> all_windows;
     std::thread gui_thread;
 
     uint16_t scroll_shift;
     uint16_t x_max;
     uint16_t y_max;
-
     uint16_t column_shift;
 
     std::atomic_flag _run;
@@ -95,10 +91,10 @@ private:
     uint64_t nfs4_procedure_total;
     uint64_t nfs4_operations_total;
     std::vector<int> nfs4_count;
+
     long int refresh_delta;
     const uint16_t max_read;
     std::atomic<uint16_t> read_counter;
-
 };
 //------------------------------------------------------------------------------
 #endif // UserGUI_H
