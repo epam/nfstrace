@@ -316,9 +316,9 @@ protected:
         // Setting up analyzer (NFSv4.0 procedures)
         for (int i = 0; i < NfsV40NullProcsAmount; ++i)
         {
-            analyzer->null(static_cast<const RPCProcedure*>(nullptr),
-                           static_cast<const struct NFS4::NULL4args*>(nullptr),
-                           static_cast<const struct NFS4::NULL4res*>(nullptr));
+            analyzer->null4(static_cast<const RPCProcedure*>(nullptr),
+                            static_cast<const struct NFS4::NULL4args*>(nullptr),
+                            static_cast<const struct NFS4::NULL4res*>(nullptr));
         }
         for (int i = 0; i < NfsV40CompoundProcsAmount; ++i)
         {

@@ -871,9 +871,9 @@ void PrintAnalyzer::commit3(const RPCProcedure*             proc,
 // 4th line - <tabulation>related RPC procedure-specific results
 // 5rd line - <tabulation>related NFSv4-operations
 
-void PrintAnalyzer::null(const RPCProcedure* proc,
-                         const struct NFS4::NULL4args*,
-                         const struct NFS4::NULL4res*)
+void PrintAnalyzer::null4(const RPCProcedure* proc,
+                          const struct NFS4::NULL4args*,
+                          const struct NFS4::NULL4res*)
 {
     if(!print_procedure(out, proc)) return;
 

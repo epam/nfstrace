@@ -173,7 +173,7 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
                 switch(procedure)
                 {
                 case ProcEnumNFS4::NFS_NULL:
-                    return analyzers(&IAnalyzer::INFSv4rpcgen::null, NFSPROC4RPCGEN_NULL {c,r,s});
+                    return analyzers(&IAnalyzer::INFSv4rpcgen::null4, NFSPROC4RPCGEN_NULL {c,r,s});
                 case ProcEnumNFS4::COMPOUND:
                     {
                     NFSPROC4RPCGEN_COMPOUND compound {c,r,s};
