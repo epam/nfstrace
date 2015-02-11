@@ -27,7 +27,7 @@
 
 #include "latencies.h"
 //------------------------------------------------------------------------------
-/*! Counts and keeps breakdown statistic for session
+/*! Counts and keeps breakdown statistics for session
  */
 class BreakdownCounter
 {
@@ -36,16 +36,16 @@ public:
     ~BreakdownCounter();
 
     /*!
-     * \brief operator [] returns statistic by index (command number)
+     * \brief operator [] returns statistics by index (command number)
      * \param index - command number
-     * \return statistic
+     * \return statistics
      */
     const NST::breakdown::Latencies operator[](int index) const;
 
     /*!
-     * \brief operator [] returns statistic by index (command number)
+     * \brief operator [] returns statistics by index (command number)
      * \param index - command number
-     * \return statistic
+     * \return statistics
      */
     NST::breakdown::Latencies& operator[](int index);
 
@@ -61,10 +61,10 @@ private:
 };
 
 /*!
- * Saves statistic on commands receive
+ * Saves statistics on commands receive
  * \param proc - command
  * \param cmd_code - commands code
- * \param stats - statistic
+ * \param stats - statistics
  */
 template<typename Cmd, typename Code, typename Stats>
 void account(const Cmd* proc, Code cmd_code, Stats& stats)
@@ -77,10 +77,10 @@ void account(const Cmd* proc, Code cmd_code, Stats& stats)
     ++stats.procedures_total_count;
     ++stats.procedures_count[static_cast<int>(cmd_code)];
 
-    auto i = stats.per_procedure_statistic.find(*proc->session);
-    if (i == stats.per_procedure_statistic.end())
+    auto i = stats.per_procedure_statistics.find(*proc->session);
+    if (i == stats.per_procedure_statistics.end())
     {
-        auto session_res = stats.per_procedure_statistic.emplace(*proc->session, BreakdownCounter {});
+        auto session_res = stats.per_procedure_statistics.emplace(*proc->session, BreakdownCounter {});
         if (session_res.second == false)
         {
             return;

@@ -33,16 +33,16 @@ NST::breakdown::Representer::Representer(std::ostream& o, NST::breakdown::Comman
 {
 }
 
-void Representer::flush_statistics(const Statistic& statistic)
+void Representer::flush_statistics(const Statistics& statistics)
 {
     out << "###  Breakdown analyzer  ###"
         << std::endl
         << "CIFS total procedures: "
-        << statistic.procedures_total_count
+        << statistics.procedures_total_count
         << ". Per procedure:"
         << std::endl;
 
-    for (const auto& procedure : statistic.procedures_count)
+    for (const auto& procedure : statistics.procedures_count)
     {
         //FIXME: Sync primitives to be used
         out.width(12);
@@ -54,18 +54,18 @@ void Representer::flush_statistics(const Statistic& statistic)
         out.width(7);
         out.setf(std::ios::fixed, std::ios::floatfield);
         out.precision(2);
-        out << (statistic.procedures_total_count ? ((1.0 * procedure.second / statistic.procedures_total_count) * 100.0) : 0);
+        out << (statistics.procedures_total_count ? ((1.0 * procedure.second / statistics.procedures_total_count) * 100.0) : 0);
         out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
         out << '%' << std::endl;
     };
 
-    if (statistic.per_procedure_statistic.size())  // is not empty?
+    if (statistics.per_procedure_statistics.size())  // is not empty?
     {
         out << "Per connection info: " << std::endl;
 
         std::stringstream session;
 
-        for (auto& it : statistic.per_procedure_statistic)
+        for (auto& it : statistics.per_procedure_statistics)
         {
             const BreakdownCounter& current = it.second;
             uint64_t s_total_proc = current.get_total_count();

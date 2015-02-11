@@ -26,10 +26,7 @@
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 
-Latencies::Latencies()
-    : count {0}
-, avg {}
-, m2 {}
+Latencies::Latencies() : count {0}, avg {}, m2 {}
 {
     timerclear(&min);
     timerclear(&max);
@@ -90,7 +87,7 @@ void Latencies::set_range(const timeval& t)
     }
 }
 
-long double NST::breakdown::to_sec(const timeval &val)
+long double NST::breakdown::to_sec(const timeval& val)
 {
     return (((long double)val.tv_sec) + ((long double)val.tv_usec) / 1000000.0);
 }

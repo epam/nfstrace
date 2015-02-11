@@ -30,11 +30,11 @@ bool Less::operator()(const Session& a, const Session& b) const
            ( ntohs(a.port[1]) < ntohs(b.port[1])                     ) || // compare Destination(server) ports
 
            ( (a.ip_type == Session::IPType::v4) ? // compare IPv4
-                ((ntohl(a.ip.v4.addr[0]) < ntohl(b.ip.v4.addr[0])) || (ntohl(a.ip.v4.addr[1]) < ntohl(b.ip.v4.addr[1])))
+             ((ntohl(a.ip.v4.addr[0]) < ntohl(b.ip.v4.addr[0])) || (ntohl(a.ip.v4.addr[1]) < ntohl(b.ip.v4.addr[1])))
              :
-                (memcmp(&a.ip.v6, &b.ip.v6, sizeof(a.ip.v6)) < 0 )
+             (memcmp(&a.ip.v6, &b.ip.v6, sizeof(a.ip.v6)) < 0 )
            );
 }
 
-Statistic::Statistic() : procedures_total_count {0} {}
+Statistics::Statistics() : procedures_total_count {0} {}
 //------------------------------------------------------------------------------
