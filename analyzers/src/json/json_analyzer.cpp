@@ -479,12 +479,6 @@ void JsonAnalyzer::illegal40(const RPCProcedure* /* proc */,
 // NFS4.1
 // Procedures: 
  
-void JsonAnalyzer::null41(const RPCProcedure* /*proc*/,
-                          const struct NFS41::NULL4args* /*args*/,
-                          const struct NFS41::NULL4res* /*res*/)
-{
-    _nfsV41Stat.nullProcsAmount++;
-}
 void JsonAnalyzer::compound41(const RPCProcedure* /*proc*/,
                               const struct NFS41::COMPOUND4args* /*args*/,
                               const struct NFS41::COMPOUND4res* /*res*/)

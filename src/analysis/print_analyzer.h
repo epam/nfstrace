@@ -231,9 +231,6 @@ public:
 
     void nfs4_operation(const struct NFS4::ILLEGAL4res*               res);
 
-    void null41(const RPCProcedure*          proc,
-              const struct NFS41::NULL4args* args,
-              const struct NFS41::NULL4res*  res) override final;
     void compound41(const RPCProcedure*               proc,
                    const struct NFS41::COMPOUND4args* args,
                    const struct NFS41::COMPOUND4res*  res) override final;
