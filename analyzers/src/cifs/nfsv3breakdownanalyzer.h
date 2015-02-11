@@ -73,8 +73,8 @@ public:
                 const struct NFS3::MKDIR3args*,
                 const struct NFS3::MKDIR3res*) override final;
     void symlink3(const RPCProcedure* proc,
-                 const struct NFS3::SYMLINK3args*,
-                 const struct NFS3::SYMLINK3res*) override final;
+                  const struct NFS3::SYMLINK3args*,
+                  const struct NFS3::SYMLINK3res*) override final;
     void mknod3(const RPCProcedure* proc,
                 const struct NFS3::MKNOD3args*,
                 const struct NFS3::MKNOD3res*) override final;

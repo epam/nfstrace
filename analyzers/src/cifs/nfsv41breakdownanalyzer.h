@@ -41,19 +41,19 @@ public:
     NFSv41BreakdownAnalyzer(std::ostream& o = std::cout);
     // NFSv4.1 procedures
     void null41(const RPCProcedure* proc,
-              const struct NFS41::NULL4args*,
-              const struct NFS41::NULL4res*) override final;
+                const struct NFS41::NULL4args*,
+                const struct NFS41::NULL4res*) override final;
     void compound41(const RPCProcedure*  proc,
-                   const struct NFS41::COMPOUND4args*,
-                   const struct NFS41::COMPOUND4res*) override final;
+                    const struct NFS41::COMPOUND4args*,
+                    const struct NFS41::COMPOUND4res*) override final;
     // NFSv4.1 operations
     void access41(const RPCProcedure* proc,
                   const struct NFS41::ACCESS4args*,
                   const struct NFS41::ACCESS4res* res) override final;
 
     void close41(const RPCProcedure* proc,
-                  const struct NFS41::CLOSE4args*,
-                  const struct NFS41::CLOSE4res* res) override final;
+                 const struct NFS41::CLOSE4args*,
+                 const struct NFS41::CLOSE4res* res) override final;
     void commit41(const RPCProcedure* proc,
                   const struct NFS41::COMMIT4args*,
                   const struct NFS41::COMMIT4res* res) override final;
@@ -189,8 +189,8 @@ public:
                         const struct NFS41::LAYOUTRETURN4args*,
                         const struct NFS41::LAYOUTRETURN4res* res) override final;
     void secinfo_no_name41(const RPCProcedure* proc,
-                              const NFS41::SECINFO_NO_NAME4args*,
-                              const NFS41::SECINFO_NO_NAME4res* res) override final;
+                           const NFS41::SECINFO_NO_NAME4args*,
+                           const NFS41::SECINFO_NO_NAME4res* res) override final;
     void sequence41(const RPCProcedure* proc,
                     const struct NFS41::SEQUENCE4args*,
                     const struct NFS41::SEQUENCE4res* res) override final;
