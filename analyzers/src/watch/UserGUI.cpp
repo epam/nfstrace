@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
 // Description: Header for WatchAnalyzer based on TestAnalyzer.h
-// Copyright (c) 2014 EPAM Systems. All Rights Reserved.
+// Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 #include <api/plugin_api.h>
-#include "plotter.h"
+#include "UserGUI.h"
 //------------------------------------------------------------------------------
 const time_t   UserGUI::start_time = time(NULL);
 const uint32_t UserGUI::SECINMIN   = 60;

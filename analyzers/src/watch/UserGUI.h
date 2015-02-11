@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
 // Description: Header for WatchAnalyzer based on TestAnalyzer.h
-// Copyright (c) 2014 EPAM Systems. All Rights Reserved.
+// Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef PLOTTER_H
-#define PLOTTER_H
+#ifndef USERGUI_H
+#define USERGUI_H
 //------------------------------------------------------------------------------
 #include <atomic>
 #include <cstdlib>
