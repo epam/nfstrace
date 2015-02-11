@@ -152,8 +152,8 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
     const uint32_t major_version {header->vers()};
     uint32_t minor_version {0};
 
-    if(major_version == NFS_V4 &&
-       procedure     == ProcEnumNFS4::COMPOUND)
+    if((major_version == NFS_V4 &&
+       procedure     == ProcEnumNFS4::COMPOUND))
     {
         minor_version = get_nfs4_compound_minor_version(call->data);
     }
@@ -186,7 +186,6 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
             case NFS_V41:
                 switch(procedure)
                 {
-                case ProcEnumNFS41::NFS_NULL: return analyzers(&IAnalyzer::INFSv41rpcgen::null41, NFSPROC41RPCGEN_NULL {c,r,s});
                 case ProcEnumNFS41::COMPOUND:
                     {
                     NFSPROC41RPCGEN_COMPOUND compound {c,r,s};

@@ -431,9 +431,6 @@ public:
 
     // NFSv4.1 procedures
 
-    void null41(const RPCProcedure* proc,
-              const struct NFS41::NULL4args*,
-              const struct NFS41::NULL4res*) override final { account(proc, NFS_V41); }
     void compound41(const RPCProcedure*  proc,
                    const struct NFS41::COMPOUND4args*,
                    const struct NFS41::COMPOUND4res*) override final { account(proc, NFS_V41); }

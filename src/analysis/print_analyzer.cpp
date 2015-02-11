@@ -1742,14 +1742,6 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::ILLEGAL4res* res)
 // 4th line - <tabulation>related RPC procedure-specific results
 // 5rd line - <tabulation>related NFSv4-operations
 
-void PrintAnalyzer::null41(const RPCProcedure* proc,
-                           const struct NFS41::NULL4args*,
-                           const struct NFS41::NULL4res*)
-{
-    if(!print_procedure(out, proc)) return;
-
-    out << "\tCALL  []\n\tREPLY []\n";
-}
 
 void PrintAnalyzer::compound41(const RPCProcedure*                proc,
                                const struct NFS41::COMPOUND4args* args,

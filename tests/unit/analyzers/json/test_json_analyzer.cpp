@@ -595,12 +595,6 @@ protected:
         }
 
         // Setting up analyzer (NFSv4.1 procedures)
-        for (int i = 0; i < NfsV41NullProcsAmount; ++i)
-        {
-            analyzer->null41(static_cast<const RPCProcedure*>(nullptr),
-                             static_cast<const struct NFS41::NULL4args*>(nullptr),
-                             static_cast<const struct NFS41::NULL4res*>(nullptr));
-        }
         for (int i = 0; i < NfsV41CompoundProcsAmount; ++i)
         {
             analyzer->compound41(static_cast<const RPCProcedure*>(nullptr),
@@ -1082,7 +1076,6 @@ TEST_F(JsonAnalyzerCase, collectStatistics)
     EXPECT_EQ(NfsV40illegalOpsAmount, analyzer->getNfsV40Stat().illegalOpsAmount.load());
 
     // NFS 4.1 procedures
-    EXPECT_EQ(NfsV41NullProcsAmount, analyzer->getNfsV41Stat().nullProcsAmount.load());
     EXPECT_EQ(NfsV41CompoundProcsAmount, analyzer->getNfsV41Stat().compoundProcsAmount.load());
 
     // NFS 4.1 operations
@@ -1491,11 +1484,6 @@ TEST_F(JsonAnalyzerCase, requestResponse)
     struct json_object* nfsV41Stat;
     EXPECT_TRUE(json_object_object_get_ex(root, "nfs_v41", &nfsV41Stat));
     EXPECT_NE(nullptr, nfsV41Stat);
-
-    EXPECT_TRUE(json_object_object_get_ex(nfsV41Stat, "null", &val));
-    EXPECT_NE(nullptr, val);
-    EXPECT_EQ(json_type_int, json_object_get_type(val));
-    EXPECT_EQ(NfsV41NullProcsAmount, json_object_get_int64(val));
 
     EXPECT_TRUE(json_object_object_get_ex(nfsV41Stat, "compound", &val));
     EXPECT_NE(nullptr, val);
