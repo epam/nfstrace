@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Statistic structure
+// Description: Statistics structure
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef STATISTIC_H
-#define STATISTIC_H
+#ifndef STATISTICS_H
+#define STATISTICS_H
 //------------------------------------------------------------------------------
 #include <functional>
 #include <map>
@@ -40,9 +40,9 @@ struct Less
     bool operator() (const Session& a, const Session& b) const;
 };
 
-/*! \brief All statistic data
+/*! \brief All statistics data
  */
-struct Statistic
+struct Statistics
 {
     using PerSessionStatistics = std::map<Session, BreakdownCounter, Less>;
     using ProceduresCount = std::vector<int>;
@@ -50,8 +50,8 @@ struct Statistic
     const size_t proc_types_count;//!< Count of types of procedures
 
     BreakdownCounter counter;//!< Statistics for all sessions
-    PerSessionStatistics per_session_statistic;//!< Statistics for each session
-    Statistic(size_t proc_types_count);
+    PerSessionStatistics per_session_statistics;//!< Statistics for each session
+    Statistics(size_t proc_types_count);
 
     virtual void for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const;
 
@@ -60,10 +60,10 @@ struct Statistic
     virtual void for_each_procedure_in_session(const Session& session, std::function<void(const BreakdownCounter&, size_t)> on_procedure) const;
 
     /*!
-     * Saves statistic on commands receive
+     * Saves statistics on commands receive
      * \param proc - command
      * \param cmd_code - commands code
-     * \param stats - statistic
+     * \param stats - statistics
      */
     template<typename Cmd, typename Code>
     void account(const Cmd* proc, Code cmd_code)
@@ -76,10 +76,10 @@ struct Statistic
 
         counter[cmd_index].add(latency);
 
-        auto i = per_session_statistic.find(*proc->session);
-        if (i == per_session_statistic.end())
+        auto i = per_session_statistics.find(*proc->session);
+        if (i == per_session_statistics.end())
         {
-            auto session_res = per_session_statistic.emplace(*proc->session, BreakdownCounter {proc_types_count});
+            auto session_res = per_session_statistics.emplace(*proc->session, BreakdownCounter {proc_types_count});
             if (session_res.second == false)
             {
                 return;
@@ -94,6 +94,6 @@ struct Statistic
 } // breakdown
 } // NST
 //------------------------------------------------------------------------------
-#endif // STATISTIC_H
+#endif // STATISTICS_H
 //------------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Representer of statistic
+// Description: Representer of statistics
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -34,7 +34,7 @@ NST::breakdown::Representer::Representer(std::ostream& o, NST::breakdown::Comman
 {
 }
 
-void Representer::flush_statistics(const Statistic& statistic)
+void Representer::flush_statistics(const Statistics& statistics)
 {
     out << "###  Breakdown analyzer  ###"
         << std::endl
@@ -42,7 +42,7 @@ void Representer::flush_statistics(const Statistic& statistic)
         << " protocol"
         << std::endl;
 
-    statistic.for_each_procedure([&](const BreakdownCounter & breakdown, size_t procedure)
+    statistics.for_each_procedure([&](const BreakdownCounter & breakdown, size_t procedure)
     {
         onProcedureInfoPrinted(out, breakdown, procedure);
         size_t procedure_count = breakdown[procedure].get_count();
@@ -60,27 +60,27 @@ void Representer::flush_statistics(const Statistic& statistic)
         out << '%' << std::endl;
     });
 
-    if (statistic.per_session_statistic.size())  // is not empty?
+    if (statistics.per_session_statistics.size())  // is not empty?
     {
         out << "Per connection info: " << std::endl;
 
-        statistic.for_each_session([&](const Session & session)
+        statistics.for_each_session([&](const Session & session)
         {
             std::stringstream ssession;
             print_session(ssession, session);
-            print_per_session(statistic, session, ssession.str());
+            print_per_session(statistics, session, ssession.str());
             std::ofstream file("breakdown_" + ssession.str() + ".dat", std::ios::out | std::ios::trunc);
-            store_per_session(file, statistic, session, ssession.str());
+            store_per_session(file, statistics, session, ssession.str());
         });
     }
 }
 
-void Representer::store_per_session(std::ostream& file, const Statistic& statistic, const Session& session, const std::string& ssession) const
+void Representer::store_per_session(std::ostream& file, const Statistics& statistics, const Session& session, const std::string& ssession) const
 {
     //TODO: does it make sense to join store_per_session & print_per_session?
     file << "Session: " << ssession << std::endl;
 
-    statistic.for_each_procedure_in_session(session, [&](const BreakdownCounter & breakdown, size_t procedure)
+    statistics.for_each_procedure_in_session(session, [&](const BreakdownCounter & breakdown, size_t procedure)
     {
         uint64_t s_total_proc = breakdown.get_total_count();
         file << cmdRepresenter->command_name(procedure);
@@ -94,11 +94,11 @@ void Representer::store_per_session(std::ostream& file, const Statistic& statist
     });
 }
 
-void Representer::print_per_session(const Statistic& statistic, const Session& session, const std::string& ssession) const
+void Representer::print_per_session(const Statistics& statistics, const Session& session, const std::string& ssession) const
 {
     out << "Session: " << ssession << std::endl;
 
-    statistic.for_each_procedure_in_session(session, [&](const BreakdownCounter & breakdown, size_t procedure)
+    statistics.for_each_procedure_in_session(session, [&](const BreakdownCounter & breakdown, size_t procedure)
     {
         uint64_t s_total_proc = breakdown.get_total_count();
         onProcedureInfoPrinted(out, breakdown, procedure);

@@ -36,8 +36,8 @@ namespace breakdown
  */
 class NFSv3BreakdownAnalyzer : public CIFSv2BreakdownAnalyzer
 {
-    Statistic stats;//!< Statistic
-    Representer representer;//!< Class for statistic representation
+    Statistics stats;//!< Statistics
+    Representer representer;//!< Class for statistics representation
 public:
     NFSv3BreakdownAnalyzer(std::ostream& o = std::cout);
     ~NFSv3BreakdownAnalyzer();

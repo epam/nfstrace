@@ -27,7 +27,7 @@
 
 #include "latencies.h"
 //------------------------------------------------------------------------------
-/*! Counts and keeps breakdown statistic for session
+/*! Counts and keeps breakdown statistics for session
  */
 class BreakdownCounter
 {
@@ -36,16 +36,16 @@ public:
     ~BreakdownCounter();
 
     /*!
-     * \brief operator [] returns statistic by index (command number)
+     * \brief operator [] returns statistics by index (command number)
      * \param index - command number
-     * \return statistic
+     * \return statistics
      */
     const NST::breakdown::Latencies operator[](int index) const;
 
     /*!
-     * \brief operator [] returns statistic by index (command number)
+     * \brief operator [] returns statistics by index (command number)
      * \param index - command number
-     * \return statistic
+     * \return statistics
      */
     NST::breakdown::Latencies& operator[](int index);
 
