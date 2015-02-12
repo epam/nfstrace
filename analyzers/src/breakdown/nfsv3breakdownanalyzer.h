@@ -22,8 +22,9 @@
 #ifndef NFSV3BREAKDOWNANALYZER_H
 #define NFSV3BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
-#include "cifsv2breakdownanalyzer.h"
+#include <api/plugin_api.h>
 
+#include "representer.h"
 #include "statistic.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -34,13 +35,12 @@ namespace breakdown
  * Handles NFS v3 commands
  * Class is not inhereted or reimplement functions: it only extends it!
  */
-class NFSv3BreakdownAnalyzer : public CIFSv2BreakdownAnalyzer
+class NFSv3BreakdownAnalyzer : virtual public IAnalyzer
 {
     Statistics stats;//!< Statistics
     Representer representer;//!< Class for statistics representation
 public:
     NFSv3BreakdownAnalyzer(std::ostream& o = std::cout);
-    ~NFSv3BreakdownAnalyzer();
 
     void null(const RPCProcedure* proc,
               const struct NFS3::NULL3args*,
@@ -116,4 +116,3 @@ public:
 //------------------------------------------------------------------------------
 #endif // NFSV3BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
-

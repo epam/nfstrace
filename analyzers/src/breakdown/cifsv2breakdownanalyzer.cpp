@@ -27,8 +27,7 @@ using namespace NST::breakdown;
 static const size_t space_for_cmd_name = 22;
 //------------------------------------------------------------------------------
 CIFSv2BreakdownAnalyzer::CIFSv2BreakdownAnalyzer(std::ostream& o)
-    : CIFSBreakdownAnalyzer(o)
-    , stats(SMBv2Commands().commands_count())
+    : stats(SMBv2Commands().commands_count())
     , cifs2Representer(o, new SMBv2Commands(), space_for_cmd_name)
 {
 }
@@ -130,7 +129,6 @@ void CIFSv2BreakdownAnalyzer::breakOplockSMBv2(const SMBv2::BreakOpLockCommand* 
 
 void CIFSv2BreakdownAnalyzer::flush_statistics()
 {
-    CIFSBreakdownAnalyzer::flush_statistics();//FIXME: use observer
     cifs2Representer.flush_statistics(stats);
 }
 //------------------------------------------------------------------------------

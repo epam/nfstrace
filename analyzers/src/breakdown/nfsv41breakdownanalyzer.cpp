@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 #include "nfsv41breakdownanalyzer.h"
 #include "nfsv41commands.h"
+#include "statisticscompositor.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
@@ -28,10 +29,9 @@ static const size_t space_for_cmd_name = 22;
 static const size_t count_of_compounds = 2;
 //------------------------------------------------------------------------------
 NFSv41BreakdownAnalyzer::NFSv41BreakdownAnalyzer(std::ostream& o)
-    : NFSv4BreakdownAnalyzer(o)
-    , compound_stats(count_of_compounds)
+    : compound_stats(count_of_compounds)
     , stats(NFSv41Commands().commands_count())
-    , representer(o, new NFSv41Commands(), space_for_cmd_name)
+    , representer(o, new NFSv41Commands(), space_for_cmd_name, count_of_compounds)
 {
 
 }
@@ -504,7 +504,6 @@ void NFSv41BreakdownAnalyzer::illegal41(const RPCProcedure* proc, const NFS41::I
 
 void NFSv41BreakdownAnalyzer::flush_statistics()
 {
-    NFSv4BreakdownAnalyzer::flush_statistics();
     StatisticsCompositor stat(compound_stats, stats);
     representer.flush_statistics(stat);
 }

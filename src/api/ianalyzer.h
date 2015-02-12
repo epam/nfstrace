@@ -39,6 +39,7 @@ namespace API
 class INFSv3rpcgen
 {
 public:
+    virtual ~INFSv3rpcgen() {}
     virtual void null(const RPCProcedure*,
             const struct NFS3::NULL3args*,
             const struct NFS3::NULL3res*) {}
@@ -110,6 +111,7 @@ public:
 class INFSv4rpcgen
 {
 public:
+    virtual ~INFSv4rpcgen() {}
     virtual void null4(const RPCProcedure*,
             const struct NFS4::NULL4args*,
             const struct NFS4::NULL4res*) {}
@@ -231,6 +233,7 @@ public:
 class INFSv41rpcgen
 {
 public:
+    virtual ~INFSv41rpcgen() {}
     virtual void null41(const RPCProcedure*,
             const struct NFS41::NULL4args*,
             const struct NFS41::NULL4res*) {}
@@ -408,6 +411,7 @@ public:
 class ISMBv1
 {
 public:
+    virtual ~ISMBv1() {}
 
     /*! SMBv1 "CreateDirectory" command "on receive" event handler
      * \param cmd - Specified command
@@ -940,6 +944,8 @@ public:
 class ISMBv2
 {
 public:
+    virtual ~ISMBv2() {}
+
     /*! "Close file" command "on receive" event handler
      * \param cmd - Specified command
      * \param arg - arguments for the command
@@ -1077,7 +1083,7 @@ public:
 class IAnalyzer : public INFSv3rpcgen, public INFSv4rpcgen, public INFSv41rpcgen, public ISMBv1, public ISMBv2
 {
 public:
-    virtual ~IAnalyzer() {};
+    virtual ~IAnalyzer() {}
     virtual void flush_statistics() = 0;
     virtual void on_unix_signal(int /*signo*/) {}
 };

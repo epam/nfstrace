@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Represents NFS v4 commands
+// Description: Representer of NFSv4 statistics
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,28 +19,26 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <api/plugin_api.h>
-
-#include "nfsv4commands.h"
+#include "nfsv4representer.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-const char* NST::breakdown::NFSv4Commands::command_description(int cmd_code)
+NFSv4Representer::NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name, size_t count_of_compounds)
+    : Representer(o, cmdRep, space_for_cmd_name), count_of_compounds(count_of_compounds)
 {
-    return print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(cmd_code));
+
 }
 
-const char* NST::breakdown::NFSv4Commands::command_name(int cmd_code)
+void NFSv4Representer::onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const
 {
-    return print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(cmd_code));
-}
-
-size_t NST::breakdown::NFSv4Commands::commands_count()
-{
-    return ProcEnumNFS4::count;
-}
-
-const char* NST::breakdown::NFSv4Commands::protocol_name()
-{
-    return "NFS v4.0";
+    if (procedure == 0)
+    {
+        o << "Total procedures: " << breakdown.get_total_count()
+          << ". Per procedure:"   << std::endl;
+    }
+    if (procedure == count_of_compounds)
+    {
+        o << "Total operations: " << breakdown.get_total_count()
+          << ". Per operation:"   << std::endl;
+    }
 }

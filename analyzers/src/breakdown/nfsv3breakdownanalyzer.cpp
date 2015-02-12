@@ -26,14 +26,8 @@
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 NFSv3BreakdownAnalyzer::NFSv3BreakdownAnalyzer(std::ostream& o)
-    : CIFSv2BreakdownAnalyzer(o)
-    , stats(NFSv3Commands().commands_count())
+    : stats(NFSv3Commands().commands_count())
     , representer(o, new NFSv3Commands())
-{
-
-}
-
-NFSv3BreakdownAnalyzer::~NFSv3BreakdownAnalyzer()
 {
 
 }
@@ -170,6 +164,5 @@ void NFSv3BreakdownAnalyzer::commit3(const RPCProcedure* proc, const NFS3::COMMI
 
 void NFSv3BreakdownAnalyzer::flush_statistics()
 {
-    CIFSv2BreakdownAnalyzer::flush_statistics();
     representer.flush_statistics(stats);
 }
