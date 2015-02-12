@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef _SMBv1_COMMANDS_H
-#define _SMBv1_COMMANDS_H
+#ifndef CIFS_COMMANDS_H
+#define CIFS_COMMANDS_H
 //------------------------------------------------------------------------------
 #include <cstdint>
 
@@ -264,5 +264,5 @@ struct NoAndxCmdResultType{} __attribute__ ((__packed__));                      
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//_SMBv1_COMMANDS_H
+#endif//CIFS_COMMANDS_H
 //------------------------------------------------------------------------------
