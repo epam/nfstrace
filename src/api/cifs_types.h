@@ -152,7 +152,6 @@ using FlushCommand = SMBv1::Command<FlushRequest, FlushResponse>;               
 using ReadCommand = SMBv1::Command<ReadRequest, ReadResponse>;                                        //!< Read command
 using WriteCommand = SMBv1::Command<WriteRequest, WriteResponse>;                                     //!< Write command
 using LockCommand = SMBv1::Command<LockRequest, LockResponse>;                                        //!< Lock command
-using CancelResponce = struct {};                                                                     //!< Cancel command's results
 using CancelCommand = SMBv1::Command<CancelRequest, CancelResponce>;                                  //!< Cancel command
 using ChangeNotifyCommand = SMBv1::Command<ChangeNotifyRequest, ChangeNotifyResponse>;                //!< Change Notify command
 using BreakOpLockCommand = SMBv1::Command<OplockAcknowledgment, OplockResponse>;                      //!< Break opportunistic lock command
