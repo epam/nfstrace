@@ -25,8 +25,7 @@
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 CIFSv2BreakdownAnalyzer::CIFSv2BreakdownAnalyzer(std::ostream& o)
-    : CIFSBreakdownAnalyzer(o)
-    , cifs2Representer(o, new SMBv2Commands())
+    : cifs2Representer(o, new SMBv2Commands())
 {
 }
 
@@ -127,7 +126,6 @@ void CIFSv2BreakdownAnalyzer::breakOplockSMBv2(const SMBv2::BreakOpLockCommand* 
 
 void CIFSv2BreakdownAnalyzer::flush_statistics()
 {
-    CIFSBreakdownAnalyzer::flush_statistics();//FIXME: use observer
     cifs2Representer.flush_statistics(smbv2);
 }
 //------------------------------------------------------------------------------

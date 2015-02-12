@@ -21,10 +21,22 @@
 //------------------------------------------------------------------------------
 #include <api/plugin_api.h>
 
+#include "cifsbreakdownanalyzer.h"
 #include "cifsv2breakdownanalyzer.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
+
+class Analyzer : public CIFSBreakdownAnalyzer, public CIFSv2BreakdownAnalyzer
+{
+public:
+
+    void flush_statistics() override final
+    {
+        CIFSBreakdownAnalyzer::flush_statistics();
+        CIFSv2BreakdownAnalyzer::flush_statistics();
+    }
+};
 
 extern "C"
 {
@@ -36,7 +48,7 @@ extern "C"
 
     IAnalyzer* create(const char*)
     {
-        return new CIFSv2BreakdownAnalyzer();
+        return new Analyzer();
     }
 
     void destroy(IAnalyzer* instance)

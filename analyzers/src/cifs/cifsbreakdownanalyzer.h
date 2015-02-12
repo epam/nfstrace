@@ -34,7 +34,7 @@ namespace breakdown
 /*! \class Analyzer for CIFS v1
  * Handles CIFS v1 commands
  */
-class CIFSBreakdownAnalyzer : public IAnalyzer
+class CIFSBreakdownAnalyzer : virtual public IAnalyzer
 {
     Statistics smbv1;//!< Statistic
     Representer representer;//!< Class for statistic representation
@@ -116,6 +116,7 @@ public:
     void writeBulkDataSMBv1(const SMBv1::WriteBulkDataCommand* cmd, const SMBv1::WriteBulkDataArgumentType*, const SMBv1::WriteBulkDataResultType*) override final;
     void invalidSMBv1(const SMBv1::InvalidCommand* cmd, const SMBv1::InvalidArgumentType*, const SMBv1::InvalidResultType*) override final;
     void noAndxCommandSMBv1(const SMBv1::NoAndxCommand* cmd, const SMBv1::NoAndxCmdArgumentType*, const SMBv1::NoAndxCmdResultType*) override final;
+protected:
     void flush_statistics() override;
 };
 } // breakdown
