@@ -1,10 +1,10 @@
 ###  Breakdown analyzer  ###
 CIFS total procedures: 32. Per procedure:
-SMB_COM_TRANSACTION2: Transaction 2 format request/response.    4  12.50%
-SMB_COM_TREE_DISCONNECT: Tree disconnect.    4  12.50%
-SMB_COM_NEGOTIATE: Negotiate protocol dialect.    6  18.75%
-SMB_COM_SESSION_SETUP_ANDX: Session Setup with AndX chaining.   12  37.50%
-SMB_COM_TREE_CONNECT_ANDX: Tree connect with AndX chaining.    6  18.75%
+TRANSACTION2    4  12.50%
+TREE_DISCONNECT    4  12.50%
+NEGOTIATE       6  18.75%
+SESSION_SETUP_ANDX   12  37.50%
+TREE_CONNECT_ANDX    6  18.75%
 Per connection info: 
 Session: 
 Total procedures: 5. Per procedure:
