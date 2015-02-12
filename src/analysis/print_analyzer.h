@@ -35,8 +35,6 @@ namespace NFS3  = NST::API::NFS3;
 namespace NFS4  = NST::API::NFS4;
 namespace NFS41 = NST::API::NFS41;
 
-using SMBv1Commands = NST::API::SMBv1::SMBv1Commands;
-
 class PrintAnalyzer : public IAnalyzer
 {
 public:
