@@ -109,7 +109,6 @@ static constexpr int NfsV40get_dir_delegationOpsAmount = 54;
 static constexpr int NfsV40illegalOpsAmount = 38;
  
 // NFS4.1 procedures:
-static constexpr int NfsV41NullProcsAmount = 81;
 static constexpr int NfsV41CompoundProcsAmount = 18;
 
 // NFS4.1 operations:
