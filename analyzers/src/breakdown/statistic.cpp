@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Statistic structure
+// Description: Statistics structure
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -36,12 +36,12 @@ bool Less::operator()(const Session& a, const Session& b) const
            );
 }
 
-Statistic::Statistic(size_t proc_types_count)
+Statistics::Statistics(size_t proc_types_count)
     : proc_types_count(proc_types_count)
     , counter(proc_types_count)
 {}
 
-void Statistic::for_each_procedure(std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
+void Statistics::for_each_procedure(std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
 {
     for (size_t procedure = 0; procedure < proc_types_count; ++procedure)
     {
@@ -49,17 +49,17 @@ void Statistic::for_each_procedure(std::function<void (const BreakdownCounter&, 
     }
 }
 
-void Statistic::for_each_session(std::function<void (const Session&)> on_session) const
+void Statistics::for_each_session(std::function<void (const Session&)> on_session) const
 {
-    for (auto& it : per_session_statistic)
+    for (auto& it : per_session_statistics)
     {
         on_session(it.first);
     }
 }
 
-void Statistic::for_each_procedure_in_session(const Session& session, std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
+void Statistics::for_each_procedure_in_session(const Session& session, std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
 {
-    const BreakdownCounter& current = per_session_statistic.at(session);
+    const BreakdownCounter& current = per_session_statistics.at(session);
     for (size_t procedure = 0; procedure < proc_types_count; ++procedure)
     {
         on_procedure(current, procedure);

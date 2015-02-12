@@ -34,9 +34,9 @@ namespace breakdown
  */
 class NFSv41BreakdownAnalyzer : public NFSv4BreakdownAnalyzer
 {
-    Statistic compound_stats;//!< Statistic
-    Statistic stats;//!< Statistic
-    NFSv4Representer representer;//!< Class for statistic representation
+    Statistics compound_stats;//!< Statistics
+    Statistics stats;//!< Statistics
+    NFSv4Representer representer;//!< Class for statistics representation
 public:
     NFSv41BreakdownAnalyzer(std::ostream& o = std::cout);
     // NFSv4.1 procedures

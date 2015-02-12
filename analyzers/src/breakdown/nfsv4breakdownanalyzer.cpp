@@ -387,8 +387,8 @@ void NFSv4BreakdownAnalyzer::illegal40(const RPCProcedure* proc, const NFS4::ILL
     }
 }
 
-NFSv4BreakdownAnalyzer::StatisticsCompositor::StatisticsCompositor(Statistic& procedures_stats, Statistic& operations_stats)
-    : Statistic(operations_stats)
+NFSv4BreakdownAnalyzer::StatisticsCompositor::StatisticsCompositor(Statistics& procedures_stats, Statistics& operations_stats)
+    : Statistics(operations_stats)
     , procedures_stats(procedures_stats)
 {}
 
@@ -409,8 +409,8 @@ void NFSv4BreakdownAnalyzer::StatisticsCompositor::for_each_procedure(std::funct
 
 void NFSv4BreakdownAnalyzer::StatisticsCompositor::for_each_procedure_in_session(const Session& session, std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
 {
-    auto it = procedures_stats.per_session_statistic.find(session);
-    if (it != procedures_stats.per_session_statistic.end())
+    auto it = procedures_stats.per_session_statistics.find(session);
+    if (it != procedures_stats.per_session_statistics.end())
     {
         for (size_t procedure = 0; procedure < procedures_stats.proc_types_count; ++procedure)
         {
@@ -426,7 +426,7 @@ void NFSv4BreakdownAnalyzer::StatisticsCompositor::for_each_procedure_in_session
         }
     }
 
-    const BreakdownCounter& current = per_session_statistic.at(session);
+    const BreakdownCounter& current = per_session_statistics.at(session);
     for (size_t procedure = procedures_stats.proc_types_count; procedure < proc_types_count; ++procedure)
     {
         on_procedure(current, procedure);

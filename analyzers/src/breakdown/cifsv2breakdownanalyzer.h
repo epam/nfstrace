@@ -34,8 +34,8 @@ namespace breakdown
  */
 class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
 {
-    Statistic stats;//!< Statistic
-    Representer cifs2Representer;//!< Class for statistic representation
+    Statistics stats;//!< Statistics
+    Representer cifs2Representer;//!< Class for statistics representation
 public:
     CIFSv2BreakdownAnalyzer(std::ostream& o = std::cout);
     void closeFileSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseRequest*, const SMBv2::CloseResponse*) override final;

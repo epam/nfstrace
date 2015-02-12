@@ -40,7 +40,6 @@ public:
     const char* protocol_name();
     size_t commands_count();
 };
-
 } // breakdown
 } // NST
 //------------------------------------------------------------------------------

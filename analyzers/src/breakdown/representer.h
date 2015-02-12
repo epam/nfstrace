@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Representer of statistic
+// Description: Representer of statistics
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -33,7 +33,7 @@ namespace NST
 {
 namespace breakdown
 {
-/*! \class Represents statistic and sends it to screen
+/*! \class Represents statistics and sends it to screen
  */
 class Representer
 {
@@ -42,11 +42,11 @@ class Representer
     size_t space_for_cmd_name;
 
     void store_per_session(std::ostream& file,
-                           const Statistic& statistic,
+                           const Statistics& statistics,
                            const Session& session,
                            const std::string& ssession) const;
 
-    void print_per_session(const Statistic& statistic, const Session& session, const std::string& ssession) const;
+    void print_per_session(const Statistics& statistics, const Session& session, const std::string& ssession) const;
 protected:
     /**
      * @brief handler of one procedure output event
@@ -59,10 +59,10 @@ public:
     Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name = 12);
 
     /*!
-     * \brief flush_statistics outs statistic on screen
-     * \param statistic - statistics data
+     * \brief flush_statistics outs statistics on screen
+     * \param statistics - statistics data
      */
-    void flush_statistics(const Statistic& statistic);
+    void flush_statistics(const Statistics& statistics);
 };
 } // breakdown
 } // NST

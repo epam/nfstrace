@@ -49,18 +49,18 @@ protected:
     /**
      * @brief Composes 2 statistics: for procedures and functions
      */
-    class StatisticsCompositor : public Statistic
+    class StatisticsCompositor : public Statistics
     {
-        Statistic& procedures_stats;
+        Statistics& procedures_stats;
     public:
-        StatisticsCompositor(Statistic& procedures_stats, Statistic& operations_stats);
+        StatisticsCompositor(Statistics& procedures_stats, Statistics& operations_stats);
         void for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
         void for_each_procedure_in_session(const Session& session, std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
     };
 
 private:
-    Statistic compound_stats;//!< Statistic
-    Statistic stats;//!< Statistic
+    Statistics compound_stats;//!< Statistics
+    Statistics stats;//!< Statistics
     NFSv4Representer representer;//!< stream to output
 public:
     NFSv4BreakdownAnalyzer(std::ostream& o = std::cout);

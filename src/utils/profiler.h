@@ -85,7 +85,7 @@ public:
         struct timespec stopTime;
         clock_gettime(CLOCK_REALTIME, &stopTime);
 
-        static Local local(name);// Time of vector initialization is not included into statistic
+        static Local local(name);// Time of vector initialization is not included into statistics
 
         local.values.push_back(stopTime.tv_nsec - startTime.tv_nsec);// Assume, that time < 1 second!
     }

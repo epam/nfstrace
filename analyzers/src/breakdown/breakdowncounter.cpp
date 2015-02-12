@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Statistic counter
+// Description: Statistics counter
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
