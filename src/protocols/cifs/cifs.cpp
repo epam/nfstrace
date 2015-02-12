@@ -19,6 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <assert.h>
+
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFSv1;
@@ -60,26 +62,29 @@ bool MessageHeader::isFlag(const Flags flag) const
 
 const char* NST::protocols::CIFSv1::print_cifs1_procedures(SMBv1Commands cmd_code)
 {
-    static const char * const commandNames[] = {
-      "CREATE_DIRECTORY",       "DELETE_DIRECTORY",         "OPEN",                     "CREATE",
-      "CLOSE",                  "FLUSH","DELETE",           "RENAME",                   "QUERY_INFORMATION",
-      "SET_INFORMATION",        "READ",                     "WRITE",                    "LOCK_BYTE_RANGE",
-      "UNLOCK_BYTE_RANGE",      "CREATE_TEMPORARY",         "CREATE_NEW",               "CHECK_DIRECTORY",
-      "PROCESS_EXIT",           "SEEK",                     "LOCK_AND_READ",            "WRITE_AND_UNLOCK",
-      "READ_RAW",               "READ_MPX",                 "READ_MPX_SECONDARY",       "WRITE_RAW",
-      "WRITE_MPX",              "WRITE_MPX_SECONDARY",      "WRITE_COMPLETE",           "QUERY_SERVER",
-      "SET_INFORMATION2",       "QUERY_INFORMATION2",       "LOCKING_ANDX",             "TRANSACTION",
-      "TRANSACTION_SECONDARY",  "IOCTL",                    "IOCTL_SECONDARY",          "COPY",
-      "MOVE",                   "ECHO",                     "WRITE_AND_CLOSE",          "OPEN_ANDX",
-      "READ_ANDX",              "WRITE_ANDX",               "NEW_FILE_SIZE",            "CLOSE_AND_TREE_DISC",
-      "TRANSACTION2",           "TRANSACTION2_SECONDARY",   "FIND_CLOSE2",              "FIND_NOTIFY_CLOSE",
-      "TREE_CONNECT",           "TREE_DISCONNECT",          "NEGOTIATE",                "SESSION_SETUP_ANDX",
-      "LOGOFF_ANDX",            "TREE_CONNECT_ANDX",        "SECURITY_PACKAGE_ANDX",    "QUERY_INFORMATION_DISK",
-      "SEARCH",                 "FIND",                     "FIND_UNIQUE",              "FIND_CLOSE",
-      "NT_TRANSACT",            "NT_TRANSACT_SECONDARY",    "NT_CREATE_ANDX",           "NT_CANCEL",
-      "NT_RENAME",              "OPEN_PRINT_FILE",          "WRITE_PRINT_FILE",         "CLOSE_PRINT_FILE",
-      "GET_PRINT_QUEUE",        "READ_BULK",                "WRITE_BULK",               "WRITE_BULK_DATA",
-      "INVALID",                "NO_ANDX_COMMAND"
+    assert(cmd_code < SMBv1Commands::CMD_COUNT);
+
+    static const char* const commandNames[] =
+    {
+        "CREATE_DIRECTORY",       "DELETE_DIRECTORY",         "OPEN",                     "CREATE",
+        "CLOSE",                  "FLUSH",                    "DELETE",                   "RENAME",
+        "QUERY_INFORMATION",      "SET_INFORMATION",          "READ",                     "WRITE",
+        "LOCK_BYTE_RANGE",        "UNLOCK_BYTE_RANGE",        "CREATE_TEMPORARY",         "CREATE_NEW",
+        "CHECK_DIRECTORY",        "PROCESS_EXIT",             "SEEK",                     "LOCK_AND_READ",
+        "WRITE_AND_UNLOCK",       "READ_RAW",                 "READ_MPX",                 "READ_MPX_SECONDARY",
+        "WRITE_RAW",              "WRITE_MPX",                "WRITE_MPX_SECONDARY",      "WRITE_COMPLETE",
+        "QUERY_SERVER",           "SET_INFORMATION2",         "QUERY_INFORMATION2",       "LOCKING_ANDX",
+        "TRANSACTION",            "TRANSACTION_SECONDARY",    "IOCTL",                    "IOCTL_SECONDARY",
+        "COPY",                   "MOVE",                     "ECHO",                     "WRITE_AND_CLOSE",
+        "OPEN_ANDX",              "READ_ANDX",                "WRITE_ANDX",               "NEW_FILE_SIZE",
+        "CLOSE_AND_TREE_DISC",    "TRANSACTION2",             "TRANSACTION2_SECONDARY",   "FIND_CLOSE2",
+        "FIND_NOTIFY_CLOSE",      "TREE_CONNECT",             "TREE_DISCONNECT",          "NEGOTIATE",
+        "SESSION_SETUP_ANDX",     "LOGOFF_ANDX",              "TREE_CONNECT_ANDX",        "SECURITY_PACKAGE_ANDX",
+        "QUERY_INFORMATION_DISK", "SEARCH",                   "FIND",                     "FIND_UNIQUE",
+        "FIND_CLOSE",             "NT_TRANSACT",              "NT_TRANSACT_SECONDARY",    "NT_CREATE_ANDX",
+        "NT_CANCEL",              "NT_RENAME",                "OPEN_PRINT_FILE",          "WRITE_PRINT_FILE",
+        "CLOSE_PRINT_FILE",       "GET_PRINT_QUEUE",          "READ_BULK",                "WRITE_BULK",
+        "WRITE_BULK_DATA",        "INVALID",                  "NO_ANDX_COMMAND"
     };
 
     return commandNames[static_cast<int>(cmd_code)];

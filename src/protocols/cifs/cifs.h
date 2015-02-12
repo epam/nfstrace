@@ -224,7 +224,7 @@ extern "C"
 NST_PUBLIC
 const char* print_cifs1_procedures(SMBv1Commands cmd_code);
 
-} // CIFS
+} // CIFSv1
 
 } // protocols
 } // NST
