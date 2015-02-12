@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Represents NFS v4 commands
+// Description: Representer of NFSv4 statistics
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -18,29 +18,30 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 //------------------------------------------------------------------------------
-#include <api/plugin_api.h>
-
-#include "nfsv4commands.h"
+#ifndef NFSV4REPRESENTER_H
+#define NFSV4REPRESENTER_H
 //------------------------------------------------------------------------------
-using namespace NST::breakdown;
+#include "representer.h"
 //------------------------------------------------------------------------------
-const char* NST::breakdown::NFSv4Commands::command_description(int cmd_code)
+namespace NST
 {
-    return print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(cmd_code));
-}
-
-const char* NST::breakdown::NFSv4Commands::command_name(int cmd_code)
+namespace breakdown
 {
-    return print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(cmd_code));
-}
-
-size_t NST::breakdown::NFSv4Commands::commands_count()
+/**
+ * @brief The NFSv4Representer class
+ * Splits output into commands/operations lists for NFS v4.* protocols
+ */
+class NFSv4Representer : public Representer
 {
-    return ProcEnumNFS4::count;
-}
-
-const char* NST::breakdown::NFSv4Commands::protocol_name()
-{
-    return "NFS v4.0";
-}
+    const size_t count_of_compounds;
+public:
+    NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name, size_t count_of_compounds);
+    void onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const override final;
+};
+} // breakdown
+} // NST
+//------------------------------------------------------------------------------
+#endif // NFSV4REPRESENTER_H
+//------------------------------------------------------------------------------

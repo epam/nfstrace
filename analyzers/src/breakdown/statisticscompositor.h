@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Represents NFS v4 commands
+// Description: Statistics compositor
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
@@ -19,28 +19,29 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <api/plugin_api.h>
-
-#include "nfsv4commands.h"
+#ifndef STATISTICSCOMPOSITOR_H
+#define STATISTICSCOMPOSITOR_H
 //------------------------------------------------------------------------------
-using namespace NST::breakdown;
+#include "statistic.h"
 //------------------------------------------------------------------------------
-const char* NST::breakdown::NFSv4Commands::command_description(int cmd_code)
+namespace NST
 {
-    return print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(cmd_code));
-}
+namespace breakdown
+{
+/**
+ * @brief Composes 2 statistics: for procedures and functions
+ */
+class StatisticsCompositor : public Statistics
+{
+    Statistics& procedures_stats;
+public:
+    StatisticsCompositor(Statistics& procedures_stats, Statistics& operations_stats);
+    void for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
+    void for_each_procedure_in_session(const Session& session, std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
+};
+} // breakdown
+} // NST
+//------------------------------------------------------------------------------
+#endif // STATISTICSCOMPOSITOR_H
+//------------------------------------------------------------------------------
 
-const char* NST::breakdown::NFSv4Commands::command_name(int cmd_code)
-{
-    return print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(cmd_code));
-}
-
-size_t NST::breakdown::NFSv4Commands::commands_count()
-{
-    return ProcEnumNFS4::count;
-}
-
-const char* NST::breakdown::NFSv4Commands::protocol_name()
-{
-    return "NFS v4.0";
-}

@@ -22,7 +22,10 @@
 #ifndef NFSV41BREAKDOWNANALYZER_H
 #define NFSV41BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
-#include "nfsv4breakdownanalyzer.h"
+#include <api/plugin_api.h>
+
+#include "nfsv4representer.h"
+#include "statistic.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -32,7 +35,7 @@ namespace breakdown
  * Handles NFS v4.1 commands
  * Class is not inhereted or reimplement functions: it only extends it!
  */
-class NFSv41BreakdownAnalyzer : public NFSv4BreakdownAnalyzer
+class NFSv41BreakdownAnalyzer : virtual public IAnalyzer
 {
     Statistics compound_stats;//!< Statistics
     Statistics stats;//!< Statistics

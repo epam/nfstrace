@@ -22,7 +22,10 @@
 #ifndef CIFSV2BREAKDOWNANALYZER_H
 #define CIFSV2BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
-#include "cifsv1breakdownanalyzer.h"
+#include <api/plugin_api.h>
+
+#include "representer.h"
+#include "statistic.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -32,7 +35,7 @@ namespace breakdown
  * Handles CIFS v2 commands
  * Class is not inhereted or reimplement functions: it only extends it!
  */
-class CIFSv2BreakdownAnalyzer : public CIFSBreakdownAnalyzer
+class CIFSv2BreakdownAnalyzer : virtual public IAnalyzer
 {
     Statistics stats;//!< Statistics
     Representer cifs2Representer;//!< Class for statistics representation
@@ -57,6 +60,7 @@ public:
     void queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd, const SMBv2::QueryInfoRequest*, const SMBv2::QueryInfoResponse*) override final;
     void setInfoSMBv2(const SMBv2::SetInfoCommand* cmd, const SMBv2::SetInfoRequest*, const SMBv2::SetInfoResponse*) override final;
     void breakOplockSMBv2(const SMBv2::BreakOpLockCommand* cmd, const SMBv2::OplockAcknowledgment*, const SMBv2::OplockResponse*) override final;
+protected:
     void flush_statistics() override;
 };
 } // breakdown

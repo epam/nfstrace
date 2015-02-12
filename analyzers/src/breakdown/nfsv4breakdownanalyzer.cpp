@@ -24,43 +24,17 @@
 
 #include "nfsv4breakdownanalyzer.h"
 #include "nfsv4commands.h"
+#include "statisticscompositor.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 static const size_t space_for_cmd_name = 22;
 static const size_t count_of_compounds = 2;
 //------------------------------------------------------------------------------
-
-NFSv4BreakdownAnalyzer::NFSv4Representer::NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name)
-    : Representer(o, cmdRep, space_for_cmd_name)
-{
-
-}
-
-void NFSv4BreakdownAnalyzer::NFSv4Representer::onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const
-{
-    if (procedure == 0)
-    {
-        o << "Total procedures: " << breakdown.get_total_count()
-          << ". Per procedure:"   << std::endl;
-    }
-    if (procedure == count_of_compounds)
-    {
-        o << "Total operations: " << breakdown.get_total_count()
-          << ". Per operation:"   << std::endl;
-    }
-}
-
 NFSv4BreakdownAnalyzer::NFSv4BreakdownAnalyzer(std::ostream& o)
-    : NFSv3BreakdownAnalyzer(o)
-    , compound_stats(count_of_compounds)
+    : compound_stats(count_of_compounds)
     , stats(NFSv4Commands().commands_count())
-    , representer(o, new NFSv4Commands(), space_for_cmd_name)
-{
-
-}
-
-NFSv4BreakdownAnalyzer::~NFSv4BreakdownAnalyzer()
+    , representer(o, new NFSv4Commands(), space_for_cmd_name, count_of_compounds)
 {
 
 }
@@ -387,55 +361,8 @@ void NFSv4BreakdownAnalyzer::illegal40(const RPCProcedure* proc, const NFS4::ILL
     }
 }
 
-NFSv4BreakdownAnalyzer::StatisticsCompositor::StatisticsCompositor(Statistics& procedures_stats, Statistics& operations_stats)
-    : Statistics(operations_stats)
-    , procedures_stats(procedures_stats)
-{}
-
-void NFSv4BreakdownAnalyzer::StatisticsCompositor::for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const
-{
-    assert(procedures_stats.proc_types_count < proc_types_count);
-
-    for (size_t procedure = 0; procedure < procedures_stats.proc_types_count; ++procedure)
-    {
-        on_procedure(procedures_stats.counter, procedure);
-    }
-
-    for (size_t procedure = procedures_stats.proc_types_count; procedure < proc_types_count; ++procedure)
-    {
-        on_procedure(counter, procedure);
-    }
-}
-
-void NFSv4BreakdownAnalyzer::StatisticsCompositor::for_each_procedure_in_session(const Session& session, std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
-{
-    auto it = procedures_stats.per_session_statistics.find(session);
-    if (it != procedures_stats.per_session_statistics.end())
-    {
-        for (size_t procedure = 0; procedure < procedures_stats.proc_types_count; ++procedure)
-        {
-            on_procedure((*it).second, procedure);
-        }
-    }
-    else
-    {
-        BreakdownCounter empty(procedures_stats.proc_types_count);
-        for (size_t procedure = 0; procedure < procedures_stats.proc_types_count; ++procedure)
-        {
-            on_procedure(empty, procedure);
-        }
-    }
-
-    const BreakdownCounter& current = per_session_statistics.at(session);
-    for (size_t procedure = procedures_stats.proc_types_count; procedure < proc_types_count; ++procedure)
-    {
-        on_procedure(current, procedure);
-    }
-}
-
 void NFSv4BreakdownAnalyzer::flush_statistics()
 {
-    NFSv3BreakdownAnalyzer::flush_statistics();
     StatisticsCompositor stat(compound_stats, stats);
     representer.flush_statistics(stat);
 }

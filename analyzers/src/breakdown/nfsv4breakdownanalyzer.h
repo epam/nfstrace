@@ -22,7 +22,10 @@
 #ifndef NFSV4BREAKDOWNANALYZER_H
 #define NFSV4BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
-#include "nfsv3breakdownanalyzer.h"
+#include <api/plugin_api.h>
+
+#include "nfsv4representer.h"
+#include "statistic.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -32,39 +35,15 @@ namespace breakdown
  * Handles NFS v4 commands
  * Class is not inhereted or reimplement functions: it only extends it!
  */
-class NFSv4BreakdownAnalyzer : public NFSv3BreakdownAnalyzer
+class NFSv4BreakdownAnalyzer : virtual public IAnalyzer
 {
 protected:
-    /**
-     * @brief The NFSv4Representer class
-     * Splits output into commands/operations lists
-     */
-    class NFSv4Representer : public Representer
-    {
-    public:
-        NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name);
-        void onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const override final;
-    };
-
-    /**
-     * @brief Composes 2 statistics: for procedures and functions
-     */
-    class StatisticsCompositor : public Statistics
-    {
-        Statistics& procedures_stats;
-    public:
-        StatisticsCompositor(Statistics& procedures_stats, Statistics& operations_stats);
-        void for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
-        void for_each_procedure_in_session(const Session& session, std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
-    };
-
 private:
     Statistics compound_stats;//!< Statistics
     Statistics stats;//!< Statistics
     NFSv4Representer representer;//!< stream to output
 public:
     NFSv4BreakdownAnalyzer(std::ostream& o = std::cout);
-    ~NFSv4BreakdownAnalyzer();
 
     // NFS4.0 procedures
 
