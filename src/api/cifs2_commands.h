@@ -19,9 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef API_SMBv2_COMMANDS_H
-#define API_SMBv2_COMMANDS_H
-//------------------------------------------------------------------------------
+#ifndef API_CIFS2_COMMANDS_H
+#define API_CIFS2_COMMANDS_H
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -1146,5 +1145,5 @@ struct SetInfoResponse
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//API_SMBv2_COMMANDS_H
+#endif//API_CIFS2_COMMANDS_H
 //------------------------------------------------------------------------------
