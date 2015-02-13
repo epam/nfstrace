@@ -27,7 +27,7 @@
 
 #include "commandrepresenter.h"
 #include "breakdowncounter.h"
-#include "statistic.h"
+#include "statistics.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -38,7 +38,7 @@ namespace breakdown
 class Representer
 {
     std::ostream& out;
-    std::unique_ptr<CommandRepresenter> cmdRepresenter;
+    std::unique_ptr<CommandRepresenter> cmd_representer;
     size_t space_for_cmd_name;
 
     void store_per_session(std::ostream& file,
@@ -56,7 +56,13 @@ protected:
      */
     virtual void onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const;
 public:
-    Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name = 12);
+    /**
+     * @brief Representer's constructor
+     * @param o - output stream
+     * @param cmd_representer - command representer
+     * @param space_for_cmd_name - spaces amount in output table (column's wifth)
+     */
+    Representer(std::ostream& o, CommandRepresenter* cmd_representer, size_t space_for_cmd_name = 12);
 
     /*!
      * \brief flush_statistics outs statistics on screen

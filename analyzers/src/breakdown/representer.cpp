@@ -27,9 +27,9 @@
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-NST::breakdown::Representer::Representer(std::ostream& o, NST::breakdown::CommandRepresenter* cmdRep, size_t space_for_cmd_name)
+NST::breakdown::Representer::Representer(std::ostream& o, NST::breakdown::CommandRepresenter* cmd_representer, size_t space_for_cmd_name)
     : out(o)
-    , cmdRepresenter(cmdRep)
+    , cmdRepresenter(cmd_representer)
     , space_for_cmd_name(space_for_cmd_name)
 {
 }

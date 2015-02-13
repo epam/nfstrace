@@ -19,7 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "statistic.h"
+#include "statistics.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
@@ -64,5 +64,24 @@ void Statistics::for_each_procedure_in_session(const Session& session, std::func
     {
         on_procedure(current, procedure);
     }
+}
+
+void Statistics::account(const int cmd_index, const Session &session, const timeval latency)
+{
+    counter[cmd_index].add(latency);
+
+    auto i = per_session_statistics.find(session);
+    if (i == per_session_statistics.end())
+    {
+        auto session_res = per_session_statistics.emplace(session, BreakdownCounter {proc_types_count});
+        if (session_res.second == false)
+        {
+            return;
+        }
+        i = session_res.first;
+    }
+
+    (i->second)[cmd_index].add(latency);
+
 }
 //------------------------------------------------------------------------------
