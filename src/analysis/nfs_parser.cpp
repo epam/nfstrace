@@ -182,12 +182,10 @@ void NFSParser::analyze_nfsv4_procedure(const uint32_t procedure, XDRDecoder& c,
             analyzers(&IAnalyzer::INFSv4rpcgen::null, NFSPROC4RPCGEN_NULL { c, r, s });
             break;
         case ProcEnumNFS4::COMPOUND:
-        {
             NFSPROC4RPCGEN_COMPOUND compound { c, r, s };
             analyzers(&IAnalyzer::INFSv4rpcgen::compound4, compound);
             analyze_nfs40_operations(analyzers, compound);
             break;
-        }
         }
         break;
     case NFS_V41:
