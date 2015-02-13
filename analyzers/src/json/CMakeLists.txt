@@ -13,7 +13,7 @@ if (JSON_FOUND)
             LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/analyzers) # direct output to nfstrace common binary dir
     include_directories (${JSON_INCLUDE_DIRS})
     target_link_libraries (${PROJECT_NAME} ${JSON_LIBRARIES})
-    install (TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
+    install (TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib/nfstrace)
 else ()
     message (WARNING "JSON library not found - JSON analyzer plugin is not available!")
 endif ()
