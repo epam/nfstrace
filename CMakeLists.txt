@@ -119,3 +119,6 @@ if (ASTYLE_PATH)
                                xargs ${ASTYLE_PATH} --options=${CMAKE_SOURCE_DIR}/astyle.cfg
                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif ()
+
+# Runtime analysis reports
+include ("cmake/valgrind.cmake")
