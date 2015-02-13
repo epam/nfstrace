@@ -40,7 +40,7 @@ struct Less
     bool operator() (const Session& a, const Session& b) const;
 };
 
-/*! \brief All statistics data
+/*! \brief All statistics data's container
  */
 struct Statistics
 {
@@ -48,48 +48,54 @@ struct Statistics
     using ProceduresCount = std::vector<int>;
 
     const size_t proc_types_count;//!< Count of types of procedures
-
     BreakdownCounter counter;//!< Statistics for all sessions
     PerSessionStatistics per_session_statistics;//!< Statistics for each session
+
+    /**
+     * @brief Constructor
+     * @param proc_types_count - amount of types of procedures
+     */
     Statistics(size_t proc_types_count);
 
+    /**
+     * @brief iterates by procedures
+     * @param on_procedure - callback
+     */
     virtual void for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const;
 
+    /**
+     * @brief iterates by sessions
+     * @param on_session - callback
+     */
     void for_each_session(std::function<void(const Session&)> on_session) const;
 
+    /**
+     * @brief iterates by procedure in specific session
+     * @param session - specific session
+     * @param on_procedure - callback
+     */
     virtual void for_each_procedure_in_session(const Session& session, std::function<void(const BreakdownCounter&, size_t)> on_procedure) const;
 
-    /*!
+    /**
      * Saves statistics on commands receive
-     * \param proc - command
-     * \param cmd_code - commands code
-     * \param stats - statistics
+     * @param proc - command
+     * @param cmd_code - commands code
+     * @param stats - statistics
      */
     template<typename Cmd, typename Code>
     void account(const Cmd* proc, Code cmd_code)
     {
         timeval latency {0, 0};
         const int cmd_index = static_cast<int>(cmd_code);
+        const Session& session = *proc->session;
 
         // diff between 'reply' and 'call' timestamps
         timersub(proc->rtimestamp, proc->ctimestamp, &latency);
 
-        counter[cmd_index].add(latency);
-
-        auto i = per_session_statistics.find(*proc->session);
-        if (i == per_session_statistics.end())
-        {
-            auto session_res = per_session_statistics.emplace(*proc->session, BreakdownCounter {proc_types_count});
-            if (session_res.second == false)
-            {
-                return;
-            }
-            i = session_res.first;
-        }
-
-        (i->second)[cmd_index].add(latency);
+        account(cmd_index, session, latency);
     }
-
+protected:
+    void account(const int cmd_index, const Session& session, const timeval latency);
 };
 } // breakdown
 } // NST

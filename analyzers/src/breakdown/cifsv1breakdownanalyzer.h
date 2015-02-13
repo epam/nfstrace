@@ -25,7 +25,7 @@
 #include <api/plugin_api.h>
 
 #include "representer.h"
-#include "statistic.h"
+#include "statistics.h"
 //------------------------------------------------------------------------------
 namespace NST
 {

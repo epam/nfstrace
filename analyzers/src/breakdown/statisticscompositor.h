@@ -22,7 +22,7 @@
 #ifndef STATISTICSCOMPOSITOR_H
 #define STATISTICSCOMPOSITOR_H
 //------------------------------------------------------------------------------
-#include "statistic.h"
+#include "statistics.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -30,6 +30,7 @@ namespace breakdown
 {
 /**
  * @brief Composes 2 statistics: for procedures and functions
+ * It is useful for NFS v4.* protocols
  */
 class StatisticsCompositor : public Statistics
 {
@@ -44,4 +45,3 @@ public:
 //------------------------------------------------------------------------------
 #endif // STATISTICSCOMPOSITOR_H
 //------------------------------------------------------------------------------
-
