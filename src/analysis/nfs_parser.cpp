@@ -99,7 +99,7 @@ bool NFSParser::parse_data(FilteredDataQueue::Ptr& ptr)
 // They're supposed to be used inside analyze_nfs_procedure only
 // ----------------------------------------------------------------------------
 
-static uint32_t get_nfs4_compound_minor_version(const std::uint8_t* rpc_nfs4_call);
+static uint32_t get_nfs4_compound_minor_version(const uint32_t procedure, const std::uint8_t* rpc_nfs4_call);
 
 using NFS40CompoundType = NST::protocols::NFS4::NFSPROC4RPCGEN_COMPOUND;
 using NFS41CompoundType = NST::protocols::NFS41::NFSPROC41RPCGEN_COMPOUND;
@@ -150,13 +150,6 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
     auto header = reinterpret_cast<const CallHeader*>(call->data);
     const uint32_t procedure     {header->proc()};
     const uint32_t major_version {header->vers()};
-    uint32_t minor_version {0};
-
-    if((major_version == NFS_V4 &&
-       procedure     == ProcEnumNFS4::COMPOUND))
-    {
-        minor_version = get_nfs4_compound_minor_version(call->data);
-    }
 
     try
     {
@@ -167,7 +160,8 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
         switch(major_version)
         {
         case NFS_V4:
-            switch(minor_version)
+        {
+            switch(get_nfs4_compound_minor_version(procedure, c.data().data))
             {
             case NFS_V40:
                 switch(procedure)
@@ -184,18 +178,15 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
                 }
             break;
             case NFS_V41:
-                switch(procedure)
+                if(ProcEnumNFS41::COMPOUND == procedure)
                 {
-                case ProcEnumNFS41::COMPOUND:
-                    {
                     NFSPROC41RPCGEN_COMPOUND compound {c,r,s};
                     analyzers(&IAnalyzer::INFSv41rpcgen::compound41, compound);
                     analyze_nfs41_operations(analyzers, compound);
-                    break;
-                    }
                 }
             break;
             }
+        }
         break;
         case NFS_V3:
             switch(procedure)
@@ -251,8 +242,10 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
 * minor version ONLY in call COMPOUND(1) procedure.
 * That's why only call can be passed here.
 */
-static uint32_t get_nfs4_compound_minor_version(const std::uint8_t* rpc_nfs4_call)
+static uint32_t get_nfs4_compound_minor_version(const uint32_t procedure, const std::uint8_t* rpc_nfs4_call)
 {
+    if(ProcEnumNFS4::COMPOUND != procedure)
+        return 0;
     // get initial data
     auto* it = rpc_nfs4_call;
 
