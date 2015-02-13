@@ -221,7 +221,7 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
         case NFS_V3:
             analyze_nfsv3_procedure(procedure, std::move(call), std::move(reply), s, this->analyzers);
             break;
-       }
+        }
     }
     catch(XDRDecoderError& e)
     {
