@@ -138,7 +138,7 @@ void nfs4_ops_switch(Analyzers& analyzers,
 
 // ----------------------------------------------------------------------------
 
-void NFSParser::analyze_nfsv3_procedure(const uint32_t procedure, XDRDecoder& c, XDRDecoder& r, const Session* s)
+static inline void analyze_nfsv3_procedure(const uint32_t procedure, XDRDecoder&& c, XDRDecoder&& r, const Session* s, Analyzers& analyzers)
 {
     using namespace NST::protocols::NFS3;
     switch(procedure)
@@ -168,7 +168,7 @@ void NFSParser::analyze_nfsv3_procedure(const uint32_t procedure, XDRDecoder& c,
     }
 }
 
-void NFSParser::analyze_nfsv4_procedure(const uint32_t procedure, XDRDecoder& c, XDRDecoder& r, const Session* s)
+static inline void analyze_nfsv4_procedure(const uint32_t procedure, XDRDecoder&& c, XDRDecoder&& r, const Session* s, Analyzers& analyzers)
 {
     using namespace NST::protocols::NFS4;
     using namespace NST::protocols::NFS41;
@@ -211,18 +211,16 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
 
     try
     {
-        XDRDecoder c {std::move(call) };
-        XDRDecoder r {std::move(reply)};
-        const Session* s {session->get_session()};
+        const Session* s { session->get_session() };
 
-        switch(major_version)
+        switch (major_version)
         {
         case NFS_V4:
-            analyze_nfsv4_procedure(procedure, c, r, s);
-        break;
+            analyze_nfsv4_procedure(procedure, std::move(call), std::move(reply), s, this->analyzers);
+            break;
         case NFS_V3:
-            analyze_nfsv3_procedure(procedure, c, r, s);
-        break;
+            analyze_nfsv3_procedure(procedure, std::move(call), std::move(reply), s, this->analyzers);
+            break;
        }
     }
     catch(XDRDecoderError& e)
@@ -252,8 +250,10 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
 */
 static uint32_t get_nfs4_compound_minor_version(const uint32_t procedure, const std::uint8_t* rpc_nfs4_call)
 {
-    if(ProcEnumNFS4::COMPOUND != procedure)
+    if (ProcEnumNFS4::COMPOUND != procedure)
+    {
         return 0;
+    }
     // get initial data
     auto* it = rpc_nfs4_call;
 
