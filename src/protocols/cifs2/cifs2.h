@@ -129,44 +129,50 @@ struct MessageHeader : public RawMessageHeader
  */
 const MessageHeader* get_header(const uint8_t* data);
 
+/*! Group of template specialization for converting representation
+ *  if field's bytes from network to host.
+ * (independent of type of architecture little endian or big endian)
+ *
+ * \param - reference to an object whose fields will be converted
+ */
 template<typename ParamType> inline void parse(ParamType&) {}
-template<>inline void parse(SMBv2::ErrResponse& ) {}
-template<>inline void parse(SMBv2::NegotiateRequest& ) {}
-template<>inline void parse(SMBv2::NegotiateResponse& ) {}
-template<>inline void parse(SMBv2::SessionSetupRequest& ) {}
-template<>inline void parse(SMBv2::SessionSetupResponse& ) {}
-template<>inline void parse(SMBv2::LogOffRequest& ) {}
-template<>inline void parse(SMBv2::LogOffResponse& ) {}
-template<>inline void parse(SMBv2::TreeConnectRequest& ) {}
-template<>inline void parse(SMBv2::TreeConnectResponse& ) {}
-template<>inline void parse(SMBv2::TreeDisconnectRequest& ) {}
-template<>inline void parse(SMBv2::TreeDisconnectResponse& ) {}
-template<>inline void parse(SMBv2::CreateRequest& ) {}
-template<>inline void parse(SMBv2::CreateResponse& ) {}
-template<>inline void parse(SMBv2::CloseRequest& ) {}
-template<>inline void parse(SMBv2::CloseResponse& ) {}
-template<>inline void parse(SMBv2::EchoRequest& ) {}
-template<>inline void parse(SMBv2::EchoResponse& ) {}
-template<>inline void parse(SMBv2::QueryInfoRequest& ) {}
-template<>inline void parse(SMBv2::QueryInfoResponse& ) {}
-template<>inline void parse(SMBv2::QueryDirRequest& ) {}
-template<>inline void parse(SMBv2::QueryDirResponse& ) {}
-template<>inline void parse(SMBv2::FlushRequest& ) {}
-template<>inline void parse(SMBv2::FlushResponse& ) {}
-template<>inline void parse(SMBv2::ReadRequest& ) {}
-template<>inline void parse(SMBv2::ReadResponse& ) {}
-template<>inline void parse(SMBv2::WriteRequest& ) {}
-template<>inline void parse(SMBv2::WriteResponse& ) {}
-template<>inline void parse(SMBv2::LockRequest& ) {}
-template<>inline void parse(SMBv2::LockResponse& ) {}
-template<>inline void parse(SMBv2::CancelRequest& ) {}
-template<>inline void parse(SMBv2::ChangeNotifyRequest& ) {}
-template<>inline void parse(SMBv2::ChangeNotifyResponse& ) {}
-template<>inline void parse(SMBv2::OplockResponse& ) {}
-template<>inline void parse(SMBv2::IoCtlRequest& ) {}
-template<>inline void parse(SMBv2::IoCtlResponse& ) {}
-template<>inline void parse(SMBv2::SetInfoRequest& ) {}
-template<>inline void parse(SMBv2::SetInfoResponse& ) {}
+template<> void parse(SMBv2::ErrResponse& );
+template<> void parse(SMBv2::NegotiateRequest& );
+template<> void parse(SMBv2::NegotiateResponse& );
+template<> void parse(SMBv2::SessionSetupRequest& );
+template<> void parse(SMBv2::SessionSetupResponse& );
+template<> void parse(SMBv2::LogOffRequest& );
+template<> void parse(SMBv2::LogOffResponse& );
+template<> void parse(SMBv2::TreeConnectRequest& );
+template<> void parse(SMBv2::TreeConnectResponse& );
+template<> void parse(SMBv2::TreeDisconnectRequest& );
+template<> void parse(SMBv2::TreeDisconnectResponse& );
+template<> void parse(SMBv2::CreateRequest& );
+template<> void parse(SMBv2::CreateResponse& );
+template<> void parse(SMBv2::CloseRequest& );
+template<> void parse(SMBv2::CloseResponse& );
+template<> void parse(SMBv2::EchoRequest& );
+template<> void parse(SMBv2::EchoResponse& );
+template<> void parse(SMBv2::QueryInfoRequest& );
+template<> void parse(SMBv2::QueryInfoResponse& );
+template<> void parse(SMBv2::QueryDirRequest& );
+template<> void parse(SMBv2::QueryDirResponse& );
+template<> void parse(SMBv2::FlushRequest& );
+template<> void parse(SMBv2::FlushResponse& );
+template<> void parse(SMBv2::ReadRequest& );
+template<> void parse(SMBv2::ReadResponse& );
+template<> void parse(SMBv2::WriteRequest& );
+template<> void parse(SMBv2::WriteResponse& );
+template<> void parse(SMBv2::LockRequest& );
+template<> void parse(SMBv2::LockResponse& );
+template<> void parse(SMBv2::CancelRequest& );
+template<> void parse(SMBv2::ChangeNotifyRequest& );
+template<> void parse(SMBv2::ChangeNotifyResponse& );
+template<> void parse(SMBv2::OplockResponse& );
+template<> void parse(SMBv2::IoCtlRequest& );
+template<> void parse(SMBv2::IoCtlResponse& );
+template<> void parse(SMBv2::SetInfoRequest& );
+template<> void parse(SMBv2::SetInfoResponse& );
 
 /*! Constructs new command for API from raw message
  * \param request - Call's

@@ -59,3 +59,152 @@ bool MessageHeader::isFlag(const Flags flag) const
 {
     return static_cast<uint32_t>(flag) & flags;
 }
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ErrResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::NegotiateRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::NegotiateResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::SessionSetupRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::SessionSetupResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::LogOffRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::LogOffResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeConnectRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeConnectResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeDisconnectRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeDisconnectResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::CreateRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::CreateResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::CloseRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::CloseResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::EchoRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::EchoResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryInfoRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryInfoResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryDirRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryDirResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::FlushRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::FlushResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::WriteRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::WriteResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::LockRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::LockResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::CancelRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ChangeNotifyRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ChangeNotifyResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::OplockResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::IoCtlRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::IoCtlResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::SetInfoRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::SetInfoResponse& )
+{
+}
+
