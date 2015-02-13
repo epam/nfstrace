@@ -235,4 +235,5 @@ void JsonTcpService::Task::execute()
     }
     LOG("INFO: Serving of client has been completed");
 }
+
 //------------------------------------------------------------------------------

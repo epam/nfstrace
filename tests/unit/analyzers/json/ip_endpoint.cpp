@@ -24,9 +24,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "net/ip_endpoint.h"
+#include "ip_endpoint.h"
 //------------------------------------------------------------------------------
-using namespace NST::net;
 
 static constexpr const char* ValidHost = IpEndpoint::LoopbackAddress;
 static constexpr int ValidPort = 8888;
