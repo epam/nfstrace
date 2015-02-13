@@ -56,7 +56,9 @@ public:
     void analyze_nfs_procedure(FilteredDataQueue::Ptr &&call,
                                FilteredDataQueue::Ptr &&reply,
                                Session* session);
-
+private:
+    void analyze_nfsv3_procedure(const uint32_t procedure, NST::protocols::xdr::XDRDecoder& c, NST::protocols::xdr::XDRDecoder& r, const Session* s);
+    void analyze_nfsv4_procedure(const uint32_t procedure, NST::protocols::xdr::XDRDecoder& c, NST::protocols::xdr::XDRDecoder& r, const Session* s);
 };
 
 } // analysis

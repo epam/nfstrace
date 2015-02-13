@@ -138,18 +138,78 @@ void nfs4_ops_switch(Analyzers& analyzers,
 
 // ----------------------------------------------------------------------------
 
+void NFSParser::analyze_nfsv3_procedure(const uint32_t procedure, XDRDecoder& c, XDRDecoder& r, const Session* s)
+{
+    using namespace NST::protocols::NFS3;
+    switch(procedure)
+    {
+        case ProcEnumNFS3::NFS_NULL:    analyzers(&IAnalyzer::INFSv3rpcgen::null,       NFSPROC3RPCGEN_NULL       {c, r, s}); break;
+        case ProcEnumNFS3::GETATTR:     analyzers(&IAnalyzer::INFSv3rpcgen::getattr3,   NFSPROC3RPCGEN_GETATTR    {c, r, s}); break;
+        case ProcEnumNFS3::SETATTR:     analyzers(&IAnalyzer::INFSv3rpcgen::setattr3,   NFSPROC3RPCGEN_SETATTR    {c, r, s}); break;
+        case ProcEnumNFS3::LOOKUP:      analyzers(&IAnalyzer::INFSv3rpcgen::lookup3,    NFSPROC3RPCGEN_LOOKUP     {c, r, s}); break;
+        case ProcEnumNFS3::ACCESS:      analyzers(&IAnalyzer::INFSv3rpcgen::access3,    NFSPROC3RPCGEN_ACCESS     {c, r, s}); break;
+        case ProcEnumNFS3::READLINK:    analyzers(&IAnalyzer::INFSv3rpcgen::readlink3,  NFSPROC3RPCGEN_READLINK   {c, r, s}); break;
+        case ProcEnumNFS3::READ:        analyzers(&IAnalyzer::INFSv3rpcgen::read3,      NFSPROC3RPCGEN_READ       {c, r, s}); break;
+        case ProcEnumNFS3::WRITE:       analyzers(&IAnalyzer::INFSv3rpcgen::write3,     NFSPROC3RPCGEN_WRITE      {c, r, s}); break;
+        case ProcEnumNFS3::CREATE:      analyzers(&IAnalyzer::INFSv3rpcgen::create3,    NFSPROC3RPCGEN_CREATE     {c, r, s}); break;
+        case ProcEnumNFS3::MKDIR:       analyzers(&IAnalyzer::INFSv3rpcgen::mkdir3,     NFSPROC3RPCGEN_MKDIR      {c, r, s}); break;
+        case ProcEnumNFS3::SYMLINK:     analyzers(&IAnalyzer::INFSv3rpcgen::symlink3,   NFSPROC3RPCGEN_SYMLINK    {c, r, s}); break;
+        case ProcEnumNFS3::MKNOD:       analyzers(&IAnalyzer::INFSv3rpcgen::mknod3,     NFSPROC3RPCGEN_MKNOD      {c, r, s}); break;
+        case ProcEnumNFS3::REMOVE:      analyzers(&IAnalyzer::INFSv3rpcgen::remove3,    NFSPROC3RPCGEN_REMOVE     {c, r, s}); break;
+        case ProcEnumNFS3::RMDIR:       analyzers(&IAnalyzer::INFSv3rpcgen::rmdir3,     NFSPROC3RPCGEN_RMDIR      {c, r, s}); break;
+        case ProcEnumNFS3::RENAME:      analyzers(&IAnalyzer::INFSv3rpcgen::rename3,    NFSPROC3RPCGEN_RENAME     {c, r, s}); break;
+        case ProcEnumNFS3::LINK:        analyzers(&IAnalyzer::INFSv3rpcgen::link3,      NFSPROC3RPCGEN_LINK       {c, r, s}); break;
+        case ProcEnumNFS3::READDIR:     analyzers(&IAnalyzer::INFSv3rpcgen::readdir3,   NFSPROC3RPCGEN_READDIR    {c, r, s}); break;
+        case ProcEnumNFS3::READDIRPLUS: analyzers(&IAnalyzer::INFSv3rpcgen::readdirplus3, NFSPROC3RPCGEN_READDIRPLUS{c, r, s}); break;
+        case ProcEnumNFS3::FSSTAT:      analyzers(&IAnalyzer::INFSv3rpcgen::fsstat3,    NFSPROC3RPCGEN_FSSTAT     {c, r, s}); break;
+        case ProcEnumNFS3::FSINFO:      analyzers(&IAnalyzer::INFSv3rpcgen::fsinfo3,    NFSPROC3RPCGEN_FSINFO     {c, r, s}); break;
+        case ProcEnumNFS3::PATHCONF:    analyzers(&IAnalyzer::INFSv3rpcgen::pathconf3,  NFSPROC3RPCGEN_PATHCONF   {c, r, s}); break;
+        case ProcEnumNFS3::COMMIT:      analyzers(&IAnalyzer::INFSv3rpcgen::commit3,    NFSPROC3RPCGEN_COMMIT     {c, r, s}); break;
+    }
+}
+
+void NFSParser::analyze_nfsv4_procedure(const uint32_t procedure, XDRDecoder& c, XDRDecoder& r, const Session* s)
+{
+    using namespace NST::protocols::NFS4;
+    using namespace NST::protocols::NFS41;
+
+    switch (get_nfs4_compound_minor_version(procedure, c.data().data))
+    {
+    case NFS_V40:
+        switch (procedure)
+        {
+        case ProcEnumNFS4::NFS_NULL:
+            analyzers(&IAnalyzer::INFSv4rpcgen::null, NFSPROC4RPCGEN_NULL { c, r, s });
+            break;
+        case ProcEnumNFS4::COMPOUND:
+        {
+            NFSPROC4RPCGEN_COMPOUND compound { c, r, s };
+            analyzers(&IAnalyzer::INFSv4rpcgen::compound4, compound);
+            analyze_nfs40_operations(analyzers, compound);
+            break;
+        }
+        }
+        break;
+    case NFS_V41:
+        if (ProcEnumNFS41::COMPOUND == procedure)
+        {
+            NFSPROC41RPCGEN_COMPOUND compound { c, r, s };
+            analyzers(&IAnalyzer::INFSv41rpcgen::compound41, compound);
+            analyze_nfs41_operations(analyzers, compound);
+        }
+        break;
+    }
+}
+
 void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
                                        FilteredDataQueue::Ptr&& reply,
                                        Session* session)
 {
     using namespace NST::protocols::rpc;
-    using namespace NST::protocols::NFS3;
-    using namespace NST::protocols::NFS4;
-    using namespace NST::protocols::NFS41;
 
     auto header = reinterpret_cast<const CallHeader*>(call->data);
-    const uint32_t procedure     {header->proc()};
     const uint32_t major_version {header->vers()};
+    const uint32_t procedure {header->proc()};
 
     try
     {
@@ -160,61 +220,11 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
         switch(major_version)
         {
         case NFS_V4:
-        {
-            switch(get_nfs4_compound_minor_version(procedure, c.data().data))
-            {
-            case NFS_V40:
-                switch(procedure)
-                {
-                case ProcEnumNFS4::NFS_NULL:
-                    return analyzers(&IAnalyzer::INFSv4rpcgen::null, NFSPROC4RPCGEN_NULL {c,r,s});
-                case ProcEnumNFS4::COMPOUND:
-                    {
-                    NFSPROC4RPCGEN_COMPOUND compound {c,r,s};
-                    analyzers(&IAnalyzer::INFSv4rpcgen::compound4, compound);
-                    analyze_nfs40_operations(analyzers, compound);
-                    break;
-                    }
-                }
-            break;
-            case NFS_V41:
-                if(ProcEnumNFS41::COMPOUND == procedure)
-                {
-                    NFSPROC41RPCGEN_COMPOUND compound {c,r,s};
-                    analyzers(&IAnalyzer::INFSv41rpcgen::compound41, compound);
-                    analyze_nfs41_operations(analyzers, compound);
-                }
-            break;
-            }
-        }
+            analyze_nfsv4_procedure(procedure, c, r, s);
         break;
         case NFS_V3:
-            switch(procedure)
-            {
-            case ProcEnumNFS3::NFS_NULL:    return analyzers(&IAnalyzer::INFSv3rpcgen::null,       NFSPROC3RPCGEN_NULL       {c, r, s});
-            case ProcEnumNFS3::GETATTR:     return analyzers(&IAnalyzer::INFSv3rpcgen::getattr3,   NFSPROC3RPCGEN_GETATTR    {c, r, s});
-            case ProcEnumNFS3::SETATTR:     return analyzers(&IAnalyzer::INFSv3rpcgen::setattr3,   NFSPROC3RPCGEN_SETATTR    {c, r, s});
-            case ProcEnumNFS3::LOOKUP:      return analyzers(&IAnalyzer::INFSv3rpcgen::lookup3,    NFSPROC3RPCGEN_LOOKUP     {c, r, s});
-            case ProcEnumNFS3::ACCESS:      return analyzers(&IAnalyzer::INFSv3rpcgen::access3,    NFSPROC3RPCGEN_ACCESS     {c, r, s});
-            case ProcEnumNFS3::READLINK:    return analyzers(&IAnalyzer::INFSv3rpcgen::readlink3,  NFSPROC3RPCGEN_READLINK   {c, r, s});
-            case ProcEnumNFS3::READ:        return analyzers(&IAnalyzer::INFSv3rpcgen::read3,      NFSPROC3RPCGEN_READ       {c, r, s});
-            case ProcEnumNFS3::WRITE:       return analyzers(&IAnalyzer::INFSv3rpcgen::write3,     NFSPROC3RPCGEN_WRITE      {c, r, s});
-            case ProcEnumNFS3::CREATE:      return analyzers(&IAnalyzer::INFSv3rpcgen::create3,    NFSPROC3RPCGEN_CREATE     {c, r, s});
-            case ProcEnumNFS3::MKDIR:       return analyzers(&IAnalyzer::INFSv3rpcgen::mkdir3,     NFSPROC3RPCGEN_MKDIR      {c, r, s});
-            case ProcEnumNFS3::SYMLINK:     return analyzers(&IAnalyzer::INFSv3rpcgen::symlink3,   NFSPROC3RPCGEN_SYMLINK    {c, r, s});
-            case ProcEnumNFS3::MKNOD:       return analyzers(&IAnalyzer::INFSv3rpcgen::mknod3,     NFSPROC3RPCGEN_MKNOD      {c, r, s});
-            case ProcEnumNFS3::REMOVE:      return analyzers(&IAnalyzer::INFSv3rpcgen::remove3,    NFSPROC3RPCGEN_REMOVE     {c, r, s});
-            case ProcEnumNFS3::RMDIR:       return analyzers(&IAnalyzer::INFSv3rpcgen::rmdir3,     NFSPROC3RPCGEN_RMDIR      {c, r, s});
-            case ProcEnumNFS3::RENAME:      return analyzers(&IAnalyzer::INFSv3rpcgen::rename3,    NFSPROC3RPCGEN_RENAME     {c, r, s});
-            case ProcEnumNFS3::LINK:        return analyzers(&IAnalyzer::INFSv3rpcgen::link3,      NFSPROC3RPCGEN_LINK       {c, r, s});
-            case ProcEnumNFS3::READDIR:     return analyzers(&IAnalyzer::INFSv3rpcgen::readdir3,   NFSPROC3RPCGEN_READDIR    {c, r, s});
-            case ProcEnumNFS3::READDIRPLUS: return analyzers(&IAnalyzer::INFSv3rpcgen::readdirplus3, NFSPROC3RPCGEN_READDIRPLUS{c, r, s});
-            case ProcEnumNFS3::FSSTAT:      return analyzers(&IAnalyzer::INFSv3rpcgen::fsstat3,    NFSPROC3RPCGEN_FSSTAT     {c, r, s});
-            case ProcEnumNFS3::FSINFO:      return analyzers(&IAnalyzer::INFSv3rpcgen::fsinfo3,    NFSPROC3RPCGEN_FSINFO     {c, r, s});
-            case ProcEnumNFS3::PATHCONF:    return analyzers(&IAnalyzer::INFSv3rpcgen::pathconf3,  NFSPROC3RPCGEN_PATHCONF   {c, r, s});
-            case ProcEnumNFS3::COMMIT:      return analyzers(&IAnalyzer::INFSv3rpcgen::commit3,    NFSPROC3RPCGEN_COMMIT     {c, r, s});
-            }
-       break;
+            analyze_nfsv3_procedure(procedure, c, r, s);
+        break;
        }
     }
     catch(XDRDecoderError& e)
