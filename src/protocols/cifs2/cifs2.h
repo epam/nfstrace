@@ -23,6 +23,7 @@
 #define CIFSv2_HEADER_H
 //------------------------------------------------------------------------------
 #include "api/cifs_pc_to_net.h"
+#include "api/cifs_commands.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -31,6 +32,7 @@ namespace protocols
 {
 namespace CIFSv2
 {
+namespace SMBv2 = NST::API::SMBv2;
 
 /*! CIFS v2 Flags
  */
@@ -127,6 +129,45 @@ struct MessageHeader : public RawMessageHeader
  */
 const MessageHeader* get_header(const uint8_t* data);
 
+template<typename ParamType> inline void parse(ParamType&) {}
+template<>inline void parse(SMBv2::ErrResponse& ) {}
+template<>inline void parse(SMBv2::NegotiateRequest& ) {}
+template<>inline void parse(SMBv2::NegotiateResponse& ) {}
+template<>inline void parse(SMBv2::SessionSetupRequest& ) {}
+template<>inline void parse(SMBv2::SessionSetupResponse& ) {}
+template<>inline void parse(SMBv2::LogOffRequest& ) {}
+template<>inline void parse(SMBv2::LogOffResponse& ) {}
+template<>inline void parse(SMBv2::TreeConnectRequest& ) {}
+template<>inline void parse(SMBv2::TreeConnectResponse& ) {}
+template<>inline void parse(SMBv2::TreeDisconnectRequest& ) {}
+template<>inline void parse(SMBv2::TreeDisconnectResponse& ) {}
+template<>inline void parse(SMBv2::CreateRequest& ) {}
+template<>inline void parse(SMBv2::CreateResponse& ) {}
+template<>inline void parse(SMBv2::CloseRequest& ) {}
+template<>inline void parse(SMBv2::CloseResponse& ) {}
+template<>inline void parse(SMBv2::EchoRequest& ) {}
+template<>inline void parse(SMBv2::EchoResponse& ) {}
+template<>inline void parse(SMBv2::QueryInfoRequest& ) {}
+template<>inline void parse(SMBv2::QueryInfoResponse& ) {}
+template<>inline void parse(SMBv2::QueryDirRequest& ) {}
+template<>inline void parse(SMBv2::QueryDirResponse& ) {}
+template<>inline void parse(SMBv2::FlushRequest& ) {}
+template<>inline void parse(SMBv2::FlushResponse& ) {}
+template<>inline void parse(SMBv2::ReadRequest& ) {}
+template<>inline void parse(SMBv2::ReadResponse& ) {}
+template<>inline void parse(SMBv2::WriteRequest& ) {}
+template<>inline void parse(SMBv2::WriteResponse& ) {}
+template<>inline void parse(SMBv2::LockRequest& ) {}
+template<>inline void parse(SMBv2::LockResponse& ) {}
+template<>inline void parse(SMBv2::CancelRequest& ) {}
+template<>inline void parse(SMBv2::ChangeNotifyRequest& ) {}
+template<>inline void parse(SMBv2::ChangeNotifyResponse& ) {}
+template<>inline void parse(SMBv2::OplockResponse& ) {}
+template<>inline void parse(SMBv2::IoCtlRequest& ) {}
+template<>inline void parse(SMBv2::IoCtlResponse& ) {}
+template<>inline void parse(SMBv2::SetInfoRequest& ) {}
+template<>inline void parse(SMBv2::SetInfoResponse& ) {}
+
 /*! Constructs new command for API from raw message
  * \param request - Call's
  * \param response - Reply's
@@ -144,6 +185,9 @@ inline const Cmd command(Data& request, Data& response, Session* session)
 
     cmd.parg = reinterpret_cast<const typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
     cmd.pres = response ? reinterpret_cast<const typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader)) : nullptr;
+
+    parse(cmd.parg);
+    parse(cmd.pres);
 
     return cmd;
 }
