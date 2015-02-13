@@ -18,7 +18,6 @@ else ()
     include_directories (${CMAKE_SOURCE_DIR}/src ${GMOCK_INCLUDE_DIRS})
 
     add_subdirectory (utils)
-    add_subdirectory (net)
     add_subdirectory (analyzers)
     add_subdirectory (protocols)
     add_subdirectory (filtration)

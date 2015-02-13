@@ -5,8 +5,6 @@ if (JSON_FOUND)
     project (json)
     aux_source_directory ("." SRC_LIST)
     add_library (${PROJECT_NAME} SHARED ${SRC_LIST}
-            ../../../src/net/abstract_tcp_service.cpp
-            ../../../src/net/ip_endpoint.cpp
             ../../../src/utils/log.cpp
             ../../../src/utils/out.cpp)
     set_target_properties(${PROJECT_NAME} PROPERTIES
