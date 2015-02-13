@@ -8,7 +8,10 @@ add_library (cifs         MODULE src/cifs/cifs_analyzer.cpp)
 set_target_properties (breakdown testanalyzer cifs
                        PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/analyzers"
                        NO_SONAME ON)
-add_subdirectory (src/watch)
 
 # installation of plugins ======================================================
-install (TARGETS breakdown LIBRARY DESTINATION lib/nfstrace)
+install (TARGETS breakdown testanalyzer cifs LIBRARY DESTINATION lib/nfstrace)
+
+# build analyzers (new way) ====================================================
+add_subdirectory (src/watch)
+add_subdirectory (src/json)
