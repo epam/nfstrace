@@ -238,38 +238,8 @@ elif [ "$LINUX_DISTRO" = "ALT Linux" ] ; then
     # TODO: Jenkins causes error on ALT Linux on publish valgrind report phase
     echo ">>> Valgrind/memcheck report generation is not supported on ALT Linux"
 else
-    bzcat $WORKSPACE/traces/breakdown/eth-ipv4-tcp-nfsv3.pcap.bz2 > ./eth-ipv4-tcp-nfsv3.pcap
-    bzcat $WORKSPACE/traces/breakdown/eth-ipv4-tcp-nfsv4.pcap.bz2 > ./eth-ipv4-tcp-nfsv4.pcap
-    
-    echo ">>> Generating valgrind/memcheck report for NFSv3 in 'drain' mode"
-    valgrind --tool=memcheck --leak-check=full --show-reachable=yes \
-        --undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
-        --trace-children=no --xml=yes --xml-file=./nfstrace.%p.drain.nfsv3.memcheck.xml \
-        ./nfstrace --mode=drain -b 20 -Q 4096 -M 512 -I ./eth-ipv4-tcp-nfsv3.pcap
-    if [ $? -ne 0 ] ; then
-        echo ">>> Error generating valgrind/memcheck report for NFSv3 in 'drain' mode"
-        exit 1
-    fi
-    echo ">>> Generating valgrind/memcheck report for NFSv3 in 'stat' mode"
-    valgrind --tool=memcheck --leak-check=full --show-reachable=yes \
-        --undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
-        --trace-children=no --xml=yes --xml-file=./nfstrace.%p.stat.nfsv3.memcheck.xml \
-        ./nfstrace --mode=stat -a ./analyzers/libbreakdown.so -b 20 -Q 4096 -M 512 \
-        -I ./eth-ipv4-tcp-nfsv3.pcap
-    if [ $? -ne 0 ] ; then
-        echo ">>> Error generating valgrind/memcheck report for NFSv3 in 'stat' mode"
-        exit 1
-    fi
-    echo ">>> Generating valgrind/memcheck report for NFSv4 in 'stat' mode"
-    valgrind --tool=memcheck --leak-check=full --show-reachable=yes \
-        --undef-value-errors=yes --track-origins=no --child-silent-after-fork=no \
-        --trace-children=no --xml=yes --xml-file=./nfstrace.%p.stat.nfsv4.memcheck.xml \
-        ./nfstrace --mode=stat -a ./analyzers/libbreakdown.so -b 20 -Q 4096 -M 512 \
-        -I ./eth-ipv4-tcp-nfsv4.pcap
-    if [ $? -ne 0 ] ; then
-        echo ">>> Error generating valgrind/memcheck report for NFSv4 in 'stat' mode"
-        exit 1
-    fi
+    echo ">>> Generating valgrind/memcheck report"
+    make memcheck-report-xml
 fi
 
 # Doing Release build
