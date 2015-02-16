@@ -66,7 +66,7 @@ UserGUI::UserGUI(const char *opts)
     }
     catch(std::exception& e)
     {
-        throw std::runtime_error{std::string{"Error in plugin options processing. OPTS: "} + opts + " Error: " + e.what()};
+        throw std::runtime_error{std::string{"Error in plugin options processing. OPTS: "} + opts + std::string(" Error: ") + e.what()};
     }
 
     _run.test_and_set();
@@ -173,14 +173,14 @@ void UserGUI::updateCounters(const uint64_t &nfs3_total, const std::vector<int> 
     nfs3_procedure_total += nfs3_total;
     std::vector<int>::const_iterator f;
     std::vector<int>::iterator s;
-    for( f = nfs3_pr_count.begin(), s = nfs3_count.begin(); f != nfs3_pr_count.end() && s != nfs3_count.end(); f++, s++)
+    for( f = nfs3_pr_count.begin(), s = nfs3_count.begin(); f != nfs3_pr_count.end() && s != nfs3_count.end(); ++f, ++s)
     {
         (*s) += (*f);
     }
 
     nfs4_procedure_total += nfs4_pr_total;
     nfs4_operations_total += nfs4_ops_total;
-    for(f = nfs4_op_count.begin(), s = nfs4_count.begin(); f != nfs4_op_count.end() && s != nfs3_count.end(); f++, s++)
+    for(f = nfs4_op_count.begin(), s = nfs4_count.begin(); f != nfs4_op_count.end() && s != nfs4_count.end(); ++f, ++s)
     {
         (*s) += (*f);
     }
