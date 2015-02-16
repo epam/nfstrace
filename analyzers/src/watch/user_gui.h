@@ -24,7 +24,7 @@
 //------------------------------------------------------------------------------
 #include <atomic>
 #include <cstdlib>
-#include <condition_variable>
+#include <mutex>
 #include <vector>
 #include <thread>
 
@@ -59,17 +59,10 @@ public:
     }
 
 private:
-    std::atomic<bool> enableUpdate;
 
     void updatePlot();
     uint16_t inputData();
     void keyboard();
-
-    const time_t start_time;
-    const uint32_t SECINMIN;
-    const uint32_t SECINHOUR;
-    const uint32_t SECINDAY;
-    const uint32_t MSEC;
 
     void chronoUpdate();
     void designPlot();
@@ -77,6 +70,12 @@ private:
     void initPlot();
     void updateAll();
     void thread();
+
+    const time_t start_time;
+    const uint32_t SECINMIN;
+    const uint32_t SECINHOUR;
+    const uint32_t SECINDAY;
+    const uint32_t MSEC;
 
     std::mutex mut;
     std::vector<WINDOW*> all_windows;
@@ -87,6 +86,7 @@ private:
     uint16_t y_max;
     uint16_t column_shift;
 
+    std::atomic<bool> enableUpdate;
     std::atomic_flag _run;
 
     uint64_t nfs3_procedure_total;
