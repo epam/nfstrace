@@ -75,7 +75,6 @@ UserGUI::~UserGUI()
 {
     _run.clear();
     gui_thread.join();
-    destroyPlot();
 }
 
 void UserGUI::updatePlot()
