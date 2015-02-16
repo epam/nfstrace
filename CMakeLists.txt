@@ -38,35 +38,35 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif ()
 
 # Read version string from file
-file(STRINGS VERSION NST_VERSION)
+file (STRINGS VERSION NST_VERSION)
 
 string (REPLACE "." ";" VERSION_LIST ${NST_VERSION})
-list(GET VERSION_LIST 0 NST_V_MAJOR)
-list(GET VERSION_LIST 1 NST_V_MINOR)
-list(GET VERSION_LIST 2 NST_V_PATCH)
+list (GET VERSION_LIST 0 NST_V_MAJOR)
+list (GET VERSION_LIST 1 NST_V_MINOR)
+list (GET VERSION_LIST 2 NST_V_PATCH)
 
 set (NST_VERSION_FULL "${PROJECT_NAME} ${NST_VERSION} (${CMAKE_BUILD_TYPE})")
 
-string(TIMESTAMP COMPILATION_DATE "%Y-%m-%d")
+string (TIMESTAMP COMPILATION_DATE "%Y-%m-%d")
 
 include_directories (src)
+
+# nfstrace executable ==========================================================
 file (GLOB_RECURSE SRCS "src/*.cpp")
-set  (LIBS  ${CMAKE_DL_LIBS}            # libdl with dlopen()
-            ${CMAKE_THREAD_LIBS_INIT}   # libpthread
-            ${PCAP_LIBRARY}             # libpcap
-            )
+set (LIBS ${CMAKE_DL_LIBS}          # libdl with dlopen()
+          ${CMAKE_THREAD_LIBS_INIT} # libpthread
+          ${PCAP_LIBRARY}           # libpcap
+          )
 
-configure_file(docs/nfstrace.8.in              ${PROJECT_SOURCE_DIR}/docs/nfstrace.8)
-configure_file(src/api/plugin_api.h.in         ${PROJECT_SOURCE_DIR}/src/api/plugin_api.h)
-configure_file(src/controller/build_info.h.in  ${PROJECT_SOURCE_DIR}/src/controller/build_info.h)
+configure_file (docs/nfstrace.8.in              ${PROJECT_SOURCE_DIR}/docs/nfstrace.8)
+configure_file (src/api/plugin_api.h.in         ${PROJECT_SOURCE_DIR}/src/api/plugin_api.h)
+configure_file (src/controller/build_info.h.in  ${PROJECT_SOURCE_DIR}/src/controller/build_info.h)
 
-add_executable        (${PROJECT_NAME} ${SRCS})
+add_executable (${PROJECT_NAME} ${SRCS})
 target_link_libraries (${PROJECT_NAME} ${LIBS})
 
-# build watch analyzer==========================================================
-add_subdirectory(analyzers)
-
-add_subdirectory (analyzers/src/json)
+# analyzer plugins =============================================================
+add_subdirectory (analyzers)
 
 # testing ======================================================================
 enable_testing ()
@@ -119,3 +119,6 @@ if (ASTYLE_PATH)
                                xargs ${ASTYLE_PATH} --options=${CMAKE_SOURCE_DIR}/astyle.cfg
                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif ()
+
+# Runtime analysis reports
+include ("cmake/valgrind.cmake")
