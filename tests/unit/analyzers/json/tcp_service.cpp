@@ -26,9 +26,8 @@
 #include <gtest/gtest.h>
 #include <sys/socket.h>
 
-#include "net/abstract_tcp_service.h"
+#include "abstract_tcp_service.h"
 //------------------------------------------------------------------------------
-using namespace NST::net;
 
 static constexpr std::size_t AwaitForServiceStartupMs = 250U;
 static constexpr std::size_t StartStopCyclesAmount = 5U;

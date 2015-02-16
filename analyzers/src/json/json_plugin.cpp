@@ -119,4 +119,5 @@ extern "C"
     NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
 
 } //extern "C"
+
 //------------------------------------------------------------------------------

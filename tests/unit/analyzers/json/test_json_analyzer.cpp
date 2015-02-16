@@ -28,7 +28,6 @@
 
 #include "json_analyzer.h"
 //------------------------------------------------------------------------------
-using namespace NST::net;
 
 static constexpr std::size_t AwaitForServiceStartupMs = 250U;
 static constexpr std::size_t WorkersAmount = 100U;

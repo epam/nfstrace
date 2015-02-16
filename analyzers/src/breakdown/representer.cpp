@@ -29,7 +29,7 @@ using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 NST::breakdown::Representer::Representer(std::ostream& o, NST::breakdown::CommandRepresenter* cmd_representer, size_t space_for_cmd_name)
     : out(o)
-    , cmdRepresenter(cmd_representer)
+    , cmd_representer(cmd_representer)
     , space_for_cmd_name(space_for_cmd_name)
 {
 }
@@ -38,7 +38,7 @@ void Representer::flush_statistics(const Statistics& statistics)
 {
     out << "###  Breakdown analyzer  ###"
         << std::endl
-        << cmdRepresenter->protocol_name()
+        << cmd_representer->protocol_name()
         << " protocol"
         << std::endl;
 
@@ -48,7 +48,7 @@ void Representer::flush_statistics(const Statistics& statistics)
         size_t procedure_count = breakdown[procedure].get_count();
         out.width(space_for_cmd_name);
         out << std::left
-            << cmdRepresenter->command_name(procedure);
+            << cmd_representer->command_name(procedure);
         out.width(5);
         out << std::right
             << procedure_count;
@@ -83,7 +83,7 @@ void Representer::store_per_session(std::ostream& file, const Statistics& statis
     statistics.for_each_procedure_in_session(session, [&](const BreakdownCounter & breakdown, size_t procedure)
     {
         uint64_t s_total_proc = breakdown.get_total_count();
-        file << cmdRepresenter->command_name(procedure);
+        file << cmd_representer->command_name(procedure);
         file << ' ' << breakdown[procedure].get_count() << ' ';
         file << (s_total_proc ? (((long double)(breakdown[procedure].get_count()) / s_total_proc) * 100) : 0);
         file << ' ' << to_sec(breakdown[procedure].get_min())
@@ -104,7 +104,7 @@ void Representer::print_per_session(const Statistics& statistics, const Session&
         onProcedureInfoPrinted(out, breakdown, procedure);
         out.width(22);
         out << std::left
-            << cmdRepresenter->command_name(procedure);
+            << cmd_representer->command_name(procedure);
         out.width(6);
         out << " Count:";
         out.width(5);

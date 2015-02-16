@@ -888,4 +888,5 @@ void JsonAnalyzer::illegal41(const RPCProcedure* /* proc */,
 void JsonAnalyzer::flush_statistics()
 {
 }
+
 //------------------------------------------------------------------------------
