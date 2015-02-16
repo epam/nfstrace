@@ -46,6 +46,7 @@ using namespace NST::API;
 extern "C"
 {
 // These calls implemented by nfstrace
+const char* print_cifs1_procedures(SMBv1::SMBv1Commands cmd_code);
 const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
 const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc);
 const char* print_nfs41_procedures(const ProcEnumNFS41::NFSProcedure proc);
