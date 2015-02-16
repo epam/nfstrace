@@ -41,8 +41,7 @@ operation_data el_time       {1, 8, nullptr, 1 , 2, 9  ,999, 0, 0};
 operation_data packets       {1, 8, nullptr, 1 , 2, 9  ,999, 0, 0};
 //------------------------------------------------------------------------------
 UserGUI::UserGUI(const char *opts)
-: enableUpdate{false}
-, start_time  {time(nullptr)}
+: start_time  {time(nullptr)}
 , SECINMIN    {60}
 , SECINHOUR   {60*60}
 , SECINDAY    {60*60*24}
@@ -50,6 +49,7 @@ UserGUI::UserGUI(const char *opts)
 , all_windows(3, nullptr)
 , scroll_shift {0}
 , column_shift {0}
+, enableUpdate {false}
 , _run {ATOMIC_FLAG_INIT}
 , nfs3_procedure_total   {0}
 , nfs3_count (ProcEnumNFS3::count, 0)
@@ -73,17 +73,13 @@ UserGUI::UserGUI(const char *opts)
 
 UserGUI::~UserGUI()
 {
-    if (gui_thread.joinable())
-    {
-        _run.clear();
-        gui_thread.join();
-    }
+    _run.clear();
+    gui_thread.join();
     destroyPlot();
 }
 
 void UserGUI::updatePlot()
 {
-    std::unique_lock<std::mutex> lck(mut);
 
     if(enableUpdate)
     {
@@ -92,12 +88,20 @@ void UserGUI::updatePlot()
         enableUpdate = false;
     }
 
-    uint64_t nfs3_procedure_total_copy = nfs3_procedure_total;
-    std::vector<int> nfs3_count_copy = nfs3_count;
-    uint64_t nfs4_procedure_total_copy = nfs4_procedure_total;
-    uint64_t nfs4_operations_total_copy = nfs4_operations_total;
-    std::vector<int> nfs4_count_copy = nfs4_count;
-    lck.unlock();
+    uint64_t nfs3_procedure_total_copy(0);
+    std::vector<int> nfs3_count_copy(ProcEnumNFS3::count, 0);
+    uint64_t nfs4_procedure_total_copy(0);
+    uint64_t nfs4_operations_total_copy(0);
+    std::vector<int> nfs4_count_copy(ProcEnumNFS4::count, 0);
+
+    {
+        std::unique_lock<std::mutex> lck(mut);
+        nfs3_procedure_total_copy = nfs3_procedure_total;
+        nfs3_count_copy = nfs3_count;
+        nfs4_procedure_total_copy = nfs4_procedure_total;
+        nfs4_operations_total_copy = nfs4_operations_total;
+        nfs4_count_copy = nfs4_count;
+    }
     uint16_t counter = nfsv3_total.start_y;
     if(nfsv3_total.max_y + scroll_shift > counter && counter > scroll_shift)
     {
