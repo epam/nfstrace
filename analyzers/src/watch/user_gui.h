@@ -96,8 +96,6 @@ private:
     std::vector<int> nfs4_count;
 
     long int refresh_delta;
-    const uint16_t max_read;
-    std::atomic<uint16_t> read_counter;
 };
 //------------------------------------------------------------------------------
 #endif // USERGUI_H

@@ -57,8 +57,6 @@ UserGUI::UserGUI(const char *opts)
 , nfs4_operations_total  {0}
 , nfs4_count (ProcEnumNFS4::count, 0)
 , refresh_delta {900000}
-, max_read        {5}
-, read_counter    {0}
 {
     if(opts != nullptr && *opts != '\0' ) try
     {
