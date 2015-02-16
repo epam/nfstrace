@@ -38,27 +38,27 @@ bool NFSParser::parse_data(FilteredDataQueue::Ptr& ptr)
     using namespace NST::protocols::rpc;
 
     // TODO: refactor and generalize this code
-    if(ptr->dlen < sizeof(MessageHeader))
+    if (ptr->dlen < sizeof(MessageHeader))
     {
         return false;
     }
     auto msg = reinterpret_cast<const MessageHeader*>(ptr->data);
-    switch(msg->type())
+    switch (msg->type())
     {
     case MsgType::CALL:
     {
-        if(ptr->dlen < sizeof(CallHeader))
+        if (ptr->dlen < sizeof(CallHeader))
         {
             return false;
         }
 
         auto call = static_cast<const CallHeader*>(msg);
 
-        if(RPCValidator::check(call) && (protocols::NFS4::Validator::check(call) ||
-                                         protocols::NFS3::Validator::check(call)))
+        if (RPCValidator::check(call) && (protocols::NFS4::Validator::check(call) ||
+                                          protocols::NFS3::Validator::check(call)))
         {
             Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL);
-            if(session)
+            if (session)
             {
                 session->save_call_data(call->xid(), std::move(ptr));
             }
@@ -68,22 +68,22 @@ bool NFSParser::parse_data(FilteredDataQueue::Ptr& ptr)
     break;
     case MsgType::REPLY:
     {
-        if(ptr->dlen < sizeof(ReplyHeader))
+        if (ptr->dlen < sizeof(ReplyHeader))
         {
             return false;
         }
         auto reply = static_cast<const ReplyHeader*>(msg);
 
-        if(!RPCValidator::check(reply))
+        if (!RPCValidator::check(reply))
         {
             return false;
         }
 
         Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY);
-        if(session)
+        if (session)
         {
             FilteredDataQueue::Ptr&& call_data = session->get_call_data(reply->xid());
-            if(call_data)
+            if (call_data)
             {
                 analyze_nfs_procedure(std::move(call_data), std::move(ptr), session);
             }
@@ -106,24 +106,24 @@ using NFS41CompoundType = NST::protocols::NFS41::NFSPROC41RPCGEN_COMPOUND;
 
 template
 <
-    typename ArgOpType,
-    typename ResOpType,
-    typename NFS4CompoundType
->
+typename ArgOpType,
+         typename ResOpType,
+         typename NFS4CompoundType
+         >
 void analyze_nfs4_operations(Analyzers& analyzers, NFS4CompoundType& nfs4_compound_procedure);
 
 inline void analyze_nfs40_operations(Analyzers& analyzers, NFS40CompoundType& nfs40_compound_procedure)
 {
-    analyze_nfs4_operations<NST::API::NFS4::nfs_argop4,
+    analyze_nfs4_operations < NST::API::NFS4::nfs_argop4,
                             NST::API::NFS4::nfs_resop4,
-                            NFS40CompoundType>(analyzers, nfs40_compound_procedure);
+                            NFS40CompoundType > (analyzers, nfs40_compound_procedure);
 }
 
 inline void analyze_nfs41_operations(Analyzers& analyzers, NFS41CompoundType& nfs41_compound_procedure)
 {
-    analyze_nfs4_operations<NST::API::NFS41::nfs_argop4,
+    analyze_nfs4_operations < NST::API::NFS41::nfs_argop4,
                             NST::API::NFS41::nfs_resop4,
-                            NFS41CompoundType>(analyzers, nfs41_compound_procedure);
+                            NFS41CompoundType > (analyzers, nfs41_compound_procedure);
 }
 
 void nfs4_ops_switch(Analyzers& analyzers,
@@ -141,30 +141,74 @@ void nfs4_ops_switch(Analyzers& analyzers,
 static inline void analyze_nfsv3_procedure(const uint32_t procedure, XDRDecoder&& c, XDRDecoder&& r, const Session* s, Analyzers& analyzers)
 {
     using namespace NST::protocols::NFS3;
-    switch(procedure)
+    switch (procedure)
     {
-        case ProcEnumNFS3::NFS_NULL:    analyzers(&IAnalyzer::INFSv3rpcgen::null,       NFSPROC3RPCGEN_NULL       {c, r, s}); break;
-        case ProcEnumNFS3::GETATTR:     analyzers(&IAnalyzer::INFSv3rpcgen::getattr3,   NFSPROC3RPCGEN_GETATTR    {c, r, s}); break;
-        case ProcEnumNFS3::SETATTR:     analyzers(&IAnalyzer::INFSv3rpcgen::setattr3,   NFSPROC3RPCGEN_SETATTR    {c, r, s}); break;
-        case ProcEnumNFS3::LOOKUP:      analyzers(&IAnalyzer::INFSv3rpcgen::lookup3,    NFSPROC3RPCGEN_LOOKUP     {c, r, s}); break;
-        case ProcEnumNFS3::ACCESS:      analyzers(&IAnalyzer::INFSv3rpcgen::access3,    NFSPROC3RPCGEN_ACCESS     {c, r, s}); break;
-        case ProcEnumNFS3::READLINK:    analyzers(&IAnalyzer::INFSv3rpcgen::readlink3,  NFSPROC3RPCGEN_READLINK   {c, r, s}); break;
-        case ProcEnumNFS3::READ:        analyzers(&IAnalyzer::INFSv3rpcgen::read3,      NFSPROC3RPCGEN_READ       {c, r, s}); break;
-        case ProcEnumNFS3::WRITE:       analyzers(&IAnalyzer::INFSv3rpcgen::write3,     NFSPROC3RPCGEN_WRITE      {c, r, s}); break;
-        case ProcEnumNFS3::CREATE:      analyzers(&IAnalyzer::INFSv3rpcgen::create3,    NFSPROC3RPCGEN_CREATE     {c, r, s}); break;
-        case ProcEnumNFS3::MKDIR:       analyzers(&IAnalyzer::INFSv3rpcgen::mkdir3,     NFSPROC3RPCGEN_MKDIR      {c, r, s}); break;
-        case ProcEnumNFS3::SYMLINK:     analyzers(&IAnalyzer::INFSv3rpcgen::symlink3,   NFSPROC3RPCGEN_SYMLINK    {c, r, s}); break;
-        case ProcEnumNFS3::MKNOD:       analyzers(&IAnalyzer::INFSv3rpcgen::mknod3,     NFSPROC3RPCGEN_MKNOD      {c, r, s}); break;
-        case ProcEnumNFS3::REMOVE:      analyzers(&IAnalyzer::INFSv3rpcgen::remove3,    NFSPROC3RPCGEN_REMOVE     {c, r, s}); break;
-        case ProcEnumNFS3::RMDIR:       analyzers(&IAnalyzer::INFSv3rpcgen::rmdir3,     NFSPROC3RPCGEN_RMDIR      {c, r, s}); break;
-        case ProcEnumNFS3::RENAME:      analyzers(&IAnalyzer::INFSv3rpcgen::rename3,    NFSPROC3RPCGEN_RENAME     {c, r, s}); break;
-        case ProcEnumNFS3::LINK:        analyzers(&IAnalyzer::INFSv3rpcgen::link3,      NFSPROC3RPCGEN_LINK       {c, r, s}); break;
-        case ProcEnumNFS3::READDIR:     analyzers(&IAnalyzer::INFSv3rpcgen::readdir3,   NFSPROC3RPCGEN_READDIR    {c, r, s}); break;
-        case ProcEnumNFS3::READDIRPLUS: analyzers(&IAnalyzer::INFSv3rpcgen::readdirplus3, NFSPROC3RPCGEN_READDIRPLUS{c, r, s}); break;
-        case ProcEnumNFS3::FSSTAT:      analyzers(&IAnalyzer::INFSv3rpcgen::fsstat3,    NFSPROC3RPCGEN_FSSTAT     {c, r, s}); break;
-        case ProcEnumNFS3::FSINFO:      analyzers(&IAnalyzer::INFSv3rpcgen::fsinfo3,    NFSPROC3RPCGEN_FSINFO     {c, r, s}); break;
-        case ProcEnumNFS3::PATHCONF:    analyzers(&IAnalyzer::INFSv3rpcgen::pathconf3,  NFSPROC3RPCGEN_PATHCONF   {c, r, s}); break;
-        case ProcEnumNFS3::COMMIT:      analyzers(&IAnalyzer::INFSv3rpcgen::commit3,    NFSPROC3RPCGEN_COMMIT     {c, r, s}); break;
+    case ProcEnumNFS3::NFS_NULL:
+        analyzers(&IAnalyzer::INFSv3rpcgen::null,       NFSPROC3RPCGEN_NULL       {c, r, s});
+        break;
+    case ProcEnumNFS3::GETATTR:
+        analyzers(&IAnalyzer::INFSv3rpcgen::getattr3,   NFSPROC3RPCGEN_GETATTR    {c, r, s});
+        break;
+    case ProcEnumNFS3::SETATTR:
+        analyzers(&IAnalyzer::INFSv3rpcgen::setattr3,   NFSPROC3RPCGEN_SETATTR    {c, r, s});
+        break;
+    case ProcEnumNFS3::LOOKUP:
+        analyzers(&IAnalyzer::INFSv3rpcgen::lookup3,    NFSPROC3RPCGEN_LOOKUP     {c, r, s});
+        break;
+    case ProcEnumNFS3::ACCESS:
+        analyzers(&IAnalyzer::INFSv3rpcgen::access3,    NFSPROC3RPCGEN_ACCESS     {c, r, s});
+        break;
+    case ProcEnumNFS3::READLINK:
+        analyzers(&IAnalyzer::INFSv3rpcgen::readlink3,  NFSPROC3RPCGEN_READLINK   {c, r, s});
+        break;
+    case ProcEnumNFS3::READ:
+        analyzers(&IAnalyzer::INFSv3rpcgen::read3,      NFSPROC3RPCGEN_READ       {c, r, s});
+        break;
+    case ProcEnumNFS3::WRITE:
+        analyzers(&IAnalyzer::INFSv3rpcgen::write3,     NFSPROC3RPCGEN_WRITE      {c, r, s});
+        break;
+    case ProcEnumNFS3::CREATE:
+        analyzers(&IAnalyzer::INFSv3rpcgen::create3,    NFSPROC3RPCGEN_CREATE     {c, r, s});
+        break;
+    case ProcEnumNFS3::MKDIR:
+        analyzers(&IAnalyzer::INFSv3rpcgen::mkdir3,     NFSPROC3RPCGEN_MKDIR      {c, r, s});
+        break;
+    case ProcEnumNFS3::SYMLINK:
+        analyzers(&IAnalyzer::INFSv3rpcgen::symlink3,   NFSPROC3RPCGEN_SYMLINK    {c, r, s});
+        break;
+    case ProcEnumNFS3::MKNOD:
+        analyzers(&IAnalyzer::INFSv3rpcgen::mknod3,     NFSPROC3RPCGEN_MKNOD      {c, r, s});
+        break;
+    case ProcEnumNFS3::REMOVE:
+        analyzers(&IAnalyzer::INFSv3rpcgen::remove3,    NFSPROC3RPCGEN_REMOVE     {c, r, s});
+        break;
+    case ProcEnumNFS3::RMDIR:
+        analyzers(&IAnalyzer::INFSv3rpcgen::rmdir3,     NFSPROC3RPCGEN_RMDIR      {c, r, s});
+        break;
+    case ProcEnumNFS3::RENAME:
+        analyzers(&IAnalyzer::INFSv3rpcgen::rename3,    NFSPROC3RPCGEN_RENAME     {c, r, s});
+        break;
+    case ProcEnumNFS3::LINK:
+        analyzers(&IAnalyzer::INFSv3rpcgen::link3,      NFSPROC3RPCGEN_LINK       {c, r, s});
+        break;
+    case ProcEnumNFS3::READDIR:
+        analyzers(&IAnalyzer::INFSv3rpcgen::readdir3,   NFSPROC3RPCGEN_READDIR    {c, r, s});
+        break;
+    case ProcEnumNFS3::READDIRPLUS:
+        analyzers(&IAnalyzer::INFSv3rpcgen::readdirplus3, NFSPROC3RPCGEN_READDIRPLUS {c, r, s});
+        break;
+    case ProcEnumNFS3::FSSTAT:
+        analyzers(&IAnalyzer::INFSv3rpcgen::fsstat3,    NFSPROC3RPCGEN_FSSTAT     {c, r, s});
+        break;
+    case ProcEnumNFS3::FSINFO:
+        analyzers(&IAnalyzer::INFSv3rpcgen::fsinfo3,    NFSPROC3RPCGEN_FSINFO     {c, r, s});
+        break;
+    case ProcEnumNFS3::PATHCONF:
+        analyzers(&IAnalyzer::INFSv3rpcgen::pathconf3,  NFSPROC3RPCGEN_PATHCONF   {c, r, s});
+        break;
+    case ProcEnumNFS3::COMMIT:
+        analyzers(&IAnalyzer::INFSv3rpcgen::commit3,    NFSPROC3RPCGEN_COMMIT     {c, r, s});
+        break;
     }
 }
 
@@ -223,17 +267,17 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
             break;
         }
     }
-    catch(XDRDecoderError& e)
+    catch (XDRDecoderError& e)
     {
-        const char* procedure_name{"Unknown procedure"};
-        switch(major_version)
+        const char* procedure_name {"Unknown procedure"};
+        switch (major_version)
         {
         case NFS_V4:
             procedure_name = print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(procedure));
-        break;
+            break;
         case NFS_V3:
             procedure_name = print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(procedure));
-        break;
+            break;
         }
         LOG("Some data of NFS operation %s %s(%u) was not parsed: %s", session->str().c_str(), procedure_name, procedure, e.what());
     }
@@ -241,7 +285,7 @@ void NFSParser::analyze_nfs_procedure( FilteredDataQueue::Ptr&& call,
 
 //! Get NFSv4.x minor version
 /*! This is a fast method. It doesn't call expensive XDR's mechanisms &
-* doesn't create new objects. It simply moves pointer to a proper 
+* doesn't create new objects. It simply moves pointer to a proper
 * place.
 *
 * According to NFSv4.0 & 4.1 RFC's it's possible to determine
@@ -279,10 +323,10 @@ static uint32_t get_nfs4_compound_minor_version(const uint32_t procedure, const 
 //! It's supposed to be used inside analyze_nfs_procedure only
 template
 <
-    typename ArgOpType,       // Type of arguments(call part of nfs's procedure)
-    typename ResOpType,       // Type of results(reply part of nfs's procedure)
-    typename NFS4CompoundType // Type of NFSv4.x COMPOUND procedure. Can be 4.0 or 4.1
->
+typename ArgOpType,       // Type of arguments(call part of nfs's procedure)
+         typename ResOpType,       // Type of results(reply part of nfs's procedure)
+         typename NFS4CompoundType // Type of NFSv4.x COMPOUND procedure. Can be 4.0 or 4.1
+         >
 void analyze_nfs4_operations(Analyzers& analyzers, NFS4CompoundType& nfs4_compound_procedure)
 {
     ArgOpType* arg {nullptr};
@@ -290,15 +334,15 @@ void analyze_nfs4_operations(Analyzers& analyzers, NFS4CompoundType& nfs4_compou
 
     uint32_t arg_ops_count  {0}; // Amount of NFS operations (call part)
     uint32_t res_ops_count  {0}; // Amount of NFS operations (reply part)
-    uint32_t total_ops_count{0};
+    uint32_t total_ops_count {0};
 
-    if(nfs4_compound_procedure.parg) // Checking if COMPOUND procedure has valid arg
+    if (nfs4_compound_procedure.parg) // Checking if COMPOUND procedure has valid arg
     {
         arg_ops_count = nfs4_compound_procedure.parg->argarray.argarray_len;
         arg = nfs4_compound_procedure.parg->argarray.argarray_val;
     }
 
-    if(nfs4_compound_procedure.pres) // Checking if COMPOUND procedure has valid res
+    if (nfs4_compound_procedure.pres) // Checking if COMPOUND procedure has valid res
     {
         res_ops_count = nfs4_compound_procedure.pres->resarray.resarray_len;
         res = nfs4_compound_procedure.pres->resarray.resarray_val;
@@ -308,9 +352,9 @@ void analyze_nfs4_operations(Analyzers& analyzers, NFS4CompoundType& nfs4_compou
     total_ops_count = arg_ops_count > res_ops_count ? arg_ops_count : res_ops_count;
 
     // Traversing through ALL COMPOUND procedure's operations
-    for(uint32_t i {0}; i < total_ops_count; i++)
+    for (uint32_t i {0}; i < total_ops_count; i++)
     {
-        if((arg && res)&&(arg->argop != res->resop))
+        if ((arg && res) && (arg->argop != res->resop))
         {
             // Passing each operation to analyzers using the helper's function
             nfs4_ops_switch(analyzers, &nfs4_compound_procedure, arg, nullptr);
@@ -321,8 +365,10 @@ void analyze_nfs4_operations(Analyzers& analyzers, NFS4CompoundType& nfs4_compou
             nfs4_ops_switch(analyzers, &nfs4_compound_procedure, arg, res);
         }
 
-        if(arg && i < (arg_ops_count-1)) arg++; else arg = nullptr;
-        if(res && i < (res_ops_count-1)) res++; else res = nullptr;
+        if (arg && i < (arg_ops_count - 1)) { arg++; }
+        else { arg = nullptr; }
+        if (res && i < (res_ops_count - 1)) { res++; }
+        else { res = nullptr; }
     }
 }
 
@@ -330,12 +376,12 @@ void analyze_nfs4_operations(Analyzers& analyzers, NFS4CompoundType& nfs4_compou
 //! It's supposed to be used inside nfs4_ops_switch only
 template
 <
-    typename nfs_argop4_t,
-    typename nfs_resop4_t,
-    typename IAnalyzer_func_t,
-    typename nfs_argop_member_t,
-    typename nfs_resop_member_t
->
+typename nfs_argop4_t,
+         typename nfs_resop4_t,
+         typename IAnalyzer_func_t,
+         typename nfs_argop_member_t,
+         typename nfs_resop_member_t
+         >
 inline void analyze(Analyzers& analyzers,
                     const RPCProcedure* rpc_procedure,
                     const nfs_argop4_t* arg,
@@ -345,18 +391,18 @@ inline void analyze(Analyzers& analyzers,
                     nfs_resop_member_t res_operation)
 {
     analyzers(IAnalyzer_function, rpc_procedure,
-              arg == nullptr ? nullptr : &(arg->nfs_argop4_u.*arg_operation),
-              res == nullptr ? nullptr : &(res->nfs_resop4_u.*res_operation));
+              arg == nullptr ? nullptr : & (arg->nfs_argop4_u.*arg_operation),
+              res == nullptr ? nullptr : & (res->nfs_resop4_u.*res_operation));
 }
 
 //! Internal function for proper passing NFSv4.x's res-only operations to analyzers
 //! It's supposed to be used inside nfs4_ops_switch only
 template
 <
-    typename nfs_resop4_t,
-    typename IAnalyzer_func_t,
-    typename nfs_resop_member_t
->
+typename nfs_resop4_t,
+         typename IAnalyzer_func_t,
+         typename nfs_resop_member_t
+         >
 inline void analyze(Analyzers& analyzers,
                     const RPCProcedure* rpc_procedure,
                     const nfs_resop4_t* res,
@@ -364,7 +410,7 @@ inline void analyze(Analyzers& analyzers,
                     nfs_resop_member_t res_operation)
 {
     analyzers(IAnalyzer_function, rpc_procedure,
-              res == nullptr ? nullptr : &(res->nfs_resop4_u.*res_operation));
+              res == nullptr ? nullptr : & (res->nfs_resop4_u.*res_operation));
 }
 
 //! Internal function for proper passing NFSv4.0's operations to analyzers
@@ -379,7 +425,7 @@ void nfs4_ops_switch(Analyzers& analyzers,
     using res_t   = NST::API::NFS4::nfs_resop4_u_t;
 
     uint32_t nfs_op_num = arg ? arg->argop : res->resop;
-    switch(nfs_op_num)
+    switch (nfs_op_num)
     {
     case ProcEnumNFS4::ACCESS:
         analyze(analyzers, rpc_procedure, arg, res,
@@ -607,7 +653,8 @@ void nfs4_ops_switch(Analyzers& analyzers,
                 &INFSv40::illegal40,
                 &res_t::opillegal);
         break;
-    default: break;
+    default:
+        break;
     }
 }
 
@@ -623,7 +670,7 @@ void nfs4_ops_switch(Analyzers& analyzers,
     using res_t   = NST::API::NFS41::nfs_resop4_u_t;
 
     uint32_t nfs_op_num = arg ? arg->argop : res->resop;
-    switch(nfs_op_num)
+    switch (nfs_op_num)
     {
     case ProcEnumNFS41::ACCESS:
         analyze(analyzers, rpc_procedure, arg, res,
@@ -958,7 +1005,8 @@ void nfs4_ops_switch(Analyzers& analyzers,
                 &INFSv41::illegal41,
                 &res_t::opillegal);
         break;
-    default: break;
+    default:
+        break;
     }
 }
 
