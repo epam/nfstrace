@@ -28,11 +28,6 @@
 #include <api/plugin_api.h>
 #include "user_gui.h"
 //------------------------------------------------------------------------------
-const time_t   UserGUI::start_time = time(NULL);
-const uint32_t UserGUI::SECINMIN   = 60;
-const uint32_t UserGUI::SECINHOUR  = 60*60;
-const uint32_t UserGUI::SECINDAY   = 60*60*24;
-const uint32_t UserGUI::MSEC       = 1000000;
 
 operation_data nfsv3_total   {1, 1, NULL, 28 , 2, 10 ,0 , 0, 0};
 operation_data nfsv3_proc    {1, 3, NULL, 18 , 2, 10 ,0 , 0, 0};
@@ -47,13 +42,18 @@ operation_data packets       {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
 //------------------------------------------------------------------------------
 UserGUI::UserGUI(const char *opts)
 : enableUpdate{false}
+, start_time  {time(NULL)}
+, SECINMIN    {60}
+, SECINHOUR   {60*60}
+, SECINDAY    {60*60*24}
+, MSEC        {1000000}
 , all_windows(3, NULL)
 , scroll_shift {0}
 , column_shift {0}
 , _run {ATOMIC_FLAG_INIT}
-, nfs3_procedure_total {0}
+, nfs3_procedure_total   {0}
 , nfs3_count (ProcEnumNFS3::count, 0)
-, nfs4_procedure_total {0}
+, nfs4_procedure_total   {0}
 , nfs4_operations_total  {0}
 , nfs4_count (ProcEnumNFS4::count, 0)
 , refresh_delta {900000}
@@ -72,6 +72,7 @@ UserGUI::UserGUI(const char *opts)
     _run.test_and_set();
     gui_thread = std::thread(&UserGUI::thread, this);
 }
+
 UserGUI::~UserGUI()
 {
     if (gui_thread.joinable())
@@ -84,6 +85,8 @@ UserGUI::~UserGUI()
 
 void UserGUI::updatePlot()
 {
+    std::unique_lock<std::mutex> lck(mut);
+
     if(enableUpdate)
     {
         destroyPlot();
@@ -91,13 +94,12 @@ void UserGUI::updatePlot()
         enableUpdate = false;
     }
 
-    UpRead();
     uint64_t nfs3_procedure_total_copy = nfs3_procedure_total;
     std::vector<int> nfs3_count_copy = nfs3_count;
     uint64_t nfs4_procedure_total_copy = nfs4_procedure_total;
     uint64_t nfs4_operations_total_copy = nfs4_operations_total;
     std::vector<int> nfs4_count_copy = nfs4_count;
-    DownRead();
+    lck.unlock();
     uint16_t counter = nfsv3_total.start_y;
     if(nfsv3_total.max_y + scroll_shift > counter && counter > scroll_shift)
     {
@@ -166,8 +168,7 @@ void UserGUI::updateCounters(const uint64_t &nfs3_total, const std::vector<int> 
                              const uint64_t &nfs4_ops_total, const uint64_t &nfs4_pr_total,
                              const std::vector<int> &nfs4_op_count)
 {
-    for(auto i = 0; i < max_read; i++)
-        UpRead();
+    std::unique_lock<std::mutex> lck(mut);
 
     nfs3_procedure_total += nfs3_total;
     std::vector<int>::const_iterator f;
@@ -183,9 +184,6 @@ void UserGUI::updateCounters(const uint64_t &nfs3_total, const std::vector<int> 
     {
         (*s) += (*f);
     }
-
-    for(auto i = 0; i < max_read; i++)
-        DownRead();
 }
 
 uint16_t UserGUI::inputData()
@@ -437,22 +435,7 @@ void UserGUI::thread()
     }
     catch(std::exception& e)
     {
-        DownRead();
         std::cerr << "Watch plugin error: " << e.what();
     }
-}
-
-void UserGUI::UpRead()
-{
-    std::unique_lock<std::mutex> lck(mut);
-    cv.wait(lck,[this](){ return read_counter < max_read;});
-    read_counter++;
-}
-
-void UserGUI::DownRead()
-{
-    std::unique_lock<std::mutex> lck(mut);
-    cv.wait(lck,[this](){ return read_counter > 0;});
-    read_counter--;
 }
 //------------------------------------------------------------------------------

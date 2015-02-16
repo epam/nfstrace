@@ -119,7 +119,7 @@ void WatchAnalyzer::flush_statistics()
 void WatchAnalyzer::on_unix_signal(int signo)
 {
     if (signo == SIGWINCH) {
-        gui.enableUpdate = true;
+        gui.setUpdate();
     }
 }
 
