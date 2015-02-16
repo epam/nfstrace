@@ -29,25 +29,25 @@
 #include "user_gui.h"
 //------------------------------------------------------------------------------
 
-operation_data nfsv3_total   {1, 1, NULL, 28 , 2, 10 ,0 , 0, 0};
-operation_data nfsv3_proc    {1, 3, NULL, 18 , 2, 10 ,0 , 0, 0};
-operation_data nfsv4_op_total{1, 1, NULL, 28 , 2, 9  ,0 , 0, 0};
-operation_data nfsv4_oper    {1, 3, NULL, 22 , 2, 9  ,0 , 0, 0};
-operation_data nfsv4_pr_total{1, 1, NULL, 28 , 2, 9  ,0 , 0, 0};
-operation_data nfsv4_proc    {1, 3, NULL, 22 , 2, 9  ,0 , 0, 0};
+operation_data nfsv3_total   {1, 1, nullptr, 28 , 2, 10 ,0 , 0, 0};
+operation_data nfsv3_proc    {1, 3, nullptr, 18 , 2, 10 ,0 , 0, 0};
+operation_data nfsv4_op_total{1, 1, nullptr, 28 , 2, 9  ,0 , 0, 0};
+operation_data nfsv4_oper    {1, 3, nullptr, 22 , 2, 9  ,0 , 0, 0};
+operation_data nfsv4_pr_total{1, 1, nullptr, 28 , 2, 9  ,0 , 0, 0};
+operation_data nfsv4_proc    {1, 3, nullptr, 22 , 2, 9  ,0 , 0, 0};
 
-operation_data date_time     {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
-operation_data el_time       {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
-operation_data packets       {1, 8, NULL, 1 , 2, 9  ,999, 0, 0};
+operation_data date_time     {1, 8, nullptr, 1 , 2, 9  ,999, 0, 0};
+operation_data el_time       {1, 8, nullptr, 1 , 2, 9  ,999, 0, 0};
+operation_data packets       {1, 8, nullptr, 1 , 2, 9  ,999, 0, 0};
 //------------------------------------------------------------------------------
 UserGUI::UserGUI(const char *opts)
 : enableUpdate{false}
-, start_time  {time(NULL)}
+, start_time  {time(nullptr)}
 , SECINMIN    {60}
 , SECINHOUR   {60*60}
 , SECINDAY    {60*60*24}
 , MSEC        {1000000}
-, all_windows(3, NULL)
+, all_windows(3, nullptr)
 , scroll_shift {0}
 , column_shift {0}
 , _run {ATOMIC_FLAG_INIT}
@@ -222,7 +222,7 @@ void UserGUI::keyboard()
 
 void UserGUI::chronoUpdate()
 {
-    time_t actual_time = time(NULL);
+    time_t actual_time = time(nullptr);
     tm* t = localtime(&actual_time);
     time_t shift_time = actual_time - start_time;
     mvprintw(date_time.start_y, date_time.start_x,"Date: \t %d.%d.%d \t Time: %d:%d:%d  ",t->tm_mday, t->tm_mon + 1, t->tm_year + 1900,t->tm_hour, t->tm_min, t->tm_sec);
@@ -248,8 +248,8 @@ void UserGUI::designPlot()
     column_shift++;
     chronoUpdate();
 
-    WINDOW* f_win = NULL;
-    WINDOW* s_win = NULL;
+    WINDOW* f_win = nullptr;
+    WINDOW* s_win = nullptr;
     uint16_t column_hei = 0;
     uint16_t column_hei_base = 0;
 
@@ -366,18 +366,33 @@ void UserGUI::designPlot()
 
 void UserGUI::destroyPlot()
 {
+    if(all_windows[0] == nullptr) return;
+    if(all_windows[1] != nullptr)
+    {
+        wclear(all_windows[1]);
+        delwin(all_windows[1]);
+    }
+    if(all_windows[2] != nullptr)
+    {
+        wclear(all_windows[2]);
+        delwin(all_windows[2]);
+    }
     nocbreak();
     echo();
     clrtoeol();
     refresh();
     endwin();
+
+    all_windows[0] = nullptr;
+    all_windows[1] = nullptr;
+    all_windows[2] = nullptr;
 }
 
 void UserGUI::initPlot()
 {
     WINDOW *ww = initscr();
     all_windows[0] = ww;
-    if(ww == NULL)
+    if(ww == nullptr)
     {
         throw std::runtime_error("Initialization of main window failed.");
     }
@@ -422,7 +437,7 @@ void UserGUI::thread()
         while (_run.test_and_set())
         {
             updatePlot();
-            sel_rez = select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv);
+            sel_rez = select(STDIN_FILENO + 1, &rfds, nullptr, nullptr, &tv);
 
             if (sel_rez == -1)
                break;
@@ -432,9 +447,11 @@ void UserGUI::thread()
             tv.tv_sec = refresh_delta / MSEC;
             tv.tv_usec = refresh_delta % MSEC;
         }
+        destroyPlot();
     }
     catch(std::exception& e)
     {
+        destroyPlot();
         std::cerr << "Watch plugin error: " << e.what();
     }
 }
