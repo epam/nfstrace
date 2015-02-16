@@ -23,8 +23,11 @@
 
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/cifs/cifs.h"
+#include "api/cifs_pc_to_net.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFSv2;
+using NST::API::SMBv2::ntohll;
+
 union SMBCode
 {
     uint8_t codes[4];
@@ -152,12 +155,26 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::FlushResponse& )
 {
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadRequest& )
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadRequest& param)
 {
+    param.structureSize         = ntohs(param.structureSize);
+    param.length                = ntohl(param.length);
+    param.offset                = ntohll(param.offset);
+    param.persistentFileId      = ntohll(param.persistentFileId);
+    param.volatileFileId        = ntohll(param.volatileFileId);
+    param.minimumCount          = ntohl(param.minimumCount);
+    param.channel               = static_cast<SMBv2::Channels>(ntohl(static_cast<uint32_t>(param.channel)));
+    param.RemainingBytes        = ntohl(param.RemainingBytes);
+    param.ReadChannelInfoOffset = ntohs(param.ReadChannelInfoOffset);
+    param.ReadChannelInfoLength = ntohs(param.ReadChannelInfoLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadResponse& )
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadResponse& param)
 {
+    param.structureSize = ntohs(param.structureSize);
+    param.DataLength    = ntohl(param.DataLength);
+    param.DataRemaining = ntohl(param.DataRemaining);
+    // param.Reserved2 is reserved, do not convert it
 }
 
 template<> void NST::protocols::CIFSv2::parse(SMBv2::WriteRequest& )
@@ -207,4 +224,3 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::SetInfoRequest& )
 template<> void NST::protocols::CIFSv2::parse(SMBv2::SetInfoResponse& )
 {
 }
-
