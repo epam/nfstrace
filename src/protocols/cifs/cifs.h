@@ -18,12 +18,14 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
+#define NST_PUBLIC __attribute__ ((visibility("default")))
 //------------------------------------------------------------------------------
 #ifndef CIFS_HEADER_H
 #define CIFS_HEADER_H
 //------------------------------------------------------------------------------
 #include <cstdint>
 
+#include "api/cifs_types.h"
 #include "protocols/netbios/netbios.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -32,6 +34,8 @@ namespace protocols
 {
 namespace CIFSv1
 {
+
+using SMBv1Commands = NST::API::SMBv1::SMBv1Commands;
 
 /*! Flags of message
  */
@@ -216,7 +220,11 @@ inline const Cmd command(Data& request, Data& response, Session* session)
     return cmd;
 }
 
-} // CIFS
+extern "C"
+NST_PUBLIC
+const char* print_cifs1_procedures(SMBv1Commands cmd_code);
+
+} // CIFSv1
 
 } // protocols
 } // NST
