@@ -28,7 +28,11 @@
 #include <api/plugin_api.h>
 #include "user_gui.h"
 //------------------------------------------------------------------------------
-
+const unsigned int SECINMIN  = 60;
+const unsigned int SECINHOUR = 60 * 60;
+const unsigned int SECINDAY  = 60 * 60 * 24;
+const unsigned int MSEC      = 1000000;
+//------------------------------------------------------------------------------
 operation_data nfsv3_total   {1, 1, nullptr, 28 , 2, 10 ,0 , 0, 0};
 operation_data nfsv3_proc    {1, 3, nullptr, 18 , 2, 10 ,0 , 0, 0};
 operation_data nfsv4_op_total{1, 1, nullptr, 28 , 2, 9  ,0 , 0, 0};
@@ -40,12 +44,8 @@ operation_data date_time     {1, 8, nullptr, 1 , 2, 9  ,999, 0, 0};
 operation_data el_time       {1, 8, nullptr, 1 , 2, 9  ,999, 0, 0};
 operation_data packets       {1, 8, nullptr, 1 , 2, 9  ,999, 0, 0};
 //------------------------------------------------------------------------------
-UserGUI::UserGUI(const char *opts)
+UserGUI::UserGUI(const char* opts)
 : start_time  {time(nullptr)}
-, SECINMIN    {60}
-, SECINHOUR   {60*60}
-, SECINDAY    {60*60*24}
-, MSEC        {1000000}
 , all_windows(3, nullptr)
 , scroll_shift {0}
 , column_shift {0}
@@ -165,9 +165,9 @@ void UserGUI::updatePlot()
     updateAll();
 }
 
-void UserGUI::updateCounters(const uint64_t &nfs3_total, const std::vector<int> &nfs3_pr_count,
-                             const uint64_t &nfs4_ops_total, const uint64_t &nfs4_pr_total,
-                             const std::vector<int> &nfs4_op_count)
+void UserGUI::updateCounters(const uint64_t& nfs3_total, const std::vector<int>& nfs3_pr_count,
+                             const uint64_t& nfs4_ops_total, const uint64_t& nfs4_pr_total,
+                             const std::vector<int>& nfs4_op_count)
 {
     std::unique_lock<std::mutex> lck(mut);
 
@@ -187,6 +187,11 @@ void UserGUI::updateCounters(const uint64_t &nfs3_total, const std::vector<int> 
     }
 }
 
+void UserGUI::setUpdate()
+{
+    enableUpdate = true;
+}
+
 uint16_t UserGUI::inputData()
 {
     int c = wgetch(all_windows[0]);
@@ -204,7 +209,9 @@ void UserGUI::keyboard()
             {
                 scroll_shift--;
                 enableUpdate = true;
-                do key = getch(); while ((key != EOF) && (key != '\n') && (key != ' '));
+                do
+                    key = getch();
+                while ((key != EOF) && (key != '\n') && (key != ' '));
             }
         }
         else if(key == KEY_DOWN)
@@ -213,11 +220,15 @@ void UserGUI::keyboard()
             {
                 scroll_shift++;
                 enableUpdate = true;
-                do key = getch(); while ((key != EOF) && (key != '\n') && (key != ' '));
+                do
+                    key = getch();
+                while ((key != EOF) && (key != '\n') && (key != ' '));
             }
         }
         else
-            do key = getch(); while ((key != EOF) && (key != '\n') && (key != ' '));
+            do
+                key = getch();
+            while ((key != EOF) && (key != '\n') && (key != ' '));
     }
 }
 
