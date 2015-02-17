@@ -22,7 +22,6 @@
 #ifndef CIFSv2_HEADER_H
 #define CIFSv2_HEADER_H
 //------------------------------------------------------------------------------
-#include "api/cifs_pc_to_net.h"
 #include "api/cifs_commands.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
@@ -33,24 +32,6 @@ namespace protocols
 namespace CIFSv2
 {
 namespace SMBv2 = NST::API::SMBv2;
-
-# if NFSTRACE_BYTE_ORDER == NFSTRACE_BIG_ENDIAN
-
-inline uint64_t ntohll(uint64_t input)
-{
-    // Network byte order == Big Endian
-    return input;
-}
-
-# else
-#  if NFSTRACE_BYTE_ORDER == NFSTRACE_LITTLE_ENDIAN
-
-inline uint64_t ntohll(uint64_t input)
-{
-    return be64toh(input);
-}
-#  endif
-# endif
 
 /*! CIFS v2 Flags
  */
@@ -153,7 +134,12 @@ const MessageHeader* get_header(const uint8_t* data);
  *
  * \param - reference to an object whose fields will be converted
  */
-template<typename ParamType> inline void parse(ParamType&) {}
+template<typename ParamType> inline void parse(ParamType& )
+{
+// TODO: Fix this in future!
+//    static_assert(FALSE, "This method is not supposed to be used."
+//                         "Please make template specialization for the specified type." );
+}
 template<> void parse(SMBv2::ErrResponse& );
 template<> void parse(SMBv2::NegotiateRequest& );
 template<> void parse(SMBv2::NegotiateResponse& );

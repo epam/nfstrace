@@ -48,12 +48,6 @@ namespace SMBv2
 
 # if NFSTRACE_BYTE_ORDER == NFSTRACE_BIG_ENDIAN
 
-inline uint64_t ntohll(uint64_t input)
-{
-    // Network byte order == Big Endian
-    return input;
-}
-
 /*!
  * Converter. Not very fast,
  * try to not use
@@ -102,11 +96,6 @@ constexpr uint16_t pc_to_net(uint16_t t)
 
 # else
 #  if NFSTRACE_BYTE_ORDER == NFSTRACE_LITTLE_ENDIAN
-
-inline uint64_t ntohll(uint64_t input)
-{
-    return be64toh(input);
-}
 
 /*!
  * Does nothing for Intel
