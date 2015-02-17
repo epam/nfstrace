@@ -30,6 +30,20 @@ namespace protocols
 namespace NFS
 {
 
+void print_hex(std::ostream& out,uint32_t val,size_t len)
+{
+    if(len)
+    {
+        out << std::setw(len) << std::hex << std::setfill('0') << "0x";
+        out << val;
+        out << std::dec << std::setfill(' ');
+    }
+    else
+    {
+        out << "void";
+    }
+}
+
 void print_hex(std::ostream& out, const uint32_t* const val, const uint32_t len)
 {
     if(len)

@@ -45,6 +45,10 @@ public:
     {
     }
 
+    void readSMBv2(const SMBv2::ReadCommand*,
+                           const SMBv2::ReadRequest*,
+                           const SMBv2::ReadResponse*) override final;
+
     void null(const RPCProcedure* proc,
               const struct NFS3::NULL3args*,
               const struct NFS3::NULL3res*) override final;
