@@ -47,16 +47,12 @@ struct operation_data
 class UserGUI
 {
 public:
-    UserGUI(const char *);
+    UserGUI(const char*);
     virtual ~UserGUI();
-    void updateCounters(const uint64_t &nfs3_total, const std::vector<int> &nfs3_pr_count,
-                        const uint64_t &nfs4_ops_total, const uint64_t &nfs4_pr_total,
-                        const std::vector<int> &nfs4_pr_count);
-
-    inline void setUpdate()
-    {
-        enableUpdate = true;
-    }
+    void updateCounters(const uint64_t& nfs3_total, const std::vector<int>& nfs3_pr_count,
+                        const uint64_t& nfs4_ops_total, const uint64_t& nfs4_pr_total,
+                        const std::vector<int>& nfs4_pr_count);
+    void setUpdate();
 
 private:
 
@@ -72,10 +68,6 @@ private:
     void thread();
 
     const time_t start_time;
-    const uint32_t SECINMIN;
-    const uint32_t SECINHOUR;
-    const uint32_t SECINDAY;
-    const uint32_t MSEC;
 
     std::mutex mut;
     std::vector<WINDOW*> all_windows;
