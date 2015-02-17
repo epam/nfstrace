@@ -27,6 +27,24 @@
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFSv2;
 
+# if NFSTRACE_BYTE_ORDER == NFSTRACE_BIG_ENDIAN
+
+inline uint64_t ntohll(uint64_t input)
+{
+    // Network byte order == Big Endian
+    return input;
+}
+
+# else
+#  if NFSTRACE_BYTE_ORDER == NFSTRACE_LITTLE_ENDIAN
+
+inline uint64_t ntohll(uint64_t input)
+{
+    return be64toh(input);
+}
+#  endif
+# endif
+
 union SMBCode
 {
     uint8_t codes[4];
