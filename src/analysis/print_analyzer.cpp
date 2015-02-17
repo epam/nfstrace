@@ -22,6 +22,7 @@
 #include <iomanip>
 
 #include "analysis/print_analyzer.h"
+#include "protocols/cifs2/cifs2.h"
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
@@ -32,6 +33,7 @@ namespace NST
 namespace analysis
 {
 
+using namespace NST::protocols::CIFSv2;
 using namespace NST::protocols::NFS;   // NFS helpers
 using namespace NST::protocols::NFS3;  // NFSv3 helpers
 using namespace NST::protocols::NFS4;  // NFSv4.0 helpers
@@ -152,7 +154,46 @@ bool print_procedure(std::ostream& out, const RPCProcedure* proc)
     return result;
 }
 
+template<typename E>
+constexpr auto to_integral(E e) -> typename std::underlying_type<E>::type
+{
+   return static_cast<typename std::underlying_type<E>::type>(e);
+}
+
 } // unnamed namespace
+
+void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* readCommand, const SMBv2::ReadRequest*, const SMBv2::ReadResponse* res)
+{
+    // TODO: In order to print filename (like in wireshark) we have to
+    // link to Create Request (0x05)
+    auto cmdRead = Commands::READ;
+    out << "Read request (";
+    print_hex(out, to_integral(cmdRead), sizeof(to_integral(cmdRead)));
+    out << ")\n"
+        << "  Structure size = ";
+    print_hex(out, readCommand->parg->structureSize, sizeof(readCommand->parg->structureSize));
+    out << "\n"
+        << "  Read length = " << readCommand->parg->length << "\n"
+        << "  File offset = " << readCommand->parg->offset << "\n"
+        << "  Min count = " << readCommand->parg->minimumCount << "\n"
+        << "  Channel = " << static_cast<uint32_t>(readCommand->parg->channel) << "\n"
+        << "  Remaining bytes = " << readCommand->parg->RemainingBytes << "\n"
+        << "  Channel Info Offset = " << readCommand->parg->ReadChannelInfoOffset << "\n"
+        << "  Channel Info Length = " << readCommand->parg->ReadChannelInfoLength << "\n";
+
+    out << "\n" << "Read response (";
+    print_hex(out, to_integral(cmdRead), sizeof(to_integral(cmdRead)));
+    out << ")\n"
+        << "  Structure size = ";
+    print_hex(out, res->structureSize, sizeof(res->structureSize));
+    out << "\n"
+        << "  Data offset = ";
+    print_hex(out, res->DataOffset, sizeof(res->DataOffset));
+    out << "\n"
+        << "  Read length = " << res->DataLength << "\n"
+        << "  Read remaining = " << res->DataRemaining << "\n";
+    // TODO: How should we show the bytes?
+}
 
 // Print NFSv3 procedures (rpcgen)
 // 1st line - PRC information: src and dst hosts, status of RPC procedure
