@@ -26,7 +26,6 @@
 #include "api/cifs_pc_to_net.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFSv2;
-using NST::API::SMBv2::ntohll;
 
 union SMBCode
 {
@@ -163,7 +162,6 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadRequest& param)
     param.persistentFileId      = ntohll(param.persistentFileId);
     param.volatileFileId        = ntohll(param.volatileFileId);
     param.minimumCount          = ntohl(param.minimumCount);
-    param.channel               = static_cast<SMBv2::Channels>(ntohl(static_cast<uint32_t>(param.channel)));
     param.RemainingBytes        = ntohl(param.RemainingBytes);
     param.ReadChannelInfoOffset = ntohs(param.ReadChannelInfoOffset);
     param.ReadChannelInfoLength = ntohs(param.ReadChannelInfoLength);

@@ -37,19 +37,16 @@ TEST(CIFSv2, parse)
     uint16_t fldStructSize = htons(0xABCD);
     uint32_t fldLength     = htons(0xABCD);
     uint64_t fldOffset     = htobe64(0xDEADBEEF);
-    Channels channel       = static_cast<Channels>(htonl(static_cast<uint32_t>(Channels::SMB2_CHANNEL_RDMA_V1)));
 
     readRequest.structureSize = fldStructSize;
     readRequest.length        = fldLength;
     readRequest.offset        = fldOffset;
-    readRequest.channel       = channel;
 
     parse(readRequest);
 
     EXPECT_EQ(readRequest.structureSize,  ntohs(fldStructSize));
     EXPECT_EQ(readRequest.length,         ntohl(fldLength));
     EXPECT_EQ(readRequest.offset,         be64toh(fldOffset));
-    EXPECT_EQ(readRequest.channel,        static_cast<Channels>(ntohl(static_cast<uint32_t>(channel))));
 }
 
 TEST(CIFSv2, bodies)
