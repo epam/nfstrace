@@ -53,10 +53,9 @@ public:
     bool parse_data(FilteredDataQueue::Ptr& data);
 
     void parse_data(FilteredDataQueue::Ptr&& data);
-    void analyze_nfs_procedure(FilteredDataQueue::Ptr &&call,
-                               FilteredDataQueue::Ptr &&reply,
+    void analyze_nfs_procedure(FilteredDataQueue::Ptr&& call,
+                               FilteredDataQueue::Ptr&& reply,
                                Session* session);
-
 };
 
 } // analysis
