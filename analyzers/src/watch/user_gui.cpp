@@ -28,10 +28,13 @@
 #include <api/plugin_api.h>
 #include "user_gui.h"
 //------------------------------------------------------------------------------
-const unsigned int SECINMIN  = 60;
-const unsigned int SECINHOUR = 60 * 60;
-const unsigned int SECINDAY  = 60 * 60 * 24;
-const unsigned int MSEC      = 1000000;
+namespace
+{
+    const unsigned int SECINMIN  = 60;
+    const unsigned int SECINHOUR = 60 * 60;
+    const unsigned int SECINDAY  = 60 * 60 * 24;
+    const unsigned int MSEC      = 1000000;
+}
 //------------------------------------------------------------------------------
 operation_data nfsv3_total   {1, 1, nullptr, 28 , 2, 10 ,0 , 0, 0};
 operation_data nfsv3_proc    {1, 3, nullptr, 18 , 2, 10 ,0 , 0, 0};
@@ -210,7 +213,9 @@ void UserGUI::keyboard()
                 scroll_shift--;
                 enableUpdate = true;
                 do
+                {
                     key = getch();
+                }
                 while ((key != EOF) && (key != '\n') && (key != ' '));
             }
         }
@@ -221,13 +226,17 @@ void UserGUI::keyboard()
                 scroll_shift++;
                 enableUpdate = true;
                 do
+                {
                     key = getch();
+                }
                 while ((key != EOF) && (key != '\n') && (key != ' '));
             }
         }
         else
             do
+            {
                 key = getch();
+            }
             while ((key != EOF) && (key != '\n') && (key != ' '));
     }
 }
