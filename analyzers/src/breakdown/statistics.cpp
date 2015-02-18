@@ -66,7 +66,7 @@ void Statistics::for_each_procedure_in_session(const Session& session, std::func
     }
 }
 
-void Statistics::account(const int cmd_index, const Session &session, const timeval latency)
+void Statistics::account(const int cmd_index, const Session& session, const timeval latency)
 {
     counter[cmd_index].add(latency);
 

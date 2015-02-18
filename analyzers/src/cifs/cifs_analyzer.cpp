@@ -1,7 +1,7 @@
-//------------------------------------------------------------------------------
+///------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Represents CIFS v1 commands
-// Copyright (c) 2015 EPAM Systems
+// Description: Operation CIFS analyzer. Identify clients that are busier than others.
+// Copyright (c) 2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,28 +19,44 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef CIFS_COMMANDS_H
-#define CIFS_COMMANDS_H
+#include <api/plugin_api.h>
+
+#include "cifsbreakdownanalyzer.h"
+#include "cifsv2breakdownanalyzer.h"
 //------------------------------------------------------------------------------
-#include "commandrepresenter.h"
+using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-namespace NST
+
+class Analyzer : public CIFSBreakdownAnalyzer, public CIFSv2BreakdownAnalyzer
 {
-namespace breakdown
-{
-/*!
- * Represents CIFS v1 commands
- * Converts commands to string
- */
-struct SMBv1Commands : public CommandRepresenter
-{
-    const char* command_description(int cmd_code) override final;
-    const char* command_name(int cmd_code) override final;
-    size_t commands_count();
-    const char* protocol_name();
+public:
+
+    void flush_statistics() override final
+    {
+        CIFSBreakdownAnalyzer::flush_statistics();
+        CIFSv2BreakdownAnalyzer::flush_statistics();
+    }
 };
-} // breakdown
-} // NST
-//------------------------------------------------------------------------------
-#endif // CIFS_COMMANDS_H
+
+extern "C"
+{
+
+    const char* usage()
+    {
+        return "No options";
+    }
+
+    IAnalyzer* create(const char*)
+    {
+        return new Analyzer();
+    }
+
+    void destroy(IAnalyzer* instance)
+    {
+        delete instance;
+    }
+
+    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
+
+}//extern "C"
 //------------------------------------------------------------------------------

@@ -19,28 +19,24 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef CIFS_COMMANDS_H
-#define CIFS_COMMANDS_H
+#include <api/plugin_api.h>
+
+#include "cifs_commands.h"
 //------------------------------------------------------------------------------
-#include "commandrepresenter.h"
+using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-namespace NST
+const std::string NST::breakdown::SMBv1Commands::command_name(int cmd_code)
 {
-namespace breakdown
+    return print_cifs1_procedures(static_cast<NST::API::SMBv1::SMBv1Commands>(cmd_code));
+}
+
+size_t NST::breakdown::SMBv1Commands::commands_count()
 {
-/*!
- * Represents CIFS v1 commands
- * Converts commands to string
- */
-struct SMBv1Commands : public CommandRepresenter
+    return static_cast<size_t>(NST::API::SMBv1::SMBv1Commands::CMD_COUNT);
+}
+
+const std::string NST::breakdown::SMBv1Commands::command_description(int cmd_code)
 {
-    const char* command_description(int cmd_code) override final;
-    const char* command_name(int cmd_code) override final;
-    size_t commands_count();
-    const char* protocol_name();
-};
-} // breakdown
-} // NST
-//------------------------------------------------------------------------------
-#endif // CIFS_COMMANDS_H
+    return print_cifs1_procedures(static_cast<NST::API::SMBv1::SMBv1Commands>(cmd_code));
+}
 //------------------------------------------------------------------------------
