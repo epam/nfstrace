@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
 // Description: Header for WatchAnalyzer based on TestAnalyzer.h
-// Copyright (c) 2014 EPAM Systems. All Rights Reserved.
+// Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,11 +19,12 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef PLOTTER_H
-#define PLOTTER_H
+#ifndef USERGUI_H
+#define USERGUI_H
 //------------------------------------------------------------------------------
 #include <atomic>
 #include <cstdlib>
+#include <mutex>
 #include <vector>
 #include <thread>
 
@@ -43,42 +44,51 @@ struct operation_data
     uint16_t x_board_shift;
 };
 //------------------------------------------------------------------------------
-class Plotter
+class UserGUI
 {
 public:
-    Plotter();
-    virtual ~Plotter();
-    void updatePlot(const uint64_t &nfs3_total, const std::vector<int> &nfs3_pr_count,
-                    const uint64_t &nfs4_ops_total, const uint64_t &nfs4_pr_total,
-                    const std::vector<int> &nfs4_pr_count);
-
-    uint16_t inputData();
-    void enableResize();
-    inline void keyboard_thread();
-
-    const static time_t start_time;
-    const static uint32_t SECINMIN;
-    const static uint32_t SECINHOUR;
-    const static uint32_t SECINDAY;
+    UserGUI(const char*);
+    virtual ~UserGUI();
+    void updateCounters(const uint64_t& nfs3_total, const std::vector<int>& nfs3_pr_count,
+                        const uint64_t& nfs4_ops_total, const uint64_t& nfs4_pr_total,
+                        const std::vector<int>& nfs4_pr_count);
+    void setUpdate();
 
 private:
+
+    void updatePlot();
+    uint16_t inputData();
+    void keyboard();
+
     void chronoUpdate();
     void designPlot();
     void destroyPlot();
     void initPlot();
     void updateAll();
+    void thread();
 
-    int resize;
-    std::atomic_flag monitor_running;
-    std::thread keyboard_proc;
+    const time_t start_time;
 
+    std::mutex mut;
     std::vector<WINDOW*> all_windows;
+    std::thread gui_thread;
+
     uint16_t scroll_shift;
     uint16_t x_max;
     uint16_t y_max;
-
     uint16_t column_shift;
+
+    std::atomic<bool> enableUpdate;
+    std::atomic_flag _run;
+
+    uint64_t nfs3_procedure_total;
+    std::vector<int> nfs3_count;
+    uint64_t nfs4_procedure_total;
+    uint64_t nfs4_operations_total;
+    std::vector<int> nfs4_count;
+
+    long int refresh_delta;
 };
 //------------------------------------------------------------------------------
-#endif // PLOTTER_H
+#endif // USERGUI_H
 //------------------------------------------------------------------------------

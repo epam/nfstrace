@@ -20,13 +20,13 @@
 */
 //------------------------------------------------------------------------------
 #ifndef WATCH_ANALYZER_H
-#define WATCH_ANALYZER_H 
+#define WATCH_ANALYZER_H
 //------------------------------------------------------------------------------
 #include <atomic>
 #include <condition_variable>
 
 #include <api/plugin_api.h> // include plugin development definitions
-#include "plotter.h"
+#include "user_gui.h"
 //------------------------------------------------------------------------------
 class WatchAnalyzer : public IAnalyzer
 {
@@ -115,28 +115,7 @@ private:
     void count_proc(const RPCProcedure* proc);
     void account(const RPCProcedure*,
                  const struct NFS4::COMPOUND4res* res = nullptr);
-
-    void UpRead();
-    void DownRead();
-
-    uint64_t nfs3_proc_total;
-    std::vector<int> nfs3_proc_count;
-
-    uint64_t nfs4_proc_total;
-    uint64_t nfs4_ops_total;
-    std::vector<int> nfs4_proc_count;
-
-    std::thread monitor_thread;
-    std::atomic_flag monitor_running;
-
-    long int refresh_delta;
-
-    const uint16_t max_read;
-    std::atomic<uint16_t> read_counter;
-    std::condition_variable cv;
-    std::mutex mut;
-
-    Plotter pl;
+    UserGUI gui;
 };
 //------------------------------------------------------------------------------
 #endif //WATCH_ANALYZER_H
