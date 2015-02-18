@@ -36,11 +36,6 @@ NFSv41BreakdownAnalyzer::NFSv41BreakdownAnalyzer(std::ostream& o)
 
 }
 
-void NFSv41BreakdownAnalyzer::null41(const RPCProcedure* proc, const NFS41::NULL4args*, const NFS41::NULL4res*)
-{
-    compound_stats.account(proc, NFS_V41);
-}
-
 void NFSv41BreakdownAnalyzer::compound41(const RPCProcedure* proc, const NFS41::COMPOUND4args*, const NFS41::COMPOUND4res*)
 {
     compound_stats.account(proc, NFS_V41);

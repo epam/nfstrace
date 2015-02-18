@@ -11,5 +11,5 @@ install (TARGETS testanalyzer LIBRARY DESTINATION lib/nfstrace)
 
 # build analyzers (new way) ====================================================
 add_subdirectory (src/watch)
-add_subdirectory (src/json)
 add_subdirectory (src/breakdown)
+add_subdirectory (src/json)

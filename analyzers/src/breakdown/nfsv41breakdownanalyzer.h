@@ -43,9 +43,6 @@ class NFSv41BreakdownAnalyzer : virtual public IAnalyzer
 public:
     NFSv41BreakdownAnalyzer(std::ostream& o = std::cout);
     // NFSv4.1 procedures
-    void null41(const RPCProcedure* proc,
-                const struct NFS41::NULL4args*,
-                const struct NFS41::NULL4res*) override final;
     void compound41(const RPCProcedure*  proc,
                     const struct NFS41::COMPOUND4args*,
                     const struct NFS41::COMPOUND4res*) override final;
