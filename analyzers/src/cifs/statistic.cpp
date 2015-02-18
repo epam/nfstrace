@@ -1,7 +1,7 @@
-///------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Operation CIFS analyzer. Identify clients that are busier than others.
-// Copyright (c) 2014 EPAM Systems
+// Description: Statistic structure
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,44 +19,22 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <api/plugin_api.h>
-
-#include "cifsbreakdownanalyzer.h"
-#include "cifsv2breakdownanalyzer.h"
+#include "statistic.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-
-class Analyzer : public CIFSBreakdownAnalyzer, public CIFSv2BreakdownAnalyzer
+bool Less::operator()(const Session& a, const Session& b) const
 {
-public:
+    return ( (std::uint16_t)(a.ip_type) < (std::uint16_t)(b.ip_type) ) || // compare versions of IP address
+           ( ntohs(a.port[0]) < ntohs(b.port[0])                     ) || // compare Source(client) ports
+           ( ntohs(a.port[1]) < ntohs(b.port[1])                     ) || // compare Destination(server) ports
 
-    void flush_statistics() override final
-    {
-        CIFSBreakdownAnalyzer::flush_statistics();
-        CIFSv2BreakdownAnalyzer::flush_statistics();
-    }
-};
+           ( (a.ip_type == Session::IPType::v4) ? // compare IPv4
+             ((ntohl(a.ip.v4.addr[0]) < ntohl(b.ip.v4.addr[0])) || (ntohl(a.ip.v4.addr[1]) < ntohl(b.ip.v4.addr[1])))
+             :
+             (memcmp(&a.ip.v6, &b.ip.v6, sizeof(a.ip.v6)) < 0 )
+           );
+}
 
-extern "C"
-{
-
-    const char* usage()
-    {
-        return "No options";
-    }
-
-    IAnalyzer* create(const char*)
-    {
-        return new Analyzer();
-    }
-
-    void destroy(IAnalyzer* instance)
-    {
-        delete instance;
-    }
-
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
-
-}//extern "C"
+Statistics::Statistics() : procedures_total_count {0} {}
 //------------------------------------------------------------------------------

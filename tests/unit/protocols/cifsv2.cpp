@@ -22,7 +22,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "api/cifs_commands.h"
+#include "api/cifs2_commands.h"
 //------------------------------------------------------------------------------
 using namespace NST::API::SMBv2;
 //------------------------------------------------------------------------------

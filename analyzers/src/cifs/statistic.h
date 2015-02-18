@@ -1,7 +1,7 @@
-///------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Operation CIFS analyzer. Identify clients that are busier than others.
-// Copyright (c) 2014 EPAM Systems
+// Description: Statistics structure
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,44 +19,40 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#ifndef STATISTIC_H
+#define STATISTIC_H
+//------------------------------------------------------------------------------
 #include <api/plugin_api.h>
 
-#include "cifsbreakdownanalyzer.h"
-#include "cifsv2breakdownanalyzer.h"
+#include "breakdowncounter.h"
 //------------------------------------------------------------------------------
-using namespace NST::breakdown;
-//------------------------------------------------------------------------------
-
-class Analyzer : public CIFSBreakdownAnalyzer, public CIFSv2BreakdownAnalyzer
+namespace NST
 {
-public:
-
-    void flush_statistics() override final
-    {
-        CIFSBreakdownAnalyzer::flush_statistics();
-        CIFSv2BreakdownAnalyzer::flush_statistics();
-    }
+namespace breakdown
+{
+/*! \brief Comparator for sessions
+ */
+struct Less
+{
+    bool operator() (const Session& a, const Session& b) const;
 };
 
-extern "C"
+/*! \brief All statistic data
+ */
+struct Statistics
 {
+    using PerOpStat = std::map<Session, BreakdownCounter, Less>;
+    using ProceduresCount = std::map<int, int>;
 
-    const char* usage()
-    {
-        return "No options";
-    }
+    uint64_t procedures_total_count;//!< Total amount of procedures
+    ProceduresCount procedures_count;//!< Count of each procedure
+    PerOpStat per_procedure_statistics;//!< Statistic for each procedure
 
-    IAnalyzer* create(const char*)
-    {
-        return new Analyzer();
-    }
-
-    void destroy(IAnalyzer* instance)
-    {
-        delete instance;
-    }
-
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
-
-}//extern "C"
+    Statistics();
+};
+} // breakdown
+} // NST
 //------------------------------------------------------------------------------
+#endif // STATISTIC_H
+//------------------------------------------------------------------------------
+
