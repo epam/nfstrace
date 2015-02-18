@@ -1,7 +1,7 @@
-///------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Operation CIFS analyzer. Identify clients that are busier than others.
-// Copyright (c) 2014 EPAM Systems
+// Description: Statistics counter
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,44 +19,38 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <api/plugin_api.h>
+#include <algorithm>
+#include <numeric>
 
-#include "cifsbreakdownanalyzer.h"
-#include "cifsv2breakdownanalyzer.h"
+#include "breakdowncounter.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
+BreakdownCounter::BreakdownCounter() {}
 
-class Analyzer : public CIFSBreakdownAnalyzer, public CIFSv2BreakdownAnalyzer
+BreakdownCounter::~BreakdownCounter() {}
+
+Latencies& BreakdownCounter::operator[](int index)
 {
-public:
+    return latencies[index];
+}
 
-    void flush_statistics() override final
-    {
-        CIFSBreakdownAnalyzer::flush_statistics();
-        CIFSv2BreakdownAnalyzer::flush_statistics();
-    }
-};
-
-extern "C"
+uint64_t BreakdownCounter::get_total_count() const
 {
+    using LatenciesMap = std::map<int, NST::breakdown::Latencies>;
 
-    const char* usage()
+    return std::accumulate(std::begin(latencies), std::end(latencies), 0, [](int sum, LatenciesMap::value_type latency)
     {
-        return "No options";
-    }
+        return sum + latency.second.get_count();
+    });
+}
 
-    IAnalyzer* create(const char*)
+const Latencies BreakdownCounter::operator[](int index) const
+{
+    if (latencies.find(index) != latencies.end())
     {
-        return new Analyzer();
+        return latencies.at(index);
     }
-
-    void destroy(IAnalyzer* instance)
-    {
-        delete instance;
-    }
-
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
-
-}//extern "C"
+    return NST::breakdown::Latencies();
+}
 //------------------------------------------------------------------------------
