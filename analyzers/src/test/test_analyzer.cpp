@@ -439,12 +439,6 @@ public:
 
     // NFSv4.1 procedures
 
-    void null41(const RPCProcedure* /*proc*/,
-              const struct NFS41::NULL4args* /*args*/,
-              const struct NFS41::NULL4res* /*res*/) override final
-    {
-        std::cout << "TestAnalyzer::null()" << std::endl;
-    }
     void compound41(const RPCProcedure* /*proc*/,
                            const struct NFS41::COMPOUND4args* /*args*/,
                            const struct NFS41::COMPOUND4res* /*res*/) override final
