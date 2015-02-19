@@ -34,10 +34,7 @@ void StatisticsCompositor::for_each_procedure(std::function<void(const Breakdown
 {
     assert(procedures_stats.proc_types_count < proc_types_count);
 
-    for (size_t procedure = 0; procedure < procedures_stats.proc_types_count; ++procedure)
-    {
-        on_procedure(procedures_stats.counter, procedure);
-    }
+    procedures_stats.for_each_procedure(on_procedure);
 
     for (size_t procedure = procedures_stats.proc_types_count; procedure < proc_types_count; ++procedure)
     {
@@ -47,15 +44,15 @@ void StatisticsCompositor::for_each_procedure(std::function<void(const Breakdown
 
 void StatisticsCompositor::for_each_procedure_in_session(const Session& session, std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
 {
-    auto it = procedures_stats.per_session_statistics.find(session);
-    if (it != procedures_stats.per_session_statistics.end())
+    bool has_procedures_in_session = false;
+
+    procedures_stats.for_each_procedure_in_session(session, [&](const BreakdownCounter& breakdown, size_t proc)
     {
-        for (size_t procedure = 0; procedure < procedures_stats.proc_types_count; ++procedure)
-        {
-            on_procedure((*it).second, procedure);
-        }
-    }
-    else
+        on_procedure(breakdown, proc);
+        has_procedures_in_session = true;
+    });
+
+    if (!has_procedures_in_session)
     {
         BreakdownCounter empty(procedures_stats.proc_types_count);
         for (size_t procedure = 0; procedure < procedures_stats.proc_types_count; ++procedure)
@@ -69,4 +66,22 @@ void StatisticsCompositor::for_each_procedure_in_session(const Session& session,
     {
         on_procedure(current, procedure);
     }
+}
+
+bool StatisticsCompositor::has_session() const
+{
+    if (per_session_statistics.empty() || !procedures_stats.has_session())
+    {
+        return false;
+    }
+
+    bool has_procedures_in_session = false;
+    procedures_stats.for_each_session([&](const Session& session)
+    {
+        if (per_session_statistics.find(session) != per_session_statistics.end()) {
+            has_procedures_in_session = true;
+        }
+    });
+
+    return has_procedures_in_session;
 }

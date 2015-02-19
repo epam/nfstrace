@@ -42,7 +42,7 @@ void Representer::flush_statistics(const Statistics& statistics)
         << " protocol"
         << std::endl;
 
-    statistics.for_each_procedure([&](const BreakdownCounter & breakdown, size_t procedure)
+    statistics.for_each_procedure([&](const BreakdownCounter& breakdown, size_t procedure)
     {
         onProcedureInfoPrinted(out, breakdown, procedure);
         size_t procedure_count = breakdown[procedure].get_count();
@@ -60,7 +60,7 @@ void Representer::flush_statistics(const Statistics& statistics)
         out << '%' << std::endl;
     });
 
-    if (statistics.per_session_statistics.size())  // is not empty?
+    if (statistics.has_session())  // is not empty?
     {
         out << "Per connection info: " << std::endl;
 

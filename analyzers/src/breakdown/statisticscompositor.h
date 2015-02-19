@@ -39,6 +39,7 @@ public:
     StatisticsCompositor(Statistics& procedures_stats, Statistics& operations_stats);
     void for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
     void for_each_procedure_in_session(const Session& session, std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
+    bool has_session() const override;
 };
 } // breakdown
 } // NST
