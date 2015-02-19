@@ -59,6 +59,11 @@ void Statistics::for_each_session(std::function<void (const Session&)> on_sessio
 
 void Statistics::for_each_procedure_in_session(const Session& session, std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
 {
+    if (per_session_statistics.find(session) == per_session_statistics.end())
+    {
+        return;
+    }
+
     const BreakdownCounter& current = per_session_statistics.at(session);
     for (size_t procedure = 0; procedure < proc_types_count; ++procedure)
     {
