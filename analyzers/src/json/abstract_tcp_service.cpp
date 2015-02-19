@@ -27,13 +27,9 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "net/abstract_tcp_service.h"
+#include "abstract_tcp_service.h"
 #include "utils/log.h"
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace net
-{
 
 AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, const std::string& host, int backlog) :
     _port{port},
@@ -206,6 +202,4 @@ AbstractTcpService::AbstractTask::~AbstractTask()
     close(_socket);
 }
 
-} // namespace net
-} // namespace NST
 //------------------------------------------------------------------------------

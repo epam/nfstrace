@@ -29,12 +29,8 @@
 #include <thread>
 #include <vector>
 
-#include "net/ip_endpoint.h"
+#include "ip_endpoint.h"
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace net
-{
 
 //! TCP-service
 /*!
@@ -128,8 +124,6 @@ private:
     std::condition_variable _tasksQueueCond;
 };
 
-} // namespace net
-} // namespace NST
 //------------------------------------------------------------------------------
 #endif // ABSTRACT_TCP_SERVICE_H
 //------------------------------------------------------------------------------

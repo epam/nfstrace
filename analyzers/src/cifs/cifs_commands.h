@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Ilya Storozhilov
-// Description: TCP-endpoint tests
-// Copyright (c) 2013-2014 EPAM Systems
+// Author: Andrey Kuznetsov
+// Description: Represents CIFS v1 commands
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,24 +19,29 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <stdexcept>
-
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
-#include "net/ip_endpoint.h"
+#ifndef CIFS_COMMANDS_H
+#define CIFS_COMMANDS_H
 //------------------------------------------------------------------------------
-using namespace NST::net;
-
-static constexpr const char* ValidHost = IpEndpoint::LoopbackAddress;
-static constexpr int ValidPort = 8888;
-static constexpr const char* InvalidHost = "invalid_host_name";
-static constexpr int InvalidPort = -1;
-
-TEST(TestTcpEndpoint, constructDestruct)
+#include "commandrepresenter.h"
+//------------------------------------------------------------------------------
+namespace NST
 {
-    EXPECT_NO_THROW(IpEndpoint endpoint(ValidHost, ValidPort));
-    EXPECT_THROW(IpEndpoint endpoint(ValidHost, InvalidPort), std::runtime_error);
-    EXPECT_THROW(IpEndpoint endpoint(InvalidHost, ValidPort), std::runtime_error);
-    EXPECT_THROW(IpEndpoint endpoint(InvalidHost, InvalidPort), std::runtime_error);
-}
+namespace breakdown
+{
+/*!
+ * Represents CIFS v1 commands
+ * Converts commands to string
+ */
+struct SMBv1Commands : public CommandRepresenter
+{
+    const std::string command_description(int cmd_code) override final;
+
+    const std::string command_name(int cmd_code) override final;
+
+    size_t commands_count();
+};
+} // breakdown
+} // NST
+//------------------------------------------------------------------------------
+#endif // CIFS_COMMANDS_H
+//------------------------------------------------------------------------------

@@ -8,12 +8,16 @@ if (VALGRIND_PATH)
 
     foreach (PROTOCOL IN ITEMS "nfsv3" "nfsv4")
         # Preparing trace file
-
         set (ARCHIVED_TRACE_FILENAME "${CMAKE_SOURCE_DIR}/traces/breakdown/eth-ipv4-tcp-${PROTOCOL}.pcap.bz2")
         set (TRACE_FILENAME "${CMAKE_BINARY_DIR}/eth-ipv4-tcp-${PROTOCOL}.pcap")
-        message (STATUS "Unpacking '${ARCHIVED_TRACE_FILENAME}' to '${TRACE_FILENAME}'")
-        execute_process (COMMAND bzcat ${ARCHIVED_TRACE_FILENAME}
-                OUTPUT_FILE ${TRACE_FILENAME})
+        set (UNZIP_TRACE_TARGET_NAME "${PROTOCOL}_trace")
+        add_custom_target (${UNZIP_TRACE_TARGET_NAME}
+                COMMAND bzcat ${ARCHIVED_TRACE_FILENAME} > ${TRACE_FILENAME}
+                DEPENDS ${ARCHIVED_TRACE_FILENAME})
+        add_dependencies (memcheck-report ${UNZIP_TRACE_TARGET_NAME})
+        add_dependencies (memcheck-report-xml ${UNZIP_TRACE_TARGET_NAME})
+        add_dependencies (helgrind-report ${UNZIP_TRACE_TARGET_NAME})
+        add_dependencies (helgrind-report-xml ${UNZIP_TRACE_TARGET_NAME})
 
         # Memcheck report
         add_custom_command (TARGET memcheck-report

@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Parser of filtrated NFSv3 Procedures.
-// Copyright (c) 2013 EPAM Systems
+// Author: Andrey Kuznetsov
+// Description: Interface for command representers
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,47 +19,45 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef NFS_PARSER_H
-#define NFS_PARSER_H
+#ifndef COMMANDREPRESENTER_H
+#define COMMANDREPRESENTER_H
 //------------------------------------------------------------------------------
-#include "analysis/analyzers.h"
-#include "analysis/rpc_sessions.h"
-#include "controller/running_status.h"
-#include "protocols/nfs/nfs_procedure.h"
-#include "utils/filtered_data.h"
+#include <string>
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace analysis
+namespace breakdown
 {
-
-/*! \class It is class which can parse NFS messages and it called by ParserThread
+/*!
+ * \brief The CommandRepresenter struct represents interface for command representers
+ * Commands representer should be able to convert commands to string
  */
-class NFSParser
+struct CommandRepresenter
 {
-    using FilteredDataQueue = NST::utils::FilteredDataQueue;
-
-    Analyzers& analyzers;
-    Sessions<Session> sessions;
-public:
-
-    NFSParser(Analyzers& a) : analyzers(a) {}
-    NFSParser(NFSParser& c) : analyzers(c.analyzers) {}
-
-    /*! Function which will be called by ParserThread class
-     * \param data - RPC packet
-     * \return True, if it is RPC(NFS) packet and False in other case
+    /*!
+     * \brief commandDescription returns description of the command
+     * \param cmd_code command code
+     * \return description
      */
-    bool parse_data(FilteredDataQueue::Ptr& data);
+    virtual const std::string command_description(int cmd_code) = 0;
 
-    void parse_data(FilteredDataQueue::Ptr&& data);
-    void analyze_nfs_procedure(FilteredDataQueue::Ptr&& call,
-                               FilteredDataQueue::Ptr&& reply,
-                               Session* session);
+    /*!
+     * \brief commandName returns name of the command
+     * \param cmd_code command code
+     * \return name
+     */
+    virtual const std::string command_name(int cmd_code) = 0;
+
+    /*!
+     * \brief commandsCount returns total count of commands
+     * \return count
+     */
+    virtual size_t commands_count() = 0;
+
+    virtual ~CommandRepresenter() {}
 };
-
-} // analysis
+} // breakdown
 } // NST
 //------------------------------------------------------------------------------
-#endif // NFS_PARSER_H
+#endif // COMMANDREPRESENTER_H
 //------------------------------------------------------------------------------

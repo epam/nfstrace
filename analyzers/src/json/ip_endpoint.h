@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Parser of filtrated NFSv3 Procedures.
-// Copyright (c) 2013 EPAM Systems
+// Author: Ilya Storozhilov
+// Description: TCP-endpoint class declaration
+// Copyright (c) 2013-2014 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,47 +19,43 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef NFS_PARSER_H
-#define NFS_PARSER_H
+#ifndef IP_ENDPOINT
+#define IP_ENDPOINT
 //------------------------------------------------------------------------------
-#include "analysis/analyzers.h"
-#include "analysis/rpc_sessions.h"
-#include "controller/running_status.h"
-#include "protocols/nfs/nfs_procedure.h"
-#include "utils/filtered_data.h"
+#include <string>
+
+#include <netdb.h>
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace analysis
-{
 
-/*! \class It is class which can parse NFS messages and it called by ParserThread
- */
-class NFSParser
+//! IP-endpoint (host:port) helper class to use in socket operations
+class IpEndpoint
 {
-    using FilteredDataQueue = NST::utils::FilteredDataQueue;
-
-    Analyzers& analyzers;
-    Sessions<Session> sessions;
 public:
+    //! Loopback address name
+    static constexpr const char* LoopbackAddress = "localhost";
+    //! Wildcard address name
+    static constexpr const char* WildcardAddress = "*";
 
-    NFSParser(Analyzers& a) : analyzers(a) {}
-    NFSParser(NFSParser& c) : analyzers(c.analyzers) {}
-
-    /*! Function which will be called by ParserThread class
-     * \param data - RPC packet
-     * \return True, if it is RPC(NFS) packet and False in other case
+    IpEndpoint() = delete;
+    //! Constructs TCP-endpoint
+    /*!
+     * \param host Hostname or IP-address of the endpoint
+     * \param port TCP-port
+     * \param hostAsAddress Consider host as IP-address flag
      */
-    bool parse_data(FilteredDataQueue::Ptr& data);
+    IpEndpoint(const std::string& host, int port, bool hostAsAddress = false);
+    //! Destructs TCP-endpoint
+    ~IpEndpoint();
 
-    void parse_data(FilteredDataQueue::Ptr&& data);
-    void analyze_nfs_procedure(FilteredDataQueue::Ptr&& call,
-                               FilteredDataQueue::Ptr&& reply,
-                               Session* session);
+    //! Returns a pointer to 'struct addrinfo' structure for TCP-endpoint
+    struct addrinfo* addrinfo()
+    {
+        return _addrinfo;
+    }
+private:
+    struct addrinfo* _addrinfo;
 };
 
-} // analysis
-} // NST
 //------------------------------------------------------------------------------
-#endif // NFS_PARSER_H
+#endif // IP_ENDPOINT
 //------------------------------------------------------------------------------
