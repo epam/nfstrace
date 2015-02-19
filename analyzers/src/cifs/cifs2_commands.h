@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Dzianis Huznou
-// Description: Parser of filtrated NFSv3 Procedures.
-// Copyright (c) 2013 EPAM Systems
+// Author: Andrey Kuznetsov
+// Description: Represents CIFS v2 commands
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,47 +19,56 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef NFS_PARSER_H
-#define NFS_PARSER_H
+#ifndef CIFS2_COMMANDS_H
+#define CIFS2_COMMANDS_H
 //------------------------------------------------------------------------------
-#include "analysis/analyzers.h"
-#include "analysis/rpc_sessions.h"
-#include "controller/running_status.h"
-#include "protocols/nfs/nfs_procedure.h"
-#include "utils/filtered_data.h"
+#include "commandrepresenter.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
-namespace analysis
+namespace breakdown
 {
-
-/*! \class It is class which can parse NFS messages and it called by ParserThread
+/*!
+ * Represents CIFS v2 commands
+ * Converts commands to string
  */
-class NFSParser
+struct SMBv2Commands : CommandRepresenter
 {
-    using FilteredDataQueue = NST::utils::FilteredDataQueue;
-
-    Analyzers& analyzers;
-    Sessions<Session> sessions;
-public:
-
-    NFSParser(Analyzers& a) : analyzers(a) {}
-    NFSParser(NFSParser& c) : analyzers(c.analyzers) {}
-
-    /*! Function which will be called by ParserThread class
-     * \param data - RPC packet
-     * \return True, if it is RPC(NFS) packet and False in other case
+    /*!
+     * \brief The Commands enum commands codes
      */
-    bool parse_data(FilteredDataQueue::Ptr& data);
+    enum Commands
+    {
+        NEGOTIATE,
+        SESSION_SETUP,
+        LOGOFF,
+        TREE_CONNECT,
+        TREE_DISCONNECT,
+        CREATE,
+        CLOSE,
+        FLUSH,
+        READ,
+        WRITE,
+        LOCK,
+        IOCTL,
+        CANCEL,
+        ECHO,
+        QUERY_DIRECTORY,
+        CHANGE_NOTIFY,
+        QUERY_INFO,
+        SET_INFO,
+        OPLOCK_BREAK,
+        CMD_COUNT
+    };
 
-    void parse_data(FilteredDataQueue::Ptr&& data);
-    void analyze_nfs_procedure(FilteredDataQueue::Ptr&& call,
-                               FilteredDataQueue::Ptr&& reply,
-                               Session* session);
+    const std::string command_description(int cmd_code) override final;
+
+    const std::string command_name(int cmd_code) override final;
+
+    size_t commands_count();
 };
-
-} // analysis
+} // breakdown
 } // NST
 //------------------------------------------------------------------------------
-#endif // NFS_PARSER_H
+#endif // CIFS2_COMMANDS_H
 //------------------------------------------------------------------------------

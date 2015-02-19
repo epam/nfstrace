@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) try
 {
     Parameters params(argc, argv); // set and validate CLI options
 
-    if(params.show_help() || params.show_enum())
+    if (params.show_help() || params.show_enum())
     {
         return 0; // -h or -E were passed
     }
@@ -40,12 +40,12 @@ int main(int argc, char* argv[]) try
 
     return controller.run();
 }
-catch(const std::exception& e)
+catch (const std::exception& e)
 {
     std::cerr << argv[0] << ": " << e.what() << std::endl;
     return -1;
 }
-catch(...)
+catch (...)
 {
     std::cerr << argv[0] << ": Unknown exception" << std::endl;
     return -1;

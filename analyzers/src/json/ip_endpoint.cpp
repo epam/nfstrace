@@ -24,12 +24,8 @@
 
 #include <sys/socket.h>
 
-#include "net/ip_endpoint.h"
+#include "ip_endpoint.h"
 //------------------------------------------------------------------------------
-namespace NST
-{
-namespace net
-{
 
 IpEndpoint::IpEndpoint(const std::string& host, int port, bool hostAsAddress) :
     _addrinfo{}
@@ -65,6 +61,4 @@ IpEndpoint::~IpEndpoint()
     freeaddrinfo(_addrinfo);
 }
 
-} // namespace net
-} // namespace NST
 //------------------------------------------------------------------------------

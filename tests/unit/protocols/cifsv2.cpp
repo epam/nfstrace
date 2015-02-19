@@ -23,7 +23,7 @@
 #include <gtest/gtest.h>
 #include <arpa/inet.h>
 
-
+#include "api/cifs2_commands.h"
 #include "api/cifs_commands.h"
 #include "protocols/cifs2/cifs2.h"
 //------------------------------------------------------------------------------

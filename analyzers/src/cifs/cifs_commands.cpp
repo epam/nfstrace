@@ -1,7 +1,7 @@
-///------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
-// Description: Operation CIFS analyzer. Identify clients that are busier than others.
-// Copyright (c) 2014 EPAM Systems
+// Description: Represents CIFS v1 commands
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -21,42 +21,22 @@
 //------------------------------------------------------------------------------
 #include <api/plugin_api.h>
 
-#include "cifsbreakdownanalyzer.h"
-#include "cifsv2breakdownanalyzer.h"
+#include "cifs_commands.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
-
-class Analyzer : public CIFSBreakdownAnalyzer, public CIFSv2BreakdownAnalyzer
+const std::string NST::breakdown::SMBv1Commands::command_name(int cmd_code)
 {
-public:
+    return print_cifs1_procedures(static_cast<NST::API::SMBv1::SMBv1Commands>(cmd_code));
+}
 
-    void flush_statistics() override final
-    {
-        CIFSBreakdownAnalyzer::flush_statistics();
-        CIFSv2BreakdownAnalyzer::flush_statistics();
-    }
-};
-
-extern "C"
+size_t NST::breakdown::SMBv1Commands::commands_count()
 {
+    return static_cast<size_t>(NST::API::SMBv1::SMBv1Commands::CMD_COUNT);
+}
 
-    const char* usage()
-    {
-        return "No options";
-    }
-
-    IAnalyzer* create(const char*)
-    {
-        return new Analyzer();
-    }
-
-    void destroy(IAnalyzer* instance)
-    {
-        delete instance;
-    }
-
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
-
-}//extern "C"
+const std::string NST::breakdown::SMBv1Commands::command_description(int cmd_code)
+{
+    return print_cifs1_procedures(static_cast<NST::API::SMBv1::SMBv1Commands>(cmd_code));
+}
 //------------------------------------------------------------------------------
