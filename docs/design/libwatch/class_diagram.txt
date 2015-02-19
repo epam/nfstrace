@@ -1,0 +1,101 @@
+@startuml
+skinparam titleFontSize 24
+skinparam defaultFontSize 16
+title NFSTrace: libwatch class diagram
+
+enum ProtocolId {
+  NFSv3 = 0
+  NFSv4 = 1
+  NFSv41 = 2
+  CIFSv1 = 3
+  CIFSv2 = 4
+}
+
+enum CommandsAmount {
+  NFSv3 = 22
+  NFSv4 = 41
+  NFSv41 = 59
+  CIFSv1 = 255
+  CIFSv2 = 18
+}
+
+class Statistics {
+  + commands: std::map<std::size_t, std::size_t>
+}
+
+class WatchAnalyzer {
+  - _userGUI: UserGUI
+  + {abstract} onCommand(): void
+  + {abstract} onUnixSignal(): void
+}
+
+class UserGUI << thread >> {
+  - _isRunning: std::atomic<bool>
+  - _shouldRefresh: std::atomic<bool>
+  - _statisticsDeltaMutex: std::mutex
+  - _statisticsDeltaContainer: std::unordered_map<ProtocolId, Statistics>
+  - _statisticsContainer: std::unordered_map<ProtocolId, Statistics>
+  - _activeProtocolId: ProtocolId
+  - _headerWindow: HeaderWindow
+  - _statisticsWindow: StatisticsWindow
+  - run()
+  - selectProtocol(newProtocolId: ProtocolId)
+  + update(protocolId: ProtocolId, statistics: const Statistics&)
+  + refresh()
+}
+
+note right of UserGUI
+  <b>_statisticsDeltaContainer/_statisticsDeltaMutex</b>
+  are used to thread-safely pass statistics delta from
+  analyzer's thread to GUI's one;
+  <b>run()</b> is a thread-function where GUI is to
+  be created/[re-]drawn/destroyed, keyboard events are to
+  be handled and incoming statistics delta is to be applied;
+  <b>selectProtocol()</b> is to be called internally when
+  a user changes active protocol;
+  <b>update()</b> is to be called from analyzer
+  to update statistics delta;
+  <b>refresh()</b> is to be called from analyzer
+  to completely redraw GUI (e.g. on SIGCONT) -
+  this method just sets <b>_shouldRefresh</b> to <b>true</b>
+  but actual refresh is made in <b>run()</b>.
+end note
+
+
+class HeaderWindow {
+  - {static} _protocolNames: const char*[]
+  - _handle: WINDOW*
+  - _activeProtocolId: ProtocolId
+  + selectProtocol(protocolId: ProtocolId)
+  + refresh()
+}
+
+class StatisticsWindow {
+  - {static} _operationNames: const char*[][]
+  - _handle: WINDOW*
+  - _activeProtocolId: ProtocolId
+  - _activeStatistics: const Statistics&
+  - _scrollOffset: std::size_t
+  + reset(protocolId: ProtocolId, statistics: const Statistics&)
+  + update()
+  + scroll(increment: int)
+  + refresh()
+}
+
+note right of StatisticsWindow
+  <b>reset()</b> is to be called when a protocol
+  is changed and scrolling should be reset;
+  <b>update()</b> is to be called to update statistics data;
+  <b>scroll()</b> is to be called to scroll statistics data;
+  <b>refresh()</b> is to be called to completely redraw window.
+end note
+
+WatchAnalyzer "1" *-- "1" UserGUI
+UserGUI "1" *-- "1" HeaderWindow
+UserGUI "1" *-- "1" StatisticsWindow
+UserGUI "1" *-- "1" ProtocolId
+UserGUI "1" *-- "*" Statistics
+HeaderWindow "1" *-- "1" ProtocolId
+StatisticsWindow "1" o-- "1" Statistics
+StatisticsWindow "1" *-- "1" ProtocolId
+@enduml
