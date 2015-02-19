@@ -48,8 +48,6 @@ struct Statistics
     using ProceduresCount = std::vector<int>;
 
     const size_t proc_types_count;//!< Count of types of procedures
-    BreakdownCounter counter;//!< Statistics for all sessions
-    PerSessionStatistics per_session_statistics;//!< Statistics for each session
 
     /**
      * @brief Constructor
@@ -77,6 +75,11 @@ struct Statistics
     virtual void for_each_procedure_in_session(const Session& session, std::function<void(const BreakdownCounter&, size_t)> on_procedure) const;
 
     /**
+     * @brief checks is sessions are present
+     */
+    virtual bool has_session() const;
+
+    /**
      * Saves statistics on commands receive
      * @param proc - command
      * @param cmd_code - commands code
@@ -96,6 +99,9 @@ struct Statistics
     }
 protected:
     void account(const int cmd_index, const Session& session, const timeval latency);
+
+    BreakdownCounter counter;//!< Statistics for all sessions
+    PerSessionStatistics per_session_statistics;//!< Statistics for each session
 };
 } // breakdown
 } // NST
