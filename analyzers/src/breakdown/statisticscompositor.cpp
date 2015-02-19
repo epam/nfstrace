@@ -28,7 +28,8 @@ using namespace NST::breakdown;
 StatisticsCompositor::StatisticsCompositor(Statistics& procedures_stats, Statistics& operations_stats)
     : Statistics(operations_stats)
     , procedures_stats(procedures_stats)
-{}
+{
+}
 
 void StatisticsCompositor::for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const
 {
@@ -78,7 +79,8 @@ bool StatisticsCompositor::has_session() const
     bool has_procedures_in_session = false;
     procedures_stats.for_each_session([&](const Session& session)
     {
-        if (per_session_statistics.find(session) != per_session_statistics.end()) {
+        if (per_session_statistics.find(session) != per_session_statistics.end())
+        {
             has_procedures_in_session = true;
         }
     });

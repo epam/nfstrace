@@ -39,7 +39,8 @@ bool Less::operator()(const Session& a, const Session& b) const
 Statistics::Statistics(size_t proc_types_count)
     : proc_types_count(proc_types_count)
     , counter(proc_types_count)
-{}
+{
+}
 
 void Statistics::for_each_procedure(std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
 {

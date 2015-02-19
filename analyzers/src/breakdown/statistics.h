@@ -47,7 +47,7 @@ struct Statistics
     using PerSessionStatistics = std::map<Session, BreakdownCounter, Less>;
     using ProceduresCount = std::vector<int>;
 
-    const size_t proc_types_count;//!< Count of types of procedures
+    const size_t proc_types_count; //!< Count of types of procedures
 
     /**
      * @brief Constructor
@@ -100,12 +100,11 @@ struct Statistics
 protected:
     void account(const int cmd_index, const Session& session, const timeval latency);
 
-    BreakdownCounter counter;//!< Statistics for all sessions
-    PerSessionStatistics per_session_statistics;//!< Statistics for each session
+    BreakdownCounter counter; //!< Statistics for all sessions
+    PerSessionStatistics per_session_statistics; //!< Statistics for each session
 };
 } // breakdown
 } // NST
 //------------------------------------------------------------------------------
 #endif // STATISTICS_H
 //------------------------------------------------------------------------------
-

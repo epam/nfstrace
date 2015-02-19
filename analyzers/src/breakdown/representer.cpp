@@ -60,11 +60,11 @@ void Representer::flush_statistics(const Statistics& statistics)
         out << '%' << std::endl;
     });
 
-    if (statistics.has_session())  // is not empty?
+    if (statistics.has_session()) // is not empty?
     {
         out << "Per connection info: " << std::endl;
 
-        statistics.for_each_session([&](const Session & session)
+        statistics.for_each_session([&](const Session& session)
         {
             std::stringstream ssession;
             print_session(ssession, session);
@@ -80,7 +80,7 @@ void Representer::store_per_session(std::ostream& file, const Statistics& statis
     //TODO: does it make sense to join store_per_session & print_per_session?
     file << "Session: " << ssession << std::endl;
 
-    statistics.for_each_procedure_in_session(session, [&](const BreakdownCounter & breakdown, size_t procedure)
+    statistics.for_each_procedure_in_session(session, [&](const BreakdownCounter& breakdown, size_t procedure)
     {
         uint64_t s_total_proc = breakdown.get_total_count();
         file << cmd_representer->command_name(procedure);
@@ -98,7 +98,7 @@ void Representer::print_per_session(const Statistics& statistics, const Session&
 {
     out << "Session: " << ssession << std::endl;
 
-    statistics.for_each_procedure_in_session(session, [&](const BreakdownCounter & breakdown, size_t procedure)
+    statistics.for_each_procedure_in_session(session, [&](const BreakdownCounter& breakdown, size_t procedure)
     {
         uint64_t s_total_proc = breakdown.get_total_count();
         onProcedureInfoPrinted(out, breakdown, procedure);

@@ -50,7 +50,6 @@ public:
 
     void TearDown()
     {
-
     }
 };
 
@@ -58,7 +57,6 @@ class Mock
 {
 public:
     MOCK_METHOD0(mock_function, void(void));
-    virtual ~Mock() {}
 };
 
 class Proc
@@ -69,7 +67,6 @@ public:
         , rtimestamp(&_rtimestamp)
         , ctimestamp(&_ctimestamp)
     {
-
     }
 
     Session _session;
@@ -142,4 +139,3 @@ TEST_F(Breakdown, statistics_per_session)
     });
 }
 //------------------------------------------------------------------------------
-

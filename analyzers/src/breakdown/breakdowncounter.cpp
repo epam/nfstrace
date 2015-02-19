@@ -28,10 +28,11 @@ using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 BreakdownCounter::BreakdownCounter(size_t count) : latencies(count, NST::breakdown::Latencies())
 {
-
 }
 
-BreakdownCounter::~BreakdownCounter() {}
+BreakdownCounter::~BreakdownCounter()
+{
+}
 
 Latencies& BreakdownCounter::operator[](int index)
 {

@@ -18,7 +18,6 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 //------------------------------------------------------------------------------
 #include <assert.h>
 
@@ -36,7 +35,6 @@ NFSv4BreakdownAnalyzer::NFSv4BreakdownAnalyzer(std::ostream& o)
     , stats(NFSv4Commands().commands_count())
     , representer(o, new NFSv4Commands(), space_for_cmd_name, count_of_compounds)
 {
-
 }
 
 void NFSv4BreakdownAnalyzer::null4(const RPCProcedure* proc, const NFS4::NULL4args*, const NFS4::NULL4res*)
