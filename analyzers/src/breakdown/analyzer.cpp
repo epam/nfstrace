@@ -1,7 +1,7 @@
 ///------------------------------------------------------------------------------
 // Author: Andrey Kuznetsov
 // Description: Operation CIFS analyzer. Identify clients that are busier than others.
-// Copyright (c) 2014 EPAM Systems
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -29,6 +29,9 @@
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
+/*! Compositor of analyzers of differents protocols
+ * Class inherits implementation, each child has only "final overrriden" protocol events callbacks
+ */
 class Analyzer : public CIFSBreakdownAnalyzer, public CIFSv2BreakdownAnalyzer, public NFSv3BreakdownAnalyzer, public NFSv4BreakdownAnalyzer, public NFSv41BreakdownAnalyzer
 {
 public:

@@ -33,13 +33,12 @@ namespace breakdown
 {
 /*! \brief Analyzer for NFS v4.1
  * Handles NFS v4.1 commands
- * Class is not inhereted or reimplement functions: it only extends it!
  */
 class NFSv41BreakdownAnalyzer : virtual public IAnalyzer
 {
-    Statistics compound_stats;//!< Statistics
-    Statistics stats;//!< Statistics
-    NFSv4Representer representer;//!< Class for statistics representation
+    Statistics compound_stats; //!< Statistics
+    Statistics stats; //!< Statistics
+    NFSv4Representer representer; //!< Class for statistics representation
 public:
     NFSv41BreakdownAnalyzer(std::ostream& o = std::cout);
     // NFSv4.1 procedures

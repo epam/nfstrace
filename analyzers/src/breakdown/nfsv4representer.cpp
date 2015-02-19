@@ -26,7 +26,6 @@ using namespace NST::breakdown;
 NFSv4Representer::NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name, size_t count_of_compounds)
     : Representer(o, cmdRep, space_for_cmd_name), count_of_compounds(count_of_compounds)
 {
-
 }
 
 void NFSv4Representer::onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const

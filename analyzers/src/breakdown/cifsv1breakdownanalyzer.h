@@ -36,8 +36,8 @@ namespace breakdown
  */
 class CIFSBreakdownAnalyzer : virtual public IAnalyzer
 {
-    Statistics statistics;//!< Statistics
-    Representer representer;//!< Class for statistics representation
+    Statistics statistics; //!< Statistics
+    Representer representer; //!< Class for statistics representation
 public:
     CIFSBreakdownAnalyzer(std::ostream& o = std::cout);
 

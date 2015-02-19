@@ -33,12 +33,11 @@ namespace breakdown
 {
 /*! \class Analyzer for CIFS v2
  * Handles CIFS v2 commands
- * Class is not inhereted or reimplement functions: it only extends it!
  */
 class CIFSv2BreakdownAnalyzer : virtual public IAnalyzer
 {
-    Statistics stats;//!< Statistics
-    Representer cifs2Representer;//!< Class for statistics representation
+    Statistics stats; //!< Statistics
+    Representer cifs2Representer; //!< Class for statistics representation
 public:
     CIFSv2BreakdownAnalyzer(std::ostream& o = std::cout);
     void closeFileSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseRequest*, const SMBv2::CloseResponse*) override final;

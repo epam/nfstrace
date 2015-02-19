@@ -40,7 +40,6 @@ size_t NFSv3Commands::commands_count()
     return ProcEnumNFS3::count;
 }
 
-
 const char* NST::breakdown::NFSv3Commands::protocol_name()
 {
     return "NFS v3";

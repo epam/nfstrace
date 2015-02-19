@@ -33,7 +33,6 @@ NFSv41BreakdownAnalyzer::NFSv41BreakdownAnalyzer(std::ostream& o)
     , stats(NFSv41Commands().commands_count())
     , representer(o, new NFSv41Commands(), space_for_cmd_name, count_of_compounds)
 {
-
 }
 
 void NFSv41BreakdownAnalyzer::compound41(const RPCProcedure* proc, const NFS41::COMPOUND4args*, const NFS41::COMPOUND4res*)
