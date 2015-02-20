@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Source file for WatchAnalyzer based on TestAnalyzer.cpp 
+// Description: Source file for WatchAnalyzer based on TestAnalyzer.cpp
 // Copyright (c) 2014 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -133,7 +133,7 @@ void WatchAnalyzer::account(const RPCProcedure* proc,
     std::vector<int> nfs3_proc_count (ProcEnumNFS3::count, 0);
 
     uint64_t nfs4_proc_total = {0};
-    uint64_t nfs4_ops_total = {0};
+    uint64_t nfs4_ops_total  = {0};
     std::vector<int> nfs4_proc_count (ProcEnumNFS4::count, 0);
     if(nfs_vers == NFS_V4)
     {

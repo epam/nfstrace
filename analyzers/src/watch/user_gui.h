@@ -30,65 +30,35 @@
 
 #include <ncurses.h>
 //------------------------------------------------------------------------------
-struct operation_data
-{
-    uint16_t start_x;
-    uint16_t start_y;
-
-    WINDOW* my_win;
-    uint16_t mod_pos;
-    uint16_t n_colum;
-    uint16_t st_colum;
-    uint16_t max_y;
-    uint16_t y_board_shift;
-    uint16_t x_board_shift;
-};
 //------------------------------------------------------------------------------
 class UserGUI
 {
+    using StatisticsConteiner = std::unordered_map<ProtocolId, NetStatistic>;
+
+    unsigned long _refresh_delta;
+
+    std::atomic<bool> _isRunning;
+    std::atomic<bool> _shouldResize;
+    std::mutex _statisticsDeltaMutex;
+    std::atomic_flag _running;
+
+    StatisticsConteiner _statisticsConteiner;
+
+    ProtocolId activeProtocolId;
+
+    std::thread _guiThread;
+
+    void run();
+    void selectProtocol(ProtocolId); // TODO not implemented
 public:
-    UserGUI(const char*);
-    virtual ~UserGUI();
-    void updateCounters(const uint64_t& nfs3_total, const std::vector<int>& nfs3_pr_count,
-                        const uint64_t& nfs4_ops_total, const uint64_t& nfs4_pr_total,
-                        const std::vector<int>& nfs4_pr_count);
-    void setUpdate();
+    UserGUI() = delete;
+    explicit UserGUI(const char*);
+    ~UserGUI();
 
-private:
-
-    void updatePlot();
-    uint16_t inputData();
-    void keyboard();
-
-    void chronoUpdate();
-    void designPlot();
-    void destroyPlot();
-    void initPlot();
-    void updateAll();
-    void thread();
-
-    const time_t start_time;
-
-    std::mutex mut;
-    std::vector<WINDOW*> all_windows;
-    std::thread gui_thread;
-
-    uint16_t scroll_shift;
-    uint16_t x_max;
-    uint16_t y_max;
-    uint16_t column_shift;
-
-    std::atomic<bool> enableUpdate;
-    std::atomic_flag _run;
-
-    uint64_t nfs3_procedure_total;
-    std::vector<int> nfs3_count;
-    uint64_t nfs4_procedure_total;
-    uint64_t nfs4_operations_total;
-    std::vector<int> nfs4_count;
-
-    long int refresh_delta;
-};
+    void update(const ProtocolId& , const StatisticsConteiner&); // TODO not implemented
+    void refresh();                                              // TODO not implemented
+    void enableUpdate();                                         // TODO not implemented
+ };
 //------------------------------------------------------------------------------
 #endif // USERGUI_H
 //------------------------------------------------------------------------------

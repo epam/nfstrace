@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Header for WatchAnalyzer based on TestAnalyzer.h 
+// Description: Header for WatchAnalyzer based on TestAnalyzer.h
 // Copyright (c) 2014 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -27,6 +27,17 @@
 
 #include <api/plugin_api.h> // include plugin development definitions
 #include "user_gui.h"
+//------------------------------------------------------------------------------
+enum ProtocolId
+{
+    NFSv3,
+    NFSv4,
+    NFSv41,
+    CIFSv1,
+    CIFSv2
+}
+
+typename std::unordered_map<std::size_t, std::size_t> NetStatistic;
 //------------------------------------------------------------------------------
 class WatchAnalyzer : public IAnalyzer
 {
@@ -111,7 +122,6 @@ public:
                    const struct NFS4::COMPOUND4args*,
                    const struct NFS4::COMPOUND4res*) override final;
 private:
-    inline void thread();
     void count_proc(const RPCProcedure* proc);
     void account(const RPCProcedure*,
                  const struct NFS4::COMPOUND4res* res = nullptr);
