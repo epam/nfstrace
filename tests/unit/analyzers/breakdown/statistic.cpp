@@ -26,7 +26,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "breakdowncounter.h"
+#include "statistics.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 
@@ -37,11 +37,10 @@ using ::testing::_;
 namespace
 {
 
-class BreakdownTest : public ::testing::Test
+class StatisticTest : public ::testing::Test
 {
 protected:
     size_t count;
-    timeval t;
 public:
     void SetUp()
     {
@@ -54,20 +53,89 @@ public:
     }
 };
 
+class Mock
+{
+public:
+    MOCK_METHOD0(mock_function, void(void));
+};
+
+class Proc
+{
+public:
+    Proc()
+        : session(&_session)
+        , rtimestamp(&_rtimestamp)
+        , ctimestamp(&_ctimestamp)
+    {
+    }
+
+    Session _session;
+    timeval _rtimestamp;
+    timeval _ctimestamp;
+    const Session* session;
+    const timeval* rtimestamp;
+    const timeval* ctimestamp;
+};
+
 }
 //------------------------------------------------------------------------------
-TEST_F(BreakdownTest, count)
+TEST_F(StatisticTest, statistics)
 {
 
-    BreakdownCounter break_down(count);
+    Statistics stats(count);
 
-    EXPECT_EQ(0U, break_down.get_total_count());
+    EXPECT_EQ(count, stats.proc_types_count);
 
-    break_down[1].add(t);
-    break_down[1].add(t);
-    break_down[0].add(t);
+    Mock each_procedure_mock;
+    EXPECT_CALL(each_procedure_mock, mock_function())
+    .Times(count);
 
-    EXPECT_EQ(3U, break_down.get_total_count());
+    stats.for_each_procedure([&](const BreakdownCounter&, size_t)
+    {
+        each_procedure_mock.mock_function();
+    });
+}
 
+TEST_F(StatisticTest, sessions_statistics)
+{
+
+    Statistics stats(count);
+    Mock each_procedure_mock;
+    Proc proc;
+
+    EXPECT_CALL(each_procedure_mock, mock_function())
+    .Times(1);
+
+    EXPECT_FALSE(stats.has_session());
+    stats.account(&proc, 0);
+    EXPECT_TRUE(stats.has_session());
+
+    stats.for_each_session([&](const Session&)
+    {
+        each_procedure_mock.mock_function();
+    });
+}
+
+TEST_F(StatisticTest, statistics_per_session)
+{
+
+    Statistics stats(count);
+    Mock each_procedure_mock;
+    Proc proc;
+
+    EXPECT_CALL(each_procedure_mock, mock_function())
+    .Times(count);
+
+    stats.for_each_procedure_in_session(proc._session, [&](const BreakdownCounter&, size_t)
+    {
+        each_procedure_mock.mock_function();
+    });
+
+    stats.account(&proc, 1);
+
+    stats.for_each_procedure_in_session(proc._session, [&](const BreakdownCounter&, size_t)
+    {
+        each_procedure_mock.mock_function();
+    });
 }
 //------------------------------------------------------------------------------

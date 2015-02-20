@@ -26,7 +26,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "breakdowncounter.h"
+#include "latencies.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
 
@@ -37,14 +37,21 @@ using ::testing::_;
 namespace
 {
 
-class BreakdownTest : public ::testing::Test
+class LatencyTest : public ::testing::Test
 {
 protected:
     size_t count;
-    timeval t;
+    timeval t1;
+    timeval t2;
 public:
     void SetUp()
     {
+        t1.tv_sec = 10;
+        t2.tv_sec = 2;
+
+        t1.tv_usec = 12;
+        t2.tv_usec = 4;
+
         std::srand(std::time(0)); //use current time as seed for random generator
         count = std::rand() % 100 + 3;
     }
@@ -56,18 +63,38 @@ public:
 
 }
 //------------------------------------------------------------------------------
-TEST_F(BreakdownTest, count)
+TEST_F(LatencyTest, max_min)
 {
 
-    BreakdownCounter break_down(count);
+    Latencies latency;
 
-    EXPECT_EQ(0U, break_down.get_total_count());
+    EXPECT_EQ(0U, latency.get_count());
 
-    break_down[1].add(t);
-    break_down[1].add(t);
-    break_down[0].add(t);
+    latency.add(t1);
+    latency.add(t2);
 
-    EXPECT_EQ(3U, break_down.get_total_count());
+    EXPECT_EQ(2U, latency.get_count());
 
+    EXPECT_EQ(t2.tv_sec, latency.get_min().tv_sec);
+    EXPECT_EQ(t2.tv_usec, latency.get_min().tv_usec);
+
+    EXPECT_EQ(t1.tv_sec, latency.get_max().tv_sec);
+    EXPECT_EQ(t1.tv_usec, latency.get_max().tv_usec);
+
+}
+
+TEST_F(LatencyTest, avg)
+{
+    Latencies latency;
+
+    EXPECT_EQ(0.0, latency.get_avg());
+
+    latency.add(t1);
+
+    EXPECT_NEAR(10.0, latency.get_avg(), 0.0001);
+
+    latency.add(t2);
+
+    EXPECT_NEAR(6.0, latency.get_avg(), 0.0001);
 }
 //------------------------------------------------------------------------------
