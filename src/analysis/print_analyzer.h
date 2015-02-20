@@ -46,8 +46,8 @@ public:
     }
 
     void readSMBv2(const SMBv2::ReadCommand*,
-                           const SMBv2::ReadRequest*,
-                           const SMBv2::ReadResponse*) override final;
+                   const SMBv2::ReadRequest*,
+                   const SMBv2::ReadResponse*) override final;
     void createDirectorySMBv1(const SMBv1::CreateDirectoryCommand*,
                               const SMBv1::CreateDirectoryArgumentType*,
                               const SMBv1::CreateDirectoryResultType*) override final;
@@ -196,8 +196,8 @@ public:
                               const SMBv1::FindNotifyCloseArgumentType*,
                               const SMBv1::FindNotifyCloseResultType*) override final;
     void treeConnectSMBv1(const SMBv1::TreeConnectCommand*,
-                         const SMBv1::TreeConnectArgumentType*,
-                         const SMBv1::TreeConnectResultType*) override final;
+                          const SMBv1::TreeConnectArgumentType*,
+                          const SMBv1::TreeConnectResultType*) override final;
     void treeDisconnectSMBv1(const SMBv1::TreeDisconnectCommand*,
                              const SMBv1::TreeDisconnectArgumentType*,
                              const SMBv1::TreeDisconnectResultType*) override final;
@@ -460,8 +460,8 @@ public:
     void nfs4_operation(const struct NFS4::ILLEGAL4res*               res);
 
     void compound41(const RPCProcedure*               proc,
-                   const struct NFS41::COMPOUND4args* args,
-                   const struct NFS41::COMPOUND4res*  res) override final;
+                    const struct NFS41::COMPOUND4args* args,
+                    const struct NFS41::COMPOUND4res*  res) override final;
 
     void nfs41_operation(const struct NFS41::nfs_argop4*                  op);
     void nfs41_operation(const struct NFS41::nfs_resop4*                  op);
