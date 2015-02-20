@@ -23,8 +23,28 @@
 
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/cifs/cifs.h"
+#include "api/cifs_pc_to_net.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFSv2;
+
+# if NFSTRACE_BYTE_ORDER == NFSTRACE_BIG_ENDIAN
+
+inline uint64_t ntohll(uint64_t input)
+{
+    // Network byte order == Big Endian
+    return input;
+}
+
+# else
+#  if NFSTRACE_BYTE_ORDER == NFSTRACE_LITTLE_ENDIAN
+
+inline uint64_t ntohll(uint64_t input)
+{
+    return be64toh(input);
+}
+#  endif
+# endif
+
 union SMBCode
 {
     uint8_t codes[4];
@@ -58,4 +78,165 @@ const NST::protocols::CIFSv2::MessageHeader* NST::protocols::CIFSv2::get_header(
 bool MessageHeader::isFlag(const Flags flag) const
 {
     return static_cast<uint32_t>(flag) & flags;
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ErrResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::NegotiateRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::NegotiateResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::SessionSetupRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::SessionSetupResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::LogOffRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::LogOffResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeConnectRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeConnectResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeDisconnectRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeDisconnectResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::CreateRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::CreateResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::CloseRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::CloseResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::EchoRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::EchoResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryInfoRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryInfoResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryDirRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryDirResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::FlushRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::FlushResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadRequest& param)
+{
+    param.structureSize         = ntohs(param.structureSize);
+    param.length                = ntohl(param.length);
+    param.offset                = ntohll(param.offset);
+    param.persistentFileId      = ntohll(param.persistentFileId);
+    param.volatileFileId        = ntohll(param.volatileFileId);
+    param.minimumCount          = ntohl(param.minimumCount);
+    param.RemainingBytes        = ntohl(param.RemainingBytes);
+    param.ReadChannelInfoOffset = ntohs(param.ReadChannelInfoOffset);
+    param.ReadChannelInfoLength = ntohs(param.ReadChannelInfoLength);
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadResponse& param)
+{
+    param.structureSize = ntohs(param.structureSize);
+    param.DataLength    = ntohl(param.DataLength);
+    param.DataRemaining = ntohl(param.DataRemaining);
+    // param.Reserved2 is reserved, do not convert it
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::WriteRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::WriteResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::LockRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::LockResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::CancelRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ChangeNotifyRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::ChangeNotifyResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::OplockResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::IoCtlRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::IoCtlResponse& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::SetInfoRequest& )
+{
+}
+
+template<> void NST::protocols::CIFSv2::parse(SMBv2::SetInfoResponse& )
+{
 }
