@@ -45,9 +45,6 @@ public:
     {
     }
 
-    void readSMBv2(const SMBv2::ReadCommand*,
-                   const SMBv2::ReadRequest*,
-                   const SMBv2::ReadResponse*) override final;
     void createDirectorySMBv1(const SMBv1::CreateDirectoryCommand*,
                               const SMBv1::CreateDirectoryArgumentType*,
                               const SMBv1::CreateDirectoryResultType*) override final;
@@ -273,6 +270,60 @@ public:
     void noAndxCommandSMBv1(const SMBv1::NoAndxCommand*,
                             const SMBv1::NoAndxCmdArgumentType*,
                             const SMBv1::NoAndxCmdResultType*) override final;
+    void closeFileSMBv2(const SMBv2::CloseFileCommand*,
+                        const SMBv2::CloseRequest*,
+                        const SMBv2::CloseResponse*) override final;
+    void negotiateSMBv2(const SMBv2::NegotiateCommand*,
+                        const SMBv2::NegotiateRequest*,
+                        const SMBv2::NegotiateResponse*) override final;
+    void sessionSetupSMBv2(const SMBv2::SessionSetupCommand*,
+                           const SMBv2::SessionSetupRequest*,
+                           const SMBv2::SessionSetupResponse*) override final;
+    void logOffSMBv2(const SMBv2::LogOffCommand*,
+                     const SMBv2::LogOffRequest*,
+                     const SMBv2::LogOffResponse*) override final;
+    void treeConnectSMBv2(const SMBv2::TreeConnectCommand*,
+                          const SMBv2::TreeConnectRequest*,
+                          const SMBv2::TreeConnectResponse*) override final;
+    void treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand*,
+                             const SMBv2::TreeDisconnectRequest*,
+                             const SMBv2::TreeDisconnectResponse*) override final;
+    void createSMBv2(const SMBv2::CreateCommand*,
+                     const SMBv2::CreateRequest*,
+                     const SMBv2::CreateResponse*) override final;
+    void flushSMBv2(const SMBv2::FlushCommand*,
+                    const SMBv2::FlushRequest*,
+                    const SMBv2::FlushResponse*) override final;
+    void readSMBv2(const SMBv2::ReadCommand*,
+                   const SMBv2::ReadRequest*,
+                   const SMBv2::ReadResponse*) override final;
+    void writeSMBv2(const SMBv2::WriteCommand*,
+                    const SMBv2::WriteRequest*,
+                    const SMBv2::WriteResponse*) override final;
+    void lockSMBv2(const SMBv2::LockCommand*,
+                   const SMBv2::LockRequest*,
+                   const SMBv2::LockResponse*) override final;
+    void ioctlSMBv2(const SMBv2::IoctlCommand*,
+                    const SMBv2::IoCtlRequest*,
+                    const SMBv2::IoCtlResponse*) override final;
+    void cancelSMBv2(const SMBv2::CancelCommand*,
+                     const SMBv2::CancelRequest*,
+                     const SMBv2::CancelResponce*) override final;
+    void echoSMBv2(const SMBv2::EchoCommand*,
+                   const SMBv2::EchoRequest*,
+                   const SMBv2::EchoResponse*) override final;
+    void queryDirSMBv2(const SMBv2::QueryDirCommand*,
+                       const SMBv2::QueryDirRequest*,
+                       const SMBv2::QueryDirResponse*) override final;
+    void changeNotifySMBv2(const SMBv2::ChangeNotifyCommand*,
+                           const SMBv2::ChangeNotifyRequest*,
+                           const SMBv2::ChangeNotifyResponse*) override final;
+    void queryInfoSMBv2(const SMBv2::QueryInfoCommand*,
+                        const SMBv2::QueryInfoRequest*,
+                        const SMBv2::QueryInfoResponse*) override final;
+    void setInfoSMBv2(const SMBv2::SetInfoCommand*,
+                      const SMBv2::SetInfoRequest*,
+                      const SMBv2::SetInfoResponse*) override final;
     void null(const RPCProcedure* proc,
               const struct NFS3::NULL3args*,
               const struct NFS3::NULL3res*) override final;
