@@ -68,7 +68,8 @@ enum class Commands : uint16_t
     CHANGE_NOTIFY     = API::SMBv2::pc_to_net<uint16_t>(0x000F),
     QUERY_INFO        = API::SMBv2::pc_to_net<uint16_t>(0x0010),
     SET_INFO          = API::SMBv2::pc_to_net<uint16_t>(0x0011),
-    OPLOCK_BREAK      = API::SMBv2::pc_to_net<uint16_t>(0x0012)
+    OPLOCK_BREAK      = API::SMBv2::pc_to_net<uint16_t>(0x0012),
+    CMD_COUNT
 };
 
 /*! \class Raw CIFS v2 message header
@@ -206,6 +207,11 @@ inline const Cmd command(Data& request, Data& response, Session* session)
 
     return cmd;
 }
+
+extern "C"
+NST_PUBLIC
+const char* print_cifs2_procedures(Commands cmd_code);
+
 
 } // CIFSv2
 

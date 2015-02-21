@@ -20,6 +20,7 @@
 */
 //------------------------------------------------------------------------------
 #include <arpa/inet.h>
+#include <assert.h>
 
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/cifs/cifs.h"
@@ -400,3 +401,22 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::SetInfoResponse& param)
     param.structureSize = ntohs(param.structureSize);
 }
 
+// TODO: This implementation currently copy of
+// epm-nfs/analyzers/src/cifs/cifs2_commands.cpp
+// const std::string NST::breakdown::SMBv2Commands::command_name(int cmd_code)
+// Futre fix: We need to merege this enums
+const char* NST::protocols::CIFSv2::print_cifs2_procedures(Commands cmd)
+{
+    assert(cmd < Commands::CMD_COUNT);
+
+    static const char* const commandNames[] =
+    {
+        "NEGOTIATE",        "SESSION SETUP",    "LOGOFF",           "TREE CONNECT",
+        "TREE DISCONNECT",  "CREATE",           "CLOSE",            "FLUSH",
+        "READ",             "WRITE",            "LOCK",             "IOCTL",
+        "CANCEL",           "ECHO",             "QUERY DIRECTORY",  "CHANGE NOTIFY",
+        "QUERY INFO",       "SET INFO",         "OPLOCK BREAK"
+    };
+
+    return commandNames[static_cast<int>(cmd)];
+}
