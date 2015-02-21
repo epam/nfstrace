@@ -162,6 +162,29 @@ constexpr auto to_integral(E e) -> typename std::underlying_type<E>::type
     return static_cast<typename std::underlying_type<E>::type>(e);
 }
 
+template<typename CommandType>
+void print_smbv2_common_info(std::ostream& out, Commands cmdEnum, CommandType* cmd, const std::string& cmdComment)
+{
+    out << print_cifs2_procedures(cmdEnum) << " " << cmdComment << " (";
+    print_hex(out, to_integral(cmdEnum), sizeof(to_integral(cmdEnum)));
+    out << ")\n"
+        << "  Structure size = ";
+    print_hex(out, cmd->parg->structureSize, sizeof(cmd->parg->structureSize));
+    out << "\n";
+}
+
+template<typename CommandType>
+void print_smbv2_common_infoReq(std::ostream& out, Commands cmdEnum, CommandType* cmd)
+{
+    print_smbv2_common_info(out, cmdEnum, cmd, "request");
+}
+
+template<typename CommandType>
+void print_smbv2_common_infoResp(std::ostream& out, Commands cmdEnum, CommandType* cmd)
+{
+    print_smbv2_common_info(out, cmdEnum, cmd, "response");
+}
+
 } // unnamed namespace
 
 void PrintAnalyzer::createDirectorySMBv1(const SMBv1::CreateDirectoryCommand*,
@@ -733,14 +756,11 @@ void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* cmd,
                               const SMBv2::ReadRequest*,
                               const SMBv2::ReadResponse* res)
 {
-    auto cmdRead = Commands::READ;
-    out << "Read request (";
-    print_hex(out, to_integral(cmdRead), sizeof(to_integral(cmdRead)));
-    out << ")\n"
-        << "  Structure size = ";
-    print_hex(out, cmd->parg->structureSize, sizeof(cmd->parg->structureSize));
-    out << "\n"
-        << "  Read length = " << cmd->parg->length << "\n"
+    Commands cmdEnum = Commands::READ;
+
+    print_smbv2_common_infoReq(out, cmdEnum, cmd);
+
+    out << "  Read length = " << cmd->parg->length << "\n"
         << "  File offset = " << cmd->parg->offset << "\n"
         << "  Min count = " << cmd->parg->minimumCount << "\n"
         << "  Channel = " << static_cast<uint32_t>(cmd->parg->channel) << "\n"
@@ -748,23 +768,40 @@ void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* cmd,
         << "  Channel Info Offset = " << cmd->parg->ReadChannelInfoOffset << "\n"
         << "  Channel Info Length = " << cmd->parg->ReadChannelInfoLength << "\n";
 
-    out << "\n" << "Read response (";
-    print_hex(out, to_integral(cmdRead), sizeof(to_integral(cmdRead)));
-    out << ")\n"
-        << "  Structure size = ";
-    print_hex(out, res->structureSize, sizeof(res->structureSize));
-    out << "\n"
-        << "  Data offset = ";
+    print_smbv2_common_infoResp(out, cmdEnum, cmd);
+
+    out << "  Data offset = ";
     print_hex(out, res->DataOffset, sizeof(res->DataOffset));
     out << "\n"
         << "  Read length = " << res->DataLength << "\n"
         << "  Read remaining = " << res->DataRemaining << "\n";
 }
-void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand*,
+void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
                                const SMBv2::WriteRequest*,
                                const SMBv2::WriteResponse*)
 {
+    Commands cmdEnum = Commands::WRITE;
+    print_smbv2_common_infoReq(out, cmdEnum, cmd);
+
+    out << "  Data offset = ";
+    print_hex(out, cmd->parg->dataOffset, sizeof(cmd->parg->dataOffset));
+
+    out << "\n"
+    << "  Write Length = " << cmd->parg->Length << "\n"
+    << "  File Offset" << cmd->parg->Offset << "\n"
+    << "  Channel = " << static_cast<u_int32_t>(cmd->parg->Channel) << "\n"
+    << "  Remaining Bytes = " << cmd->parg->RemainingBytes << "\n"
+    << "  Channel Info Offset = " << cmd->parg->WriteChannelInfoOffset << "\n"
+    << "  Channel Info Length = " << cmd->parg->WriteChannelInfoLength << "\n"
+    << "  Write Flags = ";
+    print_hex(out, static_cast<u_int32_t>(cmd->parg->Flags), sizeof(cmd->parg->Flags) );
+    out << "\n";
+
+    //<< "cmd->pargs->Buffer[1]" << cmd->parg->Buffer[1] << "\n";
+
+    // TODO: Implement response
 }
+
 void PrintAnalyzer::lockSMBv2(const SMBv2::LockCommand*,
                               const SMBv2::LockRequest*,
                               const SMBv2::LockResponse*)
