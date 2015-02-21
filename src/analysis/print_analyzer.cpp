@@ -164,38 +164,6 @@ constexpr auto to_integral(E e) -> typename std::underlying_type<E>::type
 
 } // unnamed namespace
 
-void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* readCommand, const SMBv2::ReadRequest*, const SMBv2::ReadResponse* res)
-{
-    // TODO: In order to print filename (like in wireshark) we have to
-    // link to Create Request (0x05)
-    auto cmdRead = Commands::READ;
-    out << "Read request (";
-    print_hex(out, to_integral(cmdRead), sizeof(to_integral(cmdRead)));
-    out << ")\n"
-        << "  Structure size = ";
-    print_hex(out, readCommand->parg->structureSize, sizeof(readCommand->parg->structureSize));
-    out << "\n"
-        << "  Read length = " << readCommand->parg->length << "\n"
-        << "  File offset = " << readCommand->parg->offset << "\n"
-        << "  Min count = " << readCommand->parg->minimumCount << "\n"
-        << "  Channel = " << static_cast<uint32_t>(readCommand->parg->channel) << "\n"
-        << "  Remaining bytes = " << readCommand->parg->RemainingBytes << "\n"
-        << "  Channel Info Offset = " << readCommand->parg->ReadChannelInfoOffset << "\n"
-        << "  Channel Info Length = " << readCommand->parg->ReadChannelInfoLength << "\n";
-
-    out << "\n" << "Read response (";
-    print_hex(out, to_integral(cmdRead), sizeof(to_integral(cmdRead)));
-    out << ")\n"
-        << "  Structure size = ";
-    print_hex(out, res->structureSize, sizeof(res->structureSize));
-    out << "\n"
-        << "  Data offset = ";
-    print_hex(out, res->DataOffset, sizeof(res->DataOffset));
-    out << "\n"
-        << "  Read length = " << res->DataLength << "\n"
-        << "  Read remaining = " << res->DataRemaining << "\n";
-}
-
 void PrintAnalyzer::createDirectorySMBv1(const SMBv1::CreateDirectoryCommand*,
                                          const SMBv1::CreateDirectoryArgumentType*,
                                          const SMBv1::CreateDirectoryResultType*)
@@ -720,6 +688,124 @@ void PrintAnalyzer::noAndxCommandSMBv1(const SMBv1::NoAndxCommand*,
 {
     out << print_cifs1_procedures(SMBv1Commands::SMB_COM_NO_ANDX_COMMAND);
 }
+
+void PrintAnalyzer::closeFileSMBv2(const SMBv2::CloseFileCommand*,
+                                   const SMBv2::CloseRequest*,
+                                   const SMBv2::CloseResponse*)
+{
+}
+void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand*,
+                                   const SMBv2::NegotiateRequest*,
+                                   const SMBv2::NegotiateResponse*)
+{
+}
+void PrintAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand*,
+                                      const SMBv2::SessionSetupRequest*,
+                                      const SMBv2::SessionSetupResponse*)
+{
+}
+void PrintAnalyzer::logOffSMBv2(const SMBv2::LogOffCommand*,
+                                const SMBv2::LogOffRequest*,
+                                const SMBv2::LogOffResponse*)
+{
+}
+void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand*,
+                                     const SMBv2::TreeConnectRequest*,
+                                     const SMBv2::TreeConnectResponse*)
+{
+}
+void PrintAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand*,
+                                        const SMBv2::TreeDisconnectRequest*,
+                                        const SMBv2::TreeDisconnectResponse*)
+{
+}
+void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand*,
+                                const SMBv2::CreateRequest*,
+                                const SMBv2::CreateResponse*)
+{
+}
+void PrintAnalyzer::flushSMBv2(const SMBv2::FlushCommand*,
+                               const SMBv2::FlushRequest*,
+                               const SMBv2::FlushResponse*)
+{
+}
+void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* cmd,
+                              const SMBv2::ReadRequest*,
+                              const SMBv2::ReadResponse* res)
+{
+    auto cmdRead = Commands::READ;
+    out << "Read request (";
+    print_hex(out, to_integral(cmdRead), sizeof(to_integral(cmdRead)));
+    out << ")\n"
+        << "  Structure size = ";
+    print_hex(out, cmd->parg->structureSize, sizeof(cmd->parg->structureSize));
+    out << "\n"
+        << "  Read length = " << cmd->parg->length << "\n"
+        << "  File offset = " << cmd->parg->offset << "\n"
+        << "  Min count = " << cmd->parg->minimumCount << "\n"
+        << "  Channel = " << static_cast<uint32_t>(cmd->parg->channel) << "\n"
+        << "  Remaining bytes = " << cmd->parg->RemainingBytes << "\n"
+        << "  Channel Info Offset = " << cmd->parg->ReadChannelInfoOffset << "\n"
+        << "  Channel Info Length = " << cmd->parg->ReadChannelInfoLength << "\n";
+
+    out << "\n" << "Read response (";
+    print_hex(out, to_integral(cmdRead), sizeof(to_integral(cmdRead)));
+    out << ")\n"
+        << "  Structure size = ";
+    print_hex(out, res->structureSize, sizeof(res->structureSize));
+    out << "\n"
+        << "  Data offset = ";
+    print_hex(out, res->DataOffset, sizeof(res->DataOffset));
+    out << "\n"
+        << "  Read length = " << res->DataLength << "\n"
+        << "  Read remaining = " << res->DataRemaining << "\n";
+}
+void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand*,
+                               const SMBv2::WriteRequest*,
+                               const SMBv2::WriteResponse*)
+{
+}
+void PrintAnalyzer::lockSMBv2(const SMBv2::LockCommand*,
+                              const SMBv2::LockRequest*,
+                              const SMBv2::LockResponse*)
+{
+}
+void PrintAnalyzer::ioctlSMBv2(const SMBv2::IoctlCommand*,
+                               const SMBv2::IoCtlRequest*,
+                               const SMBv2::IoCtlResponse*)
+{
+}
+void PrintAnalyzer::cancelSMBv2(const SMBv2::CancelCommand*,
+                                const SMBv2::CancelRequest*,
+                                const SMBv2::CancelResponce*)
+{
+}
+void PrintAnalyzer::echoSMBv2(const SMBv2::EchoCommand*,
+                              const SMBv2::EchoRequest*,
+                              const SMBv2::EchoResponse*)
+{
+}
+void PrintAnalyzer::queryDirSMBv2(const SMBv2::QueryDirCommand*,
+                                  const SMBv2::QueryDirRequest*,
+                                  const SMBv2::QueryDirResponse*)
+{
+}
+void PrintAnalyzer::changeNotifySMBv2(const SMBv2::ChangeNotifyCommand*,
+                                      const SMBv2::ChangeNotifyRequest*,
+                                      const SMBv2::ChangeNotifyResponse*)
+{
+}
+void PrintAnalyzer::queryInfoSMBv2(const SMBv2::QueryInfoCommand*,
+                                   const SMBv2::QueryInfoRequest*,
+                                   const SMBv2::QueryInfoResponse*)
+{
+}
+void PrintAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand*,
+                                 const SMBv2::SetInfoRequest*,
+                                 const SMBv2::SetInfoResponse*)
+{
+}
+
 
 // Print NFSv3 procedures (rpcgen)
 // 1st line - PRC information: src and dst hosts, status of RPC procedure
