@@ -169,18 +169,18 @@ void print_smbv2_common_info(std::ostream& out, Commands cmdEnum, CommandType* c
     print_hex(out, to_integral(cmdEnum), sizeof(to_integral(cmdEnum)));
     out << ")\n"
         << "  Structure size = ";
-    print_hex(out, cmd->parg->structureSize, sizeof(cmd->parg->structureSize));
+    print_hex(out, cmd->structureSize, sizeof(cmd->structureSize));
     out << "\n";
 }
 
 template<typename CommandType>
-void print_smbv2_common_infoReq(std::ostream& out, Commands cmdEnum, CommandType* cmd)
+void print_smbv2_common_info_req(std::ostream& out, Commands cmdEnum, CommandType* cmd)
 {
     print_smbv2_common_info(out, cmdEnum, cmd, "request");
 }
 
 template<typename CommandType>
-void print_smbv2_common_infoResp(std::ostream& out, Commands cmdEnum, CommandType* cmd)
+void print_smbv2_common_info_resp(std::ostream& out, Commands cmdEnum, CommandType* cmd)
 {
     print_smbv2_common_info(out, cmdEnum, cmd, "response");
 }
@@ -758,7 +758,7 @@ void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* cmd,
 {
     Commands cmdEnum = Commands::READ;
 
-    print_smbv2_common_infoReq(out, cmdEnum, cmd);
+    print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
 
     out << "  Read length = " << cmd->parg->length << "\n"
         << "  File offset = " << cmd->parg->offset << "\n"
@@ -768,7 +768,7 @@ void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* cmd,
         << "  Channel Info Offset = " << cmd->parg->ReadChannelInfoOffset << "\n"
         << "  Channel Info Length = " << cmd->parg->ReadChannelInfoLength << "\n";
 
-    print_smbv2_common_infoResp(out, cmdEnum, cmd);
+    print_smbv2_common_info_resp(out, cmdEnum, res);
 
     out << "  Data offset = ";
     print_hex(out, res->DataOffset, sizeof(res->DataOffset));
@@ -778,10 +778,10 @@ void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* cmd,
 }
 void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
                                const SMBv2::WriteRequest*,
-                               const SMBv2::WriteResponse*)
+                               const SMBv2::WriteResponse* res)
 {
     Commands cmdEnum = Commands::WRITE;
-    print_smbv2_common_infoReq(out, cmdEnum, cmd);
+    print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
 
     out << "  Data offset = ";
     print_hex(out, cmd->parg->dataOffset, sizeof(cmd->parg->dataOffset));
@@ -799,7 +799,8 @@ void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
 
     //<< "cmd->pargs->Buffer[1]" << cmd->parg->Buffer[1] << "\n";
 
-    // TODO: Implement response
+    print_smbv2_common_info_resp(out, cmdEnum, res);
+
 }
 
 void PrintAnalyzer::lockSMBv2(const SMBv2::LockCommand*,
