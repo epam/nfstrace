@@ -19,53 +19,29 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef USERGUI_H
-#define USERGUI_H
+#ifndef NC_WINDOWS_H
+#define NC_WINDOWS_H
 //------------------------------------------------------------------------------
 #include <cstdlib>
+#include <unordered_map>
+#include <vector>
 
 #include <ncurses.h>
 //------------------------------------------------------------------------------
 class LibWatchException : public std::exception
 {
-}
-//------------------------------------------------------------------------------
-class HeaderWindow
-{
-    WINDOW* _window;
-    ProtocolId _activeProtocol;
-    time_t _start_time;
-    void destroy();
-
-public:
-    HeaderWindow() = delete;
-    HeaderWindow(MainWindow&&);
-    ~HeaderWindow();
-    void selectProtocol(const ProtocolId&);
-    void refresh();
-    void resize(MainWindow&&);
 };
 //------------------------------------------------------------------------------
-class StatisticsWindow
+enum ProtocolId
 {
-    using StatisticsConteiner = std::unordered_map<ProtocolId, NetStatistic>;
-
-    WINDOW* _window;
-    ProtocolId _activeProtocol;
-    std::unordered_map<ProtocolId, int> _scrollOffset;
-    std::unordered_map<std::size_t, std::size_t> _statistic;
-    void destroy();
-
-public:
-    StatisticsWindow() = delete;
-    StatisticsWindow(MainWindow&&);
-    ~StatisticsWindow();
-    void reset(const ProtocolId& , const StatisticsConteiner&);
-    void scroll(unsigned int);
-    void selectProtocol(const ProtocolId&);
-    void refresh();
-    void resize(MainWindow&&);
+    NFSv3,
+    NFSv4,
+    NFSv41,
+    CIFSv1,
+    CIFSv2
 };
+
+//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 class MainWindow
 {
@@ -73,13 +49,54 @@ class MainWindow
     friend class HeaderWindow;
     WINDOW* _window;
 
-    uint16_t inputKeys();
     void init();
     void destroy();
 
 public:
+    uint16_t inputKeys();
     MainWindow();
     ~MainWindow();
     void resize();
-}
+};
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+class HeaderWindow
+{
+    WINDOW* _window;
+    time_t _start_time;
+    ProtocolId _activeProtocol;
+    void destroy();
+
+public:
+    HeaderWindow() = delete;
+    HeaderWindow(MainWindow&);
+    ~HeaderWindow();
+    void updateProtocol(int);
+    void update();
+    void resize(MainWindow&);
+};
+//------------------------------------------------------------------------------
+class StatisticsWindow
+{
+public:
+    using ProtocolStatistic = std::vector<std::size_t>;
+
+private:
+    WINDOW* _window;
+    ProtocolId _activeProtocol;
+    std::unordered_map<int, unsigned int> _scrollOffset;
+    ProtocolStatistic _statistic;
+    void destroy();
+
+public:
+    StatisticsWindow() = delete;
+    StatisticsWindow(MainWindow&, ProtocolStatistic&);
+    ~StatisticsWindow();
+    void scrolling(int);
+    void updateProtocol(int , const ProtocolStatistic&);
+    void update();
+    void resize(MainWindow&);
+};
+//------------------------------------------------------------------------------
+#endif // NC_WINDOWS_H
 //------------------------------------------------------------------------------

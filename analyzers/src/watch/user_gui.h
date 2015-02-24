@@ -29,12 +29,15 @@
 #include <thread>
 
 #include <ncurses.h>
-//------------------------------------------------------------------------------
+#include "nc_windows.h"
 //------------------------------------------------------------------------------
 class UserGUI
 {
-    using StatisticsConteiner = std::unordered_map<ProtocolId, NetStatistic>;
+public:
+    using ProtocolStatistic = std::vector<std::size_t>;
+    using StatisticsConteiner = std::unordered_map<int, ProtocolStatistic>;
 
+private:
     unsigned long _refresh_delta;
 
     std::atomic<bool> _isRunning;
@@ -43,21 +46,20 @@ class UserGUI
     std::atomic_flag _running;
 
     StatisticsConteiner _statisticsConteiner;
-
     ProtocolId activeProtocolId;
 
     std::thread _guiThread;
 
     void run();
-    void selectProtocol(ProtocolId); // TODO not implemented
 public:
+
+
     UserGUI() = delete;
     explicit UserGUI(const char*);
     ~UserGUI();
 
-    void update(const ProtocolId& , const StatisticsConteiner&); // TODO not implemented
-    void refresh();                                              // TODO not implemented
-    void enableUpdate();                                         // TODO not implemented
+    void update(int , std::vector<std::size_t>&); // TODO not implemented
+    void enableUpdate();
  };
 //------------------------------------------------------------------------------
 #endif // USERGUI_H
