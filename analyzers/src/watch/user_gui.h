@@ -46,7 +46,7 @@ private:
     std::atomic_flag _running;
 
     StatisticsConteiner _statisticsConteiner;
-    ProtocolId activeProtocolId;
+    ProtocolId _activeProtocolId;
 
     std::thread _guiThread;
 
