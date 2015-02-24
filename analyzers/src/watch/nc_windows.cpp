@@ -112,6 +112,8 @@ void MainWindow::init()
     timeout(200);                 // set keyboard timeout
 
     start_color();                // set background color
+    if(_window != nullptr)
+        werase(_window);
 }
 
 void MainWindow::destroy()
@@ -140,10 +142,17 @@ void MainWindow::resize()
     if(_window != nullptr) destroy();
     init();
 }
+
+void MainWindow::update()
+{
+    if(_window != nullptr)
+        refresh();
+}
 //------------------------------------------------------------------------------
 void HeaderWindow::destroy()
 {
     if(_window == nullptr) return;
+    werase(_window);
     wclear(_window);
     delwin(_window);
     _window = nullptr;
@@ -187,8 +196,8 @@ void HeaderWindow::update()
     mvwprintw(_window, 3, 1,"Date: \t %d.%d.%d \t Time: %d:%d:%d  ",t->tm_mday, t->tm_mon + 1, t->tm_year + 1900,t->tm_hour, t->tm_min, t->tm_sec);
     mvwprintw(_window, 4, 1,"Elapsed time:  \t %d days; %d:%d:%d times",
              shift_time/SECINDAY, shift_time%SECINDAY/SECINHOUR, shift_time%SECINHOUR/SECINMIN, shift_time%SECINMIN);
-    mvwhline (_window, 5, 1, ACS_HLINE, 78);
-    mvwhline (_window, 6, 1, ACS_HLINE, 78);
+//    mvwhline (_window, 5, 1, ACS_HLINE, 78);
+//    mvwhline (_window, 6, 1, ACS_HLINE, 78);
     wrefresh (_window);
 }
 
@@ -213,6 +222,7 @@ void HeaderWindow::resize(MainWindow& m)
 void StatisticsWindow::destroy()
 {
     if(_window == nullptr) return;
+    werase(_window);
     wclear(_window);
     delwin(_window);
     _window = nullptr;
@@ -247,10 +257,11 @@ void StatisticsWindow::scrolling(int i)
 void StatisticsWindow::updateProtocol(int p)
 {
     _activeProtocol = static_cast<ProtocolId>(p);
-//    _statistic.clear();
-
     if(_window == nullptr) return;
-    switch (p)
+    werase(_window);
+    wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER , ACS_LLCORNER, ACS_LRCORNER);
+
+    switch (_activeProtocol)
     {
         case NFSv3 :
             for(unsigned int i = 0; i < ProcEnumNFS3::count; i++)
@@ -267,9 +278,9 @@ void StatisticsWindow::updateProtocol(int p)
             }
         break;
         default :
-            mvwprintw(_window, 1, 1, "%s", "\tThis protocol not implemented yet");
-            mvwprintw(_window, 2, 1, "%s", "\t\tin libwatch plugin of nfstrace.");
-            mvwprintw(_window, 3, 1, "%s", "\tTry to download latest version.");
+            mvwprintw(_window, 1, 2, "%s", "This protocol not implemented yet");
+            mvwprintw(_window, 2, 2, "%s", "\tin libwatch plugin of nfstrace.");
+            mvwprintw(_window, 3, 2, "%s", "Try to download latest version.");
         break;
     }
 }
@@ -291,19 +302,19 @@ void StatisticsWindow::update(const ProtocolStatistic& d)
             {
                 if( i > _scrollOffset.at(static_cast<int>(_activeProtocol)) && i < _window->_maxy + _scrollOffset.at(static_cast<int>(_activeProtocol)) - 1)
                 {
-                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), COUNTERS_POS, " %d  ", _statistic[i]);
-                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), PERSENT_POS, " %-3.2f%% ",
+                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), COUNTERS_POS, "%lu ", _statistic[i]);
+                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), PERSENT_POS, "%-3.2f%% ",
                               m > 0 ? static_cast<double>(_statistic[i]) / static_cast<double>(m) * 100.0 : 0.0);
                 }
             }
         break;
         case NFSv4 :
-            for(unsigned int i = 0; i < ProcEnumNFS4::count; i++)
+            for(unsigned int i = 0; i < _statistic.size(); i++)
             {
                 if( i > _scrollOffset.at(static_cast<int>(_activeProtocol)) && i < _window->_maxy + _scrollOffset.at(static_cast<int>(_activeProtocol)) - 1)
                 {
-                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), COUNTERS_POS, " %d  ", _statistic[i]);
-                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), PERSENT_POS, " %-3.2f%% ",
+                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), COUNTERS_POS, "%lu ", _statistic[i]);
+                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), PERSENT_POS, "%-3.2f%% ",
                               m > 0 ? static_cast<double>(_statistic[i]) / static_cast<double>(m) * 100.0 : 0.0);
                 }
             }
@@ -344,13 +355,7 @@ void StatisticsWindow::resize(MainWindow& m)
     {
         _window = subwin(m._window, (m._window->_maxy - GUI_HEADER_HEIGHT > tmp_size) ? tmp_size : (m._window->_maxy - GUI_HEADER_HEIGHT) ,
                                      m._window->_maxx > GUI_LENGTH ? GUI_LENGTH : m._window->_maxx, GUI_HEADER_HEIGHT - 1, 0);
-        if(_window != nullptr)
-        {
-            werase(_window);
-            wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER , ACS_LLCORNER, ACS_LRCORNER);
-        }
     }
-    updateProtocol(static_cast<int>(_activeProtocol));
 }
 
 void StatisticsWindow::setProtocol(int p)

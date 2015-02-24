@@ -42,9 +42,9 @@ void UserGUI::run()
         // prepare for select
         fd_set rfds;
 
-        MainWindow _main;
-        HeaderWindow     _headerWindow(_main);
-        StatisticsWindow _statisticsWindow(_main, _statisticsConteiner.at(activeProtocolId));
+        MainWindow mainWindow;
+        HeaderWindow     headerWindow(mainWindow);
+        StatisticsWindow statisticsWindow(mainWindow, _statisticsConteiner.at(_activeProtocolId));
 
         /* Watch stdin (fd 0) to see when it has input. */
         FD_ZERO(&rfds);
@@ -58,64 +58,76 @@ void UserGUI::run()
         int sel_rez;
         uint16_t key = 0;
 
-        std::vector<std::size_t> tmp;
+        std::vector<std::size_t> tmp(1, 0);
 
-        _headerWindow.updateProtocol(activeProtocolId);
-        _statisticsWindow.updateProtocol(activeProtocolId);
+        headerWindow.updateProtocol(_activeProtocolId);
+        statisticsWindow.updateProtocol(_activeProtocolId);
+
         while (_running.test_and_set())
         {
             if(_shouldResize)
             {
-                _main.resize();
-                _statisticsWindow.resize(_main);
-                _headerWindow.resize(_main);
+                mainWindow.resize();
+                headerWindow.resize(mainWindow);
+                statisticsWindow.resize(mainWindow);
+                headerWindow.updateProtocol(_activeProtocolId);
+                statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
+
                 _shouldResize = false;
             }
-            _headerWindow.update();
             {
                 std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
-                tmp = _statisticsConteiner.at(activeProtocolId);
+                tmp = _statisticsConteiner.at(_activeProtocolId);
             }
-            _statisticsWindow.update(tmp);
+            headerWindow.update();
+            statisticsWindow.update(tmp);
+            mainWindow.update();
+
             sel_rez = select(STDIN_FILENO + 1, &rfds, nullptr, nullptr, &tv);
             if (sel_rez == -1)
                break;
             else
             {
-                key = _main.inputKeys();
+                key = mainWindow.inputKeys();
                 if(key == KEY_LEFT)
                 {
-                    if(activeProtocolId != NFSv3)
+                    if(_activeProtocolId != NFSv3)
                     {
-                        activeProtocolId = static_cast<ProtocolId>(static_cast<int>(activeProtocolId) - 1);
-                        _statisticsWindow.setProtocol(static_cast<int>(activeProtocolId));
-                        _statisticsWindow.resize(_main);
-                        _headerWindow.updateProtocol(activeProtocolId);
-                        _headerWindow.update();
-                        _statisticsWindow.update(tmp);
+                        _activeProtocolId = static_cast<ProtocolId>(static_cast<int>(_activeProtocolId) - 1);
+                        statisticsWindow.setProtocol(static_cast<int>(_activeProtocolId));
+                        statisticsWindow.resize(mainWindow);
+                        headerWindow.updateProtocol(_activeProtocolId);
+                        statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
+                        headerWindow.update();
+                        statisticsWindow.update(tmp);
                     }
                 }
                 else if(key == KEY_RIGHT)
                 {
-                    if(activeProtocolId != CIFSv2)
+                    if(_activeProtocolId != CIFSv2)
                     {
-                        activeProtocolId = static_cast<ProtocolId>(static_cast<int>(activeProtocolId) + 1);
-                        _statisticsWindow.setProtocol(static_cast<int>(activeProtocolId));
-                        _statisticsWindow.resize(_main);
-                        _headerWindow.updateProtocol(activeProtocolId);
-                        _headerWindow.update();
-                        _statisticsWindow.update(tmp);
+                        _activeProtocolId = static_cast<ProtocolId>(static_cast<int>(_activeProtocolId) + 1);
+                        statisticsWindow.setProtocol(static_cast<int>(_activeProtocolId));
+                        statisticsWindow.resize(mainWindow);
+                        headerWindow.updateProtocol(_activeProtocolId);
+                        statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
+                        headerWindow.update();
+                        statisticsWindow.update(tmp);
                     }
                 }
                 else if(key == KEY_UP)
                 {
-                    _statisticsWindow.scrolling(SCROLL_UP);
-                    _statisticsWindow.update(tmp);
+                    statisticsWindow.scrolling(SCROLL_UP);
+                    headerWindow.updateProtocol(_activeProtocolId);
+                    statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
+                    statisticsWindow.update(tmp);
                 }
                 else if(key == KEY_DOWN)
                 {
-                    _statisticsWindow.scrolling(SCROLL_DOWN);
-                    _statisticsWindow.update(tmp);
+                    statisticsWindow.scrolling(SCROLL_DOWN);
+                    headerWindow.updateProtocol(_activeProtocolId);
+                    statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
+                    statisticsWindow.update(tmp);
                 }
             }
             tv.tv_sec = _refresh_delta / MSEC;
@@ -138,7 +150,7 @@ UserGUI::UserGUI(const char* opts)
                         {static_cast<int>(CIFSv1), std::vector<std::size_t>(10, 0)},
                         {static_cast<int>(CIFSv2), std::vector<std::size_t>(10 ,0)}
                         })
-, activeProtocolId(NFSv3)
+, _activeProtocolId(NFSv3)
 {
     if(opts != nullptr && *opts != '\0' ) try
     {
