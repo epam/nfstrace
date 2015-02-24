@@ -22,7 +22,7 @@
 #ifndef CIFSv2_HEADER_H
 #define CIFSv2_HEADER_H
 //------------------------------------------------------------------------------
-#include "api/cifs_pc_to_net.h"
+#include "api/cifs_commands.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -31,6 +31,7 @@ namespace protocols
 {
 namespace CIFSv2
 {
+namespace SMBv2 = NST::API::SMBv2;
 
 /*! CIFS v2 Flags
  */
@@ -127,6 +128,56 @@ struct MessageHeader : public RawMessageHeader
  */
 const MessageHeader* get_header(const uint8_t* data);
 
+/*! Group of template specialization for converting representation
+ *  if field's bytes from network to host.
+ * (independent of type of architecture little endian or big endian)
+ *
+ * \param - reference to an object whose fields will be converted
+ */
+template<typename ParamType> inline void parse(ParamType& )
+{
+// TODO: Fix this in future!
+//    static_assert(FALSE, "This method is not supposed to be used."
+//                         "Please make template specialization for the specified type." );
+}
+template<> void parse(SMBv2::ErrResponse& );
+template<> void parse(SMBv2::NegotiateRequest& );
+template<> void parse(SMBv2::NegotiateResponse& );
+template<> void parse(SMBv2::SessionSetupRequest& );
+template<> void parse(SMBv2::SessionSetupResponse& );
+template<> void parse(SMBv2::LogOffRequest& );
+template<> void parse(SMBv2::LogOffResponse& );
+template<> void parse(SMBv2::TreeConnectRequest& );
+template<> void parse(SMBv2::TreeConnectResponse& );
+template<> void parse(SMBv2::TreeDisconnectRequest& );
+template<> void parse(SMBv2::TreeDisconnectResponse& );
+template<> void parse(SMBv2::CreateRequest& );
+template<> void parse(SMBv2::CreateResponse& );
+template<> void parse(SMBv2::CloseRequest& );
+template<> void parse(SMBv2::CloseResponse& );
+template<> void parse(SMBv2::EchoRequest& );
+template<> void parse(SMBv2::EchoResponse& );
+template<> void parse(SMBv2::QueryInfoRequest& );
+template<> void parse(SMBv2::QueryInfoResponse& );
+template<> void parse(SMBv2::QueryDirRequest& );
+template<> void parse(SMBv2::QueryDirResponse& );
+template<> void parse(SMBv2::FlushRequest& );
+template<> void parse(SMBv2::FlushResponse& );
+template<> void parse(SMBv2::ReadRequest& );
+template<> void parse(SMBv2::ReadResponse& );
+template<> void parse(SMBv2::WriteRequest& );
+template<> void parse(SMBv2::WriteResponse& );
+template<> void parse(SMBv2::LockRequest& );
+template<> void parse(SMBv2::LockResponse& );
+template<> void parse(SMBv2::CancelRequest& );
+template<> void parse(SMBv2::ChangeNotifyRequest& );
+template<> void parse(SMBv2::ChangeNotifyResponse& );
+template<> void parse(SMBv2::OplockResponse& );
+template<> void parse(SMBv2::IoCtlRequest& );
+template<> void parse(SMBv2::IoCtlResponse& );
+template<> void parse(SMBv2::SetInfoRequest& );
+template<> void parse(SMBv2::SetInfoResponse& );
+
 /*! Constructs new command for API from raw message
  * \param request - Call's
  * \param response - Reply's
@@ -144,6 +195,9 @@ inline const Cmd command(Data& request, Data& response, Session* session)
 
     cmd.parg = reinterpret_cast<const typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
     cmd.pres = response ? reinterpret_cast<const typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader)) : nullptr;
+
+    parse(cmd.parg);
+    parse(cmd.pres);
 
     return cmd;
 }

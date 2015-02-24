@@ -43,7 +43,7 @@ Opt Args::options[Args::num] =
 {
     {'m', "mode",       Opt::REQ, LIVE,                  "set the running mode",                           DRAIN "|" LIVE "|" DUMP "|" STAT,   nullptr, false},
     {'i', "interface",  Opt::REQ, "FIRST-NIC",           "listen interface, it is required for " LIVE " and " DUMP " modes", "INTERFACE",      nullptr, false},
-    {'f', "filtration", Opt::REQ, "port 2049",           "specify the packet filter in BPF syntax(see pcap-filter(7))",      "BPF",            nullptr, false},
+    {'f', "filtration", Opt::REQ, "port 2049 or port 445","specify the packet filter in BPF syntax(see pcap-filter(7))",     "BPF",            nullptr, false},
     {'s', "snaplen",    Opt::REQ, "65535",               "set the max length of captured raw packet (bigger packets will be truncated). Can be used ONLY FOR UDP", "1..65535", nullptr, false},
     {'t', "timeout",    Opt::REQ, "100",                 "set the read timeout that will be used while capturing",           "Milliseconds",   nullptr, false},
     {'b', "bsize",      Opt::REQ, "20",                  "set the size of operation system capture buffer in MBytes; note that this option is crucial for capturing performance", "MBytes", nullptr, false},
