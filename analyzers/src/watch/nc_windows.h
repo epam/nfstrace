@@ -93,9 +93,10 @@ public:
     StatisticsWindow(MainWindow&, ProtocolStatistic&);
     ~StatisticsWindow();
     void scrolling(int);
-    void updateProtocol(int , const ProtocolStatistic&);
-    void update();
+    void updateProtocol(int);
+    void update(const ProtocolStatistic&);
     void resize(MainWindow&);
+    void setProtocol(int);
 };
 //------------------------------------------------------------------------------
 #endif // NC_WINDOWS_H
