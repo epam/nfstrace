@@ -1,3 +1,27 @@
+//------------------------------------------------------------------------------
+// Author: Vitali Adamenka
+// Description: Header for WatchAnalyzer based on TestAnalyzer.h
+// Copyright (c) 2015 EPAM Systems. All Rights Reserved.
+//------------------------------------------------------------------------------
+/*
+    This file is part of Nfstrace.
+
+    Nfstrace is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 2 of the License.
+
+    Nfstrace is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
+*/
+//------------------------------------------------------------------------------
+#include <unistd.h>
+
+#include <api/plugin_api.h> // include plugin development definitions
 #include "nc_windows.h"
 //------------------------------------------------------------------------------
 namespace
@@ -7,16 +31,21 @@ namespace
     const unsigned int SECINMIN  = 60;
     const unsigned int SECINHOUR = 60 * 60;
     const unsigned int SECINDAY  = 60 * 60 * 24;
-    const unsigned int MSEC      = 1000000;
 
     const int MAXSHIFT = 25;
     const int SHIFTCU  = 1;
+
+    const int GUI_LENGTH = 80;
+    const int GUI_HEADER_HEIGHT = 9;
+    const int GUI_STATISTIC_HEIGHT = 40;
+    const int PERSENT_POS = 29;
+    const int COUNTERS_POS = 22;
 }
 //------------------------------------------------------------------------------
 uint16_t MainWindow::inputKeys()
 {
-    int c = wgetch(_window);
-    if(c == KEY_UP || c == KEY_DOWN || c == LEFT_KEY || c == RIGHT_KEY)
+    int key = wgetch(_window);
+    if(key == KEY_UP || key == KEY_DOWN || key == KEY_LEFT || key == KEY_RIGHT)
     {
         if(key == KEY_UP)
         {
@@ -57,10 +86,10 @@ uint16_t MainWindow::inputKeys()
         {
             key = getch();
         }
-        while ((key != EOF) && (key != '\n') && (key != ' '))
+        while ((key != EOF) && (key != '\n') && (key != ' '));
         key = 0;
     }
-    return k;
+    return key;
 }
 
 void MainWindow::init()
@@ -69,7 +98,7 @@ void MainWindow::init()
     _window = initscr();
     if(_window == nullptr)
     {
-        throw LibWatchException("Initialization of Main window failed.");
+        throw LibWatchException(); //"Initialization of Main window failed.");
     }
     noecho();
     cbreak();
@@ -82,12 +111,12 @@ void MainWindow::init()
 
 void MainWindow::destroy()
 {
-    _window = nullptr;
     nocbreak();
     echo();
     clrtoeol();
     refresh();
     endwin();
+    _window = nullptr;
 }
 
 MainWindow::MainWindow()
@@ -101,7 +130,7 @@ MainWindow::~MainWindow()
     destroy();
 }
 
-MainWindow::resize()
+void MainWindow::resize()
 {
     _window = nullptr;
     nocbreak();
@@ -117,13 +146,16 @@ void HeaderWindow::destroy()
     if(_window == nullptr) return;
     wclear(_window);
     delwin(_window);
+    _window = nullptr;
 }
-HeaderWindow::HeaderWindow(MainWindow&& w)
-:_start_time{time(NULL)}
+
+HeaderWindow::HeaderWindow(MainWindow& w)
+: _start_time{time(NULL)}
+, _activeProtocol{NFSv3}
 {
     if(w._window == nullptr)
     {
-        throw LibWatchException("Initialization of Header window failed.");
+        throw LibWatchException(); //"Initialization of Header window failed.");
     }
     resize(w);
 }
@@ -133,20 +165,21 @@ HeaderWindow::~HeaderWindow()
     destroy();
 }
 
-void HeaderWindow::selectProtocol(const ProtocolId& p)
+void HeaderWindow::updateProtocol(int p)
 {
-    _activeProtocol = p;
+
+    _activeProtocol = static_cast<ProtocolId>(p);
     if(_window == nullptr) return;
-    mvwprintw(_window, 7, 1,"\t%s    |\t%s    |\t%s    |\t%s    |\t%s",
-              _activeProtocol == NFSv3  ? ProtocolsActiveNames[(const int)NFSv3]  : ProtocolsNames[(const int)NFSv3 ],
-              _activeProtocol == NFSv4  ? ProtocolsActiveNames[(const int)NFSv4]  : ProtocolsNames[(const int)NFSv4 ],
-              _activeProtocol == NFSv41 ? ProtocolsActiveNames[(const int)NFSv41] : ProtocolsNames[(const int)NFSv41],
-              _activeProtocol == CIFSv1 ? ProtocolsActiveNames[(const int)CIFSv1] : ProtocolsNames[(const int)CIFSv1],
-              _activeProtocol == CIFSv2 ? ProtocolsActiveNames[(const int)CIFSv2] : ProtocolsNames[(const int)CIFSv2]);
-    wrefresh(_window);
+
+    mvwprintw(_window, 7, 1,"%s    |%s    |%s    |%s    |%s",
+              _activeProtocol == NFSv3  ? ProtocolsActiveNames[static_cast<int>(NFSv3) ] : ProtocolsNames[static_cast<int>(NFSv3) ],
+              _activeProtocol == NFSv4  ? ProtocolsActiveNames[static_cast<int>(NFSv4) ] : ProtocolsNames[static_cast<int>(NFSv4) ],
+              _activeProtocol == NFSv41 ? ProtocolsActiveNames[static_cast<int>(NFSv41)] : ProtocolsNames[static_cast<int>(NFSv41)],
+              _activeProtocol == CIFSv1 ? ProtocolsActiveNames[static_cast<int>(CIFSv1)] : ProtocolsNames[static_cast<int>(CIFSv1)],
+              _activeProtocol == CIFSv2 ? ProtocolsActiveNames[static_cast<int>(CIFSv2)] : ProtocolsNames[static_cast<int>(CIFSv2)]);
 }
 
-void HeaderWindow::refresh()
+void HeaderWindow::update()
 {
     if(_window == nullptr) return;
     time_t actual_time = time(nullptr);
@@ -157,12 +190,14 @@ void HeaderWindow::refresh()
              shift_time/SECINDAY, shift_time%SECINDAY/SECINHOUR, shift_time%SECINHOUR/SECINMIN, shift_time%SECINMIN);
     mvwprintw(_window, 5, 1,"Date: \t %d.%d.%d \t Time: %d:%d:%d  ",t->tm_mday, t->tm_mon + 1, t->tm_year + 1900,t->tm_hour, t->tm_min, t->tm_sec);
     mvwhline (_window, 6, 1, ACS_HLINE, 78);
+    updateProtocol(static_cast<int>(_activeProtocol));
+    wrefresh (_window);
 }
 
-void HeaderWindow::resize(MainWindow&& m)
+void HeaderWindow::resize(MainWindow& m)
 {
     if(_window != nullptr) destroy();
-    _window = subwin(m._window, 8, 80, 0, 0);
+    _window = subwin(m._window, m._window->_maxy > GUI_HEADER_HEIGHT ? GUI_HEADER_HEIGHT : m._window->_maxy, m._window->_maxx > GUI_LENGTH ? GUI_LENGTH : m._window->_maxx, 0, 0);
     if(_window != nullptr)
     {
         wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER , ACS_LLCORNER, ACS_LRCORNER);
@@ -171,6 +206,7 @@ void HeaderWindow::resize(MainWindow&& m)
         mvwprintw(_window, 1, 1,"%s","Nfstrace watch plugin. To scroll press up or down keys. Ctrl + c to exit.");
         mvwprintw(_window, 2, 1,"Host name:\t %s",HOST_NAME);
     }
+    update();
 }
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -179,55 +215,114 @@ void StatisticsWindow::destroy()
     if(_window == nullptr) return;
     wclear(_window);
     delwin(_window);
+    _window = nullptr;
 }
 
-StatisticsWindow::StatisticsWindow(MainWindow&& m)
+StatisticsWindow::StatisticsWindow(MainWindow& w, ProtocolStatistic& c)
+: _window{nullptr}
+, _activeProtocol{NFSv3}
+, _scrollOffset({{static_cast<int>(NFSv3), 0}, {static_cast<int>(NFSv4), 0} ,{static_cast<int>(NFSv41), 0}, {static_cast<int>(CIFSv1), 0}, {static_cast<int>(CIFSv2), 0}})
+, _statistic(c)
 {
     if(w._window == nullptr)
     {
-        throw LibWatchException("Initialization of Header window failed.");
+        throw LibWatchException();//"Initialization of Header window failed.");
     }
     resize(w);
 }
 
-StatisticsWindo::~StatisticsWindow()
+StatisticsWindow::~StatisticsWindow()
 {
     destroy();
 }
 
-void StatisticsWindo::reset(const ProtocolId& , const StatisticsConteiner&)
-{
-    //TODO RESET 
-}
-
-void StatisticsWindow::scroll(int i)
+void StatisticsWindow::scrolling(int i)
 {
     if(i > 0 && _scrollOffset.at(_activeProtocol) <= MAXSHIFT - SHIFTCU)
-        _scrollOffset.at(_activeProtocol) += SHIFTCU;
+        _scrollOffset.at(static_cast<int>(_activeProtocol)) += SHIFTCU;
     else if(i < 0 && _scrollOffset.at(_activeProtocol) >= SHIFTCU)
-        _scrollOffset.at(_activeProtocol) -= SHIFTCU;
+        _scrollOffset.at(static_cast<int>(_activeProtocol)) -= SHIFTCU;
 }
 
-void StatisticsWindow::selectProtocol(const ProtocolId& p)
+void StatisticsWindow::updateProtocol(int /*p*/, const ProtocolStatistic& /*d*/)
 {
-    _activeProtocol = p;
+/*
+    _activeProtocol = static_cast<ProtocolId>(p);
+//    _statistic.clear();
+    _statistic = d;
     if(_window == nullptr) return;
     werase(_window);
-    // TODO chouse protocol
+    wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER , ACS_LLCORNER, ACS_LRCORNER);
+    switch (p)
+    {
+        case NFSv3 :
+            for(unsigned int i = 0; i < ProcEnumNFS3::count; i++)
+            {
+                if( i > _scrollOffset.at(p) && i < _window->_maxy + _scrollOffset.at(p))
+                    mvwprintw(_window, i + _scrollOffset.at(p), 1, "%s", print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i)));
+            }
+        break;
+        case NFSv4 :
+            for(unsigned int i = 0; i < ProcEnumNFS4::count; i++)
+            {
+                if( i > _scrollOffset.at(p) && i < _window->_maxy + _scrollOffset.at(p))
+                    mvwprintw(_window, i + _scrollOffset.at(p), 1, "%s", print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i)));
+            }
+        break;
+        default :
+            mvwprintw(_window, 1, 1, "%s", "\tThis protocol not implemented yet");
+            mvwprintw(_window, 2, 1, "%s", "\t\tin libwatch plugin of nfstrace.");
+            mvwprintw(_window, 3, 1, "%s", "\tTry to download latest version.");
+        break;
+    }
+    update();
+*/
 }
 
-void StatisticsWindow::refresh()
+void StatisticsWindow::update()
 {
-    //TODO refresh
+/*
+    std::size_t m = 0; // sum of all counters
+    for(auto p : _statistic)
+    {
+        m += p;
+    }
+    switch (_activeProtocol)
+    {
+        case NFSv3 :
+            for(unsigned int i = 0; i < ProcEnumNFS3::count; i++)
+            {
+                if( i > _scrollOffset.at(static_cast<int>(_activeProtocol)) && i < _window->_maxy + _scrollOffset.at(static_cast<int>(_activeProtocol)))
+                {
+                    mvwprintw(_window, i + _scrollOffset.at(static_cast<int>(_activeProtocol)), COUNTERS_POS, "%d  ", _statistic[i]);
+                    mvwprintw(_window, i + _scrollOffset.at(static_cast<int>(_activeProtocol)), PERSENT_POS, "%-3.2f%% ",
+                              m > 0 ? static_cast<double>(_statistic[i]) / static_cast<double>(m) * 100.0 : 0.0);
+                }
+            }
+        break;
+        case NFSv4 :
+            for(unsigned int i = 0; i < ProcEnumNFS4::count; i++)
+            {
+                if( i > _scrollOffset.at(static_cast<int>(_activeProtocol)) && i < _window->_maxy + _scrollOffset.at(static_cast<int>(_activeProtocol)))
+                {
+                    mvwprintw(_window, i + _scrollOffset.at(static_cast<int>(_activeProtocol)), PERSENT_POS, "%d  ", _statistic[i]);
+                    mvwprintw(_window, i + _scrollOffset.at(static_cast<int>(_activeProtocol)), PERSENT_POS, "%-3.2f%% ",
+                              m > 0 ? static_cast<double>(_statistic[i]) / static_cast<double>(m) * 100.0 : 0.0);
+                }
+            }
+        break;
+        default :
+        break;
+    }
+    wrefresh(_window);
+*/
 }
 
-void StatisticsWindow::resize(MainWindow&& m)
+void StatisticsWindow::resize(MainWindow& m)
 {
     if(_window != nullptr) destroy();
-    _window = subwin(m._window,/* TODO SET SIZE OF WINDOW FOR one column*/ , 80, 8, 0);
-    if(_window != nullptr)
-    {
-        wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER , ACS_LLCORNER, ACS_LRCORNER);
-        // TODO draw list of commands
-    }
+    if(m._window->_maxy > GUI_HEADER_HEIGHT + GUI_STATISTIC_HEIGHT)
+        _window = subwin(m._window,m._window->_maxy > GUI_HEADER_HEIGHT ? GUI_STATISTIC_HEIGHT + GUI_HEADER_HEIGHT : m._window->_maxy - GUI_HEADER_HEIGHT ,
+                                   m._window->_maxx > GUI_LENGTH ? GUI_LENGTH : m._window->_maxx, GUI_HEADER_HEIGHT, 0);
+    update();
 }

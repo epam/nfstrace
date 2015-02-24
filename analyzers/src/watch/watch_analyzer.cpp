@@ -20,6 +20,7 @@
 */
 //------------------------------------------------------------------------------
 #include <iostream>
+#include <unordered_map>
 #include <string>
 
 #include <unistd.h>
@@ -119,7 +120,7 @@ void WatchAnalyzer::flush_statistics()
 void WatchAnalyzer::on_unix_signal(int signo)
 {
     if (signo == SIGWINCH) {
-        gui.setUpdate();
+        gui.enableUpdate();
     }
 }
 
@@ -130,11 +131,11 @@ void WatchAnalyzer::account(const RPCProcedure* proc,
     const u_int nfs_vers = proc->call.ru.RM_cmb.cb_vers;
 
     uint64_t nfs3_proc_total = {0};
-    std::vector<int> nfs3_proc_count (ProcEnumNFS3::count, 0);
+    std::vector<std::size_t> nfs3_proc_count (ProcEnumNFS3::count, 0);
 
     uint64_t nfs4_proc_total = {0};
     uint64_t nfs4_ops_total  = {0};
-    std::vector<int> nfs4_proc_count (ProcEnumNFS4::count, 0);
+    std::vector<std::size_t> nfs4_proc_count (ProcEnumNFS4::count, 0);
     if(nfs_vers == NFS_V4)
     {
         ++nfs4_proc_total;
@@ -157,10 +158,14 @@ void WatchAnalyzer::account(const RPCProcedure* proc,
     if(nfs_vers == NFS_V3)
     {
         ++nfs3_proc_total;
-        ++nfs3_proc_count[nfs_proc];
+        ++nfs3_proc_count.at(nfs_proc);
     }
 
-    gui.updateCounters(nfs3_proc_total, nfs3_proc_count, nfs4_proc_total, nfs4_ops_total, nfs4_proc_count);
+    gui.update(NFSv3, nfs3_proc_count);
+    gui.update(NFSv4, nfs4_proc_count);
+//    gui.update(NFSv41, nullptr);
+//    gui.update(CIFSv1, nullptr);
+//    gui.update(CIFSv2, nullptr);
 }
 //------------------------------------------------------------------------------
 extern "C"

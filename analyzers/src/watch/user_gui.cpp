@@ -27,32 +27,14 @@
 
 #include <api/plugin_api.h>
 #include "user_gui.h"
+//-----------------------------------------------------------------------------
+namespace
+{
+    const int SCROLL_UP = 1;
+    const int SCROLL_DOWN = -1;
+    const unsigned int MSEC      = 1000000;
+}
 //------------------------------------------------------------------------------
-UserGUI::UserGUI(const char* opts)
-:
-, _running {ATOMIC_FLAG_INIT}
-, _refresh_delta {900000}
-{
-    if(opts != nullptr && *opts != '\0' ) try
-    {
-        refresh_delta = std::stoul(opts);
-    }
-    catch(std::exception& e)
-    {
-        throw std::runtime_error{std::string{"Error in plugin options processing. OPTS: "} + opts + std::string(" Error: ") + e.what()};
-    }
-
-    _runnning.test_and_set();
-    _guiThread = std::thread(&UserGUI::run, this);
-}
-
-UserGUI::~UserGUI()
-{
-    _run.clear();
-    _guiThread.join();
-}
-
-
 void UserGUI::run()
 {
     try
@@ -62,7 +44,7 @@ void UserGUI::run()
 
         MainWindow _main;
         HeaderWindow     _headerWindow(_main);
-        StatisticsWindow _statisticsWindow(_main);
+        StatisticsWindow _statisticsWindow(_main, _statisticsConteiner.at(activeProtocolId));
 
         /* Watch stdin (fd 0) to see when it has input. */
         FD_ZERO(&rfds);
@@ -70,32 +52,59 @@ void UserGUI::run()
 
         /* Wait up to five seconds. */
         struct timeval tv;
-        tv.tv_sec = refresh_delta / MSEC;
-        tv.tv_usec = refresh_delta % MSEC;
+        tv.tv_sec = _refresh_delta / MSEC;
+        tv.tv_usec = _refresh_delta % MSEC;
 
         int sel_rez;
         uint16_t key = 0;
-        while (_run.test_and_set())
+
+        _headerWindow.updateProtocol(activeProtocolId);
+        _statisticsWindow.updateProtocol(activeProtocolId, _statisticsConteiner.at(activeProtocolId));
+        while (_running.test_and_set())
         {
             if(_shouldResize)
             {
                 _main.resize();
                 _headerWindow.resize(_main);
                 _statisticsWindow.resize(_main);
-                _shouldRefresh = false;
+                _shouldResize = false;
             }
-            _headerWindow.refresh();
-            _statisticsWindow.refresh();
+            _headerWindow.update();
+            _statisticsWindow.update();
             sel_rez = select(STDIN_FILENO + 1, &rfds, nullptr, nullptr, &tv);
-
             if (sel_rez == -1)
                break;
             else
             {
-                key = _main.keyboard();
+                key = _main.inputKeys();
+                if(key == KEY_LEFT)
+                {
+                    if(activeProtocolId != NFSv3)
+                        activeProtocolId = static_cast<ProtocolId>(static_cast<int>(activeProtocolId) - 1);
+                }
+                else if(key == KEY_RIGHT)
+                {
+                    if(activeProtocolId != CIFSv2)
+                        activeProtocolId = static_cast<ProtocolId>(static_cast<int>(activeProtocolId) + 1);
+                }
+                else if(key == KEY_UP)
+                {
+                    _statisticsWindow.scrolling(SCROLL_UP);
+                    _statisticsWindow.update();
+                }
+                else if(key == KEY_DOWN)
+                {
+                    _statisticsWindow.scrolling(SCROLL_DOWN);
+                    _statisticsWindow.update();
+                }
             }
-            tv.tv_sec = refresh_delta / MSEC;
-            tv.tv_usec = refresh_delta % MSEC;
+            {
+                std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
+                _headerWindow.updateProtocol(activeProtocolId);
+                _statisticsWindow.updateProtocol(activeProtocolId, _statisticsConteiner.at(activeProtocolId));
+            }
+            tv.tv_sec = _refresh_delta / MSEC;
+            tv.tv_usec = _refresh_delta % MSEC;
         }
     }
     catch(LibWatchException& e)
@@ -103,4 +112,48 @@ void UserGUI::run()
         std::cerr << "Watch plugin error: " << e.what();
     }
 }
+
+UserGUI::UserGUI(const char* opts)
+: _refresh_delta {900000}
+, _isRunning {ATOMIC_FLAG_INIT}
+, _shouldResize{false}
+, _statisticsConteiner({{static_cast<int>(NFSv3),std::vector<std::size_t>(ProcEnumNFS3::count, 0)}, {static_cast<int>(NFSv4), std::vector<std::size_t>(ProcEnumNFS4::count, 0)} })//, {static_cast<int>(NFSv41)}, (ProcEnumNFS41::count, 0)},
+//                       {static_cast<int>(CIFSv1), (0, 0)}, {static_cast<int>(CIFSv2), (0 ,0)}})
+, activeProtocolId(NFSv3)
+{
+    if(opts != nullptr && *opts != '\0' ) try
+    {
+        _refresh_delta = std::stoul(opts);
+    }
+    catch(std::exception& e)
+    {
+        throw std::runtime_error{std::string{"Error in plugin options processing. OPTS: "} + opts + std::string(" Error: ") + e.what()};
+    }
+
+    _running.test_and_set();
+    _guiThread = std::thread(&UserGUI::run, this);
+}
+
+UserGUI::~UserGUI()
+{
+    _running.clear();
+    _guiThread.join();
+}
+
+void UserGUI::update(int p, std::vector<std::size_t>& d)
+{
+    std::vector<std::size_t>::iterator it;
+    std::vector<std::size_t>::iterator st;
+    std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
+    for(it = (_statisticsConteiner.at(p)).begin(), st = d.begin(); it != (_statisticsConteiner.at(p)).end() && st != d.end(); ++it, ++st)
+    {
+        (*it) += (*st);
+    }
+}
+
+void UserGUI::enableUpdate()
+{
+    _shouldResize = true;
+}
+
 //------------------------------------------------------------------------------
