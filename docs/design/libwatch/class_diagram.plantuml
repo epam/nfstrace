@@ -3,20 +3,33 @@ skinparam titleFontSize 24
 skinparam defaultFontSize 16
 title NFSTrace: libwatch class diagram
 
-enum ProtocolId {
-  NFSv3 = 0
-  NFSv4 = 1
-  NFSv41 = 2
-  CIFSv1 = 3
-  CIFSv2 = 4
+abstract class AbstractProtocol {
+  + operationsAmount: const std::size_t
+  + name: const std::string
+  + AbstractProtocol(name: const std::string&, operationsAmount: std::size_t)
+  + {abstract} operationName(std::size_t operationId): const char * = 0
 }
 
-class Statistics {
-  + commands: std::map<std::size_t, std::size_t>
+class NFSv3Protocol {
+  + NFSv3Protocol()
+  + {abstract} operationName(std::size_t operationId): const char *
+}
+
+class NFSv4Protocol {
+  + NFSv4Protocol()
+  + {abstract} operationName(std::size_t operationId): const char *
+}
+
+AbstractProtocol <|-- NFSv3Protocol
+AbstractProtocol <|-- NFSv4Protocol
+
+class CommandsStatistics {
+  + commands: std::vector<std::size_t>
 }
 
 class WatchAnalyzer {
   - _userGUI: UserGUI
+  - _protocols: std::vector<AbstractProtocol*>
   + {abstract} onCommand(): void
   + {abstract} onUnixSignal(): void
 }
@@ -24,70 +37,77 @@ class WatchAnalyzer {
 class UserGUI << thread >> {
   - _isRunning: std::atomic<bool>
   - _shouldRefresh: std::atomic<bool>
-  - _statisticsDeltaMutex: std::mutex
-  - _statisticsDeltaContainer: std::unordered_map<ProtocolId, Statistics>
-  - _statisticsContainer: std::unordered_map<ProtocolId, Statistics>
-  - _activeProtocolId: ProtocolId
+  - _statisticsMutex: std::mutex
+  - _statisticsContainer: std::unordered_map<AbstractProtocol*, CommandsStatistics>
+  - _activeProtocol: AbstractProtocol&
+  - _activeStatistics: CommandsStatistics
+  - _mainWindow: MainWindow
   - _headerWindow: HeaderWindow
   - _statisticsWindow: StatisticsWindow
-  - run()
-  - selectProtocol(newProtocolId: ProtocolId)
-  + update(protocolId: ProtocolId, statistics: const Statistics&)
+  + UserGUI(protocols: std::vector<AbstractProtocol *>&)
+  + update(protocol: const AbstractProtocol&, statistics: const CommandsStatistics&)
   + refresh()
+  - run()
+  - selectProtocol(protocol: const ActiveProtocol&)
 }
 
 note right of UserGUI
-  <b>_statisticsDeltaContainer/_statisticsDeltaMutex</b>
-  are used to thread-safely pass statistics delta from
+  <b>_statisticsContainer/_statisticsMutex</b>
+  are used to thread-safely pass statistics from
   analyzer's thread to GUI's one;
+  <b>_activeStatistics</b> is used to store statistics
+  for active protocol
   <b>run()</b> is a thread-function where GUI is to
   be created/[re-]drawn/destroyed, keyboard events are to
   be handled and incoming statistics delta is to be applied;
   <b>selectProtocol()</b> is to be called internally when
   a user changes active protocol;
   <b>update()</b> is to be called from analyzer
-  to update statistics delta;
+  to update statistics;
   <b>refresh()</b> is to be called from analyzer
   to completely redraw GUI (e.g. on SIGCONT) -
   this method just sets <b>_shouldRefresh</b> to <b>true</b>
   but actual refresh is made in <b>run()</b>.
 end note
 
-class HeaderWindow {
-  - {static} ProtocolNames: const char*[]
+class MainWindow {
   - _handle: WINDOW*
-  - _activeProtocolId: ProtocolId
-  + selectProtocol(protocolId: ProtocolId)
+}
+
+class HeaderWindow {
+  - _handle: WINDOW*
+  - _activeProtocol: const AbstractProtocol&
+  + HeaderWindow(protocols: std::vector<AbstractProtocol *>&, activeProtocol: const AbstractProtocol&)
+  + selectProtocol(protocol: const AbstractProtocol&)
   + refresh()
 }
 
 class StatisticsWindow {
-  - {static} CommandsAmount: int[]
-  - {static} OperationNames: const char*[][]
   - _handle: WINDOW*
-  - _activeProtocolId: ProtocolId
-  - _activeStatistics: const Statistics&
-  - _scrollOffset: std::size_t
-  + reset(protocolId: ProtocolId, statistics: const Statistics&)
+  - _activeProtocol: const AbstractProtocol&
+  - _statisticsContainer: const CommandsStatistics&
+  - _scrollOffsets: std::unordered_map<AbstractProtocol*, std::size_t>
+  + StatisticsWindow(activeProtocol: const AbstractProtocol&, statisticsContainer: const CommandsStatistics&)
+  + selectProtocol(protocol: const AbstractProtocol&)
   + update()
   + scroll(increment: int)
   + refresh()
 }
 
-note right of StatisticsWindow
-  <b>reset()</b> is to be called when a protocol
-  is changed and scrolling should be reset;
+note top of StatisticsWindow
+  <b>selectProtocol()</b> is to be called when a protocol is changed;
   <b>update()</b> is to be called to update statistics data;
   <b>scroll()</b> is to be called to scroll statistics data;
   <b>refresh()</b> is to be called to completely redraw window.
 end note
 
 WatchAnalyzer "1" *-- "1" UserGUI
+UserGUI "1" *-- "*" AbstractProtocol
+UserGUI "1" *-- "1" MainWindow
 UserGUI "1" *-- "1" HeaderWindow
 UserGUI "1" *-- "1" StatisticsWindow
-UserGUI "1" *-- "1" ProtocolId
-UserGUI "1" *-- "*" Statistics
-HeaderWindow "1" *-- "1" ProtocolId
-StatisticsWindow "1" o-- "1" Statistics
-StatisticsWindow "1" *-- "1" ProtocolId
+UserGUI "1" *-- "*" CommandsStatistics
+HeaderWindow "1" o-- "1" AbstractProtocol
+StatisticsWindow "1" o-- "1" CommandsStatistics
+StatisticsWindow "1" o-- "1" AbstractProtocol
 @enduml
