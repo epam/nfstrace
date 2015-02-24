@@ -11,14 +11,6 @@ enum ProtocolId {
   CIFSv2 = 4
 }
 
-enum CommandsAmount {
-  NFSv3 = 22
-  NFSv4 = 41
-  NFSv41 = 59
-  CIFSv1 = 255
-  CIFSv2 = 18
-}
-
 class Statistics {
   + commands: std::map<std::size_t, std::size_t>
 }
@@ -61,9 +53,8 @@ note right of UserGUI
   but actual refresh is made in <b>run()</b>.
 end note
 
-
 class HeaderWindow {
-  - {static} _protocolNames: const char*[]
+  - {static} ProtocolNames: const char*[]
   - _handle: WINDOW*
   - _activeProtocolId: ProtocolId
   + selectProtocol(protocolId: ProtocolId)
@@ -71,7 +62,8 @@ class HeaderWindow {
 }
 
 class StatisticsWindow {
-  - {static} _operationNames: const char*[][]
+  - {static} CommandsAmount: int[]
+  - {static} OperationNames: const char*[][]
   - _handle: WINDOW*
   - _activeProtocolId: ProtocolId
   - _activeStatistics: const Statistics&
