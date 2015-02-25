@@ -1,4 +1,5 @@
 add_subdirectory (json)
+add_subdirectory (breakdown)
 
 project (unit_test_parse)
 aux_source_directory ("." SRC_TEST_LIST)

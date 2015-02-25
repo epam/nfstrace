@@ -196,9 +196,9 @@ void JsonAnalyzer::commit3(const RPCProcedure* /*proc*/,
 // NFS4.0
 // Procedures: 
 
-void JsonAnalyzer::null(const RPCProcedure* /*proc*/,
-                        const struct NFS4::NULL4args* /*args*/,
-                        const struct NFS4::NULL4res* /*res*/)
+void JsonAnalyzer::null4(const RPCProcedure* /*proc*/,
+                         const struct NFS4::NULL4args* /*args*/,
+                         const struct NFS4::NULL4res* /*res*/)
 {
     _nfsV40Stat.nullProcsAmount++;
 }

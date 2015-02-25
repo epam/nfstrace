@@ -195,11 +195,11 @@ public:
 
     // NFSv4.0 procedures
 
-    void null(const RPCProcedure* /*proc*/,
-              const struct NFS4::NULL4args* /*args*/,
-              const struct NFS4::NULL4res* /*res*/) override final
+    void null4(const RPCProcedure* /*proc*/,
+               const struct NFS4::NULL4args* /*args*/,
+               const struct NFS4::NULL4res* /*res*/) override final
     {
-        std::cout << "TestAnalyzer::null()" << std::endl;
+        std::cout << "TestAnalyzer::null4()" << std::endl;
     }
     void compound4(const RPCProcedure* /*proc*/,
                            const struct NFS4::COMPOUND4args* /*args*/,
