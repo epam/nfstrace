@@ -105,12 +105,12 @@ void WatchAnalyzer::commit3(const RPCProcedure* proc,
              const struct NFS3::COMMIT3args*,
              const struct NFS3::COMMIT3res*) { account(proc);}
 
-void WatchAnalyzer::null(const RPCProcedure* proc,
-          const struct NFS4::NULL4args*,
-          const struct NFS4::NULL4res*) { account(proc);}
+void WatchAnalyzer::null4(const RPCProcedure* proc,
+                          const struct NFS4::NULL4args*,
+                          const struct NFS4::NULL4res*) { account(proc);}
 void WatchAnalyzer::compound4(const RPCProcedure*  proc,
-               const struct NFS4::COMPOUND4args*,
-               const struct NFS4::COMPOUND4res*  res) { account(proc, res);}
+                              const struct NFS4::COMPOUND4args*,
+                              const struct NFS4::COMPOUND4res*  res) { account(proc, res);}
 
 void WatchAnalyzer::flush_statistics()
 {
