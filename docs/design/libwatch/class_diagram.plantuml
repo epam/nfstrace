@@ -3,19 +3,19 @@ skinparam titleFontSize 24
 skinparam defaultFontSize 16
 title NFSTrace: libwatch class diagram
 
-abstract class AbstractProtocol {
+abstract class AbstractProtocol #Aquamarine {
   + operationsAmount: const std::size_t
   + name: const std::string
   + AbstractProtocol(name: const std::string&, operationsAmount: std::size_t)
   + {abstract} operationName(std::size_t operationId): const char * = 0
 }
 
-class NFSv3Protocol {
+class NFSv3Protocol #Aquamarine {
   + NFSv3Protocol()
   + {abstract} operationName(std::size_t operationId): const char *
 }
 
-class NFSv4Protocol {
+class NFSv4Protocol #Aquamarine {
   + NFSv4Protocol()
   + {abstract} operationName(std::size_t operationId): const char *
 }
@@ -70,11 +70,11 @@ note right of UserGUI
   but actual refresh is made in <b>run()</b>.
 end note
 
-class MainWindow {
+class MainWindow #Khaki {
   - _handle: WINDOW*
 }
 
-class HeaderWindow {
+class HeaderWindow #Khaki {
   - _handle: WINDOW*
   - _activeProtocol: const AbstractProtocol&
   + HeaderWindow(protocols: std::vector<AbstractProtocol *>&, activeProtocol: const AbstractProtocol&)
@@ -82,7 +82,7 @@ class HeaderWindow {
   + refresh()
 }
 
-class StatisticsWindow {
+class StatisticsWindow #Khaki {
   - _handle: WINDOW*
   - _activeProtocol: const AbstractProtocol&
   - _statisticsContainer: const CommandsStatistics&
@@ -102,6 +102,7 @@ note top of StatisticsWindow
 end note
 
 WatchAnalyzer "1" *-- "1" UserGUI
+WatchAnalyzer "1" *-- "*" AbstractProtocol
 UserGUI "1" *-- "*" AbstractProtocol
 UserGUI "1" *-- "1" MainWindow
 UserGUI "1" *-- "1" HeaderWindow
