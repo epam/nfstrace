@@ -4,20 +4,20 @@ skinparam defaultFontSize 16
 title NFSTrace: libwatch class diagram
 
 abstract class AbstractProtocol #Aquamarine {
-  + operationsAmount: const std::size_t
+  + commandsAmount: const std::size_t
   + name: const std::string
-  + AbstractProtocol(name: const std::string&, operationsAmount: std::size_t)
-  + {abstract} operationName(std::size_t operationId): const char * = 0
+  + AbstractProtocol(name: const std::string&, commandsAmount: std::size_t)
+  + {abstract} commandName(std::size_t commandId): const char * = 0
 }
 
 class NFSv3Protocol #Aquamarine {
   + NFSv3Protocol()
-  + {abstract} operationName(std::size_t operationId): const char *
+  + {abstract} commandName(std::size_t commandId): const char *
 }
 
 class NFSv4Protocol #Aquamarine {
   + NFSv4Protocol()
-  + {abstract} operationName(std::size_t operationId): const char *
+  + {abstract} commandName(std::size_t commandId): const char *
 }
 
 AbstractProtocol <|-- NFSv3Protocol
@@ -40,12 +40,11 @@ class UserGUI << thread >> {
   - _statisticsMutex: std::mutex
   - _statisticsContainer: std::unordered_map<AbstractProtocol*, CommandsStatistics>
   - _activeProtocol: AbstractProtocol&
-  - _activeStatistics: CommandsStatistics
   - _mainWindow: MainWindow
   - _headerWindow: HeaderWindow
   - _statisticsWindow: StatisticsWindow
   + UserGUI(protocols: std::vector<AbstractProtocol *>&)
-  + update(protocol: const AbstractProtocol&, statistics: const CommandsStatistics&)
+  + incrementCommand(protocol: const AbstractProtocol&, commandId: std::size_t)
   + refresh()
   - run()
   - selectProtocol(protocol: const ActiveProtocol&)
@@ -55,15 +54,13 @@ note right of UserGUI
   <b>_statisticsContainer/_statisticsMutex</b>
   are used to thread-safely pass statistics from
   analyzer's thread to GUI's one;
-  <b>_activeStatistics</b> is used to store statistics
-  for active protocol
   <b>run()</b> is a thread-function where GUI is to
   be created/[re-]drawn/destroyed, keyboard events are to
   be handled and incoming statistics delta is to be applied;
   <b>selectProtocol()</b> is to be called internally when
   a user changes active protocol;
-  <b>update()</b> is to be called from analyzer
-  to update statistics;
+  <b>incrementCommand()</b> is to be called from analyzer
+  to update statistics on command detection;
   <b>refresh()</b> is to be called from analyzer
   to completely redraw GUI (e.g. on SIGCONT) -
   this method just sets <b>_shouldRefresh</b> to <b>true</b>
