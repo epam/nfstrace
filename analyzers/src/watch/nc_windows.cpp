@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Header for WatchAnalyzer based on TestAnalyzer.h
+// Description: Source for description ncurses windows.
 // Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -36,7 +36,7 @@ namespace
     const int SHIFTCU  = 1;
 
     const int GUI_LENGTH = 80;
-    const int GUI_HEADER_HEIGHT = 9;
+    const int GUI_HEADER_HEIGHT = 6;
     const int GUI_STATISTIC_HEIGHT = 100;
     const int PERSENT_POS = 29;
     const int COUNTERS_POS = 22;
@@ -101,7 +101,7 @@ void MainWindow::init()
     _window = initscr();
     if(_window == nullptr)
     {
-        throw LibWatchException(); //"Initialization of Main window failed.");
+        throw std::runtime_error("Initialization of Main window failed.");
     }
     noecho();
     cbreak();
@@ -164,7 +164,7 @@ HeaderWindow::HeaderWindow(MainWindow& w)
 {
     if(w._window == nullptr)
     {
-        throw LibWatchException(); //"Initialization of Header window failed.");
+        throw std::runtime_error("Initialization of Header window failed.");
     }
     resize(w);
 }
@@ -172,19 +172,6 @@ HeaderWindow::HeaderWindow(MainWindow& w)
 HeaderWindow::~HeaderWindow()
 {
     destroy();
-}
-
-void HeaderWindow::updateProtocol(int p)
-{
-    _activeProtocol = static_cast<ProtocolId>(p);
-    if(_window == nullptr) return;
-
-    mvwprintw(_window, 7, 1,"  %s    %s     %s    %s    %s  ",
-              _activeProtocol == NFSv3  ? ProtocolsActiveNames[static_cast<int>(NFSv3) ] : ProtocolsNames[static_cast<int>(NFSv3) ],
-              _activeProtocol == NFSv4  ? ProtocolsActiveNames[static_cast<int>(NFSv4) ] : ProtocolsNames[static_cast<int>(NFSv4) ],
-              _activeProtocol == NFSv41 ? ProtocolsActiveNames[static_cast<int>(NFSv41)] : ProtocolsNames[static_cast<int>(NFSv41)],
-              _activeProtocol == CIFSv1 ? ProtocolsActiveNames[static_cast<int>(CIFSv1)] : ProtocolsNames[static_cast<int>(CIFSv1)],
-              _activeProtocol == CIFSv2 ? ProtocolsActiveNames[static_cast<int>(CIFSv2)] : ProtocolsNames[static_cast<int>(CIFSv2)]);
 }
 
 void HeaderWindow::update()
@@ -215,7 +202,7 @@ void HeaderWindow::resize(MainWindow& m)
         gethostname(HOST_NAME, 128);
         mvwprintw(_window, 1, 1,"%s","Nfstrace watch plugin. To scroll press up or down keys. Ctrl + c to exit.");
         mvwprintw(_window, 2, 1,"Host name:\t %s",HOST_NAME);
-        updateProtocol(static_cast<int>(_activeProtocol));
+        updateProtocol(_activeProtocol);
     }
 }
 //------------------------------------------------------------------------------
@@ -236,7 +223,7 @@ StatisticsWindow::StatisticsWindow(MainWindow& w, ProtocolStatistic& c)
 {
     if(w._window == nullptr)
     {
-        throw LibWatchException();//"Initialization of Header window failed.");
+        throw std::runtime_error("Initialization of Header window failed.");
     }
     resize(w);
 }
@@ -261,26 +248,33 @@ void StatisticsWindow::updateProtocol(int p)
     werase(_window);
     wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER , ACS_LLCORNER, ACS_LRCORNER);
 
+    mvwprintw(_window, 1 , 1,"  %s    %s     %s    %s    %s  ",
+              _activeProtocol == NFSv3  ? ProtocolsActiveNames[static_cast<int>(NFSv3) ] : ProtocolsNames[static_cast<int>(NFSv3) ],
+              _activeProtocol == NFSv4  ? ProtocolsActiveNames[static_cast<int>(NFSv4) ] : ProtocolsNames[static_cast<int>(NFSv4) ],
+              _activeProtocol == NFSv41 ? ProtocolsActiveNames[static_cast<int>(NFSv41)] : ProtocolsNames[static_cast<int>(NFSv41)],
+              _activeProtocol == CIFSv1 ? ProtocolsActiveNames[static_cast<int>(CIFSv1)] : ProtocolsNames[static_cast<int>(CIFSv1)],
+              _activeProtocol == CIFSv2 ? ProtocolsActiveNames[static_cast<int>(CIFSv2)] : ProtocolsNames[static_cast<int>(CIFSv2)]);
+
     switch (_activeProtocol)
     {
         case NFSv3 :
             for(unsigned int i = 0; i < ProcEnumNFS3::count; i++)
             {
-                if( i > _scrollOffset.at(p) && i < _window->_maxy + _scrollOffset.at(p) -1)
-                    mvwprintw(_window, i - _scrollOffset.at(p), 1, "%s", print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i)));
+                if( i + 3 > _scrollOffset.at(p) && i + 3 < _window->_maxy + _scrollOffset.at(p) -1)
+                    mvwprintw(_window, i + 3 - _scrollOffset.at(p), 1, "%s", print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i)));
             }
         break;
         case NFSv4 :
             for(unsigned int i = 0; i < ProcEnumNFS4::count; i++)
             {
-                if( i > _scrollOffset.at(p) && i < _window->_maxy + _scrollOffset.at(p) -1)
-                    mvwprintw(_window, i - _scrollOffset.at(p), 1, "%s", print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i)));
+                if( i + 3 > _scrollOffset.at(p) && i + 3 < _window->_maxy + _scrollOffset.at(p) -1)
+                    mvwprintw(_window, i + 3 - _scrollOffset.at(p), 1, "%s", print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i)));
             }
         break;
         default :
-            mvwprintw(_window, 1, 2, "%s", "This protocol not implemented yet");
-            mvwprintw(_window, 2, 2, "%s", "\tin libwatch plugin of nfstrace.");
-            mvwprintw(_window, 3, 2, "%s", "Try to download latest version.");
+            mvwprintw(_window, 3, 2, "%s", "This protocol not implemented yet");
+            mvwprintw(_window, 4, 2, "%s", "\tin libwatch plugin of nfstrace.");
+            mvwprintw(_window, 5, 2, "%s", "Try to download latest version.");
         break;
     }
 }
@@ -300,10 +294,10 @@ void StatisticsWindow::update(const ProtocolStatistic& d)
         case NFSv3 :
             for(unsigned int i = 0; i < ProcEnumNFS3::count; i++)
             {
-                if( i > _scrollOffset.at(static_cast<int>(_activeProtocol)) && i < _window->_maxy + _scrollOffset.at(static_cast<int>(_activeProtocol)) - 1)
+                if( i + 3 > _scrollOffset.at(static_cast<int>(_activeProtocol)) && i + 3 < _window->_maxy + _scrollOffset.at(static_cast<int>(_activeProtocol)) - 1)
                 {
-                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), COUNTERS_POS, "%lu ", _statistic[i]);
-                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), PERSENT_POS, "%-3.2f%% ",
+                    mvwprintw(_window, i + 3 - _scrollOffset.at(static_cast<int>(_activeProtocol)), COUNTERS_POS, "%lu ", _statistic[i]);
+                    mvwprintw(_window, i + 3 - _scrollOffset.at(static_cast<int>(_activeProtocol)), PERSENT_POS, "%-3.2f%% ",
                               m > 0 ? static_cast<double>(_statistic[i]) / static_cast<double>(m) * 100.0 : 0.0);
                 }
             }
@@ -311,10 +305,10 @@ void StatisticsWindow::update(const ProtocolStatistic& d)
         case NFSv4 :
             for(unsigned int i = 0; i < _statistic.size(); i++)
             {
-                if( i > _scrollOffset.at(static_cast<int>(_activeProtocol)) && i < _window->_maxy + _scrollOffset.at(static_cast<int>(_activeProtocol)) - 1)
+                if( i + 3 > _scrollOffset.at(static_cast<int>(_activeProtocol)) && i + 3 < _window->_maxy + _scrollOffset.at(static_cast<int>(_activeProtocol)) - 1)
                 {
-                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), COUNTERS_POS, "%lu ", _statistic[i]);
-                    mvwprintw(_window, i - _scrollOffset.at(static_cast<int>(_activeProtocol)), PERSENT_POS, "%-3.2f%% ",
+                    mvwprintw(_window, i + 3 - _scrollOffset.at(static_cast<int>(_activeProtocol)), COUNTERS_POS, "%lu ", _statistic[i]);
+                    mvwprintw(_window, i + 3 - _scrollOffset.at(static_cast<int>(_activeProtocol)), PERSENT_POS, "%-3.2f%% ",
                               m > 0 ? static_cast<double>(_statistic[i]) / static_cast<double>(m) * 100.0 : 0.0);
                 }
             }
@@ -333,13 +327,13 @@ void StatisticsWindow::resize(MainWindow& m)
     switch (_activeProtocol)
     {
         case NFSv3:
-            tmp_size = ProcEnumNFS3::count + 2;
+            tmp_size = ProcEnumNFS3::count + 5;
         break;
         case NFSv4:
-            tmp_size = ProcEnumNFS4::count + 2;
+            tmp_size = ProcEnumNFS4::count + 5;
         break;
         case NFSv41:
-            tmp_size = ProcEnumNFS41::count + 2;
+            tmp_size = ProcEnumNFS41::count + 5;
         break;
         case CIFSv1:
             tmp_size = 10;

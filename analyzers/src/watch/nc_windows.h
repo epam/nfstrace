@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Header for descriprin ncurses windows
+// Description: Header for description ncurses windows.
 // Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -23,14 +23,10 @@
 #define NC_WINDOWS_H
 //------------------------------------------------------------------------------
 #include <cstdlib>
-#include <unordered_map>
 #include <vector>
+#include <stdexcept>
 
 #include <ncurses.h>
-//------------------------------------------------------------------------------
-class LibWatchException : public std::exception
-{
-};
 //------------------------------------------------------------------------------
 enum ProtocolId
 {
@@ -40,8 +36,6 @@ enum ProtocolId
     CIFSv1,
     CIFSv2
 };
-
-//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 class MainWindow
 {
@@ -72,7 +66,6 @@ public:
     HeaderWindow() = delete;
     HeaderWindow(MainWindow&);
     ~HeaderWindow();
-    void updateProtocol(int);
     void update();
     void resize(MainWindow&);
 };
