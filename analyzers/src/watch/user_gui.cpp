@@ -44,7 +44,7 @@ void UserGUI::run()
 
         MainWindow mainWindow;
         HeaderWindow     headerWindow(mainWindow);
-        StatisticsWindow statisticsWindow(mainWindow, _statisticsConteiner.at(_activeProtocolId));
+        StatisticsWindow statisticsWindow(mainWindow, _statisticsContainer.at(_activeProtocolId));
 
         /* Watch stdin (fd 0) to see when it has input. */
         FD_ZERO(&rfds);
@@ -75,7 +75,7 @@ void UserGUI::run()
             }
             {
                 std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
-                tmp = _statisticsConteiner.at(_activeProtocolId);
+                tmp = _statisticsContainer.at(_activeProtocolId);
             }
             headerWindow.update();
             statisticsWindow.update(tmp);
@@ -111,13 +111,13 @@ void UserGUI::run()
                 }
                 else if(key == KEY_UP)
                 {
-                    statisticsWindow.scrolling(SCROLL_UP);
+                    statisticsWindow.scrollContent(SCROLL_UP);
                     statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
                     statisticsWindow.update(tmp);
                 }
                 else if(key == KEY_DOWN)
                 {
-                    statisticsWindow.scrolling(SCROLL_DOWN);
+                    statisticsWindow.scrollContent(SCROLL_DOWN);
                     statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
                     statisticsWindow.update(tmp);
                 }
@@ -134,9 +134,9 @@ void UserGUI::run()
 
 UserGUI::UserGUI(const char* opts)
 : _refresh_delta {900000}
-, _isRunning {ATOMIC_FLAG_INIT}
 , _shouldResize{false}
-, _statisticsConteiner({{static_cast<int>(NFSv3),  std::vector<std::size_t>(ProcEnumNFS3::count,  0)},
+, _running {ATOMIC_FLAG_INIT}
+, _statisticsContainer({{static_cast<int>(NFSv3),  std::vector<std::size_t>(ProcEnumNFS3::count,  0)},
                         {static_cast<int>(NFSv4),  std::vector<std::size_t>(ProcEnumNFS4::count,  0)},
                         {static_cast<int>(NFSv41), std::vector<std::size_t>(ProcEnumNFS41::count, 0)},
                         {static_cast<int>(CIFSv1), std::vector<std::size_t>(10, 0)},
@@ -167,7 +167,7 @@ void UserGUI::update(int p, std::vector<std::size_t>& d)
     std::vector<std::size_t>::iterator it;
     std::vector<std::size_t>::iterator st;
     std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
-    for(it = (_statisticsConteiner.at(p)).begin(), st = d.begin(); it != (_statisticsConteiner.at(p)).end() && st != d.end(); ++it, ++st)
+    for(it = (_statisticsContainer.at(p)).begin(), st = d.begin(); it != (_statisticsContainer.at(p)).end() && st != d.end(); ++it, ++st)
     {
         (*it) += (*st);
     }

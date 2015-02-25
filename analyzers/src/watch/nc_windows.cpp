@@ -37,7 +37,7 @@ namespace
 
     const int GUI_LENGTH = 80;
     const int GUI_HEADER_HEIGHT = 6;
-    const int GUI_STATISTIC_HEIGHT = 100;
+//    const int GUI_STATISTIC_HEIGHT = 100;
     const int PERSENT_POS = 29;
     const int COUNTERS_POS = 22;
 }
@@ -160,7 +160,6 @@ void HeaderWindow::destroy()
 
 HeaderWindow::HeaderWindow(MainWindow& w)
 : _start_time{time(NULL)}
-, _activeProtocol{NFSv3}
 {
     if(w._window == nullptr)
     {
@@ -202,7 +201,6 @@ void HeaderWindow::resize(MainWindow& m)
         gethostname(HOST_NAME, 128);
         mvwprintw(_window, 1, 1,"%s","Nfstrace watch plugin. To scroll press up or down keys. Ctrl + c to exit.");
         mvwprintw(_window, 2, 1,"Host name:\t %s",HOST_NAME);
-        updateProtocol(_activeProtocol);
     }
 }
 //------------------------------------------------------------------------------
@@ -233,7 +231,7 @@ StatisticsWindow::~StatisticsWindow()
     destroy();
 }
 
-void StatisticsWindow::scrolling(int i)
+void StatisticsWindow::scrollContent(int i)
 {
     if(i > 0 && _scrollOffset.at(_activeProtocol) <= MAXSHIFT - SHIFTCU)
         _scrollOffset.at(static_cast<int>(_activeProtocol)) += SHIFTCU;
@@ -349,6 +347,7 @@ void StatisticsWindow::resize(MainWindow& m)
     {
         _window = subwin(m._window, (m._window->_maxy - GUI_HEADER_HEIGHT > tmp_size) ? tmp_size : (m._window->_maxy - GUI_HEADER_HEIGHT) ,
                                      m._window->_maxx > GUI_LENGTH ? GUI_LENGTH : m._window->_maxx, GUI_HEADER_HEIGHT - 1, 0);
+        updateProtocol(_activeProtocol);
     }
 }
 
