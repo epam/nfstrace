@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Header for WatchAnalyzer based on TestAnalyzer.h
+// Description: Source for UserGui.
 // Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -60,7 +60,6 @@ void UserGUI::run()
 
         std::vector<std::size_t> tmp(1, 0);
 
-        headerWindow.updateProtocol(_activeProtocolId);
         statisticsWindow.updateProtocol(_activeProtocolId);
 
         while (_running.test_and_set())
@@ -70,7 +69,6 @@ void UserGUI::run()
                 mainWindow.resize();
                 headerWindow.resize(mainWindow);
                 statisticsWindow.resize(mainWindow);
-                headerWindow.updateProtocol(_activeProtocolId);
                 statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
 
                 _shouldResize = false;
@@ -96,8 +94,6 @@ void UserGUI::run()
                         _activeProtocolId = static_cast<ProtocolId>(static_cast<int>(_activeProtocolId) - 1);
                         statisticsWindow.setProtocol(static_cast<int>(_activeProtocolId));
                         statisticsWindow.resize(mainWindow);
-                        headerWindow.updateProtocol(_activeProtocolId);
-                        statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
                         headerWindow.update();
                         statisticsWindow.update(tmp);
                     }
@@ -109,8 +105,6 @@ void UserGUI::run()
                         _activeProtocolId = static_cast<ProtocolId>(static_cast<int>(_activeProtocolId) + 1);
                         statisticsWindow.setProtocol(static_cast<int>(_activeProtocolId));
                         statisticsWindow.resize(mainWindow);
-                        headerWindow.updateProtocol(_activeProtocolId);
-                        statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
                         headerWindow.update();
                         statisticsWindow.update(tmp);
                     }
@@ -118,14 +112,12 @@ void UserGUI::run()
                 else if(key == KEY_UP)
                 {
                     statisticsWindow.scrolling(SCROLL_UP);
-                    headerWindow.updateProtocol(_activeProtocolId);
                     statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
                     statisticsWindow.update(tmp);
                 }
                 else if(key == KEY_DOWN)
                 {
                     statisticsWindow.scrolling(SCROLL_DOWN);
-                    headerWindow.updateProtocol(_activeProtocolId);
                     statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
                     statisticsWindow.update(tmp);
                 }
@@ -134,7 +126,7 @@ void UserGUI::run()
             tv.tv_usec = _refresh_delta % MSEC;
         }
     }
-    catch(LibWatchException& e)
+    catch(std::runtime_error& e)
     {
         std::cerr << "Watch plugin error: " << e.what();
     }
