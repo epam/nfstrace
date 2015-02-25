@@ -112,7 +112,7 @@ class INFSv4rpcgen
 {
 public:
     virtual ~INFSv4rpcgen() {}
-    virtual void null(const RPCProcedure*,
+    virtual void null4(const RPCProcedure*,
             const struct NFS4::NULL4args*,
             const struct NFS4::NULL4res*) {}
     virtual void compound4(const RPCProcedure*,
@@ -404,7 +404,7 @@ public:
             const struct NFS41::ILLEGAL4res*) {}
 };
 
-/*! Abstract interface of plugin which collects SMBv1 statistic
+/*! Abstract interface of plugin which collects SMBv1 statistics
  */
 class ISMBv1
 {
@@ -937,7 +937,7 @@ public:
     virtual void noAndxCommandSMBv1(const SMBv1::NoAndxCommand*, const SMBv1::NoAndxCmdArgumentType*, const SMBv1::NoAndxCmdResultType*) {}
 };
 
-/*! Abstract interface of plugin which collects SMBv2 statistic
+/*! Abstract interface of plugin which collects SMBv2 statistics
  */
 class ISMBv2
 {

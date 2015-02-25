@@ -223,7 +223,7 @@ static inline void analyze_nfsv4_procedure(const uint32_t procedure, XDRDecoder&
         switch (procedure)
         {
         case ProcEnumNFS4::NFS_NULL:
-            analyzers(&IAnalyzer::INFSv4rpcgen::null, NFSPROC4RPCGEN_NULL { c, r, s });
+            analyzers(&IAnalyzer::INFSv4rpcgen::null4, NFSPROC4RPCGEN_NULL { c, r, s });
             break;
         case ProcEnumNFS4::COMPOUND:
             NFSPROC4RPCGEN_COMPOUND compound { c, r, s };
