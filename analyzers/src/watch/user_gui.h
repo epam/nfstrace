@@ -35,17 +35,16 @@ class UserGUI
 {
 public:
     using ProtocolStatistic = std::vector<std::size_t>;
-    using StatisticsConteiner = std::unordered_map<int, ProtocolStatistic>;
+    using StatisticsContainer = std::unordered_map<int, ProtocolStatistic>;
 
 private:
     unsigned long _refresh_delta;
 
-    std::atomic<bool> _isRunning;
     std::atomic<bool> _shouldResize;
     std::mutex _statisticsDeltaMutex;
     std::atomic_flag _running;
 
-    StatisticsConteiner _statisticsConteiner;
+    StatisticsContainer _statisticsContainer;
     ProtocolId _activeProtocolId;
 
     std::thread _guiThread;
@@ -53,12 +52,16 @@ private:
     void run();
 public:
 
-
     UserGUI() = delete;
     explicit UserGUI(const char*);
     ~UserGUI();
 
-    void update(int , std::vector<std::size_t>&); // TODO not implemented
+    /*! Update Protocol's data
+    */
+    void update(int , std::vector<std::size_t>&);
+
+    /*! Enable screen full update. Use for resize main window.
+    */
     void enableUpdate();
  };
 //------------------------------------------------------------------------------

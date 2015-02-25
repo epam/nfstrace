@@ -23,6 +23,7 @@
 #define NC_WINDOWS_H
 //------------------------------------------------------------------------------
 #include <cstdlib>
+#include <unordered_map>
 #include <vector>
 #include <stdexcept>
 
@@ -30,11 +31,11 @@
 //------------------------------------------------------------------------------
 enum ProtocolId
 {
-    NFSv3,
-    NFSv4,
-    NFSv41,
-    CIFSv1,
-    CIFSv2
+    NFSv3,  //!< NFS version 3
+    NFSv4,  //!< NFS version 4
+    NFSv41, //!< NFS version 4.1
+    CIFSv1, //!< CIFS version 1
+    CIFSv2  //!< CIFS version 2
 };
 //------------------------------------------------------------------------------
 class MainWindow
@@ -47,10 +48,19 @@ class MainWindow
     void destroy();
 
 public:
+
+    /*! Get iput keys
+    */
     uint16_t inputKeys();
     MainWindow();
     ~MainWindow();
+
+    /*! Resize Main Window
+    */
     void resize();
+
+    /*! Update Main Window
+    */
     void update();
 };
 //------------------------------------------------------------------------------
@@ -59,14 +69,19 @@ class HeaderWindow
 {
     WINDOW* _window;
     time_t _start_time;
-    ProtocolId _activeProtocol;
     void destroy();
 
 public:
     HeaderWindow() = delete;
     HeaderWindow(MainWindow&);
     ~HeaderWindow();
+
+    /*! Update Header Window
+    */
     void update();
+
+    /*! Resize Header Window
+    */
     void resize(MainWindow&);
 };
 //------------------------------------------------------------------------------
@@ -86,10 +101,25 @@ public:
     StatisticsWindow() = delete;
     StatisticsWindow(MainWindow&, ProtocolStatistic&);
     ~StatisticsWindow();
-    void scrolling(int);
+
+    /*! Scroll content of Statistic Winodow Up or Down
+    */
+    void scrollContent(int);
+
+    /*! Change active protocol. Print new protocl's commands.
+    */
     void updateProtocol(int);
+
+    /*! Update counters on Statistics Window
+    */
     void update(const ProtocolStatistic&);
+
+    /*! Resize Statistic Window
+    */
     void resize(MainWindow&);
+
+    /*! Only set active protocol, do not update new protocol's commands.
+    */
     void setProtocol(int);
 };
 //------------------------------------------------------------------------------
