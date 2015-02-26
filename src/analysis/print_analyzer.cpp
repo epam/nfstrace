@@ -774,6 +774,9 @@ void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd,
     print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
     print_file_name(out,cmd->parg->Buffer, cmd->parg->PathLength);
     print_smbv2_common_info_resp(out, cmdEnum, res);
+    out << " Share types =  "  << res->ShareType << "\n"
+        << " Capabilities  = " << res->capabilities << "\n"
+        << " Share flags = " << res->shareFlags << "\n";
 }
 void PrintAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd,
                                         const SMBv2::TreeDisconnectRequest*,
