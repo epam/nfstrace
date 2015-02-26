@@ -42,9 +42,13 @@ inline bool out_all()
     return Out::Global::get_level() == Out::Level::All;
 }
 
-void print_hex(std::ostream& out,
-               uint32_t val,
-               size_t len);
+void print_hex64(std::ostream& out, uint64_t val);
+
+void print_hex32(std::ostream& out, uint32_t val);
+
+void print_hex16(std::ostream& out, uint16_t val);
+
+void print_hex8(std::ostream& out, uint8_t val);
 
 void print_hex(std::ostream& out,
        const uint32_t* const val,
