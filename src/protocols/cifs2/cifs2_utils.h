@@ -39,6 +39,7 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CtlCodes code)
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::InfoTypes infoTypes);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareTypes shareTypes);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareFlags shareFlags);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities capabilities);
 }// namespace CIFSv2    
 }// namespace protocols 
 }// namespace NST       

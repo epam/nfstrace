@@ -170,6 +170,15 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareTypes sha
     return os;
 }
 
+static inline bool operator&(const NST::API::SMBv2::ShareFlags lhs, const NST::API::SMBv2::ShareFlags rhs) 
+{
+    return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+}
+static inline bool operator&(const NST::API::SMBv2::Capabilities lhs, const NST::API::SMBv2::Capabilities rhs) 
+{
+    return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+}
+
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareFlags shareFlags)
 {
     using namespace NST::API::SMBv2; 
@@ -205,32 +214,58 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareFlags sha
     {
         os << "\tSMB2_SHAREFLAG_FORCE_SHARED_DELETE\n";
     } 
-    if(shareFlags | ShareFlags::ALLOW_NAMESPACE_CACHING)
+    if(shareFlags & ShareFlags::ALLOW_NAMESPACE_CACHING)
     {
         os << "\tSMB2_SHAREFLAG_ALLOW_NAMESPACE_CACHING\n";
     } 
-    if(shareFlags | ShareFlags::ACCESS_BASED_DIRECTORY_ENUM)
+    if(shareFlags & ShareFlags::ACCESS_BASED_DIRECTORY_ENUM)
     {
         os << "\tSMB2_SHAREFLAG_ACCESS_BASED_DIRECTORY_ENUM\n";
     } 
-    if(shareFlags | ShareFlags::FORCE_LEVELII_OPLOCK)
+    if(shareFlags & ShareFlags::FORCE_LEVELII_OPLOCK)
     {
         os << "\tSMB2_SHAREFLAG_FORCE_LEVELII_OPLOCK\n";
     } 
-    if(shareFlags | ShareFlags::ENABLE_HASH)
+    if(shareFlags & ShareFlags::ENABLE_HASH)
     {
         os << "\tSMB2_SHAREFLAG_ENABLE_HASH_V1\n";
     } 
-    if(shareFlags | ShareFlags::ENABLE_HASH_2)
+    if(shareFlags & ShareFlags::ENABLE_HASH_2)
     {
         os << "\tSMB2_SHAREFLAG_ENABLE_HASH_V2\n";
     } 
-    if(shareFlags | ShareFlags::ENABLE_ENCRYPT_DATA)
+    if(shareFlags & ShareFlags::ENABLE_ENCRYPT_DATA)
     {
         os << "\tSMB2_SHAREFLAG_ENCRYPT_DATA\n";
     } 
     return os;
 } 
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities capabilities)
+{
+    using namespace NST::API::SMBv2; 
+    if(capabilities & Capabilities::DFS)
+    {
+        os << "\tSMB2_SHARE_CAP_DFS\n ";
+    } 
+    if(capabilities & Capabilities::CONTINUOUS_AVAILABILITY)
+    {
+        os << "\tSMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY\n";
+    } 
+    if(capabilities & Capabilities::SCALEOUT)
+    {
+        os << "\tSMB2_SHARE_CAP_SCALEOUT\n";
+    } 
+    if(capabilities & Capabilities::CLUSTER)
+    {
+        os << "\tSMB2_SHARE_CAP_CLUSTER\n";
+    } 
+    if(capabilities & Capabilities::ASYMMETRIC)
+    {
+        os << "\tSMB2_SHARE_CAP_ASYMMETRIC\n";
+    } 
+    return os;
+}
 } // namespace CIFSv2
 } // namespace protocols
 } // namespace NST

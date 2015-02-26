@@ -73,13 +73,11 @@ enum class SecurityModeShort : uint8_t
  */
 enum class Capabilities : uint32_t
 {
-    DFS                 = 0x00000001,             //!< When set, indicates that the client supports the Distributed File System (DFS).
-    LEASING             = 0x00000002,             //!< When set, indicates that the client supports leasing.
-    LARGE_MTU           = 0x00000004,             //!< When set, indicates that the client supports multi-credit operations.
-    MULTI_CHANNEL       = 0x00000008,             //!< When set, indicates that the client supports establishing multiple channels for a single session.
-    PERSISTENT_HANDLES  = 0x00000010,             //!< When set, indicates that the client supports persistent handles.
-    DIRECTORY_LEASING   = 0x00000020,             //!< When set, indicates that the client supports directory leasing.
-    ENCRYPTION          = 0x00000040              //!< When set, indicates that the client supports encryption.
+    DFS                     = 0x00000008,             //!< When set, indicates that the client supports the Distributed File System (DFS).
+    CONTINUOUS_AVAILABILITY = 0x00000010,             //!< When set, indicates that the client supports leasing.
+    SCALEOUT                = 0x00000020,             //!< When set, indicates that the client supports multi-credit operations.
+    CLUSTER                 = 0x00000040,             //!< When set, indicates that the client supports establishing multiple channels for a single session.
+    ASYMMETRIC              = 0x00000080,             //!< When set, indicates that the client supports persistent handles.
 };
 
 /*!
@@ -243,7 +241,7 @@ enum class ShareTypes : uint8_t
  * must be set (any of the remaining, SHI1005, flags may be set individually
  * or in combination.
  */
-enum ShareFlags : uint32_t
+enum class ShareFlags : uint32_t
 {
     MANUAL_CACHING               = 0x00000000,   //!< The client may cache files that are explicitly selected by the user for offline use.
     AUTO_CACHING                 = 0x00000010,   //!< The client may automatically cache files that are used by the user for offline access.
