@@ -20,6 +20,7 @@
 */
 //------------------------------------------------------------------------------
 #include <iomanip>
+#include <time.h>
 
 #include "analysis/print_analyzer.h"
 #include "protocols/cifs/cifs.h"
@@ -166,10 +167,10 @@ template<typename CommandType>
 void print_smbv2_common_info(std::ostream& out, Commands cmdEnum, CommandType* cmd, const std::string& cmdComment)
 {
     out << print_cifs2_procedures(cmdEnum) << " " << cmdComment << " (";
-    print_hex(out, to_integral(cmdEnum), sizeof(to_integral(cmdEnum)));
+    print_hex16(out, to_integral(cmdEnum));
     out << ")\n"
         << "  Structure size = ";
-    print_hex(out, cmd->structureSize, sizeof(cmd->structureSize));
+    print_hex16(out, cmd->structureSize);
     out << "\n";
 }
 
@@ -185,7 +186,37 @@ void print_smbv2_common_info_resp(std::ostream& out, Commands cmdEnum, CommandTy
     print_smbv2_common_info(out, cmdEnum, cmd, "response");
 }
 
+void print_time(std::ostream& out, uint64_t time)
+{
+    // TODO: Replace with C++ 11 functions
+
+    const auto EPOCH_DIFF = 0x019DB1DED53E8000LL; /* 116444736000000000 nsecs */
+    const auto RATE_DIFF = 10000000;              /* 100 nsecs */
+
+    uint64_t unixTimestamp = (time - EPOCH_DIFF) / RATE_DIFF;
+    time_t t = static_cast<time_t>(unixTimestamp);
+
+    // NOTE: If you ever want to print the year/day/month separately like this:
+    //
+    // struct tm* lt = localtime(&t);
+    //
+    // do not forget adding 1900 to tm_year field, just to get current year
+    // lt->tm_year + 1900
+
+    out << ctime(&t);
+}
+
+void print_file_name(std::ostream& out, const uint8_t *pFileName, uint16_t len)
+{
+    // TODO: Replace with human readable string
+    for(uint16_t i = 0; i < len; i++)
+    {
+        print_hex8(out, pFileName[i]);
+    }
+}
+
 } // unnamed namespace
+
 
 void PrintAnalyzer::createDirectorySMBv1(const SMBv1::CreateDirectoryCommand*,
                                          const SMBv1::CreateDirectoryArgumentType*,
@@ -742,11 +773,85 @@ void PrintAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand*,
                                         const SMBv2::TreeDisconnectResponse*)
 {
 }
-void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand*,
+void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
                                 const SMBv2::CreateRequest*,
-                                const SMBv2::CreateResponse*)
+                                const SMBv2::CreateResponse* res)
 {
+    Commands cmdEnum = Commands::CREATE;
+    print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
+
+    out << "  Oplock = ";
+    print_hex8(out, to_integral(cmd->parg->RequestedOplockLevel));
+    out << "\n"
+        << "  Impersonation = " << to_integral(cmd->parg->ImpersonationLevel) << "\n"
+        << "  Create Flags = ";
+
+    print_hex64(out, cmd->parg->SmbCreateFlags);
+    out << "\n";
+
+    out << "  Access Mask = ";
+    print_hex32(out, to_integral(cmd->parg->desiredAccess));
+    out << "\n";
+
+    out << "  File Attributes = ";
+    print_hex32(out, to_integral(cmd->parg->attributes));
+    out << "\n";
+
+    out << "  Share Access = ";
+    print_hex32(out, cmd->parg->shareAccess);
+
+    out << "\n"
+        << "  Disposition = " << to_integral(cmd->parg->createDisposition)
+        << "\n"
+        << "  Create Options = ";
+    print_hex32(out, cmd->parg->createOptions);
+
+    out << "\n";
+    out << "  File name = ";
+    print_file_name(out, cmd->parg->Buffer, cmd->parg->NameLength);
+
+    out << "\n"
+        << "  File length = " << cmd->parg->NameLength;
+
+    //
+    // TODO: In some cases buffer can contains : CreateContextsOffset, and CreateContextsLength
+    // handle and test this in future
+    //
+
+
+    out << "\n";
+    print_smbv2_common_info_resp(out, cmdEnum, res);
+
+    out << "  Oplock = ";
+    print_hex8(out, to_integral(res->oplockLevel));
+    out << "\n";
+    out << "  Response Flags = ";
+    print_hex8(out, res->flag);
+    out << "\n"
+        << "  Create Action = " << to_integral(res->CreateAction) << "\n"
+        << "  Create = ";
+    print_time(out, res->CreationTime);
+
+    out << "  Last Access = ";
+    print_time(out, res->LastAccessTime);
+
+    out << "  Last Write = ";
+    print_time(out, res->LastWriteTime);
+
+    out<< "  Last Change = ";
+    print_time(out, res->ChangeTime);
+
+    out << "  Allocation Size = ";
+    print_time(out, res->AllocationSize);
+
+    out << "  End Of File = ";
+    print_time(out, res->EndofFile);
+
+    out << "  File Attributes = ";
+    print_hex32(out, to_integral(res->attributes));
+    out << "\n";
 }
+
 void PrintAnalyzer::flushSMBv2(const SMBv2::FlushCommand*,
                                const SMBv2::FlushRequest*,
                                const SMBv2::FlushResponse*)
@@ -771,11 +876,12 @@ void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* cmd,
     print_smbv2_common_info_resp(out, cmdEnum, res);
 
     out << "  Data offset = ";
-    print_hex(out, res->DataOffset, sizeof(res->DataOffset));
+    print_hex16(out, res->DataOffset);
     out << "\n"
         << "  Read length = " << res->DataLength << "\n"
         << "  Read remaining = " << res->DataRemaining << "\n";
 }
+
 void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
                                const SMBv2::WriteRequest*,
                                const SMBv2::WriteResponse* res)
@@ -784,23 +890,28 @@ void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
     print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
 
     out << "  Data offset = ";
-    print_hex(out, cmd->parg->dataOffset, sizeof(cmd->parg->dataOffset));
+    print_hex16(out, cmd->parg->dataOffset);
 
     out << "\n"
     << "  Write Length = " << cmd->parg->Length << "\n"
-    << "  File Offset" << cmd->parg->Offset << "\n"
+    << "  File Offset = " << cmd->parg->Offset << "\n"
     << "  Channel = " << static_cast<u_int32_t>(cmd->parg->Channel) << "\n"
     << "  Remaining Bytes = " << cmd->parg->RemainingBytes << "\n"
     << "  Channel Info Offset = " << cmd->parg->WriteChannelInfoOffset << "\n"
     << "  Channel Info Length = " << cmd->parg->WriteChannelInfoLength << "\n"
     << "  Write Flags = ";
-    print_hex(out, static_cast<u_int32_t>(cmd->parg->Flags), sizeof(cmd->parg->Flags) );
+    print_hex32(out, static_cast<u_int32_t>(cmd->parg->Flags));
     out << "\n";
 
-    //<< "cmd->pargs->Buffer[1]" << cmd->parg->Buffer[1] << "\n";
+    // TODO: Wireshark also shows binary representation of file ...
+    // For now it is skipped
 
     print_smbv2_common_info_resp(out, cmdEnum, res);
 
+    out << "  Write Count = " << res->Count << "\n"
+        << "  Write Remaining = " << res->Remaining << "\n"
+        << "  Channel Info Offset = " << res->WriteChannelInfoOffset << "\n"
+        << "  Channel Info Length = " << res->WriteChannelInfoLength << "\n";
 }
 
 void PrintAnalyzer::lockSMBv2(const SMBv2::LockCommand*,

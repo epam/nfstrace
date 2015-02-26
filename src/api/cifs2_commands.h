@@ -985,7 +985,7 @@ struct FileNotifyInformation
     FileAction action;                           //!< The changes that occurred on the file. This field MUST contain one of the following values.
     uint32_t FileNameLength;                     //!< The length, in bytes, of the file name in the FileName field.
     uint32_t FileName[1];                        //!< A Unicode string with the name of the file that changed.
-};
+}  __attribute__ ((__packed__));
 
 /*!
  * \brief The LockResponse structure
