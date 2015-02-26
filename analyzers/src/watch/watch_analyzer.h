@@ -25,7 +25,6 @@
 #include <atomic>
 #include <condition_variable>
 
-#include <api/plugin_api.h> // include plugin development definitions
 #include "user_gui.h"
 //------------------------------------------------------------------------------
 class WatchAnalyzer : public IAnalyzer
@@ -114,6 +113,7 @@ private:
     void count_proc(const RPCProcedure* proc);
     void account(const RPCProcedure*,
                  const struct NFS4::COMPOUND4res* res = nullptr);
+    std::vector<AbstractProtocol* > protocols;
     UserGUI gui;
 };
 //------------------------------------------------------------------------------

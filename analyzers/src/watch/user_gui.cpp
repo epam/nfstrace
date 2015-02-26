@@ -44,7 +44,7 @@ void UserGUI::run()
 
         MainWindow mainWindow;
         HeaderWindow     headerWindow(mainWindow);
-        StatisticsWindow statisticsWindow(mainWindow, _statisticsContainer.at(_activeProtocolId));
+        StatisticsWindow statisticsWindow(mainWindow, _statisticsContainers);
 
         /* Watch stdin (fd 0) to see when it has input. */
         FD_ZERO(&rfds);
@@ -60,7 +60,7 @@ void UserGUI::run()
 
         std::vector<std::size_t> tmp(1, 0);
 
-        statisticsWindow.updateProtocol(_activeProtocolId);
+        statisticsWindow.updateProtocol(_activeProtocol);
 
         while (_running.test_and_set())
         {
@@ -69,13 +69,13 @@ void UserGUI::run()
                 mainWindow.resize();
                 headerWindow.resize(mainWindow);
                 statisticsWindow.resize(mainWindow);
-                statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
+                statisticsWindow.updateProtocol(_activeProtocol);
 
                 _shouldResize = false;
             }
             {
                 std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
-                tmp = _statisticsContainer.at(_activeProtocolId);
+                tmp = _statisticsContainers.at(_activeProtocol);
             }
             headerWindow.update();
             statisticsWindow.update(tmp);
@@ -89,17 +89,19 @@ void UserGUI::run()
                 key = mainWindow.inputKeys();
                 if(key == KEY_LEFT)
                 {
-                    if(_activeProtocolId != NFSv3)
+/*                    if(_activeProtocolId != NFSv3)
                     {
-                        _activeProtocolId = static_cast<ProtocolId>(static_cast<int>(_activeProtocolId) - 1);
+                        _activeProtocol = static_cast<ProtocolId>(static_cast<int>(_activeProtocolId) - 1);
                         statisticsWindow.setProtocol(static_cast<int>(_activeProtocolId));
                         statisticsWindow.resize(mainWindow);
                         headerWindow.update();
                         statisticsWindow.update(tmp);
                     }
+*/
                 }
                 else if(key == KEY_RIGHT)
                 {
+/*
                     if(_activeProtocolId != CIFSv2)
                     {
                         _activeProtocolId = static_cast<ProtocolId>(static_cast<int>(_activeProtocolId) + 1);
@@ -108,17 +110,18 @@ void UserGUI::run()
                         headerWindow.update();
                         statisticsWindow.update(tmp);
                     }
+*/
                 }
                 else if(key == KEY_UP)
                 {
                     statisticsWindow.scrollContent(SCROLL_UP);
-                    statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
+                    statisticsWindow.updateProtocol(_activeProtocol);
                     statisticsWindow.update(tmp);
                 }
                 else if(key == KEY_DOWN)
                 {
                     statisticsWindow.scrollContent(SCROLL_DOWN);
-                    statisticsWindow.updateProtocol(static_cast<int>(_activeProtocolId));
+                    statisticsWindow.updateProtocol(_activeProtocol);
                     statisticsWindow.update(tmp);
                 }
             }
@@ -136,13 +139,8 @@ UserGUI::UserGUI(const char* opts)
 : _refresh_delta {900000}
 , _shouldResize{false}
 , _running {ATOMIC_FLAG_INIT}
-, _statisticsContainer({{static_cast<int>(NFSv3),  std::vector<std::size_t>(ProcEnumNFS3::count,  0)},
-                        {static_cast<int>(NFSv4),  std::vector<std::size_t>(ProcEnumNFS4::count,  0)},
-                        {static_cast<int>(NFSv41), std::vector<std::size_t>(ProcEnumNFS41::count, 0)},
-                        {static_cast<int>(CIFSv1), std::vector<std::size_t>(10, 0)},
-                        {static_cast<int>(CIFSv2), std::vector<std::size_t>(10 ,0)}
-                        })
 , _activeProtocolId(NFSv3)
+, _activeProtocol(nullptr)
 {
     if(opts != nullptr && *opts != '\0' ) try
     {
@@ -162,12 +160,30 @@ UserGUI::~UserGUI()
     _guiThread.join();
 }
 
-void UserGUI::update(int p, std::vector<std::size_t>& d)
+void UserGUI::push_protocols(const std::vector<AbstractProtocol*>& v)
+{
+    try
+    {
+        for(auto i : v)
+        {
+            _allProtocols.push_back(i->getProtocolName());
+            _statisticsContainers.insert(std::make_pair<AbstractProtocol* , std::vector<std::size_t> >((AbstractProtocol*&&)i, std::vector<std::size_t>(i->getAmount(), 0)));
+        }
+        if(_activeProtocol == nullptr && ! v.empty())
+            _activeProtocol = v[0];
+    }
+    catch(...)
+    {
+        throw std::runtime_error{std::string{"Error in plugin options processing. "} + std::string(" Error: ")};
+    }
+}
+
+void UserGUI::update(AbstractProtocol* p, std::vector<std::size_t>& d)
 {
     std::vector<std::size_t>::iterator it;
     std::vector<std::size_t>::iterator st;
     std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
-    for(it = (_statisticsContainer.at(p)).begin(), st = d.begin(); it != (_statisticsContainer.at(p)).end() && st != d.end(); ++it, ++st)
+    for(it = (_statisticsContainers.at(p)).begin(), st = d.begin(); it != (_statisticsContainers.at(p)).end() && st != d.end(); ++it, ++st)
     {
         (*it) += (*st);
     }
