@@ -31,8 +31,15 @@
 #include "watch_analyzer.h"
 //------------------------------------------------------------------------------
 WatchAnalyzer::WatchAnalyzer(const char* opts)
-: gui {opts}
+: protocols(0)
+, gui {opts}
 {
+    protocols.push_back(new NFSv4Protocol());
+    protocols.push_back(new NFSv3Protocol());
+    protocols.push_back(new NFSv41Protocol());
+    gui.push_protocols(protocols);
+//    protocols.push_back(new CIFSv1Protocol());
+//    protocols.push_back(new CIFSv2Protocol());
 }
 
 WatchAnalyzer::~WatchAnalyzer()
@@ -161,8 +168,8 @@ void WatchAnalyzer::account(const RPCProcedure* proc,
         ++nfs3_proc_count.at(nfs_proc);
     }
 
-    gui.update(NFSv3, nfs3_proc_count);
-    gui.update(NFSv4, nfs4_proc_count);
+    gui.update(protocols[1], nfs3_proc_count);
+    gui.update(protocols[0], nfs4_proc_count);
 //    gui.update(NFSv41, nullptr);
 //    gui.update(CIFSv1, nullptr);
 //    gui.update(CIFSv2, nullptr);

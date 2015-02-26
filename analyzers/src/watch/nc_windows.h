@@ -28,6 +28,8 @@
 #include <stdexcept>
 
 #include <ncurses.h>
+
+#include "protocols.h"
 //------------------------------------------------------------------------------
 enum ProtocolId
 {
@@ -89,17 +91,20 @@ class StatisticsWindow
 {
 public:
     using ProtocolStatistic = std::vector<std::size_t>;
+    using StatisticsContainers = std::unordered_map<AbstractProtocol* , ProtocolStatistic>;
 
 private:
     WINDOW* _window;
-    ProtocolId _activeProtocol;
-    std::unordered_map<int, unsigned int> _scrollOffset;
+//    ProtocolId _activeProtocol;
+    AbstractProtocol* _activeProtocol;
+    std::vector<std::string> _allProtocols;
+    std::unordered_map<AbstractProtocol*, unsigned int> _scrollOffset;
     ProtocolStatistic _statistic;
     void destroy();
 
 public:
     StatisticsWindow() = delete;
-    StatisticsWindow(MainWindow&, ProtocolStatistic&);
+    StatisticsWindow(MainWindow&, StatisticsContainers&);
     ~StatisticsWindow();
 
     /*! Scroll content of Statistic Winodow Up or Down
@@ -108,7 +113,7 @@ public:
 
     /*! Change active protocol. Print new protocl's commands.
     */
-    void updateProtocol(int);
+    void updateProtocol(AbstractProtocol*);
 
     /*! Update counters on Statistics Window
     */
@@ -120,7 +125,7 @@ public:
 
     /*! Only set active protocol, do not update new protocol's commands.
     */
-    void setProtocol(int);
+    void setProtocol(AbstractProtocol*);
 };
 //------------------------------------------------------------------------------
 #endif // NC_WINDOWS_H

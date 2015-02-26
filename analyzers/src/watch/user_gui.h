@@ -35,7 +35,7 @@ class UserGUI
 {
 public:
     using ProtocolStatistic = std::vector<std::size_t>;
-    using StatisticsContainer = std::unordered_map<int, ProtocolStatistic>;
+    using StatisticsContainers = std::unordered_map<AbstractProtocol* , ProtocolStatistic>;
 
 private:
     unsigned long _refresh_delta;
@@ -44,11 +44,12 @@ private:
     std::mutex _statisticsDeltaMutex;
     std::atomic_flag _running;
 
-    StatisticsContainer _statisticsContainer;
+    StatisticsContainers _statisticsContainers;
+
     ProtocolId _activeProtocolId;
-
+    AbstractProtocol* _activeProtocol;
     std::thread _guiThread;
-
+    std::vector<std::string> _allProtocols;
     void run();
 public:
 
@@ -56,9 +57,13 @@ public:
     explicit UserGUI(const char*);
     ~UserGUI();
 
-    /*! Update Protocol's data
+    /*! Used for save all protocols.
     */
-    void update(int , std::vector<std::size_t>&);
+    void push_protocols(const std::vector<AbstractProtocol*>&);
+
+    /*! Update Protocol's data.
+    */
+    void update(AbstractProtocol* , std::vector<std::size_t>&);
 
     /*! Enable screen full update. Use for resize main window.
     */
