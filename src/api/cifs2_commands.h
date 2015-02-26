@@ -243,7 +243,7 @@ enum class ShareTypes : uint8_t
  * must be set (any of the remaining, SHI1005, flags may be set individually
  * or in combination.
  */
-enum class ShareFlags : uint32_t
+enum ShareFlags : uint32_t
 {
     MANUAL_CACHING               = 0x00000000,   //!< The client may cache files that are explicitly selected by the user for offline use.
     AUTO_CACHING                 = 0x00000010,   //!< The client may automatically cache files that are used by the user for offline access.
@@ -551,6 +551,16 @@ enum class InfoTypes : uint8_t
     QUOTA      = 0x04                            //!< The underlying object store quota information is requested.
 };
 
+enum class FsInfoLevels : uint8_t {
+    SMB2_FS_INFO_01 = 1,
+    SMB2_FS_INFO_02 = 2,
+    SMB2_FS_INFO_03 = 3,
+    SMB2_FS_INFO_04 = 4,
+    SMB2_FS_INFO_05 = 5,
+    SMB2_FS_INFO_06 = 6,
+    SMB2_FS_INFO_07 = 7
+};
+
 /*!
  * PDU infolevel structure definitions
  * BB consider moving to a different header
@@ -643,7 +653,7 @@ struct QueryInfoRequest
 {
     uint16_t  structureSize;                     //!< Must be 41
     InfoTypes infoType;                          //!< The type of information queried
-    QueryInfoLevels FileInfoClass;               //!< Class of info
+    uint8_t   FileInfoClass;                     //!< Class of info
     uint32_t  OutputBufferLength;                //!< The maximum number of bytes of information the server can send in the response.
     uint16_t  InputBufferOffset;                 //!< The offset, in bytes, from the beginning of the SMB2 header to the input buffer.
     uint16_t  Reserved;                          //!< This field MUST NOT be used and MUST be reserved.
@@ -1122,7 +1132,7 @@ struct SetInfoRequest
 {
     uint16_t structureSize;                      //!< The server MUST set this to 33
     InfoTypes infoType;                          //!< The type of information being set
-    QueryInfoLevels FileInfoClass;               //!< For setting file information, this field MUST contain one of the FILE_INFORMATION_CLASS values
+    uint8_t FileInfoClass;                       //!< For setting file information, this field MUST contain one of the FILE_INFORMATION_CLASS values
     uint32_t BufferLength;                       //!< The length, in bytes, of the information to be set.
     uint16_t BufferOffset;                       //!< The offset, in bytes, from the beginning of the SMB2 header to the information to be set.
     uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt.
