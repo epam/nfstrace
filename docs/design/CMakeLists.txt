@@ -1,0 +1,34 @@
+find_program (JAVA_PATH java)
+if (JAVA_PATH)
+    add_custom_target (documentation-design)
+    add_dependencies (documentation documentation-design)
+
+    # Processing PlantUML JAR
+    set (PLANTUML_JAR "plantuml.jar")
+    set (PLANTUML_FOUND "FALSE")
+    if (NOT "${PLANTUML_JAR_DIR}" STREQUAL "")
+        # PlantUML directory has been manually set
+        find_file (PLANTUML_JAR_PATH ${PLANTUML_JAR} PATHS ${PLANTUML_JAR_DIR})
+        if ("${PLANTUML_JAR_PATH}" STREQUAL "PLANTUML_JAR_PATH-NOTFOUND")
+            message (FATAL_ERROR "Plantuml JAR file '${PLANTUML_JAR}' not found in '${PLANTUML_JAR_DIR}' directory")
+        else ()
+            message (STATUS "Plantuml JAR file successfully found: '${PLANTUML_JAR_PATH}'")
+            set (PLANTUML_FOUND "TRUE")
+        endif ()
+    endif ()
+    set (DOWNLOAD_PLANTUML_JAR_PROXY_TARGET download-plantuml-jar-proxy)
+    add_custom_target (${DOWNLOAD_PLANTUML_JAR_PROXY_TARGET}) # Special target with optional 'Download PlantUML JAR' dependency
+    if (NOT ${PLANTUML_FOUND})
+        set (DOWNLOAD_PLANTUML_JAR_TARGET download-plantuml-jar)
+        set (PLANTUML_JAR_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${PLANTUML_JAR}")
+        add_custom_command (OUTPUT ${PLANTUML_JAR_PATH}
+            COMMAND ${CMAKE_COMMAND} -DPLANTUML_JAR_PATH=${PLANTUML_JAR_PATH} -P ${CMAKE_CURRENT_SOURCE_DIR}/download_plantuml.cmake)
+        set_source_files_properties (${PLANTUML_JAR_PATH} PROPERTIES GENERATED 1)
+        add_custom_target (${DOWNLOAD_PLANTUML_JAR_TARGET} SOURCES ${PLANTUML_JAR_PATH})
+        add_dependencies (${DOWNLOAD_PLANTUML_JAR_PROXY_TARGET} ${DOWNLOAD_PLANTUML_JAR_TARGET})
+    endif ()
+
+    add_subdirectory (libwatch)
+else ()
+    message (WARNING "Java is not found - design documentation is not available")
+endif ()
