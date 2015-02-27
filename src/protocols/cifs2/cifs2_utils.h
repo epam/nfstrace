@@ -23,6 +23,7 @@
 #define CIFS2_UTILS_H
 
 #include <iostream>
+#include <assert.h>
 
 #include "api/cifs2_commands.h"
 
@@ -32,6 +33,13 @@ namespace protocols
 {
 namespace CIFSv2
 {
+
+template<typename E>
+inline constexpr auto to_integral(E e) -> typename std::underlying_type<E>::type
+{
+    return static_cast<typename std::underlying_type<E>::type>(e);
+}
+
 void print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoType, const uint8_t infoClass);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::QueryInfoLevels infoLevels);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::FsInfoLevels infoLevels);
@@ -40,6 +48,15 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::InfoTypes info
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareTypes shareTypes);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareFlags shareFlags);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities capabilities);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::OplockLevels value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ImpersonationLevels value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::DesiredAccessFlags value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::FileAttributes value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareAccessFlags value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CreateDisposition value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CreateOptionsFlags value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CreateActions value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::WriteFlags value);
 }// namespace CIFSv2    
 }// namespace protocols 
 }// namespace NST       

@@ -32,7 +32,6 @@
 #include "protocols/cifs2/cifs2_utils.h"
 //------------------------------------------------------------------------------
 
-
 namespace NST
 {
 namespace analysis
@@ -157,12 +156,6 @@ bool print_procedure(std::ostream& out, const RPCProcedure* proc)
     }
     out << '\n'; // end line of RPC procedure information
     return result;
-}
-
-template<typename E>
-constexpr auto to_integral(E e) -> typename std::underlying_type<E>::type
-{
-    return static_cast<typename std::underlying_type<E>::type>(e);
 }
 
 template<typename CommandType>
@@ -793,31 +786,30 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
     Commands cmdEnum = Commands::CREATE;
     print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
 
-    out << "  Oplock = ";
-    print_hex8(out, to_integral(cmd->parg->RequestedOplockLevel));
-    out << "\n"
-        << "  Impersonation = " << to_integral(cmd->parg->ImpersonationLevel) << "\n"
+    out << "  Oplock = "
+        << cmd->parg->RequestedOplockLevel
+        << "\n"
+        << "  Impersonation = " << cmd->parg->ImpersonationLevel << "\n"
         << "  Create Flags = ";
 
     print_hex64(out, cmd->parg->SmbCreateFlags);
     out << "\n";
 
-    out << "  Access Mask = ";
-    print_hex32(out, to_integral(cmd->parg->desiredAccess));
-    out << "\n";
+    out << "  Access Mask = "
+        << cmd->parg->desiredAccess
+        << "\n";
 
-    out << "  File Attributes = ";
-    print_hex32(out, to_integral(cmd->parg->attributes));
-    out << "\n";
+    out << "  File Attributes = "
+        << cmd->parg->attributes
+        << "\n";
 
-    out << "  Share Access = ";
-    print_hex32(out, cmd->parg->shareAccess);
-
-    out << "\n"
-        << "  Disposition = " << to_integral(cmd->parg->createDisposition)
+    out << "  Share Access = "
+        << cmd->parg->shareAccess
         << "\n"
-        << "  Create Options = ";
-    print_hex32(out, cmd->parg->createOptions);
+        << "  Disposition = " << cmd->parg->createDisposition
+        << "\n"
+        << "  Create Options = "
+        << cmd->parg->createOptions;
 
     out << "\n";
     out << "  File name = ";
@@ -835,13 +827,13 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
     out << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, res);
 
-    out << "  Oplock = ";
-    print_hex8(out, to_integral(res->oplockLevel));
-    out << "\n";
-    out << "  Response Flags = ";
+    out << "  Oplock = "
+        << res->oplockLevel
+        << "\n"
+        << "  Response Flags = ";
     print_hex8(out, res->flag);
     out << "\n"
-        << "  Create Action = " << to_integral(res->CreateAction) << "\n"
+        << "  Create Action = " << res->CreateAction << "\n"
         << "  Create = ";
     print_time(out, res->CreationTime);
 
@@ -860,10 +852,11 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
     out << "  End Of File = ";
     print_time(out, res->EndofFile);
 
-    out << "  File Attributes = ";
-    print_hex32(out, to_integral(res->attributes));
-    out << "\n";
+    out << "  File Attributes = "
+        << res->attributes
+        << "\n";
 }
+
 void PrintAnalyzer::flushSMBv2(const SMBv2::FlushCommand* cmd,
                                const SMBv2::FlushRequest*,
                                const SMBv2::FlushResponse* res)
@@ -883,7 +876,7 @@ void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* cmd,
     out << "  Read length = " << cmd->parg->length << "\n"
         << "  File offset = " << cmd->parg->offset << "\n"
         << "  Min count = " << cmd->parg->minimumCount << "\n"
-        << "  Channel = " << static_cast<uint32_t>(cmd->parg->channel) << "\n"
+        << "  Channel = " << to_integral(cmd->parg->channel) << "\n"
         << "  Remaining bytes = " << cmd->parg->RemainingBytes << "\n"
         << "  Channel Info Offset = " << cmd->parg->ReadChannelInfoOffset << "\n"
         << "  Channel Info Length = " << cmd->parg->ReadChannelInfoLength << "\n";
@@ -910,13 +903,11 @@ void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
     out << "\n"
     << "  Write Length = " << cmd->parg->Length << "\n"
     << "  File Offset = " << cmd->parg->Offset << "\n"
-    << "  Channel = " << static_cast<u_int32_t>(cmd->parg->Channel) << "\n"
+    << "  Channel = " << to_integral(cmd->parg->Channel) << "\n"
     << "  Remaining Bytes = " << cmd->parg->RemainingBytes << "\n"
     << "  Channel Info Offset = " << cmd->parg->WriteChannelInfoOffset << "\n"
     << "  Channel Info Length = " << cmd->parg->WriteChannelInfoLength << "\n"
-    << "  Write Flags = ";
-    print_hex32(out, static_cast<u_int32_t>(cmd->parg->Flags));
-    out << "\n";
+    << "  Write Flags = " << cmd->parg->Flags << "\n";
 
     // TODO: Wireshark also shows binary representation of file ...
     // For now it is skipped
