@@ -356,12 +356,20 @@ enum class DesiredAccessFlags : uint32_t
 /*!
  * Share Access Flags
  */
+/*
 enum ShareAccessFlags : uint32_t
 {
     READ_LE     = (0x00000001),       //!< When set, indicates that other opens are allowed to read this file while this open is present.
     WRITE_LE    = (0x00000002),       //!< When set, indicates that other opens are allowed to write this file while this open is present
     DELETE_LE   = (0x00000004),       //!< When set, indicates that other opens are allowed to delete or rename this file while this open is present
     ALL_LE      = (0x00000007)        //!< Combine
+};*/
+
+enum ShareAccessFlags : uint32_t
+{
+    SHARE_READ_LE     = (0x00000001),    //!< When set, indicates that other opens are allowed to read this file while this open is present.
+    SHARE_WRITE_LE    = (0x00000002),    //!< When set, indicates that other opens are allowed to write this file while this open is present.
+    SHARE_DELETE_LE   = (0x00000004)     //!< When set, indicates that other opens are allowed to delete or rename this file while this open is present.
 };
 
 /*!

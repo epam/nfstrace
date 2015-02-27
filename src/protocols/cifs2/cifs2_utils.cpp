@@ -20,8 +20,10 @@
 */
 
 #include <bitset>
+#include <sstream>
 
 #include "cifs2_utils.h"
+#include "protocols/nfs/nfs_utils.h"
 
 namespace NST
 {
@@ -29,6 +31,367 @@ namespace protocols
 {
 namespace CIFSv2
 {
+
+using namespace NST::protocols::NFS;
+using namespace NST::API::SMBv2;
+
+namespace
+{
+    static const std::string flagDelimiter = " | ";
+
+    inline bool operator&(const NST::API::SMBv2::ShareFlags lhs, const NST::API::SMBv2::ShareFlags rhs)
+    {
+        return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+    }
+    inline bool operator&(const NST::API::SMBv2::Capabilities lhs, const NST::API::SMBv2::Capabilities rhs)
+    {
+        return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+    }
+
+    inline bool operator&(const NST::API::SMBv2::DesiredAccessFlags lhs, const NST::API::SMBv2::DesiredAccessFlags rhs)
+    {
+        return to_integral(lhs) & to_integral(rhs);
+    }
+
+    inline bool operator&(const NST::API::SMBv2::FileAttributes lhs, const NST::API::SMBv2::FileAttributes rhs)
+    {
+        return to_integral(lhs) & to_integral(rhs);
+    }
+
+    inline bool operator&(const NST::API::SMBv2::ShareAccessFlags lhs, const NST::API::SMBv2::ShareAccessFlags rhs)
+    {
+        return to_integral(lhs) & to_integral(rhs);
+    }
+
+    inline bool operator&(const NST::API::SMBv2::WriteFlags lhs, const NST::API::SMBv2::WriteFlags rhs)
+    {
+        return to_integral(lhs) & to_integral(rhs);
+    }
+
+    const char* enumToCharPtr(const NST::API::SMBv2::OplockLevels value)
+    {
+        switch (value)
+        {
+            case OplockLevels::NONE:      return "NONE";
+            case OplockLevels::II:        return "II";
+            case OplockLevels::EXCLUSIVE: return "EXCLUSIVE";
+            case OplockLevels::BATCH:     return "BATCH";
+            case OplockLevels::LEASE:     return "LEASE";
+        }
+
+        assert("enumToCharPtr: Cannot conver input value into string representation.");
+        return nullptr;
+    }
+
+    const char* enumToCharPtr(const NST::API::SMBv2::ImpersonationLevels value)
+    {
+        switch (value)
+        {
+            case ImpersonationLevels::ANONYMOUS:        return "ANONYMOUS";
+            case ImpersonationLevels::IDENTIFICATION:   return "IDENTIFICATION";
+            case ImpersonationLevels::IMPERSONATION:    return "IMPERSONATION";
+            case ImpersonationLevels::DELEGATE:         return "DELEGATE";
+        }
+
+        assert("enumToCharPtr: Cannot conver input value into string representation.");
+        return nullptr;
+    }
+
+    const char* enumToCharPtr(const NST::API::SMBv2::CreateDisposition value)
+    {
+        switch(value)
+        {
+            case CreateDisposition::SUPERSEDE:       return "SUPERSEDE";
+            case CreateDisposition::OPEN:            return "OPEN";
+            case CreateDisposition::CREATE:          return "CREATE";
+            case CreateDisposition::OPEN_IF:         return "OPEN_IF";
+            case CreateDisposition::OVERWRITE:       return "OVERWRITE";
+            case CreateDisposition::OVERWRITE_IF:    return "OVERWRITE_IF";
+        }
+
+        assert("enumToCharPtr: Cannot conver input value into string representation.");
+        return nullptr;
+    }
+
+    const char* enumToCharPtr(const NST::API::SMBv2::CreateActions value)
+    {
+        switch(value)
+        {
+            case CreateActions::SUPERSEDED:          return "SUPERSEDED";
+            case CreateActions::OPENED:              return "OPENED";
+            case CreateActions::CREATED:             return "CREATED";
+            case CreateActions::FILE_OVERWRITTEN:    return "FILE_OVERWRITTEN";
+        }
+
+        assert("enumToCharPtr: Cannot conver input value into string representation.");
+        return nullptr;
+    }
+
+    inline std::string ClearFromLastDelimiter(std::string str, std::string delimiter = flagDelimiter)
+    {
+        if (str.length() == 0) return str;
+        return str.erase(str.length() - delimiter.length());
+    }
+
+    std::string enumToFlags(const NST::API::SMBv2::DesiredAccessFlags value, std::string delimiter = flagDelimiter)
+    {
+        std::ostringstream str;
+        if (value & DesiredAccessFlags::READ_DATA_LE)
+        {
+            str << "READ_DATA_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::WRITE_DATA_LE)
+        {
+            str << "WRITE_DATA_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::APPEND_DATA_LE)
+        {
+            str << "APPEND_DATA_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::READ_EA_LE)
+        {
+            str << "READ_EA_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::WRITE_EA_LE)
+        {
+            str << "WRITE_EA_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::EXECUTE_LE)
+        {
+            str << "EXECUTE_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::READ_ATTRIBUTES_LE)
+        {
+            str << "READ_ATTRIBUTES_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::WRITE_ATTRIBUTES_LE)
+        {
+            str << "WRITE_ATTRIBUTES_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::DELETE_LE)
+        {
+            str << "DELETE_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::READ_CONTROL_LE)
+        {
+            str << "READ_CONTROL_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::WRITE_DAC_LE)
+        {
+            str << "WRITE_DAC_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::WRITE_OWNER_LE)
+        {
+            str << "WRITE_OWNER_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::SYNCHRONIZE_LE)
+        {
+            str << "SYNCHRONIZE_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::ACCESS_SYSTEM_SECURITY_LE)
+        {
+            str << "ACCESS_SYSTEM_SECURITY_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::MAXIMAL_ACCESS_LE)
+        {
+            str << "MAXIMAL_ACCESS_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::GENERIC_ALL_LE)
+        {
+            str << "GENERIC_ALL_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::GENERIC_EXECUTE_LE)
+        {
+            str << "GENERIC_EXECUTE_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::GENERIC_WRITE_LE)
+        {
+            str << "GENERIC_WRITE_LE" << delimiter;
+        }
+        if (value & DesiredAccessFlags::GENERIC_READ_LE)
+        {
+            str << "GENERIC_READ_LE" << delimiter;
+        }
+
+        return ClearFromLastDelimiter(str.str());
+    }
+
+    std::string enumToFlags(const NST::API::SMBv2::FileAttributes value, std::string delimiter = flagDelimiter)
+    {
+        std::ostringstream str;
+
+        if (value & FileAttributes::READONLY)
+        {
+            str << "READONLY" << delimiter;
+        }
+        if (value & FileAttributes::HIDDEN)
+        {
+            str << "HIDDEN" << delimiter;
+        }
+        if (value & FileAttributes::SYSTEM)
+        {
+            str << "SYSTEM" << delimiter;
+        }
+        if (value & FileAttributes::DIRECTORY)
+        {
+            str << "DIRECTORY" << delimiter;
+        }
+        if (value & FileAttributes::ARCHIVE)
+        {
+            str << "ARCHIVE" << delimiter;
+        }
+        if (value & FileAttributes::NORMAL)
+        {
+            str << "NORMAL" << delimiter;
+        }
+        if (value & FileAttributes::TEMPORARY)
+        {
+            str << "TEMPORARY" << delimiter;
+        }
+        if (value & FileAttributes::SPARSE_FILE)
+        {
+            str << "SPARSE_FILE" << delimiter;
+        }
+        if (value & FileAttributes::REPARSE_POINT)
+        {
+            str << "REPARSE_POINT" << delimiter;
+        }
+        if (value & FileAttributes::COMPRESSED)
+        {
+            str << "COMPRESSED" << delimiter;
+        }
+        if (value & FileAttributes::OFFLINE)
+        {
+            str << "OFFLINE" << delimiter;
+        }
+        if (value & FileAttributes::NOT_CONTENT_INDEXED)
+        {
+            str << "NOT_CONTENT_INDEXED" << delimiter;
+        }
+        if (value & FileAttributes::ENCRYPTED)
+        {
+            str << "ENCRYPTED" << delimiter;
+        }
+
+        return ClearFromLastDelimiter(str.str());
+    }
+
+    std::string enumToFlags(const NST::API::SMBv2::ShareAccessFlags value, std::string delimiter = flagDelimiter)
+    {
+        std::ostringstream str;
+
+        if (value & ShareAccessFlags::SHARE_READ_LE)
+        {
+            str << "SHARE_READ_LE" << delimiter;
+        }
+        if (value & ShareAccessFlags::SHARE_WRITE_LE)
+        {
+            str << "SHARE_WRITE_LE" << delimiter;
+        }
+        if (value & ShareAccessFlags::SHARE_DELETE_LE)
+        {
+            str << "SHARE_DELETE_LE" << delimiter;
+        }
+
+        return ClearFromLastDelimiter(str.str());
+    }
+
+    std::string enumToFlags(const NST::API::SMBv2::CreateOptionsFlags value, std::string delimiter = flagDelimiter)
+    {
+        std::ostringstream str;
+
+        if (value & CreateOptionsFlags::DIRECTORY_FILE_LE)
+        {
+            str << "DIRECTORY_FILE_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::WRITE_THROUGH_LE)
+        {
+            str << "WRITE_THROUGH_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::SEQUENTIAL_ONLY_LE)
+        {
+            str << "SEQUENTIAL_ONLY_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::NO_INTERMEDIATE_BUFFERRING_LE)
+        {
+            str << "NO_INTERMEDIATE_BUFFERRING_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::SYNCHRONOUS_IO_ALERT_LE)
+        {
+            str << "SYNCHRONOUS_IO_ALERT_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::SYNCHRONOUS_IO_NON_ALERT_LE)
+        {
+            str << "SYNCHRONOUS_IO_NON_ALERT_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::NON_DIRECTORY_FILE_LE)
+        {
+            str << "NON_DIRECTORY_FILE_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::COMPLETE_IF_OPLOCKED_LE)
+        {
+            str << "COMPLETE_IF_OPLOCKED_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::NO_EA_KNOWLEDGE_LE)
+        {
+            str << "NO_EA_KNOWLEDGE_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::RANDOM_ACCESS_LE)
+        {
+            str << "RANDOM_ACCESS_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::DELETE_ON_CLOSE_LE)
+        {
+            str << "DELETE_ON_CLOSE_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::OPEN_BY_FILE_ID_LE)
+        {
+            str << "OPEN_BY_FILE_ID_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::OPEN_FOR_BACKUP_INTENT_LE)
+        {
+            str << "OPEN_FOR_BACKUP_INTENT_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::NO_COMPRESSION_LE)
+        {
+            str << "NO_COMPRESSION_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::RESERVE_OPFILTER_LE)
+        {
+            str << "RESERVE_OPFILTER_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::OPEN_REPARSE_POINT_LE)
+        {
+            str << "OPEN_REPARSE_POINT_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::OPEN_NO_RECALL_LE)
+        {
+            str << "OPEN_NO_RECALL_LE" << delimiter;
+        }
+        if (value & CreateOptionsFlags::OPEN_FOR_FREE_SPACE_QUERY_LE)
+        {
+            str << "OPEN_FOR_FREE_SPACE_QUERY_LE" << delimiter;
+        }
+
+        return ClearFromLastDelimiter(str.str());
+    }
+
+    std::string enumToFlags(const NST::API::SMBv2::WriteFlags value, std::string delimiter = flagDelimiter)
+    {
+        std::ostringstream str;
+
+        if (value & WriteFlags::SMB2_WRITEFLAG_WRITE_THROUGH)
+        {
+            str << "SMB2_WRITEFLAG_WRITE_THROUGH" << delimiter;
+        }
+        if (value & WriteFlags::SMB2_WRITEFLAG_WRITE_UNBUFFERED)
+        {
+            str << "SMB2_WRITEFLAG_WRITE_UNBUFFERED" << delimiter;
+        }
+
+        return ClearFromLastDelimiter(str.str());
+    }
+}
 
 void print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoType, const uint8_t infoClass)
 {
@@ -170,13 +533,29 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareTypes sha
     return os;
 }
 
-static inline bool operator&(const NST::API::SMBv2::ShareFlags lhs, const NST::API::SMBv2::ShareFlags rhs) 
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::OplockLevels value)
 {
-    return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+    os << " (" << enumToCharPtr(value) << ") ";
+    print_hex8(os, to_integral(value));
+
+    return os;
 }
-static inline bool operator&(const NST::API::SMBv2::Capabilities lhs, const NST::API::SMBv2::Capabilities rhs) 
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ImpersonationLevels value)
 {
-    return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+    os << " (" << enumToCharPtr(value) << ") "
+       << to_integral(value);
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::DesiredAccessFlags value)
+{
+    print_hex32(os, to_integral(value));
+
+    os << " (" << enumToFlags(value) << ") ";
+
+    return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareFlags shareFlags)
@@ -266,6 +645,71 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities c
     } 
     return os;
 }
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::FileAttributes value)
+{
+    print_hex32(os, to_integral(value));
+
+    if (to_integral(value) > 0)
+    {
+        os << " (" << enumToFlags(value) << ")";
+    }
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareAccessFlags value)
+{
+    os << to_integral(value);
+
+    if (to_integral(value) > 0)
+    {
+        os << " (" << enumToFlags(value) << ")";
+    }
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CreateDisposition value)
+{
+    os << " (" << enumToCharPtr(value) << ") "
+       << to_integral(value);
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CreateOptionsFlags value)
+{
+    print_hex32(os, to_integral(value));
+
+    if (to_integral(value) > 0)
+    {
+        os << " (" << enumToFlags(value) << ") ";
+    }
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CreateActions value)
+{
+    os << " (" << enumToCharPtr(value) << ") "
+       << to_integral(value);
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::WriteFlags value)
+{
+    print_hex32(os, to_integral(value));
+
+    if (to_integral(value) > 0)
+    {
+        os << " (" << enumToFlags(value) << ") ";
+    }
+
+    return os;
+}
+
 } // namespace CIFSv2
 } // namespace protocols
 } // namespace NST
