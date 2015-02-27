@@ -102,13 +102,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif ()
 
 # documentation ================================================================
-find_program (DOXYGEN_PATH doxygen)
-
-if (DOXYGEN_PATH)
-    add_custom_target (documentation
-                       COMMAND ${DOXYGEN_PATH} Doxyfile
-                       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-endif ()
+add_subdirectory (docs)
 
 # code style ===================================================================
 find_program (ASTYLE_PATH astyle)

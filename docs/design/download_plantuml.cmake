@@ -1,0 +1,10 @@
+message ("Downloading PlantUML JAR. Use '-DPLANTUML_JAR_DIR=<dir_with_plantuml_jar>' param for CMake to use local PlantUML JAR.")
+file (DOWNLOAD "http://downloads.sourceforge.net/project/plantuml/plantuml.jar"
+    ${PLANTUML_JAR_PATH} SHOW_PROGRESS STATUS DOWNLOAD_STATUS_LIST)
+list (GET DOWNLOAD_STATUS_LIST 0 DOWNLOAD_STATUS)
+if (${DOWNLOAD_STATUS} EQUAL 0)
+    message ("Successfully downloaded PlantUML JAR")
+else ()
+    list (GET DOWNLOAD_STATUS_LIST 1 DOWNLOAD_ERROR)
+    message (FATAL_ERROR "PlantUML JAR download error: ${DOWNLOAD_ERROR}")
+endif ()
