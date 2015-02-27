@@ -107,6 +107,9 @@ public:
     StatisticsWindow(MainWindow&, StatisticsContainers&);
     ~StatisticsWindow();
 
+    void nextProtocol();
+    void previousProtocol();
+
     /*! Scroll content of Statistic Winodow Up or Down
     */
     void scrollContent(int);

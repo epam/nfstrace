@@ -250,30 +250,24 @@ void StatisticsWindow::updateProtocol(AbstractProtocol* p)
     werase(_window);
     wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER , ACS_LLCORNER, ACS_LRCORNER);
 
-    std::string tmp("    ");
+    std::string tmp("  ");
     for(auto s : _allProtocols)
     {
         if(!s.compare(_activeProtocol->getProtocolName()))
         {
-            tmp = tmp + std::string("< ") + s + std::string(" >    ");
+            tmp = tmp + std::string(" < ") + s + std::string(" > ");
         }
         else
         {
-            tmp = tmp + std::string("    ") + s + std::string("    ");
+            tmp = tmp + std::string("   ") + s + std::string("   ");
         }
     }
 
     mvwprintw(_window, 1 , 1,"%s", tmp.c_str());
-/*
-              _activeProtocol == NFSv3  ? ProtocolsActiveNames[static_cast<int>(NFSv3) ] : ProtocolsNames[static_cast<int>(NFSv3) ],
-              _activeProtocol == NFSv4  ? ProtocolsActiveNames[static_cast<int>(NFSv4) ] : ProtocolsNames[static_cast<int>(NFSv4) ],
-              _activeProtocol == NFSv41 ? ProtocolsActiveNames[static_cast<int>(NFSv41)] : ProtocolsNames[static_cast<int>(NFSv41)],
-              _activeProtocol == CIFSv1 ? ProtocolsActiveNames[static_cast<int>(CIFSv1)] : ProtocolsNames[static_cast<int>(CIFSv1)],
-              _activeProtocol == CIFSv2 ? ProtocolsActiveNames[static_cast<int>(CIFSv2)] : ProtocolsNames[static_cast<int>(CIFSv2)]);
-*/
+
     for(unsigned int i = 0; i < p->getAmount(); i++)
     {
-        if( i + 3 > _scrollOffset.at(p) && i + 3 < _window->_maxy + _scrollOffset.at(p) -1)
+        if( i + 1 > _scrollOffset.at(p) && i + 3 < _window->_maxy + _scrollOffset.at(p) -1)
             mvwprintw(_window, i + 3 - (unsigned int)(_scrollOffset.at(p)), 1, "%s", p->printProcedure(i));
     }
 }
@@ -289,7 +283,7 @@ void StatisticsWindow::update(const ProtocolStatistic& d)
     }
     for(unsigned int i = 0; i < _statistic.size(); i++)
     {
-        if( i + 3 > _scrollOffset.at(_activeProtocol) && i + 3 < _window->_maxy + _scrollOffset.at(_activeProtocol) - 1)
+        if( i + 1 > _scrollOffset.at(_activeProtocol) && i + 3 < _window->_maxy + _scrollOffset.at(_activeProtocol) - 1)
         {
             mvwprintw(_window, i + 3 - _scrollOffset.at(_activeProtocol), COUNTERS_POS, "%lu ", _statistic[i]);
             mvwprintw(_window, i + 3 - _scrollOffset.at(_activeProtocol), PERSENT_POS, "%-3.2f%% ",
@@ -306,7 +300,7 @@ void StatisticsWindow::resize(MainWindow& m)
         destroy();
     short tmp_size;
     if(_activeProtocol != nullptr)
-        tmp_size = _activeProtocol->getAmount();
+        tmp_size = _activeProtocol->getAmount() + 5;
     else
         tmp_size = 10;
     if(m._window != nullptr && m._window->_maxy > GUI_HEADER_HEIGHT)

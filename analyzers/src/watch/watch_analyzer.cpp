@@ -31,15 +31,9 @@
 #include "watch_analyzer.h"
 //------------------------------------------------------------------------------
 WatchAnalyzer::WatchAnalyzer(const char* opts)
-: protocols(0)
-, gui {opts}
+: protocols{{new NFSv4Protocol()}, {new NFSv3Protocol()}}
+, gui {opts, protocols}
 {
-    protocols.push_back(new NFSv4Protocol());
-    protocols.push_back(new NFSv3Protocol());
-    protocols.push_back(new NFSv41Protocol());
-    gui.push_protocols(protocols);
-//    protocols.push_back(new CIFSv1Protocol());
-//    protocols.push_back(new CIFSv2Protocol());
 }
 
 WatchAnalyzer::~WatchAnalyzer()
