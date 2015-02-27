@@ -31,13 +31,17 @@
 #include "watch_analyzer.h"
 //------------------------------------------------------------------------------
 WatchAnalyzer::WatchAnalyzer(const char* opts)
-: protocols{{new NFSv4Protocol()}, {new NFSv3Protocol()}}
+: protocols{(new NFSv4Protocol()), (new NFSv3Protocol())}
 , gui {opts, protocols}
 {
 }
 
 WatchAnalyzer::~WatchAnalyzer()
 {
+    for(auto i : protocols)
+    {
+        delete(i);
+    }
 }
 
 void WatchAnalyzer::null(const RPCProcedure* proc,

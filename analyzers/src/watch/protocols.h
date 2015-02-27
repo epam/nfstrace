@@ -30,7 +30,7 @@ class AbstractProtocol
 public:
     AbstractProtocol() = delete;
     AbstractProtocol(const char*, std::size_t);
-    ~AbstractProtocol();
+    virtual ~AbstractProtocol();
     virtual const char* printProcedure(std::size_t);
     unsigned int getAmount();
     std::string getProtocolName();
