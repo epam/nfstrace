@@ -25,6 +25,7 @@
 #include <atomic>
 #include <condition_variable>
 
+#include <api/plugin_api.h> // include plugin development definitions
 #include "user_gui.h"
 //------------------------------------------------------------------------------
 class WatchAnalyzer : public IAnalyzer

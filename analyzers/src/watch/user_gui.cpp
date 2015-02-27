@@ -87,30 +87,38 @@ void UserGUI::run()
             else
             {
                 key = mainWindow.inputKeys();
-                if(key == KEY_LEFT)
+                if(key == KEY_LEFT || key == KEY_RIGHT)
                 {
-/*                    if(_activeProtocolId != NFSv3)
+                    for(std::vector<std::string>::iterator i = _allProtocols.begin(); i != _allProtocols.end(); ++i)
                     {
-                        _activeProtocol = static_cast<ProtocolId>(static_cast<int>(_activeProtocolId) - 1);
-                        statisticsWindow.setProtocol(static_cast<int>(_activeProtocolId));
-                        statisticsWindow.resize(mainWindow);
-                        headerWindow.update();
-                        statisticsWindow.update(tmp);
+                        if(!i->compare(_activeProtocol->getProtocolName()))
+                        {
+                            if(key == KEY_RIGHT)
+                            {
+                                if(i == _allProtocols.begin()) break;
+                                --i;
+                            }
+                            else if (key == KEY_LEFT)
+                            {
+                                if((i + 1) == _allProtocols.end()) break;
+                                ++i;
+                            }
+                            for(auto a : _statisticsContainers)
+                            {
+                                if(!(a.first->getProtocolName()).compare(*i))
+                                {
+                                    {
+                                        std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
+                                        tmp = a.second;
+                                    }
+                                    _activeProtocol = a.first;
+                                    statisticsWindow.setProtocol(_activeProtocol);
+                                    statisticsWindow.resize(mainWindow);
+                                    statisticsWindow.update(tmp);
+                                }
+                            }
+                        }
                     }
-*/
-                }
-                else if(key == KEY_RIGHT)
-                {
-/*
-                    if(_activeProtocolId != CIFSv2)
-                    {
-                        _activeProtocolId = static_cast<ProtocolId>(static_cast<int>(_activeProtocolId) + 1);
-                        statisticsWindow.setProtocol(static_cast<int>(_activeProtocolId));
-                        statisticsWindow.resize(mainWindow);
-                        headerWindow.update();
-                        statisticsWindow.update(tmp);
-                    }
-*/
                 }
                 else if(key == KEY_UP)
                 {
@@ -135,20 +143,34 @@ void UserGUI::run()
     }
 }
 
-UserGUI::UserGUI(const char* opts)
+UserGUI::UserGUI(const char* opts, std::vector<AbstractProtocol*>& v)
 : _refresh_delta {900000}
 , _shouldResize{false}
 , _running {ATOMIC_FLAG_INIT}
-, _activeProtocolId(NFSv3)
 , _activeProtocol(nullptr)
 {
-    if(opts != nullptr && *opts != '\0' ) try
+    try
     {
-        _refresh_delta = std::stoul(opts);
+        if(opts != nullptr && *opts != '\0' )
+        {
+            _refresh_delta = std::stoul(opts);
+        }
+
+        for(auto i : v)
+        {
+            _allProtocols.push_back(i->getProtocolName());
+            _statisticsContainers.insert(std::make_pair<AbstractProtocol* , std::vector<std::size_t> >((AbstractProtocol*&&)i, std::vector<std::size_t>(i->getAmount(), 0)));
+        }
+        if(_activeProtocol == nullptr && ! v.empty())
+            _activeProtocol = v.back();
     }
     catch(std::exception& e)
     {
         throw std::runtime_error{std::string{"Error in plugin options processing. OPTS: "} + opts + std::string(" Error: ") + e.what()};
+    }
+    catch(...)
+    {
+        throw std::runtime_error{std::string{"Unknown exception in libwatch plugin initialization."}};
     }
     _running.test_and_set();
     _guiThread = std::thread(&UserGUI::run, this);
@@ -158,24 +180,6 @@ UserGUI::~UserGUI()
 {
     _running.clear();
     _guiThread.join();
-}
-
-void UserGUI::push_protocols(const std::vector<AbstractProtocol*>& v)
-{
-    try
-    {
-        for(auto i : v)
-        {
-            _allProtocols.push_back(i->getProtocolName());
-            _statisticsContainers.insert(std::make_pair<AbstractProtocol* , std::vector<std::size_t> >((AbstractProtocol*&&)i, std::vector<std::size_t>(i->getAmount(), 0)));
-        }
-        if(_activeProtocol == nullptr && ! v.empty())
-            _activeProtocol = v[0];
-    }
-    catch(...)
-    {
-        throw std::runtime_error{std::string{"Error in plugin options processing. "} + std::string(" Error: ")};
-    }
 }
 
 void UserGUI::update(AbstractProtocol* p, std::vector<std::size_t>& d)

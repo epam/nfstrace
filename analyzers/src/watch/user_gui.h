@@ -46,7 +46,6 @@ private:
 
     StatisticsContainers _statisticsContainers;
 
-    ProtocolId _activeProtocolId;
     AbstractProtocol* _activeProtocol;
     std::thread _guiThread;
     std::vector<std::string> _allProtocols;
@@ -54,12 +53,8 @@ private:
 public:
 
     UserGUI() = delete;
-    explicit UserGUI(const char*);
+    explicit UserGUI(const char*, std::vector<AbstractProtocol*>&);
     ~UserGUI();
-
-    /*! Used for save all protocols.
-    */
-    void push_protocols(const std::vector<AbstractProtocol*>&);
 
     /*! Update Protocol's data.
     */
