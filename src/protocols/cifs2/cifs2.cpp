@@ -338,7 +338,6 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::FileNotifyInformation& para
 {
     param.NextEntryOffset = ntohl(param.NextEntryOffset);
     param.FileNameLength = ntohl(param.FileNameLength);
-    param.FileName[1] = ntohl(param.FileName[1]);
 }
 
 template<> void NST::protocols::CIFSv2::parse(SMBv2::ChangeNotifyResponse& param)
