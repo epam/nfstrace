@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Source for all nfs protocols.
+// Description: Header for describe ncurses main window.
 // Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -19,65 +19,42 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef PROTOCOLS_H
-#define PROTOCOLS_H
+#ifndef MAIN_WINDOW_H
+#define MAIN_WINDOW_H
 //------------------------------------------------------------------------------
-#include <cstdlib>
-#include <string>
+#include <ncurses.h>
+
+//#include "header_window.h"
+//#include "statistics_window.h"
 //------------------------------------------------------------------------------
-class AbstractProtocol
+class MainWindow
 {
-public:
-    AbstractProtocol() = delete;
-    AbstractProtocol(const char*, std::size_t);
-    virtual ~AbstractProtocol();
-    virtual const char* printProcedure(std::size_t);
-    unsigned int getAmount();
-    std::string getProtocolName();
-private:
-    std::string name;
-    std::size_t amount;
-};
+    friend class HeaderWindow;
+    friend class StatisticsWindow;
+    WINDOW* _window;
 
-class NFSv3Protocol : public AbstractProtocol
-{
-public:
-    NFSv3Protocol();
-    ~NFSv3Protocol();
-    virtual const char* printProcedure(std::size_t);
-};
+    void init();
+    void destroy();
+    void cleanStdin(int);
 
-class NFSv4Protocol : public AbstractProtocol
-{
 public:
-    NFSv4Protocol();
-    ~NFSv4Protocol();
-    virtual const char* printProcedure(std::size_t);
-};
 
-class NFSv41Protocol : public AbstractProtocol
-{
-public:
-    NFSv41Protocol();
-    ~NFSv41Protocol();
-    virtual const char* printProcedure(std::size_t);
-};
+    MainWindow();
+    ~MainWindow();
 
-class CIFSv1Protocol : public AbstractProtocol
-{
-public:
-    CIFSv1Protocol();
-    ~CIFSv1Protocol();
-    virtual const char* printProcedure(std::size_t);
-};
+    /*! Get iput keys
+    */
+    int inputKeys();
 
-class CIFSv2Protocol : public AbstractProtocol
-{
-public:
-    CIFSv2Protocol();
-    ~CIFSv2Protocol();
-    virtual const char* printProcedure(std::size_t);
+    /*! Resize Main Window
+    */
+    void resize();
+
+    /*! Update Main Window
+    */
+    void update();
 };
 //------------------------------------------------------------------------------
-#endif // PROTOCOLS_H
+#endif // MAIN_WINDOW_H
 //------------------------------------------------------------------------------
+

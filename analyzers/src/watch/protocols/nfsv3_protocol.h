@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Header for UserGUI
+// Description: Header for NFSv3 protocol.
 // Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -19,51 +19,18 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef USERGUI_H
-#define USERGUI_H
+#ifndef NFSV3_PROTOCOL_H
+#define NFSV3_PROTOCOL_H
 //------------------------------------------------------------------------------
-#include <atomic>
-#include <cstdlib>
-#include <mutex>
-#include <vector>
-#include <thread>
-
-#include <ncurses.h>
-#include "./protocols/abstract_protocol.h"
+#include "abstract_protocol.h"
 //------------------------------------------------------------------------------
-class UserGUI
+class NFSv3Protocol : public AbstractProtocol
 {
 public:
-    using ProtocolStatistic = std::vector<std::size_t>;
-    using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
-
-private:
-    unsigned long _refresh_delta;
-
-    std::atomic<bool> _shouldResize;
-    std::mutex _statisticsDeltaMutex;
-    std::atomic_flag _running;
-
-    StatisticsContainers _statisticsContainers;
-
-    AbstractProtocol* _activeProtocol;
-    std::thread _guiThread;
-    std::vector<std::string> _allProtocols;
-    void run();
-public:
-
-    UserGUI() = delete;
-    UserGUI(const char*, std::vector<AbstractProtocol*>&);
-    ~UserGUI();
-
-    /*! Update Protocol's data.
-    */
-    void update(AbstractProtocol*, std::vector<std::size_t>&);
-
-    /*! Enable screen full update. Use for resize main window.
-    */
-    void enableUpdate();
+    NFSv3Protocol();
+    ~NFSv3Protocol();
+    virtual const char* printProcedure(std::size_t);
 };
 //------------------------------------------------------------------------------
-#endif // USERGUI_H
+#endif // NFSV3_PROTOCOL_H
 //------------------------------------------------------------------------------
