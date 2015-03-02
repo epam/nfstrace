@@ -165,18 +165,23 @@ template<> void parse(SMBv2::FlushRequest& );
 template<> void parse(SMBv2::FlushResponse& );
 template<> void parse(SMBv2::ReadRequest& );
 template<> void parse(SMBv2::ReadResponse& );
+template<> void parse(SMBv2::Lock& );
 template<> void parse(SMBv2::WriteRequest& );
 template<> void parse(SMBv2::WriteResponse& );
 template<> void parse(SMBv2::LockRequest& );
 template<> void parse(SMBv2::LockResponse& );
 template<> void parse(SMBv2::CancelRequest& );
 template<> void parse(SMBv2::ChangeNotifyRequest& );
+template<> void parse(SMBv2::FileNotifyInformation& );
 template<> void parse(SMBv2::ChangeNotifyResponse& );
+template<> void parse(SMBv2::OplockAcknowledgment& );
 template<> void parse(SMBv2::OplockResponse& );
 template<> void parse(SMBv2::IoCtlRequest& );
 template<> void parse(SMBv2::IoCtlResponse& );
 template<> void parse(SMBv2::SetInfoRequest& );
 template<> void parse(SMBv2::SetInfoResponse& );
+template<> void parse(SMBv2::CancelResponce& );
+template<> void parse(SMBv2::CancelRequest& );
 
 /*! Constructs new command for API from raw message
  * \param request - Call's
