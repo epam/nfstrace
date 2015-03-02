@@ -53,7 +53,7 @@ private:
 public:
 
     UserGUI() = delete;
-    explicit UserGUI(const char*, std::vector<AbstractProtocol*>&);
+    UserGUI(const char*, std::vector<AbstractProtocol*>&);
     ~UserGUI();
 
     /*! Update Protocol's data.
