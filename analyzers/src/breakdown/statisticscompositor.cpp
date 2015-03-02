@@ -29,6 +29,14 @@ StatisticsCompositor::StatisticsCompositor(Statistics& procedures_stats, Statist
     : Statistics(operations_stats)
     , procedures_stats(procedures_stats)
 {
+    procedures_stats.for_each_session([&](const Session& session)
+    {
+        auto i = per_session_statistics.find(session);
+        if (i == per_session_statistics.end())
+        {
+            per_session_statistics.emplace(session, BreakdownCounter {proc_types_count});
+        }
+    });
 }
 
 void StatisticsCompositor::for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const
@@ -71,19 +79,5 @@ void StatisticsCompositor::for_each_procedure_in_session(const Session& session,
 
 bool StatisticsCompositor::has_session() const
 {
-    if (per_session_statistics.empty() || !procedures_stats.has_session())
-    {
-        return false;
-    }
-
-    bool has_procedures_in_session = false;
-    procedures_stats.for_each_session([&](const Session& session)
-    {
-        if (per_session_statistics.find(session) != per_session_statistics.end())
-        {
-            has_procedures_in_session = true;
-        }
-    });
-
-    return has_procedures_in_session;
+    return !per_session_statistics.empty() || procedures_stats.has_session();
 }
