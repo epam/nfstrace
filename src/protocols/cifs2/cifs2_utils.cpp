@@ -422,88 +422,88 @@ namespace
         return ClearFromLastDelimiter(str.str());
     }
 
-    std::string enumToFlags(const NST::API::SMBv2::ShareFlags shareFlags, std::string delimiter = flagDelimiter)  
+    std::string enumToFlags(const NST::API::SMBv2::ShareFlags value, std::string delimiter = flagDelimiter)  
     {
         std::ostringstream str;
-        if(shareFlags & ShareFlags::MANUAL_CACHING)
+        if(value & ShareFlags::MANUAL_CACHING)
         {
             str << "SMB2_SHAREFLAG_MANUAL_CACHING " << delimiter;
         } 
-        if(shareFlags & ShareFlags::AUTO_CACHING)
+        if(value & ShareFlags::AUTO_CACHING)
         {
             str << "SMB2_SHAREFLAG_AUTO_CACHING" << delimiter;
         } 
-        if(shareFlags & ShareFlags::VDO_CACHING)
+        if(value & ShareFlags::VDO_CACHING)
         {
             str << "SMB2_SHAREFLAG_VDO_CACHING" << delimiter;
         } 
-        if(shareFlags & ShareFlags::NO_CACHING)
+        if(value & ShareFlags::NO_CACHING)
         {
             str << "SMB2_SHAREFLAG_NO_CACHING" << delimiter;
         } 
-        if(shareFlags & (ShareFlags::DFS))
+        if(value & (ShareFlags::DFS))
         {
             str << "SMB2_SHAREFLAG_DFS" << delimiter;
         } 
-        if(shareFlags & ShareFlags::DFS_ROOT)
+        if(value & ShareFlags::DFS_ROOT)
         {
             str << "SMB2_SHAREFLAG_DFS_ROOT" << delimiter;
         } 
-        if(shareFlags & ShareFlags::RESTRICT_EXCLUSIVE_OPENS)
+        if(value & ShareFlags::RESTRICT_EXCLUSIVE_OPENS)
         {
             str << "SMB2_SHAREFLAG_RESTRICT_EXCLUSIVE_OPENS" << delimiter;
         } 
-        if(shareFlags & ShareFlags::FORCE_SHARED_DELETE)
+        if(value & ShareFlags::FORCE_SHARED_DELETE)
         {
             str << "SMB2_SHAREFLAG_FORCE_SHARED_DELETE" << delimiter;
         } 
-        if(shareFlags & ShareFlags::ALLOW_NAMESPACE_CACHING)
+        if(value & ShareFlags::ALLOW_NAMESPACE_CACHING)
         {
             str << "SMB2_SHAREFLAG_ALLOW_NAMESPACE_CACHING" << delimiter;
         } 
-        if(shareFlags & ShareFlags::ACCESS_BASED_DIRECTORY_ENUM)
+        if(value & ShareFlags::ACCESS_BASED_DIRECTORY_ENUM)
         {
             str << "SMB2_SHAREFLAG_ACCESS_BASED_DIRECTORY_ENUM" << delimiter;
         } 
-        if(shareFlags & ShareFlags::FORCE_LEVELII_OPLOCK)
+        if(value & ShareFlags::FORCE_LEVELII_OPLOCK)
         {
             str << "SMB2_SHAREFLAG_FORCE_LEVELII_OPLOCK" << delimiter;
         } 
-        if(shareFlags & ShareFlags::ENABLE_HASH)
+        if(value & ShareFlags::ENABLE_HASH)
         {
             str << "SMB2_SHAREFLAG_ENABLE_HASH_V1" << delimiter;
         } 
-        if(shareFlags & ShareFlags::ENABLE_HASH_2)
+        if(value & ShareFlags::ENABLE_HASH_2)
         {
             str << "SMB2_SHAREFLAG_ENABLE_HASH_V2" << delimiter;
         } 
-        if(shareFlags & ShareFlags::ENABLE_ENCRYPT_DATA)
+        if(value & ShareFlags::ENABLE_ENCRYPT_DATA)
         {
-            str << "SMB2_SHAREFLAG_ENCRYPT_DATA" << delimiter; ;
+            str << "SMB2_SHAREFLAG_ENCRYPT_DATA" << delimiter;
         } 
         return ClearFromLastDelimiter(str.str());
     }
 
-    std::string enumToFlags(const NST::API::SMBv2::ShareCapabilities capabilities, std::string delimiter = flagDelimiter)
+    std::string enumToFlags(const NST::API::SMBv2::ShareCapabilities value, std::string delimiter = flagDelimiter)
     {
         std::ostringstream str;
-        if(capabilities & ShareCapabilities::DFS)
+        if(value & ShareCapabilities::DFS)
         {
             str << "SMB2_SHARE_CAP_DFS" << delimiter;
         } 
-        if(capabilities & ShareCapabilities::CONTINUOUS_AVAILABILITY)
+        if(value & ShareCapabilities::CONTINUOUS_AVAILABILITY)
         {
             str << "SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY" << delimiter;
         } 
-        if(capabilities & ShareCapabilities::SCALEOUT)
+        if(value & ShareCapabilities::SCALEOUT)
         {
             str << "SMB2_SHARE_CAP_SCALEOUT" << delimiter;
         } 
-        if(capabilities & ShareCapabilities::CLUSTER)
+        if(value & ShareCapabilities::CLUSTER)
         {
             str << "SMB2_SHARE_CAP_CLUSTER" << delimiter;
         } 
-        if(capabilities & ShareCapabilities::ASYMMETRIC)
+        if(value & ShareCapabilities::ASYMMETRIC)
         {
             str << "SMB2_SHARE_CAP_ASYMMETRIC" << delimiter;
         } 
@@ -524,56 +524,56 @@ namespace
         return ClearFromLastDelimiter(str.str());
     }
 
-    std::string enumToFlags(const NST::API::SMBv2::Capabilities capabilities, std::string delimiter = flagDelimiter)
+    std::string enumToFlags(const NST::API::SMBv2::Capabilities value, std::string delimiter = flagDelimiter)
     {
         std::ostringstream str;
-        if(capabilities & Capabilities::DFS)
+        if(value & Capabilities::DFS)
         {
             str << "DFS" << delimiter;
         } 
-        if(capabilities & Capabilities::LEASING)
+        if(value & Capabilities::LEASING)
         {
             str << "LEASING" << delimiter;
         } 
-        if(capabilities & Capabilities::LARGE_MTU)
+        if(value & Capabilities::LARGE_MTU)
         {
             str << "LARGE_MTU" << delimiter;
         } 
-        if(capabilities & Capabilities::MULTI_CHANNEL)
+        if(value & Capabilities::MULTI_CHANNEL)
         {
             str << "MULTI_CHANNEL" << delimiter;
         } 
-        if(capabilities & Capabilities::PERSISTENT_HANDLES)
+        if(value & Capabilities::PERSISTENT_HANDLES)
         {
             str << "PERSISTENT_HANDLES" << delimiter;
         } 
-        if(capabilities & Capabilities::DIRECTORY_LEASING)
+        if(value & Capabilities::DIRECTORY_LEASING)
         {
             str << "DIRECTORY_LEASING" << delimiter;
         } 
-        if(capabilities & Capabilities::ENCRYPTION)
+        if(value & Capabilities::ENCRYPTION)
         {
             str << "ENCRYPTION" << delimiter;
         } 
         return ClearFromLastDelimiter(str.str());
     }
 
-    std::string enumToFlags(const NST::API::SMBv2::SessionFlags flags, std::string delimiter = flagDelimiter)
+    std::string enumToFlags(const NST::API::SMBv2::SessionFlags value, std::string delimiter = flagDelimiter)
     {
         std::ostringstream str;
-        if(flags & SessionFlags::NONE)
+        if(value & SessionFlags::NONE)
         {
             str << "NONE" << delimiter;
         } 
-        if(flags & SessionFlags::IS_GUEST)
+        if(value & SessionFlags::IS_GUEST)
         {
             str << "SMB2_SESSION_FLAG_IS_GUEST" << delimiter;
         } 
-        if(flags & SessionFlags::IS_NULL)
+        if(value & SessionFlags::IS_NULL)
         {
             str << "SMB2_SESSION_FLAG_IS_NULL" << delimiter;
         } 
-        if(flags & SessionFlags::IS_ENCRYPT_DATA)
+        if(value & SessionFlags::IS_ENCRYPT_DATA)
         {
             str << "SMB2_SESSION_FLAG_ENCRYPT_DATA" << delimiter;
         } 
@@ -598,10 +598,10 @@ void print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoTy
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::FsInfoLevels infoLevels)
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::FsInfoLevels value)
 {
     using namespace NST::API::SMBv2;
-    switch(infoLevels)
+    switch(value)
     {
     case FsInfoLevels::SMB2_FS_INFO_01: os << "SMB2_FS_INFO_01"; break;
     case FsInfoLevels::SMB2_FS_INFO_02: os << "SMB2_FS_INFO_02"; break;
@@ -611,15 +611,15 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::FsInfoLevels i
     case FsInfoLevels::SMB2_FS_INFO_06: os << "SMB2_FS_INFO_06"; break;
     case FsInfoLevels::SMB2_FS_INFO_07: os << "SMB2_FS_INFO_07"; break;
     }
-    os << " (0x" << std::hex << to_integral(infoLevels) << ")" << std::dec; 
+    os << " (0x" << std::hex << to_integral(value) << ")" << std::dec; 
     return os;
 } 
 
 
-std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::QueryInfoLevels infoLevels)
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::QueryInfoLevels value)
 {
     using namespace NST::API::SMBv2;
-    switch(infoLevels)
+    switch(value)
     {
     case QueryInfoLevels::DIRECTORY_INFORMATION:             os << "DIRECTORY_INFORMATION"; break;
     case QueryInfoLevels::FULL_DIRECTORY_INFORMATION:        os << "FULL_DIRECTORY_INFORMATION"; break;
@@ -667,7 +667,7 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::QueryInfoLevel
     case QueryInfoLevels::ID_GLOBAL_TX_DIRECTORY_INFORMATION:os << "ID_GLOBAL_TX_DIRECTORY_INFORMATION"; break;
     case QueryInfoLevels::STANDARD_LINK_INFORMATION:         os << "STANDARD_LINK_INFORMATION"; break;
     } 
-    os << " (0x" << std::hex << to_integral(infoLevels) << ")" << std::dec;
+    os << " (0x" << std::hex << to_integral(value) << ")" << std::dec;
     return os;
 }
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CtlCodes code)
@@ -708,6 +708,7 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::InfoTypes info
     os << " (0x" << std::hex << to_integral(infoTypes) << std::dec << ")";
     return os;
 }
+
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareTypes value)
 {
     os << enumToCharPtr(value);
@@ -849,24 +850,24 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SecurityModeSh
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities capabilities)
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities value)
 {
     using namespace NST::API::SMBv2; 
-    print_hex32(os, to_integral(capabilities));
-    if (to_integral(capabilities) > 0)
+    print_hex32(os, to_integral(value));
+    if (to_integral(value) > 0)
     {
-        os << " (" << enumToFlags(capabilities) << ")";
+        os << " (" << enumToFlags(value) << ")";
     }
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SessionFlags flags) 
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SessionFlags value) 
 {
     using namespace NST::API::SMBv2; 
-    print_hex32(os, to_integral(flags));
-    if (to_integral(flags) > 0)
+    print_hex32(os, to_integral(value));
+    if (to_integral(value) > 0)
     {
-        os << " (" << enumToFlags(flags) << ")";
+        os << " (" << enumToFlags(value) << ")";
     }
     return os;
 }
