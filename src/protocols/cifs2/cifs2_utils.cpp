@@ -41,11 +41,12 @@ namespace
 
     inline bool operator&(const NST::API::SMBv2::ShareFlags lhs, const NST::API::SMBv2::ShareFlags rhs)
     {
-        return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+        return to_integral(lhs) & to_integral(rhs);
     }
+
     inline bool operator&(const NST::API::SMBv2::Capabilities lhs, const NST::API::SMBv2::Capabilities rhs)
     {
-        return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+        return to_integral(lhs) & to_integral(rhs);
     }
 
     inline bool operator&(const NST::API::SMBv2::DesiredAccessFlags lhs, const NST::API::SMBv2::DesiredAccessFlags rhs)
@@ -64,6 +65,21 @@ namespace
     }
 
     inline bool operator&(const NST::API::SMBv2::WriteFlags lhs, const NST::API::SMBv2::WriteFlags rhs)
+    {
+        return to_integral(lhs) & to_integral(rhs);
+    }
+
+    inline bool operator&(const NST::API::SMBv2::SecurityModeShort lhs, const NST::API::SMBv2::SecurityModeShort rhs)
+    {
+        return to_integral(lhs) & to_integral(rhs);
+    }
+
+    inline bool operator&(const NST::API::SMBv2::ShareCapabilities lhs, const NST::API::SMBv2::ShareCapabilities rhs)
+    {
+        return to_integral(lhs) & to_integral(rhs);
+    }
+
+    inline bool operator&(const NST::API::SMBv2::SessionFlags lhs, const NST::API::SMBv2::SessionFlags rhs)
     {
         return to_integral(lhs) & to_integral(rhs);
     }
@@ -121,6 +137,20 @@ namespace
             case CreateActions::OPENED:              return "OPENED";
             case CreateActions::CREATED:             return "CREATED";
             case CreateActions::FILE_OVERWRITTEN:    return "FILE_OVERWRITTEN";
+        }
+
+        assert("enumToCharPtr: Cannot conver input value into string representation.");
+        return nullptr;
+    }
+
+    const char* enumToCharPtr(const NST::API::SMBv2::ShareTypes value)
+    { 
+        using namespace NST::API::SMBv2;
+        switch(value)
+        {
+            case ShareTypes::DISK:        return "SMB2_SHARE_TYPE_DISK";
+            case ShareTypes::PIPE:        return "SMB2_SHARE_TYPE_PIPE";
+            case ShareTypes::PRINT:       return "SMB2_SHARE_TYPE_PRINT";
         }
 
         assert("enumToCharPtr: Cannot conver input value into string representation.");
@@ -391,6 +421,164 @@ namespace
 
         return ClearFromLastDelimiter(str.str());
     }
+
+    std::string enumToFlags(const NST::API::SMBv2::ShareFlags shareFlags, std::string delimiter = flagDelimiter)  
+    {
+        std::ostringstream str;
+        if(shareFlags & ShareFlags::MANUAL_CACHING)
+        {
+            str << "SMB2_SHAREFLAG_MANUAL_CACHING " << delimiter;
+        } 
+        if(shareFlags & ShareFlags::AUTO_CACHING)
+        {
+            str << "SMB2_SHAREFLAG_AUTO_CACHING" << delimiter;
+        } 
+        if(shareFlags & ShareFlags::VDO_CACHING)
+        {
+            str << "SMB2_SHAREFLAG_VDO_CACHING" << delimiter;
+        } 
+        if(shareFlags & ShareFlags::NO_CACHING)
+        {
+            str << "SMB2_SHAREFLAG_NO_CACHING" << delimiter;
+        } 
+        if(shareFlags & (ShareFlags::DFS))
+        {
+            str << "SMB2_SHAREFLAG_DFS" << delimiter;
+        } 
+        if(shareFlags & ShareFlags::DFS_ROOT)
+        {
+            str << "SMB2_SHAREFLAG_DFS_ROOT" << delimiter;
+        } 
+        if(shareFlags & ShareFlags::RESTRICT_EXCLUSIVE_OPENS)
+        {
+            str << "SMB2_SHAREFLAG_RESTRICT_EXCLUSIVE_OPENS" << delimiter;
+        } 
+        if(shareFlags & ShareFlags::FORCE_SHARED_DELETE)
+        {
+            str << "SMB2_SHAREFLAG_FORCE_SHARED_DELETE" << delimiter;
+        } 
+        if(shareFlags & ShareFlags::ALLOW_NAMESPACE_CACHING)
+        {
+            str << "SMB2_SHAREFLAG_ALLOW_NAMESPACE_CACHING" << delimiter;
+        } 
+        if(shareFlags & ShareFlags::ACCESS_BASED_DIRECTORY_ENUM)
+        {
+            str << "SMB2_SHAREFLAG_ACCESS_BASED_DIRECTORY_ENUM" << delimiter;
+        } 
+        if(shareFlags & ShareFlags::FORCE_LEVELII_OPLOCK)
+        {
+            str << "SMB2_SHAREFLAG_FORCE_LEVELII_OPLOCK" << delimiter;
+        } 
+        if(shareFlags & ShareFlags::ENABLE_HASH)
+        {
+            str << "SMB2_SHAREFLAG_ENABLE_HASH_V1" << delimiter;
+        } 
+        if(shareFlags & ShareFlags::ENABLE_HASH_2)
+        {
+            str << "SMB2_SHAREFLAG_ENABLE_HASH_V2" << delimiter;
+        } 
+        if(shareFlags & ShareFlags::ENABLE_ENCRYPT_DATA)
+        {
+            str << "SMB2_SHAREFLAG_ENCRYPT_DATA" << delimiter; ;
+        } 
+        return ClearFromLastDelimiter(str.str());
+    }
+
+    std::string enumToFlags(const NST::API::SMBv2::ShareCapabilities capabilities, std::string delimiter = flagDelimiter)
+    {
+        std::ostringstream str;
+        if(capabilities & ShareCapabilities::DFS)
+        {
+            str << "SMB2_SHARE_CAP_DFS" << delimiter;
+        } 
+        if(capabilities & ShareCapabilities::CONTINUOUS_AVAILABILITY)
+        {
+            str << "SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY" << delimiter;
+        } 
+        if(capabilities & ShareCapabilities::SCALEOUT)
+        {
+            str << "SMB2_SHARE_CAP_SCALEOUT" << delimiter;
+        } 
+        if(capabilities & ShareCapabilities::CLUSTER)
+        {
+            str << "SMB2_SHARE_CAP_CLUSTER" << delimiter;
+        } 
+        if(capabilities & ShareCapabilities::ASYMMETRIC)
+        {
+            str << "SMB2_SHARE_CAP_ASYMMETRIC" << delimiter;
+        } 
+        return ClearFromLastDelimiter(str.str());
+    }
+
+    std::string enumToFlags(const NST::API::SMBv2::SecurityModeShort value, std::string delimiter = flagDelimiter)
+    {
+        std::ostringstream str;
+        if(value & SecurityModeShort::SIGNING_ENABLED)
+        {
+            str << "SIGNING_ENABLED" << delimiter;
+        } 
+        if(value & SecurityModeShort::SIGNING_REQUIRED)
+        {
+            str << "SIGNING_REQUIRED" << delimiter;
+        } 
+        return ClearFromLastDelimiter(str.str());
+    }
+
+    std::string enumToFlags(const NST::API::SMBv2::Capabilities capabilities, std::string delimiter = flagDelimiter)
+    {
+        std::ostringstream str;
+        if(capabilities & Capabilities::DFS)
+        {
+            str << "DFS" << delimiter;
+        } 
+        if(capabilities & Capabilities::LEASING)
+        {
+            str << "LEASING" << delimiter;
+        } 
+        if(capabilities & Capabilities::LARGE_MTU)
+        {
+            str << "LARGE_MTU" << delimiter;
+        } 
+        if(capabilities & Capabilities::MULTI_CHANNEL)
+        {
+            str << "MULTI_CHANNEL" << delimiter;
+        } 
+        if(capabilities & Capabilities::PERSISTENT_HANDLES)
+        {
+            str << "PERSISTENT_HANDLES" << delimiter;
+        } 
+        if(capabilities & Capabilities::DIRECTORY_LEASING)
+        {
+            str << "DIRECTORY_LEASING" << delimiter;
+        } 
+        if(capabilities & Capabilities::ENCRYPTION)
+        {
+            str << "ENCRYPTION" << delimiter;
+        } 
+        return ClearFromLastDelimiter(str.str());
+    }
+
+    std::string enumToFlags(const NST::API::SMBv2::SessionFlags flags, std::string delimiter = flagDelimiter)
+    {
+        std::ostringstream str;
+        if(flags & SessionFlags::NONE)
+        {
+            str << "NONE" << delimiter;
+        } 
+        if(flags & SessionFlags::IS_GUEST)
+        {
+            str << "SMB2_SESSION_FLAG_IS_GUEST" << delimiter;
+        } 
+        if(flags & SessionFlags::IS_NULL)
+        {
+            str << "SMB2_SESSION_FLAG_IS_NULL" << delimiter;
+        } 
+        if(flags & SessionFlags::IS_ENCRYPT_DATA)
+        {
+            str << "SMB2_SESSION_FLAG_ENCRYPT_DATA" << delimiter;
+        } 
+        return ClearFromLastDelimiter(str.str());
+    }
 }
 
 void print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoType, const uint8_t infoClass)
@@ -423,7 +611,7 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::FsInfoLevels i
     case FsInfoLevels::SMB2_FS_INFO_06: os << "SMB2_FS_INFO_06"; break;
     case FsInfoLevels::SMB2_FS_INFO_07: os << "SMB2_FS_INFO_07"; break;
     }
-    os << " (0x" << std::hex << static_cast<uint32_t>(infoLevels) << ")" << std::dec; 
+    os << " (0x" << std::hex << to_integral(infoLevels) << ")" << std::dec; 
     return os;
 } 
 
@@ -479,7 +667,7 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::QueryInfoLevel
     case QueryInfoLevels::ID_GLOBAL_TX_DIRECTORY_INFORMATION:os << "ID_GLOBAL_TX_DIRECTORY_INFORMATION"; break;
     case QueryInfoLevels::STANDARD_LINK_INFORMATION:         os << "STANDARD_LINK_INFORMATION"; break;
     } 
-    os << " (0x" << std::hex << static_cast<uint32_t>(infoLevels) << ")" << std::dec;
+    os << " (0x" << std::hex << to_integral(infoLevels) << ")" << std::dec;
     return os;
 }
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CtlCodes code)
@@ -503,7 +691,7 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CtlCodes code)
         case CtlCodes::FSCTL_FILE_LEVEL_TRIM:               os << "FSCTL_FILE_LEVEL_TRIM"; break;
         case CtlCodes::FSCTL_VALIDATE_NEGOTIATE_INFO:       os << "FSCTL_VALIDATE_NEGOTIATE_INFO"; break;
     }
-    os << "(0x" << std::hex << static_cast<uint32_t>(code) << std::dec << ")";
+    os << " (0x" << std::hex << to_integral(code) << std::dec << ")";
     return os;
 }
 
@@ -517,33 +705,28 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::InfoTypes info
         case InfoTypes::SECURITY:          os << "SMB2_0_INFO_SECURITY"; break;
         case InfoTypes::QUOTA:             os << "SMB2_0_INFO_QUOTA"; break;
     }
-    os << "(0x" << std::hex << static_cast<uint32_t>(infoTypes) << std::dec << ")";
+    os << " (0x" << std::hex << to_integral(infoTypes) << std::dec << ")";
     return os;
 }
-std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareTypes shareTypes)
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareTypes value)
 {
-    using namespace NST::API::SMBv2;
-    switch(shareTypes)
-    {
-        case ShareTypes::DISK:        os << "SMB2_SHARE_TYPE_DISK"; break;
-        case ShareTypes::PIPE:        os << "SMB2_SHARE_TYPE_PIPE"; break;
-        case ShareTypes::PRINT:       os << "SMB2_SHARE_TYPE_PRINT"; break;
-    }
-    os << "(0x" << std::hex << static_cast<uint32_t>(shareTypes) << std::dec << ")";
+    os << enumToCharPtr(value);
+    os << " (";
+    print_hex32(os, to_integral(value)); 
+    os << ")";
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::OplockLevels value)
 {
-    os << " (" << enumToCharPtr(value) << ") ";
-    print_hex8(os, to_integral(value));
-
+    os << "(" << enumToCharPtr(value) << ") ";
+    print_hex8(os, to_integral(value)); 
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ImpersonationLevels value)
 {
-    os << " (" << enumToCharPtr(value) << ") "
+    os << "(" << enumToCharPtr(value) << ") "
        << to_integral(value);
 
     return os;
@@ -551,98 +734,31 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ImpersonationL
 
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::DesiredAccessFlags value)
 {
-    print_hex32(os, to_integral(value));
-
-    os << " (" << enumToFlags(value) << ") ";
-
+    print_hex32(os, to_integral(value)); 
+    os << " (" << enumToFlags(value) << ") "; 
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareFlags shareFlags)
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareFlags value)
 {
     using namespace NST::API::SMBv2; 
-    if(shareFlags & ShareFlags::MANUAL_CACHING)
+    print_hex32(os, to_integral(value));
+    if (to_integral(value) > 0)
     {
-        os << "\tSMB2_SHAREFLAG_MANUAL_CACHING\n ";
-    } 
-    if(shareFlags & (ShareFlags::AUTO_CACHING))
-    {
-        os << "\tSMB2_SHAREFLAG_AUTO_CACHING\n";
-    } 
-    if(shareFlags & (ShareFlags::VDO_CACHING))
-    {
-        os << "\tSMB2_SHAREFLAG_VDO_CACHING\n";
-    } 
-    if(shareFlags & ShareFlags::NO_CACHING)
-    {
-        os << "\tSMB2_SHAREFLAG_NO_CACHING\n";
-    } 
-    if(shareFlags & (ShareFlags::DFS))
-    {
-        os << "\tSMB2_SHAREFLAG_DFS\n";
-    } 
-    if(shareFlags & ShareFlags::DFS_ROOT)
-    {
-        os << "\tSMB2_SHAREFLAG_DFS_ROOT\n";
-    } 
-    if(shareFlags & ShareFlags::RESTRICT_EXCLUSIVE_OPENS)
-    {
-        os << "\tSMB2_SHAREFLAG_RESTRICT_EXCLUSIVE_OPENS\n";
-    } 
-    if(shareFlags & ShareFlags::FORCE_SHARED_DELETE)
-    {
-        os << "\tSMB2_SHAREFLAG_FORCE_SHARED_DELETE\n";
-    } 
-    if(shareFlags & ShareFlags::ALLOW_NAMESPACE_CACHING)
-    {
-        os << "\tSMB2_SHAREFLAG_ALLOW_NAMESPACE_CACHING\n";
-    } 
-    if(shareFlags & ShareFlags::ACCESS_BASED_DIRECTORY_ENUM)
-    {
-        os << "\tSMB2_SHAREFLAG_ACCESS_BASED_DIRECTORY_ENUM\n";
-    } 
-    if(shareFlags & ShareFlags::FORCE_LEVELII_OPLOCK)
-    {
-        os << "\tSMB2_SHAREFLAG_FORCE_LEVELII_OPLOCK\n";
-    } 
-    if(shareFlags & ShareFlags::ENABLE_HASH)
-    {
-        os << "\tSMB2_SHAREFLAG_ENABLE_HASH_V1\n";
-    } 
-    if(shareFlags & ShareFlags::ENABLE_HASH_2)
-    {
-        os << "\tSMB2_SHAREFLAG_ENABLE_HASH_V2\n";
-    } 
-    if(shareFlags & ShareFlags::ENABLE_ENCRYPT_DATA)
-    {
-        os << "\tSMB2_SHAREFLAG_ENCRYPT_DATA\n";
-    } 
-    return os;
+        os << " (" << enumToFlags(value) << ") ";
+    }
+    return os; 
 } 
 
-std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities capabilities)
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareCapabilities value)
 {
     using namespace NST::API::SMBv2; 
-    if(capabilities & Capabilities::DFS)
+    print_hex32(os, to_integral(value)); 
+    if (to_integral(value) > 0)
     {
-        os << "\tSMB2_SHARE_CAP_DFS\n ";
-    } 
-    if(capabilities & Capabilities::CONTINUOUS_AVAILABILITY)
-    {
-        os << "\tSMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY\n";
-    } 
-    if(capabilities & Capabilities::SCALEOUT)
-    {
-        os << "\tSMB2_SHARE_CAP_SCALEOUT\n";
-    } 
-    if(capabilities & Capabilities::CLUSTER)
-    {
-        os << "\tSMB2_SHARE_CAP_CLUSTER\n";
-    } 
-    if(capabilities & Capabilities::ASYMMETRIC)
-    {
-        os << "\tSMB2_SHARE_CAP_ASYMMETRIC\n";
-    } 
+        os << " (" << enumToFlags(value) << ")";
+    }
     return os;
 }
 
@@ -692,8 +808,7 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CreateOptionsF
 
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CreateActions value)
 {
-    os << " (" << enumToCharPtr(value) << ") "
-       << to_integral(value);
+    os << " (" << enumToCharPtr(value) << ") " << to_integral(value);
 
     return os;
 }
@@ -707,6 +822,52 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::WriteFlags val
         os << " (" << enumToFlags(value) << ") ";
     }
 
+    return os;
+}
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SessionFlagsBinding value)
+{
+    using namespace NST::API::SMBv2;
+    switch(value) 
+    {
+        case SessionFlagsBinding::NONE:     os << "NONE"; break;
+        case SessionFlagsBinding::BINDING:  os << "BINDING"; break;
+    }
+    os << " (";
+    print_hex32(os, to_integral(value));
+    os << ")";
+    return os;
+}
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SecurityModeShort value)
+{
+    print_hex32(os, to_integral(value));
+
+    if (to_integral(value) > 0)
+    {
+        os << " (" << enumToFlags(value) << ") ";
+    }
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities capabilities)
+{
+    using namespace NST::API::SMBv2; 
+    print_hex32(os, to_integral(capabilities));
+    if (to_integral(capabilities) > 0)
+    {
+        os << " (" << enumToFlags(capabilities) << ")";
+    }
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SessionFlags flags) 
+{
+    using namespace NST::API::SMBv2; 
+    print_hex32(os, to_integral(flags));
+    if (to_integral(flags) > 0)
+    {
+        os << " (" << enumToFlags(flags) << ")";
+    }
     return os;
 }
 

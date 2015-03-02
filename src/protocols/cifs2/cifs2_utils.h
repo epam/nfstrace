@@ -47,7 +47,7 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CtlCodes code)
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::InfoTypes infoTypes);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareTypes shareTypes);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareFlags shareFlags);
-std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities capabilities);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ShareCapabilities capabilities);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::OplockLevels value);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::ImpersonationLevels value);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::DesiredAccessFlags value);
@@ -57,6 +57,10 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CreateDisposit
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CreateOptionsFlags value);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CreateActions value);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::WriteFlags value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SessionFlagsBinding value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SecurityModeShort value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities capabilities);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SessionFlags value);
 }// namespace CIFSv2    
 }// namespace protocols 
 }// namespace NST       
