@@ -208,6 +208,7 @@ void print_file_name(std::ostream& out, const uint8_t *pFileName, uint16_t len)
     {
         print_hex8(out, pFileName[i]);
     }
+    out << "\n";
 }
 
 } // unnamed namespace
@@ -748,15 +749,30 @@ void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand*,
                                    const SMBv2::NegotiateResponse*)
 {
 }
-void PrintAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand*,
+void PrintAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd,
                                       const SMBv2::SessionSetupRequest*,
-                                      const SMBv2::SessionSetupResponse*)
+                                      const SMBv2::SessionSetupResponse* res)
 {
+    Commands cmdEnum = Commands::SESSION_SETUP;
+    print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
+    out << "Flags = " << cmd->parg->VcNumber << "\n"
+        << "Security mode = " << cmd->parg->securityMode << "\n"
+        << "Capabilities = " << cmd->parg->capabilities << "\n"
+        << "Channel = " << cmd->parg->Channel << "\n"
+        << "Previous session id = " << cmd->parg->PreviousSessionId << "\n"
+        << "Security buffer: \n";
+    print_file_name(out , cmd->parg->Buffer, cmd->parg->SecurityBufferLength);
+    print_smbv2_common_info_resp(out, cmdEnum, res);
+    out << "Session flags = " << res->sessionFlags << "\n";
+    print_file_name(out , res->Buffer, res->SecurityBufferLength);
 }
-void PrintAnalyzer::logOffSMBv2(const SMBv2::LogOffCommand*,
+void PrintAnalyzer::logOffSMBv2(const SMBv2::LogOffCommand* cmd,
                                 const SMBv2::LogOffRequest*,
-                                const SMBv2::LogOffResponse*)
+                                const SMBv2::LogOffResponse* res)
 {
+    Commands cmdEnum = Commands::LOGOFF;
+    print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
+    print_smbv2_common_info_resp(out, cmdEnum, res);
 }
 
 void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd,
@@ -767,9 +783,9 @@ void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd,
     print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
     print_file_name(out,cmd->parg->Buffer, cmd->parg->PathLength);
     print_smbv2_common_info_resp(out, cmdEnum, res);
-    out << " Share types =  "  << res->ShareType << "\n"
-        << " Capabilities  = " << res->capabilities << "\n"
-        << " Share flags = " << res->shareFlags << "\n";
+    out << "  Share types = " << res->ShareType << "\n"
+        << "  Capabilities = "  << res->capabilities << "\n"
+        << "  Share flags = " << res->shareFlags << "\n";
 }
 void PrintAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd,
                                         const SMBv2::TreeDisconnectRequest*,
@@ -843,7 +859,7 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
     out << "  Last Write = ";
     print_time(out, res->LastWriteTime);
 
-    out<< "  Last Change = ";
+    out << "  Last Change = ";
     print_time(out, res->ChangeTime);
 
     out << "  Allocation Size = ";
@@ -908,7 +924,6 @@ void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
     << "  Channel Info Offset = " << cmd->parg->WriteChannelInfoOffset << "\n"
     << "  Channel Info Length = " << cmd->parg->WriteChannelInfoLength << "\n"
     << "  Write Flags = " << cmd->parg->Flags << "\n";
-
     // TODO: Wireshark also shows binary representation of file ...
     // For now it is skipped
 
@@ -993,8 +1008,10 @@ void PrintAnalyzer::queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd,
     using namespace NST::API::SMBv2;
     Commands cmdEnum = Commands::QUERY_INFO;
     print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
-    out << "  Class = "     << cmd->parg->infoType << "\n";
+    out << "  Class = " << cmd->parg->infoType << "\n";
     print_info_levels(out, cmd->parg->infoType, cmd->parg->FileInfoClass);
+    //TODO: Print GUID handle file
+    //print_file_name(out, cmd->parg->Buffer, cmd->parg->OutputBufferLength);
     print_smbv2_common_info_resp(out, cmdEnum, res);
     out << "  Offset = 0x" << std::hex << static_cast<uint32_t>(res->OutputBufferOffset) << std::dec << "\n"
         << "  Length = 0x" << std::hex << static_cast<uint32_t>(res->OutputBufferLength) << std::dec << "\n";
@@ -1007,6 +1024,8 @@ void PrintAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* cmd,
     print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
     out << "  Class = " << cmd->parg->infoType << "\n";
     print_info_levels(out, cmd->parg->infoType, cmd->parg->FileInfoClass);
+    //TODO: Print GUID handle file
+    //print_file_name(out, cmd->parg->Buffer, cmd->parg->OutputBufferLength);
     out << "  Setinfo Size = " << cmd->parg->BufferLength << "\n"
         << "  Setinfo Offset = 0x" << std::hex << cmd->parg->BufferOffset << std::dec << "\n";
 
