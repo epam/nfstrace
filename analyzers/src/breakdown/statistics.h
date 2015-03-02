@@ -65,7 +65,7 @@ struct Statistics
      * @brief iterates by sessions
      * @param on_session - callback
      */
-    void for_each_session(std::function<void(const Session&)> on_session) const;
+    virtual void for_each_session(std::function<void(const Session&)> on_session) const;
 
     /**
      * @brief iterates by procedure in specific session

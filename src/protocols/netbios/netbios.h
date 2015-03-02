@@ -37,7 +37,7 @@ namespace NetBIOS
 struct RawMessageHeader
 {
     int8_t _start;//!< In SMB direct always 0x00
-    int8_t flag;//!< Packet flags
+    int8_t _;
     int16_t length;//!< Packet length
 } __attribute__ ((__packed__));
 
