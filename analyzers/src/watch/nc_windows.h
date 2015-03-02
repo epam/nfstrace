@@ -31,15 +31,6 @@
 
 #include "protocols.h"
 //------------------------------------------------------------------------------
-enum ProtocolId
-{
-    NFSv3,  //!< NFS version 3
-    NFSv4,  //!< NFS version 4
-    NFSv41, //!< NFS version 4.1
-    CIFSv1, //!< CIFS version 1
-    CIFSv2  //!< CIFS version 2
-};
-//------------------------------------------------------------------------------
 class MainWindow
 {
     friend class StatisticsWindow;
@@ -89,13 +80,11 @@ public:
 //------------------------------------------------------------------------------
 class StatisticsWindow
 {
-public:
     using ProtocolStatistic = std::vector<std::size_t>;
     using StatisticsContainers = std::unordered_map<AbstractProtocol* , ProtocolStatistic>;
 
 private:
     WINDOW* _window;
-//    ProtocolId _activeProtocol;
     AbstractProtocol* _activeProtocol;
     std::vector<std::string> _allProtocols;
     std::unordered_map<AbstractProtocol*, unsigned int> _scrollOffset;
@@ -106,9 +95,6 @@ public:
     StatisticsWindow() = delete;
     StatisticsWindow(MainWindow&, StatisticsContainers&);
     ~StatisticsWindow();
-
-    void nextProtocol();
-    void previousProtocol();
 
     /*! Scroll content of Statistic Winodow Up or Down
     */

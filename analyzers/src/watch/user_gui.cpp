@@ -30,9 +30,9 @@
 //-----------------------------------------------------------------------------
 namespace
 {
-    const int SCROLL_UP = 1;
+    const int SCROLL_UP   = 1;
     const int SCROLL_DOWN = -1;
-    const unsigned int MSEC = 1000000;
+    const int MSEC        = 1000000;
 }
 //------------------------------------------------------------------------------
 void UserGUI::run()
@@ -155,7 +155,6 @@ UserGUI::UserGUI(const char* opts, std::vector<AbstractProtocol*>& v)
         {
             _refresh_delta = std::stoul(opts);
         }
-
         for(auto i : v)
         {
             _allProtocols.push_back(i->getProtocolName());

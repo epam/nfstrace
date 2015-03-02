@@ -25,20 +25,22 @@
 //------------------------------------------------------------------------------
 namespace
 {
-//    const char *ProtocolsNames[] = {"NFS v3", "NFS v4", "NFS v41", "CIFS v1", "CIFS v2", nullptr};
-//    const char *ProtocolsActiveNames[] = {"< NFS v3 >", "< NFS v4 >", "< NFS v41 >", "< CIFS v1 >", "< CIFS v2 >", nullptr};
     const unsigned int SECINMIN  = 60;
     const unsigned int SECINHOUR = 60 * 60;
     const unsigned int SECINDAY  = 60 * 60 * 24;
 
+    const unsigned int BORDER_SIZE = 1;
+
     const int MAXSHIFT = 25;
     const int SHIFTCU  = 1;
 
-    const int GUI_LENGTH = 80;
+    const int GUI_LENGTH        = 80;
     const int GUI_HEADER_HEIGHT = 6;
-//    const int GUI_STATISTIC_HEIGHT = 100;
-    const int PERSENT_POS = 29;
-    const int COUNTERS_POS = 22;
+    const int PERSENT_POS       = 29;
+    const int COUNTERS_POS      = 22;
+
+    const int FIRST_CHAR_POS = 1;
+    const int EMPTY_LINE     = 1;
 }
 //------------------------------------------------------------------------------
 uint16_t MainWindow::inputKeys()
@@ -148,6 +150,14 @@ void MainWindow::update()
         refresh();
 }
 //------------------------------------------------------------------------------
+namespace HEADER
+{
+    const int MEMO_LINE = 1;
+    const int HOST_LINE = 2;
+    const int DATE_LINE = 3;
+    const int ELAPSED_LINE = 4;
+}
+
 void HeaderWindow::destroy()
 {
     if(_window == nullptr) return;
@@ -178,9 +188,10 @@ void HeaderWindow::update()
     time_t actual_time = time(nullptr);
     tm* t = localtime(&actual_time);
     time_t shift_time = actual_time - _start_time;
-    mvwprintw(_window, 3, 1,"Date: \t %d.%d.%d \t Time: %d:%d:%d  ",t->tm_mday, t->tm_mon + 1, t->tm_year + 1900,t->tm_hour, t->tm_min, t->tm_sec);
-    mvwprintw(_window, 4, 1,"Elapsed time:  \t %d days; %d:%d:%d times",
-             shift_time/SECINDAY, shift_time%SECINDAY/SECINHOUR, shift_time%SECINHOUR/SECINMIN, shift_time%SECINMIN);
+    /* tm starts with 0 month and 1900 year*/
+    mvwprintw(_window, HEADER::DATE_LINE, FIRST_CHAR_POS,"Date: \t %d.%d.%d \t Time: %d:%d:%d  ",t->tm_mday, t->tm_mon + 1, t->tm_year + 1900,t->tm_hour, t->tm_min, t->tm_sec);
+    mvwprintw(_window, HEADER::ELAPSED_LINE, FIRST_CHAR_POS,"Elapsed time:  \t %d days; %d:%d:%d times",
+              shift_time/SECINDAY, shift_time%SECINDAY/SECINHOUR, shift_time%SECINHOUR/SECINMIN, shift_time%SECINMIN);
 //    mvwhline (_window, 5, 1, ACS_HLINE, 78);
 //    mvwhline (_window, 6, 1, ACS_HLINE, 78);
     wrefresh (_window);
@@ -198,11 +209,18 @@ void HeaderWindow::resize(MainWindow& m)
         wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER , ACS_LLCORNER, ACS_LRCORNER);
         char HOST_NAME[128];
         gethostname(HOST_NAME, 128);
-        mvwprintw(_window, 1, 1,"%s","Nfstrace watch plugin. To scroll press up or down keys. Ctrl + c to exit.");
-        mvwprintw(_window, 2, 1,"Host name:\t %s",HOST_NAME);
+        mvwprintw(_window, HEADER::MEMO_LINE, FIRST_CHAR_POS,"%s","Nfstrace watch plugin. To scroll press up or down keys. Ctrl + c to exit.");
+        mvwprintw(_window, HEADER::HOST_LINE, FIRST_CHAR_POS,"Host name:\t %s",HOST_NAME);
     }
 }
 //------------------------------------------------------------------------------
+namespace STATISTICS
+{
+    const int PROTOCOLS_LINE = 1;
+    const int FIRST_OPERATION_LINE = 3;
+    const int DEFAULT_LINES = 10;
+}
+
 void StatisticsWindow::destroy()
 {
     if(_window == nullptr) return;
@@ -263,12 +281,12 @@ void StatisticsWindow::updateProtocol(AbstractProtocol* p)
         }
     }
 
-    mvwprintw(_window, 1 , 1,"%s", tmp.c_str());
+    mvwprintw(_window, STATISTICS::PROTOCOLS_LINE , FIRST_CHAR_POS,"%s", tmp.c_str());
 
     for(unsigned int i = 0; i < p->getAmount(); i++)
     {
-        if( i + 1 > _scrollOffset.at(p) && i + 3 < _window->_maxy + _scrollOffset.at(p) -1)
-            mvwprintw(_window, i + 3 - (unsigned int)(_scrollOffset.at(p)), 1, "%s", p->printProcedure(i));
+        if( i >= _scrollOffset.at(p) && i - _scrollOffset.at(p) + BORDER_SIZE < static_cast<unsigned int>(_window->_maxy))
+            mvwprintw(_window, i + STATISTICS::FIRST_OPERATION_LINE - (_scrollOffset.at(p)), FIRST_CHAR_POS, "%s", p->printProcedure(i));
     }
 }
 
@@ -283,10 +301,10 @@ void StatisticsWindow::update(const ProtocolStatistic& d)
     }
     for(unsigned int i = 0; i < _statistic.size(); i++)
     {
-        if( i + 1 > _scrollOffset.at(_activeProtocol) && i + 3 < _window->_maxy + _scrollOffset.at(_activeProtocol) - 1)
+        if(i >= _scrollOffset.at(_activeProtocol) && i - _scrollOffset.at(_activeProtocol) + BORDER_SIZE < static_cast<unsigned int>(_window->_maxy))
         {
-            mvwprintw(_window, i + 3 - _scrollOffset.at(_activeProtocol), COUNTERS_POS, "%lu ", _statistic[i]);
-            mvwprintw(_window, i + 3 - _scrollOffset.at(_activeProtocol), PERSENT_POS, "%-3.2f%% ",
+            mvwprintw(_window, i + STATISTICS::FIRST_OPERATION_LINE - _scrollOffset.at(_activeProtocol), COUNTERS_POS, "%lu ", _statistic[i]);
+            mvwprintw(_window, i + STATISTICS::FIRST_OPERATION_LINE - _scrollOffset.at(_activeProtocol), PERSENT_POS, "%-3.2f%% ",
                       m > 0 ? static_cast<double>(_statistic[i]) / static_cast<double>(m) * 100.0 : 0.0);
         }
     }
@@ -300,9 +318,9 @@ void StatisticsWindow::resize(MainWindow& m)
         destroy();
     short tmp_size;
     if(_activeProtocol != nullptr)
-        tmp_size = _activeProtocol->getAmount() + 5;
+        tmp_size = _activeProtocol->getAmount() + 2 * BORDER_SIZE + 2 * EMPTY_LINE + STATISTICS::PROTOCOLS_LINE;
     else
-        tmp_size = 10;
+        tmp_size = STATISTICS::DEFAULT_LINES;
     if(m._window != nullptr && m._window->_maxy > GUI_HEADER_HEIGHT)
     {
         _window = subwin(m._window, (m._window->_maxy - GUI_HEADER_HEIGHT > tmp_size) ? tmp_size : (m._window->_maxy - GUI_HEADER_HEIGHT) ,

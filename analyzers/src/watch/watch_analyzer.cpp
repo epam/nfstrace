@@ -38,9 +38,16 @@ WatchAnalyzer::WatchAnalyzer(const char* opts)
 
 WatchAnalyzer::~WatchAnalyzer()
 {
-    for(auto i : protocols)
+    try
     {
-        delete(i);
+        for(auto i : protocols)
+        {
+            delete(i);
+        }
+    }
+    catch(std::exception& e)
+    {
+        std::cerr << "Error in WatchAnalyzer. " << e.what();
     }
 }
 
@@ -168,9 +175,6 @@ void WatchAnalyzer::account(const RPCProcedure* proc,
 
     gui.update(protocols[1], nfs3_proc_count);
     gui.update(protocols[0], nfs4_proc_count);
-//    gui.update(NFSv41, nullptr);
-//    gui.update(CIFSv1, nullptr);
-//    gui.update(CIFSv2, nullptr);
 }
 //------------------------------------------------------------------------------
 extern "C"
