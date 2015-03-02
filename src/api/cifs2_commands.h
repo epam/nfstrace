@@ -73,11 +73,22 @@ enum class SecurityModeShort : uint8_t
  */
 enum class Capabilities : uint32_t
 {
-    DFS                     = 0x00000008,             //!< When set, indicates that the client supports the Distributed File System (DFS).
-    CONTINUOUS_AVAILABILITY = 0x00000010,             //!< When set, indicates that the client supports leasing.
-    SCALEOUT                = 0x00000020,             //!< When set, indicates that the client supports multi-credit operations.
-    CLUSTER                 = 0x00000040,             //!< When set, indicates that the client supports establishing multiple channels for a single session.
-    ASYMMETRIC              = 0x00000080,             //!< When set, indicates that the client supports persistent handles.
+    DFS                 = 0x00000001,             //!< When set, indicates that the client supports the Distributed File System (DFS).
+    LEASING             = 0x00000002,             //!< When set, indicates that the client supports leasing.
+    LARGE_MTU           = 0x00000004,             //!< When set, indicates that the client supports multi-credit operations.
+    MULTI_CHANNEL       = 0x00000008,             //!< When set, indicates that the client supports establishing multiple channels for a single session.
+    PERSISTENT_HANDLES  = 0x00000010,             //!< When set, indicates that the client supports persistent handles.
+    DIRECTORY_LEASING   = 0x00000020,             //!< When set, indicates that the client supports directory leasing.
+    ENCRYPTION          = 0x00000040              //!< When set, indicates that the client supports encryption.
+};
+
+enum class ShareCapabilities : uint32_t
+{
+    DFS                     = 0x00000008,
+    CONTINUOUS_AVAILABILITY = 0x00000010,
+    SCALEOUT                = 0x00000020,
+    CLUSTER                 = 0x00000040,
+    ASYMMETRIC              = 0x00000080
 };
 
 /*!
@@ -270,7 +281,7 @@ struct TreeConnectResponse
     ShareTypes ShareType;                        //!< The type of share being accessed.
     uint8_t   Reserved;                          //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
     ShareFlags shareFlags;                       //!< This field contains properties for this share.
-    Capabilities capabilities;                   //!< Indicates various capabilities for this share
+    ShareCapabilities capabilities;              //!< Indicates various capabilities for this share
     uint32_t MaximalAccess;                      //!< Contains the maximal access for the user that establishes the tree connect on the share based on the share's permissions
 }  __attribute__ ((__packed__));
 
