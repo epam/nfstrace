@@ -26,6 +26,7 @@
 #include <condition_variable>
 
 #include <api/plugin_api.h> // include plugin development definitions
+#include "./protocols/abstract_protocol.h"
 #include "user_gui.h"
 //------------------------------------------------------------------------------
 class WatchAnalyzer : public IAnalyzer
@@ -68,8 +69,8 @@ public:
                 const struct NFS3::MKDIR3args*,
                 const struct NFS3::MKDIR3res*) override final;
     void symlink3(const RPCProcedure* proc,
-                 const struct NFS3::SYMLINK3args*,
-                 const struct NFS3::SYMLINK3res*) override final;
+                  const struct NFS3::SYMLINK3args*,
+                  const struct NFS3::SYMLINK3res*) override final;
     void mknod3(const RPCProcedure* proc,
                 const struct NFS3::MKNOD3args*,
                 const struct NFS3::MKNOD3res*) override final;
@@ -115,8 +116,8 @@ private:
     void account(const RPCProcedure*,
                  const struct NFS4::COMPOUND4res* res = nullptr);
     std::vector<AbstractProtocol* > protocols;
-    UserGUI gui;
+    UserGUI* gui;
 };
 //------------------------------------------------------------------------------
-#endif //WATCH_ANALYZER_H
+#endif // WATCH_ANALYZER_H
 //------------------------------------------------------------------------------

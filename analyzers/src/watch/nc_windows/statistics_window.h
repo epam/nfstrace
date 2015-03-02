@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Header for description ncurses windows.
+// Description: Header for describe ncurses statistic window.
 // Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -19,69 +19,19 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef NC_WINDOWS_H
-#define NC_WINDOWS_H
+#ifndef STATISTICS_WINDOW_H
+#define STATISTICS_WINDOW_H
 //------------------------------------------------------------------------------
-#include <cstdlib>
 #include <unordered_map>
 #include <vector>
-#include <stdexcept>
 
-#include <ncurses.h>
-
-#include "protocols.h"
-//------------------------------------------------------------------------------
-class MainWindow
-{
-    friend class StatisticsWindow;
-    friend class HeaderWindow;
-    WINDOW* _window;
-
-    void init();
-    void destroy();
-
-public:
-
-    /*! Get iput keys
-    */
-    uint16_t inputKeys();
-    MainWindow();
-    ~MainWindow();
-
-    /*! Resize Main Window
-    */
-    void resize();
-
-    /*! Update Main Window
-    */
-    void update();
-};
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-class HeaderWindow
-{
-    WINDOW* _window;
-    time_t _start_time;
-    void destroy();
-
-public:
-    HeaderWindow() = delete;
-    HeaderWindow(MainWindow&);
-    ~HeaderWindow();
-
-    /*! Update Header Window
-    */
-    void update();
-
-    /*! Resize Header Window
-    */
-    void resize(MainWindow&);
-};
+#include "../protocols/abstract_protocol.h"
+#include "main_window.h"
 //------------------------------------------------------------------------------
 class StatisticsWindow
 {
     using ProtocolStatistic = std::vector<std::size_t>;
-    using StatisticsContainers = std::unordered_map<AbstractProtocol* , ProtocolStatistic>;
+    using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
 
 private:
     WINDOW* _window;
@@ -90,6 +40,7 @@ private:
     std::unordered_map<AbstractProtocol*, unsigned int> _scrollOffset;
     ProtocolStatistic _statistic;
     void destroy();
+    bool canWrite(unsigned int);
 
 public:
     StatisticsWindow() = delete;
@@ -117,5 +68,5 @@ public:
     void setProtocol(AbstractProtocol*);
 };
 //------------------------------------------------------------------------------
-#endif // NC_WINDOWS_H
+#endif // STATISTICS_WINDOWS_H
 //------------------------------------------------------------------------------
