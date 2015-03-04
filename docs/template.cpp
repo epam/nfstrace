@@ -39,12 +39,12 @@ SayHello::~SayHello()
 {
 }
 
-void SayHello::set_value(unsigned int v)
+void SayHello::set_value(std::uint32_t v)
 {
     value = v;
 }
 
-unsigned int SayHello::get_value() const
+std::uint32_t SayHello::get_value() const
 {
     return value;
 }
@@ -56,10 +56,24 @@ int main(int argc, char** argv)
     hello::SayHello hello;
     std::cout << hello.say() << std::endl;
 
-
     hello.set(42);
 
     assert(42 == hello.get());
+
+    // FizzBuzz
+    for(std::size_t i=1; i<=100; i++)
+    {
+        if((i % 15) == 0)
+        {
+            std::cout << "FizzBuzz\n";
+        }
+        else if(i % 3 == 0) std::cout << "Fizz\n";
+        else if(i % 5 == 0) std::cout << "Buzz\n";
+        else
+        {
+            std::cout << i << '\n';
+        }
+    }
 
     return 0;
 }
