@@ -25,11 +25,11 @@
 #include <atomic>
 #include <cstdlib>
 #include <mutex>
-#include <vector>
 #include <thread>
+#include <vector>
 
 #include <ncurses.h>
-#include "./protocols/abstract_protocol.h"
+#include "protocols/abstract_protocol.h"
 //------------------------------------------------------------------------------
 class UserGUI
 {

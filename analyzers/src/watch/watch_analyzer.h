@@ -26,7 +26,7 @@
 #include <condition_variable>
 
 #include <api/plugin_api.h> // include plugin development definitions
-#include "./protocols/abstract_protocol.h"
+#include "protocols/abstract_protocol.h"
 #include "user_gui.h"
 //------------------------------------------------------------------------------
 class WatchAnalyzer : public IAnalyzer

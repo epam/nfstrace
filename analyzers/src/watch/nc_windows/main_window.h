@@ -23,9 +23,6 @@
 #define MAIN_WINDOW_H
 //------------------------------------------------------------------------------
 #include <ncurses.h>
-
-//#include "header_window.h"
-//#include "statistics_window.h"
 //------------------------------------------------------------------------------
 class MainWindow
 {
