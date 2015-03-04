@@ -611,7 +611,9 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::FsInfoLevels v
     case FsInfoLevels::SMB2_FS_INFO_06: os << "SMB2_FS_INFO_06"; break;
     case FsInfoLevels::SMB2_FS_INFO_07: os << "SMB2_FS_INFO_07"; break;
     }
-    os << " (0x" << std::hex << to_integral(value) << ")" << std::dec; 
+    os << " (";
+    print_hex16(os, to_integral(value));
+    os << ")";
     return os;
 } 
 
@@ -667,13 +669,15 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::QueryInfoLevel
     case QueryInfoLevels::ID_GLOBAL_TX_DIRECTORY_INFORMATION:os << "ID_GLOBAL_TX_DIRECTORY_INFORMATION"; break;
     case QueryInfoLevels::STANDARD_LINK_INFORMATION:         os << "STANDARD_LINK_INFORMATION"; break;
     } 
-    os << " (0x" << std::hex << to_integral(value) << ")" << std::dec;
+    os << " (";
+    print_hex16(os, to_integral(value));
+    os << ")";
     return os;
 }
-std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CtlCodes code)
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CtlCodes value)
 {
     using namespace NST::API::SMBv2;
-    switch(code)
+    switch(value)
     {
         case CtlCodes::SCTL_DFS_GET_REFERRALS:              os << "SCTL_DFS_GET_REFERRALS"; break;
         case CtlCodes::FSCTL_PIPE_PEEK:                     os << "FSCTL_PIPE_PEEK"; break;
@@ -691,21 +695,25 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CtlCodes code)
         case CtlCodes::FSCTL_FILE_LEVEL_TRIM:               os << "FSCTL_FILE_LEVEL_TRIM"; break;
         case CtlCodes::FSCTL_VALIDATE_NEGOTIATE_INFO:       os << "FSCTL_VALIDATE_NEGOTIATE_INFO"; break;
     }
-    os << " (0x" << std::hex << to_integral(code) << std::dec << ")";
+    os << " (";
+    print_hex16(os, to_integral(value));
+    os << ")";
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::InfoTypes infoTypes)
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::InfoTypes value)
 {
     using namespace NST::API::SMBv2;
-    switch(infoTypes)
+    switch(value)
     {
         case InfoTypes::FILE:              os << "SMB2_0_INFO_FILE"; break;
         case InfoTypes::FILESYSTEM:        os << "SMB2_0_INFO_FILESYSTEM"; break;
         case InfoTypes::SECURITY:          os << "SMB2_0_INFO_SECURITY"; break;
         case InfoTypes::QUOTA:             os << "SMB2_0_INFO_QUOTA"; break;
     }
-    os << " (0x" << std::hex << to_integral(infoTypes) << std::dec << ")";
+    os << " (";
+    print_hex16(os, to_integral(value));
+    os << ")";
     return os;
 }
 
