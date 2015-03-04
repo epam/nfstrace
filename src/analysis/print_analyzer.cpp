@@ -201,12 +201,14 @@ void print_time(std::ostream& out, uint64_t time)
     out << ctime(&t);
 }
 
-void print_file_name(std::ostream& out, const uint8_t *pFileName, uint16_t len)
+void print_buffer(std::ostream& out, const uint8_t *buffer, uint16_t len)
 {
-    // TODO: Replace with human readable string
+    // TODO: Add unicode support
+    const char* char_buffer = reinterpret_cast<const char*>(buffer);
+    out << "  ";
     for(uint16_t i = 0; i < len; i++)
     {
-        print_hex8(out, pFileName[i]);
+        out << char_buffer[i];
     }
     out << "\n";
 }
@@ -755,16 +757,15 @@ void PrintAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd,
 {
     Commands cmdEnum = Commands::SESSION_SETUP;
     print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
-    out << "Flags = " << cmd->parg->VcNumber << "\n"
-        << "Security mode = " << cmd->parg->securityMode << "\n"
-        << "Capabilities = " << cmd->parg->capabilities << "\n"
-        << "Channel = " << cmd->parg->Channel << "\n"
-        << "Previous session id = " << cmd->parg->PreviousSessionId << "\n"
-        << "Security buffer: \n";
-    print_file_name(out , cmd->parg->Buffer, cmd->parg->SecurityBufferLength);
+    out << "  Flags = " << cmd->parg->VcNumber << "\n"
+        << "  Security mode = " << cmd->parg->securityMode << "\n"
+        << "  Capabilities = " << cmd->parg->capabilities << "\n"
+        << "  Channel = " << cmd->parg->Channel << "\n"
+        << "  Previous session id = " << cmd->parg->PreviousSessionId << "\n";
+    //TODO: print security blob ( cmd->parg->Buffer )
     print_smbv2_common_info_resp(out, cmdEnum, res);
-    out << "Session flags = " << res->sessionFlags << "\n";
-    print_file_name(out , res->Buffer, res->SecurityBufferLength);
+    out << "  Session flags = " << res->sessionFlags << "\n";
+    //TODO: print security blob ( res->Buffer )
 }
 void PrintAnalyzer::logOffSMBv2(const SMBv2::LogOffCommand* cmd,
                                 const SMBv2::LogOffRequest*,
@@ -781,7 +782,8 @@ void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd,
 {
     Commands cmdEnum = Commands::TREE_CONNECT;
     print_smbv2_common_info_req(out, cmdEnum, cmd->parg);
-    print_file_name(out,cmd->parg->Buffer, cmd->parg->PathLength);
+    out << "  Tree = ";
+    print_buffer(out,cmd->parg->Buffer, cmd->parg->PathLength);
     print_smbv2_common_info_resp(out, cmdEnum, res);
     out << "  Share types = " << res->ShareType << "\n"
         << "  Capabilities = "  << res->capabilities << "\n"
@@ -829,7 +831,7 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
 
     out << "\n";
     out << "  File name = ";
-    print_file_name(out, cmd->parg->Buffer, cmd->parg->NameLength);
+    print_buffer(out, cmd->parg->Buffer, cmd->parg->NameLength);
 
     out << "\n"
         << "  File length = " << cmd->parg->NameLength;
