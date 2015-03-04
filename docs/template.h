@@ -22,6 +22,7 @@
 #ifndef TEMPLATE_H
 #define TEMPLATE_H
 //------------------------------------------------------------------------------
+#include <cstdint>  // include language headers in alphabetical order
 #include <string>
 //------------------------------------------------------------------------------
 #define MY_MIN(a,b) (((a) < (b)) ? (a) : (b)) //!< This is example of preprocessor usage
@@ -37,27 +38,27 @@ public:
     SayHello();// May be uncommented
     ~SayHello();// May be uncommented
 
-    SayHello(const SayHello&);              // undefined. May be uncommented
-    SayHello& operator=(const SayHello&);   // undefined. May be uncommented
+    SayHello(const SayHello&)            = delete;
+    SayHello& operator=(const SayHello&) = delete;
 
     /*!  small functions may be implemented in-place
      * \return hello string
      */
     inline const std::string& say() const { return text; }
 
-    /*! Returns value
-     * \return value of sth
-     */
-    unsigned int get() const;
-
     /*! Sets some value
      * \param v - new value
      */
-    void set(unsigned int v);
+    void set_value(std::uint32_t v);
+
+    /*! Returns value
+     * \return value of sth
+     */
+    std::uint32_t get_value() const;
 
 private:
     std::string text;//!< Hello phrase
-    unsigned int value; //!< just a value for get/set methods
+    std::uint32_t value; //!< just a value for get/set methods
 
     static const unsigned int BAD_COFFEE;//!< Some constant
 };
