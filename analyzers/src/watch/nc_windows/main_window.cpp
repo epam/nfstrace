@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <unistd.h>
 #include <stdexcept>
+#include <unistd.h>
 
 #include "main_window.h"
 //------------------------------------------------------------------------------
@@ -60,9 +60,8 @@ void MainWindow::destroy()
     _window = nullptr;
 }
 
-void MainWindow::cleanStdin(int k)
+void MainWindow::cleanStdin(int key)
 {
-    int key = k;
     while ((key != EOF) && (key != '\n') && (key != ' '))
     {
         key = getch();

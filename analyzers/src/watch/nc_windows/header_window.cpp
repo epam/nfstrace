@@ -20,8 +20,8 @@
 */
 //------------------------------------------------------------------------------
 #include <ctime>
-#include <unistd.h>
 #include <stdexcept>
+#include <unistd.h>
 
 #include "header_window.h"
 #include "nc_window_const.h"
@@ -91,8 +91,8 @@ void HeaderWindow::resize(MainWindow& m)
     {
         werase(_window);
         wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER , ACS_LLCORNER, ACS_LRCORNER);
-        char HOST_NAME[HOST_SIZE];
-        gethostname(HOST_NAME, HOST_SIZE);
+        char HOST_NAME[HEADER::HOST_SIZE];
+        gethostname(HOST_NAME, HEADER::HOST_SIZE);
         mvwprintw(_window, HEADER::MEMO_LINE, FIRST_CHAR_POS, "%s", "Nfstrace watch plugin. To scroll press up or down keys. Ctrl + c to exit.");
         mvwprintw(_window, HEADER::HOST_LINE, FIRST_CHAR_POS, "Host name:\t %s", HOST_NAME);
     }

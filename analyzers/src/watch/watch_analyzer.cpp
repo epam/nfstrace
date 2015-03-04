@@ -19,17 +19,18 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <algorithm>
 #include <iostream>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 #include <unistd.h>
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/types.h>
 
-#include "./protocols/nfsv3_protocol.h"
-#include "./protocols/nfsv4_protocol.h"
+#include "protocols/nfsv3_protocol.h"
+#include "protocols/nfsv4_protocol.h"
 #include "watch_analyzer.h"
 //------------------------------------------------------------------------------
 WatchAnalyzer::WatchAnalyzer(const char* opts)
@@ -43,10 +44,10 @@ WatchAnalyzer::~WatchAnalyzer()
     try
     {
         delete(gui);
-        for (auto p : protocols)
-        {
+        for_each (protocols.begin(), protocols.end(), [&](AbstractProtocol*& p)
+        { 
             delete(p);
-        }
+        });
     }
     catch (std::exception& e)
     {

@@ -19,6 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <algorithm>
 #include <ctime>
 #include <unistd.h>
 
@@ -61,7 +62,7 @@ StatisticsWindow::StatisticsWindow(MainWindow& w, StatisticsContainers& c)
     {
         _allProtocols.push_back((i.first)->getProtocolName());
         _scrollOffset.insert(std::make_pair<AbstractProtocol*, std::size_t>((AbstractProtocol*)i.first, 0));
-    }
+    };
     _activeProtocol = (c.begin())->first;
     _statistic = c.at(_activeProtocol);
     resize(w);
@@ -94,7 +95,7 @@ void StatisticsWindow::updateProtocol(AbstractProtocol* p)
     wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER , ACS_LLCORNER, ACS_LRCORNER);
 
     std::string tmp("  ");
-    for (auto s : _allProtocols)
+    for_each (_allProtocols.begin(), _allProtocols.end(), [&](std::string& s)
     {
         if (!s.compare(_activeProtocol->getProtocolName()))
         {
@@ -104,8 +105,8 @@ void StatisticsWindow::updateProtocol(AbstractProtocol* p)
         {
             tmp += std::string("   ") + s + std::string("   ");
         }
-    }
 
+    });
     mvwprintw(_window, STATISTICS::PROTOCOLS_LINE , FIRST_CHAR_POS, "%s", tmp.c_str());
 
     for (unsigned int i = 0; i < p->getAmount(); i++)
@@ -125,10 +126,7 @@ void StatisticsWindow::update(const ProtocolStatistic& d)
     {
         return;
     }
-    for (auto p : _statistic)
-    {
-        m += p;
-    }
+    m = std::accumulate(_statistic.begin(), _statistic.end(), 0);
     for (unsigned int i = 0; i < _statistic.size(); i++)
     {
         if ( canWrite(i))

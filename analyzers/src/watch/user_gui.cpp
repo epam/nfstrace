@@ -26,9 +26,9 @@
 #include <unistd.h>
 
 #include <api/plugin_api.h>
-#include "./nc_windows/main_window.h"
-#include "./nc_windows/header_window.h"
-#include "./nc_windows/statistics_window.h"
+#include "nc_windows/header_window.h"
+#include "nc_windows/main_window.h"
+#include "nc_windows/statistics_window.h"
 #include "user_gui.h"
 //-----------------------------------------------------------------------------
 namespace
