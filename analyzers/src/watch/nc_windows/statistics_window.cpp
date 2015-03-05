@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 #include <algorithm>
 #include <ctime>
+#include <numeric>
 #include <unistd.h>
 
 #include "nc_window_const.h"

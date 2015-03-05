@@ -19,6 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <algorithm>
 #include <ctime>
 #include <stdexcept>
 #include <unistd.h>
