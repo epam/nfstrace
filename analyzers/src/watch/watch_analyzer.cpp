@@ -34,25 +34,13 @@
 #include "watch_analyzer.h"
 //------------------------------------------------------------------------------
 WatchAnalyzer::WatchAnalyzer(const char* opts)
-: protocols {(new NFSv4Protocol()), (new NFSv3Protocol())}
-, gui {new UserGUI(opts, protocols)}
+: protocols {std::shared_ptr<AbstractProtocol>(new NFSv4Protocol()), std::shared_ptr<AbstractProtocol> (new NFSv3Protocol())}
+, gui {opts, protocols}
 {
 }
 
 WatchAnalyzer::~WatchAnalyzer()
 {
-    try
-    {
-        delete(gui);
-        for_each (protocols.begin(), protocols.end(), [&](AbstractProtocol*& p)
-        { 
-            delete(p);
-        });
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << "Error in libwatch plugin. " << e.what();
-    }
 }
 
 void WatchAnalyzer::null(const RPCProcedure* proc,
@@ -137,7 +125,7 @@ void WatchAnalyzer::on_unix_signal(int signo)
 {
     if (signo == SIGWINCH)
     {
-        gui->enableUpdate();
+        gui.enableUpdate();
     }
 }
 
@@ -178,8 +166,8 @@ void WatchAnalyzer::account(const RPCProcedure* proc,
         ++nfs3_proc_count.at(nfs_proc);
     }
 
-    gui->update(protocols[1], nfs3_proc_count);
-    gui->update(protocols[0], nfs4_proc_count);
+    gui.update(protocols[1].get(), nfs3_proc_count);
+    gui.update(protocols[0].get(), nfs4_proc_count);
 }
 //------------------------------------------------------------------------------
 extern "C"

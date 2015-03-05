@@ -24,6 +24,7 @@
 //------------------------------------------------------------------------------
 #include <atomic>
 #include <cstdlib>
+#include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
@@ -53,7 +54,7 @@ private:
 public:
 
     UserGUI() = delete;
-    UserGUI(const char*, std::vector<AbstractProtocol*>&);
+    UserGUI(const char*, std::vector<std::shared_ptr<AbstractProtocol> >&);
     ~UserGUI();
 
     /*! Update Protocol's data.

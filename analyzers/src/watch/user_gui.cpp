@@ -149,7 +149,7 @@ void UserGUI::run()
     }
 }
 
-UserGUI::UserGUI(const char* opts, std::vector<AbstractProtocol*>& v)
+UserGUI::UserGUI(const char* opts, std::vector<std::shared_ptr<AbstractProtocol> >& v)
 : _refresh_delta {900000}
 , _shouldResize {false}
 , _running {ATOMIC_FLAG_INIT}
@@ -161,14 +161,14 @@ UserGUI::UserGUI(const char* opts, std::vector<AbstractProtocol*>& v)
         {
             _refresh_delta = std::stoul(opts);
         }
-        for (auto i : v)
+        for (auto it = v.begin(); it != v.end(); ++it)
         {
-            _allProtocols.push_back(i->getProtocolName());
-            _statisticsContainers.insert(std::make_pair<AbstractProtocol*, std::vector<std::size_t> >((AbstractProtocol* && )i, std::vector<std::size_t>(i->getAmount(), 0)));
+            _allProtocols.push_back((it->get())->getProtocolName());
+            _statisticsContainers.insert(std::make_pair<AbstractProtocol*, std::vector<std::size_t> >((AbstractProtocol* && )(it->get()), std::vector<std::size_t>(it->get()->getAmount(), 0)));
         }
         if (_activeProtocol == nullptr && ! v.empty())
         {
-            _activeProtocol = v.back();
+            _activeProtocol = v.back().get();
         }
     }
     catch (std::exception& e)
