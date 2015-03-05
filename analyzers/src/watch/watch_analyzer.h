@@ -115,8 +115,8 @@ private:
     void count_proc(const RPCProcedure* proc);
     void account(const RPCProcedure*,
                  const struct NFS4::COMPOUND4res* res = nullptr);
-    std::vector<AbstractProtocol* > protocols;
-    UserGUI* gui;
+    std::vector<std::shared_ptr<AbstractProtocol> > protocols;
+    UserGUI gui;
 };
 //------------------------------------------------------------------------------
 #endif // WATCH_ANALYZER_H
