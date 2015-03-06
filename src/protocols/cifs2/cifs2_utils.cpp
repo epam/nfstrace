@@ -157,6 +157,43 @@ namespace
         return nullptr;
     }
 
+    const char* enumToCharPtr(const NST::API::SMBv2::NTStatus value)
+    { 
+        using namespace NST::API::SMBv2;
+        switch(value)
+        {
+            case NTStatus::STATUS_SUCCESS: return "STATUS_SUCCESS";
+            case NTStatus::STATUS_NO_MORE_FILES: return "STATUS_NO_MORE_FILES";
+            case NTStatus::STATUS_INVALID_HANDLE: return "STATUS_INVALID_HANDLE";
+            case NTStatus::STATUS_INVALID_PARAMETER: return "STATUS_INVALID_PARAMETER";
+            case NTStatus::STATUS_NO_SUCH_FILE: return "STATUS_NO_SUCH_FILE";
+            case NTStatus::STATUS_MORE_PROCESSING_REQUIRED: return "STATUS_MORE_PROCESSING_REQUIRED";
+            case NTStatus::STATUS_INVALID_SYSTEM_SERVICE: return "STATUS_INVALID_SYSTEM_SERVICE";
+            case NTStatus::STATUS_ACCESS_DENIED: return "STATUS_ACCESS_DENIED";
+            case NTStatus::STATUS_OBJECT_NAME_INVALID: return "STATUS_OBJECT_NAME_INVALID";
+            case NTStatus::STATUS_OBJECT_NAME_NOT_FOUND: return "STATUS_OBJECT_NAME_NOT_FOUND";
+            case NTStatus::STATUS_OBJECT_NAME_COLLISION: return "STATUS_OBJECT_NAME_COLLISION";
+            case NTStatus::STATUS_OBJECT_PATH_NOT_FOUND: return "STATUS_OBJECT_PATH_NOT_FOUND";
+            case NTStatus::STATUS_OBJECT_PATH_SYNTAX_BAD: return "STATUS_OBJECT_PATH_SYNTAX_BAD";
+            case NTStatus::STATUS_SHARING_VIOLATION: return "STATUS_SHARING_VIOLATION";
+            case NTStatus::STATUS_EA_TOO_LARGE: return "STATUS_EA_TOO_LARGE";
+            case NTStatus::STATUS_FILE_LOCK_CONFLICT: return "STATUS_FILE_LOCK_CONFLICT";
+            case NTStatus::STATUS_LOCK_NOT_GRANTED: return "STATUS_LOCK_NOT_GRANTED";
+            case NTStatus::STATUS_LOGON_FAILURE: return "STATUS_LOGON_FAILURE";
+            case NTStatus::STATUS_RANGE_NOT_LOCKED: return "STATUS_RANGE_NOT_LOCKED";
+            case NTStatus::STATUS_FILE_IS_A_DIRECTORY: return "STATUS_FILE_IS_A_DIRECTORY";
+            case NTStatus::STATUS_NOT_SUPPORTED: return "STATUS_NOT_SUPPORTED";
+            case NTStatus::STATUS_BAD_DEVICE_TYPE: return "STATUS_BAD_DEVICE_TYPE";
+            case NTStatus::STATUS_REQUEST_NOT_ACCEPTED: return "STATUS_REQUEST_NOT_ACCEPTED";
+            case NTStatus::STATUS_DIRECTORY_NOT_EMPTY: return "STATUS_DIRECTORY_NOT_EMPTY";
+            case NTStatus::STATUS_NOT_A_DIRECTORY: return "STATUS_NOT_A_DIRECTORY";
+            case NTStatus::STATUS_CANCELLED: return "STATUS_CANCELLED";
+        }
+
+        assert("enumToCharPtr: Cannot conver input value into string representation.");
+        return nullptr;
+    }
+
     inline std::string ClearFromLastDelimiter(std::string str, std::string delimiter = flagDelimiter)
     {
         if (str.length() == 0) return str;
@@ -877,6 +914,14 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SessionFlags v
     {
         os << " (" << enumToFlags(value) << ")";
     }
+    return os;
+}
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::NTStatus value)
+{
+    using namespace NST::API::SMBv2; 
+    os << enumToCharPtr(value) << " (";
+    print_hex32(os, to_integral(value));
+    os << ")\n";
     return os;
 }
 
