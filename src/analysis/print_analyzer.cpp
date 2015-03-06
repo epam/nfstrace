@@ -165,11 +165,10 @@ void print_smbv2_common_info(std::ostream& out, Commands cmdEnum, CommandType* c
     print_hex16(out, to_integral(cmdEnum));
     out << ")\n"
         << "  Structure size = ";
-    print_hex16(out, cmd->req_header->StructureSize);
-    out << "\n  Credit Charge = " << cmd->req_header->CreditCharge << "\n";
+    print_hex16(out, cmd->StructureSize);
+    out << "\n  Credit Charge = " << cmd->CreditCharge << "\n";
     out << "  Session Id = ";
-    print_hex64(out, cmd->req_header->SessionId);
-    out << "\n";
+    print_hex64(out, cmd->SessionId);
 }
 
 template<typename CommandType>
@@ -178,14 +177,14 @@ void print_smbv2_common_info_req(std::ostream& out, Commands cmdEnum, CommandTyp
     out << "\n";
     NST::utils::operator<<(out, *(cmd->session));
     out << "\n";
-    print_smbv2_common_info(out, cmdEnum, cmd, "request");
+    print_smbv2_common_info(out, cmdEnum, cmd->req_header, "request");
 }
 
 template<typename CommandType>
 void print_smbv2_common_info_resp(std::ostream& out, Commands cmdEnum, CommandType* cmd)
 {
-    print_smbv2_common_info(out, cmdEnum, cmd, "response");
-    out << "  NT Status = " << static_cast<NST::API::SMBv2::NTStatus>(cmd->res_header->status) << "\n";
+    print_smbv2_common_info(out, cmdEnum, cmd->res_header, "response");
+    out << "\n  NT Status = " << static_cast<NST::API::SMBv2::NTStatus>(cmd->res_header->status);
 }
 
 void print_time(std::ostream& out, uint64_t time)
@@ -217,7 +216,6 @@ void print_buffer(std::ostream& out, const uint8_t *buffer, uint16_t len)
     {
         out << char_buffer[i];
     }
-    out << "\n";
 }
 
 } // unnamed namespace
@@ -997,7 +995,7 @@ void PrintAnalyzer::queryDirSMBv2(const SMBv2::QueryDirCommand* cmd,
 {
     Commands cmdEnum = Commands::QUERY_DIRECTORY;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
-    out << "  Info level = " << cmd->parg->infoType << "\n"
+    out << "\n  Info level = " << cmd->parg->infoType << "\n"
         << "  File index = " << cmd->parg->FileIndex << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
 }
