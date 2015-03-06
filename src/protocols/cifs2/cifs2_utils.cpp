@@ -84,6 +84,11 @@ namespace
         return to_integral(lhs) & to_integral(rhs);
     }
 
+    inline bool operator&(const NST::API::SMBv2::AccessMask lhs, const NST::API::SMBv2::AccessMask rhs)
+    {
+        return to_integral(lhs) & to_integral(rhs);
+    }
+
     const char* enumToCharPtr(const NST::API::SMBv2::OplockLevels value)
     {
         switch (value)
@@ -616,6 +621,92 @@ namespace
         } 
         return ClearFromLastDelimiter(str.str());
     }
+
+    std::string enumToFlags(const NST::API::SMBv2::AccessMask value, std::string delimiter = flagDelimiter)
+    {
+        std::ostringstream str;
+        if(value & AccessMask::FILE_READ_DATA)
+        {
+            str << "FILE_READ_DATA" << delimiter;
+        } 
+        if(value & AccessMask::FILE_WRITE_DATA)
+        {
+            str << "FILE_WRITE_DATA" << delimiter;
+        } 
+        if(value & AccessMask::FILE_APPEND_DATA)
+        {
+            str << "FILE_APPEND_DATA" << delimiter;
+        } 
+        if(value & AccessMask::FILE_READ_EA)
+        {
+            str << "FILE_READ_EA" << delimiter;
+        } 
+        if(value & AccessMask::FILE_WRITE_EA)
+        {
+            str << "FILE_WRITE_EA" << delimiter;
+        } 
+        if(value & AccessMask::FILE_DELETE_CHILD)
+        {
+            str << "FILE_DELETE_CHILD" << delimiter;
+        } 
+        if(value & AccessMask::FILE_EXECUTE)
+        {
+            str << "FILE_EXECUTE" << delimiter;
+        } 
+        if(value & AccessMask::FILE_READ_ATTRIBUTES)
+        {
+            str << "FILE_READ_ATTRIBUTES" << delimiter;
+        } 
+        if(value & AccessMask::FILE_WRITE_ATTRIBUTES)
+        {
+            str << "FILE_WRITE_ATTRIBUTES" << delimiter;
+        } 
+        if(value & AccessMask::DELETE)
+        {
+            str << "DELETE" << delimiter;
+        } 
+        if(value & AccessMask::READ_CONTROL)
+        {
+            str << "READ_CONTROL" << delimiter;
+        } 
+        if(value & AccessMask::WRITE_DAC)
+        {
+            str << "WRITE_DAC" << delimiter;
+        } 
+        if(value & AccessMask::WRITE_OWNER)
+        {
+            str << "WRITE_OWNER" << delimiter;
+        } 
+        if(value & AccessMask::SYNCHRONIZE)
+        {
+            str << "SYNCHRONIZE" << delimiter;
+        } 
+        if(value & AccessMask::ACCESS_SYSTEM_SECURITY)
+        {
+            str << "ACCESS_SYSTEM_SECURITY" << delimiter;
+        } 
+        if(value & AccessMask::MAXIMUM_ALLOWED)
+        {
+            str << "MAXIMUM_ALLOWED" << delimiter;
+        } 
+        if(value & AccessMask::GENERIC_ALL)
+        {
+            str << "GENERIC_ALL" << delimiter;
+        } 
+        if(value & AccessMask::GENERIC_EXECUTE)
+        {
+            str << "GENERIC_EXECUTE" << delimiter;
+        } 
+        if(value & AccessMask::GENERIC_WRITE)
+        {
+            str << "GENERIC_WRITE" << delimiter;
+        } 
+        if(value & AccessMask::GENERIC_READ)
+        {
+            str << "GENERIC_READ" << delimiter;
+        } 
+        return ClearFromLastDelimiter(str.str());
+    }
 }
 
 void print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoType, const uint8_t infoClass)
@@ -922,6 +1013,17 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::NTStatus value
     os << enumToCharPtr(value) << " (";
     print_hex32(os, to_integral(value));
     os << ")\n";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::AccessMask value)
+{
+    using namespace NST::API::SMBv2; 
+    print_hex32(os, to_integral(value));
+    if (to_integral(value) > 0)
+    {
+        os << " (" << enumToFlags(value) << ")";
+    }
     return os;
 }
 
