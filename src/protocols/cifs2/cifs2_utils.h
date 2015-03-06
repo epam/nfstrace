@@ -61,6 +61,7 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SessionFlagsBi
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SecurityModeShort value);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities capabilities);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SessionFlags value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::NTStatus value);
 }// namespace CIFSv2    
 }// namespace protocols 
 }// namespace NST       

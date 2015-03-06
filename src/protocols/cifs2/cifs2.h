@@ -23,6 +23,7 @@
 #define CIFSv2_HEADER_H
 //------------------------------------------------------------------------------
 #include "api/cifs_commands.h"
+#include "api/cifs2_commands.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -72,6 +73,7 @@ enum class Commands : uint16_t
     CMD_COUNT
 };
 
+
 /*! \class Raw CIFS v2 message header
  */
 struct RawMessageHeader
@@ -85,7 +87,7 @@ struct RawMessageHeader
     int16_t StructureSize;//!< In the SMB 2.002 dialect, this field MUST NOT be used and MUST be reserved. The sender MUST set this to 0, and the receiver MUST ignore it. In all other dialects, this field indicates the number of credits that this request consumes.
     int16_t CreditCharge;//!< In a request, this field is interpreted in different ways depending on the SMB2 dialect. In the SMB 3.x dialect family, this field is interpreted as the ChannelSequence field followed by the Reserved field in a request.
 
-    int32_t status;//!< Used to communicate error messages from the server to the client.
+    uint32_t status;//!< Used to communicate error messages from the server to the client.
 
     Commands cmd_code;//!< Code of SMB command
     int16_t Credit;//!< This MUST be set to 64, which is the size, in bytes, of the SMB2 header structure.
@@ -199,6 +201,8 @@ inline const Cmd command(Data& request, Data& response, Session* session)
     cmd.ctimestamp = &request->timestamp;
     cmd.rtimestamp = response ? &response->timestamp : &request->timestamp;
 
+    cmd.req_header = reinterpret_cast<const RawMessageHeader*>(request->data);
+    cmd.res_header = reinterpret_cast<const RawMessageHeader*>(response->data);
     cmd.parg = reinterpret_cast<const typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
     cmd.pres = response ? reinterpret_cast<const typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader)) : nullptr;
 
