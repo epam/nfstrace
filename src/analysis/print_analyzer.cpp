@@ -179,13 +179,13 @@ void print_smbv2_common_info_req(std::ostream& out, Commands cmdEnum, CommandTyp
     NST::utils::operator<<(out, *(cmd->session));
     out << "\n";
     print_smbv2_common_info(out, cmdEnum, cmd, "request");
-    out << "  NT Status = " << static_cast<NST::API::SMBv2::NTStatus>(cmd->res_header->status) << "\n";
 }
 
 template<typename CommandType>
 void print_smbv2_common_info_resp(std::ostream& out, Commands cmdEnum, CommandType* cmd)
 {
     print_smbv2_common_info(out, cmdEnum, cmd, "response");
+    out << "  NT Status = " << static_cast<NST::API::SMBv2::NTStatus>(cmd->res_header->status) << "\n";
 }
 
 void print_time(std::ostream& out, uint64_t time)
@@ -794,7 +794,8 @@ void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd,
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
     out << "  Share types = " << res->ShareType << "\n"
         << "  Capabilities = "  << res->capabilities << "\n"
-        << "  Share flags = " << res->shareFlags << "\n";
+        << "  Share flags = " << res->shareFlags << "\n"
+        << "  Access mask = " << static_cast<NST::API::SMBv2::AccessMask>(res->MaximalAccess) << "\n";
 }
 void PrintAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd,
                                         const SMBv2::TreeDisconnectRequest*,
@@ -858,28 +859,29 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
         << "  Response Flags = ";
     print_hex8(out, res->flag);
     out << "\n"
-        << "  Create Action = " << res->CreateAction << "\n"
-        << "  Create = ";
-    print_time(out, res->CreationTime);
+        << "  Create Action = " << res->CreateAction << "\n";
+    if (cmd->res_header->status == to_integral(NST::API::SMBv2::NTStatus::STATUS_SUCCESS))
+    {
+        out << "  Create = ";
+        print_time(out, res->CreationTime);
 
-    out << "  Last Access = ";
-    print_time(out, res->LastAccessTime);
+        out << "  Last Access = ";
+        print_time(out, res->LastAccessTime);
 
-    out << "  Last Write = ";
-    print_time(out, res->LastWriteTime);
+        out << "  Last Write = ";
+        print_time(out, res->LastWriteTime);
 
-    out << "  Last Change = ";
-    print_time(out, res->ChangeTime);
+        out << "  Last Change = ";
+        print_time(out, res->ChangeTime);
 
-    out << "  Allocation Size = ";
-    print_time(out, res->AllocationSize);
+        out << "  Allocation Size = ";
+        print_time(out, res->AllocationSize);
 
-    out << "  End Of File = ";
-    print_time(out, res->EndofFile);
+        out << "  End Of File = ";
+        print_time(out, res->EndofFile);
 
-    out << "  File Attributes = "
-        << res->attributes
-        << "\n";
+        out << "  File Attributes = " << res->attributes << "\n";
+    }
 }
 
 void PrintAnalyzer::flushSMBv2(const SMBv2::FlushCommand* cmd,
