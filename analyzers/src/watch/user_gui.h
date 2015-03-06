@@ -39,7 +39,7 @@ public:
     using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
 
 private:
-    unsigned long _refresh_delta;
+    unsigned long _refresh_delta; // in microseconds
 
     std::atomic<bool> _shouldResize;
     std::mutex _statisticsDeltaMutex;
@@ -51,10 +51,11 @@ private:
     std::thread _guiThread;
     std::vector<std::string> _allProtocols;
     void run();
+    timeval getTimeval();
 public:
 
     UserGUI() = delete;
-    UserGUI(const char*, std::vector<std::shared_ptr<AbstractProtocol> >&);
+    UserGUI(const char*, std::vector<AbstractProtocol* >&);
     ~UserGUI();
 
     /*! Update Protocol's data.

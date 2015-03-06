@@ -29,12 +29,12 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-#include "protocols/nfsv3_protocol.h"
-#include "protocols/nfsv4_protocol.h"
 #include "watch_analyzer.h"
 //------------------------------------------------------------------------------
 WatchAnalyzer::WatchAnalyzer(const char* opts)
-: protocols {std::shared_ptr<AbstractProtocol>(new NFSv4Protocol()), std::shared_ptr<AbstractProtocol> (new NFSv3Protocol())}
+: _nfsv4{}
+, _nfsv3{}
+, protocols {&_nfsv4,&_nfsv3}
 , gui {opts, protocols}
 {
 }
@@ -166,8 +166,8 @@ void WatchAnalyzer::account(const RPCProcedure* proc,
         ++nfs3_proc_count.at(nfs_proc);
     }
 
-    gui.update(protocols[1].get(), nfs3_proc_count);
-    gui.update(protocols[0].get(), nfs4_proc_count);
+    gui.update(&_nfsv3, nfs3_proc_count);
+    gui.update(&_nfsv4, nfs4_proc_count);
 }
 //------------------------------------------------------------------------------
 extern "C"
