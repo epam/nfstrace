@@ -83,34 +83,12 @@ int MainWindow::inputKeys()
 {
     int key = wgetch(_window);
 
-    if (key == KEY_UP || key == KEY_DOWN || key == KEY_LEFT || key == KEY_RIGHT)
+    if (key != KEY_UP && key != KEY_DOWN && key != KEY_LEFT && key != KEY_RIGHT)
     {
-        if (key == KEY_UP)
-        {
-            cleanStdin(key);
-            return KEY_UP;
-        }
-        else if (key == KEY_DOWN)
-        {
-            cleanStdin(key);
-            return KEY_DOWN;
-        }
-        else if (key == KEY_LEFT)
-        {
-            cleanStdin(key);
-            return KEY_LEFT;
-        }
-        else if (key == KEY_RIGHT)
-        {
-            cleanStdin(key);
-            return KEY_RIGHT;
-        }
+        key = 0;
     }
-    else
-    {
-        cleanStdin(key);
-    }
-    return 0;
+    cleanStdin(key);
+    return key;
 }
 
 void MainWindow::resize()
