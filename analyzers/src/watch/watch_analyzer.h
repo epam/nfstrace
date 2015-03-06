@@ -26,7 +26,8 @@
 #include <condition_variable>
 
 #include <api/plugin_api.h> // include plugin development definitions
-#include "protocols/abstract_protocol.h"
+#include "protocols/nfsv3_protocol.h"
+#include "protocols/nfsv4_protocol.h"
 #include "user_gui.h"
 //------------------------------------------------------------------------------
 class WatchAnalyzer : public IAnalyzer
@@ -115,7 +116,10 @@ private:
     void count_proc(const RPCProcedure* proc);
     void account(const RPCProcedure*,
                  const struct NFS4::COMPOUND4res* res = nullptr);
-    std::vector<std::shared_ptr<AbstractProtocol> > protocols;
+    NFSv4Protocol _nfsv4;
+    NFSv3Protocol _nfsv3;
+
+    std::vector<AbstractProtocol* > protocols;
     UserGUI gui;
 };
 //------------------------------------------------------------------------------

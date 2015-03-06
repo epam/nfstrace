@@ -78,16 +78,19 @@ void StatisticsWindow::scrollContent(int i)
     if (i > 0 && _scrollOffset.at(_activeProtocol) <= MAXSHIFT - SHIFTCU)
     {
         _scrollOffset.at(_activeProtocol) += SHIFTCU;
+        updateProtocol(_activeProtocol);
     }
     else if (i < 0 && _scrollOffset.at(_activeProtocol) >= SHIFTCU)
     {
         _scrollOffset.at(_activeProtocol) -= SHIFTCU;
+        updateProtocol(_activeProtocol);
     }
 }
 
 void StatisticsWindow::updateProtocol(AbstractProtocol* p)
 {
-    _activeProtocol = p;
+    if(p != nullptr)
+        _activeProtocol = p;
     if (_window == nullptr)
     {
         return;
@@ -110,7 +113,7 @@ void StatisticsWindow::updateProtocol(AbstractProtocol* p)
     });
     mvwprintw(_window, STATISTICS::PROTOCOLS_LINE , FIRST_CHAR_POS, "%s", tmp.c_str());
 
-    for (unsigned int i = 0; i < p->getAmount(); i++)
+    for (unsigned int i = 0; i < _activeProtocol->getAmount(); i++)
     {
         if ( canWrite(i))
         {
@@ -147,14 +150,10 @@ void StatisticsWindow::resize(MainWindow& m)
     {
         destroy();
     }
-    int tmp_size;
+    int tmp_size = STATISTICS::DEFAULT_LINES;
     if (_activeProtocol != nullptr)
     {
         tmp_size = _activeProtocol->getAmount() + 2 * BORDER_SIZE + 2 * EMPTY_LINE + STATISTICS::PROTOCOLS_LINE;
-    }
-    else
-    {
-        tmp_size = STATISTICS::DEFAULT_LINES;
     }
     if (m._window != nullptr && m._window->_maxy > GUI_HEADER_HEIGHT)
     {

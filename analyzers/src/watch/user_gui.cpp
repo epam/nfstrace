@@ -19,6 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <algorithm>
 #include <exception>
 #include <iostream>
 #include <system_error>
@@ -53,12 +54,9 @@ void UserGUI::run()
         FD_ZERO(&rfds);
         FD_SET(STDIN_FILENO, &rfds);
 
-        /* Wait up to five seconds. */
-        struct timeval tv;
-        tv.tv_sec = _refresh_delta / MSEC;
-        tv.tv_usec = _refresh_delta % MSEC;
+        /* Set wait time. */
+        struct timeval tv = getTimeval();
 
-        int sel_rez;
         uint16_t key = 0;
 
         std::vector<std::size_t> tmp;
@@ -85,8 +83,7 @@ void UserGUI::run()
             statisticsWindow.update(tmp);
             mainWindow.update();
 
-            sel_rez = select(STDIN_FILENO + 1, &rfds, nullptr, nullptr, &tv);
-            if (sel_rez == -1)
+            if( select(STDIN_FILENO + 1, &rfds, nullptr, nullptr, &tv) == -1)
             {
                 break;
             }
@@ -95,52 +92,55 @@ void UserGUI::run()
                 key = mainWindow.inputKeys();
                 if (key == KEY_LEFT || key == KEY_RIGHT)
                 {
-                    for (std::vector<std::string>::iterator i = _allProtocols.begin(); i != _allProtocols.end(); ++i)
+                    auto it = find_if (_allProtocols.begin(), _allProtocols.end(), [&](std::string s)
                     {
-                        if (!i->compare(_activeProtocol->getProtocolName()))
+                        return !(s.compare(_activeProtocol->getProtocolName()));
+                    });
+                    if (it != _allProtocols.end())
+                    {
+                        if (key == KEY_RIGHT)
                         {
-                            if (key == KEY_RIGHT)
+                            if (it + 1 == _allProtocols.end())
+                                it = _allProtocols.begin();
+                            else
+                                ++it;
+                        }
+                        else if (key == KEY_LEFT)
+                        {
+                            if (it == _allProtocols.begin())
+                                it = _allProtocols.end() - 1;
+                            else
+                                --it;
+                        }
+                        auto a = find_if ( _statisticsContainers.begin(), _statisticsContainers.end(),[&](std::pair<AbstractProtocol*, std::vector<std::size_t> > p)
+                        {
+                            return !(p.first->getProtocolName().compare(*it));
+                        });
+                        if (a != _statisticsContainers.end())
+                        {
+                            _activeProtocol = a->first;
+                            statisticsWindow.setProtocol(_activeProtocol);
+                            statisticsWindow.resize(mainWindow);
                             {
-                                if (i == _allProtocols.begin()) { break; }
-                                --i;
+                                std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
+                                tmp = a->second;
                             }
-                            else if (key == KEY_LEFT)
-                            {
-                                if ((i + 1) == _allProtocols.end()) { break; }
-                                ++i;
-                            }
-                            for (auto a : _statisticsContainers)
-                            {
-                                if (!(a.first->getProtocolName()).compare(*i))
-                                {
-                                    {
-                                        std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
-                                        tmp = a.second;
-                                    }
-                                    _activeProtocol = a.first;
-                                    statisticsWindow.setProtocol(_activeProtocol);
-                                    statisticsWindow.resize(mainWindow);
-                                    statisticsWindow.update(tmp);
-                                }
-                            }
+                            statisticsWindow.update(tmp);
                         }
                     }
                 }
                 else if (key == KEY_UP)
                 {
                     statisticsWindow.scrollContent(SCROLL_UP);
-                    statisticsWindow.updateProtocol(_activeProtocol);
                     statisticsWindow.update(tmp);
                 }
                 else if (key == KEY_DOWN)
                 {
                     statisticsWindow.scrollContent(SCROLL_DOWN);
-                    statisticsWindow.updateProtocol(_activeProtocol);
                     statisticsWindow.update(tmp);
                 }
             }
-            tv.tv_sec = _refresh_delta / MSEC;
-            tv.tv_usec = _refresh_delta % MSEC;
+            tv = getTimeval();
         }
     }
     catch (std::runtime_error& e)
@@ -149,7 +149,15 @@ void UserGUI::run()
     }
 }
 
-UserGUI::UserGUI(const char* opts, std::vector<std::shared_ptr<AbstractProtocol> >& v)
+timeval UserGUI::getTimeval()
+{
+    struct timeval tv;
+    tv.tv_sec = _refresh_delta / MSEC;
+    tv.tv_usec = _refresh_delta % MSEC;
+    return tv;
+}
+
+UserGUI::UserGUI(const char* opts, std::vector<AbstractProtocol* >& data)
 : _refresh_delta {900000}
 , _shouldResize {false}
 , _running {ATOMIC_FLAG_INIT}
@@ -161,14 +169,14 @@ UserGUI::UserGUI(const char* opts, std::vector<std::shared_ptr<AbstractProtocol>
         {
             _refresh_delta = std::stoul(opts);
         }
-        for (auto it = v.begin(); it != v.end(); ++it)
+        for (auto it = data.begin(); it != data.end(); ++it)
         {
-            _allProtocols.push_back((it->get())->getProtocolName());
-            _statisticsContainers.insert(std::make_pair<AbstractProtocol*, std::vector<std::size_t> >((AbstractProtocol* && )(it->get()), std::vector<std::size_t>(it->get()->getAmount(), 0)));
+            _allProtocols.push_back((*it)->getProtocolName());
+            _statisticsContainers.insert(std::make_pair<AbstractProtocol*, std::vector<std::size_t> >((AbstractProtocol*&&)(*it), std::vector<std::size_t>((*it)->getAmount(), 0)));
         }
-        if (_activeProtocol == nullptr && ! v.empty())
+        if (_activeProtocol == nullptr && ! data.empty())
         {
-            _activeProtocol = v.back().get();
+            _activeProtocol = data.back();
         }
     }
     catch (std::exception& e)
