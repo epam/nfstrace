@@ -48,7 +48,7 @@ void StatisticsWindow::destroy()
 
 bool StatisticsWindow::canWrite(unsigned int i)
 {
-    return (i >= _scrollOffset.at(_activeProtocol) && i - _scrollOffset.at(_activeProtocol) + BORDER_SIZE < static_cast<unsigned int>(_window->_maxy));
+    return (i >= _scrollOffset.at(_activeProtocol) && i - _scrollOffset.at(_activeProtocol) + BORDER_SIZE + STATISTICS::FIRST_OPERATION_LINE < static_cast<unsigned int>(_window->_maxy));
 }
 
 StatisticsWindow::StatisticsWindow(MainWindow& w, StatisticsContainers& c)
