@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Vitali Adamenka
-// Description: Header for CIFSv2 protocol.
-// Copyright (c) 2015 EPAM Systems. All Rights Reserved.
+// Author: Andrey Kuznetsov
+// Description: Represents CIFS v2 commands
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,19 +19,46 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef CIFSV2_PROTOCOL_H
-#define CIFSV2_PROTOCOL_H
+#ifndef CIFSV2_COMMANDS_H
+#define CIFSV2_COMMANDS_H
 //------------------------------------------------------------------------------
-#include "abstract_protocol.h"
-#include "cifsv2_commands.h"
+#include "commandrepresenter.h"
 //------------------------------------------------------------------------------
-class CIFSv2Protocol : public AbstractProtocol
+struct SMBv2Commands : CIFSRepresenter::CommandRepresenter
 {
-public:
-    CIFSv2Protocol();
-    ~CIFSv2Protocol();
-    virtual const char* printProcedure(std::size_t);
+    /*!
+     * \brief The Commands enum commands codes
+     */
+    enum Commands
+    {
+        NEGOTIATE,
+        SESSION_SETUP,
+        LOGOFF,
+        TREE_CONNECT,
+        TREE_DISCONNECT,
+        CREATE,
+        CLOSE,
+        FLUSH,
+        READ,
+        WRITE,
+        LOCK,
+        IOCTL,
+        CANCEL,
+        ECHO,
+        QUERY_DIRECTORY,
+        CHANGE_NOTIFY,
+        QUERY_INFO,
+        SET_INFO,
+        OPLOCK_BREAK,
+        CMD_COUNT
+    };
+
+    const std::string command_description(int cmd_code) override final;
+
+    const std::string command_name(int cmd_code) override final;
+
+    size_t commands_count();
 };
 //------------------------------------------------------------------------------
-#endif // CIFSV2_PROTOCOL_H
+#endif // CIFS2_COMMANDS_H
 //------------------------------------------------------------------------------

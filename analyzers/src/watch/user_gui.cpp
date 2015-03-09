@@ -98,14 +98,14 @@ void UserGUI::run()
                     });
                     if (it != _allProtocols.end())
                     {
-                        if (key == KEY_RIGHT)
+                        if (key == KEY_LEFT)
                         {
                             if (it + 1 == _allProtocols.end())
                                 it = _allProtocols.begin();
                             else
                                 ++it;
                         }
-                        else if (key == KEY_LEFT)
+                        else if (key == KEY_RIGHT)
                         {
                             if (it == _allProtocols.begin())
                                 it = _allProtocols.end() - 1;

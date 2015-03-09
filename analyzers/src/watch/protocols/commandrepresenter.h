@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Vitali Adamenka
-// Description: Source for CIFSv2 protocol.
-// Copyright (c) 2015 EPAM Systems. All Rights Reserved.
+// Author: Andrey Kuznetsov
+// Description: Interface for command representers
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,24 +19,21 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <api/plugin_api.h> // include plugin development definitions
-#include "cifsv2_protocol.h"
+#ifndef COMMANDREPRESENTER_H
+#define COMMANDREPRESENTER_H
 //------------------------------------------------------------------------------
-CIFSv2Protocol::CIFSv2Protocol()
-: AbstractProtocol {"CIFS v2", SMBv2Commands::Commands::CMD_COUNT}
-{
-}
-
-CIFSv2Protocol::~CIFSv2Protocol()
-{
-}
-
-const char* CIFSv2Protocol::printProcedure(std::size_t i)
-{
-    if ( i >= SMBv2Commands::Commands::CMD_COUNT) { return nullptr; }
-    SMBv2Commands tmp;
-    return tmp.command_name(i).c_str();
-}
+#include <string>
 //------------------------------------------------------------------------------
-
+namespace CIFSRepresenter
+{
+struct CommandRepresenter
+{
+    virtual const std::string command_description(int cmd_code) = 0;
+    virtual const std::string command_name(int cmd_code) = 0;
+    virtual size_t commands_count() = 0;
+    virtual ~CommandRepresenter() {}
+};
+} // CIFSRepresenter
+//------------------------------------------------------------------------------
+#endif // COMMANDREPRESENTER_H
 //------------------------------------------------------------------------------
