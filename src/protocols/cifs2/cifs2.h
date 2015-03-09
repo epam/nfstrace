@@ -202,7 +202,8 @@ inline const Cmd command(Data& request, Data& response, Session* session)
     cmd.rtimestamp = response ? &response->timestamp : &request->timestamp;
 
     cmd.req_header = reinterpret_cast<const RawMessageHeader*>(request->data);
-    cmd.res_header = reinterpret_cast<const RawMessageHeader*>(response->data);
+    if(response)
+        cmd.res_header = reinterpret_cast<const RawMessageHeader*>(response->data);
     cmd.parg = reinterpret_cast<const typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
     cmd.pres = response ? reinterpret_cast<const typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader)) : nullptr;
 
