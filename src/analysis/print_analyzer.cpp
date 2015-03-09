@@ -183,8 +183,11 @@ void print_smbv2_common_info_req(std::ostream& out, Commands cmdEnum, CommandTyp
 template<typename CommandType>
 void print_smbv2_common_info_resp(std::ostream& out, Commands cmdEnum, CommandType* cmd)
 {
-    print_smbv2_common_info(out, cmdEnum, cmd->res_header, "response");
-    out << "\n  NT Status = " << static_cast<NST::API::SMBv2::NTStatus>(cmd->res_header->status);
+    if(cmd->res_header)
+    {
+        print_smbv2_common_info(out, cmdEnum, cmd->res_header, "response");
+        out << "\n  NT Status = " << static_cast<NST::API::SMBv2::NTStatus>(cmd->res_header->status);
+    }
 }
 
 void print_time(std::ostream& out, uint64_t time)
