@@ -22,6 +22,13 @@
 #include <api/plugin_api.h> // include plugin development definitions
 #include "nfsv4_protocol.h"
 //------------------------------------------------------------------------------
+namespace
+{
+const int NFSV4_NUMBER_OF_GROUPS = 2;
+const int PROCEDURES_GROUP = 1;
+const int OPERATIONS_GROUP = 2;
+}
+
 NFSv4Protocol::NFSv4Protocol()
 : AbstractProtocol {"NFS v4", ProcEnumNFS4::count}
 {
@@ -35,5 +42,20 @@ const char* NFSv4Protocol::printProcedure(std::size_t i)
 {
     if ( i > ProcEnumNFS4::count) { return nullptr; }
     return  print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(i));
+}
+
+std::size_t NFSv4Protocol::getGroups()
+{
+    return NFSV4_NUMBER_OF_GROUPS;
+}
+
+std::size_t NFSv4Protocol::getGroupBegin(std::size_t i)
+{
+    if(i == PROCEDURES_GROUP)
+        return 0;
+    else if(i == OPERATIONS_GROUP)
+        return ProcEnumNFS4::count_proc;
+    else
+        return getAmount();
 }
 //------------------------------------------------------------------------------

@@ -22,6 +22,11 @@
 #include "abstract_protocol.h"
 #include <api/plugin_api.h> // include plugin development definitions
 //------------------------------------------------------------------------------
+namespace
+{
+    const int EMPTY_GROUP = 1;
+}
+
 AbstractProtocol::AbstractProtocol(const char* n, std::size_t i)
 : name {n}
 , amount {i}
@@ -46,4 +51,18 @@ unsigned int AbstractProtocol::getAmount()
 {
     return amount;
 }
+
+std::size_t AbstractProtocol::getGroups()
+{
+    return EMPTY_GROUP;
+}
+
+std::size_t AbstractProtocol::getGroupBegin(std::size_t i)
+{
+    if( i == EMPTY_GROUP)
+        return 0;
+    else
+        return amount;
+}
+
 //------------------------------------------------------------------------------
