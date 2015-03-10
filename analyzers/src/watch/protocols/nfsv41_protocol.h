@@ -30,6 +30,8 @@ public:
     NFSv41Protocol();
     ~NFSv41Protocol();
     virtual const char* printProcedure(std::size_t);
+    virtual std::size_t getGroups();
+    virtual std::size_t getGroupBegin(std::size_t);
 };
 //------------------------------------------------------------------------------
 #endif // NFSV41_PROTOCOL_H

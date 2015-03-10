@@ -38,6 +38,16 @@ public:
     virtual const char* printProcedure(std::size_t);
 
     /*!
+     * Return number of groups
+     */
+    virtual std::size_t getGroups();
+
+    /*!
+     * Return first counter of group
+     */
+    virtual std::size_t getGroupBegin(std::size_t);
+
+    /*!
      * Return amount of operations.
      */
     unsigned int getAmount();
@@ -46,6 +56,7 @@ public:
      * Return protocol's name.
      */
     std::string getProtocolName();
+
 private:
     std::string name;
     std::size_t amount;

@@ -30,6 +30,8 @@ public:
     NFSv4Protocol();
     ~NFSv4Protocol();
     virtual const char* printProcedure(std::size_t);
+    virtual std::size_t getGroups();
+    virtual std::size_t getGroupBegin(std::size_t);
 };
 //------------------------------------------------------------------------------
 #endif // PROTOCOLS_H
