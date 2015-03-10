@@ -31,7 +31,14 @@ namespace API
  */
 namespace SMBv2
 {
-
+// https://msdn.microsoft.com/en-us/library/ff718266.aspx
+struct Guid
+{
+  uint32_t Data1;               // unsigned long  replaced by uint32_t
+  uint16_t Data2;               // unsigned short replaced by uint16_t
+  uint16_t Data3;               // unsigned short replaced by uint16_t
+  uint8_t  Data4[8];            // byte           replaced by uint8_t
+}  __attribute__ ((__packed__));
 /*!
  * \brief The errResponse struct
  * The SMB2 ERROR Response packet is sent by the server
