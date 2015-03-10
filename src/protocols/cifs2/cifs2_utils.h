@@ -40,6 +40,13 @@ inline constexpr auto to_integral(E e) -> typename std::underlying_type<E>::type
     return static_cast<typename std::underlying_type<E>::type>(e);
 }
 
+inline std::string ClearFromLastDelimiter(std::string str, std::string delimiter)
+{
+    if (str.length() == 0) return str;
+    return str.erase(str.length() - delimiter.length());
+}
+
+
 void print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoType, const uint8_t infoClass);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::QueryInfoLevels infoLevels);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::FsInfoLevels infoLevels);
@@ -63,6 +70,8 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::Capabilities c
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SessionFlags value);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::NTStatus value);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::AccessMask value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CloseFlags value);
+std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SecurityMode value);
 }// namespace CIFSv2    
 }// namespace protocols 
 }// namespace NST       

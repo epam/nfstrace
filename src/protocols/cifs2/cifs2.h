@@ -137,54 +137,49 @@ const MessageHeader* get_header(const uint8_t* data);
  *
  * \param - reference to an object whose fields will be converted
  */
-template<typename ParamType> inline void parse(ParamType& )
-{
-// TODO: Fix this in future!
-//    static_assert(FALSE, "This method is not supposed to be used."
-//                         "Please make template specialization for the specified type." );
-}
-template<> void parse(SMBv2::ErrResponse& );
-template<> void parse(SMBv2::NegotiateRequest& );
-template<> void parse(SMBv2::NegotiateResponse& );
-template<> void parse(SMBv2::SessionSetupRequest& );
-template<> void parse(SMBv2::SessionSetupResponse& );
-template<> void parse(SMBv2::LogOffRequest& );
-template<> void parse(SMBv2::LogOffResponse& );
-template<> void parse(SMBv2::TreeConnectRequest& );
-template<> void parse(SMBv2::TreeConnectResponse& );
-template<> void parse(SMBv2::TreeDisconnectRequest& );
-template<> void parse(SMBv2::TreeDisconnectResponse& );
-template<> void parse(SMBv2::CreateRequest& );
-template<> void parse(SMBv2::CreateResponse& );
-template<> void parse(SMBv2::CloseRequest& );
-template<> void parse(SMBv2::CloseResponse& );
-template<> void parse(SMBv2::EchoRequest& );
-template<> void parse(SMBv2::EchoResponse& );
-template<> void parse(SMBv2::QueryInfoRequest& );
-template<> void parse(SMBv2::QueryInfoResponse& );
-template<> void parse(SMBv2::QueryDirRequest& );
-template<> void parse(SMBv2::QueryDirResponse& );
-template<> void parse(SMBv2::FlushRequest& );
-template<> void parse(SMBv2::FlushResponse& );
-template<> void parse(SMBv2::ReadRequest& );
-template<> void parse(SMBv2::ReadResponse& );
-template<> void parse(SMBv2::Lock& );
-template<> void parse(SMBv2::WriteRequest& );
-template<> void parse(SMBv2::WriteResponse& );
-template<> void parse(SMBv2::LockRequest& );
-template<> void parse(SMBv2::LockResponse& );
-template<> void parse(SMBv2::CancelRequest& );
-template<> void parse(SMBv2::ChangeNotifyRequest& );
-template<> void parse(SMBv2::FileNotifyInformation& );
-template<> void parse(SMBv2::ChangeNotifyResponse& );
-template<> void parse(SMBv2::OplockAcknowledgment& );
-template<> void parse(SMBv2::OplockResponse& );
-template<> void parse(SMBv2::IoCtlRequest& );
-template<> void parse(SMBv2::IoCtlResponse& );
-template<> void parse(SMBv2::SetInfoRequest& );
-template<> void parse(SMBv2::SetInfoResponse& );
-template<> void parse(SMBv2::CancelResponce& );
-template<> void parse(SMBv2::CancelRequest& );
+
+void parseGuid(uint8_t* );
+void parse(SMBv2::ErrResponse*&);
+void parse(SMBv2::NegotiateRequest*&);
+void parse(SMBv2::NegotiateResponse*&);
+void parse(SMBv2::SessionSetupRequest*&);
+void parse(SMBv2::SessionSetupResponse*&);
+void parse(SMBv2::LogOffRequest*&);
+void parse(SMBv2::LogOffResponse*&);
+void parse(SMBv2::TreeConnectRequest*&);
+void parse(SMBv2::TreeConnectResponse*&);
+void parse(SMBv2::TreeDisconnectRequest*&);
+void parse(SMBv2::TreeDisconnectResponse*&);
+void parse(SMBv2::CreateRequest*&);
+void parse(SMBv2::CreateResponse*&);
+void parse(SMBv2::CloseRequest*&);
+void parse(SMBv2::CloseResponse*&);
+void parse(SMBv2::EchoRequest*&);
+void parse(SMBv2::EchoResponse*&);
+void parse(SMBv2::QueryInfoRequest*&);
+void parse(SMBv2::QueryInfoResponse*&);
+void parse(SMBv2::QueryDirRequest*&);
+void parse(SMBv2::QueryDirResponse*&);
+void parse(SMBv2::FlushRequest*&);
+void parse(SMBv2::FlushResponse*&);
+void parse(SMBv2::ReadRequest*&);
+void parse(SMBv2::ReadResponse*&);
+void parse(SMBv2::Lock*&);
+void parse(SMBv2::WriteRequest*&);
+void parse(SMBv2::WriteResponse*&);
+void parse(SMBv2::LockRequest*&);
+void parse(SMBv2::LockResponse*&);
+void parse(SMBv2::ChangeNotifyRequest*&);
+void parse(SMBv2::FileNotifyInformation*&);
+void parse(SMBv2::ChangeNotifyResponse*&);
+void parse(SMBv2::OplockAcknowledgment*&);
+void parse(SMBv2::OplockResponse*&);
+void parse(SMBv2::IoCtlRequest*&);
+void parse(SMBv2::IoCtlResponse*&);
+void parse(SMBv2::SetInfoRequest*&);
+void parse(SMBv2::SetInfoResponse*&);
+void parse(SMBv2::CancelResponce*&);
+void parse(SMBv2::CancelRequest*&);
 
 /*! Constructs new command for API from raw message
  * \param request - Call's
@@ -201,14 +196,21 @@ inline const Cmd command(Data& request, Data& response, Session* session)
     cmd.ctimestamp = &request->timestamp;
     cmd.rtimestamp = response ? &response->timestamp : &request->timestamp;
 
-    cmd.req_header = reinterpret_cast<const RawMessageHeader*>(request->data);
-    if(response)
-        cmd.res_header = reinterpret_cast<const RawMessageHeader*>(response->data);
-    cmd.parg = reinterpret_cast<const typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
-    cmd.pres = response ? reinterpret_cast<const typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader)) : nullptr;
+    //
+    // Since we have to modify structures before command creation
+    // we have to cast raw data to pointer type ( in contrast to const pointer )
+    //
+    auto req_header = reinterpret_cast<RawMessageHeader*>(request->data);
+    auto res_header = reinterpret_cast<RawMessageHeader*>(response->data);
+    auto pargs = reinterpret_cast<typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
+    auto pres = response ? reinterpret_cast<typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader)) : nullptr;
 
-    parse(cmd.parg);
-    parse(cmd.pres);
+    parse(pargs);
+
+    cmd.req_header = req_header;
+    cmd.res_header = res_header;
+    cmd.parg = pargs;
+    cmd.pres = pres;
 
     return cmd;
 }

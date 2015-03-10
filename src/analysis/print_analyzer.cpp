@@ -21,6 +21,10 @@
 //------------------------------------------------------------------------------
 #include <iomanip>
 #include <time.h>
+#include <algorithm>
+#include <iterator>
+#include <utility>
+#include <sstream>
 
 #include "analysis/print_analyzer.h"
 #include "protocols/cifs/cifs.h"
@@ -161,7 +165,9 @@ bool print_procedure(std::ostream& out, const RPCProcedure* proc)
 template<typename CommandType>
 void print_smbv2_common_info(std::ostream& out, Commands cmdEnum, CommandType* cmd, const std::string& cmdComment)
 {
-    out << print_cifs2_procedures(cmdEnum) << " " << cmdComment << " (";
+    out << print_cifs2_procedures(cmdEnum)
+        << " "
+        << cmdComment << " (";
     print_hex16(out, to_integral(cmdEnum));
     out << ")\n"
         << "  Structure size = ";
@@ -192,6 +198,12 @@ void print_smbv2_common_info_resp(std::ostream& out, Commands cmdEnum, CommandTy
 
 void print_time(std::ostream& out, uint64_t time)
 {
+    if (time == 0)
+    {
+        out << "Create: No time specified (0)\n";
+        return;
+    }
+
     // TODO: Replace with C++ 11 functions
 
     const auto EPOCH_DIFF = 0x019DB1DED53E8000LL; /* 116444736000000000 nsecs */
@@ -219,6 +231,68 @@ void print_buffer(std::ostream& out, const uint8_t *buffer, uint16_t len)
     {
         out << char_buffer[i];
     }
+    out << "\n";
+}
+
+void print_guid(std::ostream& out, const uint8_t *pGuidString)
+{
+    if (pGuidString == nullptr)
+    {
+        return;
+    }
+
+    const auto GUID_BYTES_NUM = 16;
+    uint8_t localGuid[GUID_BYTES_NUM];
+    std::copy(pGuidString, pGuidString + GUID_BYTES_NUM, std::begin(localGuid));
+    std::ostringstream str;
+    std::string delimiter = "-";
+
+    auto hexPrinter = [&str](uint8_t hexValue)
+    {
+        str << std::hex << (0xF & (hexValue >> 4)) << (0xF & hexValue) << std::dec;
+    };
+
+    auto guidPartPrinter = [&]
+            (const std::pair<uint8_t,uint8_t>& offset,
+             bool showReverseBeforePrint)
+    {
+        auto numOfElements = offset.second - offset.first;
+
+        auto start = std::begin(localGuid) + offset.first;
+        auto end = start + numOfElements;
+        if (showReverseBeforePrint)
+        {
+            std::reverse(start, end);
+        }
+
+        std::for_each(start, end, hexPrinter);
+        str << delimiter;
+    };
+
+    std::pair<uint8_t, uint8_t> invertOffsets[] =
+    {
+        std::make_pair(0, 4),
+        std::make_pair(4, 6),
+        std::make_pair(6, 8)
+    };
+
+    std::pair<uint8_t, uint8_t> directOffsets[] =
+    {
+        std::make_pair(8, 10),
+        std::make_pair(10, 16)
+    };
+
+    for(const auto& offset : invertOffsets)
+    {
+        guidPartPrinter(offset, true);
+    }
+
+    for(const auto& offset : directOffsets)
+    {
+        guidPartPrinter(offset, false);
+    }
+
+    out << ClearFromLastDelimiter(str.str(), delimiter);
 }
 
 } // unnamed namespace
@@ -749,16 +823,119 @@ void PrintAnalyzer::noAndxCommandSMBv1(const SMBv1::NoAndxCommand*,
     out << print_cifs1_procedures(SMBv1Commands::SMB_COM_NO_ANDX_COMMAND);
 }
 
-void PrintAnalyzer::closeFileSMBv2(const SMBv2::CloseFileCommand*,
+void PrintAnalyzer::closeFileSMBv2(const SMBv2::CloseFileCommand* cmd,
                                    const SMBv2::CloseRequest*,
-                                   const SMBv2::CloseResponse*)
+                                   const SMBv2::CloseResponse* res)
 {
+    Commands cmdEnum = Commands::CLOSE;
+    print_smbv2_common_info_req(out, cmdEnum, cmd);
+    out << "  Close Flags = "
+        << cmd->parg->Flags
+        << "\n";
+
+    print_smbv2_common_info_resp(out, cmdEnum, cmd);
+
+    out << "  Close Flags = "
+        << res->Flags
+        << "\n";
+
+    out << "  Create = ";
+    print_time(out, res->CreationTime);
+
+    out << "  Last Access = ";
+    print_time(out, res->LastAccessTime);
+
+    out << "  Last Write = ";
+    print_time(out, res->LastWriteTime);
+
+    out << "  Last Change = ";
+    print_time(out, res->ChangeTime);
+
+    out << "  Allocation Size = "
+        << res->AllocationSize
+        << "\n";
+
+    out << "  End of File = "
+        << res->EndOfFile
+        << "\n";
+
+    out << "  File Attributes = "
+        << res->Attributes
+        << "\n";
+
 }
-void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand*,
+
+void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand* cmd,
                                    const SMBv2::NegotiateRequest*,
-                                   const SMBv2::NegotiateResponse*)
+                                   const SMBv2::NegotiateResponse* res)
 {
+    Commands cmdEnum = Commands::NEGOTIATE;
+    print_smbv2_common_info_req(out, cmdEnum, cmd);
+
+    out << "  Dialect count = "
+        << cmd->parg->dialectCount
+        << "\n";
+
+    out << "  Security mode = "
+        << cmd->parg->securityMode
+        << "\n";
+
+    out << "  Capabilities = "
+        << cmd->parg->capabilities
+        << "\n";
+
+    out << "  Client Guid = ";
+    print_guid(out, cmd->parg->clientGUID);
+    out << "\n";
+
+    out << "  Boot Time = ";
+    print_time(out, cmd->parg->clientStartTime);
+
+    for(int i = 0; i < cmd->parg->dialectCount; i++)
+    {
+        out << "  Dialect = ";
+        print_hex16(out, to_integral(cmd->parg->dialects[i]));
+        out << "\n";
+    }
+
+    print_smbv2_common_info_resp(out, cmdEnum, cmd);
+
+    out << "  Security mode = "
+        << res->securityMode
+        << "\n";
+
+    out << "  Dialect = ";
+    print_hex16(out, res->dialectRevision);
+    out << "\n";
+
+    out << "  Server Guid = ";
+    print_guid(out, res->serverGUID);
+    out << "\n";
+
+    out << "  Capabilities = "
+        << res->capabilities
+        << "\n";
+
+    out << "  Max Transaction Size  = "
+        << res->maxTransactSize
+        << "\n";
+
+    out << "  Max Read Size = "
+        << res->maxReadSize
+        << "\n";
+
+    out << "  Max Write Size = "
+        << res->maxWriteSize
+        << "\n";
+
+    out << "  Current Time = ";
+    print_time(out, res->systemTime);
+
+    out << "  Boot Time = ";
+    print_time(out, res->serverStartTime);
+
 }
+
 void PrintAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd,
                                       const SMBv2::SessionSetupRequest*,
                                       const SMBv2::SessionSetupResponse* res)
@@ -881,7 +1058,8 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
         out << "  End Of File = ";
         print_time(out, res->EndofFile);
 
-        out << "  File Attributes = " << res->attributes << "\n";
+        out << "  File Attributes = " 
+            << res->attributes << "\n";
     }
 }
 
