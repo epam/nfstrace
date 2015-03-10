@@ -30,24 +30,6 @@
 using namespace NST::API::SMBv2;
 using namespace NST::protocols::CIFSv2;
 //------------------------------------------------------------------------------
-TEST(CIFSv2, parse)
-{
-    ReadRequest readRequest;
-
-    uint16_t fldStructSize = htons(0xABCD);
-    uint32_t fldLength     = htons(0xABCD);
-    uint64_t fldOffset     = htobe64(0xDEADBEEF);
-
-    readRequest.structureSize = fldStructSize;
-    readRequest.length        = fldLength;
-    readRequest.offset        = fldOffset;
-
-    parse(readRequest);
-
-    EXPECT_EQ(readRequest.structureSize,  ntohs(fldStructSize));
-    EXPECT_EQ(readRequest.length,         ntohl(fldLength));
-    EXPECT_EQ(readRequest.offset,         be64toh(fldOffset));
-}
 
 TEST(CIFSv2, bodies)
 {
