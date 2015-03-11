@@ -201,17 +201,17 @@ inline const Cmd command(Data& request, Data& response, Session* session)
     // we have to cast raw data to pointer type ( in contrast to const pointer )
     //
     auto req_header = reinterpret_cast<RawMessageHeader*>(request->data);
-    auto res_header = reinterpret_cast<RawMessageHeader*>(response->data);
     auto pargs = reinterpret_cast<typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
-    auto pres = response ? reinterpret_cast<typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader)) : nullptr;
 
     parse(pargs);
 
     cmd.req_header = req_header;
-    cmd.res_header = res_header;
-    cmd.parg = pargs;
-    cmd.pres = pres;
-
+    if(response)
+    {
+        cmd.res_header = reinterpret_cast<RawMessageHeader*>(response->data);
+        cmd.pres = reinterpret_cast<typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader));
+    }
+    cmd.parg = pargs; 
     return cmd;
 }
 
