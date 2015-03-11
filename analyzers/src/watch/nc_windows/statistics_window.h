@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Header for UserGUI
+// Description: Header for describe ncurses statistic window.
 // Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -19,52 +19,54 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef USERGUI_H
-#define USERGUI_H
+#ifndef STATISTICS_WINDOW_H
+#define STATISTICS_WINDOW_H
 //------------------------------------------------------------------------------
-#include <atomic>
-#include <cstdlib>
-#include <mutex>
-#include <thread>
+#include <unordered_map>
 #include <vector>
 
-#include <ncurses.h>
-#include "protocols/abstract_protocol.h"
+#include "../protocols/abstract_protocol.h"
+#include "main_window.h"
 //------------------------------------------------------------------------------
-class UserGUI
+class StatisticsWindow
 {
-public:
     using ProtocolStatistic = std::vector<std::size_t>;
     using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
 
 private:
-    unsigned long _refresh_delta; // in microseconds
-
-    std::atomic<bool> _shouldResize;
-    std::mutex _statisticsDeltaMutex;
-    std::atomic_flag _running;
-
-    StatisticsContainers _statisticsContainers;
-
+    WINDOW* _window;
     AbstractProtocol* _activeProtocol;
-    std::thread _guiThread;
     std::vector<std::string> _allProtocols;
-    void run();
-    timeval getTimeval();
+    std::unordered_map<AbstractProtocol*, unsigned int> _scrollOffset;
+    ProtocolStatistic _statistic;
+    void destroy();
+    bool canWrite(unsigned int);
+
 public:
+    StatisticsWindow() = delete;
+    StatisticsWindow(MainWindow&, StatisticsContainers&);
+    ~StatisticsWindow();
 
-    UserGUI() = delete;
-    UserGUI(const char*, std::vector<AbstractProtocol* >&);
-    ~UserGUI();
-
-    /*! Update Protocol's data.
+    /*! Scroll content of Statistic Winodow Up or Down
     */
-    void update(AbstractProtocol*, std::vector<std::size_t>&);
+    void scrollContent(int);
 
-    /*! Enable screen full update. Use for resize main window.
+    /*! Change active protocol. Print new protocl's commands.
     */
-    void enableUpdate();
+    void updateProtocol(AbstractProtocol*);
+
+    /*! Update counters on Statistics Window
+    */
+    void update(const ProtocolStatistic&);
+
+    /*! Resize Statistic Window
+    */
+    void resize(MainWindow&);
+
+    /*! Only set active protocol, do not update new protocol's commands.
+    */
+    void setProtocol(AbstractProtocol*);
 };
 //------------------------------------------------------------------------------
-#endif // USERGUI_H
+#endif // STATISTICS_WINDOWS_H
 //------------------------------------------------------------------------------
