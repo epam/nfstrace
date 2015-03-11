@@ -53,6 +53,13 @@ namespace NFS41 = NST::API::NFS41;
 
 namespace
 {
+
+enum class NewLine
+{
+    Add,            // default value
+    Remove
+};
+
 bool print_procedure(std::ostream& out, const RPCProcedure* proc)
 {
     bool result {false};
@@ -163,7 +170,7 @@ bool print_procedure(std::ostream& out, const RPCProcedure* proc)
 }
 
 template<typename CommandType>
-void print_smbv2_common_info(std::ostream& out, Commands cmdEnum, CommandType* cmd, const std::string& cmdComment)
+void print_smbv2_common_info(std::ostream& out, Commands cmdEnum, CommandType* cmd, const std::string& cmdComment, NewLine option)
 {
     out << print_cifs2_procedures(cmdEnum)
         << " "
@@ -172,9 +179,10 @@ void print_smbv2_common_info(std::ostream& out, Commands cmdEnum, CommandType* c
     out << ")\n"
         << "  Structure size = ";
     print_hex16(out, cmd->StructureSize);
-    out << "\n  Credit Charge = " << cmd->CreditCharge << "\n";
-    out << "  Session Id = ";
-    print_hex64(out, cmd->SessionId);
+    if (option == NewLine::Add)
+    {
+        out << "\n";
+    }
 }
 
 template<typename CommandType>
@@ -183,43 +191,66 @@ void print_smbv2_common_info_req(std::ostream& out, Commands cmdEnum, CommandTyp
     out << "\n";
     NST::utils::operator<<(out, *(cmd->session));
     out << "\n";
-    print_smbv2_common_info(out, cmdEnum, cmd->req_header, "request");
+    print_smbv2_common_info(out, cmdEnum, cmd->req_header, "request", NewLine::Add);
+}
+
+template<typename CommandType>
+void print_smbv2_common_info_resp(std::ostream& out, Commands cmdEnum, CommandType* cmd, NewLine option)
+{
+    if(cmd->res_header)
+    {
+        print_smbv2_common_info(out, cmdEnum, cmd->res_header, "response", option);
+    }
 }
 
 template<typename CommandType>
 void print_smbv2_common_info_resp(std::ostream& out, Commands cmdEnum, CommandType* cmd)
 {
-    if(cmd->res_header)
+    print_smbv2_common_info(out, cmdEnum, cmd->res_header, "response", NewLine::Add);
+}
+
+void print_time(std::ostream& out, uint64_t time, NewLine option)
+{
+    // TODO: Replace with C++ 11 functions
+
+    std::ostringstream str;
+
+    if (time != 0)
     {
-        print_smbv2_common_info(out, cmdEnum, cmd->res_header, "response");
-        out << "\n  NT Status = " << static_cast<NST::API::SMBv2::NTStatus>(cmd->res_header->status);
+        const auto EPOCH_DIFF = 0x019DB1DED53E8000LL; /* 116444736000000000 nsecs */
+        const auto RATE_DIFF = 10000000;              /* 100 nsecs */
+
+        uint64_t unixTimestamp = (time - EPOCH_DIFF) / RATE_DIFF;
+        time_t t = static_cast<time_t>(unixTimestamp);
+
+        // NOTE: If you ever want to print the year/day/month separately like this:
+        //
+        // struct tm* lt = localtime(&t);
+        //
+        // do not forget adding 1900 to tm_year field, just to get current year
+        // lt->tm_year + 1900
+
+        // ctime adds "\n" at the end
+        str << ctime(&t);
     }
+    else
+    {
+        str << "Create: No time specified (0)\n";
+    }
+
+    std::string resultString = str.str();
+
+    if (option == NewLine::Remove)
+    {
+        resultString = ClearFromLastDelimiter(resultString, "\n");
+    }
+
+    out << resultString;
 }
 
 void print_time(std::ostream& out, uint64_t time)
 {
-    if (time == 0)
-    {
-        out << "Create: No time specified (0)\n";
-        return;
-    }
-
-    // TODO: Replace with C++ 11 functions
-
-    const auto EPOCH_DIFF = 0x019DB1DED53E8000LL; /* 116444736000000000 nsecs */
-    const auto RATE_DIFF = 10000000;              /* 100 nsecs */
-
-    uint64_t unixTimestamp = (time - EPOCH_DIFF) / RATE_DIFF;
-    time_t t = static_cast<time_t>(unixTimestamp);
-
-    // NOTE: If you ever want to print the year/day/month separately like this:
-    //
-    // struct tm* lt = localtime(&t);
-    //
-    // do not forget adding 1900 to tm_year field, just to get current year
-    // lt->tm_year + 1900
-
-    out << ctime(&t);
+   print_time(out, time, NewLine::Add);
 }
 
 void print_buffer(std::ostream& out, const uint8_t *buffer, uint16_t len)
@@ -860,9 +891,7 @@ void PrintAnalyzer::closeFileSMBv2(const SMBv2::CloseFileCommand* cmd,
         << "\n";
 
     out << "  File Attributes = "
-        << res->Attributes
-        << "\n";
-
+        << res->Attributes;
 }
 
 void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand* cmd,
@@ -932,7 +961,7 @@ void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand* cmd,
     print_time(out, res->systemTime);
 
     out << "  Boot Time = ";
-    print_time(out, res->serverStartTime);
+    print_time(out, res->serverStartTime, NewLine::Remove);
 
 }
 
@@ -949,7 +978,7 @@ void PrintAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd,
         << "  Previous session id = " << cmd->parg->PreviousSessionId << "\n";
     //TODO: print security blob ( cmd->parg->Buffer )
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
-    out << "  Session flags = " << res->sessionFlags << "\n";
+    out << "  Session flags = " << res->sessionFlags;
     //TODO: print security blob ( res->Buffer )
 }
 void PrintAnalyzer::logOffSMBv2(const SMBv2::LogOffCommand* cmd,
@@ -958,7 +987,7 @@ void PrintAnalyzer::logOffSMBv2(const SMBv2::LogOffCommand* cmd,
 {
     Commands cmdEnum = Commands::LOGOFF;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
-    print_smbv2_common_info_resp(out, cmdEnum, cmd);
+    print_smbv2_common_info_resp(out, cmdEnum, cmd, NewLine::Remove);
 }
 
 void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd,
@@ -973,7 +1002,7 @@ void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd,
     out << "  Share types = " << res->ShareType << "\n"
         << "  Capabilities = "  << res->capabilities << "\n"
         << "  Share flags = " << res->shareFlags << "\n"
-        << "  Access mask = " << static_cast<NST::API::SMBv2::AccessMask>(res->MaximalAccess) << "\n";
+        << "  Access mask = " << static_cast<NST::API::SMBv2::AccessMask>(res->MaximalAccess);
 }
 void PrintAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd,
                                         const SMBv2::TreeDisconnectRequest*,
@@ -981,7 +1010,7 @@ void PrintAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd,
 {
     Commands cmdEnum = Commands::TREE_DISCONNECT;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
-    print_smbv2_common_info_resp(out, cmdEnum, cmd);
+    print_smbv2_common_info_resp(out, cmdEnum, cmd, NewLine::Remove);
 }
 void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
                                 const SMBv2::CreateRequest*,
@@ -1019,14 +1048,12 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
     out << "  File name = ";
     print_buffer(out, cmd->parg->Buffer, cmd->parg->NameLength);
 
-    out << "\n"
-        << "  File length = " << cmd->parg->NameLength;
+    out << "  File length = " << cmd->parg->NameLength;
 
     //
     // TODO: In some cases buffer can contains : CreateContextsOffset, and CreateContextsLength
     // handle and test this in future
     //
-
 
     out << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
@@ -1037,10 +1064,11 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
         << "  Response Flags = ";
     print_hex8(out, res->flag);
     out << "\n"
-        << "  Create Action = " << res->CreateAction << "\n";
+        << "  Create Action = " << res->CreateAction;
+
     if (cmd->res_header->status == to_integral(NST::API::SMBv2::NTStatus::STATUS_SUCCESS))
     {
-        out << "  Create = ";
+        out << "\n  Create = ";
         print_time(out, res->CreationTime);
 
         out << "  Last Access = ";
@@ -1059,7 +1087,7 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
         print_time(out, res->EndofFile);
 
         out << "  File Attributes = " 
-            << res->attributes << "\n";
+            << res->attributes;
     }
 }
 
@@ -1069,7 +1097,7 @@ void PrintAnalyzer::flushSMBv2(const SMBv2::FlushCommand* cmd,
 {
     Commands cmdEnum = Commands::FLUSH;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
-    print_smbv2_common_info_resp(out, cmdEnum, cmd);
+    print_smbv2_common_info_resp(out, cmdEnum, cmd, NewLine::Remove);
 }
 void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* cmd,
                               const SMBv2::ReadRequest*,
@@ -1093,7 +1121,7 @@ void PrintAnalyzer::readSMBv2(const SMBv2::ReadCommand* cmd,
     print_hex16(out, res->DataOffset);
     out << "\n"
         << "  Read length = " << res->DataLength << "\n"
-        << "  Read remaining = " << res->DataRemaining << "\n";
+        << "  Read remaining = " << res->DataRemaining;
 }
 
 void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
@@ -1122,7 +1150,7 @@ void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
     out << "  Write Count = " << res->Count << "\n"
         << "  Write Remaining = " << res->Remaining << "\n"
         << "  Channel Info Offset = " << res->WriteChannelInfoOffset << "\n"
-        << "  Channel Info Length = " << res->WriteChannelInfoLength << "\n";
+        << "  Channel Info Length = " << res->WriteChannelInfoLength;
 }
 
 void PrintAnalyzer::lockSMBv2(const SMBv2::LockCommand* cmd,
@@ -1133,7 +1161,7 @@ void PrintAnalyzer::lockSMBv2(const SMBv2::LockCommand* cmd,
     print_smbv2_common_info_req(out, cmdEnum, cmd);
     out << "  Lock Count = " << static_cast<uint32_t>(cmd->parg->LockCount) << "\n"
         << "  Lock Sequence = " << static_cast<uint32_t>(cmd->parg->LockSequence) << "\n";
-    print_smbv2_common_info_resp(out, cmdEnum, cmd);
+    print_smbv2_common_info_resp(out, cmdEnum, cmd, NewLine::Remove);
 }
 void PrintAnalyzer::ioctlSMBv2(const SMBv2::IoctlCommand* cmd,
                                const SMBv2::IoCtlRequest*,
@@ -1153,7 +1181,7 @@ void PrintAnalyzer::ioctlSMBv2(const SMBv2::IoctlCommand* cmd,
         << "  Input offset = " << res->InputOffset << "\n"
         << "  Input count = " << res->InputCount << "\n"
         << "  Output offset = " << res->OutputOffset << "\n"
-        << "  Output count = " << res->OutputCount << "\n";
+        << "  Output count = " << res->OutputCount;
 }
 void PrintAnalyzer::cancelSMBv2(const SMBv2::CancelCommand* cmd,
                                 const SMBv2::CancelRequest*,
@@ -1168,7 +1196,7 @@ void PrintAnalyzer::echoSMBv2(const SMBv2::EchoCommand* cmd,
 {
     Commands cmdEnum = Commands::ECHO;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
-    print_smbv2_common_info_resp(out, cmdEnum, cmd);
+    print_smbv2_common_info_resp(out, cmdEnum, cmd, NewLine::Remove);
 }
 void PrintAnalyzer::queryDirSMBv2(const SMBv2::QueryDirCommand* cmd,
                                   const SMBv2::QueryDirRequest*,
@@ -1178,7 +1206,7 @@ void PrintAnalyzer::queryDirSMBv2(const SMBv2::QueryDirCommand* cmd,
     print_smbv2_common_info_req(out, cmdEnum, cmd);
     out << "\n  Info level = " << cmd->parg->infoType << "\n"
         << "  File index = " << cmd->parg->FileIndex << "\n";
-    print_smbv2_common_info_resp(out, cmdEnum, cmd);
+    print_smbv2_common_info_resp(out, cmdEnum, cmd, NewLine::Remove);
 }
 void PrintAnalyzer::changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* cmd,
                                       const SMBv2::ChangeNotifyRequest*,
@@ -1189,7 +1217,7 @@ void PrintAnalyzer::changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* cmd,
     out << "  Length = 0x" << std::hex << cmd->parg->OutputBufferLength << std::dec << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
     out << "  Length = 0x" << std::hex << res->OutputBufferLength << std::dec << "\n"
-        << "  Offset = 0x" << std::hex << res->OutputBufferOffset << std::dec << "\n";
+        << "  Offset = 0x" << std::hex << res->OutputBufferOffset << std::dec;
 }
 void PrintAnalyzer::queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd,
                                    const SMBv2::QueryInfoRequest*,
@@ -1204,7 +1232,7 @@ void PrintAnalyzer::queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd,
     //print_file_name(out, cmd->parg->Buffer, cmd->parg->OutputBufferLength);
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
     out << "  Offset = 0x" << std::hex << static_cast<uint32_t>(res->OutputBufferOffset) << std::dec << "\n"
-        << "  Length = 0x" << std::hex << static_cast<uint32_t>(res->OutputBufferLength) << std::dec << "\n";
+        << "  Length = 0x" << std::hex << static_cast<uint32_t>(res->OutputBufferLength) << std::dec;
 }
 void PrintAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* cmd,
                                  const SMBv2::SetInfoRequest*,
@@ -1218,8 +1246,7 @@ void PrintAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* cmd,
     //print_file_name(out, cmd->parg->Buffer, cmd->parg->OutputBufferLength);
     out << "  Setinfo Size = " << cmd->parg->BufferLength << "\n"
         << "  Setinfo Offset = 0x" << std::hex << cmd->parg->BufferOffset << std::dec << "\n";
-
-    print_smbv2_common_info_resp(out, cmdEnum, cmd);
+    print_smbv2_common_info_resp(out, cmdEnum, cmd, NewLine::Remove);
 }
 
 
