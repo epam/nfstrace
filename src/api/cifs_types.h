@@ -64,10 +64,10 @@ public:
     using RequestType = Request;
     using ResponseType = Response;
     using HeaderType = Header;
-    const HeaderType* req_header;
-    const HeaderType* res_header;
-    const RequestType* parg;//!< Arguments of specified command
-    const ResponseType* pres;//!< Results of specified command
+    const HeaderType* req_header = nullptr;
+    const HeaderType* res_header = nullptr;
+    const RequestType* parg = nullptr;//!< Arguments of specified command
+    const ResponseType* pres = nullptr;//!< Results of specified command
 };
 
 using CreateDirectoryCommand = SMBv1::Command< NST::protocols::CIFSv1::RawMessageHeader, CreateDirectoryArgumentType, CreateDirectoryResultType>;                          //!< CreateDirectory command
