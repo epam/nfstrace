@@ -108,7 +108,7 @@ public:
                          const struct NFS3::COMMIT3args*,
                          const struct NFS3::COMMIT3res*) override final;
     // NFS v4
-    virtual void null(const RPCProcedure*,
+    virtual void null4(const RPCProcedure*,
                       const struct NFS4::NULL4args*,
                       const struct NFS4::NULL4res*) override final;
     virtual void compound4(const RPCProcedure*,

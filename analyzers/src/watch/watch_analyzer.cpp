@@ -114,7 +114,7 @@ void WatchAnalyzer::commit3(const RPCProcedure* proc,
 
 // NFS4.0 procedures
 
-void WatchAnalyzer::null(const RPCProcedure* proc,
+void WatchAnalyzer::null4(const RPCProcedure* proc,
                          const struct NFS4::NULL4args*,
                          const struct NFS4::NULL4res*) { nfs_account(proc, NFS_V40); }
 void WatchAnalyzer::compound4(const RPCProcedure*  proc,
