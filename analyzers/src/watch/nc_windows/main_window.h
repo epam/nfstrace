@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Header for UserGUI
+// Description: Header for describe ncurses main window.
 // Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -19,53 +19,39 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef USERGUI_H
-#define USERGUI_H
+#ifndef MAIN_WINDOW_H
+#define MAIN_WINDOW_H
 //------------------------------------------------------------------------------
-#include <atomic>
-#include <cstdlib>
-#include <memory>
-#include <mutex>
-#include <thread>
-#include <vector>
-
 #include <ncurses.h>
-#include "protocols/abstract_protocol.h"
 //------------------------------------------------------------------------------
-class UserGUI
+class MainWindow
 {
-public:
-    using ProtocolStatistic = std::vector<std::size_t>;
-    using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
+    friend class HeaderWindow;
+    friend class StatisticsWindow;
+    WINDOW* _window;
 
-private:
-    unsigned long _refresh_delta; // in microseconds
+    void init();
+    void destroy();
+    void cleanStdin(int);
 
-    std::atomic<bool> _shouldResize;
-    std::mutex _statisticsDeltaMutex;
-    std::atomic_flag _running;
-
-    StatisticsContainers _statisticsContainers;
-
-    AbstractProtocol* _activeProtocol;
-    std::thread _guiThread;
-    std::vector<std::string> _allProtocols;
-    void run();
-    timeval getTimeval();
 public:
 
-    UserGUI() = delete;
-    UserGUI(const char*, std::vector<AbstractProtocol* >&);
-    ~UserGUI();
+    MainWindow();
+    ~MainWindow();
 
-    /*! Update Protocol's data.
+    /*! Get iput keys
     */
-    void update(AbstractProtocol*, std::vector<std::size_t>&);
+    int inputKeys();
 
-    /*! Enable screen full update. Use for resize main window.
+    /*! Resize Main Window
     */
-    void enableUpdate();
+    void resize();
+
+    /*! Update Main Window
+    */
+    void update();
 };
 //------------------------------------------------------------------------------
-#endif // USERGUI_H
+#endif // MAIN_WINDOW_H
 //------------------------------------------------------------------------------
+

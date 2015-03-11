@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Header for UserGUI
+// Description: Source for CIFSv2 protocol.
 // Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -19,53 +19,24 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef USERGUI_H
-#define USERGUI_H
+#include <api/plugin_api.h> // include plugin development definitions
+#include "cifsv2_protocol.h"
 //------------------------------------------------------------------------------
-#include <atomic>
-#include <cstdlib>
-#include <memory>
-#include <mutex>
-#include <thread>
-#include <vector>
-
-#include <ncurses.h>
-#include "protocols/abstract_protocol.h"
-//------------------------------------------------------------------------------
-class UserGUI
+CIFSv2Protocol::CIFSv2Protocol()
+: AbstractProtocol {"CIFS v2", SMBv2Commands::Commands::CMD_COUNT}
 {
-public:
-    using ProtocolStatistic = std::vector<std::size_t>;
-    using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
+}
 
-private:
-    unsigned long _refresh_delta; // in microseconds
+CIFSv2Protocol::~CIFSv2Protocol()
+{
+}
 
-    std::atomic<bool> _shouldResize;
-    std::mutex _statisticsDeltaMutex;
-    std::atomic_flag _running;
-
-    StatisticsContainers _statisticsContainers;
-
-    AbstractProtocol* _activeProtocol;
-    std::thread _guiThread;
-    std::vector<std::string> _allProtocols;
-    void run();
-    timeval getTimeval();
-public:
-
-    UserGUI() = delete;
-    UserGUI(const char*, std::vector<AbstractProtocol* >&);
-    ~UserGUI();
-
-    /*! Update Protocol's data.
-    */
-    void update(AbstractProtocol*, std::vector<std::size_t>&);
-
-    /*! Enable screen full update. Use for resize main window.
-    */
-    void enableUpdate();
-};
+const char* CIFSv2Protocol::printProcedure(std::size_t i)
+{
+    if ( i >= SMBv2Commands::Commands::CMD_COUNT) { return nullptr; }
+    SMBv2Commands tmp;
+    return tmp.command_name(i).c_str();
+}
 //------------------------------------------------------------------------------
-#endif // USERGUI_H
+
 //------------------------------------------------------------------------------

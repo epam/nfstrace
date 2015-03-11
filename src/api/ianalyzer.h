@@ -234,7 +234,7 @@ class INFSv41rpcgen
 {
 public:
     virtual ~INFSv41rpcgen() {}
-	//there is no null41 procedure, use null if needed: IAnalyzer::INFSv4rpcgen::null
+    //there is no null41 procedure, use null if needed: IAnalyzer::INFSv4rpcgen::null
     virtual void compound41(const RPCProcedure*,
             const struct NFS41::COMPOUND4args*,
             const struct NFS41::COMPOUND4res*) {}

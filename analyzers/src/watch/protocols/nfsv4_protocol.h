@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Header for UserGUI
+// Description: Header for NFSv4 protocol.
 // Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -19,53 +19,20 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef USERGUI_H
-#define USERGUI_H
+#ifndef NFSV4_PROTOCOL_H
+#define NFSV4_PROTOCOL_H
 //------------------------------------------------------------------------------
-#include <atomic>
-#include <cstdlib>
-#include <memory>
-#include <mutex>
-#include <thread>
-#include <vector>
-
-#include <ncurses.h>
-#include "protocols/abstract_protocol.h"
+#include "abstract_protocol.h"
 //------------------------------------------------------------------------------
-class UserGUI
+class NFSv4Protocol : public AbstractProtocol
 {
 public:
-    using ProtocolStatistic = std::vector<std::size_t>;
-    using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
-
-private:
-    unsigned long _refresh_delta; // in microseconds
-
-    std::atomic<bool> _shouldResize;
-    std::mutex _statisticsDeltaMutex;
-    std::atomic_flag _running;
-
-    StatisticsContainers _statisticsContainers;
-
-    AbstractProtocol* _activeProtocol;
-    std::thread _guiThread;
-    std::vector<std::string> _allProtocols;
-    void run();
-    timeval getTimeval();
-public:
-
-    UserGUI() = delete;
-    UserGUI(const char*, std::vector<AbstractProtocol* >&);
-    ~UserGUI();
-
-    /*! Update Protocol's data.
-    */
-    void update(AbstractProtocol*, std::vector<std::size_t>&);
-
-    /*! Enable screen full update. Use for resize main window.
-    */
-    void enableUpdate();
+    NFSv4Protocol();
+    ~NFSv4Protocol();
+    virtual const char* printProcedure(std::size_t);
+    virtual std::size_t getGroups();
+    virtual std::size_t getGroupBegin(std::size_t);
 };
 //------------------------------------------------------------------------------
-#endif // USERGUI_H
+#endif // PROTOCOLS_H
 //------------------------------------------------------------------------------

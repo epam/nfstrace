@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Vitali Adamenka
-// Description: Header for UserGUI
-// Copyright (c) 2015 EPAM Systems. All Rights Reserved.
+// Author: Andrey Kuznetsov
+// Description: Interface for command representers
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,53 +19,21 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef USERGUI_H
-#define USERGUI_H
+#ifndef COMMANDREPRESENTER_H
+#define COMMANDREPRESENTER_H
 //------------------------------------------------------------------------------
-#include <atomic>
-#include <cstdlib>
-#include <memory>
-#include <mutex>
-#include <thread>
-#include <vector>
-
-#include <ncurses.h>
-#include "protocols/abstract_protocol.h"
+#include <string>
 //------------------------------------------------------------------------------
-class UserGUI
+namespace CIFSRepresenter
 {
-public:
-    using ProtocolStatistic = std::vector<std::size_t>;
-    using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
-
-private:
-    unsigned long _refresh_delta; // in microseconds
-
-    std::atomic<bool> _shouldResize;
-    std::mutex _statisticsDeltaMutex;
-    std::atomic_flag _running;
-
-    StatisticsContainers _statisticsContainers;
-
-    AbstractProtocol* _activeProtocol;
-    std::thread _guiThread;
-    std::vector<std::string> _allProtocols;
-    void run();
-    timeval getTimeval();
-public:
-
-    UserGUI() = delete;
-    UserGUI(const char*, std::vector<AbstractProtocol* >&);
-    ~UserGUI();
-
-    /*! Update Protocol's data.
-    */
-    void update(AbstractProtocol*, std::vector<std::size_t>&);
-
-    /*! Enable screen full update. Use for resize main window.
-    */
-    void enableUpdate();
+struct CommandRepresenter
+{
+    virtual const std::string command_description(int cmd_code) = 0;
+    virtual const std::string command_name(int cmd_code) = 0;
+    virtual size_t commands_count() = 0;
+    virtual ~CommandRepresenter() {}
 };
+} // CIFSRepresenter
 //------------------------------------------------------------------------------
-#endif // USERGUI_H
+#endif // COMMANDREPRESENTER_H
 //------------------------------------------------------------------------------

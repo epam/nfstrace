@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
-// Author: Vitali Adamenka
-// Description: Header for UserGUI
-// Copyright (c) 2015 EPAM Systems. All Rights Reserved.
+// Author: Andrey Kuznetsov
+// Description: Represents CIFS v2 commands
+// Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
 /*
     This file is part of Nfstrace.
@@ -19,53 +19,46 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef USERGUI_H
-#define USERGUI_H
+#ifndef CIFSV2_COMMANDS_H
+#define CIFSV2_COMMANDS_H
 //------------------------------------------------------------------------------
-#include <atomic>
-#include <cstdlib>
-#include <memory>
-#include <mutex>
-#include <thread>
-#include <vector>
-
-#include <ncurses.h>
-#include "protocols/abstract_protocol.h"
+#include "commandrepresenter.h"
 //------------------------------------------------------------------------------
-class UserGUI
+struct SMBv2Commands : CIFSRepresenter::CommandRepresenter
 {
-public:
-    using ProtocolStatistic = std::vector<std::size_t>;
-    using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
+    /*!
+     * \brief The Commands enum commands codes
+     */
+    enum Commands
+    {
+        NEGOTIATE,
+        SESSION_SETUP,
+        LOGOFF,
+        TREE_CONNECT,
+        TREE_DISCONNECT,
+        CREATE,
+        CLOSE,
+        FLUSH,
+        READ,
+        WRITE,
+        LOCK,
+        IOCTL,
+        CANCEL,
+        ECHO,
+        QUERY_DIRECTORY,
+        CHANGE_NOTIFY,
+        QUERY_INFO,
+        SET_INFO,
+        OPLOCK_BREAK,
+        CMD_COUNT
+    };
 
-private:
-    unsigned long _refresh_delta; // in microseconds
+    const std::string command_description(int cmd_code) override final;
 
-    std::atomic<bool> _shouldResize;
-    std::mutex _statisticsDeltaMutex;
-    std::atomic_flag _running;
+    const std::string command_name(int cmd_code) override final;
 
-    StatisticsContainers _statisticsContainers;
-
-    AbstractProtocol* _activeProtocol;
-    std::thread _guiThread;
-    std::vector<std::string> _allProtocols;
-    void run();
-    timeval getTimeval();
-public:
-
-    UserGUI() = delete;
-    UserGUI(const char*, std::vector<AbstractProtocol* >&);
-    ~UserGUI();
-
-    /*! Update Protocol's data.
-    */
-    void update(AbstractProtocol*, std::vector<std::size_t>&);
-
-    /*! Enable screen full update. Use for resize main window.
-    */
-    void enableUpdate();
+    size_t commands_count();
 };
 //------------------------------------------------------------------------------
-#endif // USERGUI_H
+#endif // CIFS2_COMMANDS_H
 //------------------------------------------------------------------------------
