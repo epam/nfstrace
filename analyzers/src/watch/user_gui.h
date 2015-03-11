@@ -24,7 +24,6 @@
 //------------------------------------------------------------------------------
 #include <atomic>
 #include <cstdlib>
-#include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
