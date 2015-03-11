@@ -20,6 +20,7 @@
 */
 //------------------------------------------------------------------------------
 #include <stdexcept>
+
 #include <unistd.h>
 
 #include "main_window.h"
