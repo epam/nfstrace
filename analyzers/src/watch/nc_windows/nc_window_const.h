@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Author: Vitali Adamenka
-// Description: Header for UserGUI
+// Description: Header for description all ncurses windows constants.
 // Copyright (c) 2015 EPAM Systems. All Rights Reserved.
 //------------------------------------------------------------------------------
 /*
@@ -19,53 +19,28 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef USERGUI_H
-#define USERGUI_H
+#ifndef NC_WINDOW_CONST_H
+#define NC_WINDOW_CONST_H
 //------------------------------------------------------------------------------
-#include <atomic>
-#include <cstdlib>
-#include <memory>
-#include <mutex>
-#include <thread>
-#include <vector>
-
-#include <ncurses.h>
-#include "protocols/abstract_protocol.h"
-//------------------------------------------------------------------------------
-class UserGUI
+namespace
 {
-public:
-    using ProtocolStatistic = std::vector<std::size_t>;
-    using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
+const unsigned int SECINMIN  = 60;
+const unsigned int SECINHOUR = 60 * 60;
+const unsigned int SECINDAY  = 60 * 60 * 24;
 
-private:
-    unsigned long _refresh_delta; // in microseconds
+const unsigned int BORDER_SIZE = 1;
 
-    std::atomic<bool> _shouldResize;
-    std::mutex _statisticsDeltaMutex;
-    std::atomic_flag _running;
+const int MAXSHIFT = 25;
+const int SHIFTCU  = 1;
 
-    StatisticsContainers _statisticsContainers;
+const int GUI_LENGTH        = 80;
+const int GUI_HEADER_HEIGHT = 6;
+const int PERSENT_POS       = 29;
+const int COUNTERS_POS      = 22;
 
-    AbstractProtocol* _activeProtocol;
-    std::thread _guiThread;
-    std::vector<std::string> _allProtocols;
-    void run();
-    timeval getTimeval();
-public:
-
-    UserGUI() = delete;
-    UserGUI(const char*, std::vector<AbstractProtocol* >&);
-    ~UserGUI();
-
-    /*! Update Protocol's data.
-    */
-    void update(AbstractProtocol*, std::vector<std::size_t>&);
-
-    /*! Enable screen full update. Use for resize main window.
-    */
-    void enableUpdate();
-};
+const int FIRST_CHAR_POS = 1;
+const int EMPTY_LINE     = 1;
+}
 //------------------------------------------------------------------------------
-#endif // USERGUI_H
+#endif // NC_WINDOW_CONST_H
 //------------------------------------------------------------------------------
