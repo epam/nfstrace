@@ -131,13 +131,6 @@ struct MessageHeader : public RawMessageHeader
  */
 const MessageHeader* get_header(const uint8_t* data);
 
-/*! Group of template specialization for converting representation
- *  if field's bytes from network to host.
- * (independent of type of architecture little endian or big endian)
- *
- * \param - reference to an object whose fields will be converted
- */
-
 void parseGuid(uint8_t* );
 void parse(SMBv2::ErrResponse*&);
 void parse(SMBv2::NegotiateRequest*&);
