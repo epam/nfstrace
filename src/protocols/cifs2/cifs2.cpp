@@ -20,6 +20,7 @@
 */
 //------------------------------------------------------------------------------
 #include <arpa/inet.h>
+#include <assert.h>
 
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/cifs/cifs.h"
@@ -80,19 +81,19 @@ bool MessageHeader::isFlag(const Flags flag) const
     return static_cast<uint32_t>(flag) & flags;
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::ErrResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::ErrResponse& param)
 {
     param.byteCount = ntohl(param.byteCount);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::NegotiateRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::NegotiateRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.dialectCount = ntohs(param.dialectCount);
     param.clientStartTime = ntohll(param.clientStartTime);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::NegotiateResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::NegotiateResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.dialectRevision = ntohs(param.dialectRevision);
@@ -105,7 +106,7 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::NegotiateResponse& param)
     param.securityBufferLength = ntohs(param.securityBufferLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::SessionSetupRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::SessionSetupRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.Channel = ntohl(param.Channel);
@@ -114,47 +115,47 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::SessionSetupRequest& param)
     param.PreviousSessionId = ntohll(param.PreviousSessionId);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::SessionSetupResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::SessionSetupResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.SecurityBufferOffset = ntohs(param.SecurityBufferOffset);
     param.SecurityBufferLength = ntohs(param.SecurityBufferLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::LogOffRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::LogOffRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::LogOffResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::LogOffResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeConnectRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::TreeConnectRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.PathOffset = ntohs(param.PathOffset);
     param.PathLength = ntohs(param.PathLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeConnectResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::TreeConnectResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.MaximalAccess = ntohl(param.MaximalAccess);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeDisconnectRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::TreeDisconnectRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::TreeDisconnectResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::TreeDisconnectResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::CreateRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::CreateRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.SmbCreateFlags = ntohll(param.SmbCreateFlags);
@@ -164,7 +165,7 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::CreateRequest& param)
     param.CreateContextsLength = ntohl(param.CreateContextsLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::CreateResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::CreateResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.CreationTime = ntohll(param.CreationTime);
@@ -179,14 +180,14 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::CreateResponse& param)
     param.CreateContextsLength = ntohl(param.CreateContextsLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::CloseRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::CloseRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.PersistentFileId = ntohll(param.PersistentFileId);
     param.VolatileFileId = ntohll(param.VolatileFileId);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::CloseResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::CloseResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.CreationTime = ntohll(param.CreationTime);
@@ -198,17 +199,17 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::CloseResponse& param)
     param.Attributes = ntohl(param.Attributes);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::EchoRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::EchoRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::EchoResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::EchoResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryInfoRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::QueryInfoRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.OutputBufferLength = ntohl(param.OutputBufferLength);
@@ -218,14 +219,14 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryInfoRequest& param)
     param.VolatileFileId = ntohll(param.VolatileFileId);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryInfoResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::QueryInfoResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.OutputBufferOffset = ntohs(param.OutputBufferOffset);
     param.OutputBufferLength = ntohl(param.OutputBufferLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryDirRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::QueryDirRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.FileIndex = ntohl(param.FileIndex);
@@ -236,26 +237,26 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryDirRequest& param)
     param.OutputBufferLength = ntohl(param.OutputBufferLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::QueryDirResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::QueryDirResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.OutputBufferOffset = ntohs(param.OutputBufferOffset);
     param.OutputBufferLength = ntohl(param.OutputBufferLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::FlushRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::FlushRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.PersistentFileId = ntohll(param.PersistentFileId);
     param.VolatileFileId = ntohll(param.VolatileFileId);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::FlushResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::FlushResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::ReadRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.length = ntohl(param.length);
@@ -268,14 +269,14 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadRequest& param)
     param.ReadChannelInfoLength = ntohs(param.ReadChannelInfoLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::ReadResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::ReadResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.DataLength = ntohl(param.DataLength);
     param.DataRemaining = ntohl(param.DataRemaining);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::WriteRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::WriteRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.dataOffset = ntohs(param.dataOffset);
@@ -288,7 +289,7 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::WriteRequest& param)
     param.WriteChannelInfoLength = ntohs(param.WriteChannelInfoLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::WriteResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::WriteResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.Count = ntohl(param.Count);
@@ -297,13 +298,13 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::WriteResponse& param)
     param.WriteChannelInfoLength = ntohs(param.WriteChannelInfoLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::Lock& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::Lock& param)
 {
     param.Offset = ntohll(param.Offset);
     param.Length = ntohll(param.Length);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::LockRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::LockRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.LockCount = ntohs(param.LockCount);
@@ -312,21 +313,21 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::LockRequest& param)
     param.volatileFileId = ntohll(param.volatileFileId);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::LockResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::LockResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::CancelRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::CancelRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::CancelResponce&)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::CancelResponce&)
 {
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::ChangeNotifyRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::ChangeNotifyRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.OutputBufferLength = ntohl(param.OutputBufferLength);
@@ -334,34 +335,34 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::ChangeNotifyRequest& param)
     param.volatileFileId = ntohll(param.volatileFileId);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::FileNotifyInformation& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::FileNotifyInformation& param)
 {
     param.NextEntryOffset = ntohl(param.NextEntryOffset);
     param.FileNameLength = ntohl(param.FileNameLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::ChangeNotifyResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::ChangeNotifyResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.OutputBufferOffset = ntohs(param.OutputBufferOffset);
     param.OutputBufferLength = ntohl(param.OutputBufferLength);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::OplockAcknowledgment& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::OplockAcknowledgment& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.persistentFileId = ntohll(param.persistentFileId);
     param.volatileFileId = ntohll(param.volatileFileId);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::OplockResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::OplockResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.persistentFileId = ntohll(param.persistentFileId);
     param.volatileFileId = ntohll(param.volatileFileId);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::IoCtlRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::IoCtlRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.persistentFileId = ntohll(param.persistentFileId);
@@ -374,7 +375,7 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::IoCtlRequest& param)
     param.MaxOutputResponse = ntohl(param.MaxOutputResponse);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::IoCtlResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::IoCtlResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.persistentFileId = ntohll(param.persistentFileId);
@@ -385,7 +386,7 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::IoCtlResponse& param)
     param.OutputCount = ntohl(param.OutputCount);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::SetInfoRequest& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::SetInfoRequest& param)
 {
     param.structureSize = ntohs(param.structureSize);
     param.BufferLength = ntohl(param.BufferLength);
@@ -394,8 +395,23 @@ template<> void NST::protocols::CIFSv2::parse(SMBv2::SetInfoRequest& param)
     param.volatileFileId = ntohll(param.volatileFileId);
 }
 
-template<> void NST::protocols::CIFSv2::parse(SMBv2::SetInfoResponse& param)
+template<> void NST::protocols::CIFSv2::parse(API::SMBv2::SetInfoResponse& param)
 {
     param.structureSize = ntohs(param.structureSize);
 }
 
+const char* NST::protocols::CIFSv2::print_cifs2_procedures(SMBv2Commands cmd_code)
+{
+    assert(cmd_code < SMBv2Commands::CMD_COUNT);
+
+    static const char* const commandNames[] =
+    {
+        "NEGOTIATE",        "SESSION_SETUP",        "LOGOFF",         "TREE_CONNECT",
+        "TREE_DISCONNECT",  "CREATE",               "CLOSE",          "FLUSH",
+        "READ",             "WRITE",                "LOCK",           "IOCTL",
+        "CANCEL",           "ECHO",                 "QUERY_DIRECTORY","CHANGE_NOTIFY",
+        "QUERY_INFO",       "SET_INFO",             "OPLOCK_BREAK"
+    };
+
+    return commandNames[static_cast<int>(cmd_code)];
+}

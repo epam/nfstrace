@@ -33,10 +33,11 @@
 //------------------------------------------------------------------------------
 WatchAnalyzer::WatchAnalyzer(const char* opts)
 : _cifsv2 {}
+, _cifsv1 {}
 , _nfsv41 {}
 , _nfsv4 {}
 , _nfsv3 {}
-, protocols {&_cifsv2, &_nfsv41, &_nfsv4, &_nfsv3}
+, protocols {&_cifsv2, &_cifsv1, &_nfsv41, &_nfsv4, &_nfsv3}
 , gui {opts, protocols}
 {
 }
@@ -405,101 +406,477 @@ void WatchAnalyzer::reclaim_complete41(const RPCProcedure* proc,
                                        const struct NFS41::RECLAIM_COMPLETE4res* res) { if (res) { account41_op(proc, ProcEnumNFS41::NFSProcedure::RECLAIM_COMPLETE); } }
 void WatchAnalyzer::illegal41(const RPCProcedure* proc,
                               const struct NFS41::ILLEGAL4res* res) { if (res) { account41_op(proc, ProcEnumNFS41::NFSProcedure::ILLEGAL); } }
+// CIFS v1
+void WatchAnalyzer::createDirectorySMBv1(const SMBv1::CreateDirectoryCommand* cmd, const SMBv1::CreateDirectoryArgumentType*, const SMBv1::CreateDirectoryResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_CREATE_DIRECTORY);
+}
+
+void WatchAnalyzer::deleteDirectorySMBv1(const SMBv1::DeleteDirectoryCommand* cmd, const SMBv1::DeleteDirectoryArgumentType*, const SMBv1::DeleteDirectoryResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_DELETE_DIRECTORY);
+}
+
+void WatchAnalyzer::openSMBv1(const SMBv1::OpenCommand* cmd, const SMBv1::OpenArgumentType*, const SMBv1::OpenResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_OPEN);
+}
+
+void WatchAnalyzer::createSMBv1(const SMBv1::CreateCommand* cmd, const SMBv1::CreateArgumentType*, const SMBv1::CreateResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_CREATE);
+}
+
+void WatchAnalyzer::closeSMBv1(const SMBv1::CloseCommand* cmd, const SMBv1::CloseArgumentType*, const SMBv1::CloseResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_CLOSE);
+}
+
+void WatchAnalyzer::flushSMBv1(const SMBv1::FlushCommand* cmd, const SMBv1::FlushArgumentType*, const SMBv1::FlushResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_FLUSH);
+}
+
+void WatchAnalyzer::deleteSMBv1(const SMBv1::DeleteCommand* cmd, const SMBv1::DeleteArgumentType*, const SMBv1::DeleteResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_DELETE);
+}
+
+void WatchAnalyzer::renameSMBv1(const SMBv1::RenameCommand* cmd, const SMBv1::RenameArgumentType*, const SMBv1::RenameResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_RENAME);
+}
+
+void WatchAnalyzer::queryInfoSMBv1(const SMBv1::QueryInformationCommand* cmd, const SMBv1::QueryInformationArgumentType*, const SMBv1::QueryInformationResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_QUERY_INFORMATION);
+}
+
+void WatchAnalyzer::setInfoSMBv1(const SMBv1::SetInformationCommand* cmd, const SMBv1::SetInformationArgumentType*, const SMBv1::SetInformationResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_SET_INFORMATION);
+}
+
+void WatchAnalyzer::readSMBv1(const SMBv1::ReadCommand* cmd, const SMBv1::ReadArgumentType*, const SMBv1::ReadResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_READ);
+}
+
+void WatchAnalyzer::writeSMBv1(const SMBv1::WriteCommand* cmd, const SMBv1::WriteArgumentType*, const SMBv1::WriteResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_WRITE);
+}
+
+void WatchAnalyzer::lockByteRangeSMBv1(const SMBv1::LockByteRangeCommand* cmd, const SMBv1::LockByteRangeArgumentType*, const SMBv1::LockByteRangeResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_LOCK_BYTE_RANGE);
+}
+
+void WatchAnalyzer::unlockByteRangeSMBv1(const SMBv1::UnlockByteRangeCommand* cmd, const SMBv1::UnlockByteRangeArgumentType*, const SMBv1::UnlockByteRangeResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_UNLOCK_BYTE_RANGE);
+}
+
+void WatchAnalyzer::createTmpSMBv1(const SMBv1::CreateTemporaryCommand* cmd, const SMBv1::CreateTemporaryArgumentType*, const SMBv1::CreateTemporaryResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_CREATE_TEMPORARY);
+}
+
+void WatchAnalyzer::createNewSMBv1(const SMBv1::CreateNewCommand* cmd, const SMBv1::CreateNewArgumentType*, const SMBv1::CreateNewResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_CREATE_NEW);
+}
+
+void WatchAnalyzer::checkDirectorySMBv1(const SMBv1::CheckDirectoryCommand* cmd, const SMBv1::CheckDirectoryArgumentType*, const SMBv1::CheckDirectoryResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_CHECK_DIRECTORY);
+}
+
+void WatchAnalyzer::processExitSMBv1(const SMBv1::ProcessExitCommand* cmd, const SMBv1::ProcessExitArgumentType*, const SMBv1::ProcessExitResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_PROCESS_EXIT);
+}
+
+void WatchAnalyzer::seekSMBv1(const SMBv1::SeekCommand* cmd, const SMBv1::SeekArgumentType*, const SMBv1::SeekResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_SEEK);
+}
+
+void WatchAnalyzer::lockAndReadSMBv1(const SMBv1::LockAndReadCommand* cmd, const SMBv1::LockAndReadArgumentType*, const SMBv1::LockAndReadResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_LOCK_AND_READ);
+}
+
+void WatchAnalyzer::writeAndUnlockSMBv1(const SMBv1::WriteAndUnlockCommand* cmd, const SMBv1::WriteAndUnlockArgumentType*, const SMBv1::WriteAndUnlockResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_WRITE_AND_UNLOCK);
+}
+
+void WatchAnalyzer::readRawSMBv1(const SMBv1::ReadRawCommand* cmd, const SMBv1::ReadRawArgumentType*, const SMBv1::ReadRawResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_READ_RAW);
+}
+
+void WatchAnalyzer::readMpxSMBv1(const SMBv1::ReadMpxCommand* cmd, const SMBv1::ReadMpxArgumentType*, const SMBv1::ReadMpxResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_READ_MPX);
+}
+
+void WatchAnalyzer::readMpxSecondarySMBv1(const SMBv1::ReadMpxSecondaryCommand* cmd, const SMBv1::ReadMpxSecondaryArgumentType*, const SMBv1::ReadMpxSecondaryResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_READ_MPX_SECONDARY);
+}
+
+void WatchAnalyzer::writeRawSMBv1(const SMBv1::WriteRawCommand* cmd, const SMBv1::WriteRawArgumentType*, const SMBv1::WriteRawResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_WRITE_RAW);
+}
+
+void WatchAnalyzer::writeMpxSMBv1(const SMBv1::WriteMpxCommand* cmd, const SMBv1::WriteMpxArgumentType*, const SMBv1::WriteMpxResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_WRITE_MPX);
+}
+
+void WatchAnalyzer::writeMpxSecondarySMBv1(const SMBv1::WriteMpxSecondaryCommand* cmd, const SMBv1::WriteMpxSecondaryArgumentType*, const SMBv1::WriteMpxSecondaryResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_WRITE_MPX_SECONDARY);
+}
+
+void WatchAnalyzer::writeCompleteSMBv1(const SMBv1::WriteCompleteCommand* cmd, const SMBv1::WriteCompleteArgumentType*, const SMBv1::WriteCompleteResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_WRITE_COMPLETE);
+}
+
+void WatchAnalyzer::queryServerSMBv1(const SMBv1::QueryServerCommand* cmd, const SMBv1::QueryServerArgumentType*, const SMBv1::QueryServerResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_QUERY_SERVER);
+}
+
+void WatchAnalyzer::setInfo2SMBv1(const SMBv1::SetInformation2Command* cmd, const SMBv1::SetInformation2ArgumentType*, const SMBv1::SetInformation2ResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_SET_INFORMATION2);
+}
+
+void WatchAnalyzer::queryInfo2SMBv1(const SMBv1::QueryInformation2Command* cmd, const SMBv1::QueryInformation2ArgumentType*, const SMBv1::QueryInformation2ResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_QUERY_INFORMATION2);
+}
+
+void WatchAnalyzer::lockingAndxSMBv1(const SMBv1::LockingAndxCommand* cmd, const SMBv1::LockingAndxArgumentType*, const SMBv1::LockingAndxResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_LOCKING_ANDX);
+}
+
+void WatchAnalyzer::transactionSMBv1(const SMBv1::TransactionCommand* cmd, const SMBv1::TransactionArgumentType*, const SMBv1::TransactionResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_TRANSACTION);
+}
+
+void WatchAnalyzer::transactionSecondarySMBv1(const SMBv1::TransactionSecondaryCommand* cmd, const SMBv1::TransactionSecondaryArgumentType*, const SMBv1::TransactionSecondaryResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_TRANSACTION_SECONDARY);
+}
+
+void WatchAnalyzer::ioctlSMBv1(const SMBv1::IoctlCommand* cmd, const SMBv1::IoctlArgumentType*, const SMBv1::IoctlResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_IOCTL);
+}
+
+void WatchAnalyzer::ioctlSecondarySMBv1(const SMBv1::IoctlSecondaryCommand* cmd, const SMBv1::IoctlSecondaryArgumentType*, const SMBv1::IoctlSecondaryResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_IOCTL_SECONDARY);
+}
+
+void WatchAnalyzer::copySMBv1(const SMBv1::CopyCommand* cmd, const SMBv1::CopyArgumentType*, const SMBv1::CopyResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_COPY);
+}
+
+void WatchAnalyzer::moveSMBv1(const SMBv1::MoveCommand* cmd, const SMBv1::MoveArgumentType*, const SMBv1::MoveResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_MOVE);
+}
+
+void WatchAnalyzer::echoSMBv1(const SMBv1::EchoCommand* cmd, const SMBv1::EchoArgumentType*, const SMBv1::EchoResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_ECHO);
+}
+
+void WatchAnalyzer::writeAndCloseSMBv1(const SMBv1::WriteAndCloseCommand* cmd, const SMBv1::WriteAndCloseArgumentType*, const SMBv1::WriteAndCloseResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_WRITE_AND_CLOSE);
+}
+
+void WatchAnalyzer::openAndxSMBv1(const SMBv1::OpenAndxCommand* cmd, const SMBv1::OpenAndxArgumentType*, const SMBv1::OpenAndxResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_OPEN_ANDX);
+}
+
+void WatchAnalyzer::readAndxSMBv1(const SMBv1::ReadAndxCommand* cmd, const SMBv1::ReadAndxArgumentType*, const SMBv1::ReadAndxResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_READ_ANDX);
+}
+
+void WatchAnalyzer::writeAndxSMBv1(const SMBv1::WriteAndxCommand* cmd, const SMBv1::WriteAndxArgumentType*, const SMBv1::WriteAndxResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_WRITE_ANDX);
+}
+
+void WatchAnalyzer::newFileSizeSMBv1(const SMBv1::NewFileSizeCommand* cmd, const SMBv1::NewFileSizeArgumentType*, const SMBv1::NewFileSizeResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_NEW_FILE_SIZE);
+}
+
+void WatchAnalyzer::closeAndTreeDiscSMBv1(const SMBv1::CloseAndTreeDiscCommand* cmd, const SMBv1::CloseAndTreeDiscArgumentType*, const SMBv1::CloseAndTreeDiscResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_CLOSE_AND_TREE_DISC);
+}
+
+void WatchAnalyzer::transaction2SMBv1(const SMBv1::Transaction2Command* cmd, const SMBv1::Transaction2ArgumentType*, const SMBv1::Transaction2ResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_TRANSACTION2);
+}
+
+void WatchAnalyzer::transaction2SecondarySMBv1(const SMBv1::Transaction2SecondaryCommand* cmd, const SMBv1::Transaction2SecondaryArgumentType*, const SMBv1::Transaction2SecondaryResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_TRANSACTION2_SECONDARY);
+}
+
+void WatchAnalyzer::findClose2SMBv1(const SMBv1::FindClose2Command* cmd, const SMBv1::FindClose2ArgumentType*, const SMBv1::FindClose2ResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_FIND_CLOSE2);
+}
+
+void WatchAnalyzer::findNotifyCloseSMBv1(const SMBv1::FindNotifyCloseCommand* cmd, const SMBv1::FindNotifyCloseArgumentType*, const SMBv1::FindNotifyCloseResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_FIND_NOTIFY_CLOSE);
+}
+
+void WatchAnalyzer::treeConnectSMBv1(const SMBv1::TreeConnectCommand* cmd, const SMBv1::TreeConnectArgumentType*, const SMBv1::TreeConnectResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_TREE_CONNECT);
+}
+
+void WatchAnalyzer::treeDisconnectSMBv1(const SMBv1::TreeDisconnectCommand* cmd, const SMBv1::TreeDisconnectArgumentType*, const SMBv1::TreeDisconnectResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_TREE_DISCONNECT);
+}
+
+void WatchAnalyzer::negotiateSMBv1(const SMBv1::NegotiateCommand* cmd, const SMBv1::NegotiateArgumentType*, const SMBv1::NegotiateResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_NEGOTIATE);
+}
+
+void WatchAnalyzer::sessionSetupAndxSMBv1(const SMBv1::SessionSetupAndxCommand* cmd, const SMBv1::SessionSetupAndxArgumentType*, const SMBv1::SessionSetupAndxResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_SESSION_SETUP_ANDX);
+}
+
+void WatchAnalyzer::logoffAndxSMBv1(const SMBv1::LogoffAndxCommand* cmd, const SMBv1::LogoffAndxArgumentType*, const SMBv1::LogoffAndxResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_LOGOFF_ANDX);
+}
+
+void WatchAnalyzer::treeConnectAndxSMBv1(const SMBv1::TreeConnectAndxCommand* cmd, const SMBv1::TreeConnectAndxArgumentType*, const SMBv1::TreeConnectAndxResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_TREE_CONNECT_ANDX);
+}
+
+void WatchAnalyzer::securityPackageAndxSMBv1(const SMBv1::SecurityPackageAndxCommand* cmd, const SMBv1::SecurityPackageAndxArgumentType*, const SMBv1::SecurityPackageAndxResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_SECURITY_PACKAGE_ANDX);
+}
+
+void WatchAnalyzer::queryInformationDiskSMBv1(const SMBv1::QueryInformationDiskCommand* cmd, const SMBv1::QueryInformationDiskArgumentType*, const SMBv1::QueryInformationDiskResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_QUERY_INFORMATION_DISK);
+}
+
+void WatchAnalyzer::searchSMBv1(const SMBv1::SearchCommand* cmd, const SMBv1::SearchArgumentType*, const SMBv1::SearchResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_SEARCH);
+}
+
+void WatchAnalyzer::findSMBv1(const SMBv1::FindCommand* cmd, const SMBv1::FindArgumentType*, const SMBv1::FindResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_FIND);
+}
+
+void WatchAnalyzer::findUniqueSMBv1(const SMBv1::FindUniqueCommand* cmd, const SMBv1::FindUniqueArgumentType*, const SMBv1::FindUniqueResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_FIND_UNIQUE);
+}
+
+void WatchAnalyzer::findCloseSMBv1(const SMBv1::FindCloseCommand* cmd, const SMBv1::FindCloseArgumentType*, const SMBv1::FindCloseResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_FIND_CLOSE);
+}
+
+void WatchAnalyzer::ntTransactSMBv1(const SMBv1::NtTransactCommand* cmd, const SMBv1::NtTransactArgumentType*, const SMBv1::NtTransactResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_NT_TRANSACT);
+}
+
+void WatchAnalyzer::ntTransactSecondarySMBv1(const SMBv1::NtTransactSecondaryCommand* cmd, const SMBv1::NtTransactSecondaryArgumentType*, const SMBv1::NtTransactSecondaryResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_NT_TRANSACT_SECONDARY);
+}
+
+void WatchAnalyzer::ntCreateAndxSMBv1(const SMBv1::NtCreateAndxCommand* cmd, const SMBv1::NtCreateAndxArgumentType*, const SMBv1::NtCreateAndxResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_NT_CREATE_ANDX);
+}
+
+void WatchAnalyzer::ntCancelSMBv1(const SMBv1::NtCancelCommand* cmd, const SMBv1::NtCancelArgumentType*, const SMBv1::NtCancelResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_NT_CANCEL);
+}
+
+void WatchAnalyzer::ntRenameSMBv1(const SMBv1::NtRenameCommand* cmd, const SMBv1::NtRenameArgumentType*, const SMBv1::NtRenameResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_NT_RENAME);
+}
+
+void WatchAnalyzer::openPrintFileSMBv1(const SMBv1::OpenPrintFileCommand* cmd, const SMBv1::OpenPrintFileArgumentType*, const SMBv1::OpenPrintFileResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_OPEN_PRINT_FILE);
+}
+
+void WatchAnalyzer::writePrintFileSMBv1(const SMBv1::WritePrintFileCommand* cmd, const SMBv1::WritePrintFileArgumentType*, const SMBv1::WritePrintFileResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_WRITE_PRINT_FILE);
+}
+
+void WatchAnalyzer::closePrintFileSMBv1(const SMBv1::ClosePrintFileCommand* cmd, const SMBv1::ClosePrintFileArgumentType*, const SMBv1::ClosePrintFileResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_CLOSE_PRINT_FILE);
+}
+
+void WatchAnalyzer::getPrintQueueSMBv1(const SMBv1::GetPrintQueueCommand* cmd, const SMBv1::GetPrintQueueArgumentType*, const SMBv1::GetPrintQueueResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_GET_PRINT_QUEUE);
+}
+
+void WatchAnalyzer::readBulkSMBv1(const SMBv1::ReadBulkCommand* cmd, const SMBv1::ReadBulkArgumentType*, const SMBv1::ReadBulkResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_READ_BULK);
+}
+
+void WatchAnalyzer::writeBulkSMBv1(const SMBv1::WriteBulkCommand* cmd, const SMBv1::WriteBulkArgumentType*, const SMBv1::WriteBulkResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_WRITE_BULK);
+}
+
+void WatchAnalyzer::writeBulkDataSMBv1(const SMBv1::WriteBulkDataCommand* cmd, const SMBv1::WriteBulkDataArgumentType*, const SMBv1::WriteBulkDataResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_WRITE_BULK_DATA);
+}
+
+void WatchAnalyzer::invalidSMBv1(const SMBv1::InvalidCommand* cmd, const SMBv1::InvalidArgumentType*, const SMBv1::InvalidResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_INVALID);
+}
+
+void WatchAnalyzer::noAndxCommandSMBv1(const SMBv1::NoAndxCommand* cmd, const SMBv1::NoAndxCmdArgumentType*, const SMBv1::NoAndxCmdResultType*)
+{
+    cifsv1_account(cmd, SMBv1::SMBv1Commands::SMB_COM_NO_ANDX_COMMAND);
+}
+
 // CIFS v2
 
 void WatchAnalyzer::closeFileSMBv2(const SMBv2::CloseFileCommand* cmd, const SMBv2::CloseRequest*, const SMBv2::CloseResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::CLOSE);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_CLOSE);
 }
 
 void WatchAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand* cmd, const SMBv2::NegotiateRequest*, const SMBv2::NegotiateResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::NEGOTIATE);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_NEGOTIATE);
 }
 
 void WatchAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd, const SMBv2::SessionSetupRequest*, const SMBv2::SessionSetupResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::SESSION_SETUP);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_SESSION_SETUP);
 }
 
 void WatchAnalyzer::logOffSMBv2(const SMBv2::LogOffCommand* cmd, const SMBv2::LogOffRequest*, const SMBv2::LogOffResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::LOGOFF);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_LOGOFF);
 }
 
 void WatchAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd, const SMBv2::TreeConnectRequest*, const SMBv2::TreeConnectResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::TREE_CONNECT);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_TREE_CONNECT);
 }
 
 void WatchAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd, const SMBv2::TreeDisconnectRequest*, const SMBv2::TreeDisconnectResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::TREE_DISCONNECT);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_TREE_DISCONNECT);
 }
 
 void WatchAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd, const SMBv2::CreateRequest*, const SMBv2::CreateResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::CREATE);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_CREATE);
 }
 
 void WatchAnalyzer::flushSMBv2(const SMBv2::FlushCommand* cmd, const SMBv2::FlushRequest*, const SMBv2::FlushResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::FLUSH);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_FLUSH);
 }
 
 void WatchAnalyzer::readSMBv2(const SMBv2::ReadCommand* cmd, const SMBv2::ReadRequest*, const SMBv2::ReadResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::READ);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_READ);
 }
 
 void WatchAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd, const SMBv2::WriteRequest*, const SMBv2::WriteResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::WRITE);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_WRITE);
 }
 
 void WatchAnalyzer::lockSMBv2(const SMBv2::LockCommand* cmd, const SMBv2::LockRequest*, const SMBv2::LockResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::LOCK);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_LOCK);
 }
 
 void WatchAnalyzer::ioctlSMBv2(const SMBv2::IoctlCommand* cmd, const SMBv2::IoCtlRequest*, const SMBv2::IoCtlResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::IOCTL);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_IOCTL);
 }
 
 void WatchAnalyzer::cancelSMBv2(const SMBv2::CancelCommand* cmd, const SMBv2::CancelRequest*, const SMBv2::CancelResponce*)
 {
-    cifs_account(cmd, SMBv2Commands::CANCEL);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_CANCEL);
 }
 
 void WatchAnalyzer::echoSMBv2(const SMBv2::EchoCommand* cmd, const SMBv2::EchoRequest*, const SMBv2::EchoResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::ECHO);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_ECHO);
 }
 
 void WatchAnalyzer::queryDirSMBv2(const SMBv2::QueryDirCommand* cmd, const SMBv2::QueryDirRequest*, const SMBv2::QueryDirResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::QUERY_DIRECTORY);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_QUERY_DIRECTORY);
 }
 
 void WatchAnalyzer::changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* cmd, const SMBv2::ChangeNotifyRequest*, const SMBv2::ChangeNotifyResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::CHANGE_NOTIFY);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_CHANGE_NOTIFY);
 }
 
 void WatchAnalyzer::queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd, const SMBv2::QueryInfoRequest*, const SMBv2::QueryInfoResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::QUERY_INFO);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_QUERY_INFO);
 }
 
 void WatchAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* cmd, const SMBv2::SetInfoRequest*, const SMBv2::SetInfoResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::SET_INFO);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_SET_INFO);
 }
 
 void WatchAnalyzer::breakOplockSMBv2(const SMBv2::BreakOpLockCommand* cmd, const SMBv2::OplockAcknowledgment*, const SMBv2::OplockResponse*)
 {
-    cifs_account(cmd, SMBv2Commands::OPLOCK_BREAK);
+    cifsv2_account(cmd, SMBv2::SMBv2Commands::SMBv2_COM_OPLOCK_BREAK);
 }
 
 void WatchAnalyzer::flush_statistics()
