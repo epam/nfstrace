@@ -493,23 +493,8 @@ public:
 
 private:
 
-    template<typename Cmd, typename Code>
-    void cifsv2_account(const Cmd* /*proc*/, Code cmd_code)
-    {
-        std::vector<std::size_t> cifsv2_proc_count (static_cast<int>(SMBv2::SMBv2Commands::CMD_COUNT), 0);
-        ++cifsv2_proc_count[static_cast<int>(cmd_code)];
-        gui.update(&_cifsv2, cifsv2_proc_count);
-    }
-
-    template<typename Cmd, typename Code>
-    void cifsv1_account(const Cmd* /*proc*/, Code cmd_code)
-    {
-        std::vector<std::size_t> cifsv1_proc_count (static_cast<int>(SMBv1::SMBv1Commands::CMD_COUNT), 0);
-        ++cifsv1_proc_count[static_cast<int>(cmd_code)];
-        gui.update(&_cifsv1, cifsv1_proc_count);
-    }
-
     void count_proc(const RPCProcedure* proc);
+    void cifs_account(AbstractProtocol &protocol, int cmd_code);
     void nfs_account(const RPCProcedure*,
                      const unsigned int nfs_minor_vers = NFS_V41);
     void account40_op(const RPCProcedure*, const ProcEnumNFS4::NFSProcedure);
