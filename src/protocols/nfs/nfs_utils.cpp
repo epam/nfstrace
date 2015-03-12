@@ -31,6 +31,7 @@ namespace NFS
 {
 
 void print_hex64(std::ostream& out, uint64_t val)
+
 {
     out << "0x" << std::setfill('0') << std::setw(16) << std::hex << val
         << std::dec << std::setfill(' ');

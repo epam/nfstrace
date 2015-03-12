@@ -53,14 +53,7 @@ namespace NFS4  = NST::API::NFS4;
 namespace NFS41 = NST::API::NFS41;
 
 namespace
-{
-
-enum class NewLine
-{
-    Add,            // default value
-    Remove
-};
-
+{ 
 bool print_procedure(std::ostream& out, const RPCProcedure* proc)
 {
     using namespace NST::utils;
@@ -859,15 +852,12 @@ void PrintAnalyzer::closeFileSMBv2(const SMBv2::CloseFileCommand* cmd,
 {
     Commands cmdEnum = Commands::CLOSE;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
-    out << "  Close Flags = "
-        << cmd->parg->Flags
-        << "\n";
+
+    print_enum(out,"Close Flags", cmd->parg->Flags);
 
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
 
-    out << "  Close Flags = "
-        << res->Flags
-        << "\n";
+    print_enum(out,"Close Flags", res->Flags);
 
     out << "  Create = ";
     print_time(out, res->CreationTime);
@@ -904,13 +894,8 @@ void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand* cmd,
         << cmd->parg->dialectCount
         << "\n";
 
-    out << "  Security mode = "
-        << cmd->parg->securityMode
-        << "\n";
-
-    out << "  Capabilities = "
-        << cmd->parg->capabilities
-        << "\n";
+    print_enum(out,"Security mode", cmd->parg->securityMode);
+    print_enum(out,"Capabilities", cmd->parg->capabilities); 
 
     out << "  Client Guid = ";
     print_guid(out, cmd->parg->clientGUID);
@@ -928,9 +913,7 @@ void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand* cmd,
 
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
 
-    out << "  Security mode = "
-        << res->securityMode
-        << "\n";
+    print_enum(out,"Security mode", res->securityMode); 
 
     out << "  Dialect = ";
     print_hex16(out, res->dialectRevision);
@@ -940,9 +923,7 @@ void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand* cmd,
     print_guid(out, res->serverGUID);
     out << "\n";
 
-    out << "  Capabilities = "
-        << res->capabilities
-        << "\n";
+    print_enum(out,"Capabilities", res->capabilities); 
 
     out << "  Max Transaction Size  = "
         << res->maxTransactSize
@@ -970,14 +951,14 @@ void PrintAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd,
 {
     Commands cmdEnum = Commands::SESSION_SETUP;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
-    out << "  Flags = " << cmd->parg->VcNumber << "\n"
-        << "  Security mode = " << cmd->parg->securityMode << "\n"
-        << "  Capabilities = " << cmd->parg->capabilities << "\n"
-        << "  Channel = " << cmd->parg->Channel << "\n"
+    print_enum(out,"Flags", cmd->parg->VcNumber); 
+    print_enum(out,"Security mode", cmd->parg->securityMode); 
+    print_enum(out,"Capabilities", cmd->parg->capabilities); 
+    out << "  Channel = " << cmd->parg->Channel << "\n"
         << "  Previous session id = " << cmd->parg->PreviousSessionId << "\n";
     //TODO: print security blob ( cmd->parg->Buffer )
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
-    out << "  Session flags = " << res->sessionFlags;
+    print_enum(out,"Session flags", res->sessionFlags, NewLine::Remove); 
     //TODO: print security blob ( res->Buffer )
 }
 void PrintAnalyzer::logOffSMBv2(const SMBv2::LogOffCommand* cmd,
@@ -1001,11 +982,12 @@ void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd,
         print_buffer(out,cmd->parg->Buffer, cmd->parg->PathLength);
     }
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
-    out << "  Share types = " << res->ShareType << "\n"
-        << "  Capabilities = "  << res->capabilities << "\n"
-        << "  Share flags = " << res->shareFlags << "\n"
-        << "  Access mask = " << static_cast<NST::API::SMBv2::AccessMask>(res->MaximalAccess);
+    print_enum(out,"Share types", res->ShareType); 
+    print_enum(out,"Capabilities", res->capabilities); 
+    print_enum(out,"Share flags", res->shareFlags); 
+    print_enum(out,"Access mask", static_cast<NST::API::SMBv2::AccessMask>(res->MaximalAccess), NewLine::Remove); 
 }
+
 void PrintAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd,
                                         const SMBv2::TreeDisconnectRequest*,
                                         const SMBv2::TreeDisconnectResponse*)
@@ -1021,37 +1003,24 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
     Commands cmdEnum = Commands::CREATE;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
 
-    out << "  Oplock = "
-        << cmd->parg->RequestedOplockLevel
-        << "\n"
-        << "  Impersonation = " << cmd->parg->ImpersonationLevel << "\n"
-        << "  Create Flags = ";
-
+    print_enum(out,"Oplock", cmd->parg->RequestedOplockLevel); 
+    print_enum(out,"Impersonation", cmd->parg->ImpersonationLevel); 
+    out << "  Create Flags = "; 
     print_hex64(out, cmd->parg->SmbCreateFlags);
     out << "\n";
 
-    out << "  Access Mask = "
-        << cmd->parg->desiredAccess
-        << "\n";
-
-    out << "  File Attributes = "
-        << cmd->parg->attributes
-        << "\n";
-
-    out << "  Share Access = "
-        << cmd->parg->shareAccess
-        << "\n"
-        << "  Disposition = " << cmd->parg->createDisposition
-        << "\n"
-        << "  Create Options = "
-        << cmd->parg->createOptions;
+    print_enum(out,"Access Mask", cmd->parg->desiredAccess); 
+    print_enum(out,"File Attributes", cmd->parg->attributes); 
+    print_enum(out,"Share Access", cmd->parg->shareAccess); 
+    print_enum(out,"Disposition", cmd->parg->createDisposition); 
+    print_enum(out,"Create Options", cmd->parg->createOptions); 
 
     if(cmd->parg->NameLength > 0)
     {
-        out << "\n  File name = ";
+        out << "  File name = ";
         print_buffer(out, cmd->parg->Buffer, cmd->parg->NameLength);
 
-        out << "  File length = " << cmd->parg->NameLength;
+        out << "  File length = " << cmd->parg->NameLength << "\n";
     }
 
     //
@@ -1059,16 +1028,13 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
     // handle and test this in future
     //
 
-    out << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
 
-    out << "  Oplock = "
-        << res->oplockLevel
-        << "\n"
-        << "  Response Flags = ";
+    print_enum(out,"Oplock", res->oplockLevel); 
+    out << "  Response Flags = ";
     print_hex8(out, res->flag);
-    out << "\n"
-        << "  Create Action = " << res->CreateAction;
+    out << "\n";
+    print_enum(out, "Create Action", res->CreateAction, NewLine::Remove); 
 
     if (cmd->res_header && cmd->res_header->status == to_integral(NST::API::SMBv2::NTStatus::STATUS_SUCCESS))
     {
@@ -1090,8 +1056,7 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
         out << "  End Of File = ";
         print_time(out, res->EndofFile);
 
-        out << "  File Attributes = " 
-            << res->attributes;
+        print_enum(out,"File Attributes", res->attributes, NewLine::Remove); 
     }
 }
 
@@ -1144,8 +1109,8 @@ void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
     << "  Channel = " << to_integral(cmd->parg->Channel) << "\n"
     << "  Remaining Bytes = " << cmd->parg->RemainingBytes << "\n"
     << "  Channel Info Offset = " << cmd->parg->WriteChannelInfoOffset << "\n"
-    << "  Channel Info Length = " << cmd->parg->WriteChannelInfoLength << "\n"
-    << "  Write Flags = " << cmd->parg->Flags << "\n";
+    << "  Channel Info Length = " << cmd->parg->WriteChannelInfoLength << "\n"; 
+    print_enum(out, "Write Flags", cmd->parg->Flags); 
     // TODO: Wireshark also shows binary representation of file ...
     // For now it is skipped
 
@@ -1173,16 +1138,16 @@ void PrintAnalyzer::ioctlSMBv2(const SMBv2::IoctlCommand* cmd,
 {
     Commands cmdEnum = Commands::IOCTL;
     print_smbv2_common_info_req(out, cmdEnum, cmd); 
-    out << "  Control Code = " << cmd->parg->CtlCode << "\n"
-        << "  Input offset = " << cmd->parg->InputOffset << "\n"
+    print_enum(out,"Control Code", cmd->parg->CtlCode); 
+    out << "  Input offset = " << cmd->parg->InputOffset << "\n"
         << "  Input count = " << cmd->parg->InputCount << "\n"
         << "  Max input response = " << cmd->parg->MaxInputResponse << "\n"
         << "  Output offset = " << cmd->parg->OutputOffset << "\n"
         << "  Output count = " << cmd->parg->OutputCount << "\n"
         << "  Max output response  = " << cmd->parg->MaxOutputResponse << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
-    out << "  Control Code = " << res->CtlCode << "\n"
-        << "  Input offset = " << res->InputOffset << "\n"
+    print_enum(out,"Control Code", res->CtlCode); 
+    out << "  Input offset = " << res->InputOffset << "\n"
         << "  Input count = " << res->InputCount << "\n"
         << "  Output offset = " << res->OutputOffset << "\n"
         << "  Output count = " << res->OutputCount;
@@ -1208,8 +1173,11 @@ void PrintAnalyzer::queryDirSMBv2(const SMBv2::QueryDirCommand* cmd,
 {
     Commands cmdEnum = Commands::QUERY_DIRECTORY;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
-    out << "  Info level = " << cmd->parg->infoType << "\n"
-        << "  File index = " << cmd->parg->FileIndex << "\n";
+    print_enum(out,"Info level", cmd->parg->infoType); 
+    out << "  File index = " << cmd->parg->FileIndex << "\n"
+        << "  Output buffer length = " << cmd->parg->OutputBufferLength << "\n"
+        << "  Search pattern =";
+    print_buffer(out, cmd->parg->Buffer, cmd->parg->FileNameLength);
     print_smbv2_common_info_resp(out, cmdEnum, cmd, NewLine::Remove);
 }
 void PrintAnalyzer::changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* cmd,
@@ -1235,7 +1203,7 @@ void PrintAnalyzer::queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd,
     using namespace NST::API::SMBv2;
     Commands cmdEnum = Commands::QUERY_INFO;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
-    out << "  Class = " << cmd->parg->infoType << "\n";
+    print_enum(out,"Class", cmd->parg->infoType); 
     print_info_levels(out, cmd->parg->infoType, cmd->parg->FileInfoClass);
     //TODO: Print GUID handle file
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
@@ -1250,7 +1218,7 @@ void PrintAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* cmd,
 {
     Commands cmdEnum = Commands::SET_INFO;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
-    out << "  Class = " << cmd->parg->infoType << "\n";
+    print_enum(out,"Class", cmd->parg->infoType); 
     print_info_levels(out, cmd->parg->infoType, cmd->parg->FileInfoClass);
     //TODO: Print GUID handle file
     out << "  Setinfo Size = ";
