@@ -1,4 +1,4 @@
-NFSTRACE
+NFSTRACE ![NFSTRACE Logo](docs/logo64.png "Logo")
 ========
 
 `nfstrace` is an NFS tracing/monitoring/capturing/analyzing tool.
