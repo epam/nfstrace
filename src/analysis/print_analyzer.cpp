@@ -36,7 +36,6 @@
 #include "protocols/cifs2/cifs2_utils.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
-
 namespace NST
 {
 namespace analysis
@@ -956,10 +955,8 @@ void PrintAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd,
     print_enum(out,"Capabilities", cmd->parg->capabilities); 
     out << "  Channel = " << cmd->parg->Channel << "\n"
         << "  Previous session id = " << cmd->parg->PreviousSessionId << "\n";
-    //TODO: print security blob ( cmd->parg->Buffer )
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
     print_enum(out,"Session flags", res->sessionFlags, NewLine::Remove); 
-    //TODO: print security blob ( res->Buffer )
 }
 void PrintAnalyzer::logOffSMBv2(const SMBv2::LogOffCommand* cmd,
                                 const SMBv2::LogOffRequest*,
@@ -985,7 +982,7 @@ void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd,
     print_enum(out,"Share types", res->ShareType); 
     print_enum(out,"Capabilities", res->capabilities); 
     print_enum(out,"Share flags", res->shareFlags); 
-    print_enum(out,"Access mask", static_cast<NST::API::SMBv2::AccessMask>(res->MaximalAccess), NewLine::Remove); 
+    print_enum(out,"Access mask", static_cast<SMBv2::AccessMask>(res->MaximalAccess), NewLine::Remove);
 }
 
 void PrintAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd,
@@ -1023,11 +1020,6 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
         out << "  File length = " << cmd->parg->NameLength << "\n";
     }
 
-    //
-    // TODO: In some cases buffer can contains : CreateContextsOffset, and CreateContextsLength
-    // handle and test this in future
-    //
-
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
 
     print_enum(out,"Oplock", res->oplockLevel); 
@@ -1036,7 +1028,7 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
     out << "\n";
     print_enum(out, "Create Action", res->CreateAction, NewLine::Remove); 
 
-    if (cmd->res_header && cmd->res_header->status == to_integral(NST::API::SMBv2::NTStatus::STATUS_SUCCESS))
+    if (cmd->res_header && cmd->res_header->status == to_integral(SMBv2::NTStatus::STATUS_SUCCESS))
     {
         out << "\n  Create = ";
         print_time(out, res->CreationTime);
@@ -1111,8 +1103,6 @@ void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
     << "  Channel Info Offset = " << cmd->parg->WriteChannelInfoOffset << "\n"
     << "  Channel Info Length = " << cmd->parg->WriteChannelInfoLength << "\n"; 
     print_enum(out, "Write Flags", cmd->parg->Flags); 
-    // TODO: Wireshark also shows binary representation of file ...
-    // For now it is skipped
 
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
 
@@ -1200,12 +1190,10 @@ void PrintAnalyzer::queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd,
                                    const SMBv2::QueryInfoRequest*,
                                    const SMBv2::QueryInfoResponse* res)
 {
-    using namespace NST::API::SMBv2;
     Commands cmdEnum = Commands::QUERY_INFO;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
     print_enum(out,"Class", cmd->parg->infoType); 
     print_info_levels(out, cmd->parg->infoType, cmd->parg->FileInfoClass);
-    //TODO: Print GUID handle file
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
     out << "  Offset = ";
     print_hex32(out, res->OutputBufferOffset); 
@@ -1220,7 +1208,6 @@ void PrintAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* cmd,
     print_smbv2_common_info_req(out, cmdEnum, cmd);
     print_enum(out,"Class", cmd->parg->infoType); 
     print_info_levels(out, cmd->parg->infoType, cmd->parg->FileInfoClass);
-    //TODO: Print GUID handle file
     out << "  Setinfo Size = ";
     print_hex32(out, cmd->parg->BufferLength); 
     out << "\n  Setinfo Offset = ";
