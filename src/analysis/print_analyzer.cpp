@@ -1176,14 +1176,14 @@ void PrintAnalyzer::changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* cmd,
 {
     Commands cmdEnum = Commands::CHANGE_NOTIFY;
     print_smbv2_common_info_req(out, cmdEnum, cmd);
-    out << "  Length = 0x";
+    out << "  Length = ";
     print_hex32(out, cmd->parg->OutputBufferLength);
     out << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
-    out << "  Offset = 0x";
+    out << "  Offset = ";
     print_hex32(out, res->OutputBufferOffset); 
     out << "\n";
-    out << "  Length = 0x";
+    out << "  Length = ";
     print_hex32(out, res->OutputBufferLength);
 }
 void PrintAnalyzer::queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd,
@@ -1195,9 +1195,9 @@ void PrintAnalyzer::queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd,
     print_enum(out,"Class", cmd->parg->infoType); 
     print_info_levels(out, cmd->parg->infoType, cmd->parg->FileInfoClass);
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
-    out << "  Offset = 0x";
+    out << "  Offset = ";
     print_hex32(out, res->OutputBufferOffset); 
-    out << "\n  Length = 0x";
+    out << "\n  Length = ";
     print_hex32(out, res->OutputBufferLength);
 }
 void PrintAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* cmd,
@@ -1210,7 +1210,7 @@ void PrintAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* cmd,
     print_info_levels(out, cmd->parg->infoType, cmd->parg->FileInfoClass);
     out << "  Setinfo Size = ";
     print_hex32(out, cmd->parg->BufferLength); 
-    out << "\n  Setinfo Offset = 0x";
+    out << "\n  Setinfo Offset = ";
     print_hex16(out, cmd->parg->BufferOffset);
     out << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
