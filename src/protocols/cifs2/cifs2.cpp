@@ -20,7 +20,7 @@
 */
 //------------------------------------------------------------------------------
 #include <arpa/inet.h>
-#include <assert.h>
+#include <cassert>
 
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/cifs/cifs.h"
