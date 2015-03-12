@@ -24,6 +24,7 @@
 #define NFS_UTILS_H
 //------------------------------------------------------------------------------
 #include <ostream>
+#include <iomanip>
 #include <cstring>
 
 #include "utils/out.h"
@@ -42,13 +43,41 @@ inline bool out_all()
     return Out::Global::get_level() == Out::Level::All;
 }
 
+namespace 
+{
+template <typename T>
+struct Helper
+{ 
+    static void print_hex(std::ostream& out, T val)
+    {
+        out << "0x" << std::setfill('0') << std::setw(sizeof(T)/4) << std::hex << val
+            << std::dec << std::setfill(' ');
+    }
+};
+template <>
+struct Helper<uint8_t>
+{ 
+    static void print_hex(std::ostream& out, char val)
+    {
+        out << "0x" << std::setfill('0') << std::setw(4) << std::hex << 
+            static_cast<uint16_t>(val) << std::dec << std::setfill(' ');
+    }
+};
+}
+
+template <typename T>
+void print_hex(std::ostream& out, T val)
+{
+    Helper<T>::print_hex(out, val);
+} 
+
 void print_hex64(std::ostream& out, uint64_t val);
 
 void print_hex32(std::ostream& out, uint32_t val);
 
 void print_hex16(std::ostream& out, uint16_t val);
 
-void print_hex8(std::ostream& out, uint8_t val);
+void print_hex8(std::ostream& out, uint8_t val); 
 
 void print_hex(std::ostream& out,
        const uint32_t* const val,
