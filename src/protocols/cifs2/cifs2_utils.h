@@ -26,6 +26,7 @@
 #include <assert.h>
 
 #include "api/cifs2_commands.h"
+#include "protocols/nfs/nfs_utils.h"
 
 namespace NST
 {
@@ -34,20 +35,18 @@ namespace protocols
 namespace CIFSv2
 {
 
+enum class NewLine
+{
+    Add,            // default value
+    Remove
+};
+
 template<typename E>
 inline constexpr auto to_integral(E e) -> typename std::underlying_type<E>::type
 {
     return static_cast<typename std::underlying_type<E>::type>(e);
 }
 
-inline std::string ClearFromLastDelimiter(std::string str, std::string delimiter)
-{
-    if (str.length() == 0) return str;
-    return str.erase(str.length() - delimiter.length());
-}
-
-
-void print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoType, const uint8_t infoClass);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::QueryInfoLevels infoLevels);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::FsInfoLevels infoLevels);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CtlCodes code);
@@ -72,6 +71,29 @@ std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::NTStatus value
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::AccessMask value);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::CloseFlags value);
 std::ostream& operator<<(std::ostream& os, const NST::API::SMBv2::SecurityMode value);
+
+inline std::string ClearFromLastDelimiter(std::string str, const std::string& delimiter)
+{
+    if (str.length() == 0) return str;
+    return str.erase(str.length() - delimiter.length());
+} 
+
+template <typename T>
+void print_enum(std::ostream& os, const std::string name, T value, NewLine nl = NewLine::Add)
+{
+    using namespace NST::API::SMBv2;
+    using namespace NST::protocols::NFS;
+    os << "  " << name << " = ";
+    auto int_value = to_integral(value);
+    print_hex(os, int_value);
+    os << " (" << value << ")"; 
+    if(nl == NewLine::Add)
+    {
+        os << "\n";
+    }
+} 
+
+void print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoType, const uint8_t infoClass);
 }// namespace CIFSv2    
 }// namespace protocols 
 }// namespace NST       
