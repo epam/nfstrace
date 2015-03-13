@@ -23,7 +23,7 @@
 #include "cifsv2_protocol.h"
 //------------------------------------------------------------------------------
 CIFSv2Protocol::CIFSv2Protocol()
-: AbstractProtocol {"CIFS v2", SMBv2Commands::Commands::CMD_COUNT}
+: AbstractProtocol {"CIFS v2", static_cast<std::size_t>(SMBv2::SMBv2Commands::CMD_COUNT)}
 {
 }
 
@@ -33,9 +33,8 @@ CIFSv2Protocol::~CIFSv2Protocol()
 
 const char* CIFSv2Protocol::printProcedure(std::size_t i)
 {
-    if ( i >= SMBv2Commands::Commands::CMD_COUNT) { return nullptr; }
-    SMBv2Commands tmp;
-    return tmp.command_name(i).c_str();
+    if ( i >= static_cast<std::size_t>(SMBv2::SMBv2Commands::CMD_COUNT)) { return nullptr; }
+    return print_cifs2_procedures(static_cast<SMBv2::SMBv2Commands>(i));
 }
 //------------------------------------------------------------------------------
 

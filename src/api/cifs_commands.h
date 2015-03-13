@@ -34,7 +34,6 @@ namespace API
  */
 namespace SMBv1
 {
-
 /*! CIFS v1 commands list
  */
 enum class SMBv1Commands
