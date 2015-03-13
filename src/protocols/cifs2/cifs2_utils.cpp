@@ -270,25 +270,29 @@ std::ostream& operator<<(std::ostream& out, const ShareFlags value)
 {
     auto int_value = to_integral(value) & ~to_integral(ShareFlags::NO_CACHING);
 
-    print_flag_if_set(out, "SMB2_SHAREFLAG_DFS",                           int_value, ShareFlags::DFS);
-    print_flag_if_set(out, "SMB2_SHAREFLAG_DFS_ROOT",                      int_value, ShareFlags::DFS_ROOT);
-    print_flag_if_set(out, "SMB2_SHAREFLAG_RESTRICT_EXCLUSIVE_OPENS",      int_value, ShareFlags::RESTRICT_EXCLUSIVE_OPENS);
-    print_flag_if_set(out, "SMB2_SHAREFLAG_FORCE_SHARED_DELETE",           int_value, ShareFlags::FORCE_SHARED_DELETE);
-    print_flag_if_set(out, "SMB2_SHAREFLAG_ALLOW_NAMESPACE_CACHING",       int_value, ShareFlags::ALLOW_NAMESPACE_CACHING);
-    print_flag_if_set(out, "SMB2_SHAREFLAG_ACCESS_BASED_DIRECTORY_ENUM",   int_value, ShareFlags::ACCESS_BASED_DIRECTORY_ENUM);
-    print_flag_if_set(out, "SMB2_SHAREFLAG_FORCE_LEVELII_OPLOCK",          int_value, ShareFlags::FORCE_LEVELII_OPLOCK);
-    print_flag_if_set(out, "SMB2_SHAREFLAG_ENABLE_HASH_V1",                int_value, ShareFlags::ENABLE_HASH);
-    print_flag_if_set(out, "SMB2_SHAREFLAG_ENABLE_HASH_V2",                int_value, ShareFlags::ENABLE_HASH_2);
-    print_flag_if_set(out, "SMB2_SHAREFLAG_ENCRYPT_DATA",                  int_value, ShareFlags::ENABLE_ENCRYPT_DATA);
-
-    out << " Caching policy = ";
+    out << "Caching policy = ";
     switch(to_integral(value) & to_integral(ShareFlags::NO_CACHING))
     {
-        case to_integral(ShareFlags::MANUAL_CACHING):    return out << "MANUAL_CACHING"; 
-        case to_integral(ShareFlags::AUTO_CACHING):      return out << "AUTO_CACHING"; 
-        case to_integral(ShareFlags::VDO_CACHING):       return out << "VDO_CACHING"; 
-        case to_integral(ShareFlags::NO_CACHING):        return out << "NO_CACHING"; 
+        case to_integral(ShareFlags::MANUAL_CACHING):    out << "MANUAL_CACHING"; break;
+        case to_integral(ShareFlags::AUTO_CACHING):      out << "AUTO_CACHING";   break; 
+        case to_integral(ShareFlags::VDO_CACHING):       out << "VDO_CACHING";    break;
+        case to_integral(ShareFlags::NO_CACHING):        out << "NO_CACHING";     break;
     } 
+
+    if(int_value > 0)
+    {
+        out << flagDelimiter; 
+        print_flag_if_set(out, "SMB2_SHAREFLAG_DFS",                           int_value, ShareFlags::DFS);
+        print_flag_if_set(out, "SMB2_SHAREFLAG_DFS_ROOT",                      int_value, ShareFlags::DFS_ROOT);
+        print_flag_if_set(out, "SMB2_SHAREFLAG_RESTRICT_EXCLUSIVE_OPENS",      int_value, ShareFlags::RESTRICT_EXCLUSIVE_OPENS);
+        print_flag_if_set(out, "SMB2_SHAREFLAG_FORCE_SHARED_DELETE",           int_value, ShareFlags::FORCE_SHARED_DELETE);
+        print_flag_if_set(out, "SMB2_SHAREFLAG_ALLOW_NAMESPACE_CACHING",       int_value, ShareFlags::ALLOW_NAMESPACE_CACHING);
+        print_flag_if_set(out, "SMB2_SHAREFLAG_ACCESS_BASED_DIRECTORY_ENUM",   int_value, ShareFlags::ACCESS_BASED_DIRECTORY_ENUM);
+        print_flag_if_set(out, "SMB2_SHAREFLAG_FORCE_LEVELII_OPLOCK",          int_value, ShareFlags::FORCE_LEVELII_OPLOCK);
+        print_flag_if_set(out, "SMB2_SHAREFLAG_ENABLE_HASH_V1",                int_value, ShareFlags::ENABLE_HASH);
+        print_flag_if_set(out, "SMB2_SHAREFLAG_ENABLE_HASH_V2",                int_value, ShareFlags::ENABLE_HASH_2);
+        print_flag_if_set(out, "SMB2_SHAREFLAG_ENCRYPT_DATA",                  int_value, ShareFlags::ENABLE_ENCRYPT_DATA); 
+    }
 
     return out;
 }
@@ -297,11 +301,17 @@ std::ostream& operator<<(std::ostream& out, const ShareCapabilities value)
 {
     auto int_value = to_integral(value);
 
-    print_flag_if_set(out, "SMB2_SHARE_CAP_DFS",                       int_value, ShareCapabilities::DFS);
-    print_flag_if_set(out, "SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY",   int_value, ShareCapabilities::CONTINUOUS_AVAILABILITY);
-    print_flag_if_set(out, "SMB2_SHARE_CAP_SCALEOUT",                  int_value, ShareCapabilities::SCALEOUT);
-    print_flag_if_set(out, "SMB2_SHARE_CAP_CLUSTER",                   int_value, ShareCapabilities::CLUSTER);
-    print_flag_if_set(out, "SMB2_SHARE_CAP_ASYMMETRIC",                int_value, ShareCapabilities::ASYMMETRIC);
+    if(int_value > 0)
+    { 
+        print_flag_if_set(out, "SMB2_SHARE_CAP_DFS",                       int_value, ShareCapabilities::DFS);
+        print_flag_if_set(out, "SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY",   int_value, ShareCapabilities::CONTINUOUS_AVAILABILITY);
+        print_flag_if_set(out, "SMB2_SHARE_CAP_SCALEOUT",                  int_value, ShareCapabilities::SCALEOUT);
+        print_flag_if_set(out, "SMB2_SHARE_CAP_CLUSTER",                   int_value, ShareCapabilities::CLUSTER);
+        print_flag_if_set(out, "SMB2_SHARE_CAP_ASYMMETRIC",                int_value, ShareCapabilities::ASYMMETRIC);
+    } else 
+    {
+        out << "Capabilities field is not set";
+    }
 
     return out;
 }
@@ -375,7 +385,13 @@ std::ostream& operator<<(std::ostream& out, const CloseFlags value)
 {
     auto int_value = to_integral(value);
 
-    print_flag_if_set(out, "POSTQUERY_ATTRIB",   int_value, CloseFlags::POSTQUERY_ATTRIB);
+    if(int_value > 0)
+    {
+        print_flag_if_set(out, "POSTQUERY_ATTRIB",   int_value, CloseFlags::POSTQUERY_ATTRIB);
+    } else 
+    {
+        out << "Close Flag field is not set";
+    }
 
     return out;
 }
