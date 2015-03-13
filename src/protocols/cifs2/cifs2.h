@@ -23,6 +23,7 @@
 #define CIFSv2_HEADER_H
 //------------------------------------------------------------------------------
 #include "api/cifs_commands.h"
+#include "api/cifs2_commands.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -31,7 +32,8 @@ namespace protocols
 {
 namespace CIFSv2
 {
-namespace SMBv2 = NST::API::SMBv2;
+
+using SMBv2Commands = NST::API::SMBv2::SMBv2Commands;
 
 /*! CIFS v2 Flags
  */
@@ -140,48 +142,48 @@ template<typename ParamType> inline void parse(ParamType& )
 //    static_assert(FALSE, "This method is not supposed to be used."
 //                         "Please make template specialization for the specified type." );
 }
-template<> void parse(SMBv2::ErrResponse& );
-template<> void parse(SMBv2::NegotiateRequest& );
-template<> void parse(SMBv2::NegotiateResponse& );
-template<> void parse(SMBv2::SessionSetupRequest& );
-template<> void parse(SMBv2::SessionSetupResponse& );
-template<> void parse(SMBv2::LogOffRequest& );
-template<> void parse(SMBv2::LogOffResponse& );
-template<> void parse(SMBv2::TreeConnectRequest& );
-template<> void parse(SMBv2::TreeConnectResponse& );
-template<> void parse(SMBv2::TreeDisconnectRequest& );
-template<> void parse(SMBv2::TreeDisconnectResponse& );
-template<> void parse(SMBv2::CreateRequest& );
-template<> void parse(SMBv2::CreateResponse& );
-template<> void parse(SMBv2::CloseRequest& );
-template<> void parse(SMBv2::CloseResponse& );
-template<> void parse(SMBv2::EchoRequest& );
-template<> void parse(SMBv2::EchoResponse& );
-template<> void parse(SMBv2::QueryInfoRequest& );
-template<> void parse(SMBv2::QueryInfoResponse& );
-template<> void parse(SMBv2::QueryDirRequest& );
-template<> void parse(SMBv2::QueryDirResponse& );
-template<> void parse(SMBv2::FlushRequest& );
-template<> void parse(SMBv2::FlushResponse& );
-template<> void parse(SMBv2::ReadRequest& );
-template<> void parse(SMBv2::ReadResponse& );
-template<> void parse(SMBv2::Lock& );
-template<> void parse(SMBv2::WriteRequest& );
-template<> void parse(SMBv2::WriteResponse& );
-template<> void parse(SMBv2::LockRequest& );
-template<> void parse(SMBv2::LockResponse& );
-template<> void parse(SMBv2::CancelRequest& );
-template<> void parse(SMBv2::ChangeNotifyRequest& );
-template<> void parse(SMBv2::FileNotifyInformation& );
-template<> void parse(SMBv2::ChangeNotifyResponse& );
-template<> void parse(SMBv2::OplockAcknowledgment& );
-template<> void parse(SMBv2::OplockResponse& );
-template<> void parse(SMBv2::IoCtlRequest& );
-template<> void parse(SMBv2::IoCtlResponse& );
-template<> void parse(SMBv2::SetInfoRequest& );
-template<> void parse(SMBv2::SetInfoResponse& );
-template<> void parse(SMBv2::CancelResponce& );
-template<> void parse(SMBv2::CancelRequest& );
+template<> void parse(API::SMBv2::ErrResponse& );
+template<> void parse(API::SMBv2::NegotiateRequest& );
+template<> void parse(API::SMBv2::NegotiateResponse& );
+template<> void parse(API::SMBv2::SessionSetupRequest& );
+template<> void parse(API::SMBv2::SessionSetupResponse& );
+template<> void parse(API::SMBv2::LogOffRequest& );
+template<> void parse(API::SMBv2::LogOffResponse& );
+template<> void parse(API::SMBv2::TreeConnectRequest& );
+template<> void parse(API::SMBv2::TreeConnectResponse& );
+template<> void parse(API::SMBv2::TreeDisconnectRequest& );
+template<> void parse(API::SMBv2::TreeDisconnectResponse& );
+template<> void parse(API::SMBv2::CreateRequest& );
+template<> void parse(API::SMBv2::CreateResponse& );
+template<> void parse(API::SMBv2::CloseRequest& );
+template<> void parse(API::SMBv2::CloseResponse& );
+template<> void parse(API::SMBv2::EchoRequest& );
+template<> void parse(API::SMBv2::EchoResponse& );
+template<> void parse(API::SMBv2::QueryInfoRequest& );
+template<> void parse(API::SMBv2::QueryInfoResponse& );
+template<> void parse(API::SMBv2::QueryDirRequest& );
+template<> void parse(API::SMBv2::QueryDirResponse& );
+template<> void parse(API::SMBv2::FlushRequest& );
+template<> void parse(API::SMBv2::FlushResponse& );
+template<> void parse(API::SMBv2::ReadRequest& );
+template<> void parse(API::SMBv2::ReadResponse& );
+template<> void parse(API::SMBv2::Lock& );
+template<> void parse(API::SMBv2::WriteRequest& );
+template<> void parse(API::SMBv2::WriteResponse& );
+template<> void parse(API::SMBv2::LockRequest& );
+template<> void parse(API::SMBv2::LockResponse& );
+template<> void parse(API::SMBv2::CancelRequest& );
+template<> void parse(API::SMBv2::ChangeNotifyRequest& );
+template<> void parse(API::SMBv2::FileNotifyInformation& );
+template<> void parse(API::SMBv2::ChangeNotifyResponse& );
+template<> void parse(API::SMBv2::OplockAcknowledgment& );
+template<> void parse(API::SMBv2::OplockResponse& );
+template<> void parse(API::SMBv2::IoCtlRequest& );
+template<> void parse(API::SMBv2::IoCtlResponse& );
+template<> void parse(API::SMBv2::SetInfoRequest& );
+template<> void parse(API::SMBv2::SetInfoResponse& );
+template<> void parse(API::SMBv2::CancelResponce& );
+template<> void parse(API::SMBv2::CancelRequest& );
 
 /*! Constructs new command for API from raw message
  * \param request - Call's
@@ -206,6 +208,10 @@ inline const Cmd command(Data& request, Data& response, Session* session)
 
     return cmd;
 }
+
+extern "C"
+NST_PUBLIC
+const char* print_cifs2_procedures(SMBv2Commands cmd_code);
 
 } // CIFSv2
 
