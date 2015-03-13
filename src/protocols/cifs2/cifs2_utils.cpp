@@ -308,7 +308,8 @@ std::ostream& operator<<(std::ostream& out, const ShareCapabilities value)
         print_flag_if_set(out, "SMB2_SHARE_CAP_SCALEOUT",                  int_value, ShareCapabilities::SCALEOUT);
         print_flag_if_set(out, "SMB2_SHARE_CAP_CLUSTER",                   int_value, ShareCapabilities::CLUSTER);
         print_flag_if_set(out, "SMB2_SHARE_CAP_ASYMMETRIC",                int_value, ShareCapabilities::ASYMMETRIC);
-    } else 
+    }
+    else
     {
         out << "Capabilities field is not set";
     }
@@ -330,13 +331,20 @@ std::ostream& operator<<(std::ostream& out, const Capabilities value)
 {
     auto int_value = to_integral(value);
 
-    print_flag_if_set(out, "DFS",               int_value, Capabilities::DFS);
-    print_flag_if_set(out, "LEASING",           int_value, Capabilities::LEASING);
-    print_flag_if_set(out, "LARGE_MTU",         int_value, Capabilities::LARGE_MTU);
-    print_flag_if_set(out, "MULTI_CHANNEL",     int_value, Capabilities::MULTI_CHANNEL);
-    print_flag_if_set(out, "PERSISTENT_HANDLES",int_value, Capabilities::PERSISTENT_HANDLES);
-    print_flag_if_set(out, "DIRECTORY_LEASING", int_value, Capabilities::DIRECTORY_LEASING);
-    print_flag_if_set(out, "ENCRYPTION",        int_value, Capabilities::ENCRYPTION);
+    if(int_value > 0)
+    {
+        print_flag_if_set(out, "DFS",               int_value, Capabilities::DFS);
+        print_flag_if_set(out, "LEASING",           int_value, Capabilities::LEASING);
+        print_flag_if_set(out, "LARGE_MTU",         int_value, Capabilities::LARGE_MTU);
+        print_flag_if_set(out, "MULTI_CHANNEL",     int_value, Capabilities::MULTI_CHANNEL);
+        print_flag_if_set(out, "PERSISTENT_HANDLES",int_value, Capabilities::PERSISTENT_HANDLES);
+        print_flag_if_set(out, "DIRECTORY_LEASING", int_value, Capabilities::DIRECTORY_LEASING);
+        print_flag_if_set(out, "ENCRYPTION",        int_value, Capabilities::ENCRYPTION);
+    }
+    else
+    {
+        out << "Capabilities field is not set";
+    }
 
     return out;
 }
@@ -388,7 +396,8 @@ std::ostream& operator<<(std::ostream& out, const CloseFlags value)
     if(int_value > 0)
     {
         print_flag_if_set(out, "POSTQUERY_ATTRIB",   int_value, CloseFlags::POSTQUERY_ATTRIB);
-    } else 
+    }
+    else
     {
         out << "Close Flag field is not set";
     }
