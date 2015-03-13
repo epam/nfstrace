@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <bitset>
-#include <sstream>
+#include <iostream>
+#include <type_traits>
 
 #include "cifs2_utils.h"
 #include "protocols/nfs/nfs_utils.h"
@@ -35,26 +35,18 @@ namespace CIFSv2
 {
 using namespace NST::API::SMBv2;
 
-namespace 
-{ 
-    template<typename T>
-    inline bool operator&(T lhs, T rhs)
-    {
-        return to_integral(lhs) & to_integral(rhs);
-    } 
-} 
-
 std::ostream& operator<<(std::ostream& out, const OplockLevels value)
 {
     switch (value)
     {
-        case OplockLevels::NONE:      out << "NONE";break;
-        case OplockLevels::II:        out << "II";break;
-        case OplockLevels::EXCLUSIVE: out << "EXCLUSIVE";break;
-        case OplockLevels::BATCH:     out << "BATCH";break;
-        case OplockLevels::LEASE:     out << "LEASE";break;
-        default: 
-        assert("Cannot convert OplockLevels value into string representation.");
+        case OplockLevels::NONE:      return out << "NONE";
+        case OplockLevels::II:        return out << "II";
+        case OplockLevels::EXCLUSIVE: return out << "EXCLUSIVE";
+        case OplockLevels::BATCH:     return out << "BATCH";
+        case OplockLevels::LEASE:     return out << "LEASE";
+        default:
+            // empty default block
+            ;
     }
 
     return out;
@@ -64,12 +56,13 @@ std::ostream& operator<<(std::ostream& out, const ImpersonationLevels value)
 {
     switch (value)
     {
-        case ImpersonationLevels::ANONYMOUS:        out << "ANONYMOUS";break;
-        case ImpersonationLevels::IDENTIFICATION:   out << "IDENTIFICATION";break;
-        case ImpersonationLevels::IMPERSONATION:    out << "IMPERSONATION";break;
-        case ImpersonationLevels::DELEGATE:         out << "DELEGATE";break;
+        case ImpersonationLevels::ANONYMOUS:        return out << "ANONYMOUS";
+        case ImpersonationLevels::IDENTIFICATION:   return out << "IDENTIFICATION";
+        case ImpersonationLevels::IMPERSONATION:    return out << "IMPERSONATION";
+        case ImpersonationLevels::DELEGATE:         return out << "DELEGATE";
         default:
-        assert("Cannot convert ImpersonationLevels value into string representation.");
+            // empty default block
+            ;
     }
 
     return out;
@@ -79,14 +72,15 @@ std::ostream& operator<<(std::ostream& out, const CreateDisposition value)
 {
     switch(value)
     {
-        case CreateDisposition::SUPERSEDE:       out << "SUPERSEDE";break;
-        case CreateDisposition::OPEN:            out << "OPEN";break;
-        case CreateDisposition::CREATE:          out << "CREATE";break;
-        case CreateDisposition::OPEN_IF:         out << "OPEN_IF";break;
-        case CreateDisposition::OVERWRITE:       out << "OVERWRITE";break;
-        case CreateDisposition::OVERWRITE_IF:    out << "OVERWRITE_IF";break;
+        case CreateDisposition::SUPERSEDE:       return out << "SUPERSEDE";
+        case CreateDisposition::OPEN:            return out << "OPEN";
+        case CreateDisposition::CREATE:          return out << "CREATE";
+        case CreateDisposition::OPEN_IF:         return out << "OPEN_IF";
+        case CreateDisposition::OVERWRITE:       return out << "OVERWRITE";
+        case CreateDisposition::OVERWRITE_IF:    return out << "OVERWRITE_IF";
         default:
-        assert("Cannot convert CreateDisposition value into string representation.");
+            // empty default block
+            ;
     }
 
     return out;
@@ -96,12 +90,13 @@ std::ostream& operator<<(std::ostream& out, const CreateActions value)
 {
     switch(value)
     {
-        case CreateActions::SUPERSEDED:          out << "SUPERSEDED";break;
-        case CreateActions::OPENED:              out << "OPENED";break;
-        case CreateActions::CREATED:             out << "CREATED";break;
-        case CreateActions::FILE_OVERWRITTEN:    out << "FILE_OVERWRITTEN";break;
-        default: 
-        assert("Cannot convert CreateActions into string representation.");
+        case CreateActions::SUPERSEDED:          return out << "SUPERSEDED";
+        case CreateActions::OPENED:              return out << "OPENED";
+        case CreateActions::CREATED:             return out << "CREATED";
+        case CreateActions::FILE_OVERWRITTEN:    return out << "FILE_OVERWRITTEN";
+        default:
+            // empty default block
+            ;
     }
 
     return out;
@@ -111,11 +106,12 @@ std::ostream& operator<<(std::ostream& out, const ShareTypes value)
 { 
     switch(value)
     {
-        case ShareTypes::DISK:        out << "SMB2_SHARE_TYPE_DISK";break;
-        case ShareTypes::PIPE:        out << "SMB2_SHARE_TYPE_PIPE";break;
-        case ShareTypes::PRINT:       out << "SMB2_SHARE_TYPE_PRINT";break;
+        case ShareTypes::DISK:  return out << "SMB2_SHARE_TYPE_DISK";
+        case ShareTypes::PIPE:  return out << "SMB2_SHARE_TYPE_PIPE";
+        case ShareTypes::PRINT: return out << "SMB2_SHARE_TYPE_PRINT";
         default:
-        assert("Cannot conver ShareTypes value into string representation.");
+            // empty default block
+            ;
     }
 
     return out;
@@ -125,579 +121,272 @@ std::ostream& operator<<(std::ostream& out, const NTStatus value)
 { 
     switch(value)
     {
-        case NTStatus::STATUS_SUCCESS:                  out << "STATUS_SUCCESS";break;
-        case NTStatus::STATUS_NO_MORE_FILES:            out << "STATUS_NO_MORE_FILES";break;
-        case NTStatus::STATUS_INVALID_HANDLE:           out << "STATUS_INVALID_HANDLE";break;
-        case NTStatus::STATUS_INVALID_PARAMETER:        out << "STATUS_INVALID_PARAMETER";break;
-        case NTStatus::STATUS_NO_SUCH_FILE:             out << "STATUS_NO_SUCH_FILE";break;
-        case NTStatus::STATUS_MORE_PROCESSING_REQUIRED: out << "STATUS_MORE_PROCESSING_REQUIRED";break;
-        case NTStatus::STATUS_INVALID_SYSTEM_SERVICE:   out << "STATUS_INVALID_SYSTEM_SERVICE";break;
-        case NTStatus::STATUS_ACCESS_DENIED:            out << "STATUS_ACCESS_DENIED";break;
-        case NTStatus::STATUS_OBJECT_NAME_INVALID:      out << "STATUS_OBJECT_NAME_INVALID";break;
-        case NTStatus::STATUS_OBJECT_NAME_NOT_FOUND:    out << "STATUS_OBJECT_NAME_NOT_FOUND";break;
-        case NTStatus::STATUS_OBJECT_NAME_COLLISION:    out << "STATUS_OBJECT_NAME_COLLISION";break;
-        case NTStatus::STATUS_OBJECT_PATH_NOT_FOUND:    out << "STATUS_OBJECT_PATH_NOT_FOUND";break;
-        case NTStatus::STATUS_OBJECT_PATH_SYNTAX_BAD:   out << "STATUS_OBJECT_PATH_SYNTAX_BAD";break;
-        case NTStatus::STATUS_SHARING_VIOLATION:        out << "STATUS_SHARING_VIOLATION";break;
-        case NTStatus::STATUS_EA_TOO_LARGE:             out << "STATUS_EA_TOO_LARGE";break;
-        case NTStatus::STATUS_FILE_LOCK_CONFLICT:       out << "STATUS_FILE_LOCK_CONFLICT";break;
-        case NTStatus::STATUS_LOCK_NOT_GRANTED:         out << "STATUS_LOCK_NOT_GRANTED";break;
-        case NTStatus::STATUS_LOGON_FAILURE:            out << "STATUS_LOGON_FAILURE";break;
-        case NTStatus::STATUS_RANGE_NOT_LOCKED:         out << "STATUS_RANGE_NOT_LOCKED";break;
-        case NTStatus::STATUS_FILE_IS_A_DIRECTORY:      out << "STATUS_FILE_IS_A_DIRECTORY";break;
-        case NTStatus::STATUS_NOT_SUPPORTED:            out << "STATUS_NOT_SUPPORTED";break;
-        case NTStatus::STATUS_BAD_DEVICE_TYPE:          out << "STATUS_BAD_DEVICE_TYPE";break;
-        case NTStatus::STATUS_REQUEST_NOT_ACCEPTED:     out << "STATUS_REQUEST_NOT_ACCEPTED";break;
-        case NTStatus::STATUS_DIRECTORY_NOT_EMPTY:      out << "STATUS_DIRECTORY_NOT_EMPTY";break;
-        case NTStatus::STATUS_NOT_A_DIRECTORY:          out << "STATUS_NOT_A_DIRECTORY";break;
-        case NTStatus::STATUS_CANCELLED:                out << "STATUS_CANCELLED";break;
+        case NTStatus::STATUS_SUCCESS:                  return out << "STATUS_SUCCESS";
+        case NTStatus::STATUS_NO_MORE_FILES:            return out << "STATUS_NO_MORE_FILES";
+        case NTStatus::STATUS_INVALID_HANDLE:           return out << "STATUS_INVALID_HANDLE";
+        case NTStatus::STATUS_INVALID_PARAMETER:        return out << "STATUS_INVALID_PARAMETER";
+        case NTStatus::STATUS_NO_SUCH_FILE:             return out << "STATUS_NO_SUCH_FILE";
+        case NTStatus::STATUS_MORE_PROCESSING_REQUIRED: return out << "STATUS_MORE_PROCESSING_REQUIRED";
+        case NTStatus::STATUS_INVALID_SYSTEM_SERVICE:   return out << "STATUS_INVALID_SYSTEM_SERVICE";
+        case NTStatus::STATUS_ACCESS_DENIED:            return out << "STATUS_ACCESS_DENIED";
+        case NTStatus::STATUS_OBJECT_NAME_INVALID:      return out << "STATUS_OBJECT_NAME_INVALID";
+        case NTStatus::STATUS_OBJECT_NAME_NOT_FOUND:    return out << "STATUS_OBJECT_NAME_NOT_FOUND";
+        case NTStatus::STATUS_OBJECT_NAME_COLLISION:    return out << "STATUS_OBJECT_NAME_COLLISION";
+        case NTStatus::STATUS_OBJECT_PATH_NOT_FOUND:    return out << "STATUS_OBJECT_PATH_NOT_FOUND";
+        case NTStatus::STATUS_OBJECT_PATH_SYNTAX_BAD:   return out << "STATUS_OBJECT_PATH_SYNTAX_BAD";
+        case NTStatus::STATUS_SHARING_VIOLATION:        return out << "STATUS_SHARING_VIOLATION";
+        case NTStatus::STATUS_EA_TOO_LARGE:             return out << "STATUS_EA_TOO_LARGE";
+        case NTStatus::STATUS_FILE_LOCK_CONFLICT:       return out << "STATUS_FILE_LOCK_CONFLICT";
+        case NTStatus::STATUS_LOCK_NOT_GRANTED:         return out << "STATUS_LOCK_NOT_GRANTED";
+        case NTStatus::STATUS_LOGON_FAILURE:            return out << "STATUS_LOGON_FAILURE";
+        case NTStatus::STATUS_RANGE_NOT_LOCKED:         return out << "STATUS_RANGE_NOT_LOCKED";
+        case NTStatus::STATUS_FILE_IS_A_DIRECTORY:      return out << "STATUS_FILE_IS_A_DIRECTORY";
+        case NTStatus::STATUS_NOT_SUPPORTED:            return out << "STATUS_NOT_SUPPORTED";
+        case NTStatus::STATUS_BAD_DEVICE_TYPE:          return out << "STATUS_BAD_DEVICE_TYPE";
+        case NTStatus::STATUS_REQUEST_NOT_ACCEPTED:     return out << "STATUS_REQUEST_NOT_ACCEPTED";
+        case NTStatus::STATUS_DIRECTORY_NOT_EMPTY:      return out << "STATUS_DIRECTORY_NOT_EMPTY";
+        case NTStatus::STATUS_NOT_A_DIRECTORY:          return out << "STATUS_NOT_A_DIRECTORY";
+        case NTStatus::STATUS_CANCELLED:                return out << "STATUS_CANCELLED";
         default:
-        assert("Cannot conver NTStatus value into string representation.");
+            // empty default block
+            ;
     } 
 
     return out;
 }
 
+namespace
+{
+template <typename T>
+void print_flag_if_set(std::ostream& out, const std::string& name, typename std::underlying_type<T>::type& value, T flag)
+{
+    auto int_flag = to_integral(flag);
+    if (value & int_flag)
+    {
+        out << name;
+        value = value & ~int_flag;
+        if(value > 0)
+            out << flagDelimiter;
+    }
+}
+}
+
 std::ostream& operator<<(std::ostream& out, const DesiredAccessFlags value)
 {
-    std::ostringstream str;
-    if (value & DesiredAccessFlags::READ_DATA_LE)
-    {
-        str << "READ_DATA_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::WRITE_DATA_LE)
-    {
-        str << "WRITE_DATA_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::APPEND_DATA_LE)
-    {
-        str << "APPEND_DATA_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::READ_EA_LE)
-    {
-        str << "READ_EA_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::WRITE_EA_LE)
-    {
-        str << "WRITE_EA_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::EXECUTE_LE)
-    {
-        str << "EXECUTE_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::READ_ATTRIBUTES_LE)
-    {
-        str << "READ_ATTRIBUTES_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::WRITE_ATTRIBUTES_LE)
-    {
-        str << "WRITE_ATTRIBUTES_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::DELETE_LE)
-    {
-        str << "DELETE_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::READ_CONTROL_LE)
-    {
-        str << "READ_CONTROL_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::WRITE_DAC_LE)
-    {
-        str << "WRITE_DAC_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::WRITE_OWNER_LE)
-    {
-        str << "WRITE_OWNER_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::SYNCHRONIZE_LE)
-    {
-        str << "SYNCHRONIZE_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::ACCESS_SYSTEM_SECURITY_LE)
-    {
-        str << "ACCESS_SYSTEM_SECURITY_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::MAXIMAL_ACCESS_LE)
-    {
-        str << "MAXIMAL_ACCESS_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::GENERIC_ALL_LE)
-    {
-        str << "GENERIC_ALL_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::GENERIC_EXECUTE_LE)
-    {
-        str << "GENERIC_EXECUTE_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::GENERIC_WRITE_LE)
-    {
-        str << "GENERIC_WRITE_LE" << flagDelimiter;
-    }
-    if (value & DesiredAccessFlags::GENERIC_READ_LE)
-    {
-        str << "GENERIC_READ_LE" << flagDelimiter;
-    }
+    auto int_value = to_integral(value);
 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
+    print_flag_if_set(out, "READ_DATA_LE",                 int_value, DesiredAccessFlags::READ_DATA_LE);
+    print_flag_if_set(out, "WRITE_DATA_LE",                int_value, DesiredAccessFlags::WRITE_DATA_LE);
+    print_flag_if_set(out, "APPEND_DATA_LE",               int_value, DesiredAccessFlags::APPEND_DATA_LE);
+    print_flag_if_set(out, "READ_EA_LE",                   int_value, DesiredAccessFlags::READ_EA_LE);
+    print_flag_if_set(out, "WRITE_EA_LE",                  int_value, DesiredAccessFlags::WRITE_EA_LE);
+    print_flag_if_set(out, "EXECUTE_LE",                   int_value, DesiredAccessFlags::EXECUTE_LE);
+    print_flag_if_set(out, "READ_ATTRIBUTES_LE",           int_value, DesiredAccessFlags::READ_ATTRIBUTES_LE);
+    print_flag_if_set(out, "WRITE_ATTRIBUTES_LE",          int_value, DesiredAccessFlags::WRITE_ATTRIBUTES_LE);
+    print_flag_if_set(out, "DELETE_LE",                    int_value, DesiredAccessFlags::DELETE_LE);
+    print_flag_if_set(out, "READ_CONTROL_LE",              int_value, DesiredAccessFlags::READ_CONTROL_LE);
+    print_flag_if_set(out, "WRITE_DAC_LE",                 int_value, DesiredAccessFlags::WRITE_DAC_LE);
+    print_flag_if_set(out, "WRITE_OWNER_LE",               int_value, DesiredAccessFlags::WRITE_OWNER_LE);
+    print_flag_if_set(out, "SYNCHRONIZE_LE",               int_value, DesiredAccessFlags::SYNCHRONIZE_LE);
+    print_flag_if_set(out, "ACCESS_SYSTEM_SECURITY_LE",    int_value, DesiredAccessFlags::ACCESS_SYSTEM_SECURITY_LE);
+    print_flag_if_set(out, "MAXIMAL_ACCESS_LE",            int_value, DesiredAccessFlags::MAXIMAL_ACCESS_LE);
+    print_flag_if_set(out, "GENERIC_ALL_LE",               int_value, DesiredAccessFlags::GENERIC_ALL_LE);
+    print_flag_if_set(out, "GENERIC_EXECUTE_LE",           int_value, DesiredAccessFlags::GENERIC_EXECUTE_LE);
+    print_flag_if_set(out, "GENERIC_WRITE_LE",             int_value, DesiredAccessFlags::GENERIC_WRITE_LE);
+    print_flag_if_set(out, "GENERIC_READ_LE",              int_value, DesiredAccessFlags::GENERIC_READ_LE);
+
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const FileAttributes value)
 {
-    std::ostringstream str;
+    auto int_value = to_integral(value);
 
-    if (value & FileAttributes::READONLY)
-    {
-        str << "READONLY" << flagDelimiter;
-    }
-    if (value & FileAttributes::HIDDEN)
-    {
-        str << "HIDDEN" << flagDelimiter;
-    }
-    if (value & FileAttributes::SYSTEM)
-    {
-        str << "SYSTEM" << flagDelimiter;
-    }
-    if (value & FileAttributes::DIRECTORY)
-    {
-        str << "DIRECTORY" << flagDelimiter;
-    }
-    if (value & FileAttributes::ARCHIVE)
-    {
-        str << "ARCHIVE" << flagDelimiter;
-    }
-    if (value & FileAttributes::NORMAL)
-    {
-        str << "NORMAL" << flagDelimiter;
-    }
-    if (value & FileAttributes::TEMPORARY)
-    {
-        str << "TEMPORARY" << flagDelimiter;
-    }
-    if (value & FileAttributes::SPARSE_FILE)
-    {
-        str << "SPARSE_FILE" << flagDelimiter;
-    }
-    if (value & FileAttributes::REPARSE_POINT)
-    {
-        str << "REPARSE_POINT" << flagDelimiter;
-    }
-    if (value & FileAttributes::COMPRESSED)
-    {
-        str << "COMPRESSED" << flagDelimiter;
-    }
-    if (value & FileAttributes::OFFLINE)
-    {
-        str << "OFFLINE" << flagDelimiter;
-    }
-    if (value & FileAttributes::NOT_CONTENT_INDEXED)
-    {
-        str << "NOT_CONTENT_INDEXED" << flagDelimiter;
-    }
-    if (value & FileAttributes::ENCRYPTED)
-    {
-        str << "ENCRYPTED" << flagDelimiter;
-    }
+    print_flag_if_set(out, "READONLY",            int_value, FileAttributes::READONLY);
+    print_flag_if_set(out, "HIDDEN",              int_value, FileAttributes::HIDDEN);
+    print_flag_if_set(out, "SYSTEM",              int_value, FileAttributes::SYSTEM);
+    print_flag_if_set(out, "DIRECTORY",           int_value, FileAttributes::DIRECTORY);
+    print_flag_if_set(out, "ARCHIVE",             int_value, FileAttributes::ARCHIVE);
+    print_flag_if_set(out, "NORMAL",              int_value, FileAttributes::NORMAL); 
+    print_flag_if_set(out, "TEMPORARY",           int_value, FileAttributes::TEMPORARY);
+    print_flag_if_set(out, "SPARSE_FILE",         int_value, FileAttributes::SPARSE_FILE);
+    print_flag_if_set(out, "REPARSE_POINT",       int_value, FileAttributes::REPARSE_POINT);
+    print_flag_if_set(out, "COMPRESSED",          int_value, FileAttributes::COMPRESSED);
+    print_flag_if_set(out, "OFFLINE",             int_value, FileAttributes::OFFLINE);
+    print_flag_if_set(out, "NOT_CONTENT_INDEXED", int_value, FileAttributes::NOT_CONTENT_INDEXED);
+    print_flag_if_set(out, "ENCRYPTED",           int_value, FileAttributes::ENCRYPTED);
 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const ShareAccessFlags value)
 {
-    std::ostringstream str;
+    auto int_value = to_integral(value);
 
-    if (value & ShareAccessFlags::SHARE_READ_LE)
-    {
-        str << "SHARE_READ_LE" << flagDelimiter;
-    }
-    if (value & ShareAccessFlags::SHARE_WRITE_LE)
-    {
-        str << "SHARE_WRITE_LE" << flagDelimiter;
-    }
-    if (value & ShareAccessFlags::SHARE_DELETE_LE)
-    {
-        str << "SHARE_DELETE_LE" << flagDelimiter;
-    }
+    print_flag_if_set(out, "SHARE_READ_LE",     int_value, ShareAccessFlags::SHARE_READ_LE);
+    print_flag_if_set(out, "SHARE_WRITE_LE",    int_value, ShareAccessFlags::SHARE_WRITE_LE);
+    print_flag_if_set(out, "SHARE_DELETE_LE",   int_value, ShareAccessFlags::SHARE_DELETE_LE);
 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const CreateOptionsFlags value)
 {
-    std::ostringstream str;
+    auto int_value = to_integral(value);
 
-    if (value & CreateOptionsFlags::DIRECTORY_FILE_LE)
-    {
-        str << "DIRECTORY_FILE_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::WRITE_THROUGH_LE)
-    {
-        str << "WRITE_THROUGH_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::SEQUENTIAL_ONLY_LE)
-    {
-        str << "SEQUENTIAL_ONLY_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::NO_INTERMEDIATE_BUFFERRING_LE)
-    {
-        str << "NO_INTERMEDIATE_BUFFERRING_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::SYNCHRONOUS_IO_ALERT_LE)
-    {
-        str << "SYNCHRONOUS_IO_ALERT_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::SYNCHRONOUS_IO_NON_ALERT_LE)
-    {
-        str << "SYNCHRONOUS_IO_NON_ALERT_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::NON_DIRECTORY_FILE_LE)
-    {
-        str << "NON_DIRECTORY_FILE_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::COMPLETE_IF_OPLOCKED_LE)
-    {
-        str << "COMPLETE_IF_OPLOCKED_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::NO_EA_KNOWLEDGE_LE)
-    {
-        str << "NO_EA_KNOWLEDGE_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::RANDOM_ACCESS_LE)
-    {
-        str << "RANDOM_ACCESS_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::DELETE_ON_CLOSE_LE)
-    {
-        str << "DELETE_ON_CLOSE_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::OPEN_BY_FILE_ID_LE)
-    {
-        str << "OPEN_BY_FILE_ID_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::OPEN_FOR_BACKUP_INTENT_LE)
-    {
-        str << "OPEN_FOR_BACKUP_INTENT_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::NO_COMPRESSION_LE)
-    {
-        str << "NO_COMPRESSION_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::RESERVE_OPFILTER_LE)
-    {
-        str << "RESERVE_OPFILTER_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::OPEN_REPARSE_POINT_LE)
-    {
-        str << "OPEN_REPARSE_POINT_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::OPEN_NO_RECALL_LE)
-    {
-        str << "OPEN_NO_RECALL_LE" << flagDelimiter;
-    }
-    if (value & CreateOptionsFlags::OPEN_FOR_FREE_SPACE_QUERY_LE)
-    {
-        str << "OPEN_FOR_FREE_SPACE_QUERY_LE" << flagDelimiter;
-    }
+    print_flag_if_set(out, "DIRECTORY_FILE_LE",            int_value, CreateOptionsFlags::DIRECTORY_FILE_LE);
+    print_flag_if_set(out, "WRITE_THROUGH_LE",             int_value, CreateOptionsFlags::WRITE_THROUGH_LE);
+    print_flag_if_set(out, "SEQUENTIAL_ONLY_LE",           int_value, CreateOptionsFlags::SEQUENTIAL_ONLY_LE);
+    print_flag_if_set(out, "NO_INTERMEDIATE_BUFFERRING_LE",int_value, CreateOptionsFlags::NO_INTERMEDIATE_BUFFERRING_LE);
+    print_flag_if_set(out, "SYNCHRONOUS_IO_ALERT_LE",      int_value, CreateOptionsFlags::SYNCHRONOUS_IO_ALERT_LE);
+    print_flag_if_set(out, "SYNCHRONOUS_IO_NON_ALERT_LE",  int_value, CreateOptionsFlags::SYNCHRONOUS_IO_NON_ALERT_LE);
+    print_flag_if_set(out, "NON_DIRECTORY_FILE_LE",        int_value, CreateOptionsFlags::NON_DIRECTORY_FILE_LE);
+    print_flag_if_set(out, "COMPLETE_IF_OPLOCKED_LE",      int_value, CreateOptionsFlags::COMPLETE_IF_OPLOCKED_LE);
+    print_flag_if_set(out, "NO_EA_KNOWLEDGE_LE",           int_value, CreateOptionsFlags::NO_EA_KNOWLEDGE_LE);
+    print_flag_if_set(out, "RANDOM_ACCESS_LE",             int_value, CreateOptionsFlags::RANDOM_ACCESS_LE);
+    print_flag_if_set(out, "DELETE_ON_CLOSE_LE",           int_value, CreateOptionsFlags::DELETE_ON_CLOSE_LE);
+    print_flag_if_set(out, "OPEN_BY_FILE_ID_LE",           int_value, CreateOptionsFlags::OPEN_BY_FILE_ID_LE);
+    print_flag_if_set(out, "OPEN_FOR_BACKUP_INTENT_LE",    int_value, CreateOptionsFlags::OPEN_FOR_BACKUP_INTENT_LE);
+    print_flag_if_set(out, "NO_COMPRESSION_LE",            int_value, CreateOptionsFlags::NO_COMPRESSION_LE);
+    print_flag_if_set(out, "RESERVE_OPFILTER_LE",          int_value, CreateOptionsFlags::RESERVE_OPFILTER_LE);
+    print_flag_if_set(out, "OPEN_REPARSE_POINT_LE",        int_value, CreateOptionsFlags::OPEN_REPARSE_POINT_LE);
+    print_flag_if_set(out, "OPEN_NO_RECALL_LE",            int_value, CreateOptionsFlags::OPEN_NO_RECALL_LE);
+    print_flag_if_set(out, "OPEN_FOR_FREE_SPACE_QUERY_LE", int_value, CreateOptionsFlags::OPEN_FOR_FREE_SPACE_QUERY_LE);
 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const WriteFlags value)
 {
-    std::ostringstream str;
+    auto int_value = to_integral(value);
 
-    if (value & WriteFlags::SMB2_WRITEFLAG_WRITE_THROUGH)
-    {
-        str << "SMB2_WRITEFLAG_WRITE_THROUGH" << flagDelimiter;
-    }
-    if (value & WriteFlags::SMB2_WRITEFLAG_WRITE_UNBUFFERED)
-    {
-        str << "SMB2_WRITEFLAG_WRITE_UNBUFFERED" << flagDelimiter;
-    }
+    print_flag_if_set(out, "SMB2_WRITEFLAG_WRITE_THROUGH",     int_value, WriteFlags::SMB2_WRITEFLAG_WRITE_THROUGH);
+    print_flag_if_set(out, "SMB2_WRITEFLAG_WRITE_UNBUFFERED",  int_value, WriteFlags::SMB2_WRITEFLAG_WRITE_UNBUFFERED);
 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const ShareFlags value)
 {
-    std::ostringstream str;
-    if(value & ShareFlags::MANUAL_CACHING)
+    auto int_value = to_integral(value) & ~to_integral(ShareFlags::NO_CACHING);
+
+    print_flag_if_set(out, "SMB2_SHAREFLAG_DFS",                           int_value, ShareFlags::DFS);
+    print_flag_if_set(out, "SMB2_SHAREFLAG_DFS_ROOT",                      int_value, ShareFlags::DFS_ROOT);
+    print_flag_if_set(out, "SMB2_SHAREFLAG_RESTRICT_EXCLUSIVE_OPENS",      int_value, ShareFlags::RESTRICT_EXCLUSIVE_OPENS);
+    print_flag_if_set(out, "SMB2_SHAREFLAG_FORCE_SHARED_DELETE",           int_value, ShareFlags::FORCE_SHARED_DELETE);
+    print_flag_if_set(out, "SMB2_SHAREFLAG_ALLOW_NAMESPACE_CACHING",       int_value, ShareFlags::ALLOW_NAMESPACE_CACHING);
+    print_flag_if_set(out, "SMB2_SHAREFLAG_ACCESS_BASED_DIRECTORY_ENUM",   int_value, ShareFlags::ACCESS_BASED_DIRECTORY_ENUM);
+    print_flag_if_set(out, "SMB2_SHAREFLAG_FORCE_LEVELII_OPLOCK",          int_value, ShareFlags::FORCE_LEVELII_OPLOCK);
+    print_flag_if_set(out, "SMB2_SHAREFLAG_ENABLE_HASH_V1",                int_value, ShareFlags::ENABLE_HASH);
+    print_flag_if_set(out, "SMB2_SHAREFLAG_ENABLE_HASH_V2",                int_value, ShareFlags::ENABLE_HASH_2);
+    print_flag_if_set(out, "SMB2_SHAREFLAG_ENCRYPT_DATA",                  int_value, ShareFlags::ENABLE_ENCRYPT_DATA);
+
+    out << " Caching policy = ";
+    switch(to_integral(value) & to_integral(ShareFlags::NO_CACHING))
     {
-        str << "SMB2_SHAREFLAG_MANUAL_CACHING " << flagDelimiter;
+        case to_integral(ShareFlags::MANUAL_CACHING):    return out << "MANUAL_CACHING"; 
+        case to_integral(ShareFlags::AUTO_CACHING):      return out << "AUTO_CACHING"; 
+        case to_integral(ShareFlags::VDO_CACHING):       return out << "VDO_CACHING"; 
+        case to_integral(ShareFlags::NO_CACHING):        return out << "NO_CACHING"; 
     } 
-    if(value & ShareFlags::AUTO_CACHING)
-    {
-        str << "SMB2_SHAREFLAG_AUTO_CACHING" << flagDelimiter;
-    } 
-    if(value & ShareFlags::VDO_CACHING)
-    {
-        str << "SMB2_SHAREFLAG_VDO_CACHING" << flagDelimiter;
-    } 
-    if(value & ShareFlags::NO_CACHING)
-    {
-        str << "SMB2_SHAREFLAG_NO_CACHING" << flagDelimiter;
-    } 
-    if(value & (ShareFlags::DFS))
-    {
-        str << "SMB2_SHAREFLAG_DFS" << flagDelimiter;
-    } 
-    if(value & ShareFlags::DFS_ROOT)
-    {
-        str << "SMB2_SHAREFLAG_DFS_ROOT" << flagDelimiter;
-    } 
-    if(value & ShareFlags::RESTRICT_EXCLUSIVE_OPENS)
-    {
-        str << "SMB2_SHAREFLAG_RESTRICT_EXCLUSIVE_OPENS" << flagDelimiter;
-    } 
-    if(value & ShareFlags::FORCE_SHARED_DELETE)
-    {
-        str << "SMB2_SHAREFLAG_FORCE_SHARED_DELETE" << flagDelimiter;
-    } 
-    if(value & ShareFlags::ALLOW_NAMESPACE_CACHING)
-    {
-        str << "SMB2_SHAREFLAG_ALLOW_NAMESPACE_CACHING" << flagDelimiter;
-    } 
-    if(value & ShareFlags::ACCESS_BASED_DIRECTORY_ENUM)
-    {
-        str << "SMB2_SHAREFLAG_ACCESS_BASED_DIRECTORY_ENUM" << flagDelimiter;
-    } 
-    if(value & ShareFlags::FORCE_LEVELII_OPLOCK)
-    {
-        str << "SMB2_SHAREFLAG_FORCE_LEVELII_OPLOCK" << flagDelimiter;
-    } 
-    if(value & ShareFlags::ENABLE_HASH)
-    {
-        str << "SMB2_SHAREFLAG_ENABLE_HASH_V1" << flagDelimiter;
-    } 
-    if(value & ShareFlags::ENABLE_HASH_2)
-    {
-        str << "SMB2_SHAREFLAG_ENABLE_HASH_V2" << flagDelimiter;
-    } 
-    if(value & ShareFlags::ENABLE_ENCRYPT_DATA)
-    {
-        str << "SMB2_SHAREFLAG_ENCRYPT_DATA" << flagDelimiter;
-    } 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
+
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const ShareCapabilities value)
 {
-    std::ostringstream str;
-    if(value & ShareCapabilities::DFS)
-    {
-        str << "SMB2_SHARE_CAP_DFS" << flagDelimiter;
-    } 
-    if(value & ShareCapabilities::CONTINUOUS_AVAILABILITY)
-    {
-        str << "SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY" << flagDelimiter;
-    } 
-    if(value & ShareCapabilities::SCALEOUT)
-    {
-        str << "SMB2_SHARE_CAP_SCALEOUT" << flagDelimiter;
-    } 
-    if(value & ShareCapabilities::CLUSTER)
-    {
-        str << "SMB2_SHARE_CAP_CLUSTER" << flagDelimiter;
-    } 
-    if(value & ShareCapabilities::ASYMMETRIC)
-    {
-        str << "SMB2_SHARE_CAP_ASYMMETRIC" << flagDelimiter;
-    } 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
+    auto int_value = to_integral(value);
+
+    print_flag_if_set(out, "SMB2_SHARE_CAP_DFS",                       int_value, ShareCapabilities::DFS);
+    print_flag_if_set(out, "SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY",   int_value, ShareCapabilities::CONTINUOUS_AVAILABILITY);
+    print_flag_if_set(out, "SMB2_SHARE_CAP_SCALEOUT",                  int_value, ShareCapabilities::SCALEOUT);
+    print_flag_if_set(out, "SMB2_SHARE_CAP_CLUSTER",                   int_value, ShareCapabilities::CLUSTER);
+    print_flag_if_set(out, "SMB2_SHARE_CAP_ASYMMETRIC",                int_value, ShareCapabilities::ASYMMETRIC);
+
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const SecurityModeShort value)
 {
-    std::ostringstream str;
-    if(value & SecurityModeShort::SIGNING_ENABLED)
-    {
-        str << "SIGNING_ENABLED" << flagDelimiter;
-    } 
-    if(value & SecurityModeShort::SIGNING_REQUIRED)
-    {
-        str << "SIGNING_REQUIRED" << flagDelimiter;
-    } 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
+    auto int_value = to_integral(value);
+
+    print_flag_if_set(out, "SIGNING_ENABLED",   int_value, SecurityModeShort::SIGNING_ENABLED);
+    print_flag_if_set(out, "SIGNING_REQUIRED",  int_value, SecurityModeShort::SIGNING_REQUIRED);
+
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const Capabilities value)
 {
-    std::ostringstream str;
-    if(value & Capabilities::DFS)
-    {
-        str << "DFS" << flagDelimiter;
-    } 
-    if(value & Capabilities::LEASING)
-    {
-        str << "LEASING" << flagDelimiter;
-    } 
-    if(value & Capabilities::LARGE_MTU)
-    {
-        str << "LARGE_MTU" << flagDelimiter;
-    } 
-    if(value & Capabilities::MULTI_CHANNEL)
-    {
-        str << "MULTI_CHANNEL" << flagDelimiter;
-    } 
-    if(value & Capabilities::PERSISTENT_HANDLES)
-    {
-        str << "PERSISTENT_HANDLES" << flagDelimiter;
-    } 
-    if(value & Capabilities::DIRECTORY_LEASING)
-    {
-        str << "DIRECTORY_LEASING" << flagDelimiter;
-    } 
-    if(value & Capabilities::ENCRYPTION)
-    {
-        str << "ENCRYPTION" << flagDelimiter;
-    } 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
+    auto int_value = to_integral(value);
+
+    print_flag_if_set(out, "DFS",               int_value, Capabilities::DFS);
+    print_flag_if_set(out, "LEASING",           int_value, Capabilities::LEASING);
+    print_flag_if_set(out, "LARGE_MTU",         int_value, Capabilities::LARGE_MTU);
+    print_flag_if_set(out, "MULTI_CHANNEL",     int_value, Capabilities::MULTI_CHANNEL);
+    print_flag_if_set(out, "PERSISTENT_HANDLES",int_value, Capabilities::PERSISTENT_HANDLES);
+    print_flag_if_set(out, "DIRECTORY_LEASING", int_value, Capabilities::DIRECTORY_LEASING);
+    print_flag_if_set(out, "ENCRYPTION",        int_value, Capabilities::ENCRYPTION);
+
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const SessionFlags value)
 {
-    std::ostringstream str;
-    if(value & SessionFlags::NONE)
-    {
-        str << "NONE" << flagDelimiter;
-    } 
-    if(value & SessionFlags::IS_GUEST)
-    {
-        str << "SMB2_SESSION_FLAG_IS_GUEST" << flagDelimiter;
-    } 
-    if(value & SessionFlags::IS_NULL)
-    {
-        str << "SMB2_SESSION_FLAG_IS_NULL" << flagDelimiter;
-    } 
-    if(value & SessionFlags::IS_ENCRYPT_DATA)
-    {
-        str << "SMB2_SESSION_FLAG_ENCRYPT_DATA" << flagDelimiter;
-    } 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
+    auto int_value = to_integral(value);
+
+    print_flag_if_set(out, "NONE",                          int_value, SessionFlags::NONE);
+    print_flag_if_set(out, "SMB2_SESSION_FLAG_IS_GUEST",    int_value, SessionFlags::IS_GUEST);
+    print_flag_if_set(out, "SMB2_SESSION_FLAG_IS_NULL",     int_value, SessionFlags::IS_NULL);
+    print_flag_if_set(out, "SMB2_SESSION_FLAG_ENCRYPT_DATA",int_value, SessionFlags::IS_ENCRYPT_DATA);
+
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const AccessMask value)
 {
-    std::ostringstream str;
-    if(value & AccessMask::FILE_READ_DATA)
-    {
-        str << "FILE_READ_DATA" << flagDelimiter;
-    } 
-    if(value & AccessMask::FILE_WRITE_DATA)
-    {
-        str << "FILE_WRITE_DATA" << flagDelimiter;
-    } 
-    if(value & AccessMask::FILE_APPEND_DATA)
-    {
-        str << "FILE_APPEND_DATA" << flagDelimiter;
-    } 
-    if(value & AccessMask::FILE_READ_EA)
-    {
-        str << "FILE_READ_EA" << flagDelimiter;
-    } 
-    if(value & AccessMask::FILE_WRITE_EA)
-    {
-        str << "FILE_WRITE_EA" << flagDelimiter;
-    } 
-    if(value & AccessMask::FILE_DELETE_CHILD)
-    {
-        str << "FILE_DELETE_CHILD" << flagDelimiter;
-    } 
-    if(value & AccessMask::FILE_EXECUTE)
-    {
-        str << "FILE_EXECUTE" << flagDelimiter;
-    } 
-    if(value & AccessMask::FILE_READ_ATTRIBUTES)
-    {
-        str << "FILE_READ_ATTRIBUTES" << flagDelimiter;
-    } 
-    if(value & AccessMask::FILE_WRITE_ATTRIBUTES)
-    {
-        str << "FILE_WRITE_ATTRIBUTES" << flagDelimiter;
-    } 
-    if(value & AccessMask::DELETE)
-    {
-        str << "DELETE" << flagDelimiter;
-    } 
-    if(value & AccessMask::READ_CONTROL)
-    {
-        str << "READ_CONTROL" << flagDelimiter;
-    } 
-    if(value & AccessMask::WRITE_DAC)
-    {
-        str << "WRITE_DAC" << flagDelimiter;
-    } 
-    if(value & AccessMask::WRITE_OWNER)
-    {
-        str << "WRITE_OWNER" << flagDelimiter;
-    } 
-    if(value & AccessMask::SYNCHRONIZE)
-    {
-        str << "SYNCHRONIZE" << flagDelimiter;
-    } 
-    if(value & AccessMask::ACCESS_SYSTEM_SECURITY)
-    {
-        str << "ACCESS_SYSTEM_SECURITY" << flagDelimiter;
-    } 
-    if(value & AccessMask::MAXIMUM_ALLOWED)
-    {
-        str << "MAXIMUM_ALLOWED" << flagDelimiter;
-    } 
-    if(value & AccessMask::GENERIC_ALL)
-    {
-        str << "GENERIC_ALL" << flagDelimiter;
-    } 
-    if(value & AccessMask::GENERIC_EXECUTE)
-    {
-        str << "GENERIC_EXECUTE" << flagDelimiter;
-    } 
-    if(value & AccessMask::GENERIC_WRITE)
-    {
-        str << "GENERIC_WRITE" << flagDelimiter;
-    } 
-    if(value & AccessMask::GENERIC_READ)
-    {
-        str << "GENERIC_READ" << flagDelimiter;
-    } 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
+    auto int_value = to_integral(value);
+
+    print_flag_if_set(out, "FILE_READ_DATA",           int_value, AccessMask::FILE_READ_DATA);
+    print_flag_if_set(out, "FILE_WRITE_DATA",          int_value, AccessMask::FILE_WRITE_DATA);
+    print_flag_if_set(out, "FILE_APPEND_DATA",         int_value, AccessMask::FILE_APPEND_DATA);
+    print_flag_if_set(out, "FILE_READ_EA",             int_value, AccessMask::FILE_READ_EA);
+    print_flag_if_set(out, "FILE_WRITE_EA",            int_value, AccessMask::FILE_WRITE_EA);
+    print_flag_if_set(out, "FILE_DELETE_CHILD",        int_value, AccessMask::FILE_DELETE_CHILD);
+    print_flag_if_set(out, "FILE_EXECUTE",             int_value, AccessMask::FILE_EXECUTE);
+    print_flag_if_set(out, "FILE_READ_ATTRIBUTES",     int_value, AccessMask::FILE_READ_ATTRIBUTES);
+    print_flag_if_set(out, "FILE_WRITE_ATTRIBUTES",    int_value, AccessMask::FILE_WRITE_ATTRIBUTES);
+    print_flag_if_set(out, "DELETE",                   int_value, AccessMask::DELETE);
+    print_flag_if_set(out, "READ_CONTROL",             int_value, AccessMask::READ_CONTROL);
+    print_flag_if_set(out, "WRITE_DAC",                int_value, AccessMask::WRITE_DAC);
+    print_flag_if_set(out, "WRITE_OWNER",              int_value, AccessMask::WRITE_OWNER);
+    print_flag_if_set(out, "SYNCHRONIZE",              int_value, AccessMask::SYNCHRONIZE);
+    print_flag_if_set(out, "ACCESS_SYSTEM_SECURITY",   int_value, AccessMask::ACCESS_SYSTEM_SECURITY);
+    print_flag_if_set(out, "MAXIMUM_ALLOWED",          int_value, AccessMask::MAXIMUM_ALLOWED);
+    print_flag_if_set(out, "GENERIC_ALL",              int_value, AccessMask::GENERIC_ALL);
+    print_flag_if_set(out, "GENERIC_EXECUTE",          int_value, AccessMask::GENERIC_EXECUTE);
+    print_flag_if_set(out, "GENERIC_WRITE",            int_value, AccessMask::GENERIC_WRITE);
+    print_flag_if_set(out, "GENERIC_READ",             int_value, AccessMask::GENERIC_READ);
+
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const CloseFlags value)
 {
-    std::ostringstream str;
+    auto int_value = to_integral(value);
 
-    if (value & CloseFlags::POSTQUERY_ATTRIB)
-    {
-        out << "POSTQUERY_ATTRIB";
-    }
+    print_flag_if_set(out, "POSTQUERY_ATTRIB",   int_value, CloseFlags::POSTQUERY_ATTRIB);
 
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const SecurityMode value)
 {
-    std::ostringstream str;
+    auto int_value = to_integral(value);
 
-    if (value & SecurityMode::SIGNING_ENABLED)
-    {
-        str << "SIGNING_ENABLED" << flagDelimiter;
-    }
-    if (value & SecurityMode::SIGNING_REQUIRED)
-    {
-        str << "SIGNING_REQUIRED" << flagDelimiter;
-    }
+    print_flag_if_set(out, "SIGNING_ENABLED",   int_value, SecurityMode::SIGNING_ENABLED);
+    print_flag_if_set(out, "SIGNING_REQUIRED",  int_value, SecurityMode::SIGNING_REQUIRED);
 
-    out << ClearFromLastDelimiter(str.str(), flagDelimiter);
     return out;
 }
 
@@ -705,15 +394,16 @@ std::ostream& operator<<(std::ostream& out, const FsInfoLevels value)
 {
     switch(value)
     {
-        case FsInfoLevels::SMB2_FS_INFO_01: out << "SMB2_FS_INFO_01";break;
-        case FsInfoLevels::SMB2_FS_INFO_02: out << "SMB2_FS_INFO_02";break;
-        case FsInfoLevels::SMB2_FS_INFO_03: out << "SMB2_FS_INFO_03";break;
-        case FsInfoLevels::SMB2_FS_INFO_04: out << "SMB2_FS_INFO_04";break;
-        case FsInfoLevels::SMB2_FS_INFO_05: out << "SMB2_FS_INFO_05";break;
-        case FsInfoLevels::SMB2_FS_INFO_06: out << "SMB2_FS_INFO_06";break;
-        case FsInfoLevels::SMB2_FS_INFO_07: out << "SMB2_FS_INFO_07";break;
+        case FsInfoLevels::SMB2_FS_INFO_01: return out << "SMB2_FS_INFO_01";
+        case FsInfoLevels::SMB2_FS_INFO_02: return out << "SMB2_FS_INFO_02";
+        case FsInfoLevels::SMB2_FS_INFO_03: return out << "SMB2_FS_INFO_03";
+        case FsInfoLevels::SMB2_FS_INFO_04: return out << "SMB2_FS_INFO_04";
+        case FsInfoLevels::SMB2_FS_INFO_05: return out << "SMB2_FS_INFO_05";
+        case FsInfoLevels::SMB2_FS_INFO_06: return out << "SMB2_FS_INFO_06";
+        case FsInfoLevels::SMB2_FS_INFO_07: return out << "SMB2_FS_INFO_07";
         default:
-        assert("Cannot convert FsInfoLevels value into string representation.");
+            // empty default block
+            ;
     } 
     return out;
 }
@@ -722,53 +412,54 @@ std::ostream& operator<<(std::ostream& out, const QueryInfoLevels value)
 {
     switch(value)
     {
-        case QueryInfoLevels::DIRECTORY_INFORMATION:             out << "DIRECTORY_INFORMATION";break;
-        case QueryInfoLevels::FULL_DIRECTORY_INFORMATION:        out << "FULL_DIRECTORY_INFORMATION";break;
-        case QueryInfoLevels::BOTH_DIRECTORY_INFORMATION:        out << "BOTH_DIRECTORY_INFORMATION";break;
-        case QueryInfoLevels::BASIC_INFORMATION:                 out << "BASIC_INFORMATION";break;
-        case QueryInfoLevels::STANDARD_INFORMATION:              out << "STANDARD_INFORMATION";break;
-        case QueryInfoLevels::INTERNAL_INFORMATION:              out << "INTERNAL_INFORMATION";break;
-        case QueryInfoLevels::EA_INFORMATION:                    out << "EA_INFORMATION";break;
-        case QueryInfoLevels::ACCESS_INFORMATION:                out << "ACCESS_INFORMATION";break;
-        case QueryInfoLevels::NAME_INFORMATION:                  out << "NAME_INFORMATION";break;
-        case QueryInfoLevels::RENAME_INFORMATION:                out << "RENAME_INFORMATION";break;
-        case QueryInfoLevels::LINK_INFORMATION:                  out << "LINK_INFORMATION";break;
-        case QueryInfoLevels::NAMES_INFORMATION:                 out << "NAMES_INFORMATION";break;
-        case QueryInfoLevels::DISPOSITION_INFORMATION:           out << "DISPOSITION_INFORMATION";break;
-        case QueryInfoLevels::POSITION_INFORMATION:              out << "POSITION_INFORMATION";break;
-        case QueryInfoLevels::FULL_EA_INFORMATION:               out << "FULL_EA_INFORMATION";break;
-        case QueryInfoLevels::MODE_INFORMATION:                  out << "MODE_INFORMATION";break;
-        case QueryInfoLevels::ALIGNMENT_INFORMATION:             out << "ALIGNMENT_INFORMATION";break;
-        case QueryInfoLevels::ALL_INFORMATION:                   out << "ALL_INFORMATION";break;
-        case QueryInfoLevels::ALLOCATION_INFORMATION:            out << "ALLOCATION_INFORMATION";break;
-        case QueryInfoLevels::END_OF_FILE_INFORMATION:           out << "END_OF_FILE_INFORMATION";break;
-        case QueryInfoLevels::ALTERNATE_NAME_INFORMATION:        out << "ALTERNATE_NAME_INFORMATION";break;
-        case QueryInfoLevels::STREAM_INFORMATION:                out << "STREAM_INFORMATION";break;
-        case QueryInfoLevels::PIPE_INFORMATION:                  out << "PIPE_INFORMATION";break;
-        case QueryInfoLevels::PIPE_LOCAL_INFORMATION:            out << "PIPE_LOCAL_INFORMATION";break;
-        case QueryInfoLevels::PIPE_REMOTE_INFORMATION:           out << "PIPE_REMOTE_INFORMATION";break;
-        case QueryInfoLevels::MAILSLOT_QUERY_INFORMATION:        out << "MAILSLOT_QUERY_INFORMATION";break;
-        case QueryInfoLevels::MAILSLOT_SET_INFORMATION:          out << "MAILSLOT_SET_INFORMATION";break;
-        case QueryInfoLevels::COMPRESSION_INFORMATION:           out << "COMPRESSION_INFORMATION";break;
-        case QueryInfoLevels::OBJECT_ID_INFORMATION:             out << "OBJECT_ID_INFORMATION";break;
-        case QueryInfoLevels::MOVE_CLUSTER_INFORMATION:          out << "MOVE_CLUSTER_INFORMATION";break;
-        case QueryInfoLevels::QUOTA_INFORMATION:                 out << "QUOTA_INFORMATION";break;
-        case QueryInfoLevels::REPARSE_POINT_INFORMATION:         out << "REPARSE_POINT_INFORMATION";break;
-        case QueryInfoLevels::NETWORK_OPEN_INFORMATION:          out << "NETWORK_OPEN_INFORMATION";break;
-        case QueryInfoLevels::ATTRIBUTE_TAG_INFORMATION:         out << "ATTRIBUTE_TAG_INFORMATION";break;
-        case QueryInfoLevels::TRACKING_INFORMATION:              out << "TRACKING_INFORMATION";break;
-        case QueryInfoLevels::ID_BOTH_DIRECTORY_INFORMATION:     out << "ID_BOTH_DIRECTORY_INFORMATION";break;
-        case QueryInfoLevels::ID_FULL_DIRECTORY_INFORMATION:     out << "ID_FULL_DIRECTORY_INFORMATION";break;
-        case QueryInfoLevels::VALID_DATA_LENGTH_INFORMATION:     out << "VALID_DATA_LENGTH_INFORMATION";break;
-        case QueryInfoLevels::SHORT_NAME_INFORMATION:            out << "SHORT_NAME_INFORMATION";break;
-        case QueryInfoLevels::SFIO_RESERVE_INFORMATION:          out << "SFIO_RESERVE_INFORMATION";break;
-        case QueryInfoLevels::SFIO_VOLUME_INFORMATION:           out << "SFIO_VOLUME_INFORMATION";break;
-        case QueryInfoLevels::HARD_LINK_INFORMATION:             out << "HARD_LINK_INFORMATION";break;
-        case QueryInfoLevels::NORMALIZED_NAME_INFORMATION:       out << "NORMALIZED_NAME_INFORMATION";break;
-        case QueryInfoLevels::ID_GLOBAL_TX_DIRECTORY_INFORMATION:out << "ID_GLOBAL_TX_DIRECTORY_INFORMATION";break;
-        case QueryInfoLevels::STANDARD_LINK_INFORMATION:         out << "STANDARD_LINK_INFORMATION";break;
-        default: 
-        assert("Cannot convert QueryInfoLevels value into string representation.");
+        case QueryInfoLevels::DIRECTORY_INFORMATION:              return out << "DIRECTORY_INFORMATION";
+        case QueryInfoLevels::FULL_DIRECTORY_INFORMATION:         return out << "FULL_DIRECTORY_INFORMATION";
+        case QueryInfoLevels::BOTH_DIRECTORY_INFORMATION:         return out << "BOTH_DIRECTORY_INFORMATION";
+        case QueryInfoLevels::BASIC_INFORMATION:                  return out << "BASIC_INFORMATION";
+        case QueryInfoLevels::STANDARD_INFORMATION:               return out << "STANDARD_INFORMATION";
+        case QueryInfoLevels::INTERNAL_INFORMATION:               return out << "INTERNAL_INFORMATION";
+        case QueryInfoLevels::EA_INFORMATION:                     return out << "EA_INFORMATION";
+        case QueryInfoLevels::ACCESS_INFORMATION:                 return out << "ACCESS_INFORMATION";
+        case QueryInfoLevels::NAME_INFORMATION:                   return out << "NAME_INFORMATION";
+        case QueryInfoLevels::RENAME_INFORMATION:                 return out << "RENAME_INFORMATION";
+        case QueryInfoLevels::LINK_INFORMATION:                   return out << "LINK_INFORMATION";
+        case QueryInfoLevels::NAMES_INFORMATION:                  return out << "NAMES_INFORMATION";
+        case QueryInfoLevels::DISPOSITION_INFORMATION:            return out << "DISPOSITION_INFORMATION";
+        case QueryInfoLevels::POSITION_INFORMATION:               return out << "POSITION_INFORMATION";
+        case QueryInfoLevels::FULL_EA_INFORMATION:                return out << "FULL_EA_INFORMATION";
+        case QueryInfoLevels::MODE_INFORMATION:                   return out << "MODE_INFORMATION";
+        case QueryInfoLevels::ALIGNMENT_INFORMATION:              return out << "ALIGNMENT_INFORMATION";
+        case QueryInfoLevels::ALL_INFORMATION:                    return out << "ALL_INFORMATION";
+        case QueryInfoLevels::ALLOCATION_INFORMATION:             return out << "ALLOCATION_INFORMATION";
+        case QueryInfoLevels::END_OF_FILE_INFORMATION:            return out << "END_OF_FILE_INFORMATION";
+        case QueryInfoLevels::ALTERNATE_NAME_INFORMATION:         return out << "ALTERNATE_NAME_INFORMATION";
+        case QueryInfoLevels::STREAM_INFORMATION:                 return out << "STREAM_INFORMATION";
+        case QueryInfoLevels::PIPE_INFORMATION:                   return out << "PIPE_INFORMATION";
+        case QueryInfoLevels::PIPE_LOCAL_INFORMATION:             return out << "PIPE_LOCAL_INFORMATION";
+        case QueryInfoLevels::PIPE_REMOTE_INFORMATION:            return out << "PIPE_REMOTE_INFORMATION";
+        case QueryInfoLevels::MAILSLOT_QUERY_INFORMATION:         return out << "MAILSLOT_QUERY_INFORMATION";
+        case QueryInfoLevels::MAILSLOT_SET_INFORMATION:           return out << "MAILSLOT_SET_INFORMATION";
+        case QueryInfoLevels::COMPRESSION_INFORMATION:            return out << "COMPRESSION_INFORMATION";
+        case QueryInfoLevels::OBJECT_ID_INFORMATION:              return out << "OBJECT_ID_INFORMATION";
+        case QueryInfoLevels::MOVE_CLUSTER_INFORMATION:           return out << "MOVE_CLUSTER_INFORMATION";
+        case QueryInfoLevels::QUOTA_INFORMATION:                  return out << "QUOTA_INFORMATION";
+        case QueryInfoLevels::REPARSE_POINT_INFORMATION:          return out << "REPARSE_POINT_INFORMATION";
+        case QueryInfoLevels::NETWORK_OPEN_INFORMATION:           return out << "NETWORK_OPEN_INFORMATION";
+        case QueryInfoLevels::ATTRIBUTE_TAG_INFORMATION:          return out << "ATTRIBUTE_TAG_INFORMATION";
+        case QueryInfoLevels::TRACKING_INFORMATION:               return out << "TRACKING_INFORMATION";
+        case QueryInfoLevels::ID_BOTH_DIRECTORY_INFORMATION:      return out << "ID_BOTH_DIRECTORY_INFORMATION";
+        case QueryInfoLevels::ID_FULL_DIRECTORY_INFORMATION:      return out << "ID_FULL_DIRECTORY_INFORMATION";
+        case QueryInfoLevels::VALID_DATA_LENGTH_INFORMATION:      return out << "VALID_DATA_LENGTH_INFORMATION";
+        case QueryInfoLevels::SHORT_NAME_INFORMATION:             return out << "SHORT_NAME_INFORMATION";
+        case QueryInfoLevels::SFIO_RESERVE_INFORMATION:           return out << "SFIO_RESERVE_INFORMATION";
+        case QueryInfoLevels::SFIO_VOLUME_INFORMATION:            return out << "SFIO_VOLUME_INFORMATION";
+        case QueryInfoLevels::HARD_LINK_INFORMATION:              return out << "HARD_LINK_INFORMATION";
+        case QueryInfoLevels::NORMALIZED_NAME_INFORMATION:        return out << "NORMALIZED_NAME_INFORMATION";
+        case QueryInfoLevels::ID_GLOBAL_TX_DIRECTORY_INFORMATION: return out << "ID_GLOBAL_TX_DIRECTORY_INFORMATION";
+        case QueryInfoLevels::STANDARD_LINK_INFORMATION:          return out << "STANDARD_LINK_INFORMATION";
+        default:
+            // empty default block
+            ;
     }
     return out;
 }
@@ -777,23 +468,24 @@ std::ostream& operator<<(std::ostream& out, const CtlCodes value)
 {
     switch(value)
     {
-        case CtlCodes::SCTL_DFS_GET_REFERRALS:              out << "SCTL_DFS_GET_REFERRALS";break;
-        case CtlCodes::FSCTL_PIPE_PEEK:                     out << "FSCTL_PIPE_PEEK";break;
-        case CtlCodes::FSCTL_PIPE_WAIT:                     out << "FSCTL_PIPE_WAIT";break;
-        case CtlCodes::FSCTL_PIPE_TRANSCEIVE:               out << "FSCTL_PIPE_TRANSCEIVE";break;
-        case CtlCodes::FSCTL_SRV_COPYCHUNK:                 out << "FSCTL_SRV_COPYCHUNK";break;
-        case CtlCodes::FSCTL_SRV_ENUMERATE_SNAPSHOTS:       out << "FSCTL_SRV_ENUMERATE_SNAPSHOTS";break;
-        case CtlCodes::FSCTL_SRV_REQUEST_RESUME_KEY:        out << "FSCTL_SRV_REQUEST_RESUME_KEY";break;
-        case CtlCodes::FSCTL_SRV_READ_HASH:                 out << "FSCTL_SRV_READ_HASH";break;
-        case CtlCodes::FSCTL_SRV_COPYCHUNK_WRITE:           out << "FSCTL_SRV_COPYCHUNK_WRITE";break;
-        case CtlCodes::FSCTL_LMR_REQUEST_RESILIENCY:        out << "FSCTL_LMR_REQUEST_RESILIENCY";break;
-        case CtlCodes::FSCTL_QUERY_NETWORK_INTERFACE_INFO:  out << "FSCTL_QUERY_NETWORK_INTERFACE_INFO";break;
-        case CtlCodes::FSCTL_SET_REPARSE_POINT:             out << "FSCTL_SET_REPARSE_POINT";break;
-        case CtlCodes::FSCTL_DFS_GET_REFERRALS_EX:          out << "FSCTL_DFS_GET_REFERRALS_EX";break;
-        case CtlCodes::FSCTL_FILE_LEVEL_TRIM:               out << "FSCTL_FILE_LEVEL_TRIM";break;
-        case CtlCodes::FSCTL_VALIDATE_NEGOTIATE_INFO:       out << "FSCTL_VALIDATE_NEGOTIATE_INFO";break;
-        default: 
-        assert("Cannot convert CtlCodes value into string representation.");
+        case CtlCodes::SCTL_DFS_GET_REFERRALS:              return out << "SCTL_DFS_GET_REFERRALS";
+        case CtlCodes::FSCTL_PIPE_PEEK:                     return out << "FSCTL_PIPE_PEEK";
+        case CtlCodes::FSCTL_PIPE_WAIT:                     return out << "FSCTL_PIPE_WAIT";
+        case CtlCodes::FSCTL_PIPE_TRANSCEIVE:               return out << "FSCTL_PIPE_TRANSCEIVE";
+        case CtlCodes::FSCTL_SRV_COPYCHUNK:                 return out << "FSCTL_SRV_COPYCHUNK";
+        case CtlCodes::FSCTL_SRV_ENUMERATE_SNAPSHOTS:       return out << "FSCTL_SRV_ENUMERATE_SNAPSHOTS";
+        case CtlCodes::FSCTL_SRV_REQUEST_RESUME_KEY:        return out << "FSCTL_SRV_REQUEST_RESUME_KEY";
+        case CtlCodes::FSCTL_SRV_READ_HASH:                 return out << "FSCTL_SRV_READ_HASH";
+        case CtlCodes::FSCTL_SRV_COPYCHUNK_WRITE:           return out << "FSCTL_SRV_COPYCHUNK_WRITE";
+        case CtlCodes::FSCTL_LMR_REQUEST_RESILIENCY:        return out << "FSCTL_LMR_REQUEST_RESILIENCY";
+        case CtlCodes::FSCTL_QUERY_NETWORK_INTERFACE_INFO:  return out << "FSCTL_QUERY_NETWORK_INTERFACE_INFO";
+        case CtlCodes::FSCTL_SET_REPARSE_POINT:             return out << "FSCTL_SET_REPARSE_POINT";
+        case CtlCodes::FSCTL_DFS_GET_REFERRALS_EX:          return out << "FSCTL_DFS_GET_REFERRALS_EX";
+        case CtlCodes::FSCTL_FILE_LEVEL_TRIM:               return out << "FSCTL_FILE_LEVEL_TRIM";
+        case CtlCodes::FSCTL_VALIDATE_NEGOTIATE_INFO:       return out << "FSCTL_VALIDATE_NEGOTIATE_INFO";
+        default:
+            // empty default block
+            ;
     }
     return out;
 }
@@ -802,12 +494,13 @@ std::ostream& operator<<(std::ostream& out, const InfoTypes value)
 {
     switch(value)
     {
-        case InfoTypes::FILE:              out << "SMB2_0_INFO_FILE";break;
-        case InfoTypes::FILESYSTEM:        out << "SMB2_0_INFO_FILESYSTEM";break;
-        case InfoTypes::SECURITY:          out << "SMB2_0_INFO_SECURITY";break;
-        case InfoTypes::QUOTA:             out << "SMB2_0_INFO_QUOTA";break;
-        default: 
-        assert("Cannot convert InfoTypes value into string representation.");
+        case InfoTypes::FILE:        return out << "SMB2_0_INFO_FILE";
+        case InfoTypes::FILESYSTEM:  return out << "SMB2_0_INFO_FILESYSTEM";
+        case InfoTypes::SECURITY:    return out << "SMB2_0_INFO_SECURITY";
+        case InfoTypes::QUOTA:       return out << "SMB2_0_INFO_QUOTA";
+        default:
+            // empty default block
+            ;
     }
     return out;
 }
@@ -816,28 +509,30 @@ std::ostream& operator<<(std::ostream& out, const SessionFlagsBinding value)
 {
     switch(value)
     {
-        case SessionFlagsBinding::NONE:     out << "NONE";break;
-        case SessionFlagsBinding::BINDING:  out << "BINDING";break;
-        default: 
-        assert("Cannot convert SessionFlagsBinding value into string representation.");
+        case SessionFlagsBinding::NONE:     return out << "NONE";
+        case SessionFlagsBinding::BINDING:  return out << "BINDING";
+        default:
+            // empty default block
+            ;
     }
     return out;
 } 
 
-void print_info_levels(std::ostream& out, const InfoTypes infoType, const uint8_t infoClass)
+std::ostream& print_info_levels(std::ostream& out, const InfoTypes infoType, const uint8_t infoClass)
 {
     switch(infoType)
     {
         case InfoTypes::FILE:
             print_enum(out, "InfoLevel", static_cast<QueryInfoLevels>(infoClass));
-            break;
+            
         case InfoTypes::FILESYSTEM:
             print_enum(out, "InfoLevel", static_cast<FsInfoLevels>(infoClass));
-            break;
+            
         default:
             //we dont handle other classes
             ;
     }
+    return out;
 } 
 } // namespace CIFSv2
 } // namespace protocols
