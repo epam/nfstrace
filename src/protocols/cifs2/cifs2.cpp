@@ -83,7 +83,7 @@ bool MessageHeader::isFlag(const Flags flag) const
 
 void NST::protocols::CIFSv2::parseGuid(uint8_t (&guid)[16])
 {
-   Guid &p = reinterpret_cast<Guid&>(guid);
+    Guid &p = reinterpret_cast<Guid&>(guid);
     p.Data1 = le32toh(p.Data1);
     p.Data2 = le16toh(p.Data2);
     p.Data3 = le16toh(p.Data3);
