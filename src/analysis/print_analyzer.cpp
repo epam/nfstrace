@@ -256,65 +256,37 @@ void print_buffer(std::ostream& out, const uint8_t *buffer, uint16_t len)
     out << "\n";
 }
 
-void print_guid(std::ostream& out, const uint8_t *pGuidString)
+void print_guid(std::ostream& out, const uint8_t (&guid)[16])
 {
-    if (pGuidString == nullptr)
+    const Guid& refGuid = reinterpret_cast<const Guid&>(guid);
+
+    // print hex value with preceding 0 (zeros) if necessary
+    // ( e.g: 0x01 will be printed as 01 or 0x00 as 00 )
+    auto print_hex = [&out](uint32_t value, uint8_t bitShift)
     {
-        return;
+        out << std::hex << std::setfill('0') << std::setw(2)
+            << (static_cast<uint32_t>(value >> bitShift) & 0xFF) << std::dec;
+    };
+
+    print_hex(refGuid.Data1, 24);
+    print_hex(refGuid.Data1, 16);
+    print_hex(refGuid.Data1,  8);
+    print_hex(refGuid.Data1,  0);
+    out << "-";
+    print_hex(refGuid.Data2, 8);
+    print_hex(refGuid.Data2, 0);
+    out << "-";
+    print_hex(refGuid.Data3, 8);
+    print_hex(refGuid.Data3, 0);
+    out << "-";
+    print_hex(refGuid.Data4[0], 0);
+    print_hex(refGuid.Data4[1], 0);
+    out << "-";
+
+    for(uint8_t i = 2; i < 8; i++)
+    {
+        print_hex(refGuid.Data4[i], 0);
     }
-
-    const auto GUID_BYTES_NUM = 16;
-    uint8_t localGuid[GUID_BYTES_NUM];
-    std::copy(pGuidString, pGuidString + GUID_BYTES_NUM, std::begin(localGuid));
-    std::ostringstream str;
-    std::string delimiter = "-";
-
-    auto hexPrinter = [&str](uint8_t hexValue)
-    {
-        str << std::hex << (0xF & (hexValue >> 4)) << (0xF & hexValue) << std::dec;
-    };
-
-    auto guidPartPrinter = [&]
-            (const std::pair<uint8_t,uint8_t>& offset,
-             bool showReverseBeforePrint)
-    {
-        auto numOfElements = offset.second - offset.first;
-
-        auto start = std::begin(localGuid) + offset.first;
-        auto end = start + numOfElements;
-        if (showReverseBeforePrint)
-        {
-            std::reverse(start, end);
-        }
-
-        std::for_each(start, end, hexPrinter);
-        str << delimiter;
-    };
-
-    std::pair<uint8_t, uint8_t> invertOffsets[] =
-    {
-        std::make_pair(0, 4),
-        std::make_pair(4, 6),
-        std::make_pair(6, 8)
-    };
-
-    std::pair<uint8_t, uint8_t> directOffsets[] =
-    {
-        std::make_pair(8, 10),
-        std::make_pair(10, 16)
-    };
-
-    for(const auto& offset : invertOffsets)
-    {
-        guidPartPrinter(offset, true);
-    }
-
-    for(const auto& offset : directOffsets)
-    {
-        guidPartPrinter(offset, false);
-    }
-
-    out << ClearFromLastDelimiter(str.str(), delimiter);
 }
 
 } // unnamed namespace

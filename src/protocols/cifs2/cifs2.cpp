@@ -81,19 +81,12 @@ bool MessageHeader::isFlag(const Flags flag) const
     return static_cast<uint32_t>(flag) & flags;
 }
 
-void NST::protocols::CIFSv2::parseGuid(uint8_t* pGuid)
+void NST::protocols::CIFSv2::parseGuid(uint8_t (&guid)[16])
 {
-    if (pGuid == nullptr)
-    {
-        return;
-    }
-
-    // Bytes:   4          2      2      2      6
-    //          f193fb68 - 13b3 - 409f - 9f44 - 87d98987e0b7
-    SMBv2::Guid *p = reinterpret_cast<SMBv2::Guid*>(pGuid);
-    p->Data1 = le32toh(p->Data1);
-    p->Data2 = le16toh(p->Data2);
-    p->Data3 = le16toh(p->Data3);
+    Guid &p = reinterpret_cast<Guid&>(guid);
+    p.Data1 = le32toh(p.Data1);
+    p.Data2 = le16toh(p.Data2);
+    p.Data3 = le16toh(p.Data3);
 }
 
 void NST::protocols::CIFSv2::parse(SMBv2::ErrResponse*&) { }
