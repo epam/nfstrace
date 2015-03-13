@@ -22,8 +22,7 @@
 #ifndef CIFS2_UTILS_H
 #define CIFS2_UTILS_H
 //------------------------------------------------------------------------------
-#include <iostream>
-#include <assert.h>
+#include <iosfwd>
 
 #include "api/cifs2_commands.h"
 #include "protocols/nfs/nfs_utils.h"
@@ -34,17 +33,7 @@ namespace protocols
 {
 namespace CIFSv2
 {
-
 namespace SMBv2 = NST::API::SMBv2;
-
-/*! NewLine used as additional information for methods
- *  whether to add or remove new line charcet in output stream
- */
-enum class NewLine
-{
-    Add,            // default value
-    Remove
-};
 
 /*! Convert enum type to underlying integer type
  * \param e - instance of enumeration to be converted
@@ -79,29 +68,20 @@ std::ostream& operator<<(std::ostream& out, const SMBv2::SessionFlags value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::NTStatus value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::AccessMask value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::CloseFlags value);
-std::ostream& operator<<(std::ostream& out, const SMBv2::SecurityMode value);
-
-inline std::string ClearFromLastDelimiter(std::string str, const std::string& delimiter)
-{
-    if (str.length() == 0) return str;
-    return str.erase(str.length() - delimiter.length());
-} 
+std::ostream& operator<<(std::ostream& out, const SMBv2::SecurityMode value); 
 
 template <typename T>
-void print_enum(std::ostream& out, const std::string name, T value, NewLine nl = NewLine::Add)
+std::ostream& print_enum(std::ostream& out, const std::string name, T value )
 {
     using namespace NST::protocols::NFS;
     out << "  " << name << " = ";
     auto int_value = to_integral(value);
     print_hex(out, int_value);
     out << " (" << value << ")";
-    if(nl == NewLine::Add)
-    {
-        out << "\n";
-    }
+    return out;
 } 
 
-void print_info_levels(std::ostream& out, const SMBv2::InfoTypes infoType, const uint8_t infoClass);
+std::ostream& print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoType, const uint8_t infoClass);
 }// namespace CIFSv2    
 }// namespace protocols 
 }// namespace NST       
