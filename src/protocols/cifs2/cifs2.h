@@ -34,6 +34,15 @@ namespace CIFSv2
 {
 namespace SMBv2 = NST::API::SMBv2;
 
+// https://msdn.microsoft.com/en-us/library/ff718266.aspx
+struct Guid
+{
+  uint32_t Data1;               // unsigned long  replaced by uint32_t
+  uint16_t Data2;               // unsigned short replaced by uint16_t
+  uint16_t Data3;               // unsigned short replaced by uint16_t
+  uint8_t  Data4[8];            // byte           replaced by uint8_t
+}  __attribute__ ((__packed__));
+
 /*! CIFS v2 Flags
  */
 enum class Flags : uint32_t
@@ -131,7 +140,7 @@ struct MessageHeader : public RawMessageHeader
  */
 const MessageHeader* get_header(const uint8_t* data);
 
-void parseGuid(uint8_t* );
+void parseGuid(uint8_t (&guid)[16]);
 void parse(SMBv2::ErrResponse*&);
 void parse(SMBv2::NegotiateRequest*&);
 void parse(SMBv2::NegotiateResponse*&);
