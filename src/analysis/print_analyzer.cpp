@@ -194,9 +194,6 @@ std::ostream& print_smbv2_common_info_resp(std::ostream& out, Commands cmdEnum, 
 std::ostream& print_time(std::ostream& out, uint64_t time)
 {
     // TODO: Replace with C++ 11 functions
-
-    std::ostringstream str;
-
     if (time != 0)
     {
         const auto EPOCH_DIFF = 0x019DB1DED53E8000LL; /* 116444736000000000 nsecs */
@@ -212,17 +209,19 @@ std::ostream& print_time(std::ostream& out, uint64_t time)
         // do not forget adding 1900 to tm_year field, just to get current year
         // lt->tm_year + 1900
 
-        // ctime adds "\n" at the end
-        str << ctime(&t);
+        const char *pTime = ctime(&t);
+        if (pTime != nullptr)
+        {
+            // ctime adds "\n" at the end - remove it.
+            size_t len = std::strlen(pTime);
+            out << std::string(pTime, len - 1);
+        }
     }
     else
     {
-        str << "Create: No time specified (0)\n";
+        out << "Create: No time specified (0)";
     }
 
-
-    const std::string& result = str.str();
-    out << result.substr(0, result.length() - 1);
     return out;
 } 
 
