@@ -250,7 +250,7 @@ enum class ShareTypes : uint8_t
 /*!
  * Possible shareFlags - exactly one and only one of the first 4 caching flags
  * must be set (any of the remaining, SHI1005, flags may be set individually
- * or in combination.
+ * or in combination.)
  */
 enum class ShareFlags : uint32_t
 {
@@ -1135,8 +1135,8 @@ enum class AccessMask: uint32_t
     FILE_APPEND_DATA = 0x00000004,
     FILE_READ_EA = 0x00000008,
     FILE_WRITE_EA = 0x00000010,
-    FILE_DELETE_CHILD = 0x00000040,
     FILE_EXECUTE = 0x00000020,
+    FILE_DELETE_CHILD = 0x00000040,
     FILE_READ_ATTRIBUTES = 0x00000080,
     FILE_WRITE_ATTRIBUTES = 0x00000100,
     DELETE = 0x00010000,
