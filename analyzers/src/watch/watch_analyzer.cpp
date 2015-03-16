@@ -786,97 +786,97 @@ void WatchAnalyzer::noAndxCommandSMBv1(const SMBv1::NoAndxCommand* /*cmd*/, cons
 
 void WatchAnalyzer::closeFileSMBv2(const SMBv2::CloseFileCommand* /*cmd*/, const SMBv2::CloseRequest*, const SMBv2::CloseResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_CLOSE));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::CLOSE));
 }
 
 void WatchAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand* /*cmd*/, const SMBv2::NegotiateRequest*, const SMBv2::NegotiateResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_NEGOTIATE));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::NEGOTIATE));
 }
 
 void WatchAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand* /*cmd*/, const SMBv2::SessionSetupRequest*, const SMBv2::SessionSetupResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_SESSION_SETUP));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SESSION_SETUP));
 }
 
 void WatchAnalyzer::logOffSMBv2(const SMBv2::LogOffCommand* /*cmd*/, const SMBv2::LogOffRequest*, const SMBv2::LogOffResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_LOGOFF));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::LOGOFF));
 }
 
 void WatchAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* /*cmd*/, const SMBv2::TreeConnectRequest*, const SMBv2::TreeConnectResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_TREE_CONNECT));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::TREE_CONNECT));
 }
 
 void WatchAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* /*cmd*/, const SMBv2::TreeDisconnectRequest*, const SMBv2::TreeDisconnectResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_TREE_DISCONNECT));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::TREE_DISCONNECT));
 }
 
 void WatchAnalyzer::createSMBv2(const SMBv2::CreateCommand* /*cmd*/, const SMBv2::CreateRequest*, const SMBv2::CreateResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_CREATE));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::CREATE));
 }
 
 void WatchAnalyzer::flushSMBv2(const SMBv2::FlushCommand* /*cmd*/, const SMBv2::FlushRequest*, const SMBv2::FlushResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_FLUSH));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::FLUSH));
 }
 
 void WatchAnalyzer::readSMBv2(const SMBv2::ReadCommand* /*cmd*/, const SMBv2::ReadRequest*, const SMBv2::ReadResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_READ));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::READ));
 }
 
 void WatchAnalyzer::writeSMBv2(const SMBv2::WriteCommand* /*cmd*/, const SMBv2::WriteRequest*, const SMBv2::WriteResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_WRITE));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::WRITE));
 }
 
 void WatchAnalyzer::lockSMBv2(const SMBv2::LockCommand* /*cmd*/, const SMBv2::LockRequest*, const SMBv2::LockResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_LOCK));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::LOCK));
 }
 
 void WatchAnalyzer::ioctlSMBv2(const SMBv2::IoctlCommand* /*cmd*/, const SMBv2::IoCtlRequest*, const SMBv2::IoCtlResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_IOCTL));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::IOCTL));
 }
 
 void WatchAnalyzer::cancelSMBv2(const SMBv2::CancelCommand* /*cmd*/, const SMBv2::CancelRequest*, const SMBv2::CancelResponce*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_CANCEL));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::CANCEL));
 }
 
 void WatchAnalyzer::echoSMBv2(const SMBv2::EchoCommand* /*cmd*/, const SMBv2::EchoRequest*, const SMBv2::EchoResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_ECHO));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::ECHO));
 }
 
 void WatchAnalyzer::queryDirSMBv2(const SMBv2::QueryDirCommand* /*cmd*/, const SMBv2::QueryDirRequest*, const SMBv2::QueryDirResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_QUERY_DIRECTORY));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::QUERY_DIRECTORY));
 }
 
 void WatchAnalyzer::changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* /*cmd*/, const SMBv2::ChangeNotifyRequest*, const SMBv2::ChangeNotifyResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_CHANGE_NOTIFY));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::CHANGE_NOTIFY));
 }
 
 void WatchAnalyzer::queryInfoSMBv2(const SMBv2::QueryInfoCommand* /*cmd*/, const SMBv2::QueryInfoRequest*, const SMBv2::QueryInfoResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_QUERY_INFO));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::QUERY_INFO));
 }
 
 void WatchAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* /*cmd*/, const SMBv2::SetInfoRequest*, const SMBv2::SetInfoResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_SET_INFO));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SET_INFO));
 }
 
 void WatchAnalyzer::breakOplockSMBv2(const SMBv2::BreakOpLockCommand* /*cmd*/, const SMBv2::OplockAcknowledgment*, const SMBv2::OplockResponse*)
 {
-    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::SMBv2_COM_OPLOCK_BREAK));
+    cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::OPLOCK_BREAK));
 }
 
 void WatchAnalyzer::flush_statistics()

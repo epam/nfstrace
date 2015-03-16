@@ -4,7 +4,7 @@ if (NOT "${JSON_ANALYZER_TEST}" STREQUAL "ON")
 else ()
     find_program (TCPREPLAY_PATH tcpreplay)
     if (TCPREPLAY_PATH)
-        set (IF_NAME "eth0") # TODO: Use virtual network interface or at least to make it platform-specific
+        set (IF_NAME "eno1") # TODO: Use virtual network interface or at least to make it platform-specific
         set (CHECK_JSON_ANALYZER_SCRIPT "check-json-analyzer.py")
         configure_file ("${CHECK_JSON_ANALYZER_SCRIPT}.in" "${CHECK_JSON_ANALYZER_SCRIPT}")
         add_test (NAME functional_test_json_analyzer COMMAND sudo python ${CHECK_JSON_ANALYZER_SCRIPT})

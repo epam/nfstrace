@@ -22,6 +22,8 @@
 #ifndef API_CIFS2_COMMANDS_H
 #define API_CIFS2_COMMANDS_H
 //------------------------------------------------------------------------------
+#include <api/cifs_pc_to_net.h>
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace API
@@ -31,29 +33,29 @@ namespace API
 namespace SMBv2
 {
 
-/*! CIFSv2 commands list.
+/*! CIFS v2 commands
  */
-enum class SMBv2Commands
+enum class SMBv2Commands : uint16_t
 {
-    SMBv2_COM_NEGOTIATE,        //!<Negotiate command.
-    SMBv2_COM_SESSION_SETUP,    //!<Session setup command.
-    SMBv2_COM_LOGOFF,           //!<Log off command.
-    SMBv2_COM_TREE_CONNECT,     //!<Tree connect command.
-    SMBv2_COM_TREE_DISCONNECT,  //!<Tree disconnect command.
-    SMBv2_COM_CREATE,           //!<Create command.
-    SMBv2_COM_CLOSE,            //!<Close command.
-    SMBv2_COM_FLUSH,            //!<Flush command.
-    SMBv2_COM_READ,             //!<Read command.
-    SMBv2_COM_WRITE,            //!<Write command.
-    SMBv2_COM_LOCK,             //!<Lock command.
-    SMBv2_COM_IOCTL,            //!<Ioctl command.
-    SMBv2_COM_CANCEL,           //!<Cancel command.
-    SMBv2_COM_ECHO,             //!<Echo command.
-    SMBv2_COM_QUERY_DIRECTORY,  //!<Query directory command.
-    SMBv2_COM_CHANGE_NOTIFY,    //!<Change Notify command.
-    SMBv2_COM_QUERY_INFO,       //!<Query Info command.
-    SMBv2_COM_SET_INFO,         //!<Set Info command.
-    SMBv2_COM_OPLOCK_BREAK,     //!<Break opportunistic lock command.
+    NEGOTIATE         = API::SMBv2::pc_to_net<uint16_t>(0x0000),
+    SESSION_SETUP     = API::SMBv2::pc_to_net<uint16_t>(0x0001),
+    LOGOFF            = API::SMBv2::pc_to_net<uint16_t>(0x0002),
+    TREE_CONNECT      = API::SMBv2::pc_to_net<uint16_t>(0x0003),
+    TREE_DISCONNECT   = API::SMBv2::pc_to_net<uint16_t>(0x0004),
+    CREATE            = API::SMBv2::pc_to_net<uint16_t>(0x0005),
+    CLOSE             = API::SMBv2::pc_to_net<uint16_t>(0x0006),
+    FLUSH             = API::SMBv2::pc_to_net<uint16_t>(0x0007),
+    READ              = API::SMBv2::pc_to_net<uint16_t>(0x0008),
+    WRITE             = API::SMBv2::pc_to_net<uint16_t>(0x0009),
+    LOCK              = API::SMBv2::pc_to_net<uint16_t>(0x000A),
+    IOCTL             = API::SMBv2::pc_to_net<uint16_t>(0x000B),
+    CANCEL            = API::SMBv2::pc_to_net<uint16_t>(0x000C),
+    ECHO              = API::SMBv2::pc_to_net<uint16_t>(0x000D),
+    QUERY_DIRECTORY   = API::SMBv2::pc_to_net<uint16_t>(0x000E),
+    CHANGE_NOTIFY     = API::SMBv2::pc_to_net<uint16_t>(0x000F),
+    QUERY_INFO        = API::SMBv2::pc_to_net<uint16_t>(0x0010),
+    SET_INFO          = API::SMBv2::pc_to_net<uint16_t>(0x0011),
+    OPLOCK_BREAK      = API::SMBv2::pc_to_net<uint16_t>(0x0012),
     CMD_COUNT
 };
 /*!
@@ -104,6 +106,15 @@ enum class Capabilities : uint32_t
     PERSISTENT_HANDLES  = 0x00000010,             //!< When set, indicates that the client supports persistent handles.
     DIRECTORY_LEASING   = 0x00000020,             //!< When set, indicates that the client supports directory leasing.
     ENCRYPTION          = 0x00000040              //!< When set, indicates that the client supports encryption.
+};
+
+enum class ShareCapabilities : uint32_t
+{
+    DFS                     = 0x00000008,
+    CONTINUOUS_AVAILABILITY = 0x00000010,
+    SCALEOUT                = 0x00000020,
+    CLUSTER                 = 0x00000040,
+    ASYMMETRIC              = 0x00000080
 };
 
 /*!
@@ -265,7 +276,7 @@ enum class ShareTypes : uint8_t
 /*!
  * Possible shareFlags - exactly one and only one of the first 4 caching flags
  * must be set (any of the remaining, SHI1005, flags may be set individually
- * or in combination.
+ * or in combination.)
  */
 enum class ShareFlags : uint32_t
 {
@@ -296,7 +307,7 @@ struct TreeConnectResponse
     ShareTypes ShareType;                        //!< The type of share being accessed.
     uint8_t   Reserved;                          //!< This field MUST NOT be used and MUST be reserved. The server MUST set this to 0, and the client MUST ignore it on receipt.
     ShareFlags shareFlags;                       //!< This field contains properties for this share.
-    Capabilities capabilities;                   //!< Indicates various capabilities for this share
+    ShareCapabilities capabilities;              //!< Indicates various capabilities for this share
     uint32_t MaximalAccess;                      //!< Contains the maximal access for the user that establishes the tree connect on the share based on the share's permissions
 }  __attribute__ ((__packed__));
 
@@ -382,12 +393,20 @@ enum class DesiredAccessFlags : uint32_t
 /*!
  * Share Access Flags
  */
+/*
 enum ShareAccessFlags : uint32_t
 {
     READ_LE     = (0x00000001),       //!< When set, indicates that other opens are allowed to read this file while this open is present.
     WRITE_LE    = (0x00000002),       //!< When set, indicates that other opens are allowed to write this file while this open is present
     DELETE_LE   = (0x00000004),       //!< When set, indicates that other opens are allowed to delete or rename this file while this open is present
     ALL_LE      = (0x00000007)        //!< Combine
+};*/
+
+enum ShareAccessFlags : uint32_t
+{
+    SHARE_READ_LE     = (0x00000001),    //!< When set, indicates that other opens are allowed to read this file while this open is present.
+    SHARE_WRITE_LE    = (0x00000002),    //!< When set, indicates that other opens are allowed to write this file while this open is present.
+    SHARE_DELETE_LE   = (0x00000004)     //!< When set, indicates that other opens are allowed to delete or rename this file while this open is present.
 };
 
 /*!
@@ -575,6 +594,16 @@ enum class InfoTypes : uint8_t
     QUOTA      = 0x04                            //!< The underlying object store quota information is requested.
 };
 
+enum class FsInfoLevels : uint8_t {
+    SMB2_FS_INFO_01 = 1,
+    SMB2_FS_INFO_02 = 2,
+    SMB2_FS_INFO_03 = 3,
+    SMB2_FS_INFO_04 = 4,
+    SMB2_FS_INFO_05 = 5,
+    SMB2_FS_INFO_06 = 6,
+    SMB2_FS_INFO_07 = 7
+};
+
 /*!
  * PDU infolevel structure definitions
  * BB consider moving to a different header
@@ -667,7 +696,7 @@ struct QueryInfoRequest
 {
     uint16_t  structureSize;                     //!< Must be 41
     InfoTypes infoType;                          //!< The type of information queried
-    QueryInfoLevels FileInfoClass;               //!< Class of info
+    uint8_t   FileInfoClass;                     //!< Class of info
     uint32_t  OutputBufferLength;                //!< The maximum number of bytes of information the server can send in the response.
     uint16_t  InputBufferOffset;                 //!< The offset, in bytes, from the beginning of the SMB2 header to the input buffer.
     uint16_t  Reserved;                          //!< This field MUST NOT be used and MUST be reserved.
@@ -1009,7 +1038,7 @@ struct FileNotifyInformation
     FileAction action;                           //!< The changes that occurred on the file. This field MUST contain one of the following values.
     uint32_t FileNameLength;                     //!< The length, in bytes, of the file name in the FileName field.
     uint32_t FileName[1];                        //!< A Unicode string with the name of the file that changed.
-};
+}  __attribute__ ((__packed__));
 
 /*!
  * \brief The LockResponse structure
@@ -1093,6 +1122,63 @@ enum class IoCtlOpFlags : uint32_t
 };
 
 /*!
+ * NT error codes.
+ */
+enum class NTStatus: uint32_t
+{
+    STATUS_SUCCESS = 0x00000000,
+    STATUS_NO_MORE_FILES = 0x80000006,
+    STATUS_INVALID_HANDLE = 0xC0000008,
+    STATUS_INVALID_PARAMETER = 0xC000000D,
+    STATUS_NO_SUCH_FILE = 0xC000000F,
+    STATUS_MORE_PROCESSING_REQUIRED = 0xC0000016,
+    STATUS_INVALID_SYSTEM_SERVICE = 0xC000001C,
+    STATUS_ACCESS_DENIED = 0xC0000022,
+    STATUS_OBJECT_NAME_INVALID = 0xC0000033,
+    STATUS_OBJECT_NAME_NOT_FOUND = 0xC0000034,
+    STATUS_OBJECT_NAME_COLLISION = 0xC0000035,
+    STATUS_OBJECT_PATH_NOT_FOUND = 0xC000003A,
+    STATUS_OBJECT_PATH_SYNTAX_BAD = 0xC000003B,
+    STATUS_SHARING_VIOLATION = 0xC0000043,
+    STATUS_EA_TOO_LARGE = 0xC0000050,
+    STATUS_FILE_LOCK_CONFLICT = 0xC0000054,
+    STATUS_LOCK_NOT_GRANTED = 0xC0000055,
+    STATUS_LOGON_FAILURE = 0xC000006D,
+    STATUS_RANGE_NOT_LOCKED = 0xC000007E,
+    STATUS_FILE_IS_A_DIRECTORY = 0xC00000BA,
+    STATUS_NOT_SUPPORTED = 0xC00000BB,
+    STATUS_BAD_DEVICE_TYPE = 0xC00000CB,
+    STATUS_REQUEST_NOT_ACCEPTED = 0xC00000D0,
+    STATUS_DIRECTORY_NOT_EMPTY = 0xC0000101,
+    STATUS_NOT_A_DIRECTORY = 0xC0000103,
+    STATUS_CANCELLED = 0xC0000120
+};
+
+enum class AccessMask: uint32_t
+{
+    FILE_READ_DATA = 0x00000001,
+    FILE_WRITE_DATA = 0x00000002,
+    FILE_APPEND_DATA = 0x00000004,
+    FILE_READ_EA = 0x00000008,
+    FILE_WRITE_EA = 0x00000010,
+    FILE_EXECUTE = 0x00000020,
+    FILE_DELETE_CHILD = 0x00000040,
+    FILE_READ_ATTRIBUTES = 0x00000080,
+    FILE_WRITE_ATTRIBUTES = 0x00000100,
+    DELETE = 0x00010000,
+    READ_CONTROL = 0x00020000,
+    WRITE_DAC = 0x00040000,
+    WRITE_OWNER = 0x00080000,
+    SYNCHRONIZE = 0x00100000,
+    ACCESS_SYSTEM_SECURITY = 0x01000000,
+    MAXIMUM_ALLOWED = 0x02000000,
+    GENERIC_ALL = 0x10000000,
+    GENERIC_EXECUTE = 0x20000000,
+    GENERIC_WRITE = 0x40000000,
+    GENERIC_READ = 0x80000000 
+};
+
+/*!
  * \brief The IoCtlRequest structure
  * The SMB2 IOCTL Request packet is sent by a client
  * to issue an implementation-specific file system
@@ -1146,7 +1232,7 @@ struct SetInfoRequest
 {
     uint16_t structureSize;                      //!< The server MUST set this to 33
     InfoTypes infoType;                          //!< The type of information being set
-    QueryInfoLevels FileInfoClass;               //!< For setting file information, this field MUST contain one of the FILE_INFORMATION_CLASS values
+    uint8_t FileInfoClass;                       //!< For setting file information, this field MUST contain one of the FILE_INFORMATION_CLASS values
     uint32_t BufferLength;                       //!< The length, in bytes, of the information to be set.
     uint16_t BufferOffset;                       //!< The offset, in bytes, from the beginning of the SMB2 header to the information to be set.
     uint16_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this field to 0, and the server MUST ignore it on receipt.
