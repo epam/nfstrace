@@ -22,6 +22,8 @@
 #ifndef API_CIFS2_COMMANDS_H
 #define API_CIFS2_COMMANDS_H
 //------------------------------------------------------------------------------
+#include <api/cifs_pc_to_net.h>
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace API
@@ -31,29 +33,29 @@ namespace API
 namespace SMBv2
 {
 
-/*! CIFSv2 commands list.
+/*! CIFS v2 commands
  */
-enum class SMBv2Commands
+enum class SMBv2Commands : uint16_t
 {
-    SMBv2_COM_NEGOTIATE,        //!<Negotiate command.
-    SMBv2_COM_SESSION_SETUP,    //!<Session setup command.
-    SMBv2_COM_LOGOFF,           //!<Log off command.
-    SMBv2_COM_TREE_CONNECT,     //!<Tree connect command.
-    SMBv2_COM_TREE_DISCONNECT,  //!<Tree disconnect command.
-    SMBv2_COM_CREATE,           //!<Create command.
-    SMBv2_COM_CLOSE,            //!<Close command.
-    SMBv2_COM_FLUSH,            //!<Flush command.
-    SMBv2_COM_READ,             //!<Read command.
-    SMBv2_COM_WRITE,            //!<Write command.
-    SMBv2_COM_LOCK,             //!<Lock command.
-    SMBv2_COM_IOCTL,            //!<Ioctl command.
-    SMBv2_COM_CANCEL,           //!<Cancel command.
-    SMBv2_COM_ECHO,             //!<Echo command.
-    SMBv2_COM_QUERY_DIRECTORY,  //!<Query directory command.
-    SMBv2_COM_CHANGE_NOTIFY,    //!<Change Notify command.
-    SMBv2_COM_QUERY_INFO,       //!<Query Info command.
-    SMBv2_COM_SET_INFO,         //!<Set Info command.
-    SMBv2_COM_OPLOCK_BREAK,     //!<Break opportunistic lock command.
+    NEGOTIATE         = API::SMBv2::pc_to_net<uint16_t>(0x0000),
+    SESSION_SETUP     = API::SMBv2::pc_to_net<uint16_t>(0x0001),
+    LOGOFF            = API::SMBv2::pc_to_net<uint16_t>(0x0002),
+    TREE_CONNECT      = API::SMBv2::pc_to_net<uint16_t>(0x0003),
+    TREE_DISCONNECT   = API::SMBv2::pc_to_net<uint16_t>(0x0004),
+    CREATE            = API::SMBv2::pc_to_net<uint16_t>(0x0005),
+    CLOSE             = API::SMBv2::pc_to_net<uint16_t>(0x0006),
+    FLUSH             = API::SMBv2::pc_to_net<uint16_t>(0x0007),
+    READ              = API::SMBv2::pc_to_net<uint16_t>(0x0008),
+    WRITE             = API::SMBv2::pc_to_net<uint16_t>(0x0009),
+    LOCK              = API::SMBv2::pc_to_net<uint16_t>(0x000A),
+    IOCTL             = API::SMBv2::pc_to_net<uint16_t>(0x000B),
+    CANCEL            = API::SMBv2::pc_to_net<uint16_t>(0x000C),
+    ECHO              = API::SMBv2::pc_to_net<uint16_t>(0x000D),
+    QUERY_DIRECTORY   = API::SMBv2::pc_to_net<uint16_t>(0x000E),
+    CHANGE_NOTIFY     = API::SMBv2::pc_to_net<uint16_t>(0x000F),
+    QUERY_INFO        = API::SMBv2::pc_to_net<uint16_t>(0x0010),
+    SET_INFO          = API::SMBv2::pc_to_net<uint16_t>(0x0011),
+    OPLOCK_BREAK      = API::SMBv2::pc_to_net<uint16_t>(0x0012),
     CMD_COUNT
 };
 /*!

@@ -144,9 +144,9 @@ void NST::protocols::CIFSv2::parse(SMBv2::CancelRequest*&){ }
 // epm-nfs/analyzers/src/cifs/cifs2_commands.cpp
 // const std::string NST::breakdown::SMBv2Commands::command_name(int cmd_code)
 // Futre fix: We need to merege these enums
-const char* NST::protocols::CIFSv2::print_cifs2_procedures(Commands cmd)
+const char* NST::protocols::CIFSv2::print_cifs2_procedures(SMBv2Commands cmd)
 {
-    assert(cmd < Commands::CMD_COUNT);
+    assert(cmd < SMBv2Commands::CMD_COUNT);
 
     static const char* const commandNames[] =
     {
