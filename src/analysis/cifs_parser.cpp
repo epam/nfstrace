@@ -302,43 +302,43 @@ void CIFSParser::analyse_operation(Session* session,
 
     switch (request->cmd_code)
     {
-    case Commands::CLOSE:
+    case SMBv2Commands::CLOSE:
         return analyzers(&IAnalyzer::ISMBv2::closeFileSMBv2,            command<CloseFileCommand>(requestData, responseData, session));
-    case Commands::NEGOTIATE:
+    case SMBv2Commands::NEGOTIATE:
         return analyzers(&IAnalyzer::ISMBv2::negotiateSMBv2,            command<NegotiateCommand>(requestData, responseData, session));
-    case Commands::SESSION_SETUP:
+    case SMBv2Commands::SESSION_SETUP:
         return analyzers(&IAnalyzer::ISMBv2::sessionSetupSMBv2,         command<SessionSetupCommand>(requestData, responseData, session));
-    case Commands::LOGOFF:
+    case SMBv2Commands::LOGOFF:
         return analyzers(&IAnalyzer::ISMBv2::logOffSMBv2,               command<LogOffCommand>(requestData, responseData, session));
-    case Commands::TREE_CONNECT:
+    case SMBv2Commands::TREE_CONNECT:
         return analyzers(&IAnalyzer::ISMBv2::treeConnectSMBv2,          command<TreeConnectCommand>(requestData, responseData, session));
-    case Commands::TREE_DISCONNECT:
+    case SMBv2Commands::TREE_DISCONNECT:
         return analyzers(&IAnalyzer::ISMBv2::treeDisconnectSMBv2,       command<TreeDisconnectCommand>(requestData, responseData, session));
-    case Commands::CREATE:
+    case SMBv2Commands::CREATE:
         return analyzers(&IAnalyzer::ISMBv2::createSMBv2,               command<CreateCommand>(requestData, responseData, session));
-    case Commands::FLUSH:
+    case SMBv2Commands::FLUSH:
         return analyzers(&IAnalyzer::ISMBv2::flushSMBv2,                command<FlushCommand>(requestData, responseData, session));
-    case Commands::READ:
+    case SMBv2Commands::READ:
         return analyzers(&IAnalyzer::ISMBv2::readSMBv2,                 command<ReadCommand>(requestData, responseData, session));
-    case Commands::WRITE:
+    case SMBv2Commands::WRITE:
         return analyzers(&IAnalyzer::ISMBv2::writeSMBv2,                command<WriteCommand>(requestData, responseData, session));
-    case Commands::LOCK:
+    case SMBv2Commands::LOCK:
         return analyzers(&IAnalyzer::ISMBv2::lockSMBv2,                 command<LockCommand>(requestData, responseData, session));
-    case Commands::IOCTL:
+    case SMBv2Commands::IOCTL:
         return analyzers(&IAnalyzer::ISMBv2::ioctlSMBv2,                command<IoctlCommand>(requestData, responseData, session));
-    case Commands::CANCEL:
+    case SMBv2Commands::CANCEL:
         return analyzers(&IAnalyzer::ISMBv2::cancelSMBv2,               command<CancelCommand>(requestData, responseData, session));
-    case Commands::ECHO:
+    case SMBv2Commands::ECHO:
         return analyzers(&IAnalyzer::ISMBv2::echoSMBv2,                 command<EchoCommand>(requestData, responseData, session));
-    case Commands::QUERY_DIRECTORY:
+    case SMBv2Commands::QUERY_DIRECTORY:
         return analyzers(&IAnalyzer::ISMBv2::queryDirSMBv2,             command<QueryDirCommand>(requestData, responseData, session));
-    case Commands::CHANGE_NOTIFY:
+    case SMBv2Commands::CHANGE_NOTIFY:
         return analyzers(&IAnalyzer::ISMBv2::changeNotifySMBv2,         command<ChangeNotifyCommand>(requestData, responseData, session));
-    case Commands::QUERY_INFO:
+    case SMBv2Commands::QUERY_INFO:
         return analyzers(&IAnalyzer::ISMBv2::queryInfoSMBv2,            command<QueryInfoCommand>(requestData, responseData, session));
-    case Commands::SET_INFO:
+    case SMBv2Commands::SET_INFO:
         return analyzers(&IAnalyzer::ISMBv2::setInfoSMBv2,              command<SetInfoCommand>(requestData, responseData, session));
-    case Commands::OPLOCK_BREAK:
+    case SMBv2Commands::OPLOCK_BREAK:
         return analyzers(&IAnalyzer::ISMBv2::breakOplockSMBv2,          command<BreakOpLockCommand>(requestData, responseData, session));
     default:
         LOG("Usupported command");

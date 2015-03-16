@@ -28,6 +28,7 @@
 #include "analysis/cifs_parser.h"
 #include "api/cifs_types.h"
 #include "api/cifs_pc_to_net.h"
+#include "api/cifs2_commands.h"
 //------------------------------------------------------------------------------
 using namespace NST::filtration;
 using namespace NST::analysis;
@@ -173,7 +174,7 @@ TEST(Parser, CIFSAsyncParser)
 
     CIFSv2::MessageHeader header;
     header.head_code =  NST::API::SMBv2::pc_to_net<uint32_t>(0x424d53fe);// Protocol's marker
-    header.cmd_code = CIFSv2::Commands::READ;
+    header.cmd_code = NST::API::SMBv2::SMBv2Commands::READ;
     header.flags = static_cast<uint32_t>(CIFSv2::Flags::ASYNC_COMMAND);
 
     el->data = reinterpret_cast<uint8_t*>(&header);
