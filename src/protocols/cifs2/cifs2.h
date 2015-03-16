@@ -34,6 +34,15 @@ namespace CIFSv2
 {
 
 using SMBv2Commands = NST::API::SMBv2::SMBv2Commands;
+namespace SMBv2 = NST::API::SMBv2;
+// https://msdn.microsoft.com/en-us/library/ff718266.aspx
+struct Guid
+{
+  uint32_t Data1;               // unsigned long  replaced by uint32_t
+  uint16_t Data2;               // unsigned short replaced by uint16_t
+  uint16_t Data3;               // unsigned short replaced by uint16_t
+  uint8_t  Data4[8];            // byte           replaced by uint8_t
+}  __attribute__ ((__packed__));
 
 /*! CIFS v2 Flags
  */
@@ -46,31 +55,6 @@ enum class Flags : uint32_t
     SIGNED               = API::SMBv2::pc_to_net<uint32_t>(0x00000008), //!< When set, indicates that this packet has been signed. The use of this flag is as specified in 3.1.5.1.
     DFS_OPERATIONS       = API::SMBv2::pc_to_net<uint32_t>(0x01000000), //!< When set, indicates that this command is a DFS operation. The use of this flag is as specified in 3.3.5.9.
     REPLAY_OPERATION     = API::SMBv2::pc_to_net<uint32_t>(0x02000000)  //!< This flag is only valid for the SMB 3.x dialect family. When set, it indicates that this command is a replay operation. The client MUST ignore this bit on receipt.
-};
-
-/*! CIFS v2 commands
- */
-enum class Commands : uint16_t
-{
-    NEGOTIATE         = API::SMBv2::pc_to_net<uint16_t>(0x0000),
-    SESSION_SETUP     = API::SMBv2::pc_to_net<uint16_t>(0x0001),
-    LOGOFF            = API::SMBv2::pc_to_net<uint16_t>(0x0002),
-    TREE_CONNECT      = API::SMBv2::pc_to_net<uint16_t>(0x0003),
-    TREE_DISCONNECT   = API::SMBv2::pc_to_net<uint16_t>(0x0004),
-    CREATE            = API::SMBv2::pc_to_net<uint16_t>(0x0005),
-    CLOSE             = API::SMBv2::pc_to_net<uint16_t>(0x0006),
-    FLUSH             = API::SMBv2::pc_to_net<uint16_t>(0x0007),
-    READ              = API::SMBv2::pc_to_net<uint16_t>(0x0008),
-    WRITE             = API::SMBv2::pc_to_net<uint16_t>(0x0009),
-    LOCK              = API::SMBv2::pc_to_net<uint16_t>(0x000A),
-    IOCTL             = API::SMBv2::pc_to_net<uint16_t>(0x000B),
-    CANCEL            = API::SMBv2::pc_to_net<uint16_t>(0x000C),
-    ECHO              = API::SMBv2::pc_to_net<uint16_t>(0x000D),
-    QUERY_DIRECTORY   = API::SMBv2::pc_to_net<uint16_t>(0x000E),
-    CHANGE_NOTIFY     = API::SMBv2::pc_to_net<uint16_t>(0x000F),
-    QUERY_INFO        = API::SMBv2::pc_to_net<uint16_t>(0x0010),
-    SET_INFO          = API::SMBv2::pc_to_net<uint16_t>(0x0011),
-    OPLOCK_BREAK      = API::SMBv2::pc_to_net<uint16_t>(0x0012)
 };
 
 /*! \class Raw CIFS v2 message header
@@ -86,9 +70,9 @@ struct RawMessageHeader
     int16_t StructureSize;//!< In the SMB 2.002 dialect, this field MUST NOT be used and MUST be reserved. The sender MUST set this to 0, and the receiver MUST ignore it. In all other dialects, this field indicates the number of credits that this request consumes.
     int16_t CreditCharge;//!< In a request, this field is interpreted in different ways depending on the SMB2 dialect. In the SMB 3.x dialect family, this field is interpreted as the ChannelSequence field followed by the Reserved field in a request.
 
-    int32_t status;//!< Used to communicate error messages from the server to the client.
+    uint32_t status;//!< Used to communicate error messages from the server to the client.
 
-    Commands cmd_code;//!< Code of SMB command
+    SMBv2Commands cmd_code;//!< Code of SMB command
     int16_t Credit;//!< This MUST be set to 64, which is the size, in bytes, of the SMB2 header structure.
 
     int32_t flags;//!< 1-bit flags describing various features in effect for the message.
@@ -130,60 +114,48 @@ struct MessageHeader : public RawMessageHeader
  */
 const MessageHeader* get_header(const uint8_t* data);
 
-/*! Group of template specialization for converting representation
- *  if field's bytes from network to host.
- * (independent of type of architecture little endian or big endian)
- *
- * \param - reference to an object whose fields will be converted
- */
-template<typename ParamType> inline void parse(ParamType& )
-{
-// TODO: Fix this in future!
-//    static_assert(FALSE, "This method is not supposed to be used."
-//                         "Please make template specialization for the specified type." );
-}
-template<> void parse(API::SMBv2::ErrResponse& );
-template<> void parse(API::SMBv2::NegotiateRequest& );
-template<> void parse(API::SMBv2::NegotiateResponse& );
-template<> void parse(API::SMBv2::SessionSetupRequest& );
-template<> void parse(API::SMBv2::SessionSetupResponse& );
-template<> void parse(API::SMBv2::LogOffRequest& );
-template<> void parse(API::SMBv2::LogOffResponse& );
-template<> void parse(API::SMBv2::TreeConnectRequest& );
-template<> void parse(API::SMBv2::TreeConnectResponse& );
-template<> void parse(API::SMBv2::TreeDisconnectRequest& );
-template<> void parse(API::SMBv2::TreeDisconnectResponse& );
-template<> void parse(API::SMBv2::CreateRequest& );
-template<> void parse(API::SMBv2::CreateResponse& );
-template<> void parse(API::SMBv2::CloseRequest& );
-template<> void parse(API::SMBv2::CloseResponse& );
-template<> void parse(API::SMBv2::EchoRequest& );
-template<> void parse(API::SMBv2::EchoResponse& );
-template<> void parse(API::SMBv2::QueryInfoRequest& );
-template<> void parse(API::SMBv2::QueryInfoResponse& );
-template<> void parse(API::SMBv2::QueryDirRequest& );
-template<> void parse(API::SMBv2::QueryDirResponse& );
-template<> void parse(API::SMBv2::FlushRequest& );
-template<> void parse(API::SMBv2::FlushResponse& );
-template<> void parse(API::SMBv2::ReadRequest& );
-template<> void parse(API::SMBv2::ReadResponse& );
-template<> void parse(API::SMBv2::Lock& );
-template<> void parse(API::SMBv2::WriteRequest& );
-template<> void parse(API::SMBv2::WriteResponse& );
-template<> void parse(API::SMBv2::LockRequest& );
-template<> void parse(API::SMBv2::LockResponse& );
-template<> void parse(API::SMBv2::CancelRequest& );
-template<> void parse(API::SMBv2::ChangeNotifyRequest& );
-template<> void parse(API::SMBv2::FileNotifyInformation& );
-template<> void parse(API::SMBv2::ChangeNotifyResponse& );
-template<> void parse(API::SMBv2::OplockAcknowledgment& );
-template<> void parse(API::SMBv2::OplockResponse& );
-template<> void parse(API::SMBv2::IoCtlRequest& );
-template<> void parse(API::SMBv2::IoCtlResponse& );
-template<> void parse(API::SMBv2::SetInfoRequest& );
-template<> void parse(API::SMBv2::SetInfoResponse& );
-template<> void parse(API::SMBv2::CancelResponce& );
-template<> void parse(API::SMBv2::CancelRequest& );
+void parseGuid(uint8_t (&guid)[16]);
+void parse(SMBv2::ErrResponse*&);
+void parse(SMBv2::NegotiateRequest*&);
+void parse(SMBv2::NegotiateResponse*&);
+void parse(SMBv2::SessionSetupRequest*&);
+void parse(SMBv2::SessionSetupResponse*&);
+void parse(SMBv2::LogOffRequest*&);
+void parse(SMBv2::LogOffResponse*&);
+void parse(SMBv2::TreeConnectRequest*&);
+void parse(SMBv2::TreeConnectResponse*&);
+void parse(SMBv2::TreeDisconnectRequest*&);
+void parse(SMBv2::TreeDisconnectResponse*&);
+void parse(SMBv2::CreateRequest*&);
+void parse(SMBv2::CreateResponse*&);
+void parse(SMBv2::CloseRequest*&);
+void parse(SMBv2::CloseResponse*&);
+void parse(SMBv2::EchoRequest*&);
+void parse(SMBv2::EchoResponse*&);
+void parse(SMBv2::QueryInfoRequest*&);
+void parse(SMBv2::QueryInfoResponse*&);
+void parse(SMBv2::QueryDirRequest*&);
+void parse(SMBv2::QueryDirResponse*&);
+void parse(SMBv2::FlushRequest*&);
+void parse(SMBv2::FlushResponse*&);
+void parse(SMBv2::ReadRequest*&);
+void parse(SMBv2::ReadResponse*&);
+void parse(SMBv2::Lock*&);
+void parse(SMBv2::WriteRequest*&);
+void parse(SMBv2::WriteResponse*&);
+void parse(SMBv2::LockRequest*&);
+void parse(SMBv2::LockResponse*&);
+void parse(SMBv2::ChangeNotifyRequest*&);
+void parse(SMBv2::FileNotifyInformation*&);
+void parse(SMBv2::ChangeNotifyResponse*&);
+void parse(SMBv2::OplockAcknowledgment*&);
+void parse(SMBv2::OplockResponse*&);
+void parse(SMBv2::IoCtlRequest*&);
+void parse(SMBv2::IoCtlResponse*&);
+void parse(SMBv2::SetInfoRequest*&);
+void parse(SMBv2::SetInfoResponse*&);
+void parse(SMBv2::CancelResponce*&);
+void parse(SMBv2::CancelRequest*&);
 
 /*! Constructs new command for API from raw message
  * \param request - Call's
@@ -200,12 +172,22 @@ inline const Cmd command(Data& request, Data& response, Session* session)
     cmd.ctimestamp = &request->timestamp;
     cmd.rtimestamp = response ? &response->timestamp : &request->timestamp;
 
-    cmd.parg = reinterpret_cast<const typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
-    cmd.pres = response ? reinterpret_cast<const typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader)) : nullptr;
+    //
+    // Since we have to modify structures before command creation
+    // we have to cast raw data to pointer type ( in contrast to const pointer )
+    //
+    auto req_header = reinterpret_cast<RawMessageHeader*>(request->data);
+    auto pargs = reinterpret_cast<typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
 
-    parse(cmd.parg);
-    parse(cmd.pres);
+    parse(pargs);
 
+    cmd.req_header = req_header;
+    if(response)
+    {
+        cmd.res_header = reinterpret_cast<RawMessageHeader*>(response->data);
+        cmd.pres = reinterpret_cast<typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader));
+    }
+    cmd.parg = pargs; 
     return cmd;
 }
 

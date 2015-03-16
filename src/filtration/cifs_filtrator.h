@@ -33,11 +33,14 @@
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/netbios/netbios.h"
 #include "utils/log.h"
+#include "api/cifs2_commands.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
+
+using SMBv2Commands = NST::API::SMBv2::SMBv2Commands;
 
 template<typename Writer>
 class CIFSFiltrator : public FiltratorImpl<CIFSFiltrator<Writer>, Writer>
@@ -131,7 +134,7 @@ private:
 
     inline void set_msg_size(const CIFSv2::MessageHeader* header, const size_t length)
     {
-        if (((header->cmd_code == CIFSv2::Commands::READ) || (header->cmd_code == CIFSv2::Commands::WRITE)) && !header->nextCommand)
+        if (((header->cmd_code == SMBv2Commands::READ) || (header->cmd_code == SMBv2Commands::WRITE)) && !header->nextCommand)
         {
             return BaseImpl::setToBeCopied(std::min(length, rw_hdr_max));
         }
