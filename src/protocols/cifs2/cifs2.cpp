@@ -19,6 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <cassert>
+
 #include <arpa/inet.h>
 #include <assert.h>
 
@@ -157,3 +159,4 @@ const char* NST::protocols::CIFSv2::print_cifs2_procedures(Commands cmd)
 
     return commandNames[static_cast<int>(cmd)];
 }
+
