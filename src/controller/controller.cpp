@@ -70,6 +70,8 @@ Controller::Controller(const Parameters& params) try
         case RunningMode::Profiling:
         {
             analysis.reset(new AnalysisManager{status, params});
+            if(analysis->isSilent())
+                utils::Out::Global _gout{utils::Out::Level::Silent};
 
             filtration->add_online_analysis(params, analysis->get_queue());
         }
@@ -82,6 +84,8 @@ Controller::Controller(const Parameters& params) try
         case RunningMode::Analysis:
         {
             analysis.reset(new AnalysisManager{status, params});
+            if(analysis->isSilent())
+                utils::Out::Global _gout{utils::Out::Level::Silent};
 
             filtration->add_offline_analysis(params.input_file(),
                                              analysis->get_queue());

@@ -103,10 +103,15 @@ public:
             a->on_unix_signal(signo);
         }
     }
+    inline bool isSilent()
+    {
+        return _silent;
+    }
 private:
     Storage  modules; // pointers to all modules (plugins and builtins)
     Plugins  plugins;
     BuiltIns builtin;
+    bool _silent;
 };
 
 } // namespace analysis

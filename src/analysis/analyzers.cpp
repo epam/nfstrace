@@ -29,6 +29,7 @@ namespace analysis
 {
 
 Analyzers::Analyzers(const controller::Parameters& params)
+: _silent{false}
 {
     for(const auto& a : params.analysis_modules())
     {
@@ -39,6 +40,10 @@ Analyzers::Analyzers(const controller::Parameters& params)
 
             std::unique_ptr<PluginInstance> plugin{new PluginInstance{a.path, a.args}};
             modules.emplace_back(plugin->instance());
+            if(!_silent && plugin->Silent())
+            {
+                _silent = true;
+            }
             plugins.emplace_back(std::move(plugin));
         }
         catch(std::runtime_error& e)

@@ -809,7 +809,13 @@ void destroy(IAnalyzer* instance)
     delete instance;
 }
 
-NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
+const AnalyzerRequirements* requirements()
+{
+    static const AnalyzerRequirements requirements{true};
+    return &requirements;
+}
+
+NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy, nullptr)
 
 }//extern "C"
 //------------------------------------------------------------------------------
