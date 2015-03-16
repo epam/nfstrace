@@ -34,7 +34,7 @@ namespace CIFSv2
 {
 
 using SMBv2Commands = NST::API::SMBv2::SMBv2Commands;
-
+namespace SMBv2 = NST::API::SMBv2;
 // https://msdn.microsoft.com/en-us/library/ff718266.aspx
 struct Guid
 {
@@ -57,33 +57,6 @@ enum class Flags : uint32_t
     REPLAY_OPERATION     = API::SMBv2::pc_to_net<uint32_t>(0x02000000)  //!< This flag is only valid for the SMB 3.x dialect family. When set, it indicates that this command is a replay operation. The client MUST ignore this bit on receipt.
 };
 
-/*! CIFS v2 commands
- */
-enum class Commands : uint16_t
-{
-    NEGOTIATE         = API::SMBv2::pc_to_net<uint16_t>(0x0000),
-    SESSION_SETUP     = API::SMBv2::pc_to_net<uint16_t>(0x0001),
-    LOGOFF            = API::SMBv2::pc_to_net<uint16_t>(0x0002),
-    TREE_CONNECT      = API::SMBv2::pc_to_net<uint16_t>(0x0003),
-    TREE_DISCONNECT   = API::SMBv2::pc_to_net<uint16_t>(0x0004),
-    CREATE            = API::SMBv2::pc_to_net<uint16_t>(0x0005),
-    CLOSE             = API::SMBv2::pc_to_net<uint16_t>(0x0006),
-    FLUSH             = API::SMBv2::pc_to_net<uint16_t>(0x0007),
-    READ              = API::SMBv2::pc_to_net<uint16_t>(0x0008),
-    WRITE             = API::SMBv2::pc_to_net<uint16_t>(0x0009),
-    LOCK              = API::SMBv2::pc_to_net<uint16_t>(0x000A),
-    IOCTL             = API::SMBv2::pc_to_net<uint16_t>(0x000B),
-    CANCEL            = API::SMBv2::pc_to_net<uint16_t>(0x000C),
-    ECHO              = API::SMBv2::pc_to_net<uint16_t>(0x000D),
-    QUERY_DIRECTORY   = API::SMBv2::pc_to_net<uint16_t>(0x000E),
-    CHANGE_NOTIFY     = API::SMBv2::pc_to_net<uint16_t>(0x000F),
-    QUERY_INFO        = API::SMBv2::pc_to_net<uint16_t>(0x0010),
-    SET_INFO          = API::SMBv2::pc_to_net<uint16_t>(0x0011),
-    OPLOCK_BREAK      = API::SMBv2::pc_to_net<uint16_t>(0x0012),
-    CMD_COUNT
-};
-
-
 /*! \class Raw CIFS v2 message header
  */
 struct RawMessageHeader
@@ -99,7 +72,7 @@ struct RawMessageHeader
 
     uint32_t status;//!< Used to communicate error messages from the server to the client.
 
-    Commands cmd_code;//!< Code of SMB command
+    SMBv2Commands cmd_code;//!< Code of SMB command
     int16_t Credit;//!< This MUST be set to 64, which is the size, in bytes, of the SMB2 header structure.
 
     int32_t flags;//!< 1-bit flags describing various features in effect for the message.
