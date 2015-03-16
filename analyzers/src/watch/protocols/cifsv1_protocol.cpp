@@ -23,3 +23,20 @@
 #include "cifsv1_protocol.h"
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+CIFSv1Protocol::CIFSv1Protocol()
+: AbstractProtocol {"CIFS v1", static_cast<std::size_t>(SMBv1::SMBv1Commands::CMD_COUNT)}
+{
+}
+
+CIFSv1Protocol::~CIFSv1Protocol()
+{
+}
+
+const char* CIFSv1Protocol::printProcedure(std::size_t i)
+{
+    if ( i >= static_cast<std::size_t>(SMBv1::SMBv1Commands::CMD_COUNT)) { return nullptr; }
+    return print_cifs1_procedures(static_cast<SMBv1::SMBv1Commands>(i));
+}
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------

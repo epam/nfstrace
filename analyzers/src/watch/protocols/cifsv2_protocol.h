@@ -23,7 +23,6 @@
 #define CIFSV2_PROTOCOL_H
 //------------------------------------------------------------------------------
 #include "abstract_protocol.h"
-#include "cifsv2_commands.h"
 //------------------------------------------------------------------------------
 class CIFSv2Protocol : public AbstractProtocol
 {

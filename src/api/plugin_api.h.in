@@ -25,6 +25,8 @@
 //------------------------------------------------------------------------------
 #include <iostream>
 
+#include "cifs_commands.h"
+#include "cifs2_commands.h"
 #include "ianalyzer.h"
 #include "nfs_types.h"
 #include "nfs3_types_rpcgen.h"
@@ -47,6 +49,7 @@ extern "C"
 {
 // These calls implemented by nfstrace
 const char* print_cifs1_procedures(SMBv1::SMBv1Commands cmd_code);
+const char* print_cifs2_procedures(SMBv2::SMBv2Commands cmd_code);
 const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
 const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc);
 const char* print_nfs41_procedures(const ProcEnumNFS41::NFSProcedure proc);

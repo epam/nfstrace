@@ -26,12 +26,36 @@ namespace NST
 {
 namespace API
 {
-
 /*! SMB 2 version
  */
 namespace SMBv2
 {
 
+/*! CIFSv2 commands list.
+ */
+enum class SMBv2Commands
+{
+    SMBv2_COM_NEGOTIATE,        //!<Negotiate command.
+    SMBv2_COM_SESSION_SETUP,    //!<Session setup command.
+    SMBv2_COM_LOGOFF,           //!<Log off command.
+    SMBv2_COM_TREE_CONNECT,     //!<Tree connect command.
+    SMBv2_COM_TREE_DISCONNECT,  //!<Tree disconnect command.
+    SMBv2_COM_CREATE,           //!<Create command.
+    SMBv2_COM_CLOSE,            //!<Close command.
+    SMBv2_COM_FLUSH,            //!<Flush command.
+    SMBv2_COM_READ,             //!<Read command.
+    SMBv2_COM_WRITE,            //!<Write command.
+    SMBv2_COM_LOCK,             //!<Lock command.
+    SMBv2_COM_IOCTL,            //!<Ioctl command.
+    SMBv2_COM_CANCEL,           //!<Cancel command.
+    SMBv2_COM_ECHO,             //!<Echo command.
+    SMBv2_COM_QUERY_DIRECTORY,  //!<Query directory command.
+    SMBv2_COM_CHANGE_NOTIFY,    //!<Change Notify command.
+    SMBv2_COM_QUERY_INFO,       //!<Query Info command.
+    SMBv2_COM_SET_INFO,         //!<Set Info command.
+    SMBv2_COM_OPLOCK_BREAK,     //!<Break opportunistic lock command.
+    CMD_COUNT
+};
 /*!
  * \brief The errResponse struct
  * The SMB2 ERROR Response packet is sent by the server

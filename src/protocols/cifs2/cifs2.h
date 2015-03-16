@@ -32,7 +32,8 @@ namespace protocols
 {
 namespace CIFSv2
 {
-namespace SMBv2 = NST::API::SMBv2;
+
+using SMBv2Commands = NST::API::SMBv2::SMBv2Commands;
 
 // https://msdn.microsoft.com/en-us/library/ff718266.aspx
 struct Guid
@@ -219,8 +220,7 @@ inline const Cmd command(Data& request, Data& response, Session* session)
 
 extern "C"
 NST_PUBLIC
-const char* print_cifs2_procedures(Commands cmd_code);
-
+const char* print_cifs2_procedures(SMBv2Commands cmd_code);
 
 } // CIFSv2
 
