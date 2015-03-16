@@ -33,6 +33,8 @@ Plugin::Plugin(const std::string& path)
     , usage  {nullptr}
     , create {nullptr}
     , destroy{nullptr}
+    , requirements{nullptr}
+    , _silent{false}
 {
     plugin_get_entry_points_func nst_get_entry_points{nullptr};
 
@@ -53,12 +55,22 @@ Plugin::Plugin(const std::string& path)
         usage   = entry_points->usage;
         create  = entry_points->create;
         destroy = entry_points->destroy;
+        requirements = entry_points->requirements;
     }
 
     if(!usage  || !create || !destroy)
     {
         throw std::runtime_error{path + ": can't load entry point for some plugin function(s)"};
     }
+
+    if (requirements != nullptr) {
+        // Processing analyzer requirements
+        const AnalyzerRequirements* r = requirements();
+        if (r != nullptr) {
+            _silent = r->silence;
+        }
+    }
+
 }
 
 const std::string Plugin::usage_of(const std::string& path)
@@ -68,7 +80,7 @@ const std::string Plugin::usage_of(const std::string& path)
 }
 
 PluginInstance::PluginInstance(const std::string& path, const std::string& args)
-    : Plugin{path}
+: Plugin{path}
 {
     analysis = create(args.c_str());
     if(!analysis) throw std::runtime_error{path + ": create call returns NULL-pointer"};
