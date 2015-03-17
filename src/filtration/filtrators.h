@@ -111,11 +111,10 @@ public:
             LOG("Unknown packet");
         }
     }
-};// Filtrators
+};
 
-}// filtration
-
-}// NST
+} // namespace filtration
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // FILTRATORS_H
+#endif//FILTRATORS_H
 //------------------------------------------------------------------------------

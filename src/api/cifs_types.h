@@ -40,7 +40,7 @@ namespace CIFSv2
 {
     struct RawMessageHeader;
 }
-}
+} // namespace protocols
 namespace API
 {
 

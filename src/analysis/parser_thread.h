@@ -28,7 +28,7 @@
 #include "analysis/analyzers.h"
 #include "controller/running_status.h"
 #include "utils/filtered_data.h"
-///------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis

@@ -30,6 +30,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /*!
  * \brief Latencies calculates latencies
  */
@@ -92,9 +93,9 @@ private:
  * \return converted value
  */
 long double to_sec(const timeval& val);
-} // breakdown
-} // NST
-//------------------------------------------------------------------------------
-#endif // LATENCIES_H
-//------------------------------------------------------------------------------
 
+} // namespace breakdown
+} // namespace NST
+//------------------------------------------------------------------------------
+#endif//LATENCIES_H
+//------------------------------------------------------------------------------

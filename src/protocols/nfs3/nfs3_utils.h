@@ -19,7 +19,6 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
 #ifndef NFS3_UTILS_H
 #define NFS3_UTILS_H
 //------------------------------------------------------------------------------
@@ -31,6 +30,8 @@
 
 #include "protocols/xdr/xdr_decoder.h"
 #include "protocols/rpc/rpc_header.h"
+//------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {

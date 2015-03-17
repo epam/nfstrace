@@ -28,6 +28,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /*!
  * Represents CIFS v1 commands
  * Converts commands to string
@@ -39,8 +40,8 @@ struct SMBv1Commands : public CommandRepresenter
     size_t commands_count();
     const char* protocol_name();
 };
-} // breakdown
-} // NST
+} // namespace breakdown
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // CIFS_COMMANDS_H
+#endif//CIFS_COMMANDS_H
 //------------------------------------------------------------------------------

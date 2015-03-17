@@ -26,7 +26,6 @@
 
 #include <netdb.h>
 //------------------------------------------------------------------------------
-
 //! IP-endpoint (host:port) helper class to use in socket operations
 class IpEndpoint
 {
@@ -55,7 +54,6 @@ public:
 private:
     struct addrinfo* _addrinfo;
 };
-
 //------------------------------------------------------------------------------
-#endif // IP_ENDPOINT
+#endif//IP_ENDPOINT
 //------------------------------------------------------------------------------

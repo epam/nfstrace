@@ -27,7 +27,6 @@
 #include "api/ianalyzer.h"
 #include "json_tcp_service.h"
 //------------------------------------------------------------------------------
-
 using namespace NST::API;
 
 class JsonAnalyzer : public IAnalyzer
@@ -582,7 +581,6 @@ private:
     NfsV40Stat _nfsV40Stat;
     NfsV41Stat _nfsV41Stat;
 };
-
 //------------------------------------------------------------------------------
-#endif // JSON_ANALYZER_H
+#endif//JSON_ANALYZER_H
 //------------------------------------------------------------------------------

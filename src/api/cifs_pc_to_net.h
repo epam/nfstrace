@@ -23,9 +23,8 @@
 #define PC_TO_NET_H
 //------------------------------------------------------------------------------
 #include <cstdint>
-
+//------------------------------------------------------------------------------
 #ifdef __linux__
-//
 #include <endian.h>
 #define NFSTRACE_BYTE_ORDER __BYTE_ORDER
 #define NFSTRACE_BIG_ENDIAN __BIG_ENDIAN
@@ -38,7 +37,6 @@
 #define NFSTRACE_LITTLE_ENDIAN LITTLE_ENDIAN
 #endif
 //------------------------------------------------------------------------------
-
 namespace NST
 {
 namespace API
@@ -109,10 +107,9 @@ constexpr T pc_to_net(T t)
 #  endif
 #endif
 
-} // CIFSv2
-
-} // protocols
+} // SMBv2
+} // API
 } // NST
 //------------------------------------------------------------------------------
-#endif // PC_TO_NET_H
+#endif//PC_TO_NET_H
 //------------------------------------------------------------------------------

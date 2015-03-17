@@ -31,6 +31,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /*! \brief NFSv3BreakdownAnalyzer Analyzer for NFS v3
  * Handles NFS v3 commands
  */
@@ -110,8 +111,9 @@ public:
 
     void flush_statistics() override;
 };
-} // breakdown
-} // NST
+
+} // namespace breakdown
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // NFSV3BREAKDOWNANALYZER_H
+#endif//NFSV3BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
