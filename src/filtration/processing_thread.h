@@ -80,5 +80,5 @@ protected:
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif //PROCESSING_THREAD_H
+#endif//PROCESSING_THREAD_H
 //------------------------------------------------------------------------------

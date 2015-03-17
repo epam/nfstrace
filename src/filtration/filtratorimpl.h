@@ -27,6 +27,7 @@ namespace NST
 {
 namespace filtration
 {
+
 /*!
  * Filtering TCP stream strategy (implementation)
  * Implemented via CRTP - Curiously recurring template pattern,
@@ -313,9 +314,8 @@ protected:
 
 };
 
-} // filtration
-
-} // NST
+} // namespace filtration
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // IFILTRATOR_H
+#endif//IFILTRATOR_H
 //------------------------------------------------------------------------------
