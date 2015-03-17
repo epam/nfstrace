@@ -37,13 +37,25 @@ Analyzers::Analyzers(const controller::Parameters& params)
         try // try to load plugin
         {
             message << "Loading module: '" << a.path << "' with args: [" << a.args << "]";
-
             std::unique_ptr<PluginInstance> plugin{new PluginInstance{a.path, a.args}};
-            modules.emplace_back(plugin->instance());
-            if(!_silent && plugin->Silent())
+            if(plugin->silent())
             {
-                _silent = true;
+                if(!_silent)
+                {
+                    _silent = true;
+                }
             }
+            else
+            {
+                if(_silent)
+                {
+                    time_t t = time(nullptr);
+                    TRACE("\n%s Error in plugin %s loading. Already load module with silent option.", ctime(&t), a.path.c_str());
+                    continue;
+                }
+            }
+
+            modules.emplace_back(plugin->instance());
             plugins.emplace_back(std::move(plugin));
         }
         catch(std::runtime_error& e)

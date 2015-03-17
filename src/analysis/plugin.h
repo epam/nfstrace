@@ -36,7 +36,7 @@ class Plugin : private NST::utils::DynamicLoad
 {
 public:
     static const std::string usage_of(const std::string& path);
-    inline bool isSilent() { return _silent; }
+    bool isSilent();
 
 protected:
     explicit Plugin(const std::string& path);
@@ -47,7 +47,6 @@ protected:
     plugin_create_func  create;
     plugin_destroy_func destroy;
     plugin_requirements_func requirements;
-    bool _silent;
 };
 
 class PluginInstance : private Plugin
@@ -59,7 +58,7 @@ public:
     ~PluginInstance();
 
     inline IAnalyzer* instance() const { return analysis; }
-    inline bool Silent(){ return isSilent(); }
+    inline bool silent(){ return isSilent(); }
 private:
     IAnalyzer* analysis;
 };
