@@ -63,7 +63,7 @@ StatisticsWindow::StatisticsWindow(MainWindow& w, StatisticsContainers& c)
     for (auto i : c)
     {
         _allProtocols.push_back((i.first)->getProtocolName());
-        _scrollOffset.insert(std::make_pair<AbstractProtocol*, std::size_t>((AbstractProtocol*)i.first, 0));
+        _scrollOffset.insert(std::make_pair<AbstractProtocol*, std::size_t>(reinterpret_cast<AbstractProtocol*>(i.first), 0));
     };
     _activeProtocol = (c.begin())->first;
     _statistic = c.at(_activeProtocol);
@@ -138,7 +138,6 @@ void StatisticsWindow::updateProtocol(AbstractProtocol* p)
 void StatisticsWindow::update(const ProtocolStatistic& d)
 {
     _statistic = d;
-    std::size_t m = 0; // sum of all counters
     if (_statistic.empty() || _window == nullptr)
     {
         return;
@@ -147,7 +146,8 @@ void StatisticsWindow::update(const ProtocolStatistic& d)
     unsigned int line = STATISTICS::FIRST_OPERATION_LINE;
     for(unsigned int i = STATISTICS::DEFAULT_GROUP; i <= _activeProtocol->getGroups(); i++)
     {
-        m = 0;
+        std::size_t m = 0; // sum of all counters
+
         for(std::size_t tmp = _activeProtocol->getGroupBegin(i); tmp < _activeProtocol->getGroupBegin(i + 1); tmp++)
         {
             m += _statistic[tmp];

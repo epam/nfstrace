@@ -42,12 +42,12 @@ const char* AbstractProtocol::printProcedure(std::size_t)
     return nullptr;
 }
 
-std::string AbstractProtocol::getProtocolName()
+std::string AbstractProtocol::getProtocolName() const
 {
     return name;
 }
 
-unsigned int AbstractProtocol::getAmount()
+unsigned int AbstractProtocol::getAmount() const
 {
     return amount;
 }

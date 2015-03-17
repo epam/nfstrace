@@ -50,12 +50,12 @@ public:
     /*!
      * Return amount of operations.
      */
-    unsigned int getAmount();
+    unsigned int getAmount() const;
 
     /*!
      * Return protocol's name.
      */
-    std::string getProtocolName();
+    std::string getProtocolName() const;
 
 private:
     std::string name;
