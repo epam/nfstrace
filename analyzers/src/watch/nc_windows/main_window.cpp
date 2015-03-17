@@ -101,7 +101,7 @@ void MainWindow::resize()
     init();
 }
 
-void MainWindow::update()
+void MainWindow::update() const
 {
     if (_window != nullptr)
     {
