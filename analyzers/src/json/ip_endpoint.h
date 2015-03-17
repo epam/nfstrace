@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef IP_ENDPOINT
-#define IP_ENDPOINT
+#ifndef IP_ENDPOINT_H
+#define IP_ENDPOINT_H
 //------------------------------------------------------------------------------
 #include <string>
 
@@ -55,5 +55,5 @@ private:
     struct addrinfo* _addrinfo;
 };
 //------------------------------------------------------------------------------
-#endif//IP_ENDPOINT
+#endif//IP_ENDPOINT_H
 //------------------------------------------------------------------------------
