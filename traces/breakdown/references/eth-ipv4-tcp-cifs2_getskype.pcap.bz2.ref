@@ -541,41 +541,41 @@ INVALID                Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 St
 NO_ANDX_COMMAND        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 ###  Breakdown analyzer  ###
 CIFS v2 protocol
-Total operations: 95. Per operation:
-NEGOTIATE                 2   2.11%
-SESSION SETUP             2   2.11%
+Total operations: 97. Per operation:
+NEGOTIATE                 2   2.06%
+SESSION SETUP             4   4.12%
 LOGOFF                    0   0.00%
-TREE CONNECT              3   3.16%
-TREE DISCONNECT           2   2.11%
-CREATE                   20  21.05%
-CLOSE                    20  21.05%
+TREE CONNECT              3   3.09%
+TREE DISCONNECT           2   2.06%
+CREATE                   20  20.62%
+CLOSE                    20  20.62%
 FLUSH                     0   0.00%
-READ                      4   4.21%
+READ                      4   4.12%
 WRITE                     0   0.00%
 LOCK                      0   0.00%
-IOCTL                     2   2.11%
+IOCTL                     2   2.06%
 CANCEL                    0   0.00%
-ECHO                     14  14.74%
-QUERY DIRECTORY          20  21.05%
+ECHO                     14  14.43%
+QUERY DIRECTORY          20  20.62%
 CHANGE NOTIFY             0   0.00%
-QUERY INFO                6   6.32%
+QUERY INFO                6   6.19%
 SET INFO                  0   0.00%
 OPLOCK BREAK              0   0.00%
 Per connection info: 
 Session: 10.20.9.35:38560 --> 10.20.0.4:445 [TCP]
-Total operations: 5. Per operation:
-NEGOTIATE              Count:    1 ( 20.00%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
-SESSION SETUP          Count:    1 ( 20.00%) Min: 0.053 Max: 0.053 Avg: 0.053 StDev: 0.00000000
+Total operations: 6. Per operation:
+NEGOTIATE              Count:    1 ( 16.67%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
+SESSION SETUP          Count:    2 ( 33.33%) Min: 0.001 Max: 0.053 Avg: 0.027 StDev: 0.03722988
 LOGOFF                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-TREE CONNECT           Count:    1 ( 20.00%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
-TREE DISCONNECT        Count:    1 ( 20.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+TREE CONNECT           Count:    1 ( 16.67%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
+TREE DISCONNECT        Count:    1 ( 16.67%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 CREATE                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 CLOSE                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 FLUSH                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 READ                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 WRITE                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 LOCK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-IOCTL                  Count:    1 ( 20.00%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
+IOCTL                  Count:    1 ( 16.67%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
 CANCEL                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 ECHO                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 QUERY DIRECTORY        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
@@ -584,24 +584,24 @@ QUERY INFO             Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 St
 SET INFO               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 OPLOCK BREAK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 Session: 10.20.9.35:38566 --> 10.20.0.4:445 [TCP]
-Total operations: 90. Per operation:
-NEGOTIATE              Count:    1 (  1.11%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
-SESSION SETUP          Count:    1 (  1.11%) Min: 0.005 Max: 0.005 Avg: 0.005 StDev: 0.00000000
+Total operations: 91. Per operation:
+NEGOTIATE              Count:    1 (  1.10%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
+SESSION SETUP          Count:    2 (  2.20%) Min: 0.001 Max: 0.005 Avg: 0.003 StDev: 0.00309996
 LOGOFF                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-TREE CONNECT           Count:    2 (  2.22%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000919
-TREE DISCONNECT        Count:    1 (  1.11%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
-CREATE                 Count:   20 ( 22.22%) Min: 0.001 Max: 0.079 Avg: 0.005 StDev: 0.01761051
-CLOSE                  Count:   20 ( 22.22%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00008486
+TREE CONNECT           Count:    2 (  2.20%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000919
+TREE DISCONNECT        Count:    1 (  1.10%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
+CREATE                 Count:   20 ( 21.98%) Min: 0.001 Max: 0.079 Avg: 0.005 StDev: 0.01761051
+CLOSE                  Count:   20 ( 21.98%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00008486
 FLUSH                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-READ                   Count:    4 (  4.44%) Min: 0.057 Max: 0.092 Avg: 0.071 StDev: 0.01505799
+READ                   Count:    4 (  4.40%) Min: 0.057 Max: 0.092 Avg: 0.071 StDev: 0.01505799
 WRITE                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 LOCK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-IOCTL                  Count:    1 (  1.11%) Min: 0.003 Max: 0.003 Avg: 0.003 StDev: 0.00000000
+IOCTL                  Count:    1 (  1.10%) Min: 0.003 Max: 0.003 Avg: 0.003 StDev: 0.00000000
 CANCEL                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-ECHO                   Count:   14 ( 15.56%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00001850
-QUERY DIRECTORY        Count:   20 ( 22.22%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00018560
+ECHO                   Count:   14 ( 15.38%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00001850
+QUERY DIRECTORY        Count:   20 ( 21.98%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00018560
 CHANGE NOTIFY          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-QUERY INFO             Count:    6 (  6.67%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00003118
+QUERY INFO             Count:    6 (  6.59%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00003118
 SET INFO               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 OPLOCK BREAK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 ###  Breakdown analyzer  ###
