@@ -149,7 +149,7 @@ void UserGUI::run()
     }
 }
 
-timeval UserGUI::getTimeval()
+timeval UserGUI::getTimeval() const
 {
     struct timeval tv;
     tv.tv_sec = _refresh_delta / MSEC;

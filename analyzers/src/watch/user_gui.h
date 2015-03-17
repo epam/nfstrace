@@ -50,7 +50,7 @@ private:
     std::thread _guiThread;
     std::vector<std::string> _allProtocols;
     void run();
-    timeval getTimeval();
+    timeval getTimeval() const;
 public:
 
     UserGUI() = delete;
