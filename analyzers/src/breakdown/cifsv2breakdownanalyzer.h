@@ -31,6 +31,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /*! \class Analyzer for CIFS v2
  * Handles CIFS v2 commands
  */
@@ -62,8 +63,9 @@ public:
 protected:
     void flush_statistics() override;
 };
-} // breakdown
-} // NST
+
+} // namespace breakdown
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // CIFSV2BREAKDOWNANALYZER_H
+#endif//CIFSV2BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------

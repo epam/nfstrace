@@ -33,6 +33,7 @@ namespace protocols
 {
 namespace CIFSv2
 {
+
 namespace SMBv2 = NST::API::SMBv2;
 
 /*! Convert enum type to underlying integer type
@@ -82,10 +83,10 @@ std::ostream& print_enum(std::ostream& out, const std::string name, T value )
 } 
 
 std::ostream& print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoType, const uint8_t infoClass);
-}// namespace CIFSv2    
-}// namespace protocols 
-}// namespace NST       
 
+} // namespace CIFSv2
+} // namespace protocols
+} // namespace NST
 //------------------------------------------------------------------------------
 #endif//CIFS2_UTILS_H
 //------------------------------------------------------------------------------

@@ -24,7 +24,6 @@
 //------------------------------------------------------------------------------
 #include "abstract_tcp_service.h"
 //------------------------------------------------------------------------------
-
 class JsonTcpService : public AbstractTcpService
 {
 public:
@@ -48,7 +47,6 @@ private:
     JsonAnalyzer& _analyzer;
     std::size_t _maxServingDurationMs;
 };
-
 //------------------------------------------------------------------------------
-#endif // JSON_TCP_SERVICE_H
+#endif//JSON_TCP_SERVICE_H
 //------------------------------------------------------------------------------

@@ -18,7 +18,6 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 //------------------------------------------------------------------------------
 #ifndef NFSV4REPRESENTER_H
 #define NFSV4REPRESENTER_H
@@ -29,6 +28,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /**
  * @brief The NFSv4Representer class
  * Splits output into commands/operations lists for NFS v4.* protocols
@@ -40,8 +40,9 @@ public:
     NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name, size_t count_of_compounds);
     void onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const override final;
 };
-} // breakdown
-} // NST
+
+} // namespace breakdown
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // NFSV4REPRESENTER_H
+#endif//NFSV4REPRESENTER_H
 //------------------------------------------------------------------------------

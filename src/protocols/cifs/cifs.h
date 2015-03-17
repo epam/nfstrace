@@ -18,7 +18,6 @@
     You should have received a copy of the GNU General Public License
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
-#define NST_PUBLIC __attribute__ ((visibility("default")))
 //------------------------------------------------------------------------------
 #ifndef CIFS_HEADER_H
 #define CIFS_HEADER_H
@@ -27,6 +26,8 @@
 
 #include "api/cifs_types.h"
 #include "protocols/netbios/netbios.h"
+//------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -224,10 +225,9 @@ extern "C"
 NST_PUBLIC
 const char* print_cifs1_procedures(SMBv1Commands cmd_code);
 
-} // CIFSv1
-
-} // protocols
-} // NST
+} // namespace CIFSv1
+} // namespace protocols
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // CIFS_HEADER_H
+#endif//CIFS_HEADER_H
 //------------------------------------------------------------------------------
