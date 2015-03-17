@@ -28,13 +28,26 @@ namespace NST
 namespace analysis
 {
 
+bool Plugin::isSilent()
+{
+    if (requirements != nullptr)
+    {
+        // Processing analyzer requirements
+        const AnalyzerRequirements* r = requirements();
+        if (r != nullptr)
+        {
+            return r->silence;
+        }
+    }
+    return false;
+}
+
 Plugin::Plugin(const std::string& path)
     : DynamicLoad{path}
     , usage  {nullptr}
     , create {nullptr}
     , destroy{nullptr}
     , requirements{nullptr}
-    , _silent{false}
 {
     plugin_get_entry_points_func nst_get_entry_points{nullptr};
 
@@ -62,15 +75,6 @@ Plugin::Plugin(const std::string& path)
     {
         throw std::runtime_error{path + ": can't load entry point for some plugin function(s)"};
     }
-
-    if (requirements != nullptr) {
-        // Processing analyzer requirements
-        const AnalyzerRequirements* r = requirements();
-        if (r != nullptr) {
-            _silent = r->silence;
-        }
-    }
-
 }
 
 const std::string Plugin::usage_of(const std::string& path)

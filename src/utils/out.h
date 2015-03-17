@@ -47,7 +47,8 @@ public:
         Global(const Global&)            = delete;
         Global& operator=(const Global&) = delete;
 
-        static Level get_level();   // return global level of verbosity
+        static Level get_level();     // return global level of verbosity
+        static void set_level(Level); // set global level of verbosity
     };
 
     explicit Out(Level level=Level::Info);   // verbose level of message
