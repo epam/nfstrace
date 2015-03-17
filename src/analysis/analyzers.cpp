@@ -49,8 +49,7 @@ Analyzers::Analyzers(const controller::Parameters& params)
             {
                 if(_silent)
                 {
-                    time_t t = time(nullptr);
-                    TRACE("\n%s Error in plugin %s loading. Already load module with silent option.", ctime(&t), a.path.c_str());
+                    TRACE("Error in plugin %s loading. Already load module with silent option.", a.path.c_str());
                     continue;
                 }
             }
