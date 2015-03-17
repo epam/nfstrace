@@ -549,10 +549,10 @@ std::ostream& print_info_levels(std::ostream& out, const InfoTypes infoType, con
     {
         case InfoTypes::FILE:
             print_enum(out, "InfoLevel", static_cast<QueryInfoLevels>(infoClass));
-            
+            break;
         case InfoTypes::FILESYSTEM:
             print_enum(out, "InfoLevel", static_cast<FsInfoLevels>(infoClass));
-            
+            break;
         default:
             //we dont handle other classes
             ;
