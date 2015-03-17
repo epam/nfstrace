@@ -19,7 +19,6 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
 #ifndef NFS_UTILS_H
 #define NFS_UTILS_H
 //------------------------------------------------------------------------------
@@ -28,6 +27,8 @@
 #include <cstring>
 
 #include "utils/out.h"
+//------------------------------------------------------------------------------
+#define NST_PUBLIC __attribute__ ((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {

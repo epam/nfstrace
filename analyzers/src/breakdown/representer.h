@@ -33,6 +33,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /*! \class Represents statistics and sends it to screen
  */
 class Representer
@@ -70,8 +71,9 @@ public:
      */
     void flush_statistics(const Statistics& statistics);
 };
-} // breakdown
-} // NST
+
+} // namespace breakdown
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // REPRESENTER_H
+#endif//REPRESENTER_H
 //------------------------------------------------------------------------------

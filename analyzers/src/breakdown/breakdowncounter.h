@@ -60,5 +60,5 @@ private:
     std::vector<NST::breakdown::Latencies> latencies;
 };
 //------------------------------------------------------------------------------
-#endif // BREAKDOWNCOUNTER_H
+#endif//BREAKDOWNCOUNTER_H
 //------------------------------------------------------------------------------

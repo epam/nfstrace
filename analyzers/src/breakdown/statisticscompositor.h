@@ -28,6 +28,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /**
  * @brief Composes 2 statistics: for procedures and functions
  * It is useful for NFS v4.* protocols
@@ -41,8 +42,9 @@ public:
     void for_each_procedure_in_session(const Session& session, std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
     bool has_session() const override;
 };
-} // breakdown
-} // NST
+
+} // namespace breakdown
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // STATISTICSCOMPOSITOR_H
+#endif//STATISTICSCOMPOSITOR_H
 //------------------------------------------------------------------------------
