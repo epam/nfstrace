@@ -63,7 +63,7 @@ extern "C"
         delete instance;
     }
 
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy)
+    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy, nullptr)
 
 }//extern "C"
 //------------------------------------------------------------------------------

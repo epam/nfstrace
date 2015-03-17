@@ -56,6 +56,11 @@ public:
     {
         analysiss->on_unix_signal(signo);
     }
+
+    inline bool isSilent()
+    {
+        return analysiss->isSilent();
+    }
 private:
     std::unique_ptr<Analyzers> analysiss;
     std::unique_ptr<FilteredDataQueue> queue;
