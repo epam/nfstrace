@@ -32,7 +32,7 @@ class MainWindow
 
     void init();
     void destroy();
-    void cleanStdin(int);
+    static void cleanStdin(int);
 
 public:
 
@@ -49,7 +49,7 @@ public:
 
     /*! Update Main Window
     */
-    void update();
+    void update() const;
 };
 //------------------------------------------------------------------------------
 #endif // MAIN_WINDOW_H
