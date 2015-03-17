@@ -29,6 +29,7 @@ namespace analysis
 {
 
 Analyzers::Analyzers(const controller::Parameters& params)
+: _silent{false}
 {
     for(const auto& a : params.analysis_modules())
     {
@@ -36,8 +37,23 @@ Analyzers::Analyzers(const controller::Parameters& params)
         try // try to load plugin
         {
             message << "Loading module: '" << a.path << "' with args: [" << a.args << "]";
-
             std::unique_ptr<PluginInstance> plugin{new PluginInstance{a.path, a.args}};
+            if(plugin->silent())
+            {
+                if(!_silent)
+                {
+                    _silent = true;
+                }
+            }
+            else
+            {
+                if(_silent)
+                {
+                    TRACE("Error in plugin %s loading. Already load module with silent option.", a.path.c_str());
+                    continue;
+                }
+            }
+
             modules.emplace_back(plugin->instance());
             plugins.emplace_back(std::move(plugin));
         }

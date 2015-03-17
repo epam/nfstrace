@@ -41,6 +41,11 @@ Out::Level Out::Global::get_level()
     return global;
 }
 
+void Out::Global::set_level(Out::Level l)
+{
+    global = l;
+}
+
 Out::Out(Level level)
 : std::ostream{ (global >= level) ? std::cout.rdbuf() : nullptr }
 {
