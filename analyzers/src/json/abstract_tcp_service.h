@@ -31,7 +31,6 @@
 
 #include "ip_endpoint.h"
 //------------------------------------------------------------------------------
-
 //! TCP-service
 /*!
  * Abstract task for TCP-service
@@ -123,7 +122,6 @@ private:
     std::mutex _tasksQueueMutex;
     std::condition_variable _tasksQueueCond;
 };
-
 //------------------------------------------------------------------------------
-#endif // ABSTRACT_TCP_SERVICE_H
+#endif//ABSTRACT_TCP_SERVICE_H
 //------------------------------------------------------------------------------

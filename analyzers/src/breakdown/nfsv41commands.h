@@ -28,6 +28,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /*!
  * Represents NFS v 4.0 commands
  * Converts commands to string
@@ -40,8 +41,9 @@ public:
     const char* protocol_name();
     size_t commands_count();
 };
-} // breakdown
-} // NST
+
+} // namespace breakdown
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // NFSV41COMMANDS_H
+#endif//NFSV41COMMANDS_H
 //------------------------------------------------------------------------------

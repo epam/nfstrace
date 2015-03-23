@@ -23,6 +23,7 @@
 #define CIFS2_UTILS_H
 //------------------------------------------------------------------------------
 #include <iosfwd>
+#include <sstream>
 
 #include "api/cifs2_commands.h"
 #include "protocols/nfs/nfs_utils.h"
@@ -33,6 +34,7 @@ namespace protocols
 {
 namespace CIFSv2
 {
+
 namespace SMBv2 = NST::API::SMBv2;
 
 /*! Convert enum type to underlying integer type
@@ -77,15 +79,15 @@ std::ostream& print_enum(std::ostream& out, const std::string name, T value )
     out << "  " << name << " = ";
     auto int_value = to_integral(value);
     print_hex(out, int_value);
-    out << " (" << value << ")";
+    out << " " << value;
     return out;
 } 
 
 std::ostream& print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoType, const uint8_t infoClass);
-}// namespace CIFSv2    
-}// namespace protocols 
-}// namespace NST       
 
+} // namespace CIFSv2
+} // namespace protocols
+} // namespace NST
 //------------------------------------------------------------------------------
 #endif//CIFS2_UTILS_H
 //------------------------------------------------------------------------------

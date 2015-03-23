@@ -195,10 +195,9 @@ extern "C"
 NST_PUBLIC
 const char* print_cifs2_procedures(SMBv2Commands cmd_code);
 
-} // CIFSv2
-
-} // protocols
-} // NST
+} // namespace CIFSv2
+} // namespace protocols
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // CIFSv2_HEADER_H
+#endif//CIFSv2_HEADER_H
 //------------------------------------------------------------------------------
