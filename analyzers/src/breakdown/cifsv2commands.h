@@ -28,6 +28,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /*!
  * Represents CIFS v2 commands
  * Converts commands to string
@@ -69,8 +70,9 @@ struct SMBv2Commands : CommandRepresenter
 
     const char* protocol_name();
 };
-} // breakdown
-} // NST
+
+} // namespace breakdown
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // CIFS2_COMMANDS_H
+#endif//CIFS2_COMMANDS_H
 //------------------------------------------------------------------------------

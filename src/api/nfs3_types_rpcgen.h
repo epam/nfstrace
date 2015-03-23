@@ -955,5 +955,5 @@ typedef struct COMMIT3res COMMIT3res;
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif //NFS3_TYPES_RPCGEN_H
+#endif//NFS3_TYPES_RPCGEN_H
 //------------------------------------------------------------------------------

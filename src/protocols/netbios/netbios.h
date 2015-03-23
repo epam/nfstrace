@@ -63,9 +63,9 @@ inline const struct MessageHeader* get_header(const uint8_t* data)
     return nullptr;
 }
 
-} // NetBIOS
-} // protocols
-} // NST
+} // namespace NetBIOS
+} // namespace protocols
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // NETBIOS_HEADER_H
+#endif//NETBIOS_HEADER_H
 //------------------------------------------------------------------------------

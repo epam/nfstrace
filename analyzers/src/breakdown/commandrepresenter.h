@@ -28,6 +28,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /*!
  * \brief The CommandRepresenter struct represents interface for command representers
  * Commands representer should be able to convert commands to string
@@ -62,8 +63,9 @@ struct CommandRepresenter
 
     virtual ~CommandRepresenter() {}
 };
-} // breakdown
-} // NST
+
+} // namespace breakdown
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // COMMANDREPRESENTER_H
+#endif//COMMANDREPRESENTER_H
 //------------------------------------------------------------------------------

@@ -51,7 +51,8 @@ void print_hex16(std::ostream& out, uint16_t val)
 
 void print_hex8(std::ostream& out, uint8_t val)
 {
-    out << "0x" << std::setfill('0') << std::setw(2) << std::hex << val
+    out << "0x" << std::setfill('0') << std::setw(2) << std::hex
+        << static_cast<u_int16_t>(val)          // prevent implicit cast to char
         << std::dec << std::setfill(' ');
 }
 

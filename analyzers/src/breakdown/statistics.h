@@ -33,6 +33,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /*! \brief Comparator for sessions
  */
 struct Less
@@ -103,8 +104,9 @@ protected:
     BreakdownCounter counter; //!< Statistics for all sessions
     PerSessionStatistics per_session_statistics; //!< Statistics for each session
 };
-} // breakdown
-} // NST
+
+} // namespace breakdown
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // STATISTICS_H
+#endif//STATISTICS_H
 //------------------------------------------------------------------------------

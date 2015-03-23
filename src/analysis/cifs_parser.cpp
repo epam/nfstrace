@@ -95,7 +95,9 @@ void CIFSParser::parse_packet(const CIFSv2::MessageHeader* header, utils::Filter
         // It is response
         if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY))
         {
-            FilteredDataQueue::Ptr&& requestData = session->get_call_data(header->SessionId);
+            //Loosing precision: conversion from int64_t to uint32_t
+            const uint32_t messageId = static_cast<uint32_t>(header->messageId);
+            FilteredDataQueue::Ptr&& requestData = session->get_call_data(messageId);
             if (requestData)
             {
                 if (const MessageHeader* request = get_header(requestData->data))
@@ -117,7 +119,9 @@ void CIFSParser::parse_packet(const CIFSv2::MessageHeader* header, utils::Filter
             {
                 return analyse_operation(session, header, nullptr, std::move(ptr), std::move(nullptr));
             }
-            return session->save_call_data(header->SessionId, std::move(ptr));
+            //Loosing precision: conversion from int64_t to uint32_t
+            const uint32_t messageId = static_cast<uint32_t>(header->messageId);
+            return session->save_call_data(messageId, std::move(ptr));
         }
         LOG("Can't get right CIFS session");
     }

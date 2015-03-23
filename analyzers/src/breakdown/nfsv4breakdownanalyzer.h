@@ -31,6 +31,7 @@ namespace NST
 {
 namespace breakdown
 {
+
 /*! \brief Analyzer for NFS v4
  * Handles NFS v4 commands
  */
@@ -168,9 +169,8 @@ public:
     void flush_statistics() override;
 };
 
-} // protocols
-} // NST
+} // namespace breakdown
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // NFSV4BREAKDOWNANALYZER_H
+#endif//NFSV4BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------
-

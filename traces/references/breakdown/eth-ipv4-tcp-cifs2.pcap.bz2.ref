@@ -78,46 +78,46 @@ INVALID                   0   0.00%
 NO_ANDX_COMMAND           0   0.00%
 ###  Breakdown analyzer  ###
 CIFS v2 protocol
-Total operations: 29. Per operation:
-NEGOTIATE                 1   3.45%
-SESSION SETUP             1   3.45%
+Total operations: 30. Per operation:
+NEGOTIATE                 1   3.33%
+SESSION SETUP             2   6.67%
 LOGOFF                    0   0.00%
-TREE CONNECT              2   6.90%
-TREE DISCONNECT           1   3.45%
-CREATE                    6  20.69%
-CLOSE                     6  20.69%
+TREE CONNECT              2   6.67%
+TREE DISCONNECT           1   3.33%
+CREATE                    6  20.00%
+CLOSE                     6  20.00%
 FLUSH                     0   0.00%
 READ                      0   0.00%
 WRITE                     0   0.00%
 LOCK                      0   0.00%
 IOCTL                     0   0.00%
 CANCEL                    0   0.00%
-ECHO                      4  13.79%
-QUERY DIRECTORY           6  20.69%
+ECHO                      4  13.33%
+QUERY DIRECTORY           6  20.00%
 CHANGE NOTIFY             0   0.00%
-QUERY INFO                2   6.90%
+QUERY INFO                2   6.67%
 SET INFO                  0   0.00%
 OPLOCK BREAK              0   0.00%
 Per connection info: 
 Session: 10.20.9.39:48207 --> 10.20.0.5:445 [TCP]
-Total operations: 29. Per operation:
-NEGOTIATE              Count:    1 (  3.45%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
-SESSION SETUP          Count:    1 (  3.45%) Min: 0.002 Max: 0.002 Avg: 0.002 StDev: 0.00000000
+Total operations: 30. Per operation:
+NEGOTIATE              Count:    1 (  3.33%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
+SESSION SETUP          Count:    2 (  6.67%) Min: 0.001 Max: 0.002 Avg: 0.001 StDev: 0.00077782
 LOGOFF                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-TREE CONNECT           Count:    2 (  6.90%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00009617
-TREE DISCONNECT        Count:    1 (  3.45%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
-CREATE                 Count:    6 ( 20.69%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00011734
-CLOSE                  Count:    6 ( 20.69%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00004669
+TREE CONNECT           Count:    2 (  6.67%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00009617
+TREE DISCONNECT        Count:    1 (  3.33%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00000000
+CREATE                 Count:    6 ( 20.00%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00011734
+CLOSE                  Count:    6 ( 20.00%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00004669
 FLUSH                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 READ                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 WRITE                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 LOCK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 IOCTL                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 CANCEL                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-ECHO                   Count:    4 ( 13.79%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00008427
-QUERY DIRECTORY        Count:    6 ( 20.69%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00010042
+ECHO                   Count:    4 ( 13.33%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00008427
+QUERY DIRECTORY        Count:    6 ( 20.00%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00010042
 CHANGE NOTIFY          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-QUERY INFO             Count:    2 (  6.90%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00006505
+QUERY INFO             Count:    2 (  6.67%) Min: 0.001 Max: 0.001 Avg: 0.001 StDev: 0.00006505
 SET INFO               Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 OPLOCK BREAK           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 ###  Breakdown analyzer  ###

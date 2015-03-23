@@ -208,8 +208,8 @@ private:
     MessageSet nfs3_read_match;
 };
 
-} // analysis
-} // NST
+} // namespace filtration
+} // namespace NST
 //------------------------------------------------------------------------------
-#endif // RPC_FILTRATOR_H
+#endif//RPC_FILTRATOR_H
 //------------------------------------------------------------------------------
