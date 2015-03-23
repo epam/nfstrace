@@ -32,13 +32,15 @@
 // TODO: DANGEROUS MACRO ! Passing custom client string as format to printf().
 // May be cause of SIGSEGV
 #define TRACE(...) {\
-    NST::utils::Log::message("\n" __FILE__ ":" STRINGIZE(__LINE__) ": " __VA_ARGS__);\
+    NST::utils::Log::message(__FILE__ ":" STRINGIZE(__LINE__) ": " __VA_ARGS__);\
+    NST::utils::Log::message("\n");\
     NST::utils::Log::flush();\
 }
 #endif
 
 #define LOG(...) {\
-    NST::utils::Log::message("\n" __VA_ARGS__);\
+    NST::utils::Log::message(__VA_ARGS__);\
+    NST::utils::Log::message("\n");\
 }
 
 #define LOGONCE(...) {\
