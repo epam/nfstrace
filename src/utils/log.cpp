@@ -70,9 +70,10 @@ static FILE* try_open(const std::string& file_name)
         throw std::system_error{errno, std::system_category(),
                                {"Log file already locked: " + file_name}};
     }
+    time_t now = time(NULL);
     fprintf(file, "--------------------------------------------------------------------------\n");
     fprintf(file, "--------------------------------------------------------------------------\n");
-    fprintf(file, "Nfstrace log: " __TIMESTAMP__ " PID = %lu\n", static_cast<unsigned long>(getpid()));
+    fprintf(file, "Nfstrace log: PID = %lu %s", static_cast<unsigned long>(getpid()), ctime(&now));
     fprintf(file, "--------------------------------------------------------------------------\n");
     return file;
 }
