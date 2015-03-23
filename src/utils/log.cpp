@@ -57,7 +57,7 @@ namespace // unnanmed
 
 static FILE* try_open(const std::string& file_name)
 {
-    FILE* file = fopen(file_name.c_str(), "w");
+    FILE* file = fopen(file_name.c_str(), "a+");
     if(file == nullptr)
     {
         throw std::system_error{errno, std::system_category(),
@@ -70,6 +70,10 @@ static FILE* try_open(const std::string& file_name)
         throw std::system_error{errno, std::system_category(),
                                {"Log file already locked: " + file_name}};
     }
+    fprintf(file, "--------------------------------------------------------------------------\n");
+    fprintf(file, "--------------------------------------------------------------------------\n");
+    fprintf(file, "Nfstrace log: " __TIMESTAMP__ " PID = %lu\n", static_cast<unsigned long>(getpid()));
+    fprintf(file, "--------------------------------------------------------------------------\n");
     return file;
 }
 
@@ -98,20 +102,14 @@ Log::Global::Global(const std::string& path)
 
         if(exists && S_ISDIR(st.st_mode))
         {
-            if(log_file_path.back() == '/')
-            {
-                log_file_path.erase(log_file_path.find_last_not_of('/') + 1);
-            }
-            log_file_path = log_file_path + '/' + default_file_name;
+            throw std::system_error{errno, std::system_category(),
+                                   {"Incorrect log file path: " + log_file_path + " - it is a directory! Please set correct path to log."}};
         }
     }
     else
     {
         log_file_path = default_file_name;
     }
-
-    // Append timestamp
-    log_file_path = log_file_path + "." + std::to_string(std::time(0));
 
     log_file = try_open(log_file_path);
     own_file = true;
