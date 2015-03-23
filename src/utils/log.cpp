@@ -88,8 +88,6 @@ Log::Global::Global(const std::string& path)
         throw std::runtime_error{"Global Logger already have been created."};
     }
 
-    const std::string default_file_name {"nfstrace.log"};
-
     if(!log_file_path.empty())
     {
         struct stat st;
@@ -109,7 +107,7 @@ Log::Global::Global(const std::string& path)
     }
     else
     {
-        log_file_path = default_file_name;
+        log_file_path = "nfstrace.log";
     }
 
     log_file = try_open(log_file_path);
