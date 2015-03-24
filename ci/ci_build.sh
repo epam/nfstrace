@@ -206,9 +206,9 @@ if [ $? -ne 0 ] ; then
     echo ">>> Debug build compilation error"
     exit 1
 fi
-CTEST_OUTPUT_ON_FAILURE=TRUE ctest -R unit*
+CTEST_OUTPUT_ON_FAILURE=TRUE make test
 if [ $? -ne 0 ] ; then
-    echo ">>> Running unit-tests on Debug build error"
+    echo ">>> Running tests on Debug build error"
     exit 1
 fi
 if [ "$PLATFORM" = "FreeBSD" ] ; then
@@ -220,11 +220,6 @@ else
         echo ">>> Code coverage report creation error"
         exit 1
     fi
-fi
-CTEST_OUTPUT_ON_FAILURE=TRUE ctest -E unit*
-if [ $? -ne 0 ] ; then
-    echo ">>> Running functional tests on Debug build error"
-    exit 1
 fi
 
 # Running valgrind/memcheck
