@@ -62,7 +62,7 @@ void CIFSParser::parse_packet(const CIFSv1::MessageHeader* header, NST::utils::F
         // It is response
         if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY))
         {
-            FilteredDataQueue::Ptr&& requestData = session->get_call_data(header->sec.CID);
+            FilteredDataQueue::Ptr&& requestData = session->get_call_data(header->sec.sequenceNumber);
             if (requestData)
             {
                 if (const MessageHeader* request = get_header(requestData->data))
@@ -79,7 +79,7 @@ void CIFSParser::parse_packet(const CIFSv1::MessageHeader* header, NST::utils::F
         // It is request
         if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::CALL))
         {
-            return session->save_call_data(header->sec.CID, std::move(ptr));
+            return session->save_call_data(header->sec.sequenceNumber, std::move(ptr));
         }
         LOG("Can't get right CIFS session");
     }
