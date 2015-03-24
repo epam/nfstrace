@@ -82,32 +82,34 @@ public:
 
     inline static bool isCIFSV1Header(const uint8_t* header)
     {
-    	return CIFSv1::get_header(header + sizeof(NetBIOS::MessageHeader)) != nullptr;
+        return CIFSv1::get_header(header + sizeof(NetBIOS::MessageHeader)) != nullptr;
     }
 
     inline static bool isCIFSV2Header(const uint8_t* header)
     {
-    	return CIFSv2::get_header(header + sizeof(NetBIOS::MessageHeader)) != nullptr;
+        return CIFSv2::get_header(header + sizeof(NetBIOS::MessageHeader)) != nullptr;
     }
 
     inline static bool isRightHeader(const uint8_t* header)
     {
-    	return NetBIOS::get_header(header) && (isCIFSV1Header(header) || isCIFSV2Header(header));
+        return NetBIOS::get_header(header) && (isCIFSV1Header(header) || isCIFSV2Header(header));
     }
 
     inline bool collect_header(PacketInfo& info)
     {
-    	size_t length = 0;
-    	if(isCIFSV1Header(info.data))
-    	{
-    		length = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::RawMessageHeader);
-    	} else if(isCIFSV2Header(info.data))
-    	{
-    		length = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::RawMessageHeader);
-    	} else
-    	{
-    		length = lengthOfBaseHeader();
-    	}
+        size_t length = 0;
+        if(isCIFSV1Header(info.data))
+        {
+            length = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::RawMessageHeader);
+        }
+        else if(isCIFSV2Header(info.data))
+        {
+            length = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::RawMessageHeader);
+        }
+        else
+        {
+            length = lengthOfBaseHeader();
+        }
         return BaseImpl::collect_header(info, length, length);
     }
 
@@ -128,7 +130,6 @@ public:
                 set_msg_size(header, length);
                 return BaseImpl::read_message(info);
             }
-
         }
         return false;
     }
