@@ -98,7 +98,7 @@ public:
         return sizeof(RecordMark);
     }
 
-    inline bool collect_header(PacketInfo& info)
+    inline bool collect_header(PacketInfo& info, typename Writer::Collection&)
     {
         return BaseImpl::collect_header(info, lengthOfCallHeader(), lengthOfReplyHeader());
     }
