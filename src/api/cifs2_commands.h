@@ -1070,8 +1070,7 @@ struct OplockAcknowledgment
     OplockLevels LockCount;                      //!< The client will set this field to the lowered oplock level that the client accepts for this file
     uint8_t Reserved1;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
     uint32_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
-    uint64_t persistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
-    uint64_t volatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint8_t  fileId[16];                         //!< SMB2_FILEID structure
 }  __attribute__ ((__packed__));
 
 /*!
@@ -1085,8 +1084,7 @@ struct OplockResponse
     OplockLevels LockCount;                      //!< The client will set this field to the lowered oplock level that the client accepts for this file
     uint8_t Reserved1;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
     uint32_t Reserved;                           //!< This field MUST NOT be used and MUST be reserved. The client MUST set this to 0, and the server MUST ignore it on receipt.
-    uint64_t persistentFileId;                   //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
-    uint64_t volatileFileId;                     //!< An SMB2_FILEID identifier of the file or named pipe on which to perform the query.
+    uint8_t  fileId[16];                         //!< SMB2_FILEID structure
 }  __attribute__ ((__packed__));
 
 /*!

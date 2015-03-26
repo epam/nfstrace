@@ -99,6 +99,9 @@ public:
     void setInfoSMBv2(const SMBv2::SetInfoCommand*,
                       const SMBv2::SetInfoRequest*,
                       const SMBv2::SetInfoResponse*) override final;
+    void breakOplockSMBv2(const SMBv2::BreakOpLockCommand*,
+                               const SMBv2::OplockAcknowledgment*,
+                               const SMBv2::OplockResponse*) override final;
     void null(const RPCProcedure* proc,
               const struct NFS3::NULL3args*,
               const struct NFS3::NULL3res*) override final;

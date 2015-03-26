@@ -646,6 +646,23 @@ void PrintAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* cmd,
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
 }
 
+void PrintAnalyzer::breakOplockSMBv2(const SMBv2::BreakOpLockCommand* cmd,
+                           const SMBv2::OplockAcknowledgment*,
+                           const SMBv2::OplockResponse* res)
+{
+    SMBv2Commands cmdEnum = SMBv2Commands::OPLOCK_BREAK;
+
+    print_smbv2_common_info_req(out, cmdEnum, cmd) << "\n";
+    print_enum(out, "Oplock", cmd->parg->LockCount) << "\n";
+    out << "  File Id = ";
+    print_guid(out, cmd->parg->fileId);
+    out << "\n";
+
+    print_smbv2_common_info_resp(out, cmdEnum, cmd) << "\n";
+    print_enum(out, "Oplock", res->LockCount) << "\n";
+    out << "  File Id = ";
+    print_guid(out, res->fileId);
+}
 
 // Print NFSv3 procedures (rpcgen)
 // 1st line - PRC information: src and dst hosts, status of RPC procedure
