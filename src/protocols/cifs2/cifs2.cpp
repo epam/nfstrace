@@ -139,11 +139,11 @@ void NST::protocols::CIFSv2::parse(SMBv2::SetInfoResponse*&){ }
 void NST::protocols::CIFSv2::parse(SMBv2::CancelResponce*&){ }
 void NST::protocols::CIFSv2::parse(SMBv2::CancelRequest*&){ }
 
-
 // TODO: This implementation currently copy of
 // epm-nfs/analyzers/src/cifs/cifs2_commands.cpp
 // const std::string NST::breakdown::SMBv2Commands::command_name(int cmd_code)
 // Futre fix: We need to merege these enums
+// TODO: Move implementation to some common module
 const char* NST::protocols::CIFSv2::print_cifs2_procedures(SMBv2Commands cmd)
 {
     assert(cmd < SMBv2Commands::CMD_COUNT);
