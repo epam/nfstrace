@@ -27,6 +27,7 @@
 
 #include "api/cifs2_commands.h"
 #include "protocols/nfs/nfs_utils.h"
+#include "cifs2.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -46,7 +47,7 @@ inline constexpr auto to_integral(E e) -> typename std::underlying_type<E>::type
 {
     return static_cast<typename std::underlying_type<E>::type>(e);
 }
-
+std::ostream& operator<<(std::ostream& out, const SMBv2::SMBv2Commands value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::QueryInfoLevels value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::FsInfoLevels value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::CtlCodes value);
@@ -71,6 +72,7 @@ std::ostream& operator<<(std::ostream& out, const SMBv2::NTStatus value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::AccessMask value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::CloseFlags value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::SecurityMode value); 
+std::ostream& operator<<(std::ostream& out, Flags value);
 
 template <typename T>
 std::ostream& print_enum(std::ostream& out, const std::string name, T value )

@@ -94,7 +94,7 @@ struct RawMessageHeader
     SMB2 CANCEL Request
     */
     int64_t SessionId;//!< Uniquely identifies the established session for the command
-    int32_t Signature[4];//!< he 16-byte signature of the message, if SMB2_FLAGS_SIGNED is set in the Flags field of the SMB2 header. If the message is not signed, this field MUST be 0.
+    uint8_t Signature[16];//!< he 16-byte signature of the message, if SMB2_FLAGS_SIGNED is set in the Flags field of the SMB2 header. If the message is not signed, this field MUST be 0.
 } __attribute__ ((__packed__));
 
 /*! High level user friendly message structure
