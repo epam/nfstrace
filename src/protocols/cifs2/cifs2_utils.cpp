@@ -22,6 +22,7 @@
 #include <iostream>
 #include <type_traits>
 
+#include "cifs2.h"
 #include "cifs2_utils.h"
 #include "protocols/nfs/nfs_utils.h"
 //------------------------------------------------------------------------------
@@ -272,6 +273,15 @@ const char* enumToString(SessionFlagsBinding value)
         return nullptr;
     }
 
+}
+
+std::ostream& operator<<(std::ostream& out, const SMBv2::SMBv2Commands value)
+{
+    const char* strCommand = NST::protocols::CIFSv2::print_cifs2_procedures(value);
+
+    out << "(" << strCommand << ")";
+
+    return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const OplockLevels value)
@@ -667,7 +677,25 @@ std::ostream& operator<<(std::ostream& out, const SessionFlagsBinding value)
     }
 
     return out;
-} 
+}
+
+std::ostream& operator<<(std::ostream& out, const Flags value)
+{
+    auto int_value = to_integral(value);
+    if (int_value > 0)
+    {
+        out << "(";
+        print_flag_if_set(out, "SERVER_TO_REDIR", int_value, Flags::SERVER_TO_REDIR);
+        print_flag_if_set(out, "ASYNC_COMMAND", int_value, Flags::ASYNC_COMMAND);
+        print_flag_if_set(out, "RELATED_OPERATIONS", int_value, Flags::RELATED_OPERATIONS);
+        print_flag_if_set(out, "SIGNED", int_value, Flags::SIGNED);
+        print_flag_if_set(out, "DFS_OPERATIONS", int_value, Flags::DFS_OPERATIONS);
+        print_flag_if_set(out, "REPLAY_OPERATION", int_value, Flags::REPLAY_OPERATION);
+        out << ")";
+    }
+
+    return out;
+}
 
 std::ostream& print_info_levels(std::ostream& out, const InfoTypes infoType, const uint8_t infoClass)
 {
