@@ -202,7 +202,9 @@ std::ostream& print_buffer(std::ostream& out, const uint8_t *buffer, uint16_t le
     // TODO: Add unicode support
     const char* char_buffer = reinterpret_cast<const char*>(buffer);
 
-    for(uint16_t i = 0; i < len; i++)
+    // smb2 buffer usually contains Unicode 16-bit character
+    // currently we do not support unicode output, so make English only variant
+    for(uint16_t i = 0; i < len; i += 2)
     {
         out << char_buffer[i];
     }
