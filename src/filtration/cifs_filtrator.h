@@ -95,22 +95,29 @@ public:
         return NetBIOS::get_header(header) && (isCIFSV1Header(header) || isCIFSV2Header(header));
     }
 
-    inline bool collect_header(PacketInfo& info)
+    inline bool collect_header(PacketInfo& info, typename Writer::Collection& collection)
     {
         size_t length = 0;
-        if(isCIFSV1Header(info.data))
-        {
-            length = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::RawMessageHeader);
+        if(collection && collection.data_size() >= lengthOfBaseHeader())
+        {   //enough data is copied from previous packets to see its type
+            if(isCIFSV1Header(collection.data()))
+            {
+                length = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::RawMessageHeader);
+            }
+            else if(isCIFSV2Header(collection.data()))
+            {
+                length = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::RawMessageHeader);
+            }
+            else
+            {   //got header but it is not CIFS
+                collection.reset();//dismiss copied data
+                info.dlen = 0;//skip entire packet
+                return false;
+            }
+            return BaseImpl::collect_header(info, length, length);
         }
-        else if(isCIFSV2Header(info.data))
-        {
-            length = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::RawMessageHeader);
-        }
-        else
-        {
-            length = lengthOfBaseHeader();
-        }
-        return BaseImpl::collect_header(info, length, length);
+        BaseImpl::collect_header(info, lengthOfBaseHeader(), lengthOfBaseHeader());//try to read base header
+        return false;//continue to read full header
     }
 
     inline bool find_and_read_message(PacketInfo& info, typename Writer::Collection& collection)

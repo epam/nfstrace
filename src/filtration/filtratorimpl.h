@@ -53,7 +53,7 @@ public:
         static_assert(std::is_function<decltype(Filtrator::lengthOfFirstSkipedPart)>::value, "You have to define static function with signature 'size_t lengthOfFirstSkipedPart()' in inhereted class");
         static_assert(std::is_function<decltype(Filtrator::isRightHeader)>::value, "You have to define static function with signature 'bool isRightHeader(const uint8_t* header)' in inhereted class");
 
-        static_assert(std::is_member_function_pointer<decltype(&Filtrator::collect_header)>::value, "You have to define static function with signature 'bool collect_header(PacketInfo& info)' in inhereted class");
+        static_assert(std::is_member_function_pointer<decltype(&Filtrator::collect_header)>::value, "You have to define static function with signature 'bool collect_header(PacketInfo& info, typename Writer::Collection& collection)' in inhereted class");
         static_assert(std::is_member_function_pointer<decltype(&Filtrator::find_and_read_message)>::value, "You have to define static function with signature 'bool find_and_read_message(PacketInfo& info, typename Writer::Collection& collection)' in inhereted class");
     }
 
@@ -214,9 +214,9 @@ public:
         assert(msg_len == 0);   // Message still undetected
         Filtrator* filtrator = static_cast<Filtrator* >(this);
 
-        if (!filtrator->collect_header(info))
+        if (!filtrator->collect_header(info, collection))
         {
-            return ;
+            return;
         }
 
         assert(collection);     // collection must be initialized
@@ -254,7 +254,6 @@ protected:
     {
         if (collection && (collection.data_size() > 0)) // collection is allocated
         {
-
             assert(collection.capacity() >= callHeaderLen);
             const size_t tocopy {callHeaderLen - collection.data_size()};
             assert(tocopy != 0);
