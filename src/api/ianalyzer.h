@@ -36,6 +36,8 @@ namespace NST
 namespace API
 {
 
+/*! Abstract interface for plugins that collect NFS3 statistics
+ */
 class INFSv3rpcgen
 {
 public:
@@ -87,7 +89,7 @@ public:
             const struct NFS3::ACCESS3res*) {}
 
     /*! NFSv3 "READLINK" procedure (Read from symbolic link)
-     * \param RPCProcedure  - Specified procedure
+     * \param RPCProcedure      - Specified procedure
      * \param READLINK3args     - procedure arguments
      * \param READLINK3res      - procedure results
      */
@@ -132,7 +134,7 @@ public:
             const struct NFS3::MKDIR3res*) {}
 
     /*! NFSv3 "SYMLINK" procedure (Create a symbolic link)
-     * \param RPCProcedure  - Specified procedure
+     * \param RPCProcedure     - Specified procedure
      * \param SYMLINK3args     - procedure arguments
      * \param SYMLINK3res      - procedure results
      */
@@ -240,6 +242,8 @@ public:
             const struct NFS3::COMMIT3res*) {}
 };
 
+/*! Abstract interface for plugins that collect NFS4 statistics
+ */
 class INFSv4rpcgen
 {
 public:
@@ -573,7 +577,7 @@ public:
             const struct NFS4::WRITE4args*,
             const struct NFS4::WRITE4res*) {}
 
-    /*! NFSv4 "RELEASE_LOCKOWNER operation (Release Lockowner State)
+    /*! NFSv4 "RELEASE_LOCKOWNER" operation (Release Lockowner State)
      * \param RPCProcedure              - Specified operation
      * \param RELEASE_LOCKOWNER4args    - operation arguments
      * \param RELEASE_LOCKOWNER4res     - operation results
@@ -599,6 +603,8 @@ public:
             const struct NFS4::ILLEGAL4res*) {}
 };
 
+/*! Abstract interface for plugins that collect NFS41 statistics
+ */
 class INFSv41rpcgen
 {
 public:
@@ -1787,6 +1793,9 @@ public:
     virtual void breakOplockSMBv2(const SMBv2::BreakOpLockCommand*, const SMBv2::OplockAcknowledgment*, const SMBv2::OplockResponse*) {}
 };
 
+/*! Base interface for all nfstrace plugins.
+ * Extends protocol interfaces: NFS3, NFS4, NFS41, SMBv1, SMBv2
+ */
 class IAnalyzer : public INFSv3rpcgen, public INFSv4rpcgen, public INFSv41rpcgen, public ISMBv1, public ISMBv2
 {
 public:

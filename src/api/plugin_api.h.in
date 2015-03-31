@@ -81,21 +81,21 @@ const char* print_cifs1_procedures(SMBv1::SMBv1Commands cmd_code);
  */ 
 const char* print_cifs2_procedures(SMBv2::SMBv2Commands cmd_code);
 
-/*! Returns NFSv3 command name by code
+/*! Returns NFSv3 command name by procedure id
  * 
- * \param cmd_code Command code
+ * \param proc ProcEnumNFS3::NFSProcedure procedure
  */ 
 const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
 
-/*! Returns NFSv4 command name by code
+/*! Returns NFSv4 command name by procedure id
  *
- * \param cmd_code Command code
+ * \param proc ProcEnumNFS4::NFSProcedure procedure
  */ 
 const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc);
 
-/*! Returns NFSv41 command name by code
+/*! Returns NFSv41 command name by procedure id
  *
- * \param cmd_code Command code
+ * \param proc ProcEnumNFS41::NFSProcedure procedure
  */ 
 const char* print_nfs41_procedures(const ProcEnumNFS41::NFSProcedure proc);
 
