@@ -34,6 +34,13 @@
 #include "nfs41_types_rpcgen.h"
 //------------------------------------------------------------------------------
 #define NST_PUBLIC __attribute__ ((visibility("default")))
+/*! Macro is used to register nfstrace plugin
+ *
+ * \param U - plugin_usage_func        
+ * \param C - plugin_create_func       
+ * \param D - plugin_destroy_func      
+ * \param G - plugin_requirements_func
+ */
 #define NST_PLUGIN_ENTRY_POINTS(U, C, D, G)         \
 NST_PUBLIC                                          \
 const plugin_entry_points* nst_get_entry_points()   \
@@ -61,20 +68,52 @@ struct AnalyzerRequirements
 extern "C"
 {
 // These calls implemented by nfstrace
+
+/*! Returns CIFSv1 command name by code
+ *
+ * \param cmd_code Command code
+ */ 
 const char* print_cifs1_procedures(SMBv1::SMBv1Commands cmd_code);
+
+/*! Returns CIFSv2 command name by code
+ *
+ * \param cmd_code Command code
+ */ 
 const char* print_cifs2_procedures(SMBv2::SMBv2Commands cmd_code);
+
+/*! Returns NFSv3 command name by procedure id
+ * 
+ * \param proc ProcEnumNFS3::NFSProcedure procedure
+ */ 
 const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
+
+/*! Returns NFSv4 command name by procedure id
+ *
+ * \param proc ProcEnumNFS4::NFSProcedure procedure
+ */ 
 const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc);
+
+/*! Returns NFSv41 command name by procedure id
+ *
+ * \param proc ProcEnumNFS41::NFSProcedure procedure
+ */ 
 const char* print_nfs41_procedures(const ProcEnumNFS41::NFSProcedure proc);
+
+/*! Prints session information to out
+ *
+ * \param out output stream
+ * \param session session object
+ */ 
 void print_session(std::ostream& out, const Session& session);
+
 void print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len);
 }
 
 // These functions must be implemented by pluggable analysis module
 // Pointers to these functions must be passed to NST_PLUGIN_ENTRY_POINTS() macro
-using plugin_usage_func        = const char* (*)();            // return description of options for create(opts)
-using plugin_create_func       = IAnalyzer*  (*)(const char*); // create an instance of an Analyzer
-using plugin_destroy_func      = void        (*)(IAnalyzer*);  // destroy instance of an Analyzer
+using plugin_usage_func        = const char* (*)();                 // return description of options for create(opts)
+using plugin_create_func       = IAnalyzer*  (*)(const char*);      // create an instance of an Analyzer
+using plugin_destroy_func      = void        (*)(IAnalyzer*);       // destroy instance of an Analyzer
 using plugin_requirements_func = const AnalyzerRequirements* (*)(); // return Analyzer's requirements
 
 struct plugin_entry_points
