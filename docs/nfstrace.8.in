@@ -22,7 +22,7 @@
 .TH nfstrace 8 "@COMPILATION_DATE@" "version @NST_VERSION@"
 .\" --------------------- NAME -----------------------------------
 .SH NAME
-.B nfstrace \- NFS tracing/monitoring/capturing/analyzing tool
+.B nfstrace \- NFS and CIFS tracing/monitoring/capturing/analyzing tool
 .\" --------------------- SYNOPSIS -------------------------------
 .SH SYNOPSIS
 .B nfstrace
@@ -47,7 +47,11 @@
 .B \-b
 .I MBytes
 ]
-.br
+[
+.B \-p
+.I promisc 
+] 
+.br 
          [
 .B \-d
 .I in|out|inout
@@ -68,6 +72,9 @@
 ] [
 .B \-D
 .I MBytes
+] [
+.B \-E
+.I interfaces|plugins
 ]
 .br
          [
@@ -76,6 +83,9 @@
 ] [
 .B \-Q
 .I 1..65535
+] [
+.B \-T
+.I true|false
 ] [
 .B \-Z
 .I username
@@ -87,7 +97,7 @@
 .SH DESCRIPTION
 .B nfstrace
 performs live Ethernet 1 Gbps – 10 Gbps packets capturing and helps to
-determine NFS procedures in raw network traffic. Furthermore, it performs
+determine NFS and CIFS procedures in raw network traffic. Furthermore, it performs
 filtration, dumping, compression, statistical analysis, visualization and
 provides the API for custom pluggable analysis modules.
 .PP
@@ -105,7 +115,7 @@ Currently
 .B nfstrace
 supports the following protocols:
 .PP
-    Ethernet > IPv4 | IPv6 > UDP | TCP > NFSv3 | NFSv4
+    Ethernet > IPv4 | IPv6 > UDP | TCP > NFSv3 | NFSv4 | NFSv4.1 | CIFSv1 | CIFSv2
 .PP
 .B nfstrace
 can operate in four different modes:
@@ -263,7 +273,7 @@ Set the size of the dumping file portion,
 means no limit
 .RB (default:\  0 ).
 .TP
-.BI "\-E, \-\-enum=" interfaces|plugins|-
+.BI "\-E, \-\-enum=" interfaces|plugins
 Enumerate all available network interfaces and and/or all available plugins,
 then exit; please note that interfaces can't be listed unless nfstrace was built
 against the recent version of libpcap that supports the
@@ -299,7 +309,7 @@ option, then exit.
 .\" --------------------- ANALYSIS MODULES -----------------------
 .SH ANALYSIS MODULES
 .SS Operation Breakdown Analyzer
-Operation Breakdown (OB) analyzer calculates average frequency of NFS
+Operation Breakdown (OB) analyzer calculates average frequency of NFS and CIFS
 procedures and computes standard deviation of latency using one of two
 algorithms (two-pass or one-pass).
 .PP
@@ -354,20 +364,14 @@ or
 .SS Watch
 Watch plugin mimics old
 .B nfswatch
-utility: it monitors NFS traffic and displays it in terminal using ncurses. It
-supports NFSv3 and NFSv4.
-.PP
-.B Important:
-at the moment watch plugin's output conflicts with standard nfstrace's output.
-You have to run nfstrace with
-.B "-v 0"
-option so it will be silent and won't break ncurses output.
+utility: it monitors NFS and CIFS traffic and displays it in terminal using ncurses. It
+supports NFSv3, NFSv4, NFSv41, CIFSv1 and CIFSv2.
 .PP
 By default watch plugin will update its screen every 2 seconds, you can specify
 another timeout in milliseconds:
 .RS 4
 .PP
-.B $ nfstrace -v 0 -a libwatch.so#1000
+.B $ nfstrace -a libwatch.so#1000
 .RE
 .SS JSON Analyzer
 JSON analyzer calculates a total amount of each supported application protocol
@@ -473,7 +477,7 @@ in online analysis mode (specified with
 .B \-\-mode
 or
 .B \-m
-options) without a pluggable analysis module. It will capture NFS traffic
+options) without a pluggable analysis module. It will capture NFS and CIFS traffic
 transferred over TCP or UDP with source or destination port number equals to
 2049 and will simply print them out to
 .B stdout
@@ -494,7 +498,7 @@ Note that capturing from network interface requires superuser privileges.
 .SS Online analysis
 The following command demonstrates running
 .B nfstrace
-in online analysis mode.  Just like in the previous example it will capture NFS
+in online analysis mode.  Just like in the previous example it will capture NFS and CIFS
 traffic transferred over TCP or UDP with source or destination port number
 equals to 2049 and then it will perform Operation Breakdown analysis using
 pluggable analysis module
