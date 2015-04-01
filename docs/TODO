@@ -12,6 +12,4 @@ The '*'s mean a complexity of implementation.
 ****  Add batching to Analyzers API. Passing a sequence of RPC Procedures to an analyser
 *** Implement drawing graphics in analyzers via gnuplot directly, without external .sh script
 **** Implement libpyadapter.so or libjavaadapter.so
-***** Implement CIFS support
-**** Implement NFSv4.1 support
 **** Implement WebUI
