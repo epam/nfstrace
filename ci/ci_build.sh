@@ -47,6 +47,7 @@ SKIP_CPPCHECK=false
 SKIP_SCAN_BUILD=false
 SKIP_MEMCHECK=false
 SKIP_PACKAGING=false
+SKIP_COVERAGE=false
 
 for CLI_OPT in "$@" ; do
     case $CLI_OPT in
@@ -54,6 +55,7 @@ for CLI_OPT in "$@" ; do
         --skip-scan-build) SKIP_SCAN_BUILD=true ;;
         --skip-memcheck) SKIP_MEMCHECK=true ;;
         --skip-packaging) SKIP_PACKAGING=true ;; 
+        --skip-coverage) SKIP_COVERAGE=true ;; 
     esac
 done
 
@@ -180,6 +182,12 @@ else
     fi
 fi
 
+INCLUDE_COVERAGE=true
+if [ "$SKIP_COVERAGE" = true ] ; then
+	INCLUDE_COVERAGE=false
+	echo ">>> Skipping coverage info generation (gcc --coverage)"
+fi
+
 # Doing Debug build
 
 DEBUG_BUILD_DIR=$WORKSPACE/debug
@@ -196,7 +204,8 @@ if [ $? -ne 0 ] ; then
 fi
 cd $DEBUG_BUILD_DIR
 
-cmake -DCMAKE_BUILD_TYPE=Debug -DGMOCK_SOURCE_DIR="$HOME/gmock-1.7.0" ../
+cmake -DINCLUDE_COVERAGE_INFO="${INCLUDE_COVERAGE}" -DCMAKE_BUILD_TYPE=Debug -DGMOCK_SOURCE_DIR="$HOME/gmock-1.7.0" ../
+
 if [ $? -ne 0 ] ; then
     echo ">>> Debug build configuration error"
     exit 1
@@ -215,11 +224,13 @@ if [ "$PLATFORM" = "FreeBSD" ] ; then
     # TODO: Support for code coverage on FreeBSD
     echo ">>> Coverage report generation is not supported on FreeBSD at the moment"
 else
-    make coverage
-    if [ $? -ne 0 ] ; then
-        echo ">>> Code coverage report creation error"
-        exit 1
-    fi
+	if [ "$SKIP_COVERAGE" = false ] ; then
+		make coverage
+		if [ $? -ne 0 ] ; then
+			echo ">>> Code coverage report creation error"
+			exit 1
+		fi
+	fi
 fi
 
 # Running valgrind/memcheck
