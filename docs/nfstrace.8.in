@@ -189,17 +189,17 @@ for specifying custom filters in BPF syntax (see
 The default BPF filter in
 .B nfstrace
 is
-.BR "'port 2049'" ,
+.BR "'port 2049 or port 445'" ,
 which means that each packet that is delivered to user-space from the kernel
 satisfies the following conditions: it has IPv4 or IPv6 header and it has TCP
 and UDP header with source or destination port number equals to 2049 (default
-NFS port).
+NFS port) or 445.
 .PP
 The reality is that this filter is very heavy and support of IPv6 is
 experimental, so if you want to reach faster filtration of IPv4-only traffic we
 suggest to use the following BPF filter:
 .RS 4
-.B 'ip and port 2049'.
+.B 'ip and port 2049 or port 445'.
 .RE
 .\" --------------------- OPTIONS --------------------------------
 .SH OPTIONS
@@ -219,7 +219,7 @@ Listen interface, it is required for live and dump modes
 .BI "\-f, \-\-filtration=" filter
 Specify the packet filter in BPF syntax; for the expression syntax, see
 .BR pcap-filter (7)
-.RB (default:\  "'port 2049'" ).
+.RB (default:\  "'port 2049 or port 445'" ).
 .TP
 .BI "\-s, \-\-snaplen=" 1..65535
 Set the max length of captured raw packet (bigger packets will be truncated).
@@ -310,20 +310,13 @@ option, then exit.
 .SH ANALYSIS MODULES
 .SS Operation Breakdown Analyzer
 Operation Breakdown (OB) analyzer calculates average frequency of NFS and CIFS
-procedures and computes standard deviation of latency using one of two
-algorithms (two-pass or one-pass).
+procedures and computes standard deviation of latency.
 .PP
-Two-pass algorithm returns correct standard deviation but requires a lot of
-memory during computations. One-pass algorithm is memory-efficient but it
-accumulates computation error in case of a large number of small latencies. It
-is possible to choose one of these algorithms by passing according parameter
-while attaching OB analyzer to
-.BR nfstrace .
 .RS 4
 .PP
 .B $ nfstrace -a libbreakdown.so -h
 .br
-.B nfstrace 0.3.0 (Release)
+.B nfstrace 0.4.0 (Release)
 .br
 .B built on Linux-3.16.1-1-generic
 .br
@@ -331,23 +324,14 @@ while attaching OB analyzer to
 .br
 .B Usage: ./nfstrace [OPTIONS]...
 .br
-.B ...
-.br
-.B Usage of libbreakdown.so:
-.br
-.B ACC - for accurate evaluation(default), MEM - for memory efficient
-.B evaluation. Options cannot be combined
-.RE
 .PP
-So, say, in order to choose two-pass algorithm you have to pass
-.B ACC
-to OB analyzer:
+Usage example:
 .RS 4
 .PP
-.B $ nfstrace \-m stat \-a libreakdown.so#ACC
+.B $ nfstrace \-m stat \-a libreakdown.so
 .RE
 .PP
-OB analyzer produces
+Breakdown analyzer produces
 .B .dat
 file in the current directory for each detected NFS session that can be
 visualized using
@@ -367,11 +351,11 @@ Watch plugin mimics old
 utility: it monitors NFS and CIFS traffic and displays it in terminal using ncurses. It
 supports NFSv3, NFSv4, NFSv41, CIFSv1 and CIFSv2.
 .PP
-By default watch plugin will update its screen every 2 seconds, you can specify
+By default watch plugin will update its screen every second, you can specify
 another timeout in milliseconds:
 .RS 4
 .PP
-.B $ nfstrace -a libwatch.so#1000
+.B $ nfstrace -a libwatch.so#2000
 .RE
 .SS JSON Analyzer
 JSON analyzer calculates a total amount of each supported application protocol
@@ -468,7 +452,7 @@ or
 options). Note that you can pass more than one module here.
 .RS 4
 .PP
-.B nfstrace \-\-help \-\-analysis=libbreakdown.so
+.B nfstrace \-\-help \-\-analysis=libjson.so
 .RE
 .SS Online tracing
 The following command will run
