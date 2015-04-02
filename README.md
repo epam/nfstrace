@@ -1,10 +1,10 @@
 NFSTRACE ![NFSTRACE Logo](docs/logo64.png "Logo")
 ========
 
-`nfstrace` is an NFS tracing/monitoring/capturing/analyzing tool.
+`nfstrace` is an NFS and CIFS tracing/monitoring/capturing/analyzing tool.
 
 It performs live Ethernet 1 Gbps - 10 Gbps packets capturing and helps to
-determine NFS procedures in raw network traffic. Furthermore, it performs
+determine NFS/CIFS procedures in raw network traffic. Furthermore, it performs
 filtration, dumping, compression, statistical analysis, visualization and
 provides the API for custom pluggable analysis modules.
 
@@ -14,7 +14,7 @@ following protocols:
 - Ethernet
 - IPv4 | IPv6
 - UPD | TCP
-- NFSv3 | NFSv4
+- NFSv3 | NFSv4 | NFSv4.1 | CIFSv1 | CIFSv2
 
 `nfstrace` has been tested on the following GNU/Linux and FreeBSD systems:
 
@@ -119,7 +119,7 @@ Ilya    Storozhilov ([ilya_storozhilov@epam.com](mailto:ilya_storozhilov@epam.co
 License
 -------
 
-Copyright (c) 2013, 2014 EPAM Systems
+Copyright (c) 2015 EPAM Systems
 
 Nfstrace is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
