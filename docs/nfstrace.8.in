@@ -193,7 +193,7 @@ is
 which means that each packet that is delivered to user-space from the kernel
 satisfies the following conditions: it has IPv4 or IPv6 header and it has TCP
 and UDP header with source or destination port number equals to 2049 (default
-NFS port) or 445.
+NFS port) or 445 (default CIFS port).
 .PP
 The reality is that this filter is very heavy and support of IPv6 is
 experimental, so if you want to reach faster filtration of IPv4-only traffic we
