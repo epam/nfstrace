@@ -78,48 +78,48 @@ INVALID                   0   0.00%
 NO_ANDX_COMMAND           0   0.00%
 ###  Breakdown analyzer  ###
 CIFS v2 protocol
-Total operations: 29. Per operation:
+Total operations: 35. Per operation:
 NEGOTIATE                 0   0.00%
 SESSION SETUP             0   0.00%
 LOGOFF                    0   0.00%
 TREE CONNECT              0   0.00%
 TREE DISCONNECT           0   0.00%
-CREATE                    5  17.24%
-CLOSE                     5  17.24%
+CREATE                    5  14.29%
+CLOSE                     5  14.29%
 FLUSH                     0   0.00%
-READ                      8  27.59%
-WRITE                     1   3.45%
+READ                      8  22.86%
+WRITE                     7  20.00%
 LOCK                      0   0.00%
 IOCTL                     0   0.00%
-CANCEL                    1   3.45%
+CANCEL                    1   2.86%
 ECHO                      0   0.00%
-QUERY DIRECTORY           1   3.45%
-CHANGE NOTIFY             2   6.90%
-QUERY INFO                3  10.34%
-SET INFO                  2   6.90%
-OPLOCK BREAK              1   3.45%
+QUERY DIRECTORY           1   2.86%
+CHANGE NOTIFY             2   5.71%
+QUERY INFO                3   8.57%
+SET INFO                  2   5.71%
+OPLOCK BREAK              1   2.86%
 Per connection info: 
 Session: 192.168.47.129:49212 --> 192.168.47.128:445 [TCP]
-Total operations: 29. Per operation:
+Total operations: 35. Per operation:
 NEGOTIATE              Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 SESSION SETUP          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 LOGOFF                 Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 TREE CONNECT           Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 TREE DISCONNECT        Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-CREATE                 Count:    5 ( 17.24%) Min: 0.000 Max: 0.001 Avg: 0.001 StDev: 0.00047382
-CLOSE                  Count:    5 ( 17.24%) Min: 0.000 Max: 0.001 Avg: 0.001 StDev: 0.00043107
+CREATE                 Count:    5 ( 14.29%) Min: 0.000 Max: 0.001 Avg: 0.001 StDev: 0.00047382
+CLOSE                  Count:    5 ( 14.29%) Min: 0.000 Max: 0.001 Avg: 0.001 StDev: 0.00043107
 FLUSH                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-READ                   Count:    8 ( 27.59%) Min: 0.000 Max: 0.022 Avg: 0.006 StDev: 0.00753719
-WRITE                  Count:    1 (  3.45%) Min: 0.002 Max: 0.002 Avg: 0.002 StDev: 0.00000000
+READ                   Count:    8 ( 22.86%) Min: 0.000 Max: 0.022 Avg: 0.006 StDev: 0.00753719
+WRITE                  Count:    7 ( 20.00%) Min: 0.001 Max: 0.002 Avg: 0.002 StDev: 0.00038373
 LOCK                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 IOCTL                  Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-CANCEL                 Count:    1 (  3.45%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+CANCEL                 Count:    1 (  2.86%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 ECHO                   Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-QUERY DIRECTORY        Count:    1 (  3.45%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-CHANGE NOTIFY          Count:    2 (  6.90%) Min: 0.000 Max: 0.007 Avg: 0.004 StDev: 0.00468388
-QUERY INFO             Count:    3 ( 10.34%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00004424
-SET INFO               Count:    2 (  6.90%) Min: 0.000 Max: 0.001 Avg: 0.001 StDev: 0.00039244
-OPLOCK BREAK           Count:    1 (  3.45%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+QUERY DIRECTORY        Count:    1 (  2.86%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
+CHANGE NOTIFY          Count:    2 (  5.71%) Min: 0.000 Max: 0.007 Avg: 0.004 StDev: 0.00468388
+QUERY INFO             Count:    3 (  8.57%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00004424
+SET INFO               Count:    2 (  5.71%) Min: 0.000 Max: 0.001 Avg: 0.001 StDev: 0.00039244
+OPLOCK BREAK           Count:    1 (  2.86%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 ###  Breakdown analyzer  ###
 NFS v3 protocol
 Total operations: 0. Per operation:
