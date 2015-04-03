@@ -20,17 +20,24 @@ following protocols:
 
 - Fedora 20
 - OpenSUSE 13.2
-- Ubuntu 14.10
+- Ubuntu 14.04/14.10
 - CentOS 7
 - Arch Linux
 - FreeBSD 10.1
-- Alt Linux 7.0.4
+- Alt Linux 7.0.5
 
 You can find more detailed description at `docs/nfstrace_manual.pdf`
 
 Problems, bugs, questions, desirable enhancements, etc. should be sent to
 <nfstrace@epam.com>
 
+External Dependencies
+--------
+
+- PCAP library (core component)
+- json library (used for libjson.so plugin)
+- Curses (used for libwatch.so plugin)
+- GMock (used for testing)
 
 Building
 --------
