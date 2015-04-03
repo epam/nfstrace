@@ -22,7 +22,7 @@
 .TH nfstrace 8 "@COMPILATION_DATE@" "version @NST_VERSION@"
 .\" --------------------- NAME -----------------------------------
 .SH NAME
-.B nfstrace \- NFS tracing/monitoring/capturing/analyzing tool
+.B nfstrace \- NFS and CIFS tracing/monitoring/capturing/analyzing tool
 .\" --------------------- SYNOPSIS -------------------------------
 .SH SYNOPSIS
 .B nfstrace
@@ -47,7 +47,11 @@
 .B \-b
 .I MBytes
 ]
-.br
+[
+.B \-p
+.I promisc 
+] 
+.br 
          [
 .B \-d
 .I in|out|inout
@@ -68,6 +72,9 @@
 ] [
 .B \-D
 .I MBytes
+] [
+.B \-E
+.I interfaces|plugins
 ]
 .br
          [
@@ -76,6 +83,9 @@
 ] [
 .B \-Q
 .I 1..65535
+] [
+.B \-T
+.I true|false
 ] [
 .B \-Z
 .I username
@@ -87,7 +97,7 @@
 .SH DESCRIPTION
 .B nfstrace
 performs live Ethernet 1 Gbps – 10 Gbps packets capturing and helps to
-determine NFS procedures in raw network traffic. Furthermore, it performs
+determine NFS and CIFS procedures in raw network traffic. Furthermore, it performs
 filtration, dumping, compression, statistical analysis, visualization and
 provides the API for custom pluggable analysis modules.
 .PP
@@ -105,7 +115,7 @@ Currently
 .B nfstrace
 supports the following protocols:
 .PP
-    Ethernet > IPv4 | IPv6 > UDP | TCP > NFSv3 | NFSv4
+    Ethernet > IPv4 | IPv6 > UDP | TCP > NFSv3 | NFSv4 | NFSv4.1 | CIFSv1 | CIFSv2
 .PP
 .B nfstrace
 can operate in four different modes:
@@ -179,17 +189,17 @@ for specifying custom filters in BPF syntax (see
 The default BPF filter in
 .B nfstrace
 is
-.BR "'port 2049'" ,
+.BR "'port 2049 or port 445'" ,
 which means that each packet that is delivered to user-space from the kernel
 satisfies the following conditions: it has IPv4 or IPv6 header and it has TCP
 and UDP header with source or destination port number equals to 2049 (default
-NFS port).
+NFS port) or 445 (default CIFS port).
 .PP
 The reality is that this filter is very heavy and support of IPv6 is
 experimental, so if you want to reach faster filtration of IPv4-only traffic we
 suggest to use the following BPF filter:
 .RS 4
-.B 'ip and port 2049'.
+.B 'ip and port 2049 or port 445'.
 .RE
 .\" --------------------- OPTIONS --------------------------------
 .SH OPTIONS
@@ -209,7 +219,7 @@ Listen interface, it is required for live and dump modes
 .BI "\-f, \-\-filtration=" filter
 Specify the packet filter in BPF syntax; for the expression syntax, see
 .BR pcap-filter (7)
-.RB (default:\  "'port 2049'" ).
+.RB (default:\  "'port 2049 or port 445'" ).
 .TP
 .BI "\-s, \-\-snaplen=" 1..65535
 Set the max length of captured raw packet (bigger packets will be truncated).
@@ -263,7 +273,7 @@ Set the size of the dumping file portion,
 means no limit
 .RB (default:\  0 ).
 .TP
-.BI "\-E, \-\-enum=" interfaces|plugins|-
+.BI "\-E, \-\-enum=" interfaces|plugins
 Enumerate all available network interfaces and and/or all available plugins,
 then exit; please note that interfaces can't be listed unless nfstrace was built
 against the recent version of libpcap that supports the
@@ -299,21 +309,14 @@ option, then exit.
 .\" --------------------- ANALYSIS MODULES -----------------------
 .SH ANALYSIS MODULES
 .SS Operation Breakdown Analyzer
-Operation Breakdown (OB) analyzer calculates average frequency of NFS
-procedures and computes standard deviation of latency using one of two
-algorithms (two-pass or one-pass).
+Operation Breakdown (OB) analyzer calculates average frequency of NFS and CIFS
+procedures and computes standard deviation of latency.
 .PP
-Two-pass algorithm returns correct standard deviation but requires a lot of
-memory during computations. One-pass algorithm is memory-efficient but it
-accumulates computation error in case of a large number of small latencies. It
-is possible to choose one of these algorithms by passing according parameter
-while attaching OB analyzer to
-.BR nfstrace .
 .RS 4
 .PP
 .B $ nfstrace -a libbreakdown.so -h
 .br
-.B nfstrace 0.3.0 (Release)
+.B nfstrace 0.4.0 (Release)
 .br
 .B built on Linux-3.16.1-1-generic
 .br
@@ -321,23 +324,14 @@ while attaching OB analyzer to
 .br
 .B Usage: ./nfstrace [OPTIONS]...
 .br
-.B ...
-.br
-.B Usage of libbreakdown.so:
-.br
-.B ACC - for accurate evaluation(default), MEM - for memory efficient
-.B evaluation. Options cannot be combined
-.RE
 .PP
-So, say, in order to choose two-pass algorithm you have to pass
-.B ACC
-to OB analyzer:
+Usage example:
 .RS 4
 .PP
-.B $ nfstrace \-m stat \-a libreakdown.so#ACC
+.B $ nfstrace \-m stat \-a libreakdown.so
 .RE
 .PP
-OB analyzer produces
+Breakdown analyzer produces
 .B .dat
 file in the current directory for each detected NFS session that can be
 visualized using
@@ -354,20 +348,14 @@ or
 .SS Watch
 Watch plugin mimics old
 .B nfswatch
-utility: it monitors NFS traffic and displays it in terminal using ncurses. It
-supports NFSv3 and NFSv4.
+utility: it monitors NFS and CIFS traffic and displays it in terminal using ncurses. It
+supports NFSv3, NFSv4, NFSv41, CIFSv1 and CIFSv2.
 .PP
-.B Important:
-at the moment watch plugin's output conflicts with standard nfstrace's output.
-You have to run nfstrace with
-.B "-v 0"
-option so it will be silent and won't break ncurses output.
-.PP
-By default watch plugin will update its screen every 2 seconds, you can specify
+By default watch plugin will update its screen every second, you can specify
 another timeout in milliseconds:
 .RS 4
 .PP
-.B $ nfstrace -v 0 -a libwatch.so#1000
+.B $ nfstrace -a libwatch.so#2000
 .RE
 .SS JSON Analyzer
 JSON analyzer calculates a total amount of each supported application protocol
@@ -464,7 +452,7 @@ or
 options). Note that you can pass more than one module here.
 .RS 4
 .PP
-.B nfstrace \-\-help \-\-analysis=libbreakdown.so
+.B nfstrace \-\-help \-\-analysis=libjson.so
 .RE
 .SS Online tracing
 The following command will run
@@ -473,7 +461,7 @@ in online analysis mode (specified with
 .B \-\-mode
 or
 .B \-m
-options) without a pluggable analysis module. It will capture NFS traffic
+options) without a pluggable analysis module. It will capture NFS and CIFS traffic
 transferred over TCP or UDP with source or destination port number equals to
 2049 and will simply print them out to
 .B stdout
@@ -494,7 +482,7 @@ Note that capturing from network interface requires superuser privileges.
 .SS Online analysis
 The following command demonstrates running
 .B nfstrace
-in online analysis mode.  Just like in the previous example it will capture NFS
+in online analysis mode.  Just like in the previous example it will capture NFS and CIFS
 traffic transferred over TCP or UDP with source or destination port number
 equals to 2049 and then it will perform Operation Breakdown analysis using
 pluggable analysis module
