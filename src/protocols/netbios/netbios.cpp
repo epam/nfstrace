@@ -32,5 +32,6 @@ int8_t MessageHeader::start() const
 
 size_t MessageHeader::len() const
 {
-    return ntohs(length);
+    // reserved field "_" is used as part of "length" field when length more than 65535 bytes
+    return ntohs(length) | (_ << 16);
 }
