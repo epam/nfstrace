@@ -587,10 +587,10 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
         print_time(out, res->ChangeTime);
 
         out << "\n  Allocation Size = ";
-        print_time(out, res->AllocationSize);
+        out << res->AllocationSize;
 
         out << "\n  End Of File = ";
-        print_time(out, res->EndofFile) << "\n"; 
+        out << res->EndofFile << "\n";
 
         print_enum(out, "File Attributes", res->attributes); 
     }
