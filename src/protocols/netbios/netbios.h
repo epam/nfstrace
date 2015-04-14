@@ -36,9 +36,9 @@ namespace NetBIOS
  */
 struct RawMessageHeader
 {
-    int8_t _start;//!< In SMB direct always 0x00
-    int8_t _;
-    int16_t length;//!< Packet length
+    uint8_t _start;//!< In SMB direct always 0x00
+    uint8_t _;
+    uint16_t length;//!< Packet length
 } __attribute__ ((__packed__));
 
 /*! \class NetBIOS message header wrapper
