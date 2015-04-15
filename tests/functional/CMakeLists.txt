@@ -1,5 +1,4 @@
 set (ANALYZER "breakdown")
-add_subdirectory (json-analyzer)
 
 set (CHECK_TRACE_SCRIPT_BASE "check-compressed-trace")
 set (CHECK_TRACE_SCRIPT "${CHECK_TRACE_SCRIPT_BASE}-${ANALYZER}.sh")
