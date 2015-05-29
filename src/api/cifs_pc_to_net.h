@@ -24,7 +24,7 @@
 //------------------------------------------------------------------------------
 #include <cstdint>
 //------------------------------------------------------------------------------
-#ifdef __linux__
+#if defined(__linux__) || defined(__GNU__)
 #include <endian.h>
 #define NFSTRACE_BYTE_ORDER __BYTE_ORDER
 #define NFSTRACE_BIG_ENDIAN __BIG_ENDIAN
