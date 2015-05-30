@@ -53,8 +53,8 @@ enum class Flags : uint32_t
     RELATED_OPERATIONS   = API::SMBv2::pc_to_net<uint32_t>(0x00000004), //!< When set in an SMB2 request, indicates that this request is a related operation in a compounded request chain. The use of this flag in an SMB2 request is as specified in 3.2.4.1.4.
     //!< When set in an SMB2 compound response, indicates that the request corresponding to this response was part of a related operation in a compounded request chain. The use of this flag in an SMB2 response is as specified in 3.3.5.2.7.2.
     SIGNED               = API::SMBv2::pc_to_net<uint32_t>(0x00000008), //!< When set, indicates that this packet has been signed. The use of this flag is as specified in 3.1.5.1.
-    DFS_OPERATIONS       = API::SMBv2::pc_to_net<uint32_t>(0x01000000), //!< When set, indicates that this command is a DFS operation. The use of this flag is as specified in 3.3.5.9.
-    REPLAY_OPERATION     = API::SMBv2::pc_to_net<uint32_t>(0x02000000)  //!< This flag is only valid for the SMB 3.x dialect family. When set, it indicates that this command is a replay operation. The client MUST ignore this bit on receipt.
+    DFS_OPERATIONS       = API::SMBv2::pc_to_net<uint32_t>(0x10000000), //!< When set, indicates that this command is a DFS operation. The use of this flag is as specified in 3.3.5.9.
+    REPLAY_OPERATION     = API::SMBv2::pc_to_net<uint32_t>(0x20000000)  //!< This flag is only valid for the SMB 3.x dialect family. When set, it indicates that this command is a replay operation. The client MUST ignore this bit on receipt.
 };
 
 /*! \class Raw CIFS v2 message header
