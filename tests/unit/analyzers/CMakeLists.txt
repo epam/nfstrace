@@ -1,4 +1,3 @@
-add_subdirectory (json)
 add_subdirectory (breakdown)
 
 project (unit_test_parse)
