@@ -46,10 +46,8 @@ namespace SMBv2
 
 # if NFSTRACE_BYTE_ORDER == NFSTRACE_BIG_ENDIAN
 
-/*!
- * Converter. Not very fast,
- * try to not use
- */
+// TODO: rename this function template to LEconstant2host
+
 template<class T>
 constexpr T pc_to_net(T t)
 {
@@ -57,39 +55,20 @@ constexpr T pc_to_net(T t)
     return t;
 }
 
-/*!
- * gets only 1 byte
- * Internal function
- * \param number - number of byte
- * \param t - source number
- * \return 1 byte in right place of whole number
- */
-template<int number, class T>
-constexpr T switch_1_byte(T t)
-{
-    return ((t & (static_cast<T>(0xff) << number*8)) << ((sizeof(T) - 1 - number)*8));
-}
-
-/*!
- * Compile-time converter BE to LE for 32 bit numbers
- * \param t - source number
- * \return converted number
- */
 template<>
 constexpr uint32_t pc_to_net(uint32_t t)
 {
-    return switch_1_byte<0>(t) | switch_1_byte<1>(t) | switch_1_byte<2>(t) | switch_1_byte<3>(t);
+    return ((t & 0xFF000000) >> 24)
+         | ((t & 0x00FF0000) >> 8)
+         | ((t & 0x0000FF00) << 8)
+         | ((t & 0x000000FF) << 24);
 }
 
-/*!
- * Compile-time converter BE to LE for 16 bit numbers
- * \param t - source number
- * \return converted number
- */
 template<>
 constexpr uint16_t pc_to_net(uint16_t t)
 {
-    return switch_1_byte<0>(t) | switch_1_byte<1>(t);
+    return ((t & 0xFF00) >> 8)
+         | ((t & 0x00FF) << 8);
 }
 
 # else
