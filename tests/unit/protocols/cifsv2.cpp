@@ -30,6 +30,36 @@
 using namespace NST::API::SMBv2;
 using namespace NST::protocols::CIFSv2;
 //------------------------------------------------------------------------------
+TEST(CIFSv2, check_CIFS_constants_helpers)
+{
+    // pc_to_net<> should transform constant to LE byte order.
+    // This test checks conversion of constants to host representation of ui32
+    // ui16 words written in LE byte order format.
+    // UseCase: CIFSv1/CIFSv2 uses LE byteorder for encoding fields of messages
+    // in network traffic. These messages may be read on BE platform and should
+    // be compared with constants with corresponded BE byte order.
+    union TestData
+    {
+        std::uint32_t ui32;
+        std::uint16_t ui16;
+        std::uint8_t  bytes[4];
+    } data;
+
+    constexpr auto cui32 = pc_to_net<std::uint32_t>(0xAABBCCDD);
+
+    data.ui32 = cui32;
+    EXPECT_EQ(data.bytes[0], 0xDD);
+    EXPECT_EQ(data.bytes[1], 0xCC);
+    EXPECT_EQ(data.bytes[2], 0xBB);
+    EXPECT_EQ(data.bytes[3], 0xAA);
+
+    constexpr auto cui16 = pc_to_net<std::uint16_t>(0xEEFF);
+
+    data.ui16 = cui16;
+    EXPECT_EQ(data.bytes[0], 0xFF);
+    EXPECT_EQ(data.bytes[1], 0xEE);
+}
+
 
 TEST(CIFSv2, bodies)
 {
