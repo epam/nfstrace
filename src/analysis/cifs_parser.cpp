@@ -19,8 +19,6 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <iostream>
-
 #include "analysis/cifs_parser.h"
 #include "api/cifs_types.h"
 #include "utils/log.h"
@@ -28,8 +26,8 @@
 using namespace NST::protocols;
 using namespace NST::analysis;
 
-CIFSParser::CIFSParser(Analyzers& a) :
-    analyzers(a)
+CIFSParser::CIFSParser(Analyzers& a)
+: analyzers(a)
 {
 }
 
@@ -95,9 +93,7 @@ void CIFSParser::parse_packet(const CIFSv2::MessageHeader* header, utils::Filter
         // It is response
         if (Session* session = sessions.get_session(ptr->session, ptr->direction, MsgType::REPLY))
         {
-            //Loosing precision: conversion from int64_t to uint32_t
-            const uint32_t messageId = static_cast<uint32_t>(header->messageId);
-            FilteredDataQueue::Ptr&& requestData = session->get_call_data(messageId);
+            FilteredDataQueue::Ptr&& requestData = session->get_call_data(header->messageId);
             if (requestData)
             {
                 if (const MessageHeader* request = get_header(requestData->data))
@@ -119,9 +115,7 @@ void CIFSParser::parse_packet(const CIFSv2::MessageHeader* header, utils::Filter
             {
                 return analyse_operation(session, header, nullptr, std::move(ptr), std::move(nullptr));
             }
-            //Loosing precision: conversion from int64_t to uint32_t
-            const uint32_t messageId = static_cast<uint32_t>(header->messageId);
-            return session->save_call_data(messageId, std::move(ptr));
+            return session->save_call_data(header->messageId, std::move(ptr));
         }
         LOG("Can't get right CIFS session");
     }
