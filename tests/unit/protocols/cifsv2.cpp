@@ -40,10 +40,23 @@ TEST(CIFSv2, check_CIFS_constants_helpers)
     // be compared with constants with corresponded BE byte order.
     union TestData
     {
+        std::uint64_t ui64;
         std::uint32_t ui32;
         std::uint16_t ui16;
-        std::uint8_t  bytes[4];
+        std::uint8_t  bytes[8];
     } data;
+
+    constexpr auto cui64 = pc_to_net<std::uint64_t>(0x0011223344556677);
+
+    data.ui64 = cui64;
+    EXPECT_EQ(data.bytes[0], 0x77);
+    EXPECT_EQ(data.bytes[1], 0x66);
+    EXPECT_EQ(data.bytes[2], 0x55);
+    EXPECT_EQ(data.bytes[3], 0x44);
+    EXPECT_EQ(data.bytes[4], 0x33);
+    EXPECT_EQ(data.bytes[5], 0x22);
+    EXPECT_EQ(data.bytes[6], 0x11);
+    EXPECT_EQ(data.bytes[7], 0x00);
 
     constexpr auto cui32 = pc_to_net<std::uint32_t>(0xAABBCCDD);
 
