@@ -22,6 +22,7 @@
 #ifndef RPC_SESSIONS_H
 #define RPC_SESSIONS_H
 //------------------------------------------------------------------------------
+#include <cinttypes>
 #include <memory>
 #include <string>
 #include <vector>
@@ -54,17 +55,17 @@ public:
     Session(const Session&)            = delete;
     Session& operator=(const Session&) = delete;
     
-    void save_call_data(const uint32_t xid, FilteredDataQueue::Ptr&& data)
+    void save_call_data(const std::uint64_t xid, FilteredDataQueue::Ptr&& data)
     {
         FilteredDataQueue::Ptr& e = operations[xid];
         if(e)                   // xid call already exists
         {
-            LOG("replace RPC Call XID:%u for %s", xid, str().c_str());
+            LOG("replace RPC Call XID:%" PRIu64 " for %s", xid, str().c_str());
         }
 
         e = std::move(data);    // replace existing or set new
     }
-    inline FilteredDataQueue::Ptr get_call_data(const uint32_t xid)
+    inline FilteredDataQueue::Ptr get_call_data(const std::uint64_t xid)
     {
         auto i = operations.find(xid);
         if(i != operations.end())
@@ -75,7 +76,7 @@ public:
         }
         else
         {
-            LOG("RPC Call XID:%u is not found for %s", xid, str().c_str());
+            LOG("RPC Call XID:%" PRIu64 " is not found for %s", xid, str().c_str());
         }
 
         return FilteredDataQueue::Ptr{};
@@ -86,7 +87,7 @@ private:
 
     // TODO: add custom allocator based on BlockAllocator
     // to decrease cost of expensive insert/erase operations
-    std::unordered_map<uint32_t, FilteredDataQueue::Ptr> operations;
+    std::unordered_map<std::uint64_t, FilteredDataQueue::Ptr> operations;
 };
 
 template <typename Session>
