@@ -1,3 +1,6 @@
+[![License](https://img.shields.io/github/license/epam/nfstrace.svg)](http://opensource.org/licenses/GPL-2.0)
+[![Language](https://img.shields.io/badge/language-C++11-blue.svg)](https://isocpp.org)
+[![Release](https://img.shields.io/github/release/epam/nfstrace.svg)](https://github.com/epam/nfstrace/releases/latest)
 NFSTRACE ![NFSTRACE Logo](docs/logo64.png "Logo")
 ========
 
