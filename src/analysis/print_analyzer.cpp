@@ -266,28 +266,19 @@ std::ostream& print_session(std::ostream& out, CommandType* cmd)
 }
 
 template<typename CommandType>
-std::ostream& print_smbv2_common_info(std::ostream& out, SMBv2Commands cmdEnum, CommandType* cmd, const std::string& cmdComment)
+std::ostream& print_smbv2_common_info_req(std::ostream& out, SMBv2Commands, CommandType* cmd)
 {
-    out << print_cifs2_procedures(cmdEnum)
-        << " "
-        << cmdComment << " (";
-    print_hex16(out, to_integral(cmdEnum));
-    out << ")\n"
-        << "  Structure size = ";
-    print_hex16(out, cmd->structureSize);
+    out << "  Structure size = ";
+    print_hex16(out, cmd->parg->structureSize);
     return out;
 }
 
 template<typename CommandType>
-std::ostream& print_smbv2_common_info_req(std::ostream& out, SMBv2Commands cmdEnum, CommandType* cmd)
+std::ostream& print_smbv2_common_info_resp(std::ostream& out, SMBv2Commands, CommandType* cmd)
 {
-    return print_smbv2_common_info(out, cmdEnum, cmd->parg, "request");
-}
-
-template<typename CommandType>
-std::ostream& print_smbv2_common_info_resp(std::ostream& out, SMBv2Commands cmdEnum, CommandType* cmd)
-{
-    return print_smbv2_common_info(out, cmdEnum, cmd->pres, "response");
+    out << "  Structure size = ";
+    print_hex16(out, cmd->pres->structureSize);
+    return out;
 } 
 
 std::ostream& print_smbv2_header(std::ostream& out, const RawMessageHeader* header)
@@ -511,10 +502,12 @@ void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd,
     print_session(out, cmd) << "\n";
     print_smbv2_header(out, cmd->req_header) << "\n";
     print_smbv2_common_info_req(out, cmdEnum, cmd) << "\n";
-    if(cmd->parg->PathLength > 0)
+
+    const auto plen = NST::API::SMBv2::pc_to_net(cmd->parg->PathLength);
+    if(plen > 0)
     {
         out << "  Tree =";
-        print_buffer(out,cmd->parg->Buffer, cmd->parg->PathLength) << "\n";
+        print_buffer(out,cmd->parg->Buffer, plen) << "\n";
     }
     print_smbv2_header(out, cmd->res_header) << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd) << "\n";
@@ -556,11 +549,12 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
     print_enum(out, "Disposition", cmd->parg->createDisposition) << "\n"; 
     print_enum(out, "Create Options", cmd->parg->createOptions) << "\n"; 
 
-    if(cmd->parg->NameLength > 0)
+    const auto len = NST::API::SMBv2::pc_to_net(cmd->parg->NameLength);
+    if(len > 0)
     {
         out << "  File name = ";
-        print_buffer(out, cmd->parg->Buffer, cmd->parg->NameLength) << "\n"; 
-        out << "  File length = " << cmd->parg->NameLength << "\n";
+        print_buffer(out, cmd->parg->Buffer, len) << "\n";
+        out << "  File length = " << len << "\n";
     }
 
     print_smbv2_header(out, cmd->res_header) << "\n";
@@ -736,7 +730,8 @@ void PrintAnalyzer::queryDirSMBv2(const SMBv2::QueryDirCommand* cmd,
     out << "  File index = " << cmd->parg->FileIndex << "\n"
         << "  Output buffer length = " << cmd->parg->OutputBufferLength << "\n"
         << "  Search pattern =";
-    print_buffer(out, cmd->parg->Buffer, cmd->parg->FileNameLength) << "\n";
+    const auto len = NST::API::SMBv2::pc_to_net(cmd->parg->FileNameLength);
+    print_buffer(out, cmd->parg->Buffer, len) << "\n";
     print_smbv2_header(out, cmd->res_header) << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd);
 }
