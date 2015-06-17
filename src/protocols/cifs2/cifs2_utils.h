@@ -22,12 +22,12 @@
 #ifndef CIFS2_UTILS_H
 #define CIFS2_UTILS_H
 //------------------------------------------------------------------------------
-#include <iosfwd>
-#include <sstream>
+#include <ostream>
 
 #include "api/cifs2_commands.h"
+#include "api/cifs_pc_to_net.h"
+#include "protocols/cifs2/cifs2.h"
 #include "protocols/nfs/nfs_utils.h"
-#include "cifs2.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -75,13 +75,14 @@ std::ostream& operator<<(std::ostream& out, const SMBv2::SecurityMode value);
 std::ostream& operator<<(std::ostream& out, Flags value);
 
 template <typename T>
-std::ostream& print_enum(std::ostream& out, const std::string name, T value )
+std::ostream& print_enum(std::ostream& out, const std::string name, T value)
 {
     using namespace NST::protocols::NFS;
     out << "  " << name << " = ";
-    auto int_value = to_integral(value);
+    // Duty hack for fix issues in PrintAnalyzer on BE platforms
+    auto int_value = NST::API::SMBv2::pc_to_net(to_integral(value));
     print_hex(out, int_value);
-    out << " " << value;
+    out << " " << (T)int_value;
     return out;
 } 
 

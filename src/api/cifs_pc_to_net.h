@@ -51,7 +51,7 @@ namespace SMBv2
 template<class T>
 constexpr T pc_to_net(T t)
 {
-    static_assert(t == 0, "try to not use pc_to_net w/o specialization");
+    static_assert(t == T{}, "try to not use pc_to_net w/o specialization");
     return t;
 }
 
@@ -82,6 +82,36 @@ constexpr uint16_t pc_to_net(uint16_t t)
 {
     return ((t & 0xFF00) >> 8)
          | ((t & 0x00FF) << 8);
+}
+
+template<>
+constexpr std::uint8_t pc_to_net(std::uint8_t v)
+{
+    return v;
+}
+
+template<>
+constexpr std::int64_t pc_to_net(std::int64_t v)
+{
+    return pc_to_net((std::uint64_t)v);
+}
+
+template<>
+constexpr std::int32_t pc_to_net(std::int32_t v)
+{
+    return pc_to_net((std::uint32_t)v);
+}
+
+template<>
+constexpr std::int16_t pc_to_net(std::int16_t v)
+{
+    return pc_to_net((std::uint16_t)v);
+}
+
+template<>
+constexpr std::int8_t pc_to_net(std::int8_t v)
+{
+    return pc_to_net((std::uint8_t)v);
 }
 
 # else
