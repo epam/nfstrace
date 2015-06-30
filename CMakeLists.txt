@@ -114,5 +114,5 @@ if (ASTYLE_PATH)
                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif ()
 
-# Runtime analysis reports
+# valgrind reports =============================================================
 include ("cmake/valgrind.cmake")

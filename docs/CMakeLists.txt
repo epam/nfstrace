@@ -9,5 +9,3 @@ if (DOXYGEN_PATH)
 else ()
     message (WARNING "Doxygen is not found - source-code documentation is not available")
 endif ()
-
-add_subdirectory (design)
