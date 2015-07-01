@@ -87,8 +87,8 @@ void Latencies::set_range(const timeval& t)
     }
 }
 
-long double NST::breakdown::to_sec(const timeval& val)
+double NST::breakdown::to_sec(const timeval& val)
 {
-    return static_cast<long double>(val.tv_sec) + val.tv_usec / 1000000.0L;
+    return static_cast<double>(val.tv_sec) + static_cast<double>(val.tv_usec) / 1000000.0;
 }
 //------------------------------------------------------------------------------

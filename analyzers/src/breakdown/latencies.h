@@ -92,7 +92,7 @@ private:
  * \param val - time struct
  * \return converted value
  */
-long double to_sec(const timeval& val);
+double to_sec(const timeval& val);
 
 } // namespace breakdown
 } // namespace NST
