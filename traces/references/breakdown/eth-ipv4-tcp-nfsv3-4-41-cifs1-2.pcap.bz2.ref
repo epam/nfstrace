@@ -124,7 +124,7 @@ READ_ANDX              Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 St
 WRITE_ANDX             Count:  149 ( 67.73%) Min: 0.000 Max: 0.563 Avg: 0.013 StDev: 0.05730764
 NEW_FILE_SIZE          Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 CLOSE_AND_TREE_DISC    Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
-TRANSACTION2           Count:   51 ( 23.18%) Min: 0.000 Max: 0.029 Avg: 0.004 StDev: 0.00614999
+TRANSACTION2           Count:   51 ( 23.18%) Min: 0.001 Max: 0.029 Avg: 0.004 StDev: 0.00614999
 TRANSACTION2_SECONDARY Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 FIND_CLOSE2            Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000
 FIND_NOTIFY_CLOSE      Count:    0 (  0.00%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev: 0.00000000

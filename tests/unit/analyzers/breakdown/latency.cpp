@@ -20,8 +20,8 @@
 */
 //------------------------------------------------------------------------------
 #include <cstdlib>
-#include <iostream>
 #include <ctime>
+#include <sstream>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -96,5 +96,37 @@ TEST_F(LatencyTest, avg)
     latency.add(t2);
 
     EXPECT_NEAR(6.0, latency.get_avg(), 0.0001);
+}
+
+TEST_F(LatencyTest, convert_timeval_to_sec)
+{
+    /* This test checks to_sec() function and rounding its result to smaller
+     * precision via std::ios_base::precision()
+     *
+     * Background:
+     * The sizeof(long double) may be different on some platforms. F.e.:
+     * on Linux x86_64 the sizeof(long double) == 16 and  == 10 on x86 or mips
+     * So, binary representation of the same value are different. Result of
+     * rounding a value to lower precision may be different.
+     *
+     * We use conversion to double (its sizeof is 8) in to_sec() for more
+     * predictable conversions and rounding on various platforms.
+     */
+
+    struct timeval input;
+    input.tv_sec = 0;
+    input.tv_usec = 500;
+
+    const auto sec = to_sec(input);
+
+    EXPECT_NEAR(0.0005, sec, std::numeric_limits<double>::epsilon());
+
+    std::stringstream ss;
+
+    ss.precision(6); ss << std::fixed << sec << ' ';
+    ss.precision(4); ss << std::fixed << sec << ' ';
+    ss.precision(3); ss << std::fixed << sec;
+
+    EXPECT_EQ("0.000500 0.0005 0.001", ss.str());
 }
 //------------------------------------------------------------------------------
