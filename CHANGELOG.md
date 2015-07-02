@@ -1,3 +1,11 @@
+0.4.0
+=====
+- new libwatch plugin that outputs statistics to terminal via ncurses;
+- add support of NFSv4.1 (w/o callbacks);
+- add experimantal support of CIFS v2 and partial CIFS v1;
+- add new interfaces and functions in Plugin API;
+- update manual.
+
 0.3.2
 =====
 - new libjson plugin that outputs gathered statistics as json (via TCP);
