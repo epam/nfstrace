@@ -22,6 +22,7 @@ following protocols:
 
 `nfstrace` has been tested on the following GNU/Linux and FreeBSD systems:
 
+- Debian Sid [packages](https://packages.debian.org/unstable/main/nfstrace) [build-logs](https://buildd.debian.org/status/logs.php?pkg=nfstrace)
 - Fedora 20
 - OpenSUSE 13.2
 - Ubuntu 14.04/14.10
