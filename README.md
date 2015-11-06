@@ -121,6 +121,8 @@ Alexey  Costroma    ([alexey_costroma@epam.com](mailto:alexey_costroma@epam.com)
 
 Dzianis Huznou      ([dzianis_huznou@epam.com](mailto:dzianis_huznou@epam.com))
 
+Artsem  Iliasau     ([artsem_iliasau@epam.com](mailto:artsem_iliasau@epam.com))
+
 Pavel   Karneliuk   ([pavel_karneliuk@epam.com](mailto:pavel_karneliuk@epam.com))
 
 Andrey  Kuznetsov   ([andrey_kuznetsov@epam.com](mailto:andrey_kuznetsov@epam.com))
