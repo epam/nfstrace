@@ -2,6 +2,8 @@
 [![Language](https://img.shields.io/badge/language-C++11-blue.svg)](https://isocpp.org)
 [![Release](https://img.shields.io/github/release/epam/nfstrace.svg)](https://github.com/epam/nfstrace/releases/latest)
 [![Issues](https://img.shields.io/github/issues/epam/nfstrace.svg)](https://github.com/epam/nfstrace/issues?q=is%3Aopen+is%3Aissue)
+[![Build Status](https://img.shields.io/travis/epam/nfstrace/master.svg)](https://travis-ci.org/epam/nfstrace)
+[![Coverage Status](http://img.shields.io/coveralls/epam/nfstrace/master.svg)](https://coveralls.io/r/epam/nfstrace?branch=master)
 NFSTRACE ![NFSTRACE Logo](docs/logo64.png "Logo")
 ========
 
@@ -118,6 +120,8 @@ Yauheni Azaranka    ([yauheni_azaranka@epam.com](mailto:yaheni_azaranka@epam.com
 Alexey  Costroma    ([alexey_costroma@epam.com](mailto:alexey_costroma@epam.com))
 
 Dzianis Huznou      ([dzianis_huznou@epam.com](mailto:dzianis_huznou@epam.com))
+
+Artsem  Iliasau     ([artsem_iliasau@epam.com](mailto:artsem_iliasau@epam.com))
 
 Pavel   Karneliuk   ([pavel_karneliuk@epam.com](mailto:pavel_karneliuk@epam.com))
 
