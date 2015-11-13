@@ -1,3 +1,8 @@
+0.4.1
+=====
+- minor bug fixes for Debian platforms;
+- add travis-ci and coveralls.io integration with github.com repo.
+
 0.4.0
 =====
 - new libwatch plugin that outputs statistics to terminal via ncurses;
