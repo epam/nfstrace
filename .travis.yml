@@ -31,6 +31,7 @@ install:
   - tar xf lcov_1.11.orig.tar.gz
   - sudo make -C lcov-1.11/ install
   - gem install coveralls-lcov
+  - sudo apt-get install texlive-latex-base # install PDFLaTeX
 before_script:
   - cmake --version
   - gcov --version 
@@ -47,6 +48,7 @@ script:
   - cmake -DCMAKE_BUILD_TYPE=DEBUG -DGMOCK_SOURCE_DIR=/tmp/gmock-1.7.0 -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -D"CMAKE_C_FLAGS=$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true" ../
   - sudo make install
   - make test
+  - make documentation-pdflatex
   #- cpack -G DEB
 
 after_success:
