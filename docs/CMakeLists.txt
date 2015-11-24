@@ -10,13 +10,11 @@ endif ()
 
 find_package (LATEX COMPONENTS PDFLATEX)
 file (GLOB_RECURSE TEXS "*.tex")
-set(LATEX_USE_GLOSSARY true)
 if (TEXS AND LATEX_PDFLATEX_FOUND)
     foreach (tex ${TEXS})
         get_filename_component (name ${tex} NAME_WE)
         set (pdf "${name}.pdf")
         list (APPEND PDFS ${pdf})
-        message("PDFLATEX_COMPILER " ${PDFLATEX_COMPILER})
         set(args "${tex} -quiet -interaction=errorstopmode -disable-installer -aux-directory=${CMAKE_CURRENT_BINARY_DIR}")
         add_custom_command (OUTPUT ${pdf}
                             COMMAND ${PDFLATEX_COMPILER} ${args}
