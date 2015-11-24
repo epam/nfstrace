@@ -10,12 +10,17 @@ endif ()
 
 find_package (LATEX COMPONENTS PDFLATEX)
 file (GLOB_RECURSE TEXS "*.tex")
+set(LATEX_USE_GLOSSARY true)
 if (TEXS AND LATEX_PDFLATEX_FOUND)
     foreach (tex ${TEXS})
         get_filename_component (name ${tex} NAME_WE)
         set (pdf "${name}.pdf")
         list (APPEND PDFS ${pdf})
+        message("PDFLATEX_COMPILER " ${PDFLATEX_COMPILER})
         add_custom_command (OUTPUT ${pdf}
+                            COMMAND ${PDFLATEX_COMPILER} ${tex} -quiet -disable-installer -aux-directory=${CMAKE_CURRENT_BINARY_DIR}
+                            COMMAND makeglossaries ${name}
+                            COMMAND ${PDFLATEX_COMPILER} ${tex} -quiet -disable-installer -aux-directory=${CMAKE_CURRENT_BINARY_DIR}
                             COMMAND ${PDFLATEX_COMPILER} ${tex} -quiet -disable-installer -aux-directory=${CMAKE_CURRENT_BINARY_DIR}
                             DEPENDS ${tex}
                             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

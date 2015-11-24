@@ -1,0 +1,9 @@
+$ telnet localhost 8888 Trying 127.0.0.1...
+Connected to localhost.
+Escape character is ’^{}]’.
+{
+"nfs_v3":{ "null":32,
+"getattr":4582, ...
+},
+"nfs_v4":{ ... }, ...
+}Connection closed by foreign host.
