@@ -15,7 +15,7 @@ if (TEXS AND LATEX_PDFLATEX_FOUND)
         get_filename_component (name ${tex} NAME_WE)
         set (pdf "${name}.pdf")
         list (APPEND PDFS ${pdf})
-        set(args "${tex} -quiet -interaction=errorstopmode -disable-installer -aux-directory=${CMAKE_CURRENT_BINARY_DIR}")
+        set(args ${tex} -quiet -interaction=errorstopmode -disable-installer -aux-directory=${CMAKE_CURRENT_BINARY_DIR})
         add_custom_command (OUTPUT ${pdf}
                             COMMAND ${PDFLATEX_COMPILER} ${args}
                             COMMAND makeglossaries ${name}
