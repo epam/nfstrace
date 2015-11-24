@@ -17,11 +17,12 @@ if (TEXS AND LATEX_PDFLATEX_FOUND)
         set (pdf "${name}.pdf")
         list (APPEND PDFS ${pdf})
         message("PDFLATEX_COMPILER " ${PDFLATEX_COMPILER})
+        set(args "${tex} -quiet -interaction=errorstopmode -disable-installer -aux-directory=${CMAKE_CURRENT_BINARY_DIR}")
         add_custom_command (OUTPUT ${pdf}
-                            COMMAND ${PDFLATEX_COMPILER} ${tex} -quiet -disable-installer -aux-directory=${CMAKE_CURRENT_BINARY_DIR}
+                            COMMAND ${PDFLATEX_COMPILER} ${args}
                             COMMAND makeglossaries ${name}
-                            COMMAND ${PDFLATEX_COMPILER} ${tex} -quiet -disable-installer -aux-directory=${CMAKE_CURRENT_BINARY_DIR}
-                            COMMAND ${PDFLATEX_COMPILER} ${tex} -quiet -disable-installer -aux-directory=${CMAKE_CURRENT_BINARY_DIR}
+                            COMMAND ${PDFLATEX_COMPILER} ${args}
+                            COMMAND ${PDFLATEX_COMPILER} ${args}
                             DEPENDS ${tex}
                             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                             COMMENT "Converting ${tex} to ${pdf}" VERBATIM)
