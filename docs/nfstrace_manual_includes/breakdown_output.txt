@@ -1,0 +1,67 @@
+LLog file: nfstrace.log
+Loading module: 'libbreakdown.so' with args: []
+Read packets from:   datalink: EN10MB (Ethernet)   version: 2.4
+Note: It's potentially unsafe to run this program as root without dropping root privileges.
+Note: Use -Z username option for dropping root privileges when you run this program as user with root privileges.
+Processing packets. Press CTRL-C to quit and view results.
+Detect session 127.0.0.1:34744 --> 127.0.1.1:2049 [TCP]
+Detect session 127.0.0.1:929 --> 127.0.1.1:2049 [TCP]
+Detect session 127.0.0.1:774 --> 127.0.1.1:2049 [TCP]
+Detect session 127.0.0.1:854 --> 127.0.1.1:2049 [TCP]
+Detect session 10.0.2.15:55529 --> 10.6.208.121:445 [TCP]
+Detect session 10.0.2.15:55530 --> 10.6.208.121:445 [TCP]
+\#\#\#  Breakdown analyzer  \#\#\#
+CIFS v1 protocol Total operations: 101. Per operation:
+CREATE\_DIRECTORY          0   0.00\%
+DELETE\_DIRECTORY          0   0.00\%
+OPEN                      0   0.00\%
+CREATE                    0   0.00\% ...complete output has been omitted...
+Per connection info: 
+Session: 10.0.2.15:55529 --> 10.6.208.121:445 [TCP] Total operations: 101. Per operation:
+CREATE\_DIRECTORY       Count:    0 (  0.00\%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev:
+0.00000000
+DELETE\_DIRECTORY       Count:    0 (  0.00\%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev:
+0.00000000
+OPEN                   Count:    0 (  0.00\%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev:
+0.00000000
+CREATE                 Count:    0 (  0.00\%) Min: 0.000 Max: 0.000 Avg: 0.000 StDev:
+0.00000000
+CLOSE                  Count:    2 (  1.98\%) Min: 0.001 Max: 0.002 Avg: 0.001 StDev:
+0.00057205 
+...complete output has been omitted...
+\#\#\#  Breakdown analyzer  \#\#\#
+CIFS v2 protocol Total operations: 77. Per operation:
+NEGOTIATE                 1   1.30\%
+SESSION SETUP             2   2.60\%
+
+LOGOFF                    0   0.00\%
+TREE CONNECT              2   2.60\% 
+...complete output has been omitted...
+\#\#\#  Breakdown analyzer  \#\#\#
+NFS v3 protocol Total operations: 7123. Per operation:
+NULL            2   0.03\%
+GETATTR        47   0.66\%
+SETATTR         5   0.07\%
+LOOKUP          4   0.06\% 
+...complete output has been omitted...
+\#\#\#  Breakdown analyzer  \#\#\#
+NFS v4.0 protocol 
+Total procedures: 3264. Per procedure:
+NULL                      2   0.06\%
+COMPOUND               3262  99.94\% 
+Total operations: 9701. Per operation:
+ILLEGAL                   0   0.00\%
+ACCESS                   16   0.16\%
+CLOSE                     5   0.05\% 
+...complete output has been omitted...
+\#\#\#  Breakdown analyzer  \#\#\#
+NFS v4.1 protocol 
+Total procedures: 8127. Per procedure:
+NULL                      0   0.00\%
+COMPOUND               8127 100.00\% 
+Total operations: 32359. Per operation:
+ILLEGAL                   0   0.00\%
+ACCESS                   15   0.05\%
+CLOSE                     5   0.02\%
+COMMIT                   81   0.25\% 
+...complete output has been omitted...
