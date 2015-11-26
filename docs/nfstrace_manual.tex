@@ -1,25 +1,13 @@
-\documentclass{article}
+\documentclass[oneside]{article}
 
 % packages
 
-\usepackage{setspace}
-\usepackage{listings}
 \usepackage{color}
 \usepackage{graphicx}
-\usepackage[dvipsnames]{xcolor}
-\usepackage[hidelinks]{hyperref}
-\usepackage[acronym]{glossaries}
 \usepackage{fancyhdr}
-%\usepackage{courier}
 \usepackage{verbatim}
-\usepackage{fancyvrb}
-\usepackage{parskip}
 \usepackage{tabularx}
-\usepackage{ltablex}
 \usepackage{array}
-\usepackage{paralist}
-\usepackage{titling}
-\usepackage{xcolor}
 \usepackage[
     left=0.80in,
     right=0.80in,
@@ -28,16 +16,9 @@
     paperheight=11in,
     paperwidth=8.5in
 ]{geometry}% 
-\usepackage{rotating}
+\usepackage{alltt}
 
 \geometry{a4paper}
-
-\hypersetup{
-    colorlinks,
-    linkcolor={red!50!black},
-    citecolor={blue!50!black},
-    urlcolor={blue!80!black}
-}
 
 {\hyphenpenalty	10000}
 \setlength{\parindent}{1cm} % Default is 15pt.
@@ -46,113 +27,34 @@
 % redefine itemsize: adds more vertical space between elements
 \let\OLDitemize\itemize
 \renewcommand\itemize{\OLDitemize\addtolength{\itemsep}{10pt}}
-\definecolor{listingframecolor}{cmyk}{0,0,0,0.25}
-\CustomVerbatimEnvironment{CodeListing}{Verbatim}{
-  frame=single,
-  rulecolor=\color{listingframecolor},
-  framesep=6pt}
-%\setlist{nosep}
-\newcommand*{\includeCodeListing}[2][]{\VerbatimInput[
+\definecolor{lightblue}{RGB}{12,183,240}
+\definecolor{orange}{RGB}{255,165,0}
+\newcommand*{\includeCodeInsting}[2][]{\VerbatimInput[
           frame=single,
           rulecolor=\color{listingframecolor},
   framesep=4pt,#1]{#2}}
 
-\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
-{fontsize=\footnotesize,
- %
- %frame=lines,  % top and bottom rule only
- %framesep=2em, % separation between frame and text
- %rulecolor=\color{Gray},
- %commandchars=\|\(\), % escape character and argument delimiters for
-                      % commands within the verbatim
- %commentchar=*        % comment character
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\includetext}[1]{
+\begin{alltt}
+    % \texttt{\fbox{\parbox{\textwidth}{\small{\input{#1}}}}}
+    \small{\input{#1}}
+\end{alltt}
 }
+
+\newcommand{\gls}{}
+
 \newcommand*{\textfile}[1]{\textsf{#1}}
 \newcommand*{\textprog}[1]{\textfile{#1}}
 
 \widowpenalties 1 10000
 \raggedbottom
 
-\newcommand{\code}[1]{\texttt{#1}}
-
 \pagestyle{fancy}
-%\fancyhead{}
-% \lfoot{
-%     \begin{minipage}[t][3px][b]{1cm}
-%         \topskip0pt
-%         \vspace*{\fill}
-%         \includegraphics[width=1cm]{pictures/epam-logo.png} 
-%     \end{minipage}
-% Nfstrace User and Developer Manual}
 \fancyfoot[L]{Nfstrace User and Developer Manual}% \fancyfoot[R]{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}% Default \headrulewidth is 0.4pt
 \renewcommand{\footrulewidth}{0.4pt}% Default \footrulewidth is 0pt
-\rfoot{\today}
-
-\makeglossaries
-
-\lstset{frame=tb,
-  language=Bash,
-  aboveskip=3mm,
-  belowskip=3mm,
-  showstringspaces=false,
-  columns=flexible,
-  basicstyle={\small\ttfamily},
-  numbers=none,
-  numberstyle=\tiny\color{gray},
-  keywordstyle=\color{blue},
-  commentstyle=\color{dkgreen},
-  stringstyle=\color{mauve},
-  breaklines=true,
-  breakatwhitespace=true,
-  tabsize=3
-}
-
-%\pretitle{%
-%  \begin{center}
-%  \LARGE
-%  \includegraphics[width=3cm]{./pictures/epam-logo.png} 
-%  \newline
-%}
-%\posttitle{\end{center}}
-%\titlehead{\includegraphics[width=3cm]{./pictures/epam-logo.png}}
-
-
-% acronyms
-\newacronym{BPF}{BPF}{Berkeley packet filter}
-\newacronym{CIFS}{CIFS}{Common Internet File stem}
-\newacronym{DPI}{DPI}{Deep Packet Inspection}
-\newacronym{LSF}{LSF}{Linux Socket Filtering}
-\newacronym{NFS}{NFS}{Network File System Protocol}
-\newacronym{NIC}{NIC}{Network Interface Card}
-\newacronym{POSIX}{POSIX}{Portable Operating System Interface for Unix}
-
-% glossary entries 
-\newglossaryentry{Gnuplot}
-{
-    name={Gnuplot},
-    description={CLI tool that can generate two- and three-dimensional plots of data}
-}
-\newglossaryentry{Payload}
-{
-    name={Payload},
-    description={User’s data transferred by NFS protocol. It is useless in analysis}
-}
-\newglossaryentry{rsize}
-{
-    name={rsize},
-    description={option of NFS client connection to a NFS server}
-}
-\newglossaryentry{wsize}
-{
-    name={wsize},
-    description={option of NFS client connection to a NFS server}
-}
-\newglossaryentry{Wireshark}
-{
-    name={Wireshark},
-    description={Enterprise quality tool-set for network traffic analysis}
-}
+\rfoot{\today} 
 
 % ==============================================================================
 \begin{document}
@@ -171,11 +73,6 @@
 \vspace{3cm}
 \includegraphics[width=5cm]{pictures/logo.png}
 
-% \begin{tabular}{ l r }
-% \includegraphics[width=2cm]{./pictures/epam-logo.png} &
-%     \hspace{1cm} \includegraphics[width=5cm]{./pictures/logo.png} \\
-% {\large \today}\\[2cm] & \\
-% \end{tabular}
 \par\vspace{1cm}
 \center
 {\huge NFSTRACE USER AND DEVELOPER MANUAL}\\[0.4cm] % Title of your document
@@ -224,13 +121,13 @@ modules.
 
 \section{INTRODUCTION}
 
-nfstrace performs live Ethernet 1 Gbps – 10 Gbps packets capturing and helps to
+\textprog{nfstrace} performs live Ethernet 1 Gbps – 10 Gbps packets capturing and helps to
 determine \gls{NFS} and \gls{CIFS} procedures in raw network traffic.
 Furthermore, it performs filtration, dumping, compression, statistical
 analysis, visualization and provides the API for custom pluggable analysis
 modules. 
 
-nfstrace captures raw packets from an Ethernet interface using libpcap
+\textprog{nfstrace} captures raw packets from an Ethernet interface using libpcap
 interface to Linux (\gls{LSF}) or FreeBSD (\gls{BPF}) implementations. At the
 moment it is assumed that libpcap delivers correct TCP and UDP packets.
 Assembling of IP packets from ethernet frames and IP packets defragmentation
@@ -240,9 +137,10 @@ The application has been tested on the workstations with integrated 1 Gbps
 \gls{NIC}s (Ethernet 1000baseT/Full).
 
 Currently \textprog{nfstrace} supports the following protocols:
-\begin{CodeListing}
+\begin{alltt}
 Ethernet | IPv4 | IPv6 | UDP | TCP |  NFSv3 | NFSv4 | NFSv4.1 | CIFSv1 | CIFSv2
-\end{CodeListing}
+\end{alltt}
+
 
 \subsection{PORTABILITY}
 
@@ -250,13 +148,11 @@ The application has been developed and tested on GNU/Linux (Fedora 20, OpenSUSE
 13.2, Ubuntu 14.04/14.10, CentOS 7, Arch Linux, Alt Linux 7.0.5) and FreeBSD
 (FreeBSD 10.1). It is written in C++11 programming language and uses standard
 \gls{POSIX} interfaces and the following libraries: libpthread, libpcap,
-libstdc++.
-
-\clearpage
+libstdc++.  
 
 \section{USAGE}
 \subsection{OPTIONS}
-\setlength\extrarowheight{3pt}
+%\setlength\extrarowheight{3pt}
 \begin{tabularx}{\linewidth}{ r X }
 \textprog{-m}, & \code{--mode=live|dump|drain|stat} \\
  & Set the running mode (see the description below) (default: live).\\ 
@@ -372,9 +268,9 @@ beginning.
 The following command demonstrates available options of the application and
 plugged analysis modules (attached with \code{--analysis} or \code{-a} options). Note that
 you can pass more than one module here.
-\begin{CodeListing}
+\begin{alltt}
 nfstrace –-help --analysis=libjson.so
-\end{CodeListing}
+\end{alltt}
 
 \subsubsection{ONLINE TRACING}
 
@@ -385,9 +281,9 @@ number equals to 2049 and will simply print them out to stdout (\code{-T} or \co
 options). Capturing is over when \textprog{nfstrace} receives \textprog{SIGINT} (Control-C).  Note
 that capturing from network interface requires superuser privileges.
 
-\begin{CodeListing} 
+\begin{alltt} 
 nfstrace -–mode=live --filtration="ip and port 2049" -T 
-\end{CodeListing}
+\end{alltt}
 
 \subsubsection{ONLINE ANALYSIS}
 
@@ -396,9 +292,9 @@ Just like in the previous example it will capture \gls{NFS} traffic transferred
 over TCP or UDP with source or destination port number equals to 2049 and then
 it will perform Operation Breakdown analysis using pluggable analysis module
 \code{libbreakdown.so}.
-\begin{CodeListing}
+\begin{alltt}
 nfstrace –-mode=live -–filtration=”ip and port 2049” --analysis=libbreakdown.so
-\end{CodeListing}
+\end{alltt}
 
 \subsubsection{ONLINE DUMPING AND OFFLINE ANALYSIS}
 
@@ -408,7 +304,8 @@ dumping and offline analysis modes.  At first \textprog{nfstrace} will capture
 number equals to 2049 and will dump captured packets to \code{dump.pcap} file
 (specified with \code{--ofile} or \code{-O} options).  At the second run
 \textprog{nfstrace} will perform offline Operation Breakdown analysis using
-pluggable analysis module \code{libbreakdown.so}.  \begin{CodeListing}
+pluggable analysis module \code{libbreakdown.so}.  
+\begin{alltt}
 \# Dump captured packets to dump.pcap 
 nfstrace --mode=dump
          --filtration="ip and port 2049"
@@ -417,7 +314,7 @@ nfstrace --mode=dump
 nfstrace --mode=stat
          -I dump.pcap
          --analysis=libbreakdown.so
-\end{CodeListing}
+\end{alltt}
 
 \subsubsection{ONLINE DUMPING, COMPRESSION AND OFFLINE ANALYSIS}
 
@@ -436,10 +333,11 @@ as described in \ref{sec:dumpfileformat}.
 
 At the second run \textprog{nfstrace} will perform offline analysis. Again, the external
 tool (bzcat in this example) is used in order to decompress previously saved
-dump. \textprog{nfstrace} will read \code{stdin} (note the \code{-I -} option) and perform offline
+dump. 
+\textprog{nfstrace} will read \code{stdin} (note the \code{-I -} option) and perform offline
 analysis using Operation Breakdown analyzer.
 
-\begin{CodeListing}
+\begin{alltt}
 \# Dump captured procedures to dump.pcap file.
 \# Compress output using bzip2 when capturing is over. 
 nfstrace --mode=dump
@@ -451,7 +349,7 @@ nfstrace --mode=dump
 bzcat dump.pcap.bz2 | nfstrace --mode=stat
                                -I -
                                --analysis=libbreakdown.so
-\end{CodeListing}
+\end{alltt}
 
 \subsubsection{ONLINE DUMPING WITH FILE LIMIT, COMPRESSION AND OFFLINE ANALYSIS}
 
@@ -468,13 +366,9 @@ using Operation Breakdown analyzer.
 
 Please note that only the first dump file has the pcap header.
 
-\begin{CodeListing}
+\begin{alltt}
 \# Dump captured procedures to the multiple files and compress them. 
-nfstrace --mode=dump \
-         --filtration="ip and port 2049" \
-         -O dump.pcap \
-         -D 1 \
-         -C "bzip2 -f -9"
+nfstrace --mode=dump --filtration="ip and port 2049" -O dump.pcap -D 1 -C "bzip2 -f -9"
 
 \# get list of parts in the right order:
 \#    dump.pcap.bz2
@@ -485,7 +379,7 @@ parts=\$(ls dump.pcap*.bz2 | sort -n -t - -k 2)
 bzcat “\$parts” | nfstrace --mode=stat
 -I -
 --analysis=libbreakdown.so
-\end{CodeListing}
+\end{alltt}
 
 \subsubsection{VISUALIZATION}
 \label{sec:visualization}
@@ -501,15 +395,15 @@ scripts that understand output data format of Operation Breakdown analyzer and
 generate .png files with plots.  Note that \gls{Gnuplot} must be installed.
 
 \begin{minipage}[t]{\linewidth}
-\begin{CodeListing}
-# Extract dump.pcap from dump.pcap.bz2 to stdin.
-# Read stdin and analyze data with libbreakdown.so module. 
+\begin{alltt}
+\# Extract dump.pcap from dump.pcap.bz2 to stdin.
+\# Read stdin and analyze data with libbreakdown.so module. 
 bzcat trace.pcap.bz2 | nfstrace -m stat -I - -a libbreakdown.so
 
-# Generate plot according to *.dat files generated by
-# libbreakdown.so analyzer. 
+\# Generate plot according to *.dat files generated by
+\# libbreakdown.so analyzer. 
 nst.sh -a breakdown.plt -d . -p 'breakdown*.dat' -v
-\end{CodeListing} 
+\end{alltt} 
 \end{minipage}
 
 \section{ANALYZERS}
@@ -521,27 +415,29 @@ All pluggable modules are implemented as external shared libraries.
 Operation Breakdown (OB) analyzer calculates average frequency of NFS/CIFS
 procedures and computes standard deviation of latency.
 
-\begin{CodeListing} 
+\begin{alltt} 
 \$ nfstrace -a libbreakdown.so –h
 nfstrace 0.4.0 (Release) built on Linux-3.16.1-1-generic by C++ compiler GNU 4.9.1 
 Usage: ./nfstrace [OPTIONS]... 
-\end{CodeListing}
+\end{alltt}
 And the result of execution will look something like this:
-\includeCodeListing{nfstrace_manual_includes/breakdown_output.txt}
+%\includetextListing{nfstrace_manual_includes/breakdown_output.txt} 
+\includetext{nfstrace_manual_includes/breakdown_output.txt}
+
 %\begin{CodeListing}
 %\end{CodeListing}
 OB analyzer produces \code{.dat} file in the current directory for each detected
 NFS/CIFS session:
-\begin{CodeListing}
-$ ls -a *.dat breakdown\_10.6.137.79:949 --> 10.6.7.38:2049 [TCP].dat
-\end{CodeListing} 
+\begin{alltt}
+\$ ls -a *.dat breakdown\_10.6.137.79:949 --> 10.6.7.38:2049 [TCP].dat
+\end{alltt} 
 As described in \ref{sec:visualization}, produced \code{.dat}
 files can be visualized using \code{nst.sh} and \code{breakdown\_nfsv3.plt} or
 \code{breakdown\_nfsv4.plt} (according to \gls{NFS} version).
-\begin{CodeListing} 
+\begin{alltt} 
 nst.sh -a breakdown\_nfsv3.plt -d . -f 'breakdown\_10.6.137.79:949 -->
 10.6.7.38:2049 [TCP].dat' 
-\end{CodeListing}
+\end{alltt}
 
 \begin{figure}
 \includegraphics[width=\linewidth]{./pictures/session-visualization.png}
@@ -557,7 +453,7 @@ traffic and displays it in terminal using \code{ncurses}. It supports NFSv3, NFS
 NFSv4.1, CIFSv1 and CIFSv2.
 
 \begin{minipage}[t]{\linewidth}
-\includeCodeListing{nfstrace_manual_includes/libwatch_output.txt} 
+\includetext{nfstrace_manual_includes/libwatch_output.txt} 
 \end{minipage}
 
 \vspace{5mm}
@@ -565,9 +461,9 @@ NFSv4.1, CIFSv1 and CIFSv2.
 By default watch plugin will update its screen every second, you can specify
 another timeout in milliseconds:
 
-\begin{CodeListing}
-$ nfstrace -a libwatch.so#2000
-\end{CodeListing}
+\begin{alltt}
+\$ nfstrace -a libwatch.so\#2000
+\end{alltt}
 
 \subsection{JSON ANALYZER (LIBJSON.SO)}
 JSON analyzer calculates a total amount of each supported application protocol
@@ -593,14 +489,14 @@ Listen backlog (default: 15)\\
 \end{minipage}
 
 In order to try this analyzer out you can start \textprog{nfstrace} in on terminal:
-\begin{CodeListing}
-$ nfstrace -i eth0 -a libjson.so\#host=localhost
-\end{CodeListing}
+\begin{alltt}
+\$ nfstrace -i eth0 -a libjson.so\#host=localhost
+\end{alltt}
 And then you can make a TCP-request to \textprog{nfstrace} in another terminal to fetch
 current statistics:
 
 \begin{minipage}[t]{\linewidth}
-\includeCodeListing{nfstrace_manual_includes/telnet_output.txt} 
+\includetext{nfstrace_manual_includes/telnet_output.txt} 
 \end{minipage}
 
 \section{IMPLEMENTATION DETAILS}
@@ -670,16 +566,16 @@ definitions of types will be included with \code{<nfstrace/api/plugin\_api.h>} h
 A pluggable analysis module must be a dynamically linked shared object and must
 export the following C functions:
 
-\begin{CodeListing}
+\begin{alltt}
 const char* usage (); // return description of expected opts for create(opts)
 IAnalyzer* create (const char* opts); // create and return an instance of an Analyzer 
 void destroy (IAnalyzer* instance); // destroy created instance of an Analyzer 
 const AnalyzerRequirements* requirements(); // return Analyzer's requirements 
-\end{CodeListing}
+\end{alltt}
 After the declaration of all these function there must be the following macro:
-\begin{CodeListing}
-NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy, &requirements)
-\end{CodeListing}
+\begin{alltt}
+NST\_PLUGIN\_ENTRY\_POINTS (\&usage, \&create, \&destroy, \&requirements)
+\end{alltt}
 
 \textprog{usage()} function must return a C-string with module description and
 required parameters for creation of an instance of analyzer, this string will
@@ -707,23 +603,24 @@ In this schema you can see how data flows in different modes:
 \begin{itemize}
     \item on-line analysis –  \colorbox{green}{green line}
     \item on-line dumping –  \colorbox{yellow}{yellow line}
-    \item off-line dumping –  \colorbox{ProcessBlue}{blue line}
+    \item off-line dumping –  \colorbox{lightblue}{blue line}
     \item off-line analysis –  \colorbox{orange}{orange line}
 \end{itemize} 
 \end{minipage}
 
 \newpage
 
-\begin{sidewaysfigure}
+%\begin{sidewaysfigure}
+\begin{figure}
 \includegraphics[width=\linewidth]{./pictures/general-structure.png}
 \caption{General schema}
 \label{General schema}
 \centering
 \label{fig:generalschema}
-\end{sidewaysfigure}
+\end{figure}
 
 \clearpage
 
-\printglossaries 
+% \printglossaries 
 
 \end{document}
