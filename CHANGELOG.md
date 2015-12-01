@@ -1,3 +1,8 @@
+0.4.2
+=====
+ - documentation converted to LaTeX format
+ - repository was cleaned up via BFG Repo-Cleaner tool (https://rtyley.github.io/bfg-repo-cleaner/) to reduce the size.
+
 0.4.1
 =====
 - minor bug fixes for Debian platforms;
