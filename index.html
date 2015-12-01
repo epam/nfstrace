@@ -1,0 +1,209 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>nfstrace by epam</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/epam/nfstrace">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/epam/nfstrace/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/epam/nfstrace/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>nfstrace</h1>
+          <p>Network file system monitor and analyzer</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/epam">epam</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <p><a href="http://opensource.org/licenses/GPL-2.0"><img src="https://img.shields.io/github/license/epam/nfstrace.svg" alt="License"></a>
+<a href="https://isocpp.org"><img src="https://img.shields.io/badge/language-C++11-blue.svg" alt="Language"></a>
+<a href="https://github.com/epam/nfstrace/releases/latest"><img src="https://img.shields.io/github/release/epam/nfstrace.svg" alt="Release"></a>
+<a href="https://github.com/epam/nfstrace/issues?q=is%3Aopen+is%3Aissue"><img src="https://img.shields.io/github/issues/epam/nfstrace.svg" alt="Issues"></a>
+<a href="https://travis-ci.org/epam/nfstrace"><img src="https://img.shields.io/travis/epam/nfstrace/master.svg" alt="Build Status"></a>
+<a href="https://coveralls.io/r/epam/nfstrace?branch=master"><img src="http://img.shields.io/coveralls/epam/nfstrace/master.svg" alt="Coverage Status"></a></p>
+
+<h1>
+<a id="nfstrace" class="anchor" href="#nfstrace" aria-hidden="true"><span class="octicon octicon-link"></span></a>NFSTRACE</h1>
+
+<p><code>nfstrace</code> is an NFS and CIFS tracing/monitoring/capturing/analyzing tool.</p>
+
+<p>It performs live Ethernet 1 Gbps - 10 Gbps packets capturing and helps to
+determine NFS/CIFS procedures in raw network traffic. Furthermore, it performs
+filtration, dumping, compression, statistical analysis, visualization and
+provides the API for custom pluggable analysis modules.</p>
+
+<p><code>nfstrace</code> is written in C++11 programming language and currently supports the
+following protocols:</p>
+
+<ul>
+<li>Ethernet</li>
+<li>IPv4 | IPv6</li>
+<li>UPD | TCP</li>
+<li>NFSv3 | NFSv4 | NFSv4.1 | CIFSv1 | CIFSv2</li>
+</ul>
+
+<p><code>nfstrace</code> has been tested on the following GNU/Linux and FreeBSD systems:</p>
+
+<ul>
+<li>Debian Sid <a href="https://packages.debian.org/unstable/main/nfstrace">packages</a> <a href="https://buildd.debian.org/status/logs.php?pkg=nfstrace">build-logs</a>
+</li>
+<li>Fedora 20</li>
+<li>OpenSUSE 13.2</li>
+<li>Ubuntu 14.04/14.10</li>
+<li>CentOS 7</li>
+<li>Arch Linux</li>
+<li>FreeBSD 10.1</li>
+<li>Alt Linux 7.0.5</li>
+</ul>
+
+<p>You can find more detailed description at <code>docs/nfstrace_manual.pdf</code></p>
+
+<p>Problems, bugs, questions, desirable enhancements, etc. should be sent to
+<a href="mailto:nfstrace@epam.com">nfstrace@epam.com</a></p>
+
+<h2>
+<a id="external-dependencies" class="anchor" href="#external-dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>External Dependencies</h2>
+
+<ul>
+<li>PCAP library (core component)</li>
+<li>json library (used for libjson.so plugin)</li>
+<li>Curses (used for libwatch.so plugin)</li>
+<li>GMock (used for testing)</li>
+</ul>
+
+<h2>
+<a id="building" class="anchor" href="#building" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building</h2>
+
+<p>Since <code>nfstrace</code> is written in C++11 you have to use <code>gcc</code> &gt;= 4.8 or
+<code>clang</code> &gt;= 3.3.  Additionally, you need to install development version of
+<code>libpcap</code> (version 1.3 or newer).</p>
+
+<p>You can build <code>nfstrace</code> using <a href="http://cmake.org">CMake</a> (version 2.8.12 or
+newer). From the top level project's directory run:</p>
+
+<pre><code>$ mkdir release
+$ cd release
+$ cmake -DCMAKE_BUILD_TYPE=release ../
+$ make
+</code></pre>
+
+<p>If you want to use specific compiler you can set the <code>CC</code> and <code>CXX</code> environment
+variables:</p>
+
+<pre><code>$ CC="path/to/clang" CXX="path/to/clang++" cmake -DCMAKE_BUILD_TYPE=release ../
+</code></pre>
+
+<p>If you want to specify different installation prefix:</p>
+
+<pre><code>$ cmake -DCMAKE_INSTALL_PREFIX=/your/path ../
+</code></pre>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>By default <code>nfstrace</code> will be installed to <code>/usr/</code>.
+After you build <code>nfstrace</code> simply run:</p>
+
+<pre><code>$ sudo make install
+</code></pre>
+
+<p>If you're using rpm- or debian based Linux distribution you can try to generate
+package for your system using <code>cpack</code>. Please note that you need rpm or debian
+tools to be installed.</p>
+
+<p>In order to generate rpm package:</p>
+
+<pre><code>$ cpack -G RPM
+</code></pre>
+
+<p>In order to generate deb package:</p>
+
+<pre><code>$ cpack -G DEB
+</code></pre>
+
+<p>After that you'll be able to install generated package using your package
+manager.</p>
+
+<h2>
+<a id="testing" class="anchor" href="#testing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Testing</h2>
+
+<p>There are prepared dumps in <code>traces/</code> directory so you can perform quick sanity
+check with the following command:</p>
+
+<pre><code>$ make test
+</code></pre>
+
+<p>Please note that <code>ctest</code> is required in order to run tests, on some platforms
+it is packaged separately from <code>cmake</code>.</p>
+
+<p>Scripts will run <code>nfstrace</code> in different modes and compare its output with
+reference results.</p>
+
+<h2>
+<a id="authors" class="anchor" href="#authors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors</h2>
+
+<p>Vitali  Adamenka    (<a href="mailto:vitali_adamenka@epam.com">vitali_adamenka@epam.com</a>)</p>
+
+<p>Yauheni Azaranka    (<a href="mailto:yaheni_azaranka@epam.com">yauheni_azaranka@epam.com</a>)</p>
+
+<p>Alexey  Costroma    (<a href="mailto:alexey_costroma@epam.com">alexey_costroma@epam.com</a>)</p>
+
+<p>Dzianis Huznou      (<a href="mailto:dzianis_huznou@epam.com">dzianis_huznou@epam.com</a>)</p>
+
+<p>Artsem  Iliasau     (<a href="mailto:artsem_iliasau@epam.com">artsem_iliasau@epam.com</a>)</p>
+
+<p>Pavel   Karneliuk   (<a href="mailto:pavel_karneliuk@epam.com">pavel_karneliuk@epam.com</a>)</p>
+
+<p>Andrey  Kuznetsov   (<a href="mailto:andrey_kuznetsov@epam.com">andrey_kuznetsov@epam.com</a>)</p>
+
+<p>Mikhail Litvinets   (<a href="mailto:mikhail_litvinets@epam.com">mikhail_litvinets@epam.com</a>)</p>
+
+<p>Ilya    Storozhilov (<a href="mailto:ilya_storozhilov@epam.com">ilya_storozhilov@epam.com</a>)</p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Copyright (c) 2015 EPAM Systems</p>
+
+<p>Nfstrace is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 2 of the License.</p>
+
+<p>Nfstrace is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+
+<p>You should have received a copy of the GNU General Public License
+along with Nfstrace.
+If not, <a href="http://www.gnu.org/licenses/">see</a>.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
