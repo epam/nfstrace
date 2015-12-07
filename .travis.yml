@@ -99,9 +99,9 @@ script:
 after_success: 
   - |
     if [ "$COMPILER" == "g++-4.9" ]; then
-      - $LCOV --gcov-tool "/usr/bin/gcov-4.9" --compat-libtool --directory . --capture --output-file coverage.info # capture coverage info
-      - $LCOV --gcov-tool "/usr/bin/gcov-4.9" --remove coverage.info 'tests/*' '/usr/*' '*gmock*' --output-file coverage.info # filter out system and test code
-      - coveralls-lcov coverage.info
+      $LCOV --gcov-tool "/usr/bin/gcov-4.9" --compat-libtool --directory . --capture --output-file coverage.info # capture coverage info
+      $LCOV --gcov-tool "/usr/bin/gcov-4.9" --remove coverage.info 'tests/*' '/usr/*' '*gmock*' --output-file coverage.info # filter out system and test code
+      coveralls-lcov coverage.info
     fi
   # - coveralls --gcov "$(which "${GCOV}")" --encoding iso-8859-1 || echo 'coveralls upload failed.'
 
