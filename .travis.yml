@@ -16,7 +16,7 @@ env:
   global:
     - DEPS_DIR="$HOME/install"
     - CMAKE_DIR="$DEPS_DIR/cmake-3.3.2-Linux-x86_64" 
-    - CMAKE="$CMAKE_DIR/bin/cmake" 
+    - CMAKE="$CMAKE_DIR/bin/cmake"
     - JSON_DIR="$DEPS_DIR/json-c-0.11"
     - JSON_LIB="$JSON_DIR/install" 
     - JSON_INCLUDE_DIR="$JSON_DIR"
@@ -35,6 +35,15 @@ matrix:
       env: 
         # You can not set CXX directly as Travis CI will overwrite it. You need an intermediate variable like COMPILER
         - COMPILER=g++-4.9 CXX_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" C_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-4.9"
+      fast_finish: true
+    - os: linux
+      compiler: clang-3.5
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test','llvm-toolchain-precise-3.5']
+          packages: ['texlive-latex-base','clang-3.5','llvm-3.5-dev','libpcap-dev','valgrind']
+      env: 
+        - COMPILER=/usr/bin/clang++-3.5 gcov="/usr/bin/gcov-4.9"
       fast_finish: true
 
 before_install:
@@ -74,6 +83,7 @@ install:
     else 
       echo "Using cached lcov"
     fi
+
 before_script:
   - $CMAKE --version
   - gcov --version 
@@ -87,8 +97,11 @@ script:
   - ccache -s
 
 after_success: 
-  - $LCOV --gcov-tool "/usr/bin/gcov-4.9" --compat-libtool --directory . --capture --output-file coverage.info # capture coverage info
-  - $LCOV --gcov-tool "/usr/bin/gcov-4.9" --remove coverage.info 'tests/*' '/usr/*' '*gmock*' --output-file coverage.info # filter out system and test code
-  - coveralls-lcov coverage.info
+  - |
+    if [ "$COMPILER" == "g++-4.9" ]; then
+      $LCOV --gcov-tool "/usr/bin/gcov-4.9" --compat-libtool --directory . --capture --output-file coverage.info # capture coverage info
+      $LCOV --gcov-tool "/usr/bin/gcov-4.9" --remove coverage.info 'tests/*' '/usr/*' '*gmock*' --output-file coverage.info # filter out system and test code
+      coveralls-lcov coverage.info
+    fi
   # - coveralls --gcov "$(which "${GCOV}")" --encoding iso-8859-1 || echo 'coveralls upload failed.'
 
