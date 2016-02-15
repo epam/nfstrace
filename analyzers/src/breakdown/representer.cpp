@@ -36,32 +36,31 @@ NST::breakdown::Representer::Representer(std::ostream& o, NST::breakdown::Comman
 
 void Representer::flush_statistics(const Statistics& statistics)
 {
-    out << "###  Breakdown analyzer  ###"
-        << std::endl
-        << cmd_representer->protocol_name()
-        << " protocol"
-        << std::endl;
+    out << "###  Breakdown analyzer  ###" << std::endl
+        << cmd_representer->protocol_name() << " protocol";
 
-    statistics.for_each_procedure([&](const BreakdownCounter& breakdown, size_t procedure)
+    if(statistics.has_session())
     {
-        onProcedureInfoPrinted(out, breakdown, procedure);
-        size_t procedure_count = breakdown[procedure].get_count();
-        out.width(space_for_cmd_name);
-        out << std::left
-            << cmd_representer->command_name(procedure);
-        out.width(5);
-        out << std::right
-            << procedure_count;
-        out.width(7);
-        out.setf(std::ios::fixed, std::ios::floatfield);
-        out.precision(2);
-        out << (breakdown.get_total_count() ? ((1.0 * procedure_count / breakdown.get_total_count()) * 100.0) : 0);
-        out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
-        out << '%' << std::endl;
-    });
+        out << std::endl;
 
-    if (statistics.has_session()) // is not empty?
-    {
+        statistics.for_each_procedure([&](const BreakdownCounter& breakdown, size_t procedure)
+        {
+            onProcedureInfoPrinted(out, breakdown, procedure);
+            size_t procedure_count = breakdown[procedure].get_count();
+            out.width(space_for_cmd_name);
+            out << std::left
+                << cmd_representer->command_name(procedure);
+            out.width(5);
+            out << std::right
+                << procedure_count;
+            out.width(7);
+            out.setf(std::ios::fixed, std::ios::floatfield);
+            out.precision(2);
+            out << (breakdown.get_total_count() ? ((1.0 * procedure_count / breakdown.get_total_count()) * 100.0) : 0);
+            out.setf(std::ios::fixed | std::ios::scientific , std::ios::floatfield);
+            out << '%' << std::endl;
+        });
+
         out << "Per connection info: " << std::endl;
 
         statistics.for_each_session([&](const Session& session)
@@ -72,6 +71,10 @@ void Representer::flush_statistics(const Statistics& statistics)
             std::ofstream file("breakdown_" + ssession.str() + ".dat", std::ios::out | std::ios::trunc);
             store_per_session(file, statistics, session, ssession.str());
         });
+    }
+    else
+    {
+        out << ": Data transmission has not been detected." << std::endl;
     }
 }
 
