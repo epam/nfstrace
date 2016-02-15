@@ -105,14 +105,7 @@ endif ()
 add_subdirectory (docs)
 
 # code style ===================================================================
-find_program (ASTYLE_PATH astyle)
-
-if (ASTYLE_PATH)
-    add_custom_target (codestyle
-                       COMMAND find analyzers src tests -name '*.h' -o -name '*.cpp' |
-                               xargs ${ASTYLE_PATH} --options=${CMAKE_SOURCE_DIR}/astyle.cfg
-                       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-endif ()
+include ("cmake/codeformat.cmake")
 
 # valgrind reports =============================================================
 include ("cmake/valgrind.cmake")
