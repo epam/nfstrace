@@ -22,8 +22,8 @@
 #ifndef NETBIOS_HEADER_H
 #define NETBIOS_HEADER_H
 //------------------------------------------------------------------------------
-#include <stdlib.h>
 #include <cstdint>
+#include <cstdlib>
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -31,15 +31,14 @@ namespace protocols
 {
 namespace NetBIOS
 {
-
 /*! \class NetBIOS message header in SMB-direct case
  */
 struct RawMessageHeader
 {
-    uint8_t _start;//!< In SMB direct always 0x00
-    uint8_t _;
-    uint16_t length;//!< Packet length
-} __attribute__ ((__packed__));
+    uint8_t  _start; //!< In SMB direct always 0x00
+    uint8_t  _;
+    uint16_t length; //!< Packet length
+} __attribute__((__packed__));
 
 /*! \class NetBIOS message header wrapper
  */
@@ -55,8 +54,8 @@ struct MessageHeader : private RawMessageHeader
  */
 inline const struct MessageHeader* get_header(const uint8_t* data)
 {
-    const MessageHeader* header (reinterpret_cast<const MessageHeader*>(data));
-    if (header->start() == 0x00)
+    const MessageHeader* header(reinterpret_cast<const MessageHeader*>(data));
+    if(header->start() == 0x00)
     {
         return header;
     }
@@ -67,5 +66,5 @@ inline const struct MessageHeader* get_header(const uint8_t* data)
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NETBIOS_HEADER_H
+#endif // NETBIOS_HEADER_H
 //------------------------------------------------------------------------------

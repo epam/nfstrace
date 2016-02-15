@@ -34,7 +34,6 @@ namespace NST
 {
 namespace filtration
 {
-
 using CaptureReader = NST::filtration::pcap::CaptureReader;
 using FileReader    = NST::filtration::pcap::FileReader;
 
@@ -44,35 +43,33 @@ using FilteredDataQueue = NST::utils::FilteredDataQueue;
 
 namespace // unnamed
 {
-
 // FiltrationProcessor in separate processing thread
-template
-<
+template <
     typename Reader,
-    typename Writer
->
+    typename Writer>
 class FiltrationImpl : public ProcessingThread
 {
-    using Processor = FiltrationProcessor<Reader, Writer, Filtrators< Writer >>;
+    using Processor = FiltrationProcessor<Reader, Writer, Filtrators<Writer>>;
+
 public:
     explicit FiltrationImpl(std::unique_ptr<Reader>& reader,
                             std::unique_ptr<Writer>& writer,
-                            RunningStatus& status)
-    : ProcessingThread {status}
-    , processor{}
+                            RunningStatus&           status)
+        : ProcessingThread{status}
+        , processor{}
     {
         processor.reset(new Processor{reader, writer});
     }
-    ~FiltrationImpl() = default;
-    FiltrationImpl(const FiltrationImpl&)            = delete;
+    ~FiltrationImpl()                     = default;
+    FiltrationImpl(const FiltrationImpl&) = delete;
     FiltrationImpl& operator=(const FiltrationImpl&) = delete;
 
     virtual void stop() override final
     {
         processor->stop();
     }
-private:
 
+private:
     virtual void run() override final
     {
         try
@@ -89,32 +86,29 @@ private:
 };
 
 // create Filtration thread emplaced in unique_ptr
-template
-<
+template <
     typename Reader,
-    typename Writer
->
+    typename Writer>
 static auto create_thread(std::unique_ptr<Reader>& reader,
                           std::unique_ptr<Writer>& writer,
-                          RunningStatus& status)
-        -> std::unique_ptr<FiltrationImpl<Reader, Writer>>
+                          RunningStatus&           status)
+    -> std::unique_ptr<FiltrationImpl<Reader, Writer>>
 {
     using Thread = FiltrationImpl<Reader, Writer>;
 
     return std::unique_ptr<Thread>{new Thread{reader, writer, status}};
 }
 
-
 // create CaptureReader from Parameters emplaced in unique_ptr
 static auto create_capture_reader(const Parameters& params)
-        -> std::unique_ptr<CaptureReader>
+    -> std::unique_ptr<CaptureReader>
 {
     auto& capture_params = params.capture_params();
     if(utils::Out message{}) // print parameters to user
     {
         message << capture_params;
     }
-    return std::unique_ptr<CaptureReader>{ new CaptureReader{capture_params} };
+    return std::unique_ptr<CaptureReader>{new CaptureReader{capture_params}};
 }
 
 } // unnamed namespace
@@ -122,23 +116,23 @@ static auto create_capture_reader(const Parameters& params)
 // capture from network interface and dump to file  - OnlineDumping(Dumping)
 void FiltrationManager::add_online_dumping(const Parameters& params)
 {
-    std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
+    std::unique_ptr<CaptureReader> reader{create_capture_reader(params)};
 
     auto& dumping_params = params.dumping_params();
     if(utils::Out message{}) // print parameters to user
     {
         message << dumping_params;
     }
-    std::unique_ptr<Dumping> writer { new Dumping{ reader->get_handle(), dumping_params } };
+    std::unique_ptr<Dumping> writer{new Dumping{reader->get_handle(), dumping_params}};
     threads.emplace_back(create_thread(reader, writer, status));
 }
 
 //capture data from input file or cin to destination file
-void FiltrationManager::add_offline_dumping (const Parameters& params)
+void FiltrationManager::add_offline_dumping(const Parameters& params)
 {
     auto& dumping_params = params.dumping_params();
-    auto& ofile = dumping_params.output_file;
-    auto  ifile = params.input_file();
+    auto& ofile          = dumping_params.output_file;
+    auto  ifile          = params.input_file();
 
     if(ofile.compare("-"))
     {
@@ -152,28 +146,25 @@ void FiltrationManager::add_offline_dumping (const Parameters& params)
                 throw std::runtime_error{"Input and output files are equal. Use the -I and -O options to setup them explicitly."};
             }
         }
-
     }
-    std::unique_ptr<FileReader> reader { new FileReader{ifile} };
+    std::unique_ptr<FileReader> reader{new FileReader{ifile}};
 
     if(utils::Out message{}) // print parameters to user
     {
         message << *reader;
     }
-    std::unique_ptr<Dumping>       writer { new Dumping{ reader->get_handle(),
-                                                         dumping_params
-                                                       }
-                                          };
+    std::unique_ptr<Dumping> writer{new Dumping{reader->get_handle(),
+                                                dumping_params}};
 
     threads.emplace_back(create_thread(reader, writer, status));
 }
 
 // capture from network interface and pass to queue - OnlineAnalysis(Profiling)
-void FiltrationManager::add_online_analysis(const Parameters& params,
+void FiltrationManager::add_online_analysis(const Parameters&  params,
                                             FilteredDataQueue& queue)
 {
-    std::unique_ptr<CaptureReader> reader { create_capture_reader(params) };
-    std::unique_ptr<Queueing>      writer { new Queueing{queue}           };
+    std::unique_ptr<CaptureReader> reader{create_capture_reader(params)};
+    std::unique_ptr<Queueing>      writer{new Queueing{queue}};
 
     threads.emplace_back(create_thread(reader, writer, status));
 }
@@ -182,18 +173,18 @@ void FiltrationManager::add_online_analysis(const Parameters& params,
 void FiltrationManager::add_offline_analysis(const std::string& ifile,
                                              FilteredDataQueue& queue)
 {
-    std::unique_ptr<FileReader> reader { new FileReader{ifile} };
+    std::unique_ptr<FileReader> reader{new FileReader{ifile}};
     if(utils::Out message{}) // print parameters to user
     {
         message << *reader;
     }
-    std::unique_ptr<Queueing>   writer { new Queueing{queue}   };
+    std::unique_ptr<Queueing> writer{new Queueing{queue}};
 
     threads.emplace_back(create_thread(reader, writer, status));
 }
 
 FiltrationManager::FiltrationManager(RunningStatus& s)
-: status(s)
+    : status(s)
 {
     if(utils::Out message{utils::Out::Level::All})
     {

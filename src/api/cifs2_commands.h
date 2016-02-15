@@ -32,6 +32,7 @@ namespace API
  */
 namespace SMBv2
 {
+// clang-format off
 
 /*! CIFS v2 commands
  */
@@ -1252,8 +1253,11 @@ struct SetInfoResponse
 }  __attribute__ ((__packed__));
 
 } // namespace SMBv2
+
+// clang-format on
+
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//API_CIFS2_COMMANDS_H
+#endif // API_CIFS2_COMMANDS_H
 //------------------------------------------------------------------------------

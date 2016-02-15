@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Author: Artsem Iliasau 
+// Author: Artsem Iliasau
 // Description: Helpers for parsing CIFSv2 structures.
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
@@ -34,17 +34,15 @@ namespace protocols
 {
 namespace CIFSv2
 {
-
 using namespace NST::API::SMBv2;
 
 namespace
 {
-
 template <typename T>
 void print_flag_if_set(std::ostream& out, const std::string& name, typename std::underlying_type<T>::type& value, T flag)
 {
     auto int_flag = to_integral(flag);
-    if (value & int_flag)
+    if(value & int_flag)
     {
         out << name;
         value = value & ~int_flag;
@@ -55,6 +53,7 @@ void print_flag_if_set(std::ostream& out, const std::string& name, typename std:
 
 const char* enumToString(OplockLevels value)
 {
+    // clang-format off
     switch (value)
     {
         case OplockLevels::NONE:      return "NONE";
@@ -63,12 +62,14 @@ const char* enumToString(OplockLevels value)
         case OplockLevels::BATCH:     return "BATCH";
         case OplockLevels::LEASE:     return "LEASE";
     }
+    // clang-format on
 
     return nullptr;
 }
 
 const char* enumToString(ImpersonationLevels value)
 {
+    // clang-format off
     switch (value)
     {
         case ImpersonationLevels::ANONYMOUS:        return "ANONYMOUS";
@@ -76,12 +77,14 @@ const char* enumToString(ImpersonationLevels value)
         case ImpersonationLevels::IMPERSONATION:    return "IMPERSONATION";
         case ImpersonationLevels::DELEGATE:         return  "DELEGATE";
     }
+    // clang-format on
 
     return nullptr;
 }
 
 const char* enumToString(CreateDisposition value)
 {
+    // clang-format off
     switch (value)
     {
         case CreateDisposition::SUPERSEDE:       return "SUPERSEDE";
@@ -91,12 +94,14 @@ const char* enumToString(CreateDisposition value)
         case CreateDisposition::OVERWRITE:       return "OVERWRITE";
         case CreateDisposition::OVERWRITE_IF:    return "OVERWRITE_IF";
     }
+    // clang-format on
 
     return nullptr;
 }
 
 const char* enumToString(CreateActions value)
 {
+    // clang-format off
     switch (value)
     {
         case CreateActions::SUPERSEDED:          return "SUPERSEDED";
@@ -104,24 +109,28 @@ const char* enumToString(CreateActions value)
         case CreateActions::CREATED:             return "CREATED";
         case CreateActions::FILE_OVERWRITTEN:    return "FILE_OVERWRITTEN";
     }
+    // clang-format on
 
     return nullptr;
 }
 
 const char* enumToString(ShareTypes value)
 {
+    // clang-format off
     switch (value)
     {
         case ShareTypes::DISK:  return "SMB2_SHARE_TYPE_DISK";
         case ShareTypes::PIPE:  return "SMB2_SHARE_TYPE_PIPE";
         case ShareTypes::PRINT: return "SMB2_SHARE_TYPE_PRINT";
     }
+    // clang-format on
 
     return nullptr;
 }
 
 const char* enumToString(NTStatus value)
 {
+    // clang-format off
     switch (value)
     {
         case NTStatus::STATUS_SUCCESS:                  return "STATUS_SUCCESS";
@@ -151,12 +160,14 @@ const char* enumToString(NTStatus value)
         case NTStatus::STATUS_NOT_A_DIRECTORY:          return "STATUS_NOT_A_DIRECTORY";
         case NTStatus::STATUS_CANCELLED:                return "STATUS_CANCELLED";
     }
+    // clang-format on
 
     return nullptr;
 }
 
 const char* enumToString(FsInfoLevels value)
 {
+    // clang-format off
     switch (value)
     {
         case FsInfoLevels::SMB2_FS_INFO_01: return "SMB2_FS_INFO_01";
@@ -167,12 +178,14 @@ const char* enumToString(FsInfoLevels value)
         case FsInfoLevels::SMB2_FS_INFO_06: return "SMB2_FS_INFO_06";
         case FsInfoLevels::SMB2_FS_INFO_07: return "SMB2_FS_INFO_07";
     }
+    // clang-format on
 
     return nullptr;
 }
 
 const char* enumToString(QueryInfoLevels value)
 {
+    // clang-format off
     switch (value)
     {
         case QueryInfoLevels::DIRECTORY_INFORMATION:              return "DIRECTORY_INFORMATION";
@@ -221,12 +234,14 @@ const char* enumToString(QueryInfoLevels value)
         case QueryInfoLevels::ID_GLOBAL_TX_DIRECTORY_INFORMATION: return "ID_GLOBAL_TX_DIRECTORY_INFORMATION";
         case QueryInfoLevels::STANDARD_LINK_INFORMATION:          return "STANDARD_LINK_INFORMATION";
     }
+    // clang-format on
 
     return nullptr;
 }
 
 const char* enumToString(CtlCodes value)
 {
+    // clang-format off
     switch (value)
     {
         case CtlCodes::SCTL_DFS_GET_REFERRALS:              return "SCTL_DFS_GET_REFERRALS";
@@ -245,12 +260,14 @@ const char* enumToString(CtlCodes value)
         case CtlCodes::FSCTL_FILE_LEVEL_TRIM:               return "FSCTL_FILE_LEVEL_TRIM";
         case CtlCodes::FSCTL_VALIDATE_NEGOTIATE_INFO:       return "FSCTL_VALIDATE_NEGOTIATE_INFO";
     }
+    // clang-format on
 
     return nullptr;
 }
 
 const char* enumToString(InfoTypes value)
 {
+    // clang-format off
     switch (value)
     {
         case InfoTypes::FILE:        return "SMB2_0_INFO_FILE";
@@ -258,22 +275,25 @@ const char* enumToString(InfoTypes value)
         case InfoTypes::SECURITY:    return "SMB2_0_INFO_SECURITY";
         case InfoTypes::QUOTA:       return "SMB2_0_INFO_QUOTA";
     }
+    // clang-format on
 
     return nullptr;
 }
 
 const char* enumToString(SessionFlagsBinding value)
+{
+    // clang-format off
+    switch (value)
     {
-        switch (value)
-        {
-            case SessionFlagsBinding::NONE:     return "NONE";
-            case SessionFlagsBinding::BINDING:  return "BINDING";
-        }
-
-        return nullptr;
+        case SessionFlagsBinding::NONE:     return "NONE";
+        case SessionFlagsBinding::BINDING:  return "BINDING";
     }
+    // clang-format on
 
+    return nullptr;
 }
+
+} // namespace <unnamed>
 
 std::ostream& operator<<(std::ostream& out, const SMBv2::SMBv2Commands value)
 {
@@ -286,8 +306,8 @@ std::ostream& operator<<(std::ostream& out, const SMBv2::SMBv2Commands value)
 
 std::ostream& operator<<(std::ostream& out, const OplockLevels value)
 {
-    const char *strValue = enumToString(value);
-    if (strValue != nullptr)
+    const char* strValue = enumToString(value);
+    if(strValue != nullptr)
     {
         out << "(" << strValue << ")";
     }
@@ -297,8 +317,8 @@ std::ostream& operator<<(std::ostream& out, const OplockLevels value)
 
 std::ostream& operator<<(std::ostream& out, const ImpersonationLevels value)
 {
-    const char *strValue = enumToString(value);
-    if (strValue != nullptr)
+    const char* strValue = enumToString(value);
+    if(strValue != nullptr)
     {
         out << "(" << strValue << ")";
     }
@@ -308,8 +328,8 @@ std::ostream& operator<<(std::ostream& out, const ImpersonationLevels value)
 
 std::ostream& operator<<(std::ostream& out, const CreateDisposition value)
 {
-    const char *strValue = enumToString(value);
-    if (strValue != nullptr)
+    const char* strValue = enumToString(value);
+    if(strValue != nullptr)
     {
         out << "(" << strValue << ")";
     }
@@ -319,8 +339,8 @@ std::ostream& operator<<(std::ostream& out, const CreateDisposition value)
 
 std::ostream& operator<<(std::ostream& out, const CreateActions value)
 {
-    const char *strValue = enumToString(value);
-    if (strValue != nullptr)
+    const char* strValue = enumToString(value);
+    if(strValue != nullptr)
     {
         out << "(" << strValue << ")";
     }
@@ -330,8 +350,8 @@ std::ostream& operator<<(std::ostream& out, const CreateActions value)
 
 std::ostream& operator<<(std::ostream& out, const ShareTypes value)
 {
-    const char *strValue = enumToString(value);
-    if (strValue != nullptr)
+    const char* strValue = enumToString(value);
+    if(strValue != nullptr)
     {
         out << "(" << strValue << ")";
     }
@@ -340,9 +360,9 @@ std::ostream& operator<<(std::ostream& out, const ShareTypes value)
 }
 
 std::ostream& operator<<(std::ostream& out, const NTStatus value)
-{ 
-    const char *strValue = enumToString(value);
-    if (strValue != nullptr)
+{
+    const char* strValue = enumToString(value);
+    if(strValue != nullptr)
     {
         out << "(" << strValue << ")";
     }
@@ -354,9 +374,10 @@ std::ostream& operator<<(std::ostream& out, const DesiredAccessFlags value)
 {
     auto int_value = to_integral(value);
 
-    if (int_value > 0)
+    if(int_value > 0)
     {
         out << "(";
+        // clang-format off
         print_flag_if_set(out, "READ_DATA_LE",                 int_value, DesiredAccessFlags::READ_DATA_LE);
         print_flag_if_set(out, "WRITE_DATA_LE",                int_value, DesiredAccessFlags::WRITE_DATA_LE);
         print_flag_if_set(out, "APPEND_DATA_LE",               int_value, DesiredAccessFlags::APPEND_DATA_LE);
@@ -376,6 +397,7 @@ std::ostream& operator<<(std::ostream& out, const DesiredAccessFlags value)
         print_flag_if_set(out, "GENERIC_EXECUTE_LE",           int_value, DesiredAccessFlags::GENERIC_EXECUTE_LE);
         print_flag_if_set(out, "GENERIC_WRITE_LE",             int_value, DesiredAccessFlags::GENERIC_WRITE_LE);
         print_flag_if_set(out, "GENERIC_READ_LE",              int_value, DesiredAccessFlags::GENERIC_READ_LE);
+        // clang-format on
         out << ")";
     }
     return out;
@@ -385,9 +407,10 @@ std::ostream& operator<<(std::ostream& out, const FileAttributes value)
 {
     auto int_value = to_integral(value);
 
-    if (int_value > 0)
+    if(int_value > 0)
     {
         out << "(";
+        // clang-format off
         print_flag_if_set(out, "READONLY",            int_value, FileAttributes::READONLY);
         print_flag_if_set(out, "HIDDEN",              int_value, FileAttributes::HIDDEN);
         print_flag_if_set(out, "SYSTEM",              int_value, FileAttributes::SYSTEM);
@@ -401,6 +424,7 @@ std::ostream& operator<<(std::ostream& out, const FileAttributes value)
         print_flag_if_set(out, "OFFLINE",             int_value, FileAttributes::OFFLINE);
         print_flag_if_set(out, "NOT_CONTENT_INDEXED", int_value, FileAttributes::NOT_CONTENT_INDEXED);
         print_flag_if_set(out, "ENCRYPTED",           int_value, FileAttributes::ENCRYPTED);
+        // clang-format on
         out << ")";
     }
 
@@ -410,12 +434,14 @@ std::ostream& operator<<(std::ostream& out, const FileAttributes value)
 std::ostream& operator<<(std::ostream& out, const ShareAccessFlags value)
 {
     auto int_value = to_integral(value);
-    if (int_value > 0)
+    if(int_value > 0)
     {
         out << "(";
+        // clang-format off
         print_flag_if_set(out, "SHARE_READ_LE",     int_value, ShareAccessFlags::SHARE_READ_LE);
         print_flag_if_set(out, "SHARE_WRITE_LE",    int_value, ShareAccessFlags::SHARE_WRITE_LE);
         print_flag_if_set(out, "SHARE_DELETE_LE",   int_value, ShareAccessFlags::SHARE_DELETE_LE);
+        // clang-format on
         out << ")";
     }
 
@@ -426,9 +452,10 @@ std::ostream& operator<<(std::ostream& out, const CreateOptionsFlags value)
 {
     auto int_value = to_integral(value);
 
-    if (int_value > 0)
+    if(int_value > 0)
     {
         out << "(";
+        // clang-format off
         print_flag_if_set(out, "DIRECTORY_FILE_LE",            int_value, CreateOptionsFlags::DIRECTORY_FILE_LE);
         print_flag_if_set(out, "WRITE_THROUGH_LE",             int_value, CreateOptionsFlags::WRITE_THROUGH_LE);
         print_flag_if_set(out, "SEQUENTIAL_ONLY_LE",           int_value, CreateOptionsFlags::SEQUENTIAL_ONLY_LE);
@@ -447,6 +474,7 @@ std::ostream& operator<<(std::ostream& out, const CreateOptionsFlags value)
         print_flag_if_set(out, "OPEN_REPARSE_POINT_LE",        int_value, CreateOptionsFlags::OPEN_REPARSE_POINT_LE);
         print_flag_if_set(out, "OPEN_NO_RECALL_LE",            int_value, CreateOptionsFlags::OPEN_NO_RECALL_LE);
         print_flag_if_set(out, "OPEN_FOR_FREE_SPACE_QUERY_LE", int_value, CreateOptionsFlags::OPEN_FOR_FREE_SPACE_QUERY_LE);
+        // clang-format on
         out << ")";
     }
 
@@ -457,11 +485,13 @@ std::ostream& operator<<(std::ostream& out, const WriteFlags value)
 {
     auto int_value = to_integral(value);
 
-    if (int_value > 0)
+    if(int_value > 0)
     {
         out << "(";
+        // clang-format off
         print_flag_if_set(out, "SMB2_WRITEFLAG_WRITE_THROUGH",     int_value, WriteFlags::SMB2_WRITEFLAG_WRITE_THROUGH);
         print_flag_if_set(out, "SMB2_WRITEFLAG_WRITE_UNBUFFERED",  int_value, WriteFlags::SMB2_WRITEFLAG_WRITE_UNBUFFERED);
+        // clang-format on
         out << ")";
     }
     return out;
@@ -472,6 +502,7 @@ std::ostream& operator<<(std::ostream& out, const ShareFlags value)
     auto int_value = to_integral(value) & ~to_integral(ShareFlags::NO_CACHING);
 
     out << "Caching policy = ";
+    // clang-format off
     switch(to_integral(value) & to_integral(ShareFlags::NO_CACHING))
     {
         case to_integral(ShareFlags::MANUAL_CACHING):    out << "MANUAL_CACHING"; break;
@@ -494,6 +525,7 @@ std::ostream& operator<<(std::ostream& out, const ShareFlags value)
         print_flag_if_set(out, "SMB2_SHAREFLAG_ENABLE_HASH_V2",                int_value, ShareFlags::ENABLE_HASH_2);
         print_flag_if_set(out, "SMB2_SHAREFLAG_ENCRYPT_DATA",                  int_value, ShareFlags::ENABLE_ENCRYPT_DATA); 
     }
+    // clang-format on
 
     return out;
 }
@@ -503,13 +535,15 @@ std::ostream& operator<<(std::ostream& out, const ShareCapabilities value)
     auto int_value = to_integral(value);
 
     if(int_value > 0)
-    { 
+    {
         out << "(";
+        // clang-format off
         print_flag_if_set(out, "SMB2_SHARE_CAP_DFS",                       int_value, ShareCapabilities::DFS);
         print_flag_if_set(out, "SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY",   int_value, ShareCapabilities::CONTINUOUS_AVAILABILITY);
         print_flag_if_set(out, "SMB2_SHARE_CAP_SCALEOUT",                  int_value, ShareCapabilities::SCALEOUT);
         print_flag_if_set(out, "SMB2_SHARE_CAP_CLUSTER",                   int_value, ShareCapabilities::CLUSTER);
         print_flag_if_set(out, "SMB2_SHARE_CAP_ASYMMETRIC",                int_value, ShareCapabilities::ASYMMETRIC);
+        // clang-format on
         out << ")";
     }
 
@@ -520,11 +554,13 @@ std::ostream& operator<<(std::ostream& out, const SecurityModeShort value)
 {
     auto int_value = to_integral(value);
 
-    if (int_value > 0)
+    if(int_value > 0)
     {
         out << "(";
+        // clang-format off
         print_flag_if_set(out, "SIGNING_ENABLED",   int_value, SecurityModeShort::SIGNING_ENABLED);
         print_flag_if_set(out, "SIGNING_REQUIRED",  int_value, SecurityModeShort::SIGNING_REQUIRED);
+        // clang-format on
         out << ")";
     }
     return out;
@@ -537,6 +573,7 @@ std::ostream& operator<<(std::ostream& out, const Capabilities value)
     if(int_value > 0)
     {
         out << "(";
+        // clang-format off
         print_flag_if_set(out, "DFS",               int_value, Capabilities::DFS);
         print_flag_if_set(out, "LEASING",           int_value, Capabilities::LEASING);
         print_flag_if_set(out, "LARGE_MTU",         int_value, Capabilities::LARGE_MTU);
@@ -544,6 +581,7 @@ std::ostream& operator<<(std::ostream& out, const Capabilities value)
         print_flag_if_set(out, "PERSISTENT_HANDLES",int_value, Capabilities::PERSISTENT_HANDLES);
         print_flag_if_set(out, "DIRECTORY_LEASING", int_value, Capabilities::DIRECTORY_LEASING);
         print_flag_if_set(out, "ENCRYPTION",        int_value, Capabilities::ENCRYPTION);
+        // clang-format on
         out << ")";
     }
 
@@ -553,12 +591,12 @@ std::ostream& operator<<(std::ostream& out, const Capabilities value)
 std::ostream& operator<<(std::ostream& out, const SessionFlags value)
 {
     auto int_value = to_integral(value);
-
+    // clang-format off
     print_flag_if_set(out, "NONE",                          int_value, SessionFlags::NONE);
     print_flag_if_set(out, "SMB2_SESSION_FLAG_IS_GUEST",    int_value, SessionFlags::IS_GUEST);
     print_flag_if_set(out, "SMB2_SESSION_FLAG_IS_NULL",     int_value, SessionFlags::IS_NULL);
     print_flag_if_set(out, "SMB2_SESSION_FLAG_ENCRYPT_DATA",int_value, SessionFlags::IS_ENCRYPT_DATA);
-
+    // clang-format on
     return out;
 }
 
@@ -566,9 +604,10 @@ std::ostream& operator<<(std::ostream& out, const AccessMask value)
 {
     auto int_value = to_integral(value);
 
-    if (int_value > 0)
+    if(int_value > 0)
     {
         out << "(";
+        // clang-format off
         print_flag_if_set(out, "FILE_READ_DATA",           int_value, AccessMask::FILE_READ_DATA);
         print_flag_if_set(out, "FILE_WRITE_DATA",          int_value, AccessMask::FILE_WRITE_DATA);
         print_flag_if_set(out, "FILE_APPEND_DATA",         int_value, AccessMask::FILE_APPEND_DATA);
@@ -589,6 +628,7 @@ std::ostream& operator<<(std::ostream& out, const AccessMask value)
         print_flag_if_set(out, "GENERIC_EXECUTE",          int_value, AccessMask::GENERIC_EXECUTE);
         print_flag_if_set(out, "GENERIC_WRITE",            int_value, AccessMask::GENERIC_WRITE);
         print_flag_if_set(out, "GENERIC_READ",             int_value, AccessMask::GENERIC_READ);
+        // clang-format on
         out << ")";
     }
 
@@ -602,7 +642,7 @@ std::ostream& operator<<(std::ostream& out, const CloseFlags value)
     if(int_value > 0)
     {
         out << "(";
-        print_flag_if_set(out, "POSTQUERY_ATTRIB",   int_value, CloseFlags::POSTQUERY_ATTRIB);
+        print_flag_if_set(out, "POSTQUERY_ATTRIB", int_value, CloseFlags::POSTQUERY_ATTRIB);
         out << ")";
     }
 
@@ -613,11 +653,11 @@ std::ostream& operator<<(std::ostream& out, const SecurityMode value)
 {
     auto int_value = to_integral(value);
 
-    if (int_value > 0)
+    if(int_value > 0)
     {
         out << "(";
-        print_flag_if_set(out, "SIGNING_ENABLED",   int_value, SecurityMode::SIGNING_ENABLED);
-        print_flag_if_set(out, "SIGNING_REQUIRED",  int_value, SecurityMode::SIGNING_REQUIRED);
+        print_flag_if_set(out, "SIGNING_ENABLED", int_value, SecurityMode::SIGNING_ENABLED);
+        print_flag_if_set(out, "SIGNING_REQUIRED", int_value, SecurityMode::SIGNING_REQUIRED);
         out << ")";
     }
 
@@ -626,8 +666,8 @@ std::ostream& operator<<(std::ostream& out, const SecurityMode value)
 
 std::ostream& operator<<(std::ostream& out, const FsInfoLevels value)
 {
-    const char *strValue = enumToString(value);
-    if (strValue != nullptr)
+    const char* strValue = enumToString(value);
+    if(strValue != nullptr)
     {
         out << "(" << strValue << ")";
     }
@@ -637,8 +677,8 @@ std::ostream& operator<<(std::ostream& out, const FsInfoLevels value)
 
 std::ostream& operator<<(std::ostream& out, const QueryInfoLevels value)
 {
-    const char *strValue = enumToString(value);
-    if (strValue != nullptr)
+    const char* strValue = enumToString(value);
+    if(strValue != nullptr)
     {
         out << "(" << strValue << ")";
     }
@@ -648,8 +688,8 @@ std::ostream& operator<<(std::ostream& out, const QueryInfoLevels value)
 
 std::ostream& operator<<(std::ostream& out, const CtlCodes value)
 {
-    const char *strValue = enumToString(value);
-    if (strValue != nullptr)
+    const char* strValue = enumToString(value);
+    if(strValue != nullptr)
     {
         out << "(" << strValue << ")";
     }
@@ -659,8 +699,8 @@ std::ostream& operator<<(std::ostream& out, const CtlCodes value)
 
 std::ostream& operator<<(std::ostream& out, const InfoTypes value)
 {
-    const char *strValue = enumToString(value);
-    if (strValue != nullptr)
+    const char* strValue = enumToString(value);
+    if(strValue != nullptr)
     {
         out << "(" << strValue << ")";
     }
@@ -670,8 +710,8 @@ std::ostream& operator<<(std::ostream& out, const InfoTypes value)
 
 std::ostream& operator<<(std::ostream& out, const SessionFlagsBinding value)
 {
-    const char *strValue = enumToString(value);
-    if (strValue != nullptr)
+    const char* strValue = enumToString(value);
+    if(strValue != nullptr)
     {
         out << "(" << strValue << ")";
     }
@@ -682,7 +722,7 @@ std::ostream& operator<<(std::ostream& out, const SessionFlagsBinding value)
 std::ostream& operator<<(std::ostream& out, const Flags value)
 {
     auto int_value = to_integral(value);
-    if (int_value > 0)
+    if(int_value > 0)
     {
         out << "(";
         print_flag_if_set(out, "SERVER_TO_REDIR", int_value, Flags::SERVER_TO_REDIR);
@@ -701,15 +741,15 @@ std::ostream& print_info_levels(std::ostream& out, const InfoTypes infoType, con
 {
     switch(infoType)
     {
-        case InfoTypes::FILE:
-            print_enum(out, "InfoLevel", static_cast<QueryInfoLevels>(infoClass));
-            break;
-        case InfoTypes::FILESYSTEM:
-            print_enum(out, "InfoLevel", static_cast<FsInfoLevels>(infoClass));
-            break;
-        default:
-            //we dont handle other classes
-            ;
+    case InfoTypes::FILE:
+        print_enum(out, "InfoLevel", static_cast<QueryInfoLevels>(infoClass));
+        break;
+    case InfoTypes::FILESYSTEM:
+        print_enum(out, "InfoLevel", static_cast<FsInfoLevels>(infoClass));
+        break;
+    default:
+        //we dont handle other classes
+        ;
     }
     return out;
 }

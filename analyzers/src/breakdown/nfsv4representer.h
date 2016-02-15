@@ -28,7 +28,6 @@ namespace NST
 {
 namespace breakdown
 {
-
 /**
  * @brief The NFSv4Representer class
  * Splits output into commands/operations lists for NFS v4.* protocols
@@ -36,6 +35,7 @@ namespace breakdown
 class NFSv4Representer : public Representer
 {
     const size_t count_of_compounds;
+
 public:
     NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name, size_t count_of_compounds);
     void onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const override final;
@@ -44,5 +44,5 @@ public:
 } // namespace breakdown
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFSV4REPRESENTER_H
+#endif //NFSV4REPRESENTER_H
 //------------------------------------------------------------------------------

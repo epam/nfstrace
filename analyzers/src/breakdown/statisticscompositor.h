@@ -28,7 +28,6 @@ namespace NST
 {
 namespace breakdown
 {
-
 /**
  * @brief Composes 2 statistics: for procedures and functions
  * It is useful for NFS v4.* protocols
@@ -36,6 +35,7 @@ namespace breakdown
 class StatisticsCompositor : public Statistics
 {
     Statistics& procedures_stats;
+
 public:
     StatisticsCompositor(Statistics& procedures_stats, Statistics& operations_stats);
     void for_each_procedure(std::function<void(const BreakdownCounter&, size_t)> on_procedure) const override;
@@ -46,5 +46,5 @@ public:
 } // namespace breakdown
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//STATISTICSCOMPOSITOR_H
+#endif //STATISTICSCOMPOSITOR_H
 //------------------------------------------------------------------------------

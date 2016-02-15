@@ -23,32 +23,32 @@
 #include <functional>
 #include <system_error>
 
-#include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "abstract_tcp_service.h"
 #include "utils/log.h"
 //------------------------------------------------------------------------------
 
-AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, const std::string& host, int backlog) :
-    _port{port},
-    _host{host},
-    _backlog{backlog},
-    _isRunning{true},
-    _threadPool{workersAmount},
-    _listenerThread{},
-    _serverSocket{0},
-    _tasksQueue{},
-    _tasksQueueMutex{},
-    _tasksQueueCond{}
+AbstractTcpService::AbstractTcpService(std::size_t workersAmount, int port, const std::string& host, int backlog)
+    : _port{port}
+    , _host{host}
+    , _backlog{backlog}
+    , _isRunning{true}
+    , _threadPool{workersAmount}
+    , _listenerThread{}
+    , _serverSocket{0}
+    , _tasksQueue{}
+    , _tasksQueueMutex{}
+    , _tasksQueueCond{}
 {
 }
 
 AbstractTcpService::~AbstractTcpService()
 {
     // Disposing tasks which are still in queue
-    while (!_tasksQueue.empty())
+    while(!_tasksQueue.empty())
     {
         delete _tasksQueue.front();
         _tasksQueue.pop();
@@ -60,29 +60,29 @@ void AbstractTcpService::start()
     _isRunning = true;
     // Setting up server TCP-socket
     _serverSocket = socket(PF_INET, SOCK_STREAM, 0);
-    if (_serverSocket < 0)
+    if(_serverSocket < 0)
     {
         throw std::system_error{errno, std::system_category(), "Opening server socket error"};
     }
     // Setting SO_REUSEADDR to true
     int reuseAddr = 1;
-    if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &reuseAddr, sizeof(reuseAddr)) < 0)
+    if(setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &reuseAddr, sizeof(reuseAddr)) < 0)
     {
         throw std::system_error{errno, std::system_category(), "Setting SO_REUSEADDR socket option error"};
     }
     // Binding server socket to endpoint
     IpEndpoint endpoint{_host.c_str(), _port};
-    if (bind(_serverSocket, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen) != 0)
+    if(bind(_serverSocket, endpoint.addrinfo()->ai_addr, endpoint.addrinfo()->ai_addrlen) != 0)
     {
         throw std::system_error{errno, std::system_category(), "Binding server socket error"};
     }
     // Converting socket to listening state
-    if (listen(_serverSocket, _backlog) != 0)
+    if(listen(_serverSocket, _backlog) != 0)
     {
         throw std::system_error{errno, std::system_category(), "Converting socket to listening state error"};
     }
     // Creating threads for thread-pool
-    for (auto & thr : _threadPool)
+    for(auto& thr : _threadPool)
     {
         thr = std::thread{&AbstractTcpService::runWorker, this};
     }
@@ -98,7 +98,7 @@ void AbstractTcpService::stop()
         _tasksQueueCond.notify_all();
     }
     // Joining to thread-pool threads and disposing them
-    for (auto & thr : _threadPool)
+    for(auto& thr : _threadPool)
     {
         thr.join();
     }
@@ -109,18 +109,18 @@ void AbstractTcpService::stop()
 
 void AbstractTcpService::runWorker()
 {
-    while (true)
+    while(true)
     {
         std::unique_ptr<AbstractTask> pendingTask;
         {
             std::unique_lock<std::mutex> lock{_tasksQueueMutex};
-            while (!pendingTask)
+            while(!pendingTask)
             {
-                if (!_isRunning.load())
+                if(!_isRunning.load())
                 {
                     return;
                 }
-                if (!_tasksQueue.empty())
+                if(!_tasksQueue.empty())
                 {
                     pendingTask.reset(_tasksQueue.front());
                     _tasksQueue.pop();
@@ -137,7 +137,7 @@ void AbstractTcpService::runWorker()
 
 void AbstractTcpService::runListener()
 {
-    while (_isRunning.load())
+    while(_isRunning.load())
     {
         // Accepting incoming connection on socket
         struct timespec acceptDuration;
@@ -146,19 +146,19 @@ void AbstractTcpService::runListener()
         FD_ZERO(&readDescriptorsSet);
         FD_SET(_serverSocket, &readDescriptorsSet);
         int descriptorsCount = pselect(_serverSocket + 1, &readDescriptorsSet, NULL, NULL, &acceptDuration, NULL);
-        if (descriptorsCount == 0)
+        if(descriptorsCount == 0)
         {
             // Timeout expired
             continue;
         }
-        else if (descriptorsCount < 0)
+        else if(descriptorsCount < 0)
         {
             std::system_error e{errno, std::system_category(), "Awaiting for incoming connection on server socket error"};
             LOG("ERROR: %s", e.what());
 #ifdef __gnu_linux__
             // Several first pselect(2) calls cause "Interrupted system call" error (errno == EINTR)
             // if drop privileges option is used on Linux (see https://access.redhat.com/solutions/165483)
-            if (errno == EINTR)
+            if(errno == EINTR)
             {
                 continue;
             }
@@ -167,7 +167,7 @@ void AbstractTcpService::runListener()
         }
         // Extracting and returning pending connection
         int pendingSocketDescriptor = accept(_serverSocket, NULL, NULL);
-        if (pendingSocketDescriptor < 0)
+        if(pendingSocketDescriptor < 0)
         {
             std::system_error e{errno, std::system_category(), "Accepting incoming connection on server socket error"};
             LOG("ERROR: %s", e.what());
@@ -177,7 +177,7 @@ void AbstractTcpService::runListener()
         std::unique_ptr<AbstractTask> newTask{createTask(pendingSocketDescriptor)};
         {
             std::unique_lock<std::mutex> lock(_tasksQueueMutex);
-            if (_tasksQueue.size() < MaxTasksQueueSize)
+            if(_tasksQueue.size() < MaxTasksQueueSize)
             {
                 _tasksQueue.push(newTask.get());
                 newTask.release();
@@ -193,9 +193,10 @@ void AbstractTcpService::runListener()
 
 //------------------------------------------------------------------------------
 
-AbstractTcpService::AbstractTask::AbstractTask(int socket) :
-    _socket{socket}
-{}
+AbstractTcpService::AbstractTask::AbstractTask(int socket)
+    : _socket{socket}
+{
+}
 
 AbstractTcpService::AbstractTask::~AbstractTask()
 {

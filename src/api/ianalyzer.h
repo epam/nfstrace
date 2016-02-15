@@ -25,24 +25,23 @@
 #define IANALYZER_TYPE_H
 //------------------------------------------------------------------------------
 #include "cifs_types.h"
-#include "nfs_types.h"
 #include "nfs3_types_rpcgen.h"
-#include "nfs4_types_rpcgen.h"
 #include "nfs41_types_rpcgen.h"
+#include "nfs4_types_rpcgen.h"
+#include "nfs_types.h"
 #include "rpc_types.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace API
 {
-
 /*! Abstract interface for plugins that collect NFS3 statistics
  */
 class INFSv3rpcgen
 {
 public:
     virtual ~INFSv3rpcgen() {}
-
+    // clang-format off
     /*! NFSv3 "NULL" procedure
      * \param RPCProcedure  - Specified procedure
      * \param NULL3args     - procedure arguments
@@ -1791,6 +1790,7 @@ public:
      * \param res - result of the command
      */
     virtual void breakOplockSMBv2(const SMBv2::BreakOpLockCommand*, const SMBv2::OplockAcknowledgment*, const SMBv2::OplockResponse*) {}
+    // clang-format on
 };
 
 /*! Base interface for all nfstrace plugins.
@@ -1807,5 +1807,5 @@ public:
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//IANALYZER_TYPE_H
+#endif // IANALYZER_TYPE_H
 //------------------------------------------------------------------------------

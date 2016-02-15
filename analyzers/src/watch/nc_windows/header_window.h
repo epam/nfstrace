@@ -29,8 +29,8 @@
 class HeaderWindow
 {
     WINDOW* _window;
-    time_t _start_time;
-    void destroy();
+    time_t  _start_time;
+    void    destroy();
 
 public:
     HeaderWindow() = delete;
@@ -46,5 +46,5 @@ public:
     void resize(MainWindow&);
 };
 //------------------------------------------------------------------------------
-#endif//HEADER_WINDOWS_H
+#endif //HEADER_WINDOWS_H
 //------------------------------------------------------------------------------

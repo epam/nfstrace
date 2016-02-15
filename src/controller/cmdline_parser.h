@@ -37,15 +37,18 @@ namespace controller
 {
 namespace cmdline
 {
-
 class CLIError : public std::runtime_error
 {
 public:
-    explicit CLIError(const std::string& msg) : std::runtime_error{msg} { }
+    explicit CLIError(const std::string& msg)
+        : std::runtime_error{msg}
+    {
+    }
 };
 
 struct Opt
 {
+    // clang-format off
     class Value
     {
     public:
@@ -74,17 +77,18 @@ struct Opt
     const char* value_pattern;
     const char* value;
     bool passed;                    // is option parsed
-};
 
+    // clang-format on
+};
 
 template <typename CLI>
 class CmdlineParser
 {
 public:
-    CmdlineParser() = default;
-    virtual ~CmdlineParser() = default;
-    CmdlineParser(const CmdlineParser&)                  = delete;
-    CmdlineParser& operator=(const CmdlineParser&)       = delete;
+    CmdlineParser()                     = default;
+    virtual ~CmdlineParser()            = default;
+    CmdlineParser(const CmdlineParser&) = delete;
+    CmdlineParser& operator=(const CmdlineParser&) = delete;
 
     void parse(int argc, char** argv);
     void validate();
@@ -102,20 +106,19 @@ public:
     static bool is_default(typename CLI::Names name)
     {
         const Opt& a = CLI::options[name];
-        return a.value == a.deflt;  // compare pointers
+        return a.value == a.deflt; // compare pointers
     }
 
     static void print_usage(std::ostream& out, const char* executable);
 
 private:
-    virtual void set_multiple_value(int /*index*/, char *const /*v*/){}
-
-    void set_value(int index, char *const v)
+    virtual void set_multiple_value(int /*index*/, char* const /*v*/) {}
+    void set_value(int index, char* const v)
     {
         Opt& a = CLI::options[index];
         // if option argument specified - set it otherwise
         // set valid default OR "true" for no-args options
-        a.value = v ? v : (a.deflt && a.type != Opt::Type::NOA ? a.deflt : "true");
+        a.value  = v ? v : (a.deflt && a.type != Opt::Type::NOA ? a.deflt : "true");
         a.passed = true;
 
         if(a.type == Opt::Type::MUL)
@@ -128,7 +131,7 @@ private:
     {
         if(short_name)
         {
-            return { '\'', '-', short_name, '\'' };
+            return {'\'', '-', short_name, '\''};
         }
         return std::string{'\''} + long_name + '\'';
     }
@@ -151,12 +154,12 @@ void CmdlineParser<CLI>::parse(int argc, char** argv)
 {
     // generate input data for getopt_long()
     option long_opts[CLI::num + 1]; // +1 for NULL-option
-    char short_opts[CLI::num * 2 + 2] = {0};
+    char   short_opts[CLI::num * 2 + 2] = {0};
 
     short_opts[0] = ':';
 
-    char *short_p = &short_opts[1];
-    for (int i = 0; i < CLI::num; ++i)
+    char* short_p = &short_opts[1];
+    for(int i = 0; i < CLI::num; ++i)
     {
         const Opt& a = CLI::options[i];
 
@@ -200,13 +203,13 @@ void CmdlineParser<CLI>::parse(int argc, char** argv)
 
         case '?':
         {
-            std::string unkn{ build_name(optopt, argv[optind-1]) };
+            std::string unkn{build_name(optopt, argv[optind - 1])};
             throw CLIError{std::string{"Unrecognized option: "} + unkn};
         }
 
         case ':':
         {
-            std::string miss{ build_name(optopt, argv[optind-1]) };
+            std::string miss{build_name(optopt, argv[optind - 1])};
             throw CLIError{std::string{"Option requires an argument: "} + miss};
         }
 
@@ -226,18 +229,17 @@ void CmdlineParser<CLI>::parse(int argc, char** argv)
     if(optind != argc)
     {
         // quote non-option
-        std::string name{ build_name(0, argv[optind]) };
-        throw CLIError{std::string{"Unexpected operand on command line: "}
-                + name};
+        std::string name{build_name(0, argv[optind])};
+        throw CLIError{std::string{"Unexpected operand on command line: "} + name};
     }
 
     // set default values
     for(Opt& o : CLI::options)
     {
-        if(o.value == nullptr  // is value still uninitialized?
-        && o.deflt != nullptr) // try to substitute by default value
+        if(o.value == nullptr     // is value still uninitialized?
+           && o.deflt != nullptr) // try to substitute by default value
         {
-            o.value = o.deflt;
+            o.value  = o.deflt;
             o.passed = false;
         }
     }
@@ -251,8 +253,8 @@ void CmdlineParser<CLI>::validate()
     {
         if(o.value == nullptr) // is value still uninitialized?
         {
-            std::string lopt{ o.long_opt ? std::string("--") + o.long_opt : ""};
-            std::string name{ build_name(o.short_opt, lopt) };
+            std::string lopt{o.long_opt ? std::string("--") + o.long_opt : ""};
+            std::string name{build_name(o.short_opt, lopt)};
             throw CLIError{std::string{"Missing required option: "} + name};
         }
     }
@@ -271,9 +273,9 @@ void CmdlineParser<CLI>::print_usage(std::ostream& out, const char* name)
 
         if(o.short_opt) // print out short key
         {
-            char tmp[]{ '-', o.short_opt, ' ', '\0' };
+            char tmp[]{'-', o.short_opt, ' ', '\0'};
             if(o.long_opt) tmp[2] = ',';
-            s_opt = std::string{"   "} + tmp; //indentation
+            s_opt                 = std::string{"   "} + tmp; //indentation
         }
         if(o.long_opt) // print out long key
         {
@@ -309,5 +311,5 @@ void CmdlineParser<CLI>::print_usage(std::ostream& out, const char* name)
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//CMDLINE_PARSER_H
+#endif // CMDLINE_PARSER_H
 //------------------------------------------------------------------------------

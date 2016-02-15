@@ -22,30 +22,28 @@
 #ifndef TEMPLATE_H
 #define TEMPLATE_H
 //------------------------------------------------------------------------------
-#include <cstdint>  // include language headers in alphabetical order
+#include <cstdint> // include language headers in alphabetical order
 #include <string>
 //------------------------------------------------------------------------------
-#define MY_MIN(a,b) (((a) < (b)) ? (a) : (b)) //!< This is example of preprocessor usage
+#define MY_MIN(a, b) (((a) < (b)) ? (a) : (b)) //!< This is example of preprocessor usage
 //------------------------------------------------------------------------------
 namespace hello
 {
-
 /*! \class Represents some entity
  */
 class SayHello
 {
 public:
-    SayHello();// May be uncommented
-    ~SayHello();// May be uncommented
+    SayHello();  // May be uncommented
+    ~SayHello(); // May be uncommented
 
-    SayHello(const SayHello&)            = delete;
+    SayHello(const SayHello&) = delete;
     SayHello& operator=(const SayHello&) = delete;
 
     /*!  small functions may be implemented in-place
      * \return hello string
      */
     inline const std::string& say() const { return text; }
-
     /*! Sets some value
      * \param v - new value
      */
@@ -57,13 +55,13 @@ public:
     std::uint32_t get_value() const;
 
 private:
-    std::string text;//!< Hello phrase
+    std::string   text;  //!< Hello phrase
     std::uint32_t value; //!< just a value for get/set methods
 
-    static const unsigned int BAD_COFFEE;//!< Some constant
+    static const unsigned int BAD_COFFEE; //!< Some constant
 };
 
 } // namespace hello
 //------------------------------------------------------------------------------
-#endif//TEMPLATE_H
+#endif //TEMPLATE_H
 //------------------------------------------------------------------------------

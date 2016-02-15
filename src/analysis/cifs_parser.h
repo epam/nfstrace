@@ -32,15 +32,14 @@ namespace NST
 {
 namespace analysis
 {
-
 /*! \class It is class which can parse CIFS messages and it called by ParserThread
  */
 class CIFSParser
 {
-    using FilteredDataQueue = NST::utils::FilteredDataQueue;//!< Packets queue
+    using FilteredDataQueue = NST::utils::FilteredDataQueue; //!< Packets queue
 
-    Analyzers& analyzers;//!< Plugins manager
-    Sessions<Session> sessions;//!< Sessions list
+    Analyzers&        analyzers; //!< Plugins manager
+    Sessions<Session> sessions;  //!< Sessions list
 
     /*! Parses SMBv1 packet
      * \param header - Message's header
@@ -55,11 +54,11 @@ class CIFSParser
      * \param requestData - Call's data
      * \param responseData - Reply's data
      */
-    inline void analyse_operation(Session* session,
+    inline void analyse_operation(Session*                                session,
                                   const protocols::CIFSv1::MessageHeader* request,
                                   const protocols::CIFSv1::MessageHeader* response,
-                                  FilteredDataQueue::Ptr&& requestData,
-                                  FilteredDataQueue::Ptr&& responseData);
+                                  FilteredDataQueue::Ptr&&                requestData,
+                                  FilteredDataQueue::Ptr&&                responseData);
 
     /*! Parses SMB v2 packet
      * \param header - Message's header
@@ -74,15 +73,18 @@ class CIFSParser
      * \param requestData - Call's data
      * \param responseData - Reply's data
      */
-    inline void analyse_operation(Session* session,
+    inline void analyse_operation(Session*                                session,
                                   const protocols::CIFSv2::MessageHeader* request,
                                   const protocols::CIFSv2::MessageHeader* response,
-                                  FilteredDataQueue::Ptr&& requestData,
-                                  FilteredDataQueue::Ptr&& responseData);
-public:
+                                  FilteredDataQueue::Ptr&&                requestData,
+                                  FilteredDataQueue::Ptr&&                responseData);
 
+public:
     CIFSParser(Analyzers& a);
-    CIFSParser(CIFSParser& c) : analyzers(c.analyzers) {}
+    CIFSParser(CIFSParser& c)
+        : analyzers(c.analyzers)
+    {
+    }
 
     /*! Function which will be called by ParserThread class
      * \param data - raw packet
@@ -94,5 +96,5 @@ public:
 } // analysis
 } // NST
 //------------------------------------------------------------------------------
-#endif//CIFS_PARSER_H
+#endif //CIFS_PARSER_H
 //------------------------------------------------------------------------------

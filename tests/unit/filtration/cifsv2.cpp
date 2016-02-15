@@ -23,8 +23,8 @@
 #include <gtest/gtest.h>
 
 #include "controller/running_status.h"
-#include "filtration/filtration_processor.h"
 #include "filtration/cifs_filtrator.h"
+#include "filtration/filtration_processor.h"
 #include "filtration/filtrators.h"
 #include "filtration/packet.h"
 //------------------------------------------------------------------------------
@@ -36,14 +36,13 @@ using ::testing::_;
 
 namespace
 {
-
 class Writer
 {
 public:
-
     class Collection
     {
         Collection* pImpl = nullptr;
+
     public:
         void set(Writer& w, NST::utils::NetworkSession* /*session_ptr*/)
         {
@@ -52,7 +51,7 @@ public:
 
         virtual void reset()
         {
-            if (pImpl)
+            if(pImpl)
             {
                 pImpl->reset();
             }
@@ -60,7 +59,7 @@ public:
 
         virtual void push(PacketInfo& info, size_t size)
         {
-            if (pImpl)
+            if(pImpl)
             {
                 pImpl->push(info, size);
             }
@@ -68,7 +67,7 @@ public:
 
         virtual void skip_first(size_t size)
         {
-            if (pImpl)
+            if(pImpl)
             {
                 pImpl->skip_first(size);
             }
@@ -76,7 +75,7 @@ public:
 
         virtual void complete(PacketInfo& info)
         {
-            if (pImpl)
+            if(pImpl)
             {
                 pImpl->complete(info);
             }
@@ -89,7 +88,7 @@ public:
 
         virtual const uint8_t* data()
         {
-            if (pImpl)
+            if(pImpl)
             {
                 return pImpl->data();
             }
@@ -98,7 +97,7 @@ public:
 
         virtual size_t data_size()
         {
-            if (pImpl)
+            if(pImpl)
             {
                 return pImpl->data_size();
             }
@@ -107,7 +106,7 @@ public:
 
         virtual size_t capacity()
         {
-            if (pImpl)
+            if(pImpl)
             {
                 return pImpl->capacity();
             }
@@ -116,7 +115,7 @@ public:
 
         virtual void allocate()
         {
-            if (pImpl)
+            if(pImpl)
             {
                 pImpl->allocate();
             }
@@ -127,18 +126,16 @@ public:
     public:
         MOCK_METHOD0(reset, void());
         MOCK_METHOD2(push, void(PacketInfo&, size_t));
-        MOCK_METHOD0(data, const uint8_t* ());
+        MOCK_METHOD0(data, const uint8_t*());
         MOCK_METHOD0(data_size, size_t());
         MOCK_METHOD0(capacity, size_t());
         MOCK_METHOD0(allocate, void());
         MOCK_METHOD1(skip_first, void(size_t));
         MOCK_METHOD1(complete, void(PacketInfo&));
-
     };
 
     CollectionMock collection;
 };
-
 }
 
 TEST(Filtration, CIFSFiltratorReset)
@@ -146,7 +143,7 @@ TEST(Filtration, CIFSFiltratorReset)
     // Set conditions
     Writer mock;
     EXPECT_CALL(mock.collection, reset())
-    .Times(1);
+        .Times(1);
 
     CIFSFiltrator<Writer> f;
     f.set_writer(nullptr, &mock, 0);
@@ -159,7 +156,7 @@ TEST(Filtration, filtratorsResets)
     // Set conditions
     Writer mock;
     EXPECT_CALL(mock.collection, reset())
-    .Times(2);
+        .Times(2);
 
     Filtrators<Writer> f;
     f.set_writer(nullptr, &mock, 0);
@@ -172,25 +169,24 @@ TEST(Filtration, pushRPCheader)
     // Prepare data
     struct pcap_pkthdr header;
     header.caplen = header.len = 16;
-    const uint8_t packet[] = {0x80, 0x00, 0x00, 0x84,
+    const uint8_t packet[]     = {0x80, 0x00, 0x00, 0x84,
                               0xec, 0x8a, 0x42, 0xcb,
                               0x00, 0x00, 0x00, 0x00,
-                              0x00, 0x00, 0x00, 0x02
-                             };
+                              0x00, 0x00, 0x00, 0x02};
     PacketInfo info(&header, packet, 0);
 
     Writer mock;
     EXPECT_CALL(mock.collection, data())
-    .WillRepeatedly(Return(packet));
+        .WillRepeatedly(Return(packet));
     EXPECT_CALL(mock.collection, data_size())
-    .WillOnce(Return(0))
-    .WillOnce(Return(0))
-    .WillRepeatedly(Return(sizeof(packet)));
+        .WillOnce(Return(0))
+        .WillOnce(Return(0))
+        .WillRepeatedly(Return(sizeof(packet)));
     EXPECT_CALL(mock.collection, capacity())
-    .WillRepeatedly(Return(1000000));
+        .WillRepeatedly(Return(1000000));
     // Set conditions
     EXPECT_CALL(mock.collection, push(_, _))
-    .Times(AtLeast(1));
+        .Times(AtLeast(1));
 
     Filtrators<Writer> f;
     f.set_writer(nullptr, &mock, 0);
@@ -203,25 +199,24 @@ TEST(Filtration, pushCIFSheader)
     // Prepare data
     struct pcap_pkthdr header;
     header.caplen = header.len = 16;
-    const uint8_t packet[] = {0x00, 0x00, 0x00, 0x68,
+    const uint8_t packet[]     = {0x00, 0x00, 0x00, 0x68,
                               0xfe, 0x53, 0x4d, 0x42,
                               0x00, 0x00, 0x00, 0x00,
-                              0x00, 0x00, 0x00, 0x00
-                             };
+                              0x00, 0x00, 0x00, 0x00};
     PacketInfo info(&header, packet, 0);
 
     Writer mock;
     EXPECT_CALL(mock.collection, data())
-    .WillRepeatedly(Return(packet));
+        .WillRepeatedly(Return(packet));
     EXPECT_CALL(mock.collection, data_size())
-    .WillOnce(Return(0))
-    .WillOnce(Return(0))
-    .WillRepeatedly(Return(sizeof(packet)));
+        .WillOnce(Return(0))
+        .WillOnce(Return(0))
+        .WillRepeatedly(Return(sizeof(packet)));
     EXPECT_CALL(mock.collection, capacity())
-    .WillRepeatedly(Return(1000000));
+        .WillRepeatedly(Return(1000000));
     // Set conditions
     EXPECT_CALL(mock.collection, push(_, _))
-    .Times(AtLeast(1));
+        .Times(AtLeast(1));
 
     Filtrators<Writer> f;
     f.set_writer(nullptr, &mock, 0);

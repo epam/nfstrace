@@ -26,10 +26,10 @@
 #include <memory>
 
 #include "analysis/analysis_manager.h"
-#include "filtration/filtration_manager.h"
 #include "controller/parameters.h"
 #include "controller/running_status.h"
 #include "controller/signal_handler.h"
+#include "filtration/filtration_manager.h"
 #include "utils/log.h"
 #include "utils/out.h"
 //------------------------------------------------------------------------------
@@ -37,11 +37,13 @@ namespace NST
 {
 namespace controller
 {
-
 class ControllerError : public std::runtime_error
 {
 public:
-    explicit ControllerError(const std::string& msg) : std::runtime_error{msg} { }
+    explicit ControllerError(const std::string& msg)
+        : std::runtime_error{msg}
+    {
+    }
 };
 
 class Controller
@@ -53,25 +55,24 @@ class Controller
     {
     public:
         inline Running(Controller&);
-        Running()                                = delete;
-        Running(const Running&)                  = delete;
-        Running& operator=(const Running&)       = delete;
+        Running()               = delete;
+        Running(const Running&) = delete;
+        Running& operator=(const Running&) = delete;
         inline ~Running();
+
     private:
         Controller& controller;
     };
 
 public:
-
     Controller(const Parameters&);
-    Controller(const Controller&)            = delete;
+    Controller(const Controller&) = delete;
     Controller& operator=(const Controller&) = delete;
     ~Controller();
 
     int run();
 
 private:
-
     // initializer for global outptut
     utils::Out::Global gout;
     // initializer for global logger
@@ -86,7 +87,6 @@ private:
     // controller subsystems
     std::unique_ptr<AnalysisManager>   analysis;
     std::unique_ptr<FiltrationManager> filtration;
-
 };
 
 /*! Drop root privileges
@@ -101,5 +101,5 @@ void droproot(const std::string& dropuser);
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//CONTROLLER_H
+#endif // CONTROLLER_H
 //------------------------------------------------------------------------------

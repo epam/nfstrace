@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Author: Alexey Costroma 
+// Author: Alexey Costroma
 // Description: Helpers for parsing NFS structures.
 // Copyright (c) 2014-2015 EPAM Systems
 //------------------------------------------------------------------------------
@@ -25,7 +25,7 @@
 #include "protocols/nfs4/nfs4_utils.h"
 //------------------------------------------------------------------------------
 using namespace NST::API::NFS4;
-using namespace NST::protocols::NFS;  // NFS helpers
+using namespace NST::protocols::NFS; // NFS helpers
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -33,12 +33,12 @@ namespace protocols
 {
 namespace NFS4
 {
-
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure proc)
 {
     return out << print_nfs4_procedures(proc);
 }
 
+// clang-format off
 const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc)
 {
     // In all cases we suppose, that NFSv4 operation ILLEGAL(10044)
@@ -4435,6 +4435,8 @@ xdr_CB_COMPOUND4res (XDR* xdrs, CB_COMPOUND4res* objp)
     }
     return TRUE;
 }
+
+// clang-format on
 
 } // namespace NFS4
 } // namespace protocols

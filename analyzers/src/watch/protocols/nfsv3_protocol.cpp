@@ -20,10 +20,11 @@
 */
 //------------------------------------------------------------------------------
 #include <api/plugin_api.h> // include plugin development definitions
+
 #include "nfsv3_protocol.h"
 //------------------------------------------------------------------------------
 NFSv3Protocol::NFSv3Protocol()
-: AbstractProtocol {"NFS v3", ProcEnumNFS3::count}
+    : AbstractProtocol{"NFS v3", ProcEnumNFS3::count}
 {
 }
 
@@ -33,7 +34,10 @@ NFSv3Protocol::~NFSv3Protocol()
 
 const char* NFSv3Protocol::printProcedure(std::size_t i)
 {
-    if ( i > ProcEnumNFS3::count) { return nullptr; }
-    return  print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
+    if(i > ProcEnumNFS3::count)
+    {
+        return nullptr;
+    }
+    return print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(i));
 }
 //------------------------------------------------------------------------------

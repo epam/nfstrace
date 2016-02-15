@@ -35,15 +35,17 @@ namespace filtration
 {
 namespace pcap
 {
-
-inline const char* library_version() { return pcap_lib_version(); }
+inline const char* library_version()
+{
+    return pcap_lib_version();
+}
 
 class BaseReader
 {
 protected:
     BaseReader(const std::string& input)
-    : handle{nullptr}
-    , source{input}
+        : handle{nullptr}
+        , source{input}
     {
     }
 
@@ -56,25 +58,23 @@ protected:
     }
 
 public:
-    bool loop(void* user, pcap_handler callback, int count=0)
+    bool loop(void* user, pcap_handler callback, int count = 0)
     {
-        const int err {pcap_loop(handle, count, callback, (u_char*)user)};
+        const int err{pcap_loop(handle, count, callback, (u_char*)user)};
         if(err == -1) throw PcapError("pcap_loop", pcap_geterr(handle));
 
         return err == 0; // count is exhausted
     }
 
-    inline void     break_loop() { pcap_breakloop(handle); }
-    inline pcap_t*& get_handle() { return handle;          }
-
-    inline        int         datalink             () const { return pcap_datalink(handle); }
-    inline static const char* datalink_name        (const int dlt) { return pcap_datalink_val_to_name(dlt);        }
-    inline static const char* datalink_description (const int dlt) { return pcap_datalink_val_to_description(dlt); }
-
+    inline void               break_loop() { pcap_breakloop(handle); }
+    inline pcap_t*&           get_handle() { return handle; }
+    inline int                datalink() const { return pcap_datalink(handle); }
+    inline static const char* datalink_name(const int dlt) { return pcap_datalink_val_to_name(dlt); }
+    inline static const char* datalink_description(const int dlt) { return pcap_datalink_val_to_description(dlt); }
     virtual void print_statistic(std::ostream& out) const = 0;
 
 protected:
-    pcap_t* handle;
+    pcap_t*           handle;
     const std::string source;
 };
 
@@ -82,5 +82,5 @@ protected:
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//BASE_READER_H
+#endif // BASE_READER_H
 //------------------------------------------------------------------------------

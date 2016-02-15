@@ -19,27 +19,26 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include <iomanip>
-#include <time.h>
 #include <algorithm>
-#include <utility>
+#include <ctime>
+#include <iomanip>
 #include <sstream>
+#include <utility>
 
 #include "analysis/print_analyzer.h"
 #include "protocols/cifs/cifs.h"
 #include "protocols/cifs2/cifs2.h"
+#include "protocols/cifs2/cifs2_utils.h"
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/nfs3/nfs3_utils.h"
-#include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/nfs4/nfs41_utils.h"
-#include "protocols/cifs2/cifs2_utils.h"
+#include "protocols/nfs4/nfs4_utils.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis
 {
-
 using SMBv1Commands = NST::API::SMBv1::SMBv1Commands;
 using SMBv2Commands = NST::API::SMBv2::SMBv2Commands;
 using namespace NST::protocols::CIFSv2;
@@ -52,23 +51,23 @@ namespace NFS4  = NST::API::NFS4;
 namespace NFS41 = NST::API::NFS41;
 
 namespace
-{ 
+{
 bool print_procedure(std::ostream& out, const RPCProcedure* proc)
 {
     using namespace NST::utils;
-    bool result {false};
+    bool result{false};
     out << *(proc->session);
 
-    auto& call = proc->call;
-    const unsigned long nfs_version {call.ru.RM_cmb.cb_vers};
-    if (out_all())
+    auto&               call = proc->call;
+    const unsigned long nfs_version{call.ru.RM_cmb.cb_vers};
+    if(out_all())
     {
-        out << " XID: "         << call.rm_xid
+        out << " XID: " << call.rm_xid
             << " RPC version: " << call.ru.RM_cmb.cb_rpcvers
             << " RPC program: " << call.ru.RM_cmb.cb_prog
-            << " version: "     << nfs_version << ' ';
+            << " version: " << nfs_version << ' ';
     }
-    switch (nfs_version)
+    switch(nfs_version)
     {
     case NFS_V3:
         out << print_nfs3_procedures(static_cast<ProcEnumNFS3::NFSProcedure>(call.ru.RM_cmb.cb_proc));
@@ -80,16 +79,16 @@ bool print_procedure(std::ostream& out, const RPCProcedure* proc)
 
     // check procedure reply
     auto& reply = proc->reply;
-    if (reply.ru.RM_rmb.rp_stat == reply_stat::MSG_ACCEPTED)
+    if(reply.ru.RM_rmb.rp_stat == reply_stat::MSG_ACCEPTED)
     {
-        switch (reply.ru.RM_rmb.ru.RP_ar.ar_stat)
+        switch(reply.ru.RM_rmb.ru.RP_ar.ar_stat)
         {
         case accept_stat::SUCCESS:
-            result = true;    // Ok, reply is correct
+            result = true; // Ok, reply is correct
             break;
         case accept_stat::PROG_MISMATCH:
             out << " Program mismatch: "
-                << " low: "  << reply.ru.RM_rmb.ru.RP_ar.ru.AR_versions.low
+                << " low: " << reply.ru.RM_rmb.ru.RP_ar.ru.AR_versions.low
                 << " high: " << reply.ru.RM_rmb.ru.RP_ar.ru.AR_versions.high;
             break;
         case accept_stat::PROG_UNAVAIL:
@@ -106,10 +105,10 @@ bool print_procedure(std::ostream& out, const RPCProcedure* proc)
             break;
         }
     }
-    else if (reply.ru.RM_rmb.rp_stat == reply_stat::MSG_DENIED)
+    else if(reply.ru.RM_rmb.rp_stat == reply_stat::MSG_DENIED)
     {
         out << " RPC Call rejected: ";
-        switch (reply.ru.RM_rmb.ru.RP_dr.rj_stat)
+        switch(reply.ru.RM_rmb.ru.RP_dr.rj_stat)
         {
         case reject_stat::RPC_MISMATCH:
             out << "RPC version number mismatch, "
@@ -121,7 +120,7 @@ bool print_procedure(std::ostream& out, const RPCProcedure* proc)
         case reject_stat::AUTH_ERROR:
         {
             out << " Authentication check: ";
-            switch (reply.ru.RM_rmb.ru.RP_dr.ru.RJ_why)
+            switch(reply.ru.RM_rmb.ru.RP_dr.ru.RJ_why)
             {
             case auth_stat::AUTH_OK:
                 out << "OK";
@@ -166,13 +165,13 @@ bool print_procedure(std::ostream& out, const RPCProcedure* proc)
 std::ostream& print_time(std::ostream& out, uint64_t time)
 {
     // TODO: Replace with C++ 11 functions
-    if (time != 0)
+    if(time != 0)
     {
         const auto EPOCH_DIFF = 0x019DB1DED53E8000LL; /* 116444736000000000 nsecs */
-        const auto RATE_DIFF = 10000000;              /* 100 nsecs */
+        const auto RATE_DIFF  = 10000000;             /* 100 nsecs */
 
         uint64_t unixTimestamp = (time - EPOCH_DIFF) / RATE_DIFF;
-        time_t t = static_cast<time_t>(unixTimestamp);
+        time_t   t             = static_cast<time_t>(unixTimestamp);
 
         // NOTE: If you ever want to print the year/day/month separately like this:
         //
@@ -181,8 +180,8 @@ std::ostream& print_time(std::ostream& out, uint64_t time)
         // do not forget adding 1900 to tm_year field, just to get current year
         // lt->tm_year + 1900
 
-        const char *pTime = ctime(&t);
-        if (pTime != nullptr)
+        const char* pTime = ctime(&t);
+        if(pTime != nullptr)
         {
             // ctime adds "\n" at the end - remove it.
             size_t len = std::strlen(pTime);
@@ -197,7 +196,7 @@ std::ostream& print_time(std::ostream& out, uint64_t time)
     return out;
 }
 
-std::ostream& print_buffer(std::ostream& out, const uint8_t *buffer, uint16_t len)
+std::ostream& print_buffer(std::ostream& out, const uint8_t* buffer, uint16_t len)
 {
     // TODO: Add unicode support
     const char* char_buffer = reinterpret_cast<const char*>(buffer);
@@ -211,7 +210,7 @@ std::ostream& print_buffer(std::ostream& out, const uint8_t *buffer, uint16_t le
     return out;
 }
 
-std::ostream& print_buffer_hex(std::ostream& out, const uint8_t *buffer, uint16_t len)
+std::ostream& print_buffer_hex(std::ostream& out, const uint8_t* buffer, uint16_t len)
 {
     for(uint16_t i = 0; i < len; i++)
     {
@@ -229,16 +228,15 @@ void print_guid(std::ostream& out, const uint8_t (&guid)[16])
 
     // print hex value with preceding 0 (zeros) if necessary
     // ( e.g: 0x01 will be printed as 01 or 0x00 as 00 )
-    auto print_hex = [&out](uint32_t value, uint8_t bitShift)
-    {
+    auto print_hex = [&out](uint32_t value, uint8_t bitShift) {
         out << std::hex << std::setfill('0') << std::setw(2)
             << (static_cast<uint32_t>(value >> bitShift) & 0xFF) << std::dec;
     };
 
     print_hex(refGuid.Data1, 24);
     print_hex(refGuid.Data1, 16);
-    print_hex(refGuid.Data1,  8);
-    print_hex(refGuid.Data1,  0);
+    print_hex(refGuid.Data1, 8);
+    print_hex(refGuid.Data1, 0);
     out << "-";
     print_hex(refGuid.Data2, 8);
     print_hex(refGuid.Data2, 0);
@@ -256,7 +254,7 @@ void print_guid(std::ostream& out, const uint8_t (&guid)[16])
     }
 }
 
-template<typename CommandType>
+template <typename CommandType>
 std::ostream& print_session(std::ostream& out, CommandType* cmd)
 {
     using namespace NST::utils;
@@ -265,7 +263,7 @@ std::ostream& print_session(std::ostream& out, CommandType* cmd)
     return out;
 }
 
-template<typename CommandType>
+template <typename CommandType>
 std::ostream& print_smbv2_common_info_req(std::ostream& out, SMBv2Commands, CommandType* cmd)
 {
     out << "  Structure size = ";
@@ -273,17 +271,17 @@ std::ostream& print_smbv2_common_info_req(std::ostream& out, SMBv2Commands, Comm
     return out;
 }
 
-template<typename CommandType>
+template <typename CommandType>
 std::ostream& print_smbv2_common_info_resp(std::ostream& out, SMBv2Commands, CommandType* cmd)
 {
     out << "  Structure size = ";
     print_hex16(out, cmd->pres->structureSize);
     return out;
-} 
+}
 
 std::ostream& print_smbv2_header(std::ostream& out, const RawMessageHeader* header)
 {
-    if (header == nullptr)
+    if(header == nullptr)
     {
         return out;
     }
@@ -309,7 +307,7 @@ std::ostream& print_smbv2_header(std::ostream& out, const RawMessageHeader* head
     out << "  Credit Charge = " << header->CreditCharge << "\n";
 
     bool isResponse = header->flags & static_cast<uint32_t>(Flags::SERVER_TO_REDIR);
-    if (isResponse)
+    if(isResponse)
     {
         SMBv2::NTStatus status = static_cast<SMBv2::NTStatus>(header->status);
         print_enum(out, "NT Status", status);
@@ -322,7 +320,7 @@ std::ostream& print_smbv2_header(std::ostream& out, const RawMessageHeader* head
     out << "\n";
     print_enum(out, "Command", header->cmd_code) << "\n";
 
-    if (isResponse)
+    if(isResponse)
     {
         out << "  Credits granted = " << header->Credit << "\n";
     }
@@ -409,7 +407,7 @@ void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand* cmd,
         << "\n";
 
     print_enum(out, "Security mode", cmd->parg->securityMode) << "\n";
-    print_enum(out, "Capabilities", cmd->parg->capabilities) << "\n"; 
+    print_enum(out, "Capabilities", cmd->parg->capabilities) << "\n";
 
     out << "  Client Guid = ";
     print_guid(out, cmd->parg->clientGUID);
@@ -428,7 +426,7 @@ void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand* cmd,
     print_smbv2_header(out, cmd->res_header) << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd) << "\n";
 
-    print_enum(out, "Security mode", res->securityMode) << "\n"; 
+    print_enum(out, "Security mode", res->securityMode) << "\n";
 
     out << "  Dialect = ";
     print_hex16(out, res->dialectRevision);
@@ -457,7 +455,6 @@ void PrintAnalyzer::negotiateSMBv2(const SMBv2::NegotiateCommand* cmd,
 
     out << "\n  Boot Time = ";
     print_time(out, res->serverStartTime);
-
 }
 
 void PrintAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd,
@@ -469,9 +466,9 @@ void PrintAnalyzer::sessionSetupSMBv2(const SMBv2::SessionSetupCommand* cmd,
     print_session(out, cmd) << "\n";
     print_smbv2_header(out, cmd->req_header) << "\n";
     print_smbv2_common_info_req(out, cmdEnum, cmd) << "\n";
-    print_enum(out, "Flags", cmd->parg->VcNumber) << "\n"; 
-    print_enum(out, "Security mode", cmd->parg->securityMode) << "\n"; 
-    print_enum(out, "Capabilities", cmd->parg->capabilities) << "\n"; 
+    print_enum(out, "Flags", cmd->parg->VcNumber) << "\n";
+    print_enum(out, "Security mode", cmd->parg->securityMode) << "\n";
+    print_enum(out, "Capabilities", cmd->parg->capabilities) << "\n";
     out << "  Channel = " << cmd->parg->Channel << "\n"
         << "  Previous session id = " << cmd->parg->PreviousSessionId << "\n";
     print_smbv2_header(out, cmd->res_header) << "\n";
@@ -507,14 +504,14 @@ void PrintAnalyzer::treeConnectSMBv2(const SMBv2::TreeConnectCommand* cmd,
     if(plen > 0)
     {
         out << "  Tree =";
-        print_buffer(out,cmd->parg->Buffer, plen) << "\n";
+        print_buffer(out, cmd->parg->Buffer, plen) << "\n";
     }
     print_smbv2_header(out, cmd->res_header) << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd) << "\n";
     print_enum(out, "Share types", res->ShareType) << "\n";
     print_enum(out, "Capabilities", res->capabilities) << "\n";
     print_enum(out, "Share flags", res->shareFlags) << "\n";
-    print_enum(out, "Access mask", static_cast<SMBv2::AccessMask>(res->MaximalAccess)); 
+    print_enum(out, "Access mask", static_cast<SMBv2::AccessMask>(res->MaximalAccess));
 }
 
 void PrintAnalyzer::treeDisconnectSMBv2(const SMBv2::TreeDisconnectCommand* cmd,
@@ -538,16 +535,16 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
     print_session(out, cmd) << "\n";
     print_smbv2_header(out, cmd->req_header) << "\n";
     print_smbv2_common_info_req(out, cmdEnum, cmd) << "\n";
-    print_enum(out, "Oplock", cmd->parg->RequestedOplockLevel) << "\n";  
-    print_enum(out, "Impersonation", cmd->parg->ImpersonationLevel) << "\n"; 
-    out << "  Create Flags = "; 
+    print_enum(out, "Oplock", cmd->parg->RequestedOplockLevel) << "\n";
+    print_enum(out, "Impersonation", cmd->parg->ImpersonationLevel) << "\n";
+    out << "  Create Flags = ";
     print_hex64(out, cmd->parg->SmbCreateFlags);
     out << "\n";
-    print_enum(out, "Access Mask", cmd->parg->desiredAccess) << "\n"; 
-    print_enum(out, "File Attributes", cmd->parg->attributes) << "\n"; 
-    print_enum(out, "Share Access", cmd->parg->shareAccess) << "\n"; 
-    print_enum(out, "Disposition", cmd->parg->createDisposition) << "\n"; 
-    print_enum(out, "Create Options", cmd->parg->createOptions) << "\n"; 
+    print_enum(out, "Access Mask", cmd->parg->desiredAccess) << "\n";
+    print_enum(out, "File Attributes", cmd->parg->attributes) << "\n";
+    print_enum(out, "Share Access", cmd->parg->shareAccess) << "\n";
+    print_enum(out, "Disposition", cmd->parg->createDisposition) << "\n";
+    print_enum(out, "Create Options", cmd->parg->createOptions) << "\n";
 
     const auto len = NST::API::SMBv2::pc_to_net(cmd->parg->NameLength);
     if(len > 0)
@@ -560,13 +557,13 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
     print_smbv2_header(out, cmd->res_header) << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd) << "\n";
 
-    print_enum(out, "Oplock", res->oplockLevel) << "\n"; 
+    print_enum(out, "Oplock", res->oplockLevel) << "\n";
     out << "  Response Flags = ";
     print_hex8(out, res->flag);
     out << "\n";
-    print_enum(out, "Create Action", res->CreateAction) << "\n"; 
+    print_enum(out, "Create Action", res->CreateAction) << "\n";
 
-    if (cmd->res_header && cmd->res_header->status == to_integral(SMBv2::NTStatus::STATUS_SUCCESS))
+    if(cmd->res_header && cmd->res_header->status == to_integral(SMBv2::NTStatus::STATUS_SUCCESS))
     {
         out << "  Create = ";
         print_time(out, res->CreationTime);
@@ -586,7 +583,7 @@ void PrintAnalyzer::createSMBv2(const SMBv2::CreateCommand* cmd,
         out << "\n  End Of File = ";
         out << res->EndofFile << "\n";
 
-        print_enum(out, "File Attributes", res->attributes); 
+        print_enum(out, "File Attributes", res->attributes);
     }
 }
 
@@ -643,13 +640,13 @@ void PrintAnalyzer::writeSMBv2(const SMBv2::WriteCommand* cmd,
     print_hex16(out, cmd->parg->dataOffset);
 
     out << "\n"
-    << "  Write Length = " << cmd->parg->Length << "\n"
-    << "  File Offset = " << cmd->parg->Offset << "\n"
-    << "  Channel = " << to_integral(cmd->parg->Channel) << "\n"
-    << "  Remaining Bytes = " << cmd->parg->RemainingBytes << "\n"
-    << "  Channel Info Offset = " << cmd->parg->WriteChannelInfoOffset << "\n"
-    << "  Channel Info Length = " << cmd->parg->WriteChannelInfoLength << "\n"; 
-    print_enum(out, "Write Flags", cmd->parg->Flags) << "\n"; 
+        << "  Write Length = " << cmd->parg->Length << "\n"
+        << "  File Offset = " << cmd->parg->Offset << "\n"
+        << "  Channel = " << to_integral(cmd->parg->Channel) << "\n"
+        << "  Remaining Bytes = " << cmd->parg->RemainingBytes << "\n"
+        << "  Channel Info Offset = " << cmd->parg->WriteChannelInfoOffset << "\n"
+        << "  Channel Info Length = " << cmd->parg->WriteChannelInfoLength << "\n";
+    print_enum(out, "Write Flags", cmd->parg->Flags) << "\n";
 
     print_smbv2_header(out, cmd->res_header) << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd) << "\n";
@@ -681,8 +678,8 @@ void PrintAnalyzer::ioctlSMBv2(const SMBv2::IoctlCommand* cmd,
     SMBv2Commands cmdEnum = SMBv2Commands::IOCTL;
     print_session(out, cmd) << "\n";
     print_smbv2_header(out, cmd->req_header) << "\n";
-    print_smbv2_common_info_req(out, cmdEnum, cmd) << "\n"; 
-    print_enum(out, "Control Code", cmd->parg->CtlCode) << "\n"; 
+    print_smbv2_common_info_req(out, cmdEnum, cmd) << "\n";
+    print_enum(out, "Control Code", cmd->parg->CtlCode) << "\n";
     out << "  Input offset = " << cmd->parg->InputOffset << "\n"
         << "  Input count = " << cmd->parg->InputCount << "\n"
         << "  Max input response = " << cmd->parg->MaxInputResponse << "\n"
@@ -691,7 +688,7 @@ void PrintAnalyzer::ioctlSMBv2(const SMBv2::IoctlCommand* cmd,
         << "  Max output response  = " << cmd->parg->MaxOutputResponse << "\n";
     print_smbv2_header(out, cmd->res_header) << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd) << "\n";
-    print_enum(out, "Control Code", res->CtlCode) << "\n"; 
+    print_enum(out, "Control Code", res->CtlCode) << "\n";
     out << "  Input offset = " << res->InputOffset << "\n"
         << "  Input count = " << res->InputCount << "\n"
         << "  Output offset = " << res->OutputOffset << "\n"
@@ -726,7 +723,7 @@ void PrintAnalyzer::queryDirSMBv2(const SMBv2::QueryDirCommand* cmd,
     print_session(out, cmd) << "\n";
     print_smbv2_header(out, cmd->req_header) << "\n";
     print_smbv2_common_info_req(out, cmdEnum, cmd) << "\n";
-    print_enum(out, "Info level", cmd->parg->infoType) << "\n"; 
+    print_enum(out, "Info level", cmd->parg->infoType) << "\n";
     out << "  File index = " << cmd->parg->FileIndex << "\n"
         << "  Output buffer length = " << cmd->parg->OutputBufferLength << "\n"
         << "  Search pattern =";
@@ -749,7 +746,7 @@ void PrintAnalyzer::changeNotifySMBv2(const SMBv2::ChangeNotifyCommand* cmd,
     print_smbv2_header(out, cmd->res_header) << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd) << "\n";
     out << "  Offset = ";
-    print_hex32(out, res->OutputBufferOffset); 
+    print_hex32(out, res->OutputBufferOffset);
     out << "\n";
     out << "  Length = ";
     print_hex32(out, res->OutputBufferLength);
@@ -762,13 +759,13 @@ void PrintAnalyzer::queryInfoSMBv2(const SMBv2::QueryInfoCommand* cmd,
     print_session(out, cmd) << "\n";
     print_smbv2_header(out, cmd->req_header) << "\n";
     print_smbv2_common_info_req(out, cmdEnum, cmd) << "\n";
-    print_enum(out, "Class", cmd->parg->infoType) << "\n"; 
+    print_enum(out, "Class", cmd->parg->infoType) << "\n";
     print_info_levels(out, cmd->parg->infoType, cmd->parg->FileInfoClass) << "\n";
     //TODO: Print GUID handle file
     print_smbv2_header(out, cmd->res_header) << "\n";
     print_smbv2_common_info_resp(out, cmdEnum, cmd) << "\n";
     out << "  Offset = ";
-    print_hex32(out, res->OutputBufferOffset); 
+    print_hex32(out, res->OutputBufferOffset);
     out << "\n  Length = ";
     print_hex32(out, res->OutputBufferLength);
 }
@@ -780,10 +777,10 @@ void PrintAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* cmd,
     print_session(out, cmd) << "\n";
     print_smbv2_header(out, cmd->req_header) << "\n";
     print_smbv2_common_info_req(out, cmdEnum, cmd) << "\n";
-    print_enum(out, "Class", cmd->parg->infoType) << "\n"; 
+    print_enum(out, "Class", cmd->parg->infoType) << "\n";
     print_info_levels(out, cmd->parg->infoType, cmd->parg->FileInfoClass) << "\n";
     out << "  Setinfo Size = ";
-    print_hex32(out, cmd->parg->BufferLength); 
+    print_hex32(out, cmd->parg->BufferLength);
     out << "\n  Setinfo Offset = ";
     print_hex16(out, cmd->parg->BufferOffset);
     out << "\n";
@@ -792,8 +789,8 @@ void PrintAnalyzer::setInfoSMBv2(const SMBv2::SetInfoCommand* cmd,
 }
 
 void PrintAnalyzer::breakOplockSMBv2(const SMBv2::BreakOpLockCommand* cmd,
-                           const SMBv2::OplockAcknowledgment*,
-                           const SMBv2::OplockResponse* res)
+                                     const SMBv2::OplockAcknowledgment*,
+                                     const SMBv2::OplockResponse* res)
 {
     SMBv2Commands cmdEnum = SMBv2Commands::OPLOCK_BREAK;
 
@@ -818,7 +815,9 @@ void PrintAnalyzer::null(const RPCProcedure* proc,
                          const struct NFS3::NULL3args*,
                          const struct NFS3::NULL3res*)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
     out << "\tCALL  []\n\tREPLY []\n";
 }
 
@@ -826,18 +825,20 @@ void PrintAnalyzer::getattr3(const RPCProcedure*              proc,
                              const struct NFS3::GETATTR3args* args,
                              const struct NFS3::GETATTR3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  ["
             << " object: " << args->object
             << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all() && res->status == NFS3::nfsstat3::NFS3_OK)
+        if(out_all() && res->status == NFS3::nfsstat3::NFS3_OK)
             out << " obj attributes: "
                 << res->GETATTR3res_u.resok.obj_attributes;
         out << " ]\n";
@@ -848,21 +849,23 @@ void PrintAnalyzer::setattr3(const RPCProcedure*              proc,
                              const struct NFS3::SETATTR3args* args,
                              const struct NFS3::SETATTR3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ object: " << args->object
-            << " new attributes: "  << args->new_attributes
-            << " guard: "           << args->guard
+            << " new attributes: " << args->new_attributes
+            << " guard: " << args->guard
             << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " obj_wcc: "
                     << res->SETATTR3res_u.resok.obj_wcc;
             else
@@ -877,15 +880,19 @@ void PrintAnalyzer::lookup3(const RPCProcedure*             proc,
                             const struct NFS3::LOOKUP3args* args,
                             const struct NFS3::LOOKUP3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args) { out << "\tCALL  [ what: " << args->what << " ]\n"; }
-    if (res)
+    if(args) {
+        out << "\tCALL  [ what: " << args->what << " ]\n";
+    }
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " object: "
                     << res->LOOKUP3res_u.resok.object
                     << " object attributes: "
@@ -904,9 +911,11 @@ void PrintAnalyzer::access3(const RPCProcedure*             proc,
                             const struct NFS3::ACCESS3args* args,
                             const struct NFS3::ACCESS3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ object: ";
         print_nfs_fh(out,
@@ -917,12 +926,12 @@ void PrintAnalyzer::access3(const RPCProcedure*             proc,
         out << " ]\n";
     }
 
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
             {
                 out << " object attributes: "
                     << res->ACCESS3res_u.resok.obj_attributes
@@ -943,15 +952,19 @@ void PrintAnalyzer::readlink3(const RPCProcedure*               proc,
                               const struct NFS3::READLINK3args* args,
                               const struct NFS3::READLINK3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args) { out << "\tCALL  [ symlink: " << args->symlink << " ]\n"; }
-    if (res)
+    if(args) {
+        out << "\tCALL  [ symlink: " << args->symlink << " ]\n";
+    }
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " symlink attributes: "
                     << res->READLINK3res_u.resok.symlink_attributes
                     << " data: "
@@ -968,21 +981,23 @@ void PrintAnalyzer::read3(const RPCProcedure*           proc,
                           const struct NFS3::READ3args* args,
                           const struct NFS3::READ3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ file: " << args->file
             << " offset: " << args->offset
-            << " count: "  << args->count
+            << " count: " << args->count
             << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
             {
                 out << " file attributes: "
                     << res->READ3res_u.resok.file_attributes
@@ -1005,22 +1020,24 @@ void PrintAnalyzer::write3(const RPCProcedure*            proc,
                            const struct NFS3::WRITE3args* args,
                            const struct NFS3::WRITE3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ file: " << args->file
             << " offset: " << args->offset
-            << " count: "  << args->count
+            << " count: " << args->count
             << " stable: " << args->stable
             << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
             {
                 out << " file_wcc: "
                     << res->WRITE3res_u.resok.file_wcc
@@ -1047,18 +1064,20 @@ void PrintAnalyzer::create3(const RPCProcedure*             proc,
                             const struct NFS3::CREATE3args* args,
                             const struct NFS3::CREATE3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
         out << "\tCALL  [ where: " << args->where
             << " how: " << args->how
             << " ]\n";
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " obj: "
                     << res->CREATE3res_u.resok.obj
                     << " obj attributes: "
@@ -1077,18 +1096,20 @@ void PrintAnalyzer::mkdir3(const RPCProcedure*            proc,
                            const struct NFS3::MKDIR3args* args,
                            const struct NFS3::MKDIR3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
         out << "\tCALL  [ where: " << args->where
-            << " attributes: "     << args->attributes
+            << " attributes: " << args->attributes
             << " ]\n";
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " obj: "
                     << res->MKDIR3res_u.resok.obj
                     << " obj attributes: "
@@ -1107,18 +1128,20 @@ void PrintAnalyzer::symlink3(const RPCProcedure*              proc,
                              const struct NFS3::SYMLINK3args* args,
                              const struct NFS3::SYMLINK3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
         out << "\tCALL  [ where: " << args->where
-            << " symlink: "        << args->symlink
+            << " symlink: " << args->symlink
             << " ]\n";
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " obj: "
                     << res->SYMLINK3res_u.resok.obj
                     << " obj attributes: "
@@ -1137,20 +1160,22 @@ void PrintAnalyzer::mknod3(const RPCProcedure*            proc,
                            const struct NFS3::MKNOD3args* args,
                            const struct NFS3::MKNOD3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ where: " << args->where
-            << " what: "           << args->what
+            << " what: " << args->what
             << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " obj: "
                     << res->MKNOD3res_u.resok.obj
                     << " obj attributes: "
@@ -1169,18 +1194,20 @@ void PrintAnalyzer::remove3(const RPCProcedure*             proc,
                             const struct NFS3::REMOVE3args* args,
                             const struct NFS3::REMOVE3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ object: " << args->object << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " dir_wcc: "
                     << res->REMOVE3res_u.resok.dir_wcc;
             else
@@ -1195,18 +1222,20 @@ void PrintAnalyzer::rmdir3(const RPCProcedure*            proc,
                            const struct NFS3::RMDIR3args* args,
                            const struct NFS3::RMDIR3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ object: " << args->object << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " dir_wcc: "
                     << res->RMDIR3res_u.resok.dir_wcc;
             else
@@ -1221,18 +1250,20 @@ void PrintAnalyzer::rename3(const RPCProcedure*             proc,
                             const struct NFS3::RENAME3args* args,
                             const struct NFS3::RENAME3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
         out << "\tCALL  [ from: " << args->from
-            << " to: "            << args->to
+            << " to: " << args->to
             << " ]\n";
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " from dir_wcc: "
                     << res->RENAME3res_u.resok.fromdir_wcc
                     << " to dir_wcc: "
@@ -1251,18 +1282,20 @@ void PrintAnalyzer::link3(const RPCProcedure*           proc,
                           const struct NFS3::LINK3args* args,
                           const struct NFS3::LINK3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
         out << "\tCALL  [ file: " << args->file
-            << " link: "          << args->link
+            << " link: " << args->link
             << " ]\n";
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " file attributes: "
                     << res->LINK3res_u.resok.file_attributes
                     << " link dir_wcc: "
@@ -1281,12 +1314,14 @@ void PrintAnalyzer::readdir3(const RPCProcedure*              proc,
                              const struct NFS3::READDIR3args* args,
                              const struct NFS3::READDIR3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ dir: " << args->dir
-            << " cookie: "       << args->cookie
+            << " cookie: " << args->cookie
             << " cookieverf: ";
         print_hex(out,
                   args->cookieverf,
@@ -1294,12 +1329,12 @@ void PrintAnalyzer::readdir3(const RPCProcedure*              proc,
         out << " count: " << args->count
             << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
             {
                 out << " dir attributes: "
                     << res->READDIR3res_u.resok.dir_attributes
@@ -1324,12 +1359,14 @@ void PrintAnalyzer::readdirplus3(const RPCProcedure*                  proc,
                                  const struct NFS3::READDIRPLUS3args* args,
                                  const struct NFS3::READDIRPLUS3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ dir: " << args->dir
-            << " cookie: "       << args->cookie
+            << " cookie: " << args->cookie
             << " cookieverf: ";
         print_hex(out,
                   args->cookieverf,
@@ -1338,12 +1375,12 @@ void PrintAnalyzer::readdirplus3(const RPCProcedure*                  proc,
             << " max count: " << args->maxcount
             << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
             {
                 out << " dir attributes: "
                     << res->READDIRPLUS3res_u.resok.dir_attributes
@@ -1368,18 +1405,20 @@ void PrintAnalyzer::fsstat3(const RPCProcedure*             proc,
                             const struct NFS3::FSSTAT3args* args,
                             const struct NFS3::FSSTAT3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ fsroot: " << args->fsroot << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " obj attributes: "
                     << res->FSSTAT3res_u.resok.obj_attributes
                     << " tbytes: "
@@ -1408,18 +1447,20 @@ void PrintAnalyzer::fsinfo3(const RPCProcedure*             proc,
                             const struct NFS3::FSINFO3args* args,
                             const struct NFS3::FSINFO3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ fsroot: " << args->fsroot << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " obj attributes: "
                     << res->FSINFO3res_u.resok.obj_attributes
                     << " rtmax: "
@@ -1466,18 +1507,20 @@ void PrintAnalyzer::pathconf3(const RPCProcedure*               proc,
                               const struct NFS3::PATHCONF3args* args,
                               const struct NFS3::PATHCONF3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
     {
         out << "\tCALL  [ object: " << args->object << " ]\n";
     }
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
                 out << " obj attributes: "
                     << res->PATHCONF3res_u.resok.obj_attributes
                     << " link max: "
@@ -1504,19 +1547,21 @@ void PrintAnalyzer::commit3(const RPCProcedure*             proc,
                             const struct NFS3::COMMIT3args* args,
                             const struct NFS3::COMMIT3res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    if (args)
+    if(args)
         out << "\tCALL  [ file: " << args->file
-            << " offset: "        << args->offset
-            << " count: "         << args->count
+            << " offset: " << args->offset
+            << " count: " << args->count
             << " ]\n";
-    if (res)
+    if(res)
     {
         out << "\tREPLY [ status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->status == NFS3::nfsstat3::NFS3_OK)
+            if(res->status == NFS3::nfsstat3::NFS3_OK)
             {
                 out << " file_wcc: "
                     << res->COMMIT3res_u.resok.file_wcc
@@ -1535,7 +1580,6 @@ void PrintAnalyzer::commit3(const RPCProcedure*             proc,
     }
 }
 
-
 // Print NFSv4 procedures
 // 1st line - PRC information: src and dst hosts, status of RPC procedure
 // 2nd line - <tabulation>related RPC procedure-specific arguments
@@ -1547,7 +1591,9 @@ void PrintAnalyzer::null4(const RPCProcedure* proc,
                           const struct NFS4::NULL4args*,
                           const struct NFS4::NULL4res*)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
     out << "\tCALL  []\n\tREPLY []\n";
 }
@@ -1556,19 +1602,21 @@ void PrintAnalyzer::compound4(const RPCProcedure*               proc,
                               const struct NFS4::COMPOUND4args* args,
                               const struct NFS4::COMPOUND4res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    const u_int* array_len {};
-    if (args)
+    const u_int* array_len{};
+    if(args)
     {
         array_len = &args->argarray.argarray_len;
         out << "\tCALL  [ operations: " << *array_len
-            << " tag: "                 << args->tag
-            << " minor version: "       << args->minorversion;
-        if (*array_len)
+            << " tag: " << args->tag
+            << " minor version: " << args->minorversion;
+        if(*array_len)
         {
-            NFS4::nfs_argop4* current_el {args->argarray.argarray_val};
-            for (u_int i = 0; i < *array_len; i++, current_el++)
+            NFS4::nfs_argop4* current_el{args->argarray.argarray_val};
+            for(u_int i = 0; i < *array_len; i++, current_el++)
             {
                 out << "\n\t\t[ ";
                 nfs4_operation(current_el);
@@ -1577,14 +1625,14 @@ void PrintAnalyzer::compound4(const RPCProcedure*               proc,
             out << " ]\n";
         }
     }
-    if (res)
+    if(res)
     {
         array_len = &res->resarray.resarray_len;
         out << "\tREPLY [  operations: " << *array_len;
-        if (*array_len)
+        if(*array_len)
         {
-            NFS4::nfs_resop4* current_el {res->resarray.resarray_val};
-            for (u_int i = 0; i < *array_len; i++, current_el++)
+            NFS4::nfs_resop4* current_el{res->resarray.resarray_val};
+            for(u_int i = 0; i < *array_len; i++, current_el++)
             {
                 out << "\n\t\t[ ";
                 nfs4_operation(current_el);
@@ -1597,11 +1645,11 @@ void PrintAnalyzer::compound4(const RPCProcedure*               proc,
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::nfs_argop4* op)
 {
-    if (op)
+    if(op)
     {
         out << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(op->argop))
             << '(' << op->argop << ") [ ";
-        switch (op->argop)
+        switch(op->argop)
         {
         case NFS4::OP_ACCESS:
             return nfs4_operation(&op->nfs_argop4_u.opaccess);
@@ -1688,11 +1736,11 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::nfs_argop4* op)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::nfs_resop4* op)
 {
-    if (op)
+    if(op)
     {
         out << print_nfs4_procedures(static_cast<ProcEnumNFS4::NFSProcedure>(op->resop))
             << '(' << op->resop << ") [ ";
-        switch (op->resop)
+        switch(op->resop)
         {
         case NFS4::OP_ACCESS:
             return nfs4_operation(&op->nfs_resop4_u.opaccess);
@@ -1779,71 +1827,83 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::nfs_resop4* op)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::ACCESS4args* args)
 {
-    if (args)
+    if(args)
     {
-        if ((args->access) & NFS4::ACCESS4_READ) { out << "READ "; }
-        if ((args->access) & NFS4::ACCESS4_LOOKUP) { out << "LOOKUP "; }
-        if ((args->access) & NFS4::ACCESS4_MODIFY) { out << "MODIFY "; }
-        if ((args->access) & NFS4::ACCESS4_EXTEND) { out << "EXTEND "; }
-        if ((args->access) & NFS4::ACCESS4_DELETE) { out << "DELETE "; }
-        if ((args->access) & NFS4::ACCESS4_EXECUTE) { out << "EXECUTE "; }
+        if((args->access) & NFS4::ACCESS4_READ) {
+            out << "READ ";
+        }
+        if((args->access) & NFS4::ACCESS4_LOOKUP) {
+            out << "LOOKUP ";
+        }
+        if((args->access) & NFS4::ACCESS4_MODIFY) {
+            out << "MODIFY ";
+        }
+        if((args->access) & NFS4::ACCESS4_EXTEND) {
+            out << "EXTEND ";
+        }
+        if((args->access) & NFS4::ACCESS4_DELETE) {
+            out << "DELETE ";
+        }
+        if((args->access) & NFS4::ACCESS4_EXECUTE) {
+            out << "EXECUTE ";
+        }
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::ACCESS4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::ACCESS4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << " supported: ";
-            if ((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_READ)
+            if((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_READ)
             {
                 out << "READ ";
             }
-            if ((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_LOOKUP)
+            if((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_LOOKUP)
             {
                 out << "LOOKUP ";
             }
-            if ((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_MODIFY)
+            if((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_MODIFY)
             {
                 out << "MODIFY ";
             }
-            if ((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_EXTEND)
+            if((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_EXTEND)
             {
                 out << "EXTEND ";
             }
-            if ((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_DELETE)
+            if((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_DELETE)
             {
                 out << "DELETE ";
             }
-            if ((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_EXECUTE)
+            if((res->ACCESS4res_u.resok4.supported) & NFS4::ACCESS4_EXECUTE)
             {
                 out << "EXECUTE ";
             }
             out << " access: ";
-            if ((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_READ)
+            if((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_READ)
             {
                 out << "READ ";
             }
-            if ((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_LOOKUP)
+            if((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_LOOKUP)
             {
                 out << "LOOKUP ";
             }
-            if ((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_MODIFY)
+            if((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_MODIFY)
             {
                 out << "MODIFY ";
             }
-            if ((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_EXTEND)
+            if((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_EXTEND)
             {
                 out << "EXTEND ";
             }
-            if ((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_DELETE)
+            if((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_DELETE)
             {
                 out << "DELETE ";
             }
-            if ((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_EXECUTE)
+            if((res->ACCESS4res_u.resok4.access) & NFS4::ACCESS4_EXECUTE)
             {
                 out << "EXECUTE ";
             }
@@ -1853,19 +1913,19 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::ACCESS4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::CLOSE4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "seqid: "        << std::hex << args->seqid << std::dec
+        out << "seqid: " << std::hex << args->seqid << std::dec
             << " open state id:" << args->open_stateid;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::CLOSE4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::CLOSE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << " open state id:" << res->CLOSE4res_u.open_stateid;
         }
@@ -1874,19 +1934,19 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::CLOSE4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::COMMIT4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "offset: " << args->offset
-            << " count: "  << args->count;
+        out << "offset: " << args->offset
+            << " count: " << args->count;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::COMMIT4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::COMMIT4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << " write verifier: ";
             print_hex(out,
@@ -1898,20 +1958,20 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::COMMIT4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::CREATE4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "object type: "       << args->objtype
-            << " object name: "       << args->objname
+        out << "object type: " << args->objtype
+            << " object name: " << args->objname
             << " create attributes: " << args->createattrs;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::CREATE4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::CREATE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
             out << res->CREATE4res_u.resok4.cinfo << ' '
                 << res->CREATE4res_u.resok4.attrset;
     }
@@ -1919,35 +1979,45 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::CREATE4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::DELEGPURGE4args* args)
 {
-    if (args) { out << "client id: " << std::hex << args->clientid << std::dec; }
+    if(args) {
+        out << "client id: " << std::hex << args->clientid << std::dec;
+    }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::DELEGPURGE4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::DELEGPURGE4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::DELEGRETURN4args* args)
 {
-    if (args) { out << args->deleg_stateid; }
+    if(args) {
+        out << args->deleg_stateid;
+    }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::DELEGRETURN4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::DELEGRETURN4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::GETATTR4args* args)
 {
-    if (args) { out << args->attr_request; }
+    if(args) {
+        out << args->attr_request;
+    }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::GETATTR4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::GETATTR4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << ' ' << res->GETATTR4res_u.resok4.obj_attributes;
         }
@@ -1956,15 +2026,17 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::GETATTR4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::LINK4args* args)
 {
-    if (args) { out << "new name: " << args->newname; }
+    if(args) {
+        out << "new name: " << args->newname;
+    }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::LINK4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::LINK4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << ' ' << res->LINK4res_u.resok4.cinfo;
         }
@@ -1973,34 +2045,34 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::LINK4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::LOCK4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "lock type: " << args->locktype
-            << " reclaim: "   << args->reclaim
-            << " offset: "    << args->offset
-            << " length: "    << args->length
-            << " locker: "    << args->locker;
+        out << "lock type: " << args->locktype
+            << " reclaim: " << args->reclaim
+            << " offset: " << args->offset
+            << " length: " << args->length
+            << " locker: " << args->locker;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::LOCK4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::LOCK4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            switch (res->status)
+            switch(res->status)
             {
             case NFS4::nfsstat4::NFS4_OK:
                 out << " lock stat id: "
                     << res->LOCK4res_u.resok4.lock_stateid;
                 break;
             case NFS4::nfsstat4::NFS4ERR_DENIED:
-                out << " offset: "    << res->LOCK4res_u.denied.offset
-                    << " length: "    << res->LOCK4res_u.denied.length
+                out << " offset: " << res->LOCK4res_u.denied.offset
+                    << " length: " << res->LOCK4res_u.denied.length
                     << " lock type: " << res->LOCK4res_u.denied.locktype
-                    << " owner: "     << res->LOCK4res_u.denied.owner;
+                    << " owner: " << res->LOCK4res_u.denied.owner;
                 break;
             default:
                 break;
@@ -2011,46 +2083,46 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::LOCK4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::LOCKT4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "lock type: " << args->locktype
-            << " offset: "    << args->offset
-            << " length: "    << args->length
-            << " owner: "     << args->owner;
+        out << "lock type: " << args->locktype
+            << " offset: " << args->offset
+            << " length: " << args->length
+            << " owner: " << args->owner;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::LOCKT4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::LOCKT4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4ERR_DENIED)
-            out << " offset: "    << res->LOCKT4res_u.denied.offset
-                << " length: "    << res->LOCKT4res_u.denied.length
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4ERR_DENIED)
+            out << " offset: " << res->LOCKT4res_u.denied.offset
+                << " length: " << res->LOCKT4res_u.denied.length
                 << " lock type: " << res->LOCKT4res_u.denied.locktype
-                << " owner: "     << res->LOCKT4res_u.denied.owner;
+                << " owner: " << res->LOCKT4res_u.denied.owner;
     }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::LOCKU4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "lock type: "     << args->locktype
-            << " seqid: "       << std::hex << args->seqid << std::dec
+        out << "lock type: " << args->locktype
+            << " seqid: " << std::hex << args->seqid << std::dec
             << " lock state id: " << args->lock_stateid
-            << " offset: "        << args->offset
-            << " length: "        << args->length;
+            << " offset: " << args->offset
+            << " length: " << args->length;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::LOCKU4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::LOCKU4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << " lock state id: " << res->LOCKU4res_u.lock_stateid;
         }
@@ -2059,46 +2131,54 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::LOCKU4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::LOOKUP4args* args)
 {
-    if (args) { out << "object name: " << args->objname; }
+    if(args) {
+        out << "object name: " << args->objname;
+    }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::LOOKUP4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::LOOKUP4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::NVERIFY4args* args)
 {
-    if (args) { out << "object attributes: " << args->obj_attributes; }
+    if(args) {
+        out << "object attributes: " << args->obj_attributes;
+    }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::NVERIFY4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::NVERIFY4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN4args* args)
 {
-    static const char* const open4_share_access[4] = {"",    "READ", "WRITE", "BOTH"};
+    static const char* const open4_share_access[4] = {"", "READ", "WRITE", "BOTH"};
     static const char* const open4_share_deny[4]   = {"NONE", "READ", "WRITE", "BOTH"};
 
-    if (args)
+    if(args)
     {
-        out <<  "seqid: " << std::hex << args->seqid << std::dec
+        out << "seqid: " << std::hex << args->seqid << std::dec
             << " share access: " << open4_share_access[args->share_access]
-            << " share deny: "   << open4_share_deny[args->share_deny]
+            << " share deny: " << open4_share_deny[args->share_deny]
             << ' ' << args->owner
             << ' ' << args->openhow
             << ' ' << args->claim;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
             out << res->OPEN4res_u.resok4.stateid
                 << res->OPEN4res_u.resok4.cinfo
                 << " results flags: "
@@ -2110,29 +2190,33 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::OPENATTR4args* args)
 {
-    if (args) { out << "create directory: " << args->createdir; }
+    if(args) {
+        out << "create directory: " << args->createdir;
+    }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::OPENATTR4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::OPENATTR4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN_CONFIRM4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "open state id:" << args->open_stateid
-            << " seqid: "        << std::hex << args->seqid << std::dec;
+        out << "open state id:" << args->open_stateid
+            << " seqid: " << std::hex << args->seqid << std::dec;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN_CONFIRM4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN_CONFIRM4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << " open state id:" << res->OPEN_CONFIRM4res_u.resok4.open_stateid;
         }
@@ -2141,21 +2225,21 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN_CONFIRM4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN_DOWNGRADE4args* args)
 {
-    if (args)
+    if(args)
     {
         out << " open state id: " << args->open_stateid
-            << " seqid: "       << std::hex << args->seqid << std::dec
-            << " share access: "  << args->share_access
-            << " share deny: "    << args->share_deny;
+            << " seqid: " << std::hex << args->seqid << std::dec
+            << " share access: " << args->share_access
+            << " share deny: " << args->share_deny;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN_DOWNGRADE4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN_DOWNGRADE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << ' ' << res->OPEN_DOWNGRADE4res_u.resok4.open_stateid;
         }
@@ -2164,37 +2248,39 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::OPEN_DOWNGRADE4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::PUTFH4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "object: ";
         print_nfs_fh(out, args->object.nfs_fh4_val, args->object.nfs_fh4_len);
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::PUTFH4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::PUTFH4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::READ4args* args)
 {
-    if (args)
+    if(args)
     {
         out << args->stateid
-            << " offset: "   << args->offset
-            << " count: "    << args->count;
+            << " offset: " << args->offset
+            << " count: " << args->count;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::READ4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::READ4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << " eof: " << res->READ4res_u.resok4.eof;
-            if (res->READ4res_u.resok4.data.data_len)
+            if(res->READ4res_u.resok4.data.data_len)
             {
                 out << " data : " << *res->READ4res_u.resok4.data.data_val;
             }
@@ -2204,38 +2290,40 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::READ4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::READDIR4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "cookie: "             << args->cookie
-            << " cookieverf: "         << args->cookieverf
-            << " dir count: "          << args->dircount
-            << " max count: "          << args->maxcount
+        out << "cookie: " << args->cookie
+            << " cookieverf: " << args->cookieverf
+            << " dir count: " << args->dircount
+            << " max count: " << args->maxcount
             << " attributes request: " << args->attr_request;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::READDIR4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::READDIR4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
             out << " cookie verifier: " << res->READDIR4res_u.resok4.cookieverf
-                << " reply: "           << res->READDIR4res_u.resok4.reply;
+                << " reply: " << res->READDIR4res_u.resok4.reply;
     }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::REMOVE4args* args)
 {
-    if (args) { out << "target: " << args->target; }
+    if(args) {
+        out << "target: " << args->target;
+    }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::REMOVE4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::REMOVE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << ' ' << res->REMOVE4res_u.resok4.cinfo;
         }
@@ -2244,19 +2332,19 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::REMOVE4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::RENAME4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "old name: " << args->oldname
+        out << "old name: " << args->oldname
             << " new name: " << args->newname;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::RENAME4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::RENAME4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
             out << " source: "
                 << res->RENAME4res_u.resok4.source_cinfo
                 << " target: "
@@ -2266,31 +2354,35 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::RENAME4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::RENEW4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "client id: "
             << std::hex << args->clientid << std::dec;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::RENEW4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::RENEW4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::SECINFO4args* args)
 {
-    if (args) { out << "name: " << args->name; }
+    if(args) {
+        out << "name: " << args->name;
+    }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::SECINFO4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::SECINFO4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
-            if (res->SECINFO4res_u.resok4.SECINFO4resok_len)
+            if(res->SECINFO4res_u.resok4.SECINFO4resok_len)
                 out << " data : "
                     << *res->SECINFO4res_u.resok4.SECINFO4resok_val;
         }
@@ -2299,25 +2391,27 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::SECINFO4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::SETATTR4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "state id:" << args->stateid
             << ' ' << args->obj_attributes;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::SETATTR4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::SETATTR4res* res)
 {
-    if (res)
+    if(res)
     {
-        out <<  "status: " << res->status;
-        if (out_all()) { out << ' ' << res->attrsset; }
+        out << "status: " << res->status;
+        if(out_all()) {
+            out << ' ' << res->attrsset;
+        }
     }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::SETCLIENTID4args* args)
 {
-    if (args)
+    if(args)
     {
         out << args->client
             << " callback: "
@@ -2327,14 +2421,14 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::SETCLIENTID4args* args)
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::SETCLIENTID4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::SETCLIENTID4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            switch (res->status)
+            switch(res->status)
             {
             case NFS4::nfsstat4::NFS4_OK:
                 out << " client id: "
@@ -2356,7 +2450,7 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::SETCLIENTID4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::SETCLIENTID_CONFIRM4args* args)
 {
-    if (args)
+    if(args)
     {
         out << " client id: " << std::hex << args->clientid << std::dec
             << " verifier: ";
@@ -2364,41 +2458,47 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::SETCLIENTID_CONFIRM4args* 
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::SETCLIENTID_CONFIRM4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::SETCLIENTID_CONFIRM4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::VERIFY4args* args)
 {
-    if (args) { out << "object attributes: " << args->obj_attributes; }
+    if(args) {
+        out << "object attributes: " << args->obj_attributes;
+    }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::VERIFY4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::VERIFY4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::WRITE4args* args)
 {
-    if (args)
+    if(args)
     {
         out << args->stateid
-            << " offset: "      << args->offset
-            << " stable: "      << args->stable
+            << " offset: " << args->offset
+            << " stable: " << args->stable
             << " data length: " << args->data.data_len;
     }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::WRITE4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::WRITE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
-            out << " count: "          << res->WRITE4res_u.resok4.count
-                << " committed: "       << res->WRITE4res_u.resok4.committed
+            out << " count: " << res->WRITE4res_u.resok4.count
+                << " committed: " << res->WRITE4res_u.resok4.committed
                 << " write verifier: ";
             print_hex(out,
                       res->WRITE4res_u.resok4.writeverf,
@@ -2409,29 +2509,33 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::WRITE4res*  res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::RELEASE_LOCKOWNER4args* args)
 {
-    if (args) { out << "lock owner: " << args->lock_owner; }
+    if(args) {
+        out << "lock owner: " << args->lock_owner;
+    }
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::RELEASE_LOCKOWNER4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::RELEASE_LOCKOWNER4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::GET_DIR_DELEGATION4args* args)
 {
-    if (args)
-        out <<  "client id: "                    << args->clientid
-            << " notification types: "           << args->notif_types
-            << " dir notification delay: "       << args->dir_notif_delay
+    if(args)
+        out << "client id: " << args->clientid
+            << " notification types: " << args->notif_types
+            << " dir notification delay: " << args->dir_notif_delay
             << " dir entry notification delay: " << args->dir_entry_notif_delay;
 }
 
-void PrintAnalyzer::nfs4_operation(const struct NFS4::GET_DIR_DELEGATION4res*  res)
+void PrintAnalyzer::nfs4_operation(const struct NFS4::GET_DIR_DELEGATION4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
             out << ' ' << res->GET_DIR_DELEGATION4res_u.resok4.stateid
                 << " status: "
                 << res->GET_DIR_DELEGATION4res_u.resok4.status
@@ -2446,10 +2550,10 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::GET_DIR_DELEGATION4res*  r
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::GETFH4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << " object: " << res->GETFH4res_u.resok4.object;
         }
@@ -2458,25 +2562,31 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::GETFH4res* res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::LOOKUPP4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::PUTPUBFH4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::PUTROOTFH4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::READLINK4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS4::nfsstat4::NFS4_OK)
         {
             out << " link: " << res->READLINK4res_u.resok4.link;
         }
@@ -2485,17 +2595,23 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::READLINK4res* res)
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::RESTOREFH4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::SAVEFH4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs4_operation(const struct NFS4::ILLEGAL4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 // Print NFSv4.1 procedures
@@ -2505,25 +2621,26 @@ void PrintAnalyzer::nfs4_operation(const struct NFS4::ILLEGAL4res* res)
 // 4th line - <tabulation>related RPC procedure-specific results
 // 5rd line - <tabulation>related NFSv4-operations
 
-
 void PrintAnalyzer::compound41(const RPCProcedure*                proc,
                                const struct NFS41::COMPOUND4args* args,
                                const struct NFS41::COMPOUND4res*  res)
 {
-    if (!print_procedure(out, proc)) { return; }
+    if(!print_procedure(out, proc)) {
+        return;
+    }
 
-    const u_int* array_len {};
-    if (args)
+    const u_int* array_len{};
+    if(args)
     {
         array_len = &args->argarray.argarray_len;
         out << "\tCALL  [ operations: " << *array_len
-            << " tag: "                 << args->tag
-            << " minor version: "       << args->minorversion;
+            << " tag: " << args->tag
+            << " minor version: " << args->minorversion;
 
-        if (*array_len)
+        if(*array_len)
         {
-            NFS41::nfs_argop4* current_el {args->argarray.argarray_val};
-            for (u_int i {0}; i < *array_len; i++, current_el++)
+            NFS41::nfs_argop4* current_el{args->argarray.argarray_val};
+            for(u_int i{0}; i < *array_len; i++, current_el++)
             {
                 out << "\n\t\t[ ";
                 nfs41_operation(current_el);
@@ -2532,16 +2649,16 @@ void PrintAnalyzer::compound41(const RPCProcedure*                proc,
             out << " ]\n";
         }
     }
-    if (res)
+    if(res)
     {
         array_len = &res->resarray.resarray_len;
         out << "\tREPLY [  operations: " << *array_len
-            << " status: "               << res->status
-            << " tag: "                  << res->tag;
-        if (*array_len)
+            << " status: " << res->status
+            << " tag: " << res->tag;
+        if(*array_len)
         {
-            NFS41::nfs_resop4* current_el {res->resarray.resarray_val};
-            for (u_int i {0}; i < *array_len; i++, current_el++)
+            NFS41::nfs_resop4* current_el{res->resarray.resarray_val};
+            for(u_int i{0}; i < *array_len; i++, current_el++)
             {
                 out << "\n\t\t[ ";
                 nfs41_operation(current_el);
@@ -2554,11 +2671,11 @@ void PrintAnalyzer::compound41(const RPCProcedure*                proc,
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::nfs_argop4* op)
 {
-    if (op)
+    if(op)
     {
         out << print_nfs41_procedures(static_cast<ProcEnumNFS41::NFSProcedure>(op->argop))
             << '(' << op->argop << ") [ ";
-        switch (op->argop)
+        switch(op->argop)
         {
         case NFS41::OP_ACCESS:
             return nfs41_operation(&op->nfs_argop4_u.opaccess);
@@ -2683,11 +2800,11 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::nfs_argop4* op)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::nfs_resop4* op)
 {
-    if (op)
+    if(op)
     {
         out << print_nfs41_procedures(static_cast<ProcEnumNFS41::NFSProcedure>(op->resop))
             << '(' << op->resop << ") [ ";
-        switch (op->resop)
+        switch(op->resop)
         {
         case NFS41::OP_ACCESS:
             return nfs41_operation(&op->nfs_resop4_u.opaccess);
@@ -2812,71 +2929,83 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::nfs_resop4* op)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::ACCESS4args* args)
 {
-    if (args)
+    if(args)
     {
-        if ((args->access) & NFS41::ACCESS4_READ) { out << "READ "; }
-        if ((args->access) & NFS41::ACCESS4_LOOKUP) { out << "LOOKUP "; }
-        if ((args->access) & NFS41::ACCESS4_MODIFY) { out << "MODIFY "; }
-        if ((args->access) & NFS41::ACCESS4_EXTEND) { out << "EXTEND "; }
-        if ((args->access) & NFS41::ACCESS4_DELETE) { out << "DELETE "; }
-        if ((args->access) & NFS41::ACCESS4_EXECUTE) { out << "EXECUTE "; }
+        if((args->access) & NFS41::ACCESS4_READ) {
+            out << "READ ";
+        }
+        if((args->access) & NFS41::ACCESS4_LOOKUP) {
+            out << "LOOKUP ";
+        }
+        if((args->access) & NFS41::ACCESS4_MODIFY) {
+            out << "MODIFY ";
+        }
+        if((args->access) & NFS41::ACCESS4_EXTEND) {
+            out << "EXTEND ";
+        }
+        if((args->access) & NFS41::ACCESS4_DELETE) {
+            out << "DELETE ";
+        }
+        if((args->access) & NFS41::ACCESS4_EXECUTE) {
+            out << "EXECUTE ";
+        }
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::ACCESS4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::ACCESS4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " supported: ";
-            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_READ)
+            if((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_READ)
             {
                 out << "READ ";
             }
-            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_LOOKUP)
+            if((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_LOOKUP)
             {
                 out << "LOOKUP ";
             }
-            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_MODIFY)
+            if((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_MODIFY)
             {
                 out << "MODIFY ";
             }
-            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_EXTEND)
+            if((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_EXTEND)
             {
                 out << "EXTEND ";
             }
-            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_DELETE)
+            if((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_DELETE)
             {
                 out << "DELETE ";
             }
-            if ((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_EXECUTE)
+            if((res->ACCESS4res_u.resok4.supported) & NFS41::ACCESS4_EXECUTE)
             {
                 out << "EXECUTE ";
             }
             out << " access: ";
-            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_READ)
+            if((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_READ)
             {
                 out << "READ ";
             }
-            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_LOOKUP)
+            if((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_LOOKUP)
             {
                 out << "LOOKUP ";
             }
-            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_MODIFY)
+            if((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_MODIFY)
             {
                 out << "MODIFY ";
             }
-            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_EXTEND)
+            if((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_EXTEND)
             {
                 out << "EXTEND ";
             }
-            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_DELETE)
+            if((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_DELETE)
             {
                 out << "DELETE ";
             }
-            if ((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_EXECUTE)
+            if((res->ACCESS4res_u.resok4.access) & NFS41::ACCESS4_EXECUTE)
             {
                 out << "EXECUTE ";
             }
@@ -2886,19 +3015,19 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::ACCESS4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::CLOSE4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "seqid: "        << std::hex << args->seqid << std::dec
+        out << "seqid: " << std::hex << args->seqid << std::dec
             << " open state id:" << args->open_stateid;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::CLOSE4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::CLOSE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " open state id:" << res->CLOSE4res_u.open_stateid;
         }
@@ -2907,19 +3036,19 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::CLOSE4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::COMMIT4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "offset: " << args->offset
-            << " count: "  << args->count;
+        out << "offset: " << args->offset
+            << " count: " << args->count;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::COMMIT4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::COMMIT4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " write verifier: ";
             print_hex(out,
@@ -2931,20 +3060,20 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::COMMIT4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "object type: "       << args->objtype
-            << " object name: "       << args->objname
+        out << "object type: " << args->objtype
+            << " object name: " << args->objname
             << " create attributes: " << args->createattrs;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
             out << res->CREATE4res_u.resok4.cinfo << ' '
                 << res->CREATE4res_u.resok4.attrset;
     }
@@ -2952,35 +3081,45 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::DELEGPURGE4args* args)
 {
-    if (args) { out << "client id: " << std::hex << args->clientid << std::dec; }
+    if(args) {
+        out << "client id: " << std::hex << args->clientid << std::dec;
+    }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::DELEGPURGE4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::DELEGPURGE4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::DELEGRETURN4args* args)
 {
-    if (args) { out << args->deleg_stateid; }
+    if(args) {
+        out << args->deleg_stateid;
+    }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::DELEGRETURN4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::DELEGRETURN4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::GETATTR4args* args)
 {
-    if (args) { out << args->attr_request; }
+    if(args) {
+        out << args->attr_request;
+    }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::GETATTR4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::GETATTR4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << ' ' << res->GETATTR4res_u.resok4.obj_attributes;
         }
@@ -2989,15 +3128,17 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::GETATTR4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LINK4args* args)
 {
-    if (args) { out << "new name: " << args->newname; }
+    if(args) {
+        out << "new name: " << args->newname;
+    }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::LINK4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LINK4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << ' ' << res->LINK4res_u.resok4.cinfo;
         }
@@ -3006,34 +3147,34 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::LINK4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCK4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "lock type: " << args->locktype
-            << " reclaim: "   << args->reclaim
-            << " offset: "    << args->offset
-            << " length: "    << args->length
-            << " locker: "    << args->locker;
+        out << "lock type: " << args->locktype
+            << " reclaim: " << args->reclaim
+            << " offset: " << args->offset
+            << " length: " << args->length
+            << " locker: " << args->locker;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCK4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCK4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            switch (res->status)
+            switch(res->status)
             {
             case NFS41::nfsstat4::NFS4_OK:
                 out << " lock stat id: "
                     << res->LOCK4res_u.resok4.lock_stateid;
                 break;
             case NFS41::nfsstat4::NFS4ERR_DENIED:
-                out << " offset: "    << res->LOCK4res_u.denied.offset
-                    << " length: "    << res->LOCK4res_u.denied.length
+                out << " offset: " << res->LOCK4res_u.denied.offset
+                    << " length: " << res->LOCK4res_u.denied.length
                     << " lock type: " << res->LOCK4res_u.denied.locktype
-                    << " owner: "     << res->LOCK4res_u.denied.owner;
+                    << " owner: " << res->LOCK4res_u.denied.owner;
                 break;
             default:
                 break;
@@ -3044,46 +3185,46 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCK4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCKT4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "lock type: " << args->locktype
-            << " offset: "    << args->offset
-            << " length: "    << args->length
-            << " owner: "     << args->owner;
+        out << "lock type: " << args->locktype
+            << " offset: " << args->offset
+            << " length: " << args->length
+            << " owner: " << args->owner;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCKT4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCKT4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4ERR_DENIED)
-            out << " offset: "    << res->LOCKT4res_u.denied.offset
-                << " length: "    << res->LOCKT4res_u.denied.length
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4ERR_DENIED)
+            out << " offset: " << res->LOCKT4res_u.denied.offset
+                << " length: " << res->LOCKT4res_u.denied.length
                 << " lock type: " << res->LOCKT4res_u.denied.locktype
-                << " owner: "     << res->LOCKT4res_u.denied.owner;
+                << " owner: " << res->LOCKT4res_u.denied.owner;
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCKU4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "lock type: "     << args->locktype
-            << " seqid: "       << std::hex << args->seqid << std::dec
+        out << "lock type: " << args->locktype
+            << " seqid: " << std::hex << args->seqid << std::dec
             << " lock state id: " << args->lock_stateid
-            << " offset: "        << args->offset
-            << " length: "        << args->length;
+            << " offset: " << args->offset
+            << " length: " << args->length;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCKU4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCKU4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " lock state id: " << res->LOCKU4res_u.lock_stateid;
         }
@@ -3092,46 +3233,54 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::LOCKU4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LOOKUP4args* args)
 {
-    if (args) { out << "object name: " << args->objname; }
+    if(args) {
+        out << "object name: " << args->objname;
+    }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::LOOKUP4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::LOOKUP4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::NVERIFY4args* args)
 {
-    if (args) { out << "object attributes: " << args->obj_attributes; }
+    if(args) {
+        out << "object attributes: " << args->obj_attributes;
+    }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::NVERIFY4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::NVERIFY4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN4args* args)
 {
-    static const char* const open4_share_access[4] = {"",    "READ", "WRITE", "BOTH"};
+    static const char* const open4_share_access[4] = {"", "READ", "WRITE", "BOTH"};
     static const char* const open4_share_deny[4]   = {"NONE", "READ", "WRITE", "BOTH"};
 
-    if (args)
+    if(args)
     {
-        out <<  "seqid: " << std::hex << args->seqid << std::dec
+        out << "seqid: " << std::hex << args->seqid << std::dec
             << " share access: " << open4_share_access[args->share_access]
-            << " share deny: "   << open4_share_deny[args->share_deny]
+            << " share deny: " << open4_share_deny[args->share_deny]
             << ' ' << args->owner
             << ' ' << args->openhow
             << ' ' << args->claim;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
             out << res->OPEN4res_u.resok4.stateid
                 << res->OPEN4res_u.resok4.cinfo
                 << " results flags: "
@@ -3143,29 +3292,33 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::OPENATTR4args* args)
 {
-    if (args) { out << "create directory: " << args->createdir; }
+    if(args) {
+        out << "create directory: " << args->createdir;
+    }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::OPENATTR4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPENATTR4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_CONFIRM4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "open state id:" << args->open_stateid
-            << " seqid: "        << std::hex << args->seqid << std::dec;
+        out << "open state id:" << args->open_stateid
+            << " seqid: " << std::hex << args->seqid << std::dec;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_CONFIRM4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_CONFIRM4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " open state id:" << res->OPEN_CONFIRM4res_u.resok4.open_stateid;
         }
@@ -3174,21 +3327,21 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_CONFIRM4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_DOWNGRADE4args* args)
 {
-    if (args)
+    if(args)
     {
         out << " open state id: " << args->open_stateid
-            << " seqid: "       << std::hex << args->seqid << std::dec
-            << " share access: "  << args->share_access
-            << " share deny: "    << args->share_deny;
+            << " seqid: " << std::hex << args->seqid << std::dec
+            << " share access: " << args->share_access
+            << " share deny: " << args->share_deny;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_DOWNGRADE4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_DOWNGRADE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << ' ' << res->OPEN_DOWNGRADE4res_u.resok4.open_stateid;
         }
@@ -3197,37 +3350,39 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::OPEN_DOWNGRADE4res*  res
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::PUTFH4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "object: ";
         print_nfs_fh(out, args->object.nfs_fh4_val, args->object.nfs_fh4_len);
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::PUTFH4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::PUTFH4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::READ4args* args)
 {
-    if (args)
+    if(args)
     {
         out << args->stateid
-            << " offset: "   << args->offset
-            << " count: "    << args->count;
+            << " offset: " << args->offset
+            << " count: " << args->count;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::READ4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::READ4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " eof: " << res->READ4res_u.resok4.eof;
-            if (res->READ4res_u.resok4.data.data_len)
+            if(res->READ4res_u.resok4.data.data_len)
             {
                 out << " data: " << *res->READ4res_u.resok4.data.data_val;
             }
@@ -3237,38 +3392,40 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::READ4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::READDIR4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "cookie: "             << args->cookie
-            << " cookieverf: "         << args->cookieverf
-            << " dir count: "          << args->dircount
-            << " max count: "          << args->maxcount
+        out << "cookie: " << args->cookie
+            << " cookieverf: " << args->cookieverf
+            << " dir count: " << args->dircount
+            << " max count: " << args->maxcount
             << " attributes request: " << args->attr_request;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::READDIR4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::READDIR4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
             out << " cookie verifier: " << res->READDIR4res_u.resok4.cookieverf
-                << " reply: "           << res->READDIR4res_u.resok4.reply;
+                << " reply: " << res->READDIR4res_u.resok4.reply;
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::REMOVE4args* args)
 {
-    if (args) { out << "target: " << args->target; }
+    if(args) {
+        out << "target: " << args->target;
+    }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::REMOVE4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::REMOVE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << ' ' << res->REMOVE4res_u.resok4.cinfo;
         }
@@ -3277,19 +3434,19 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::REMOVE4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::RENAME4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "old name: " << args->oldname
+        out << "old name: " << args->oldname
             << " new name: " << args->newname;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::RENAME4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RENAME4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
             out << " source: "
                 << res->RENAME4res_u.resok4.source_cinfo
                 << " target: "
@@ -3299,31 +3456,35 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::RENAME4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::RENEW4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "client id: "
             << std::hex << args->clientid << std::dec;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::RENEW4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RENEW4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::SECINFO4args* args)
 {
-    if (args) { out << "name: " << args->name; }
+    if(args) {
+        out << "name: " << args->name;
+    }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::SECINFO4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SECINFO4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
-            if (res->SECINFO4res_u.resok4.SECINFO4resok_len)
+            if(res->SECINFO4res_u.resok4.SECINFO4resok_len)
             {
                 out << *res->SECINFO4res_u.resok4.SECINFO4resok_val;
             }
@@ -3333,25 +3494,27 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::SECINFO4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::SETATTR4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "state id:" << args->stateid
             << ' ' << args->obj_attributes;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::SETATTR4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SETATTR4res* res)
 {
-    if (res)
+    if(res)
     {
-        out <<  "status: " << res->status;
-        if (out_all()) { out << ' ' << res->attrsset; }
+        out << "status: " << res->status;
+        if(out_all()) {
+            out << ' ' << res->attrsset;
+        }
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID4args* args)
 {
-    if (args)
+    if(args)
     {
         out << args->client
             << " callback: "
@@ -3361,14 +3524,14 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID4args* args)
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all())
+        if(out_all())
         {
-            switch (res->status)
+            switch(res->status)
             {
             case NFS41::nfsstat4::NFS4_OK:
                 out << " client id: "
@@ -3390,7 +3553,7 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID_CONFIRM4args* args)
 {
-    if (args)
+    if(args)
     {
         out << " client id: " << std::hex << args->clientid << std::dec
             << " verifier: ";
@@ -3398,41 +3561,47 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID_CONFIRM4args
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID_CONFIRM4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::SETCLIENTID_CONFIRM4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::VERIFY4args* args)
 {
-    if (args) { out << "object attributes: " << args->obj_attributes; }
+    if(args) {
+        out << "object attributes: " << args->obj_attributes;
+    }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::VERIFY4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::VERIFY4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::WRITE4args* args)
 {
-    if (args)
+    if(args)
     {
         out << args->stateid
-            << " offset: "      << args->offset
-            << " stable: "      << args->stable
+            << " offset: " << args->offset
+            << " stable: " << args->stable
             << " data length: " << args->data.data_len;
     }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::WRITE4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::WRITE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
-            out << " count: "          << res->WRITE4res_u.resok4.count
-                << " committed: "       << res->WRITE4res_u.resok4.committed
+            out << " count: " << res->WRITE4res_u.resok4.count
+                << " committed: " << res->WRITE4res_u.resok4.committed
                 << " write verifier: ";
             print_hex(out,
                       res->WRITE4res_u.resok4.writeverf,
@@ -3443,20 +3612,24 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::WRITE4res*  res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::RELEASE_LOCKOWNER4args* args)
 {
-    if (args) { out << "lock owner: " << args->lock_owner; }
+    if(args) {
+        out << "lock owner: " << args->lock_owner;
+    }
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::RELEASE_LOCKOWNER4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::RELEASE_LOCKOWNER4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::GETFH4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " object: " << res->GETFH4res_u.resok4.object;
         }
@@ -3465,25 +3638,31 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::GETFH4res* res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LOOKUPP4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::PUTPUBFH4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::PUTROOTFH4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::READLINK4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->status;
-        if (out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " link: " << res->READLINK4res_u.resok4.link;
         }
@@ -3492,47 +3671,51 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::READLINK4res* res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::RESTOREFH4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::SAVEFH4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::GET_DIR_DELEGATION4args* args)
 {
-    if (args)
-        out <<  "signal delegation available: " << args->gdda_signal_deleg_avail
-            << " notification types: "          << args->gdda_notification_types
-            << " child attr delay: "            << args->gdda_child_attr_delay
-            << " dir attr delay: "              << args->gdda_dir_attr_delay
-            << " child child attributes: "      << args->gdda_child_attributes
-            << " child dir attributes: "        << args->gdda_dir_attributes;
+    if(args)
+        out << "signal delegation available: " << args->gdda_signal_deleg_avail
+            << " notification types: " << args->gdda_notification_types
+            << " child attr delay: " << args->gdda_child_attr_delay
+            << " dir attr delay: " << args->gdda_dir_attr_delay
+            << " child child attributes: " << args->gdda_child_attributes
+            << " child dir attributes: " << args->gdda_dir_attributes;
 }
 
-void PrintAnalyzer::nfs41_operation(const struct NFS41::GET_DIR_DELEGATION4res*  res)
+void PrintAnalyzer::nfs41_operation(const struct NFS41::GET_DIR_DELEGATION4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->gddr_status;
-        if (out_all() && res->gddr_status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->gddr_status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " status: " << res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.gddrnf_status;
-            if (out_all() && res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.gddrnf_status == NFS41::gddrnf4_status::GDD4_OK)
+            if(out_all() && res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.gddrnf_status == NFS41::gddrnf4_status::GDD4_OK)
             {
-                out <<  " cookieverf: ";
+                out << " cookieverf: ";
                 print_hex(out,
                           res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_cookieverf,
                           NFS41::NFS4_VERIFIER_SIZE);
                 out << " stateid: "
-                    <<  res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_stateid
+                    << res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_stateid
                     << " notification: "
-                    <<  res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_notification
+                    << res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_notification
                     << " child attributes: "
-                    <<  res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_child_attributes
+                    << res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_child_attributes
                     << " dir attributes: "
-                    <<  res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_dir_attributes;
+                    << res->GET_DIR_DELEGATION4res_u.gddr_res_non_fatal4.GET_DIR_DELEGATION4res_non_fatal_u.gddrnf_resok4.gddr_dir_attributes;
             }
             else
             {
@@ -3545,12 +3728,12 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::GET_DIR_DELEGATION4res* 
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::BACKCHANNEL_CTL4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "program: " << args->bca_cb_program
+        out << "program: " << args->bca_cb_program
             << " sec parms: ";
-        NFS41::callback_sec_parms4* current_el {args->bca_sec_parms.bca_sec_parms_val};
-        for (u_int i {0}; i < args->bca_sec_parms.bca_sec_parms_len; i++, current_el++)
+        NFS41::callback_sec_parms4* current_el{args->bca_sec_parms.bca_sec_parms_val};
+        for(u_int i{0}; i < args->bca_sec_parms.bca_sec_parms_len; i++, current_el++)
         {
             out << ' ' << current_el;
         }
@@ -3559,28 +3742,30 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::BACKCHANNEL_CTL4args* ar
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::BACKCHANNEL_CTL4res* res)
 {
-    if (res) { out << "status: " << res->bcr_status; }
+    if(res) {
+        out << "status: " << res->bcr_status;
+    }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::BIND_CONN_TO_SESSION4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "sessid: ";
+        out << "sessid: ";
         print_hex(out,
                   args->bctsa_sessid,
                   NFS41::NFS4_SESSIONID_SIZE);
-        out << " dir: "                   << args->bctsa_dir
+        out << " dir: " << args->bctsa_dir
             << " use conn in rdma mode: " << args->bctsa_use_conn_in_rdma_mode;
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::BIND_CONN_TO_SESSION4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->bctsr_status;
-        if (out_all() && res->bctsr_status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->bctsr_status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " sessid: ";
             print_hex(out,
@@ -3596,14 +3781,14 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::BIND_CONN_TO_SESSION4res
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::EXCHANGE_ID4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "client owner: "  << args->eia_clientowner
-            << " flags: "         << args->eia_flags
+        out << "client owner: " << args->eia_clientowner
+            << " flags: " << args->eia_flags
             << " state protect: " << args->eia_state_protect
             << " client impl id: ";
-        NFS41::nfs_impl_id4* current_el {args->eia_client_impl_id.eia_client_impl_id_val};
-        for (u_int i {0}; i < args->eia_client_impl_id.eia_client_impl_id_len; i++, current_el++)
+        NFS41::nfs_impl_id4* current_el{args->eia_client_impl_id.eia_client_impl_id_val};
+        for(u_int i{0}; i < args->eia_client_impl_id.eia_client_impl_id_len; i++, current_el++)
         {
             out << ' ' << current_el;
         }
@@ -3612,23 +3797,23 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::EXCHANGE_ID4args* args)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::EXCHANGE_ID4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->eir_status;
-        if (out_all() && res->eir_status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->eir_status == NFS41::nfsstat4::NFS4_OK)
         {
-            out << " clientid: "                 << res->EXCHANGE_ID4res_u.eir_resok4.eir_clientid
+            out << " clientid: " << res->EXCHANGE_ID4res_u.eir_resok4.eir_clientid
                 << " sequenceid: 0x" << std::hex << res->EXCHANGE_ID4res_u.eir_resok4.eir_sequenceid << std::dec
-                << " flags: "                    << res->EXCHANGE_ID4res_u.eir_resok4.eir_flags
-                << " state protect: "            << res->EXCHANGE_ID4res_u.eir_resok4.eir_state_protect
-                << " server owner: "             << res->EXCHANGE_ID4res_u.eir_resok4.eir_server_owner
+                << " flags: " << res->EXCHANGE_ID4res_u.eir_resok4.eir_flags
+                << " state protect: " << res->EXCHANGE_ID4res_u.eir_resok4.eir_state_protect
+                << " server owner: " << res->EXCHANGE_ID4res_u.eir_resok4.eir_server_owner
                 << " server scope: ";
             print_hex(out,
                       res->EXCHANGE_ID4res_u.eir_resok4.eir_server_scope.eir_server_scope_val,
                       res->EXCHANGE_ID4res_u.eir_resok4.eir_server_scope.eir_server_scope_len);
             out << " server impl id:";
-            NFS41::nfs_impl_id4* current_el {res->EXCHANGE_ID4res_u.eir_resok4.eir_server_impl_id.eir_server_impl_id_val};
-            for (u_int i {0}; i < res->EXCHANGE_ID4res_u.eir_resok4.eir_server_impl_id.eir_server_impl_id_len; i++, current_el++)
+            NFS41::nfs_impl_id4* current_el{res->EXCHANGE_ID4res_u.eir_resok4.eir_server_impl_id.eir_server_impl_id_val};
+            for(u_int i{0}; i < res->EXCHANGE_ID4res_u.eir_resok4.eir_server_impl_id.eir_server_impl_id_len; i++, current_el++)
             {
                 out << ' ' << current_el;
             }
@@ -3638,17 +3823,17 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::EXCHANGE_ID4res* res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE_SESSION4args* args)
 {
-    if (args)
+    if(args)
     {
-        out << "clientid: 0x" << std::hex        << args->csa_clientid
-            << "; seqid: 0x" << std::hex         << args->csa_sequence << std::dec
-            << "; flags: "                       << args->csa_flags
-            << "; fore chan attrs: [ "           << args->csa_fore_chan_attrs << " ] "
-            << "; fore back attrs: [ "           << args->csa_back_chan_attrs << " ] "
-            << "; cb program: 0x" << std::hex    << args->csa_cb_program << std::dec
+        out << "clientid: 0x" << std::hex << args->csa_clientid
+            << "; seqid: 0x" << std::hex << args->csa_sequence << std::dec
+            << "; flags: " << args->csa_flags
+            << "; fore chan attrs: [ " << args->csa_fore_chan_attrs << " ] "
+            << "; fore back attrs: [ " << args->csa_back_chan_attrs << " ] "
+            << "; cb program: 0x" << std::hex << args->csa_cb_program << std::dec
             << "; callback sec parms:";
-        NFS41::callback_sec_parms4* current_el {args->csa_sec_parms.csa_sec_parms_val};
-        for (u_int i {0}; i < args->csa_sec_parms.csa_sec_parms_len; i++, current_el++)
+        NFS41::callback_sec_parms4* current_el{args->csa_sec_parms.csa_sec_parms_val};
+        for(u_int i{0}; i < args->csa_sec_parms.csa_sec_parms_len; i++, current_el++)
         {
             out << ' ' << current_el;
         }
@@ -3657,26 +3842,26 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE_SESSION4args* arg
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::CREATE_SESSION4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->csr_status;
-        if (out_all() && res->csr_status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->csr_status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " session id: ";
             print_hex(out,
                       res->CREATE_SESSION4res_u.csr_resok4.csr_sessionid,
                       NFS41::NFS4_SESSIONID_SIZE);
             out << " sequenceid: 0x" << std::hex << res->CREATE_SESSION4res_u.csr_resok4.csr_sequence << std::dec
-                << " flags: "                    << res->CREATE_SESSION4res_u.csr_resok4.csr_flags
-                << " fore chan attrs: "          << res->CREATE_SESSION4res_u.csr_resok4.csr_fore_chan_attrs
-                << " fore back attrs: "          << res->CREATE_SESSION4res_u.csr_resok4.csr_back_chan_attrs;
+                << " flags: " << res->CREATE_SESSION4res_u.csr_resok4.csr_flags
+                << " fore chan attrs: " << res->CREATE_SESSION4res_u.csr_resok4.csr_fore_chan_attrs
+                << " fore back attrs: " << res->CREATE_SESSION4res_u.csr_resok4.csr_back_chan_attrs;
         }
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_SESSION4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "session id: ";
         print_hex(out,
@@ -3687,7 +3872,7 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_SESSION4args* ar
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_SESSION4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->dsr_status;
     }
@@ -3695,7 +3880,7 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_SESSION4res* res
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::FREE_STATEID4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "stateid: " << args->fsa_stateid;
     }
@@ -3703,7 +3888,7 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::FREE_STATEID4args* args)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::FREE_STATEID4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->fsr_status;
     }
@@ -3711,28 +3896,28 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::FREE_STATEID4res* res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::GETDEVICEINFO4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "device id: "    << args->gdia_device_id
-            << " layout type: "  << args->gdia_layout_type
-            << " maxcount: "     << args->gdia_maxcount
+        out << "device id: " << args->gdia_device_id
+            << " layout type: " << args->gdia_layout_type
+            << " maxcount: " << args->gdia_maxcount
             << " notify types: " << args->gdia_notify_types;
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::GETDEVICEINFO4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->gdir_status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->gdir_status == NFS41::nfsstat4::NFS4_OK)
+            if(res->gdir_status == NFS41::nfsstat4::NFS4_OK)
             {
-                out << " device addr: "  << res->GETDEVICEINFO4res_u.gdir_resok4.gdir_device_addr
+                out << " device addr: " << res->GETDEVICEINFO4res_u.gdir_resok4.gdir_device_addr
                     << " notification: " << res->GETDEVICEINFO4res_u.gdir_resok4.gdir_notification;
             }
-            if (res->gdir_status == NFS41::nfsstat4::NFS4ERR_TOOSMALL)
+            if(res->gdir_status == NFS41::nfsstat4::NFS4ERR_TOOSMALL)
             {
                 out << " min count: " << res->GETDEVICEINFO4res_u.gdir_mincount;
             }
@@ -3742,55 +3927,55 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::GETDEVICEINFO4res* res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::GETDEVICELIST4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "layout type: " << args->gdla_layout_type
+        out << "layout type: " << args->gdla_layout_type
             << " max devices: " << args->gdla_maxdevices
-            << " cookie: "      << args->gdla_cookie
-            << " cookieverf: "  << args->gdla_cookieverf;
+            << " cookie: " << args->gdla_cookie
+            << " cookieverf: " << args->gdla_cookieverf;
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::GETDEVICELIST4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->gdlr_status;
-        if (out_all() && res->gdlr_status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->gdlr_status == NFS41::nfsstat4::NFS4_OK)
         {
-            out << " cookie: "      << res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_cookie
-                << " cookieverf: "  << res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_cookieverf
+            out << " cookie: " << res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_cookie
+                << " cookieverf: " << res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_cookieverf
                 << " device id list: ";
-            NFS41::deviceid4* current_el {res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_deviceid_list.gdlr_deviceid_list_val};
-            for (u_int i {0}; i < res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_deviceid_list.gdlr_deviceid_list_len; i++, current_el++)
+            NFS41::deviceid4* current_el{res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_deviceid_list.gdlr_deviceid_list_val};
+            for(u_int i{0}; i < res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_deviceid_list.gdlr_deviceid_list_len; i++, current_el++)
             {
                 out << ' ' << current_el;
             }
-            out << " eof: "  << res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_eof;
+            out << " eof: " << res->GETDEVICELIST4res_u.gdlr_resok4.gdlr_eof;
         }
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTCOMMIT4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "offset: "             << args->loca_offset
-            << " length: "             << args->loca_length
-            << " reclaim: "            << args->loca_reclaim
-            << " stateid: "            << args->loca_stateid
-            << " last write offset: "  << args->loca_last_write_offset
-            << " time modify: "        << args->loca_time_modify
-            << " tayout update: "      << args->loca_layoutupdate;
+        out << "offset: " << args->loca_offset
+            << " length: " << args->loca_length
+            << " reclaim: " << args->loca_reclaim
+            << " stateid: " << args->loca_stateid
+            << " last write offset: " << args->loca_last_write_offset
+            << " time modify: " << args->loca_time_modify
+            << " tayout update: " << args->loca_layoutupdate;
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTCOMMIT4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->locr_status;
-        if (out_all() && res->locr_status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->locr_status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " new size: " << res->LAYOUTCOMMIT4res_u.locr_resok4.locr_newsize;
         }
@@ -3799,27 +3984,27 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTCOMMIT4res* res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTGET4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "signal layout avail: " << args->loga_signal_layout_avail
-            << " layout type: "         << args->loga_layout_type
-            << " iomode: "              << args->loga_iomode
-            << " offset: "              << args->loga_offset
-            << " length: "              << args->loga_length
-            << " minlength: "           << args->loga_minlength
-            << " stateid: "             << args->loga_stateid
-            << " maxcount: "            << args->loga_maxcount;
+        out << "signal layout avail: " << args->loga_signal_layout_avail
+            << " layout type: " << args->loga_layout_type
+            << " iomode: " << args->loga_iomode
+            << " offset: " << args->loga_offset
+            << " length: " << args->loga_length
+            << " minlength: " << args->loga_minlength
+            << " stateid: " << args->loga_stateid
+            << " maxcount: " << args->loga_maxcount;
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTGET4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->logr_status;
-        if (out_all())
+        if(out_all())
         {
-            if (res->logr_status == NFS41::nfsstat4::NFS4_OK)
+            if(res->logr_status == NFS41::nfsstat4::NFS4_OK)
             {
                 out << " return on close: "
                     << res->LAYOUTGET4res_u.logr_resok4.logr_return_on_close
@@ -3827,13 +4012,13 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTGET4res* res)
                     << res->LAYOUTGET4res_u.logr_resok4.logr_stateid
                     << " layout:x ";
                 NFS41::layout4* current_el = res->LAYOUTGET4res_u.logr_resok4.logr_layout.logr_layout_val;
-                for (u_int i {0}; i < res->LAYOUTGET4res_u.logr_resok4.logr_layout.logr_layout_len; i++, current_el++)
+                for(u_int i{0}; i < res->LAYOUTGET4res_u.logr_resok4.logr_layout.logr_layout_len; i++, current_el++)
                 {
                     out << ' ' << current_el;
                 }
             }
         }
-        if (res->logr_status == NFS41::nfsstat4::NFS4ERR_LAYOUTTRYLATER)
+        if(res->logr_status == NFS41::nfsstat4::NFS4ERR_LAYOUTTRYLATER)
         {
             out << "will signal layout avail: "
                 << res->LAYOUTGET4res_u.logr_will_signal_layout_avail;
@@ -3843,21 +4028,21 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTGET4res* res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTRETURN4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "reclaim: "       << args->lora_reclaim
-            << " layout type: "   << args->lora_layout_type
-            << " iomode: "        << args->lora_iomode
+        out << "reclaim: " << args->lora_reclaim
+            << " layout type: " << args->lora_layout_type
+            << " iomode: " << args->lora_iomode
             << " layout return: " << args->lora_layoutreturn;
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTRETURN4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->lorr_status;
-        if (out_all() && res->lorr_status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->lorr_status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " stateid: " << res->LAYOUTRETURN4res_u.lorr_stateid;
         }
@@ -3866,34 +4051,34 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::LAYOUTRETURN4res* res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::SEQUENCE4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "sessionid: ";
+        out << "sessionid: ";
         print_hex(out,
                   args->sa_sessionid,
                   NFS41::NFS4_SESSIONID_SIZE);
         out << " sequenceid: 0x" << std::hex << args->sa_sequenceid << std::dec
-            << " slotid: "       << args->sa_slotid
-            << " cache this: "   << args->sa_cachethis;
+            << " slotid: " << args->sa_slotid
+            << " cache this: " << args->sa_cachethis;
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::SEQUENCE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->sr_status;
-        if (out_all() && res->sr_status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->sr_status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " session: ";
             print_hex(out,
                       res->SEQUENCE4res_u.sr_resok4.sr_sessionid,
                       NFS41::NFS4_SESSIONID_SIZE);
             out << " sequenceid: 0x" << std::hex << res->SEQUENCE4res_u.sr_resok4.sr_sequenceid << std::dec
-                << " slotid: "                   << res->SEQUENCE4res_u.sr_resok4.sr_slotid
-                << " highest slotid: "           << res->SEQUENCE4res_u.sr_resok4.sr_highest_slotid
-                << " target highest slotid: "    << res->SEQUENCE4res_u.sr_resok4.sr_target_highest_slotid
-                << " status flags: "             << res->SEQUENCE4res_u.sr_resok4.sr_status_flags;
+                << " slotid: " << res->SEQUENCE4res_u.sr_resok4.sr_slotid
+                << " highest slotid: " << res->SEQUENCE4res_u.sr_resok4.sr_highest_slotid
+                << " target highest slotid: " << res->SEQUENCE4res_u.sr_resok4.sr_target_highest_slotid
+                << " status flags: " << res->SEQUENCE4res_u.sr_resok4.sr_status_flags;
         }
     }
 }
@@ -3901,7 +4086,7 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::SEQUENCE4res* res)
 //SECINFO_NO_NAME4args
 void PrintAnalyzer::nfs41_operation(const enum NFS41::secinfo_style4* args)
 {
-    if (args)
+    if(args)
     {
         out << ' ' << *args;
     }
@@ -3909,7 +4094,7 @@ void PrintAnalyzer::nfs41_operation(const enum NFS41::secinfo_style4* args)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::SET_SSV4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "ssv: ";
         out.write(args->ssa_ssv.ssa_ssv_val,
@@ -3922,10 +4107,10 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::SET_SSV4args* args)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::SET_SSV4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->ssr_status;
-        if (out_all() && res->ssr_status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->ssr_status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " digest: ";
             out.write(res->SET_SSV4res_u.ssr_resok4.ssr_digest.ssr_digest_val,
@@ -3936,11 +4121,11 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::SET_SSV4res* res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::TEST_STATEID4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "stateids:";
         NFS41::stateid4* current_el = args->ts_stateids.ts_stateids_val;
-        for (u_int i {0}; i < args->ts_stateids.ts_stateids_len; i++, current_el++)
+        for(u_int i{0}; i < args->ts_stateids.ts_stateids_len; i++, current_el++)
         {
             out << ' ' << current_el;
         }
@@ -3949,14 +4134,14 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::TEST_STATEID4args* args)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::TEST_STATEID4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->tsr_status;
-        if (out_all() && res->tsr_status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->tsr_status == NFS41::nfsstat4::NFS4_OK)
         {
             out << " status codes: ";
             NFS41::nfsstat4* current_el = res->TEST_STATEID4res_u.tsr_resok4.tsr_status_codes.tsr_status_codes_val;
-            for (u_int i {0}; i < res->TEST_STATEID4res_u.tsr_resok4.tsr_status_codes.tsr_status_codes_len; i++, current_el++)
+            for(u_int i{0}; i < res->TEST_STATEID4res_u.tsr_resok4.tsr_status_codes.tsr_status_codes_len; i++, current_el++)
             {
                 out << ' ' << current_el;
             }
@@ -3966,19 +4151,19 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::TEST_STATEID4res* res)
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::WANT_DELEGATION4args* args)
 {
-    if (args)
+    if(args)
     {
-        out <<  "want: "  << args->wda_want
+        out << "want: " << args->wda_want
             << " claim: " << args->wda_claim;
     }
 }
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::WANT_DELEGATION4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->wdr_status;
-        if (out_all() && res->wdr_status == NFS41::nfsstat4::NFS4_OK)
+        if(out_all() && res->wdr_status == NFS41::nfsstat4::NFS4_OK)
         {
             out << res->WANT_DELEGATION4res_u.wdr_resok4;
         }
@@ -3987,7 +4172,7 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::WANT_DELEGATION4res* res
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_CLIENTID4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "clientid: " << args->dca_clientid;
     }
@@ -3995,7 +4180,7 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_CLIENTID4args* a
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_CLIENTID4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->dcr_status;
     }
@@ -4003,7 +4188,7 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::DESTROY_CLIENTID4res* re
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::RECLAIM_COMPLETE4args* args)
 {
-    if (args)
+    if(args)
     {
         out << "one fs: " << args->rca_one_fs;
     }
@@ -4011,7 +4196,7 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::RECLAIM_COMPLETE4args* a
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::RECLAIM_COMPLETE4res* res)
 {
-    if (res)
+    if(res)
     {
         out << "status: " << res->rcr_status;
     }
@@ -4019,9 +4204,10 @@ void PrintAnalyzer::nfs41_operation(const struct NFS41::RECLAIM_COMPLETE4res* re
 
 void PrintAnalyzer::nfs41_operation(const struct NFS41::ILLEGAL4res* res)
 {
-    if (res) { out << "status: " << res->status; }
+    if(res) {
+        out << "status: " << res->status;
+    }
 }
-
 
 void PrintAnalyzer::flush_statistics()
 {

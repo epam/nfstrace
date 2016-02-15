@@ -25,9 +25,9 @@
 #include <cinttypes>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 #include <unordered_map>
-#include <utility>
 
 #include "protocols/rpc/rpc_header.h"
 #include "utils/filtered_data.h"
@@ -39,31 +39,30 @@ namespace NST
 {
 namespace analysis
 {
-
 class Session : public utils::ApplicationSession
 {
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
-public:
 
+public:
     Session(const utils::NetworkSession& s, utils::Session::Direction call_direction)
-    : utils::ApplicationSession{s, call_direction}
+        : utils::ApplicationSession{s, call_direction}
     {
         utils::Out message;
         message << "Detect session " << str();
     }
-    ~Session() = default;
-    Session(const Session&)            = delete;
+    ~Session()              = default;
+    Session(const Session&) = delete;
     Session& operator=(const Session&) = delete;
-    
+
     void save_call_data(const std::uint64_t xid, FilteredDataQueue::Ptr&& data)
     {
         FilteredDataQueue::Ptr& e = operations[xid];
-        if(e)                   // xid call already exists
+        if(e) // xid call already exists
         {
             LOG("replace RPC Call XID:%" PRIu64 " for %s", xid, str().c_str());
         }
 
-        e = std::move(data);    // replace existing or set new
+        e = std::move(data); // replace existing or set new
     }
     inline FilteredDataQueue::Ptr get_call_data(const std::uint64_t xid)
     {
@@ -84,7 +83,6 @@ public:
 
     inline const Session* get_session() const { return this; }
 private:
-
     // TODO: add custom allocator based on BlockAllocator
     // to decrease cost of expensive insert/erase operations
     std::unordered_map<std::uint64_t, FilteredDataQueue::Ptr> operations;
@@ -96,9 +94,9 @@ class Sessions
 public:
     using MsgType = NST::protocols::rpc::MsgType;
 
-    Sessions() = default;
-    ~Sessions()= default;
-    Sessions(const Sessions&)           = delete;
+    Sessions()                = default;
+    ~Sessions()               = default;
+    Sessions(const Sessions&) = delete;
     Sessions& operator=(const Sessions&) = delete;
 
     Session* get_session(utils::NetworkSession* app, NST::utils::Session::Direction dir, MsgType type)
@@ -107,7 +105,7 @@ public:
         {
             if(type == MsgType::CALL) // add new session only for Call
             {
-                std::unique_ptr<Session> ptr{ new Session{*app, dir} };
+                std::unique_ptr<Session> ptr{new Session{*app, dir}};
                 sessions.emplace_back(std::move(ptr));
 
                 app->application = sessions.back().get(); // set reference
@@ -118,11 +116,11 @@ public:
     }
 
 private:
-    std::vector< std::unique_ptr<Session> > sessions;
+    std::vector<std::unique_ptr<Session>> sessions;
 };
 
 } // namespace analysis
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//RPC_SESSIONS_H
+#endif //RPC_SESSIONS_H
 //------------------------------------------------------------------------------

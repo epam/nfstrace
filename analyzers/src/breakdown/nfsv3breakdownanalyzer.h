@@ -31,13 +31,12 @@ namespace NST
 {
 namespace breakdown
 {
-
 /*! \brief NFSv3BreakdownAnalyzer Analyzer for NFS v3
  * Handles NFS v3 commands
  */
 class NFSv3BreakdownAnalyzer : virtual public IAnalyzer
 {
-    Statistics stats; //!< Statistics
+    Statistics  stats;       //!< Statistics
     Representer representer; //!< Class for statistics representation
 public:
     NFSv3BreakdownAnalyzer(std::ostream& o = std::cout);
@@ -115,5 +114,5 @@ public:
 } // namespace breakdown
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFSV3BREAKDOWNANALYZER_H
+#endif //NFSV3BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------

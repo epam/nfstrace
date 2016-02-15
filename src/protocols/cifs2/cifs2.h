@@ -22,8 +22,8 @@
 #ifndef CIFSv2_HEADER_H
 #define CIFSv2_HEADER_H
 //------------------------------------------------------------------------------
-#include "api/cifs_commands.h"
 #include "api/cifs2_commands.h"
+#include "api/cifs_commands.h"
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -32,9 +32,9 @@ namespace protocols
 {
 namespace CIFSv2
 {
-
 using SMBv2Commands = NST::API::SMBv2::SMBv2Commands;
-namespace SMBv2 = NST::API::SMBv2;
+namespace SMBv2     = NST::API::SMBv2;
+// clang-format off
 // https://msdn.microsoft.com/en-us/library/ff718266.aspx
 struct Guid
 {
@@ -114,6 +114,8 @@ struct MessageHeader : public RawMessageHeader
  */
 const MessageHeader* get_header(const uint8_t* data);
 
+// clang-format on
+
 void parseGuid(uint8_t (&guid)[16]);
 void parse(SMBv2::ErrResponse*&);
 void parse(SMBv2::NegotiateRequest*&);
@@ -177,7 +179,7 @@ inline const Cmd command(Data& request, Data& response, Session* session)
     // we have to cast raw data to pointer type ( in contrast to const pointer )
     //
     auto req_header = reinterpret_cast<RawMessageHeader*>(request->data);
-    auto pargs = reinterpret_cast<typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
+    auto pargs      = reinterpret_cast<typename Cmd::RequestType*>(request->data + sizeof(RawMessageHeader));
 
     parse(pargs);
 
@@ -185,19 +187,17 @@ inline const Cmd command(Data& request, Data& response, Session* session)
     if(response)
     {
         cmd.res_header = reinterpret_cast<RawMessageHeader*>(response->data);
-        cmd.pres = reinterpret_cast<typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader));
+        cmd.pres       = reinterpret_cast<typename Cmd::ResponseType*>(response->data + sizeof(RawMessageHeader));
     }
-    cmd.parg = pargs; 
+    cmd.parg = pargs;
     return cmd;
 }
 
-extern "C"
-NST_PUBLIC
-const char* print_cifs2_procedures(SMBv2Commands cmd_code);
+extern "C" NST_PUBLIC const char* print_cifs2_procedures(SMBv2Commands cmd_code);
 
 } // namespace CIFSv2
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//CIFSv2_HEADER_H
+#endif // CIFSv2_HEADER_H
 //------------------------------------------------------------------------------

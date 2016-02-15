@@ -26,35 +26,33 @@
 
 #include "api/rpc_types.h"
 #include "protocols/nfs3/nfs3_utils.h"
-#include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/nfs4/nfs41_utils.h"
+#include "protocols/nfs4/nfs4_utils.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace protocols
 {
-
 using NFS3::proc_t_of;
 using NFS4::proc_t_of;
 using NFS41::proc_t_of;
 
-template
-<
+template <
     typename ArgType, // structure of RPC procedure parameters
     typename ResType  // structure of RPC procedure results
->
-class NFSProcedure: public NST::API::RPCProcedure
+    >
+class NFSProcedure : public NST::API::RPCProcedure
 {
 public:
     inline NFSProcedure(xdr::XDRDecoder& c, xdr::XDRDecoder& r, const Session* s)
-    : parg{&arg}    // set pointer to argument
-    , pres{&res}    // set pointer to result
+        : parg{&arg} // set pointer to argument
+        , pres{&res} // set pointer to result
     {
-        memset(&call, 0,sizeof(call ));
-        memset(&reply,0,sizeof(reply));
-        memset(&arg,      0,sizeof(arg      ));
-        memset(&res,      0,sizeof(res      ));
+        memset(&call, 0, sizeof(call));
+        memset(&reply, 0, sizeof(reply));
+        memset(&arg, 0, sizeof(arg));
+        memset(&res, 0, sizeof(res));
 
         // fill call
         if(!xdr_callmsg(c.xdr(), &call))
@@ -64,34 +62,34 @@ public:
         }
 
         // fill call arguments
-        if(!proc_t_of(arg)(c.xdr(),&arg))
+        if(!proc_t_of(arg)(c.xdr(), &arg))
         {
-            xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg     );
-            xdr_free((xdrproc_t)xdr_callmsg,    (char*)&call);
+            xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
+            xdr_free((xdrproc_t)xdr_callmsg, (char*)&call);
             throw xdr::XDRDecoderError{"XDRDecoder: cann't read call arguments"};
         }
 
         reply.ru.RM_rmb.ru.RP_ar.ru.AR_results.proc = &return_true;
 
         // fill reply
-        if(!xdr_replymsg (r.xdr(), &reply))
+        if(!xdr_replymsg(r.xdr(), &reply))
         {
-            xdr_free((xdrproc_t)xdr_replymsg,  (char*)&reply);
-            xdr_free((xdrproc_t)proc_t_of(arg),(char*)&arg      );
-            xdr_free((xdrproc_t)xdr_callmsg,   (char*)&call );
+            xdr_free((xdrproc_t)xdr_replymsg, (char*)&reply);
+            xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
+            xdr_free((xdrproc_t)xdr_callmsg, (char*)&call);
             throw xdr::XDRDecoderError{"XDRDecoder: cann't read reply data"};
         }
-  
+
         if(reply.ru.RM_rmb.rp_stat == reply_stat::MSG_ACCEPTED &&
            reply.ru.RM_rmb.ru.RP_ar.ar_stat == accept_stat::SUCCESS)
         {
             // fill reply results
-            if(!proc_t_of(res)(r.xdr(),&res))
+            if(!proc_t_of(res)(r.xdr(), &res))
             {
-                xdr_free((xdrproc_t)proc_t_of(res), (char*)&res      );
-                xdr_free((xdrproc_t)xdr_replymsg,   (char*)&reply);
-                xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg      );
-                xdr_free((xdrproc_t)xdr_callmsg,    (char*)&call );
+                xdr_free((xdrproc_t)proc_t_of(res), (char*)&res);
+                xdr_free((xdrproc_t)xdr_replymsg, (char*)&reply);
+                xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
+                xdr_free((xdrproc_t)xdr_callmsg, (char*)&call);
                 throw xdr::XDRDecoderError{"XDRDecoder: cann't read reply results"};
             }
         }
@@ -108,10 +106,10 @@ public:
 
     inline ~NFSProcedure()
     {
-        if(pres) xdr_free((xdrproc_t)proc_t_of(res), (char*)&res      );
-                 xdr_free((xdrproc_t)xdr_replymsg,   (char*)&reply);
-                 xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg      );
-                 xdr_free((xdrproc_t)xdr_callmsg,    (char*)&call );
+        if(pres) xdr_free((xdrproc_t)proc_t_of(res), (char*)&res);
+        xdr_free((xdrproc_t)xdr_replymsg, (char*)&reply);
+        xdr_free((xdrproc_t)proc_t_of(arg), (char*)&arg);
+        xdr_free((xdrproc_t)xdr_callmsg, (char*)&call);
     }
 
     // pointers to procedure specific argument and result
@@ -120,11 +118,12 @@ public:
 
 private:
     inline static bool_t return_true(XDR*, void*, ...) { return 1; }
-    inline static bool_t return_true(XDR*, ...)        { return 1; }
-
-    ArgType arg;
-    ResType res;
+    inline static bool_t return_true(XDR*, ...) { return 1; }
+    ArgType              arg;
+    ResType              res;
 };
+
+// clang-format off
 
 namespace NFS3
 {
@@ -167,8 +166,10 @@ using NFSPROC41RPCGEN_NULL     = NFSProcedure <NFS41::NULL4args,     NFS41::NULL
 using NFSPROC41RPCGEN_COMPOUND = NFSProcedure <NFS41::COMPOUND4args, NFS41::COMPOUND4res>;
 }
 
+// clang-format on
+
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS_PROCEDURE_H
+#endif // NFS_PROCEDURE_H
 //------------------------------------------------------------------------------

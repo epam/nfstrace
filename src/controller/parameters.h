@@ -32,7 +32,6 @@ namespace NST
 {
 namespace controller
 {
-
 enum class RunningMode
 {
     Profiling,
@@ -43,8 +42,16 @@ enum class RunningMode
 
 struct AParams
 {
-    AParams(const std::string& p) : path{p}, args{} {}
-    AParams(const std::string& p, const std::string& a) : path{p}, args{a} {}
+    AParams(const std::string& p)
+        : path{p}
+        , args{}
+    {
+    }
+    AParams(const std::string& p, const std::string& a)
+        : path{p}
+        , args{a}
+    {
+    }
 
     const std::string path;
     const std::string args;
@@ -54,8 +61,8 @@ struct AParams
  */
 enum class NetProtocol
 {
-    NFS    = 0x01, //!< NFS protocol
-    CIFS   = 0x02  //!< CIFS protocol
+    NFS  = 0x01, //!< NFS protocol
+    CIFS = 0x02  //!< CIFS protocol
 };
 
 class Parameters
@@ -68,29 +75,29 @@ public:
     Parameters(int argc, char** argv);
     ~Parameters();
 
-    Parameters(const Parameters&)            = delete;
+    Parameters(const Parameters&) = delete;
     Parameters& operator=(const Parameters&) = delete;
 
     bool show_help() const;
     bool show_enum() const;
 
     // access helpers
-    const std::string&  program_name() const;
-    RunningMode         running_mode() const;
-    std::string         input_file() const;
-    const std::string   dropuser() const;
-    const std::string   log_path() const;
-    unsigned short      queue_capacity() const;
-    bool                trace() const;
-    int                 verbose_level() const;
-    const CaptureParams capture_params() const;
-    const DumpingParams dumping_params() const;
+    const std::string&          program_name() const;
+    RunningMode                 running_mode() const;
+    std::string                 input_file() const;
+    const std::string           dropuser() const;
+    const std::string           log_path() const;
+    unsigned short              queue_capacity() const;
+    bool                        trace() const;
+    int                         verbose_level() const;
+    const CaptureParams         capture_params() const;
+    const DumpingParams         dumping_params() const;
     const std::vector<AParams>& analysis_modules() const;
-    static unsigned short rpcmsg_limit();
+    static unsigned short       rpcmsg_limit();
 };
 
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//PARAMETERS_H
+#endif // PARAMETERS_H
 //------------------------------------------------------------------------------

@@ -30,16 +30,16 @@
 //------------------------------------------------------------------------------
 namespace HEADER
 {
-const int MEMO_LINE = 1;
-const int HOST_LINE = 2;
-const int DATE_LINE = 3;
+const int MEMO_LINE    = 1;
+const int HOST_LINE    = 2;
+const int DATE_LINE    = 3;
 const int ELAPSED_LINE = 4;
-const int HOST_SIZE = 128;
+const int HOST_SIZE    = 128;
 }
 
 void HeaderWindow::destroy()
 {
-    if (_window == nullptr)
+    if(_window == nullptr)
     {
         return;
     }
@@ -50,9 +50,9 @@ void HeaderWindow::destroy()
 }
 
 HeaderWindow::HeaderWindow(MainWindow& w)
-: _start_time {time(NULL)}
+    : _start_time{time(NULL)}
 {
-    if (w._window == nullptr)
+    if(w._window == nullptr)
     {
         throw std::runtime_error("Initialization of Header window failed.");
     }
@@ -65,34 +65,34 @@ HeaderWindow::~HeaderWindow()
 
 void HeaderWindow::update()
 {
-    if (_window == nullptr)
+    if(_window == nullptr)
     {
         return;
     }
     time_t actual_time = time(nullptr);
-    tm* t = localtime(&actual_time);
-    time_t shift_time = actual_time - _start_time;
+    tm*    t           = localtime(&actual_time);
+    time_t shift_time  = actual_time - _start_time;
     /* tm starts with 0 month and 1900 year*/
     mvwprintw(_window, HEADER::DATE_LINE, FIRST_CHAR_POS, "Date: \t %d.%d.%d \t Time: %d:%d:%d  ", t->tm_mday, t->tm_mon + 1, t->tm_year + 1900, t->tm_hour, t->tm_min, t->tm_sec);
     mvwprintw(_window, HEADER::ELAPSED_LINE, FIRST_CHAR_POS, "Elapsed time:  \t %d days; %d:%d:%d times",
               shift_time / SECINDAY, shift_time % SECINDAY / SECINHOUR, shift_time % SECINHOUR / SECINMIN, shift_time % SECINMIN);
-    wrefresh (_window);
+    wrefresh(_window);
 }
 
 void HeaderWindow::resize(MainWindow& m)
 {
-    if (_window != nullptr)
+    if(_window != nullptr)
     {
         destroy();
     }
-    if (m._window != nullptr)
+    if(m._window != nullptr)
     {
         _window = subwin(m._window, std::min(static_cast<int>(m._window->_maxy), GUI_HEADER_HEIGHT), std::min(static_cast<int>(m._window->_maxx), GUI_LENGTH), 0, 0);
     }
-    if (_window != nullptr)
+    if(_window != nullptr)
     {
         werase(_window);
-        wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER , ACS_LLCORNER, ACS_LRCORNER);
+        wborder(_window, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, ACS_ULCORNER, ACS_URCORNER, ACS_LLCORNER, ACS_LRCORNER);
         char HOST_NAME[HEADER::HOST_SIZE];
         gethostname(HOST_NAME, HEADER::HOST_SIZE);
         mvwprintw(_window, HEADER::MEMO_LINE, FIRST_CHAR_POS, "%s", "Nfstrace watch plugin. To scroll press up or down keys. Ctrl + c to exit.");

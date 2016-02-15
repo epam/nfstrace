@@ -31,7 +31,6 @@ namespace NST
 {
 namespace breakdown
 {
-
 /*! \brief Analyzer for NFS v4
  * Handles NFS v4 commands
  */
@@ -39,9 +38,9 @@ class NFSv4BreakdownAnalyzer : virtual public IAnalyzer
 {
 protected:
 private:
-    Statistics compound_stats; //!< Statistics
-    Statistics stats; //!< Statistics
-    NFSv4Representer representer; //!< stream to output
+    Statistics       compound_stats; //!< Statistics
+    Statistics       stats;          //!< Statistics
+    NFSv4Representer representer;    //!< stream to output
 public:
     NFSv4BreakdownAnalyzer(std::ostream& o = std::cout);
 
@@ -50,7 +49,7 @@ public:
     void null4(const RPCProcedure* proc,
                const struct NFS4::NULL4args*,
                const struct NFS4::NULL4res*) override final;
-    void compound4(const RPCProcedure*  proc,
+    void compound4(const RPCProcedure* proc,
                    const struct NFS4::COMPOUND4args*,
                    const struct NFS4::COMPOUND4res*) override final;
 
@@ -78,7 +77,7 @@ public:
     void getattr40(const RPCProcedure* proc,
                    const struct NFS4::GETATTR4args*,
                    const struct NFS4::GETATTR4res* res) override final;
-    void getfh40(const RPCProcedure* proc,
+    void getfh40(const RPCProcedure*           proc,
                  const struct NFS4::GETFH4res* res) override final;
     void link40(const RPCProcedure* proc,
                 const struct NFS4::LINK4args*,
@@ -95,7 +94,7 @@ public:
     void lookup40(const RPCProcedure* proc,
                   const struct NFS4::LOOKUP4args*,
                   const struct NFS4::LOOKUP4res* res) override final;
-    void lookupp40(const RPCProcedure* proc,
+    void lookupp40(const RPCProcedure*             proc,
                    const struct NFS4::LOOKUPP4res* res) override final;
     void nverify40(const RPCProcedure* proc,
                    const struct NFS4::NVERIFY4args*,
@@ -115,9 +114,9 @@ public:
     void putfh40(const RPCProcedure* proc,
                  const struct NFS4::PUTFH4args*,
                  const struct NFS4::PUTFH4res* res) override final;
-    void putpubfh40(const RPCProcedure* proc,
+    void putpubfh40(const RPCProcedure*              proc,
                     const struct NFS4::PUTPUBFH4res* res) override final;
-    void putrootfh40(const RPCProcedure* proc,
+    void putrootfh40(const RPCProcedure*               proc,
                      const struct NFS4::PUTROOTFH4res* res) override final;
     void read40(const RPCProcedure* proc,
                 const struct NFS4::READ4args*,
@@ -125,7 +124,7 @@ public:
     void readdir40(const RPCProcedure* proc,
                    const struct NFS4::READDIR4args*,
                    const struct NFS4::READDIR4res* res) override final;
-    void readlink40(const RPCProcedure* proc,
+    void readlink40(const RPCProcedure*              proc,
                     const struct NFS4::READLINK4res* res) override final;
     void remove40(const RPCProcedure* proc,
                   const struct NFS4::REMOVE4args*,
@@ -136,9 +135,9 @@ public:
     void renew40(const RPCProcedure* proc,
                  const struct NFS4::RENEW4args*,
                  const struct NFS4::RENEW4res* res) override final;
-    void restorefh40(const RPCProcedure* proc,
+    void restorefh40(const RPCProcedure*               proc,
                      const struct NFS4::RESTOREFH4res* res) override final;
-    void savefh40(const RPCProcedure* proc,
+    void savefh40(const RPCProcedure*            proc,
                   const struct NFS4::SAVEFH4res* res) override final;
     void secinfo40(const RPCProcedure* proc,
                    const struct NFS4::SECINFO4args*,
@@ -164,7 +163,7 @@ public:
     void get_dir_delegation40(const RPCProcedure* proc,
                               const struct NFS4::GET_DIR_DELEGATION4args*,
                               const struct NFS4::GET_DIR_DELEGATION4res* res) override final;
-    void illegal40(const RPCProcedure* proc,
+    void illegal40(const RPCProcedure*             proc,
                    const struct NFS4::ILLEGAL4res* res) override final;
     void flush_statistics() override;
 };
@@ -172,5 +171,5 @@ public:
 } // namespace breakdown
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFSV4BREAKDOWNANALYZER_H
+#endif //NFSV4BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------

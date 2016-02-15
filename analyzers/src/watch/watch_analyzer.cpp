@@ -24,21 +24,21 @@
 #include <string>
 #include <unordered_map>
 
-#include <unistd.h>
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "watch_analyzer.h"
 //------------------------------------------------------------------------------
 WatchAnalyzer::WatchAnalyzer(const char* opts)
-: _cifsv2 {}
-, _cifsv1 {}
-, _nfsv41 {}
-, _nfsv4 {}
-, _nfsv3 {}
-, protocols {&_cifsv2, &_cifsv1, &_nfsv41, &_nfsv4, &_nfsv3}
-, gui {opts, protocols}
+    : _cifsv2{}
+    , _cifsv1{}
+    , _nfsv41{}
+    , _nfsv4{}
+    , _nfsv3{}
+    , protocols{&_cifsv2, &_cifsv1, &_nfsv41, &_nfsv4, &_nfsv3}
+    , gui{opts, protocols}
 {
 }
 
@@ -46,6 +46,7 @@ WatchAnalyzer::~WatchAnalyzer()
 {
 }
 
+// clang-format off
 void WatchAnalyzer::null(const RPCProcedure* proc,
                          const struct NFS3::NULL3args*,
                          const struct NFS3::NULL3res*) { nfs_account(proc); }
@@ -878,6 +879,7 @@ void WatchAnalyzer::breakOplockSMBv2(const SMBv2::BreakOpLockCommand* /*cmd*/, c
 {
     cifs_account(_cifsv2, static_cast<int>(SMBv2::SMBv2Commands::OPLOCK_BREAK));
 }
+// clang-format on
 
 void WatchAnalyzer::flush_statistics()
 {
@@ -885,15 +887,15 @@ void WatchAnalyzer::flush_statistics()
 
 void WatchAnalyzer::on_unix_signal(int signo)
 {
-    if (signo == SIGWINCH)
+    if(signo == SIGWINCH)
     {
         gui.enableUpdate();
     }
 }
 
-void WatchAnalyzer::cifs_account(AbstractProtocol &protocol, int cmd_code)
+void WatchAnalyzer::cifs_account(AbstractProtocol& protocol, int cmd_code)
 {
-    std::vector<std::size_t> cifs_proc_count (static_cast<std::size_t>(protocol.getAmount()), 0);
+    std::vector<std::size_t> cifs_proc_count(static_cast<std::size_t>(protocol.getAmount()), 0);
     ++cifs_proc_count[cmd_code];
     gui.update(&protocol, cifs_proc_count);
 }
@@ -903,25 +905,25 @@ void WatchAnalyzer::nfs_account(const RPCProcedure* proc, const unsigned int nfs
     const u_int nfs_proc = proc->call.ru.RM_cmb.cb_proc;
     const u_int nfs_vers = proc->call.ru.RM_cmb.cb_vers;
 
-    if (nfs_vers == NFS_V4)
+    if(nfs_vers == NFS_V4)
     {
-        if (nfs_minor_vers == NFS_V40)
+        if(nfs_minor_vers == NFS_V40)
         {
-            std::vector<std::size_t> nfs4_proc_count (ProcEnumNFS4::count, 0);
+            std::vector<std::size_t> nfs4_proc_count(ProcEnumNFS4::count, 0);
             ++nfs4_proc_count[nfs_proc];
             gui.update(&_nfsv4, nfs4_proc_count);
         }
 
-        if (nfs_minor_vers == NFS_V41 || nfs_proc == ProcEnumNFS4::NFS_NULL)
+        if(nfs_minor_vers == NFS_V41 || nfs_proc == ProcEnumNFS4::NFS_NULL)
         {
-            std::vector<std::size_t> nfs41_proc_count (ProcEnumNFS41::count, 0);
+            std::vector<std::size_t> nfs41_proc_count(ProcEnumNFS41::count, 0);
             ++nfs41_proc_count[nfs_proc];
             gui.update(&_nfsv41, nfs41_proc_count);
         }
     }
-    else if (nfs_vers == NFS_V3)
+    else if(nfs_vers == NFS_V3)
     {
-        std::vector<std::size_t> nfs3_proc_count (ProcEnumNFS3::count, 0);
+        std::vector<std::size_t> nfs3_proc_count(ProcEnumNFS3::count, 0);
         ++nfs3_proc_count[nfs_proc];
         gui.update(&_nfsv3, nfs3_proc_count);
     }
@@ -929,51 +931,50 @@ void WatchAnalyzer::nfs_account(const RPCProcedure* proc, const unsigned int nfs
 
 void WatchAnalyzer::account40_op(const RPCProcedure* /*proc*/, const ProcEnumNFS4::NFSProcedure operation)
 {
-    std::vector<std::size_t> nfs4_proc_count (ProcEnumNFS4::count, 0);
+    std::vector<std::size_t> nfs4_proc_count(ProcEnumNFS4::count, 0);
     ++nfs4_proc_count[operation];
     gui.update(&_nfsv4, nfs4_proc_count);
 }
 
 void WatchAnalyzer::account41_op(const RPCProcedure* /*proc*/, const ProcEnumNFS41::NFSProcedure operation)
 {
-    std::vector<std::size_t> nfs41_proc_count (ProcEnumNFS41::count, 0);
+    std::vector<std::size_t> nfs41_proc_count(ProcEnumNFS41::count, 0);
     ++nfs41_proc_count[operation];
     gui.update(&_nfsv41, nfs41_proc_count);
 }
 //------------------------------------------------------------------------------
-extern "C"
+extern "C" {
+
+const char* usage()
 {
+    return "User can set chrono output timeout in msec.\n"
+           "You have to run nfstrace with verbosity level set to 0 (nfstrace -v 0 ...)";
+}
 
-    const char* usage()
+IAnalyzer* create(const char* opts)
+{
+    try
     {
-        return "User can set chrono output timeout in msec.\n"
-               "You have to run nfstrace with verbosity level set to 0 (nfstrace -v 0 ...)";
+        return new WatchAnalyzer(opts);
     }
-
-    IAnalyzer* create(const char* opts)
+    catch(std::exception& e)
     {
-        try
-        {
-            return new WatchAnalyzer(opts);
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << "Can't initalize plugin: " << e.what() << std::endl;
-            return nullptr;
-        }
+        std::cerr << "Can't initalize plugin: " << e.what() << std::endl;
+        return nullptr;
     }
+}
 
-    void destroy(IAnalyzer* instance)
-    {
-        delete instance;
-    }
+void destroy(IAnalyzer* instance)
+{
+    delete instance;
+}
 
-    const AnalyzerRequirements* requirements()
-    {
-        static const AnalyzerRequirements requirements{true};
-        return &requirements;
-    }
+const AnalyzerRequirements* requirements()
+{
+    static const AnalyzerRequirements requirements{true};
+    return &requirements;
+}
 
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy, &requirements)
+NST_PLUGIN_ENTRY_POINTS(&usage, &create, &destroy, &requirements)
 }
 //------------------------------------------------------------------------------

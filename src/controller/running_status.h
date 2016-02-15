@@ -22,29 +22,31 @@
 #ifndef RUNNING_STATUS_H
 #define RUNNING_STATUS_H
 //------------------------------------------------------------------------------
-#include <condition_variable>
 #include <exception>
 #include <iostream>
 #include <list>
 #include <mutex>
+#include <condition_variable>
 #include <type_traits>
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
-
 class ProcessingDone : public std::runtime_error
 {
 public:
-    explicit ProcessingDone(const std::string& in) : std::runtime_error{in} { }
+    explicit ProcessingDone(const std::string& in)
+        : std::runtime_error{in}
+    {
+    }
 };
 
 class RunningStatus
 {
 public:
-    RunningStatus() = default;
-    RunningStatus(const RunningStatus&)            = delete;
+    RunningStatus()                     = default;
+    RunningStatus(const RunningStatus&) = delete;
     RunningStatus& operator=(const RunningStatus&) = delete;
 
     template <typename ExceptionType>
@@ -63,13 +65,13 @@ public:
     std::exception_ptr wait_exception()
     {
         std::unique_lock<std::mutex> lock(mutex);
-            while(fifo.empty())
-            {
-                condition.wait(lock);
-            }
-            std::exception_ptr e = fifo.front();
-            fifo.pop_front();
-            return e;
+        while(fifo.empty())
+        {
+            condition.wait(lock);
+        }
+        std::exception_ptr e = fifo.front();
+        fifo.pop_front();
+        return e;
     }
 
     void wait_and_rethrow_exception()
@@ -81,25 +83,25 @@ public:
     void print(std::ostream& out)
     {
         std::unique_lock<std::mutex> lock(mutex);
-            if(!fifo.empty())
+        if(!fifo.empty())
+        {
+            out << "list of unhandled exceptions:" << std::endl;
+            for(auto& e : fifo)
             {
-                out << "list of unhandled exceptions:" << std::endl;
-                for(auto& e : fifo)
+                try
                 {
-                    try
-                    {
-                        std::rethrow_exception(e);
-                    }
-                    catch(const std::exception& e)
-                    {
-                        out << '\t' << e.what() << std::endl;
-                    }
-                    catch(...)
-                    {
-                        out << '\t' << "Unknown exception" << std::endl;
-                    }
+                    std::rethrow_exception(e);
+                }
+                catch(const std::exception& e)
+                {
+                    out << '\t' << e.what() << std::endl;
+                }
+                catch(...)
+                {
+                    out << '\t' << "Unknown exception" << std::endl;
                 }
             }
+        }
     }
 
 private:
@@ -107,17 +109,17 @@ private:
     {
         if(e == nullptr) return;
         std::unique_lock<std::mutex> lock(mutex);
-            fifo.emplace_front(e);
-            condition.notify_one();
+        fifo.emplace_front(e);
+        condition.notify_one();
     }
 
     std::list<std::exception_ptr> fifo;
-    std::mutex mutex;
-    std::condition_variable condition;
+    std::mutex                    mutex;
+    std::condition_variable       condition;
 };
 
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//RUNNING_STATUS_H
+#endif // RUNNING_STATUS_H
 //------------------------------------------------------------------------------

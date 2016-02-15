@@ -27,14 +27,13 @@ namespace NST
 {
 namespace analysis
 {
-
 bool Plugin::isSilent()
 {
-    if (requirements != nullptr)
+    if(requirements != nullptr)
     {
         // Processing analyzer requirements
         const AnalyzerRequirements* r = requirements();
-        if (r != nullptr)
+        if(r != nullptr)
         {
             return r->silence;
         }
@@ -44,8 +43,8 @@ bool Plugin::isSilent()
 
 Plugin::Plugin(const std::string& path)
     : DynamicLoad{path}
-    , usage  {nullptr}
-    , create {nullptr}
+    , usage{nullptr}
+    , create{nullptr}
     , destroy{nullptr}
     , requirements{nullptr}
 {
@@ -65,13 +64,13 @@ Plugin::Plugin(const std::string& path)
     // Add 2.0 specific initialization here
     case NST_PLUGIN_API_VERSION:
     default:
-        usage   = entry_points->usage;
-        create  = entry_points->create;
-        destroy = entry_points->destroy;
+        usage        = entry_points->usage;
+        create       = entry_points->create;
+        destroy      = entry_points->destroy;
         requirements = entry_points->requirements;
     }
 
-    if(!usage  || !create || !destroy)
+    if(!usage || !create || !destroy)
     {
         throw std::runtime_error{path + ": can't load entry point for some plugin function(s)"};
     }
@@ -84,7 +83,7 @@ const std::string Plugin::usage_of(const std::string& path)
 }
 
 PluginInstance::PluginInstance(const std::string& path, const std::string& args)
-: Plugin{path}
+    : Plugin{path}
 {
     analysis = create(args.c_str());
     if(!analysis) throw std::runtime_error{path + ": create call returns NULL-pointer"};

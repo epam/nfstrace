@@ -25,7 +25,6 @@ namespace NST
 {
 namespace utils
 {
-
 static Out::Level global = Out::Level::Info;
 
 Out::Global::Global(const Level verbose_level)
@@ -47,7 +46,7 @@ void Out::Global::set_level(Out::Level l)
 }
 
 Out::Out(Level level)
-: std::ostream{ (global >= level) ? std::cout.rdbuf() : nullptr }
+    : std::ostream{(global >= level) ? std::cout.rdbuf() : nullptr}
 {
 }
 Out::~Out()

@@ -26,31 +26,30 @@
 
 #include "analysis/analyzers.h"
 #include "analysis/parser_thread.h"
+#include "analysis/parsers.h"
 #include "controller/parameters.h"
 #include "controller/running_status.h"
 #include "utils/filtered_data.h"
-#include "analysis/parsers.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis
 {
-
 class AnalysisManager
 {
     using Parameters        = NST::controller::Parameters;
     using RunningStatus     = NST::controller::RunningStatus;
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
+
 public:
     AnalysisManager(RunningStatus& status, const Parameters& params);
-    AnalysisManager(const AnalysisManager&)            = delete;
+    AnalysisManager(const AnalysisManager&) = delete;
     AnalysisManager& operator=(const AnalysisManager&) = delete;
-    ~AnalysisManager() = default;
+    ~AnalysisManager()                                 = default;
 
     FilteredDataQueue& get_queue() { return *queue; }
-
-    void start();
-    void stop();
+    void               start();
+    void               stop();
 
     inline void on_unix_signal(int signo)
     {
@@ -61,14 +60,15 @@ public:
     {
         return analysiss->isSilent();
     }
+
 private:
-    std::unique_ptr<Analyzers> analysiss;
-    std::unique_ptr<FilteredDataQueue> queue;
+    std::unique_ptr<Analyzers>             analysiss;
+    std::unique_ptr<FilteredDataQueue>     queue;
     std::unique_ptr<ParserThread<Parsers>> parser_thread;
 };
 
 } // namespace analysis
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//ANALYSIS_MANAGER_H
+#endif //ANALYSIS_MANAGER_H
 //------------------------------------------------------------------------------

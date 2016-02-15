@@ -25,8 +25,8 @@
 #include <utility>
 #include <rpc/rpc.h>
 //------------------------------------------------------------------------------
-#include "utils/filtered_data.h"
 #include "api/nfs3_types_rpcgen.h"
+#include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
 using NST::utils::FilteredData;
 using NST::utils::FilteredDataQueue;
@@ -37,32 +37,32 @@ namespace protocols
 {
 namespace xdr
 {
-
 class XDRDecoderError : public std::runtime_error
 {
 public:
-    explicit XDRDecoderError(const std::string& msg) : std::runtime_error{msg} { }
+    explicit XDRDecoderError(const std::string& msg)
+        : std::runtime_error{msg}
+    {
+    }
 };
 
 class XDRDecoder
 {
 public:
     XDRDecoder(FilteredDataQueue::Ptr&& p)
-    : ptr{std::move(p)}
+        : ptr{std::move(p)}
     {
         xdrmem_create(&txdr, (char*)ptr->data, ptr->dlen, XDR_DECODE);
     }
     ~XDRDecoder()
     {
-        xdr_destroy (&txdr);
+        xdr_destroy(&txdr);
     }
 
-    inline XDR* xdr() { return &txdr; }
-
-    inline const FilteredData& data() const { return *ptr; }
-
+    XDR*                xdr() { return &txdr; }
+    const FilteredData& data() const { return *ptr; }
 private:
-    XDR txdr;
+    XDR                    txdr;
     FilteredDataQueue::Ptr ptr;
 };
 
@@ -70,5 +70,5 @@ private:
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//XDR_DECODER_H
+#endif // XDR_DECODER_H
 //------------------------------------------------------------------------------

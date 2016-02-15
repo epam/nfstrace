@@ -29,32 +29,17 @@
 #include <vector>
 
 #include <ncurses.h>
+
 #include "protocols/abstract_protocol.h"
 //------------------------------------------------------------------------------
 class UserGUI
 {
 public:
-    using ProtocolStatistic = std::vector<std::size_t>;
+    using ProtocolStatistic    = std::vector<std::size_t>;
     using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
 
-private:
-    unsigned long _refresh_delta; // in microseconds
-
-    std::atomic<bool> _shouldResize;
-    std::mutex _statisticsDeltaMutex;
-    std::atomic_flag _running;
-
-    StatisticsContainers _statisticsContainers;
-
-    AbstractProtocol* _activeProtocol;
-    std::thread _guiThread;
-    std::vector<std::string> _allProtocols;
-    void run();
-    timeval getTimeval() const;
-public:
-
     UserGUI() = delete;
-    UserGUI(const char*, std::vector<AbstractProtocol* >&);
+    UserGUI(const char*, std::vector<AbstractProtocol*>&);
     ~UserGUI();
 
     /*! Update Protocol's data.
@@ -64,7 +49,20 @@ public:
     /*! Enable screen full update. Use for resize main window.
     */
     void enableUpdate();
+
+private:
+    void    run();
+    timeval getTimeval() const;
+
+    unsigned long            _refresh_delta; // in microseconds
+    std::atomic<bool>        _shouldResize;
+    std::mutex               _statisticsDeltaMutex;
+    std::atomic_flag         _running;
+    StatisticsContainers     _statisticsContainers;
+    AbstractProtocol*        _activeProtocol;
+    std::thread              _guiThread;
+    std::vector<std::string> _allProtocols;
 };
 //------------------------------------------------------------------------------
-#endif//USERGUI_H
+#endif //USERGUI_H
 //------------------------------------------------------------------------------

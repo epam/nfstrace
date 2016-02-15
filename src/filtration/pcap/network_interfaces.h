@@ -22,9 +22,9 @@
 #ifndef NETWORK_INTERFACES_H
 #define NETWORK_INTERFACES_H
 //------------------------------------------------------------------------------
-#include <pcap/pcap.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <pcap/pcap.h>
 #include <sys/socket.h>
 
 #include "filtration/pcap/pcap_error.h"
@@ -35,7 +35,6 @@ namespace filtration
 {
 namespace pcap
 {
-
 class NetworkInterfaces
 {
 public:
@@ -43,59 +42,68 @@ public:
     class Address
     {
         friend class Interface;
+
     public:
-        inline sockaddr*   address() const noexcept { return addr->addr;      }
-        inline sockaddr*   netmask() const noexcept { return addr->netmask;   }
+        inline sockaddr* address() const noexcept { return addr->addr; }
+        inline sockaddr* netmask() const noexcept { return addr->netmask; }
         inline sockaddr* broadaddr() const noexcept { return addr->broadaddr; }
-        inline sockaddr*  destaddr() const noexcept { return addr->dstaddr;   }
+        inline sockaddr* destaddr() const noexcept { return addr->dstaddr; }
+        Address&         operator=(const Address&) = delete;
+        void operator&()                           = delete;
+        void* operator new(size_t)                 = delete;
+        void operator delete(void*)                = delete;
 
-        Address& operator= (const Address&) = delete;
-        void     operator&               () = delete;
-        void*    operator new      (size_t) = delete;
-        void     operator delete    (void*) = delete;
-
-        inline      operator bool() const noexcept { return addr != nullptr; }
-        inline void operator   ++() noexcept { addr = addr->next; }
-        inline bool operator   !=(const Address& a) const noexcept { return addr != a.addr; }
+        inline operator bool() const noexcept { return addr != nullptr; }
+        inline void operator++() noexcept { addr = addr->next; }
+        inline bool operator!=(const Address& a) const noexcept { return addr != a.addr; }
         inline const Address operator*() const noexcept { return *this; }
+        Address(const Address& a)
+            : addr{a.addr}
+        {
+        }
 
-        Address(const Address& a) : addr{a.addr}{}
-        
     private:
-        Address(pcap_addr_t* a) : addr{a}{}
+        Address(pcap_addr_t* a)
+            : addr{a}
+        {
+        }
         pcap_addr_t* addr;
     };
 
     class Interface
     {
         friend class NetworkInterfaces;
+
     public:
+        inline const char* name() const noexcept { return ptr->name; }
+        inline const char* dscr() const noexcept { return ptr->description; }
+        inline bool        is_loopback() const noexcept { return ptr->flags & PCAP_IF_LOOPBACK; }
+        Interface&         operator=(const Interface&) = delete;
+        void operator&()                               = delete;
+        void* operator new(size_t)                     = delete;
+        void operator delete(void*)                    = delete;
 
-        inline const char*  name() const noexcept { return ptr->name;                     }
-        inline const char*  dscr() const noexcept { return ptr->description;              }
-        inline bool  is_loopback() const noexcept { return ptr->flags & PCAP_IF_LOOPBACK; }
-
-        Interface& operator= (const Interface&) = delete;
-        void       operator& ()                 = delete;
-        void* operator new   (size_t)           = delete;
-        void operator delete (void*)            = delete;
-
-        inline      operator bool() const noexcept { return ptr != nullptr; }
-        inline void operator   ++() noexcept { ptr = ptr->next; }
-        inline bool operator   !=(const Interface& i) const noexcept { return ptr != i.ptr; }
+        inline operator bool() const noexcept { return ptr != nullptr; }
+        inline void operator++() noexcept { ptr = ptr->next; }
+        inline bool operator!=(const Interface& i) const noexcept { return ptr != i.ptr; }
         inline const Interface operator*() const noexcept { return *this; }
-
-        Interface(const Interface& i) : ptr{i.ptr}{}
+        Interface(const Interface& i)
+            : ptr{i.ptr}
+        {
+        }
 
         const Address begin() const noexcept { return Address{ptr->addresses}; }
-        const Address   end() const noexcept { return Address{nullptr};        }
-
+        const Address end() const noexcept { return Address{nullptr}; }
     private:
-        Interface(pcap_if_t* p) : ptr{p}{}
+        Interface(pcap_if_t* p)
+            : ptr{p}
+        {
+        }
         pcap_if_t* ptr;
     };
 
-    inline NetworkInterfaces() : interfaces{nullptr}
+    inline NetworkInterfaces()
+        : interfaces{nullptr}
     {
         char errbuf[PCAP_ERRBUF_SIZE];
         if(pcap_findalldevs(&interfaces, errbuf) == -1)
@@ -128,24 +136,23 @@ public:
         throw std::runtime_error{"No suitable device found.\n Note: reading an ip address of a network device may require special privileges."};
     }
 
-    NetworkInterfaces(const NetworkInterfaces&)            = delete;
+    NetworkInterfaces(const NetworkInterfaces&) = delete;
     NetworkInterfaces& operator=(const NetworkInterfaces&) = delete;
-    void  operator&            () = delete;
-    void* operator new   (size_t) = delete;
-    void  operator delete (void*) = delete;
+    void operator&()                                       = delete;
+    void* operator new(size_t)                             = delete;
+    void operator delete(void*)                            = delete;
 
     const Interface begin() const noexcept { return Interface{interfaces}; }
-    const Interface   end() const noexcept { return Interface{nullptr};    }
-
+    const Interface end() const noexcept { return Interface{nullptr}; }
 private:
     pcap_if_t* interfaces;
 };
 
-std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Interface& i)
+std::ostream& operator<<(std::ostream& out, const NetworkInterfaces::Interface& i)
 {
     out.width(8);
     out << std::left << i.name();
-    const char* dscr {i.dscr()};
+    const char* dscr{i.dscr()};
     if(dscr)
     {
         out << '(' << dscr << ')';
@@ -157,10 +164,10 @@ std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Interface&
     return out;
 }
 
-std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Address& a)
+std::ostream& operator<<(std::ostream& out, const NetworkInterfaces::Address& a)
 {
-    sockaddr* s_address {a.address()};
-    sockaddr* s_netmask {a.netmask()};
+    sockaddr* s_address{a.address()};
+    sockaddr* s_netmask{a.netmask()};
     if(s_address)
     {
         switch(s_address->sa_family)
@@ -181,7 +188,7 @@ std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Address& a
                       sizeof(netmask));
             out << " netmask " << netmask;
 
-            sockaddr* s_broadaddr {a.broadaddr()};
+            sockaddr* s_broadaddr{a.broadaddr()};
             if(s_broadaddr)
             {
                 char broadaddr[INET_ADDRSTRLEN]{};
@@ -192,7 +199,7 @@ std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Address& a
                 out << " broadcast " << broadaddr;
             }
 
-            sockaddr* s_destaddr {a.destaddr()};
+            sockaddr* s_destaddr{a.destaddr()};
             if(s_destaddr)
             {
                 char destaddr[INET_ADDRSTRLEN]{};
@@ -238,5 +245,5 @@ std::ostream& operator <<(std::ostream& out, const NetworkInterfaces::Address& a
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NETWORK_INTERFACES_H
+#endif // NETWORK_INTERFACES_H
 //------------------------------------------------------------------------------

@@ -32,7 +32,6 @@ namespace filtration
 {
 namespace pcap
 {
-
 class BPF
 {
 public:
@@ -43,7 +42,7 @@ public:
             throw PcapError("pcap_compile", pcap_geterr(handle));
         }
     }
-    BPF(const BPF&)            = delete;
+    BPF(const BPF&) = delete;
     BPF& operator=(const BPF&) = delete;
     ~BPF()
     {
@@ -51,7 +50,6 @@ public:
     }
 
     inline operator bpf_program*() { return &bpf; }
-
 private:
     bpf_program bpf;
 };
@@ -60,5 +58,5 @@ private:
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//BPF_H
+#endif // BPF_H
 //------------------------------------------------------------------------------

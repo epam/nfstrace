@@ -33,24 +33,21 @@ namespace NST
 {
 namespace analysis
 {
-
 class Analyzers
 {
-    using Storage = std::vector<IAnalyzer*>;
-    using Plugins = std::vector< std::unique_ptr<PluginInstance> >;
-    using BuiltIns= std::vector< std::unique_ptr<IAnalyzer> >;
+    using Storage  = std::vector<IAnalyzer*>;
+    using Plugins  = std::vector<std::unique_ptr<PluginInstance>>;
+    using BuiltIns = std::vector<std::unique_ptr<IAnalyzer>>;
 
 public:
     Analyzers(const controller::Parameters& params);
-    Analyzers(const Analyzers&)            = delete;
+    Analyzers(const Analyzers&) = delete;
     Analyzers& operator=(const Analyzers&) = delete;
 
     //! This function is used for passing ALL possible procedures to analyzers
-    template
-    <
+    template <
         typename Handle,
-        typename Procedure
-    >
+        typename Procedure>
     inline void operator()(Handle handle, const Procedure& proc)
     {
         for(const auto a : modules)
@@ -60,11 +57,9 @@ public:
     }
 
     //! This function is used for passing args- or res-only NFS4.x operations (ex. NFSv4 ILLEGAL) to analyzers
-    template
-    <
+    template <
         typename Handle,
-        typename ArgOrResType
-    >
+        typename ArgOrResType>
     inline void operator()(Handle handle, const RPCProcedure* rpc, ArgOrResType* arg_or_res)
     {
         for(const auto a : modules)
@@ -74,12 +69,10 @@ public:
     }
 
     //! This function is used for passing args + res NFS4.x operations (ex. NFSv4.x ACCESS) to analyzers
-    template
-    <
+    template <
         typename Handle,
         typename ArgopType,
-        typename ResopType
-    >
+        typename ResopType>
     inline void operator()(Handle handle, const RPCProcedure* rpc, ArgopType* arg, ResopType* res)
     {
         for(const auto a : modules)
@@ -107,15 +100,16 @@ public:
     {
         return _silent;
     }
+
 private:
     Storage  modules; // pointers to all modules (plugins and builtins)
     Plugins  plugins;
     BuiltIns builtin;
-    bool _silent;
+    bool     _silent;
 };
 
 } // namespace analysis
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//ANALYZERS_H
+#endif //ANALYZERS_H
 //------------------------------------------------------------------------------

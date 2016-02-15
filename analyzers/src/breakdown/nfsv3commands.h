@@ -28,7 +28,6 @@ namespace NST
 {
 namespace breakdown
 {
-
 /*!
  * Represents NFS v3 commands
  * Converts commands to string
@@ -38,12 +37,12 @@ class NFSv3Commands : public CommandRepresenter
 public:
     const char* command_description(int cmd_code) override final;
     const char* command_name(int cmd_code) override final;
-    size_t commands_count() override final;
+    size_t      commands_count() override final;
     const char* protocol_name();
 };
 
 } // namespace breakdown
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFSV3COMMANDS_H
+#endif //NFSV3COMMANDS_H
 //------------------------------------------------------------------------------

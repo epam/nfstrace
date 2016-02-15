@@ -25,8 +25,8 @@
 #include <gtest/gtest.h>
 
 #include "controller/running_status.h"
-#include "filtration/filtration_processor.h"
 #include "filtration/cifs_filtrator.h"
+#include "filtration/filtration_processor.h"
 #include "filtration/filtrators.h"
 #include "filtration/packet.h"
 //------------------------------------------------------------------------------
@@ -35,16 +35,16 @@ using ::testing::Return;
 using ::testing::AtLeast;
 using ::testing::_;
 //------------------------------------------------------------------------------
-namespace {
-
+namespace
+{
 class Writer
 {
 public:
-
     class Collection
     {
         std::vector<uint8_t> packet;
-        Collection *pImpl = nullptr;
+        Collection*          pImpl = nullptr;
+
     public:
         void set(Writer& w, NST::utils::NetworkSession* /*session_ptr*/)
         {
@@ -67,7 +67,7 @@ public:
 
         virtual void complete(PacketInfo& info)
         {
-            if (pImpl)
+            if(pImpl)
             {
                 pImpl->complete(info);
             }
@@ -78,7 +78,7 @@ public:
             return true;
         }
 
-        virtual const uint8_t * data()
+        virtual const uint8_t* data()
         {
             return packet.data();
         }
@@ -102,15 +102,13 @@ public:
     public:
         MOCK_METHOD0(reset, void());
         MOCK_METHOD2(push, void(PacketInfo&, size_t));
-        MOCK_METHOD0(data, const uint8_t *());
+        MOCK_METHOD0(data, const uint8_t*());
         MOCK_METHOD0(data_size, size_t());
         MOCK_METHOD1(complete, void(PacketInfo&));
-
     };
 
     CollectionMock collection;
 };
-
 }
 
 TEST(Filtration, pushCIFSbyTCPStream)
@@ -118,7 +116,7 @@ TEST(Filtration, pushCIFSbyTCPStream)
     // Prepare data
     struct pcap_pkthdr header;
     header.caplen = header.len = 132;
-    const uint8_t packet[] = {0x00, 0x00, 0x00, 0x80,
+    const uint8_t packet[]     = {0x00, 0x00, 0x00, 0x80,
                               0xfe, 0x53, 0x4d, 0x42,
                               0x00, 0x00, 0x00, 0x00,
                               0x00, 0x00, 0x00, 0x00,
@@ -158,10 +156,9 @@ TEST(Filtration, pushCIFSbyTCPStream)
                               0x00, 0x00, 0x00, 0x00,
                               0x00, 0x00, 0x00, 0x00,
 
-                              0x00, 0x00, 0x00, 0x00
-                             };
+                              0x00, 0x00, 0x00, 0x00};
     PacketInfo info(&header, packet, 0);
-    Writer mock;
+    Writer     mock;
     // Set conditions
     EXPECT_CALL(mock.collection, complete(_))
         .Times(AtLeast(1));
@@ -177,7 +174,7 @@ TEST(Filtration, pushCIFSbyTCPStreamPartByPart)
     // Prepare data
     struct pcap_pkthdr header1;
     header1.caplen = header1.len = 3;
-    const uint8_t packet[] = {0x00, 0x00, 0x00, 0x80,
+    const uint8_t packet[]       = {0x00, 0x00, 0x00, 0x80,
                               0xfe, 0x53, 0x4d, 0x42,
                               0x00, 0x00, 0x00, 0x00,
                               0x00, 0x00, 0x00, 0x00,
@@ -217,14 +214,13 @@ TEST(Filtration, pushCIFSbyTCPStreamPartByPart)
                               0x00, 0x00, 0x00, 0x00,
                               0x00, 0x00, 0x00, 0x00,
 
-                              0x00, 0x00, 0x00, 0x00
-                             };
+                              0x00, 0x00, 0x00, 0x00};
     PacketInfo info1(&header1, packet, 0);
 
     struct pcap_pkthdr header2;
     header2.caplen = header2.len = sizeof(packet) - header1.len;
     PacketInfo info2(&header2, packet + header1.len, 0);
-    Writer mock;
+    Writer     mock;
 
     // Set conditions
     EXPECT_CALL(mock.collection, complete(_))
@@ -242,10 +238,10 @@ TEST(Filtration, pushRPCbyTCPStream)
     // Prepare data
     struct pcap_pkthdr header;
     header.caplen = header.len = 132;
-    const uint8_t packet[] = {0x80, 0x00, 0x00, 0x80,
+    const uint8_t packet[]     = {0x80, 0x00, 0x00, 0x80,
                               0xec, 0x8a, 0x42, 0xcb,
-                              0x00, 0x00, 0x00, 0x00,// msg type - call
-                              0x00, 0x00, 0x00, 0x02,// RPC version
+                              0x00, 0x00, 0x00, 0x00, // msg type - call
+                              0x00, 0x00, 0x00, 0x02, // RPC version
 
                               0x00, 0x00, 0x00, 0x00,
                               0x00, 0x00, 0x00, 0x00,
@@ -282,10 +278,9 @@ TEST(Filtration, pushRPCbyTCPStream)
                               0x00, 0x00, 0x00, 0x00,
                               0x00, 0x00, 0x00, 0x00,
 
-                              0x00, 0x00, 0x00, 0x00
-                             };
+                              0x00, 0x00, 0x00, 0x00};
     PacketInfo info(&header, packet, 0);
-    Writer mock;
+    Writer     mock;
     // Set conditions
     EXPECT_CALL(mock.collection, complete(_))
         .Times(AtLeast(1));
@@ -301,10 +296,10 @@ TEST(Filtration, pushRPCbyTCPStreamPartByPart)
     // Prepare data
     struct pcap_pkthdr header1;
     header1.caplen = header1.len = 3;
-    const uint8_t packet[] = {0x80, 0x00, 0x00, 0x80,
+    const uint8_t packet[]       = {0x80, 0x00, 0x00, 0x80,
                               0xec, 0x8a, 0x42, 0xcb,
-                              0x00, 0x00, 0x00, 0x00,// msg type - call
-                              0x00, 0x00, 0x00, 0x02,// RPC version
+                              0x00, 0x00, 0x00, 0x00, // msg type - call
+                              0x00, 0x00, 0x00, 0x02, // RPC version
 
                               0x00, 0x00, 0x00, 0x00,
                               0x00, 0x00, 0x00, 0x00,
@@ -341,14 +336,13 @@ TEST(Filtration, pushRPCbyTCPStreamPartByPart)
                               0x00, 0x00, 0x00, 0x00,
                               0x00, 0x00, 0x00, 0x00,
 
-                              0x00, 0x00, 0x00, 0x00
-                             };
+                              0x00, 0x00, 0x00, 0x00};
     PacketInfo info1(&header1, packet, 0);
 
     struct pcap_pkthdr header2;
     header2.caplen = header2.len = sizeof(packet) - header1.len;
     PacketInfo info2(&header2, packet + header1.len, 0);
-    Writer mock;
+    Writer     mock;
 
     // Set conditions
     EXPECT_CALL(mock.collection, complete(_))
@@ -362,4 +356,3 @@ TEST(Filtration, pushRPCbyTCPStreamPartByPart)
 }
 
 //------------------------------------------------------------------------------
-

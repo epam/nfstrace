@@ -35,140 +35,140 @@ public:
     struct NfsV3Stat
     {
         // Procedures:
-        std::atomic_int nullProcsAmount = {0};
-        std::atomic_int getattrProcsAmount = {0};
-        std::atomic_int setattrProcsAmount = {0};
-        std::atomic_int lookupProcsAmount = {0};
-        std::atomic_int accessProcsAmount = {0};
-        std::atomic_int readlinkProcsAmount = {0};
-        std::atomic_int readProcsAmount = {0};
-        std::atomic_int writeProcsAmount = {0};
-        std::atomic_int createProcsAmount = {0};
-        std::atomic_int mkdirProcsAmount = {0};
-        std::atomic_int symlinkProcsAmount = {0};
-        std::atomic_int mknodProcsAmount = {0};
-        std::atomic_int removeProcsAmount = {0};
-        std::atomic_int rmdirProcsAmount = {0};
-        std::atomic_int renameProcsAmount = {0};
-        std::atomic_int linkProcsAmount = {0};
-        std::atomic_int readdirProcsAmount = {0};
+        std::atomic_int nullProcsAmount        = {0};
+        std::atomic_int getattrProcsAmount     = {0};
+        std::atomic_int setattrProcsAmount     = {0};
+        std::atomic_int lookupProcsAmount      = {0};
+        std::atomic_int accessProcsAmount      = {0};
+        std::atomic_int readlinkProcsAmount    = {0};
+        std::atomic_int readProcsAmount        = {0};
+        std::atomic_int writeProcsAmount       = {0};
+        std::atomic_int createProcsAmount      = {0};
+        std::atomic_int mkdirProcsAmount       = {0};
+        std::atomic_int symlinkProcsAmount     = {0};
+        std::atomic_int mknodProcsAmount       = {0};
+        std::atomic_int removeProcsAmount      = {0};
+        std::atomic_int rmdirProcsAmount       = {0};
+        std::atomic_int renameProcsAmount      = {0};
+        std::atomic_int linkProcsAmount        = {0};
+        std::atomic_int readdirProcsAmount     = {0};
         std::atomic_int readdirplusProcsAmount = {0};
-        std::atomic_int fsstatProcsAmount = {0};
-        std::atomic_int fsinfoProcsAmount = {0};
-        std::atomic_int pathconfProcsAmount = {0};
-        std::atomic_int commitProcsAmount = {0};
+        std::atomic_int fsstatProcsAmount      = {0};
+        std::atomic_int fsinfoProcsAmount      = {0};
+        std::atomic_int pathconfProcsAmount    = {0};
+        std::atomic_int commitProcsAmount      = {0};
     };
     struct NfsV40Stat
     {
         // Procedures:
-        std::atomic_int nullProcsAmount = {0};
+        std::atomic_int nullProcsAmount     = {0};
         std::atomic_int compoundProcsAmount = {0};
 
         // Operations:
-        std::atomic_int accessOpsAmount = {0};
-        std::atomic_int closeOpsAmount = {0};
-        std::atomic_int commitOpsAmount = {0};
-        std::atomic_int createOpsAmount = {0};
-        std::atomic_int delegpurgeOpsAmount = {0};
-        std::atomic_int delegreturnOpsAmount = {0};
-        std::atomic_int getattrOpsAmount = {0};
-        std::atomic_int getfhOpsAmount = {0};
-        std::atomic_int linkOpsAmount = {0};
-        std::atomic_int lockOpsAmount = {0};
-        std::atomic_int locktOpsAmount = {0};
-        std::atomic_int lockuOpsAmount = {0};
-        std::atomic_int lookupOpsAmount = {0};
-        std::atomic_int lookuppOpsAmount = {0};
-        std::atomic_int nverifyOpsAmount = {0};
-        std::atomic_int openOpsAmount = {0};
-        std::atomic_int openattrOpsAmount = {0};
-        std::atomic_int open_confirmOpsAmount = {0};
-        std::atomic_int open_downgradeOpsAmount = {0};
-        std::atomic_int putfhOpsAmount = {0};
-        std::atomic_int putpubfhOpsAmount = {0};
-        std::atomic_int putrootfhOpsAmount = {0};
-        std::atomic_int readOpsAmount = {0};
-        std::atomic_int readdirOpsAmount = {0};
-        std::atomic_int readlinkOpsAmount = {0};
-        std::atomic_int removeOpsAmount = {0};
-        std::atomic_int renameOpsAmount = {0};
-        std::atomic_int renewOpsAmount = {0};
-        std::atomic_int restorefhOpsAmount = {0};
-        std::atomic_int savefhOpsAmount = {0};
-        std::atomic_int secinfoOpsAmount = {0};
-        std::atomic_int setattrOpsAmount = {0};
-        std::atomic_int setclientidOpsAmount = {0};
+        std::atomic_int accessOpsAmount              = {0};
+        std::atomic_int closeOpsAmount               = {0};
+        std::atomic_int commitOpsAmount              = {0};
+        std::atomic_int createOpsAmount              = {0};
+        std::atomic_int delegpurgeOpsAmount          = {0};
+        std::atomic_int delegreturnOpsAmount         = {0};
+        std::atomic_int getattrOpsAmount             = {0};
+        std::atomic_int getfhOpsAmount               = {0};
+        std::atomic_int linkOpsAmount                = {0};
+        std::atomic_int lockOpsAmount                = {0};
+        std::atomic_int locktOpsAmount               = {0};
+        std::atomic_int lockuOpsAmount               = {0};
+        std::atomic_int lookupOpsAmount              = {0};
+        std::atomic_int lookuppOpsAmount             = {0};
+        std::atomic_int nverifyOpsAmount             = {0};
+        std::atomic_int openOpsAmount                = {0};
+        std::atomic_int openattrOpsAmount            = {0};
+        std::atomic_int open_confirmOpsAmount        = {0};
+        std::atomic_int open_downgradeOpsAmount      = {0};
+        std::atomic_int putfhOpsAmount               = {0};
+        std::atomic_int putpubfhOpsAmount            = {0};
+        std::atomic_int putrootfhOpsAmount           = {0};
+        std::atomic_int readOpsAmount                = {0};
+        std::atomic_int readdirOpsAmount             = {0};
+        std::atomic_int readlinkOpsAmount            = {0};
+        std::atomic_int removeOpsAmount              = {0};
+        std::atomic_int renameOpsAmount              = {0};
+        std::atomic_int renewOpsAmount               = {0};
+        std::atomic_int restorefhOpsAmount           = {0};
+        std::atomic_int savefhOpsAmount              = {0};
+        std::atomic_int secinfoOpsAmount             = {0};
+        std::atomic_int setattrOpsAmount             = {0};
+        std::atomic_int setclientidOpsAmount         = {0};
         std::atomic_int setclientid_confirmOpsAmount = {0};
-        std::atomic_int verifyOpsAmount = {0};
-        std::atomic_int writeOpsAmount = {0};
-        std::atomic_int release_lockownerOpsAmount = {0};
-        std::atomic_int get_dir_delegationOpsAmount = {0};
-        std::atomic_int illegalOpsAmount = {0};
+        std::atomic_int verifyOpsAmount              = {0};
+        std::atomic_int writeOpsAmount               = {0};
+        std::atomic_int release_lockownerOpsAmount   = {0};
+        std::atomic_int get_dir_delegationOpsAmount  = {0};
+        std::atomic_int illegalOpsAmount             = {0};
     };
     struct NfsV41Stat
     {
         // Procedures:
-        std::atomic_int nullProcsAmount = {0};
+        std::atomic_int nullProcsAmount     = {0};
         std::atomic_int compoundProcsAmount = {0};
 
         // Operations:
-        std::atomic_int accessOpsAmount = {0};
-        std::atomic_int closeOpsAmount = {0};
-        std::atomic_int commitOpsAmount = {0};
-        std::atomic_int createOpsAmount = {0};
-        std::atomic_int delegpurgeOpsAmount = {0};
-        std::atomic_int delegreturnOpsAmount = {0};
-        std::atomic_int getattrOpsAmount = {0};
-        std::atomic_int getfhOpsAmount = {0};
-        std::atomic_int linkOpsAmount = {0};
-        std::atomic_int lockOpsAmount = {0};
-        std::atomic_int locktOpsAmount = {0};
-        std::atomic_int lockuOpsAmount = {0};
-        std::atomic_int lookupOpsAmount = {0};
-        std::atomic_int lookuppOpsAmount = {0};
-        std::atomic_int nverifyOpsAmount = {0};
-        std::atomic_int openOpsAmount = {0};
-        std::atomic_int openattrOpsAmount = {0};
-        std::atomic_int open_confirmOpsAmount = {0};
-        std::atomic_int open_downgradeOpsAmount = {0};
-        std::atomic_int putfhOpsAmount = {0};
-        std::atomic_int putpubfhOpsAmount = {0};
-        std::atomic_int putrootfhOpsAmount = {0};
-        std::atomic_int readOpsAmount = {0};
-        std::atomic_int readdirOpsAmount = {0};
-        std::atomic_int readlinkOpsAmount = {0};
-        std::atomic_int removeOpsAmount = {0};
-        std::atomic_int renameOpsAmount = {0};
-        std::atomic_int renewOpsAmount = {0};
-        std::atomic_int restorefhOpsAmount = {0};
-        std::atomic_int savefhOpsAmount = {0};
-        std::atomic_int secinfoOpsAmount = {0};
-        std::atomic_int setattrOpsAmount = {0};
-        std::atomic_int setclientidOpsAmount = {0};
-        std::atomic_int setclientid_confirmOpsAmount = {0};
-        std::atomic_int verifyOpsAmount = {0};
-        std::atomic_int writeOpsAmount = {0};
-        std::atomic_int release_lockownerOpsAmount = {0};
-        std::atomic_int backchannel_ctlOpsAmount = {0};
+        std::atomic_int accessOpsAmount               = {0};
+        std::atomic_int closeOpsAmount                = {0};
+        std::atomic_int commitOpsAmount               = {0};
+        std::atomic_int createOpsAmount               = {0};
+        std::atomic_int delegpurgeOpsAmount           = {0};
+        std::atomic_int delegreturnOpsAmount          = {0};
+        std::atomic_int getattrOpsAmount              = {0};
+        std::atomic_int getfhOpsAmount                = {0};
+        std::atomic_int linkOpsAmount                 = {0};
+        std::atomic_int lockOpsAmount                 = {0};
+        std::atomic_int locktOpsAmount                = {0};
+        std::atomic_int lockuOpsAmount                = {0};
+        std::atomic_int lookupOpsAmount               = {0};
+        std::atomic_int lookuppOpsAmount              = {0};
+        std::atomic_int nverifyOpsAmount              = {0};
+        std::atomic_int openOpsAmount                 = {0};
+        std::atomic_int openattrOpsAmount             = {0};
+        std::atomic_int open_confirmOpsAmount         = {0};
+        std::atomic_int open_downgradeOpsAmount       = {0};
+        std::atomic_int putfhOpsAmount                = {0};
+        std::atomic_int putpubfhOpsAmount             = {0};
+        std::atomic_int putrootfhOpsAmount            = {0};
+        std::atomic_int readOpsAmount                 = {0};
+        std::atomic_int readdirOpsAmount              = {0};
+        std::atomic_int readlinkOpsAmount             = {0};
+        std::atomic_int removeOpsAmount               = {0};
+        std::atomic_int renameOpsAmount               = {0};
+        std::atomic_int renewOpsAmount                = {0};
+        std::atomic_int restorefhOpsAmount            = {0};
+        std::atomic_int savefhOpsAmount               = {0};
+        std::atomic_int secinfoOpsAmount              = {0};
+        std::atomic_int setattrOpsAmount              = {0};
+        std::atomic_int setclientidOpsAmount          = {0};
+        std::atomic_int setclientid_confirmOpsAmount  = {0};
+        std::atomic_int verifyOpsAmount               = {0};
+        std::atomic_int writeOpsAmount                = {0};
+        std::atomic_int release_lockownerOpsAmount    = {0};
+        std::atomic_int backchannel_ctlOpsAmount      = {0};
         std::atomic_int bind_conn_to_sessionOpsAmount = {0};
-        std::atomic_int exchange_idOpsAmount = {0};
-        std::atomic_int create_sessionOpsAmount = {0};
-        std::atomic_int destroy_sessionOpsAmount = {0};
-        std::atomic_int free_stateidOpsAmount = {0};
-        std::atomic_int get_dir_delegationOpsAmount = {0};
-        std::atomic_int getdeviceinfoOpsAmount = {0};
-        std::atomic_int getdevicelistOpsAmount = {0};
-        std::atomic_int layoutcommitOpsAmount = {0};
-        std::atomic_int layoutgetOpsAmount = {0};
-        std::atomic_int layoutreturnOpsAmount = {0};
-        std::atomic_int secinfo_no_nameOpsAmount = {0};
-        std::atomic_int sequenceOpsAmount = {0};
-        std::atomic_int set_ssvOpsAmount = {0};
-        std::atomic_int test_stateidOpsAmount = {0};
-        std::atomic_int want_delegationOpsAmount = {0};
-        std::atomic_int destroy_clientidOpsAmount = {0};
-        std::atomic_int reclaim_completeOpsAmount = {0};
-        std::atomic_int illegalOpsAmount = {0};
+        std::atomic_int exchange_idOpsAmount          = {0};
+        std::atomic_int create_sessionOpsAmount       = {0};
+        std::atomic_int destroy_sessionOpsAmount      = {0};
+        std::atomic_int free_stateidOpsAmount         = {0};
+        std::atomic_int get_dir_delegationOpsAmount   = {0};
+        std::atomic_int getdeviceinfoOpsAmount        = {0};
+        std::atomic_int getdevicelistOpsAmount        = {0};
+        std::atomic_int layoutcommitOpsAmount         = {0};
+        std::atomic_int layoutgetOpsAmount            = {0};
+        std::atomic_int layoutreturnOpsAmount         = {0};
+        std::atomic_int secinfo_no_nameOpsAmount      = {0};
+        std::atomic_int sequenceOpsAmount             = {0};
+        std::atomic_int set_ssvOpsAmount              = {0};
+        std::atomic_int test_stateidOpsAmount         = {0};
+        std::atomic_int want_delegationOpsAmount      = {0};
+        std::atomic_int destroy_clientidOpsAmount     = {0};
+        std::atomic_int reclaim_completeOpsAmount     = {0};
+        std::atomic_int illegalOpsAmount              = {0};
     };
 
     JsonAnalyzer(std::size_t workersAmount, int port, const std::string& host, std::size_t maxServingDurationMs, int backlog);
@@ -265,7 +265,7 @@ public:
                  const struct NFS3::COMMIT3res* /*res*/) override final;
 
     // NFS4.0 procedures
- 
+
     void null4(const RPCProcedure* /*proc*/,
                const struct NFS4::NULL4args* /*args*/,
                const struct NFS4::NULL4res* /*res*/) override final;
@@ -280,8 +280,8 @@ public:
                   const struct NFS4::ACCESS4args* /* args */,
                   const struct NFS4::ACCESS4res* res) override final;
     void close40(const RPCProcedure* /* proc */,
-                  const struct NFS4::CLOSE4args* /* args */,
-                  const struct NFS4::CLOSE4res* res) override final;
+                 const struct NFS4::CLOSE4args* /* args */,
+                 const struct NFS4::CLOSE4res* res) override final;
     void commit40(const RPCProcedure* /* proc */,
                   const struct NFS4::COMMIT4args* /* args */,
                   const struct NFS4::COMMIT4res* res) override final;
@@ -387,7 +387,7 @@ public:
                    const struct NFS4::ILLEGAL4res* res) override final;
 
     // NFSv4.1 procedures
- 
+
     void compound41(const RPCProcedure* /*proc*/,
                     const struct NFS41::COMPOUND4args* /*args*/,
                     const struct NFS41::COMPOUND4res* /*res*/) override final;
@@ -398,8 +398,8 @@ public:
                   const struct NFS41::ACCESS4args* /* args */,
                   const struct NFS41::ACCESS4res* res) override final;
     void close41(const RPCProcedure* /* proc */,
-                  const struct NFS41::CLOSE4args* /* args */,
-                  const struct NFS41::CLOSE4res* res) override final;
+                 const struct NFS41::CLOSE4args* /* args */,
+                 const struct NFS41::CLOSE4res* res) override final;
     void commit41(const RPCProcedure* /* proc */,
                   const struct NFS41::COMMIT4args* /* args */,
                   const struct NFS41::COMMIT4res* res) override final;
@@ -502,7 +502,7 @@ public:
                            const struct NFS41::BACKCHANNEL_CTL4args* /* args */,
                            const struct NFS41::BACKCHANNEL_CTL4res* res) override final;
     void bind_conn_to_session41(const RPCProcedure* /* proc */,
-                                const struct NFS41::BIND_CONN_TO_SESSION4args* /* args */, 
+                                const struct NFS41::BIND_CONN_TO_SESSION4args* /* args */,
                                 const struct NFS41::BIND_CONN_TO_SESSION4res* res) override final;
     void exchange_id41(const RPCProcedure* /* proc */,
                        const struct NFS41::EXCHANGE_ID4args* /* args */,
@@ -535,8 +535,8 @@ public:
                         const struct NFS41::LAYOUTRETURN4args* /* args */,
                         const struct NFS41::LAYOUTRETURN4res* res) override final;
     void secinfo_no_name41(const RPCProcedure* /* proc */,
-                              const NFS41::SECINFO_NO_NAME4args* /* args */,
-                              const NFS41::SECINFO_NO_NAME4res* res) override final;
+                           const NFS41::SECINFO_NO_NAME4args* /* args */,
+                           const NFS41::SECINFO_NO_NAME4res* res) override final;
     void sequence41(const RPCProcedure* /* proc */,
                     const struct NFS41::SEQUENCE4args* /* args */,
                     const struct NFS41::SEQUENCE4res* res) override final;
@@ -577,10 +577,10 @@ public:
 
 private:
     JsonTcpService _jsonTcpService;
-    NfsV3Stat  _nfsV3Stat;
-    NfsV40Stat _nfsV40Stat;
-    NfsV41Stat _nfsV41Stat;
+    NfsV3Stat      _nfsV3Stat;
+    NfsV40Stat     _nfsV40Stat;
+    NfsV41Stat     _nfsV41Stat;
 };
 //------------------------------------------------------------------------------
-#endif//JSON_ANALYZER_H
+#endif //JSON_ANALYZER_H
 //------------------------------------------------------------------------------

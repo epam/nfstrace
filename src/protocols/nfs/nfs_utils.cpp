@@ -29,7 +29,6 @@ namespace protocols
 {
 namespace NFS
 {
-
 void print_hex64(std::ostream& out, uint64_t val)
 
 {
@@ -52,17 +51,16 @@ void print_hex16(std::ostream& out, uint16_t val)
 void print_hex8(std::ostream& out, uint8_t val)
 {
     out << "0x" << std::setfill('0') << std::setw(2) << std::hex
-        << static_cast<u_int16_t>(val)          // prevent implicit cast to char
+        << static_cast<u_int16_t>(val) // prevent implicit cast to char
         << std::dec << std::setfill(' ');
 }
 
-
 void print_hex(std::ostream& out, const uint32_t* const val, const uint32_t len)
 {
-    if (len)
+    if(len)
     {
         out << std::hex << std::setfill('0') << "0x";
-        for (uint32_t i {0}; i < len; i++)
+        for(uint32_t i{0}; i < len; i++)
         {
             out << std::setw(2) << val[i];
         }
@@ -76,10 +74,10 @@ void print_hex(std::ostream& out, const uint32_t* const val, const uint32_t len)
 
 void print_hex(std::ostream& out, const char* const val, const uint32_t len)
 {
-    if (len)
+    if(len)
     {
         out << std::hex << std::setfill('0') << "0x";
-        for (uint32_t i {0}; i < len; i++)
+        for(uint32_t i{0}; i < len; i++)
         {
             out << std::setw(2)
                 << ((static_cast<int32_t>(val[i])) & 0xFF);
@@ -94,12 +92,12 @@ void print_hex(std::ostream& out, const char* const val, const uint32_t len)
 
 void print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len)
 {
-    if (len)
+    if(len)
     {
         out << std::hex << std::setfill('0');
-        if (len <= 8 || out_all())
+        if(len <= 8 || out_all())
         {
-            for (uint32_t i {0}; i < len; i++)
+            for(uint32_t i{0}; i < len; i++)
             {
                 out << std::setw(2)
                     << ((static_cast<int32_t>(val[i])) & 0xFF);
@@ -107,13 +105,13 @@ void print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len)
         }
         else // truncate binary data to: 00112233...CCDDEEFF
         {
-            for (uint32_t i {0}; i < 4; i++)
+            for(uint32_t i{0}; i < 4; i++)
             {
                 out << std::setw(2)
                     << ((static_cast<int32_t>(val[i])) & 0xFF);
             }
             out << "...";
-            for (uint32_t i {len - 4}; i < len; i++)
+            for(uint32_t i{len - 4}; i < len; i++)
             {
                 out << std::setw(2)
                     << ((static_cast<int32_t>(val[i])) & 0xFF);

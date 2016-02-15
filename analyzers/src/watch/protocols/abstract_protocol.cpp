@@ -24,12 +24,12 @@
 //------------------------------------------------------------------------------
 namespace
 {
-    const int EMPTY_GROUP = 1;
+const int EMPTY_GROUP = 1;
 }
 
 AbstractProtocol::AbstractProtocol(const char* n, std::size_t i)
-: name {n}
-, amount {i}
+    : name{n}
+    , amount{i}
 {
 }
 
@@ -59,7 +59,7 @@ std::size_t AbstractProtocol::getGroups()
 
 std::size_t AbstractProtocol::getGroupBegin(std::size_t i)
 {
-    if( i == EMPTY_GROUP)
+    if(i == EMPTY_GROUP)
         return 0;
     else
         return amount;

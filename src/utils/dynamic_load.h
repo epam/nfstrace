@@ -28,21 +28,23 @@ namespace NST
 {
 namespace utils
 {
-
 class DynamicLoad
 {
 public:
     class DLException : public std::runtime_error
     {
     public:
-        explicit DLException(const std::string& msg) : std::runtime_error{msg} { }
+        explicit DLException(const std::string& msg)
+            : std::runtime_error{msg}
+        {
+        }
     };
 
 protected:
     explicit DynamicLoad(const std::string& file);
     ~DynamicLoad();
 
-    template<typename SymbolPtr>
+    template <typename SymbolPtr>
     void load_address_of(const std::string& name, SymbolPtr& address)
     {
         static_assert(sizeof(void*) == sizeof(SymbolPtr), "object pointer and function pointer sizes must be equal");
@@ -51,8 +53,8 @@ protected:
         using hook_dlsym_t = SymbolPtr (DynamicLoad::*)(const std::string&);
 
         hook_dlsym_t get_symbol_func = reinterpret_cast<hook_dlsym_t>(&DynamicLoad::get_symbol);
-        address = (*this.*get_symbol_func)(name);
-     }
+        address                      = (*this.*get_symbol_func)(name);
+    }
 
     /*!
      * Gets symbol by name from DLL
@@ -69,5 +71,5 @@ private:
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//DYNAMIC_LOAD_H
+#endif // DYNAMIC_LOAD_H
 //------------------------------------------------------------------------------

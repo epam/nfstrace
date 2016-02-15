@@ -24,7 +24,6 @@
 //------------------------------------------------------------------------------
 namespace
 {
-
 const unsigned int SECINMIN  = 60;
 const unsigned int SECINHOUR = 60 * 60;
 const unsigned int SECINDAY  = 60 * 60 * 24;
@@ -41,8 +40,7 @@ const int COUNTERS_POS      = 22;
 
 const int FIRST_CHAR_POS = 1;
 const int EMPTY_LINE     = 1;
-
 }
 //------------------------------------------------------------------------------
-#endif//NC_WINDOW_CONST_H
+#endif //NC_WINDOW_CONST_H
 //------------------------------------------------------------------------------

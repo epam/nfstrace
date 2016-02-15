@@ -23,11 +23,11 @@
 #define ABSTRACT_TCP_SERVICE_H
 //------------------------------------------------------------------------------
 #include <atomic>
-#include <condition_variable>
 #include <mutex>
 #include <queue>
 #include <thread>
 #include <vector>
+#include <condition_variable>
 
 #include "ip_endpoint.h"
 //------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ public:
     //! Fills 'struct timespec' value using clock timeout
     inline static void fillDuration(struct timespec& ts)
     {
-        ts.tv_sec = ClockTimeoutMs / 1000;
+        ts.tv_sec  = ClockTimeoutMs / 1000;
         ts.tv_nsec = ClockTimeoutMs % 1000 * 1000000;
     }
 
@@ -72,6 +72,7 @@ public:
     virtual void start();
     //! Stops TCP-service
     virtual void stop();
+
 protected:
     //! Asbtract TCP-service task
     class AbstractTask
@@ -94,34 +95,36 @@ protected:
 
         //! Task execution pure virtual method to override
         virtual void execute() = 0;
+
     private:
         int _socket;
     };
 
     virtual AbstractTask* createTask(int socket) = 0;
+
 private:
     using ThreadPool = std::vector<std::thread>;
 
-    static constexpr int ClockTimeoutMs = 100;
-    static constexpr std::size_t ReadBufferSize = 1024;
-    static constexpr std::size_t WriteBufferSize = 4096;
-    static constexpr std::size_t HeaderPartSize = 1024;
-    static constexpr int MaxTasksQueueSize = 128;
+    static constexpr int         ClockTimeoutMs    = 100;
+    static constexpr std::size_t ReadBufferSize    = 1024;
+    static constexpr std::size_t WriteBufferSize   = 4096;
+    static constexpr std::size_t HeaderPartSize    = 1024;
+    static constexpr int         MaxTasksQueueSize = 128;
 
     void runWorker();
     void runListener();
 
-    const int _port;
-    const std::string _host;
-    const int _backlog;
-    std::atomic_bool _isRunning;
-    ThreadPool _threadPool;
-    std::thread _listenerThread;
-    int _serverSocket;
+    const int                 _port;
+    const std::string         _host;
+    const int                 _backlog;
+    std::atomic_bool          _isRunning;
+    ThreadPool                _threadPool;
+    std::thread               _listenerThread;
+    int                       _serverSocket;
     std::queue<AbstractTask*> _tasksQueue;
-    std::mutex _tasksQueueMutex;
-    std::condition_variable _tasksQueueCond;
+    std::mutex                _tasksQueueMutex;
+    std::condition_variable   _tasksQueueCond;
 };
 //------------------------------------------------------------------------------
-#endif//ABSTRACT_TCP_SERVICE_H
+#endif //ABSTRACT_TCP_SERVICE_H
 //------------------------------------------------------------------------------

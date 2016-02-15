@@ -29,11 +29,12 @@
 //------------------------------------------------------------------------------
 
 JsonTcpService::JsonTcpService(JsonAnalyzer& analyzer, std::size_t workersAmount, int port, const std::string& host,
-                               std::size_t maxServingDurationMs, int backlog) :
-    AbstractTcpService{workersAmount, port, host, backlog},
-    _analyzer(analyzer),
-    _maxServingDurationMs{maxServingDurationMs}
-{}
+                               std::size_t maxServingDurationMs, int backlog)
+    : AbstractTcpService{workersAmount, port, host, backlog}
+    , _analyzer(analyzer)
+    , _maxServingDurationMs{maxServingDurationMs}
+{
+}
 
 AbstractTcpService::AbstractTask* JsonTcpService::createTask(int socket)
 {
@@ -42,16 +43,17 @@ AbstractTcpService::AbstractTask* JsonTcpService::createTask(int socket)
 
 //------------------------------------------------------------------------------
 
-JsonTcpService::Task::Task(JsonTcpService& service, int socket) :
-    AbstractTask{socket},
-    _service(service)
-{}
+JsonTcpService::Task::Task(JsonTcpService& service, int socket)
+    : AbstractTask{socket}
+    , _service(service)
+{
+}
 
 void JsonTcpService::Task::execute()
 {
     std::chrono::system_clock::time_point servingStarted = std::chrono::system_clock::now();
     // Composing JSON with statistics
-    struct json_object* root = json_object_new_object();
+    struct json_object* root      = json_object_new_object();
     struct json_object* nfsV3Stat = json_object_new_object();
     // NFS3 procedures:
     json_object_object_add(nfsV3Stat, "null", json_object_new_int64(_service._analyzer.getNfsV3Stat().nullProcsAmount.load()));
@@ -190,15 +192,15 @@ void JsonTcpService::Task::execute()
 
     // Sending JSON to the client
     std::size_t totalBytesSent = 0U;
-    while (totalBytesSent < json.length())
+    while(totalBytesSent < json.length())
     {
-        if (!_service.isRunning())
+        if(!_service.isRunning())
         {
             LOG("WARNING: Service shutdown detected - terminating task execution");
             return;
         }
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - servingStarted).count() >
-                static_cast<std::chrono::milliseconds::rep>(_service._maxServingDurationMs))
+        if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - servingStarted).count() >
+           static_cast<std::chrono::milliseconds::rep>(_service._maxServingDurationMs))
         {
             // TODO: Use general logging
             LOG("WARNING: A client is too slow - terminating task execution");
@@ -210,23 +212,23 @@ void JsonTcpService::Task::execute()
         FD_ZERO(&writeDescriptorsSet);
         FD_SET(socket(), &writeDescriptorsSet);
         int descriptorsCount = pselect(socket() + 1, NULL, &writeDescriptorsSet, NULL, &writeDuration, NULL);
-        if (descriptorsCount < 0)
+        if(descriptorsCount < 0)
         {
             throw std::system_error{errno, std::system_category(), "Error awaiting for sending data availability on socket"};
         }
-        else if (descriptorsCount == 0)
+        else if(descriptorsCount == 0)
         {
             // Timeout expired
             continue;
         }
         ssize_t bytesSent = send(socket(), json.data() + totalBytesSent, json.length() - totalBytesSent, MSG_NOSIGNAL);
-        if (bytesSent < 0)
+        if(bytesSent < 0)
         {
             std::system_error e{errno, std::system_category(), "Sending data to client error"};
             LOG("WARNING: %s", e.what());
             return;
         }
-        else if (bytesSent == 0)
+        else if(bytesSent == 0)
         {
             LOG("WARNING: Connection has been aborted by client while sending data");
             return;

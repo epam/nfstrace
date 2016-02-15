@@ -46,7 +46,7 @@ void UserGUI::run()
         // prepare for select
         fd_set rfds;
 
-        MainWindow mainWindow;
+        MainWindow       mainWindow;
         HeaderWindow     headerWindow(mainWindow);
         StatisticsWindow statisticsWindow(mainWindow, _statisticsContainers);
 
@@ -63,9 +63,9 @@ void UserGUI::run()
 
         statisticsWindow.updateProtocol(_activeProtocol);
 
-        while (_running.test_and_set())
+        while(_running.test_and_set())
         {
-            if (_shouldResize)
+            if(_shouldResize)
             {
                 mainWindow.resize();
                 headerWindow.resize(mainWindow);
@@ -74,67 +74,65 @@ void UserGUI::run()
 
                 _shouldResize = false;
             }
-            if (_running.test_and_set())
+            if(_running.test_and_set())
             {
-                std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
+                std::unique_lock<std::mutex> lck(_statisticsDeltaMutex);
                 tmp = _statisticsContainers.at(_activeProtocol);
             }
             headerWindow.update();
             statisticsWindow.update(tmp);
             mainWindow.update();
 
-            if( select(STDIN_FILENO + 1, &rfds, nullptr, nullptr, &tv) == -1)
+            if(select(STDIN_FILENO + 1, &rfds, nullptr, nullptr, &tv) == -1)
             {
                 break;
             }
             else
             {
                 key = mainWindow.inputKeys();
-                if (key == KEY_LEFT || key == KEY_RIGHT)
+                if(key == KEY_LEFT || key == KEY_RIGHT)
                 {
-                    auto it = find_if (_allProtocols.begin(), _allProtocols.end(), [&](std::string s)
-                    {
+                    auto it = find_if(_allProtocols.begin(), _allProtocols.end(), [&](std::string s) {
                         return !(s.compare(_activeProtocol->getProtocolName()));
                     });
-                    if (it != _allProtocols.end())
+                    if(it != _allProtocols.end())
                     {
-                        if (key == KEY_LEFT)
+                        if(key == KEY_LEFT)
                         {
-                            if (it + 1 == _allProtocols.end())
+                            if(it + 1 == _allProtocols.end())
                                 it = _allProtocols.begin();
                             else
                                 ++it;
                         }
-                        else if (key == KEY_RIGHT)
+                        else if(key == KEY_RIGHT)
                         {
-                            if (it == _allProtocols.begin())
+                            if(it == _allProtocols.begin())
                                 it = _allProtocols.end() - 1;
                             else
                                 --it;
                         }
-                        auto a = find_if ( _statisticsContainers.begin(), _statisticsContainers.end(),[&](std::pair<AbstractProtocol*, std::vector<std::size_t> > p)
-                        {
+                        auto a = find_if(_statisticsContainers.begin(), _statisticsContainers.end(), [&](std::pair<AbstractProtocol*, std::vector<std::size_t>> p) {
                             return !(p.first->getProtocolName().compare(*it));
                         });
-                        if (a != _statisticsContainers.end())
+                        if(a != _statisticsContainers.end())
                         {
                             _activeProtocol = a->first;
                             statisticsWindow.setProtocol(_activeProtocol);
                             statisticsWindow.resize(mainWindow);
                             {
-                                std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
+                                std::unique_lock<std::mutex> lck(_statisticsDeltaMutex);
                                 tmp = a->second;
                             }
                             statisticsWindow.update(tmp);
                         }
                     }
                 }
-                else if (key == KEY_UP)
+                else if(key == KEY_UP)
                 {
                     statisticsWindow.scrollContent(SCROLL_UP);
                     statisticsWindow.update(tmp);
                 }
-                else if (key == KEY_DOWN)
+                else if(key == KEY_DOWN)
                 {
                     statisticsWindow.scrollContent(SCROLL_DOWN);
                     statisticsWindow.update(tmp);
@@ -143,7 +141,7 @@ void UserGUI::run()
             tv = getTimeval();
         }
     }
-    catch (std::runtime_error& e)
+    catch(std::runtime_error& e)
     {
         std::cerr << "Watch plugin error: " << e.what();
     }
@@ -152,36 +150,36 @@ void UserGUI::run()
 timeval UserGUI::getTimeval() const
 {
     struct timeval tv;
-    tv.tv_sec = _refresh_delta / MSEC;
+    tv.tv_sec  = _refresh_delta / MSEC;
     tv.tv_usec = _refresh_delta % MSEC;
     return tv;
 }
 
-UserGUI::UserGUI(const char* opts, std::vector<AbstractProtocol* >& data)
-: _refresh_delta {900000}
-, _shouldResize {false}
-, _running {ATOMIC_FLAG_INIT}
-, _activeProtocol(nullptr)
+UserGUI::UserGUI(const char* opts, std::vector<AbstractProtocol*>& data)
+    : _refresh_delta{900000}
+    , _shouldResize{false}
+    , _running{ATOMIC_FLAG_INIT}
+    , _activeProtocol(nullptr)
 {
     try
     {
-        if (opts != nullptr && *opts != '\0' )
+        if(opts != nullptr && *opts != '\0')
         {
             _refresh_delta = std::stoul(opts);
         }
-        for (auto it = data.begin(); it != data.end(); ++it)
+        for(auto it = data.begin(); it != data.end(); ++it)
         {
             _allProtocols.push_back((*it)->getProtocolName());
-            _statisticsContainers.insert(std::make_pair<AbstractProtocol*, std::vector<std::size_t> >((AbstractProtocol*&&)(*it), std::vector<std::size_t>((*it)->getAmount(), 0)));
+            _statisticsContainers.insert(std::make_pair<AbstractProtocol*, std::vector<std::size_t>>((AbstractProtocol * &&)(*it), std::vector<std::size_t>((*it)->getAmount(), 0)));
         }
-        if (_activeProtocol == nullptr && ! data.empty())
+        if(_activeProtocol == nullptr && !data.empty())
         {
             _activeProtocol = data.back();
         }
     }
-    catch (std::exception& e)
+    catch(std::exception& e)
     {
-        throw std::runtime_error {std::string{"Error in plugin options processing. OPTS: "} + opts + std::string(" Error: ") + e.what()};
+        throw std::runtime_error{std::string{"Error in plugin options processing. OPTS: "} + opts + std::string(" Error: ") + e.what()};
     }
     _running.test_and_set();
     _guiThread = std::thread(&UserGUI::run, this);
@@ -197,8 +195,8 @@ void UserGUI::update(AbstractProtocol* p, std::vector<std::size_t>& d)
 {
     std::vector<std::size_t>::iterator it;
     std::vector<std::size_t>::iterator st;
-    std::unique_lock<std::mutex>lck(_statisticsDeltaMutex);
-    for (it = (_statisticsContainers.at(p)).begin(), st = d.begin(); it != (_statisticsContainers.at(p)).end() && st != d.end(); ++it, ++st)
+    std::unique_lock<std::mutex>       lck(_statisticsDeltaMutex);
+    for(it = (_statisticsContainers.at(p)).begin(), st = d.begin(); it != (_statisticsContainers.at(p)).end() && st != d.end(); ++it, ++st)
     {
         (*it) += (*st);
     }

@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "filtration/pcap/bpf.h"
 #include "filtration/pcap/capture_reader.h"
+#include "filtration/pcap/bpf.h"
 #include "filtration/pcap/pcap_error.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -29,51 +29,57 @@ namespace filtration
 {
 namespace pcap
 {
-
-CaptureReader::CaptureReader(const Params& params) : BaseReader{params.interface}
+CaptureReader::CaptureReader(const Params& params)
+    : BaseReader{params.interface}
 {
-    char errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
-    const char* device {source.c_str()};
+    char        errbuf[PCAP_ERRBUF_SIZE]; // storage of error description
+    const char* device{source.c_str()};
     handle = pcap_create(device, errbuf);
     if(!handle)
     {
         throw PcapError("pcap_create", errbuf);
     }
 
-    if(int status {pcap_set_snaplen(handle, params.snaplen)})
+    if(int status{pcap_set_snaplen(handle, params.snaplen)})
     {
         throw PcapError("pcap_set_snaplen", pcap_statustostr(status));
     }
 
-    if(int status {pcap_set_promisc(handle, params.promisc ? 1 : 0)})
+    if(int status{pcap_set_promisc(handle, params.promisc ? 1 : 0)})
     {
         throw PcapError("pcap_set_promisc", pcap_statustostr(status));
     }
 
-    if(int status {pcap_set_timeout(handle, params.timeout_ms)})
+    if(int status{pcap_set_timeout(handle, params.timeout_ms)})
     {
         throw PcapError("pcap_set_timeout", pcap_statustostr(status));
     }
 
-    if(int status {pcap_set_buffer_size(handle, params.buffer_size)})
+    if(int status{pcap_set_buffer_size(handle, params.buffer_size)})
     {
         throw PcapError("pcap_set_buffer_size", pcap_statustostr(status));
     }
 
-    if(int status {pcap_activate(handle)})
+    if(int status{pcap_activate(handle)})
     {
         throw PcapError("pcap_activate", pcap_statustostr(status));
     }
 
-    pcap_direction_t direction {PCAP_D_INOUT};
+    pcap_direction_t direction{PCAP_D_INOUT};
     switch(params.direction)
     {
         using Direction = CaptureReader::Direction;
-        case Direction::IN   : direction = PCAP_D_IN;    break;
-        case Direction::OUT  : direction = PCAP_D_OUT;   break;
-        case Direction::INOUT: direction = PCAP_D_INOUT; break;
+    case Direction::IN:
+        direction = PCAP_D_IN;
+        break;
+    case Direction::OUT:
+        direction = PCAP_D_OUT;
+        break;
+    case Direction::INOUT:
+        direction = PCAP_D_INOUT;
+        break;
     }
-    if(int status {pcap_setdirection(handle, direction)})
+    if(int status{pcap_setdirection(handle, direction)})
     {
         throw PcapError("pcap_setdirection", pcap_statustostr(status));
     }
@@ -94,7 +100,7 @@ CaptureReader::CaptureReader(const Params& params) : BaseReader{params.interface
 
 void CaptureReader::print_statistic(std::ostream& out) const
 {
-    struct pcap_stat stat={0,0,0};
+    struct pcap_stat stat = {0, 0, 0};
     if(pcap_stats(handle, &stat) == 0)
     {
         out << "Statistics from interface: " << source << '\n'
@@ -117,13 +123,19 @@ std::ostream& operator<<(std::ostream& out, const CaptureReader::Params& params)
         << "  buffer size : " << params.buffer_size << " bytes\n"
         << "  promiscuous mode: " << (params.promisc ? "on" : "off") << '\n'
         << "  capture traffic : ";
-        switch(params.direction)
-        {
-            using Direction = CaptureReader::Direction;
-            case Direction::IN   : out << "in";    break;
-            case Direction::OUT  : out << "out";   break;
-            case Direction::INOUT: out << "inout"; break;
-        }
+    switch(params.direction)
+    {
+        using Direction = CaptureReader::Direction;
+    case Direction::IN:
+        out << "in";
+        break;
+    case Direction::OUT:
+        out << "out";
+        break;
+    case Direction::INOUT:
+        out << "inout";
+        break;
+    }
     return out;
 }
 

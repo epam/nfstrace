@@ -30,41 +30,40 @@ namespace NST
 {
 namespace analysis
 {
-
 /*!
  * Composite parser which parses both CIFS&NFS
  */
 class Parsers
 {
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
-    CIFSParser parser_cifs;//!< CIFS parser
-    NFSParser parser_nfs;//!< NFS parser
+    CIFSParser parser_cifs; //!< CIFS parser
+    NFSParser  parser_nfs;  //!< NFS parser
 public:
-
     Parsers(Analyzers& a)
         : parser_cifs(a)
         , parser_nfs(a)
-    {}
+    {
+    }
 
     Parsers(Parsers& c)
         : parser_cifs(c.parser_cifs)
         , parser_nfs(c.parser_nfs)
-    {}
+    {
+    }
 
     /*! Function which will be called by ParserThread class
      * \param data - packet
      */
     inline void parse_data(FilteredDataQueue::Ptr& data)
     {
-        if (!parser_nfs.parse_data(data))
+        if(!parser_nfs.parse_data(data))
         {
-            if (!parser_cifs.parse_data(data))
+            if(!parser_cifs.parse_data(data))
             {
                 LOG("Unknown packet to analysis");
             }
         }
     }
-
 };
 
 } // analysis

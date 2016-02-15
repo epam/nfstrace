@@ -48,27 +48,23 @@ namespace NST
 {
 namespace utils
 {
-
-static FILE* log_file {::stderr};
-static bool  own_file {false};
+static FILE* log_file{::stderr};
+static bool  own_file{false};
 
 namespace // unnanmed
 {
-
 static FILE* try_open(const std::string& file_name)
 {
     FILE* file = fopen(file_name.c_str(), "a+");
     if(file == nullptr)
     {
-        throw std::system_error{errno, std::system_category(),
-                               {"Error in opening file: " + file_name}};
+        throw std::system_error{errno, std::system_category(), {"Error in opening file: " + file_name}};
     }
-    chmod(file_name.c_str(), S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+    chmod(file_name.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
     if(flock(fileno(file), LOCK_EX | LOCK_NB))
     {
         fclose(file);
-        throw std::system_error{errno, std::system_category(),
-                               {"Log file already locked: " + file_name}};
+        throw std::system_error{errno, std::system_category(), {"Log file already locked: " + file_name}};
     }
     time_t now = time(NULL);
     fprintf(file, "--------------------------------------------------------------------------\n");
@@ -81,7 +77,7 @@ static FILE* try_open(const std::string& file_name)
 } // namespace unnamed
 
 Log::Global::Global(const std::string& path)
-    : log_file_path {path}
+    : log_file_path{path}
 {
     if(own_file)
     {
@@ -91,18 +87,17 @@ Log::Global::Global(const std::string& path)
     if(!log_file_path.empty())
     {
         struct stat st;
-        bool exists = stat(log_file_path.c_str(), &st) == 0 ? true : false;
+
+        bool exists = (stat(log_file_path.c_str(), &st) == 0);
 
         if(!exists && log_file_path.back() == '/')
         {
-            throw std::system_error{errno, std::system_category(),
-                                   {"Error accessing directory: " + log_file_path}};
+            throw std::system_error{errno, std::system_category(), {"Error accessing directory: " + log_file_path}};
         }
 
         if(exists && S_ISDIR(st.st_mode))
         {
-            throw std::system_error{errno, std::system_category(),
-                                   {"Incorrect log file path: " + log_file_path + " - it is a directory! Please set correct path to log."}};
+            throw std::system_error{errno, std::system_category(), {"Incorrect log file path: " + log_file_path + " - it is a directory! Please set correct path to log."}};
         }
     }
     else
@@ -137,17 +132,16 @@ void Log::Global::reopen()
     FILE* temp = freopen(log_file_path.c_str(), "a+", log_file);
     if(temp == nullptr)
     {
-        throw std::system_error{errno, std::system_category(),
-                               {std::string{"Can't reopen file: "} + log_file_path}};
+        throw std::system_error{errno, std::system_category(), {std::string{"Can't reopen file: "} + log_file_path}};
     }
     log_file = temp;
 }
 
 Log::Log()
-: std::stringbuf {ios_base::out}
-, std::ostream   {nullptr}
+    : std::stringbuf{ios_base::out}
+    , std::ostream{nullptr}
 {
-    std::stringbuf::setp(buffer, buffer+sizeof(buffer));
+    std::stringbuf::setp(buffer, buffer + sizeof(buffer));
     std::ostream::init(static_cast<std::stringbuf*>(this));
     std::ostream::put('\n');
 }

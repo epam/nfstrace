@@ -22,13 +22,13 @@
 #ifndef NFS_UTILS_H
 #define NFS_UTILS_H
 //------------------------------------------------------------------------------
-#include <ostream>
-#include <iomanip>
 #include <cstring>
+#include <iomanip>
+#include <ostream>
 
 #include "utils/out.h"
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
+#define NST_PUBLIC __attribute__((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -36,7 +36,6 @@ namespace protocols
 {
 namespace NFS
 {
-
 inline bool out_all()
 {
     using Out = NST::utils::Out;
@@ -44,24 +43,23 @@ inline bool out_all()
     return Out::Global::get_level() == Out::Level::All;
 }
 
-namespace 
+namespace
 {
 template <typename T>
 struct Helper
-{ 
+{
     static void print_hex(std::ostream& out, T val)
     {
-        out << "0x" << std::setfill('0') << std::setw(sizeof(T)/4) << std::hex << val
+        out << "0x" << std::setfill('0') << std::setw(sizeof(T) / 4) << std::hex << val
             << std::dec << std::setfill(' ');
     }
 };
 template <>
 struct Helper<uint8_t>
-{ 
+{
     static void print_hex(std::ostream& out, char val)
     {
-        out << "0x" << std::setfill('0') << std::setw(4) << std::hex << 
-            static_cast<uint16_t>(val) << std::dec << std::setfill(' ');
+        out << "0x" << std::setfill('0') << std::setw(4) << std::hex << static_cast<uint16_t>(val) << std::dec << std::setfill(' ');
     }
 };
 }
@@ -70,7 +68,7 @@ template <typename T>
 void print_hex(std::ostream& out, T val)
 {
     Helper<T>::print_hex(out, val);
-} 
+}
 
 void print_hex64(std::ostream& out, uint64_t val);
 
@@ -78,25 +76,23 @@ void print_hex32(std::ostream& out, uint32_t val);
 
 void print_hex16(std::ostream& out, uint16_t val);
 
-void print_hex8(std::ostream& out, uint8_t val); 
+void print_hex8(std::ostream& out, uint8_t val);
 
-void print_hex(std::ostream& out,
-       const uint32_t* const val,
-              const uint32_t len);
+void print_hex(std::ostream&         out,
+               const uint32_t* const val,
+               const uint32_t        len);
 
-void print_hex(std::ostream& out,
-           const char* const val,
-              const uint32_t len);
+void print_hex(std::ostream&     out,
+               const char* const val,
+               const uint32_t    len);
 
-extern "C"
-NST_PUBLIC
-void print_nfs_fh(std::ostream& out,
-              const char* const val,
-                 const uint32_t len);
+extern "C" NST_PUBLIC void print_nfs_fh(std::ostream&     out,
+                                        const char* const val,
+                                        const uint32_t    len);
 
 } // namespace NFS
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS_UTILS_H
+#endif // NFS_UTILS_H
 //------------------------------------------------------------------------------

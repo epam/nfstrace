@@ -25,13 +25,13 @@
 #include <cassert>
 #include <ostream>
 
-#include "api/nfs_types.h"
 #include "api/nfs3_types_rpcgen.h"
+#include "api/nfs_types.h"
 
-#include "protocols/xdr/xdr_decoder.h"
 #include "protocols/rpc/rpc_header.h"
+#include "protocols/xdr/xdr_decoder.h"
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
+#define NST_PUBLIC __attribute__((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -39,19 +39,18 @@ namespace protocols
 {
 namespace NFS3
 {
-
 namespace NFS3 = NST::API::NFS3;
 
 using ProcEnumNFS3 = API::ProcEnumNFS3;
 
-using Validator = rpc::RPCProgramValidator
-                <
-                    100003,                 // SunRPC/NFS program
-                    3,                      // v3
-                    ProcEnumNFS3::NFS_NULL, // NFSPROC3_NULL
-                    ProcEnumNFS3::COMMIT    // NFSPROC3_COMMIT
-                >;
+using Validator = rpc::RPCProgramValidator<
+    100003,                 // SunRPC/NFS program
+    3,                      // v3
+    ProcEnumNFS3::NFS_NULL, // NFSPROC3_NULL
+    ProcEnumNFS3::COMMIT    // NFSPROC3_COMMIT
+    >;
 
+// clang-format off
 bool_t xdr_uint64 (XDR *, NFS3::uint64*);
 bool_t xdr_uint32 (XDR *, NFS3::uint32*);
 bool_t xdr_int64 (XDR *, NFS3::int64*);
@@ -185,252 +184,251 @@ bool_t xdr_COMMIT3args (XDR *, NFS3::COMMIT3args*);
 bool_t xdr_COMMIT3resok (XDR *, NFS3::COMMIT3resok*);
 bool_t xdr_COMMIT3resfail (XDR *, NFS3::COMMIT3resfail*);
 bool_t xdr_COMMIT3res (XDR *, NFS3::COMMIT3res*);
+// clang-format on
 
 // Procedure 0: NULL - Do nothing
-inline auto proc_t_of(NFS3::NULL3args&)->decltype(&xdr_NULL3args)
+inline auto proc_t_of(NFS3::NULL3args&) -> decltype(&xdr_NULL3args)
 {
     return &xdr_NULL3args;
 }
 
-inline auto proc_t_of(NFS3::NULL3res&)->decltype(&xdr_NULL3res)
+inline auto proc_t_of(NFS3::NULL3res&) -> decltype(&xdr_NULL3res)
 {
     return &xdr_NULL3res;
 }
 
 // Procedure 1: GETATTR - Get file attributes
-inline auto proc_t_of(NFS3::GETATTR3args&)->decltype(&xdr_GETATTR3args)
+inline auto proc_t_of(NFS3::GETATTR3args&) -> decltype(&xdr_GETATTR3args)
 {
     return &xdr_GETATTR3args;
 }
 
-inline auto proc_t_of(NFS3::GETATTR3res&)->decltype(&xdr_GETATTR3res)
+inline auto proc_t_of(NFS3::GETATTR3res&) -> decltype(&xdr_GETATTR3res)
 {
     return &xdr_GETATTR3res;
 }
 
 // Procedure 2: SETATTR - Set file attributes
-inline auto proc_t_of(NFS3::SETATTR3args&)->decltype(&xdr_SETATTR3args)
+inline auto proc_t_of(NFS3::SETATTR3args&) -> decltype(&xdr_SETATTR3args)
 {
     return &xdr_SETATTR3args;
 }
 
-inline auto proc_t_of(NFS3::SETATTR3res&)->decltype(&xdr_SETATTR3res)
+inline auto proc_t_of(NFS3::SETATTR3res&) -> decltype(&xdr_SETATTR3res)
 {
     return &xdr_SETATTR3res;
 }
 
 // Procedure 3: LOOKUP -  Lookup filename
-inline auto proc_t_of(NFS3::LOOKUP3args&)->decltype(&xdr_LOOKUP3args)
+inline auto proc_t_of(NFS3::LOOKUP3args&) -> decltype(&xdr_LOOKUP3args)
 {
     return &xdr_LOOKUP3args;
 }
 
-inline auto proc_t_of(NFS3::LOOKUP3res&)->decltype(&xdr_LOOKUP3res)
+inline auto proc_t_of(NFS3::LOOKUP3res&) -> decltype(&xdr_LOOKUP3res)
 {
     return &xdr_LOOKUP3res;
 }
 
 // Procedure 4: ACCESS - Check Access Permission
-inline auto proc_t_of(NFS3::ACCESS3args&)->decltype(&xdr_ACCESS3args)
+inline auto proc_t_of(NFS3::ACCESS3args&) -> decltype(&xdr_ACCESS3args)
 {
     return &xdr_ACCESS3args;
 }
 
-inline auto proc_t_of(NFS3::ACCESS3res&)->decltype(&xdr_ACCESS3res)
+inline auto proc_t_of(NFS3::ACCESS3res&) -> decltype(&xdr_ACCESS3res)
 {
     return &xdr_ACCESS3res;
 }
 
 // Procedure 5: READLINK - Read from symbolic link
-inline auto proc_t_of(NFS3::READLINK3args&)->decltype(&xdr_READLINK3args)
+inline auto proc_t_of(NFS3::READLINK3args&) -> decltype(&xdr_READLINK3args)
 {
     return &xdr_READLINK3args;
 }
 
-inline auto proc_t_of(NFS3::READLINK3res&)->decltype(&xdr_READLINK3res)
+inline auto proc_t_of(NFS3::READLINK3res&) -> decltype(&xdr_READLINK3res)
 {
     return &xdr_READLINK3res;
 }
 
 // Procedure 6: READ - Read From file
-inline auto proc_t_of(NFS3::READ3args&)->decltype(&xdr_READ3args)
+inline auto proc_t_of(NFS3::READ3args&) -> decltype(&xdr_READ3args)
 {
     return &xdr_READ3args;
 }
 
-inline auto proc_t_of(NFS3::READ3res&)->decltype(&xdr_READ3res)
+inline auto proc_t_of(NFS3::READ3res&) -> decltype(&xdr_READ3res)
 {
     return &xdr_READ3res;
 }
 
 // Procedure 7: WRITE - Write to file
-inline auto proc_t_of(NFS3::WRITE3args&)->decltype(&xdr_WRITE3args)
+inline auto proc_t_of(NFS3::WRITE3args&) -> decltype(&xdr_WRITE3args)
 {
     return &xdr_WRITE3args;
 }
 
-inline auto proc_t_of(NFS3::WRITE3res&)->decltype(&xdr_WRITE3res)
+inline auto proc_t_of(NFS3::WRITE3res&) -> decltype(&xdr_WRITE3res)
 {
     return &xdr_WRITE3res;
 }
 
 // Procedure 8: CREATE - Create a file
-inline auto proc_t_of(NFS3::CREATE3args&)->decltype(&xdr_CREATE3args)
+inline auto proc_t_of(NFS3::CREATE3args&) -> decltype(&xdr_CREATE3args)
 {
     return &xdr_CREATE3args;
 }
 
-inline auto proc_t_of(NFS3::CREATE3res&)->decltype(&xdr_CREATE3res)
+inline auto proc_t_of(NFS3::CREATE3res&) -> decltype(&xdr_CREATE3res)
 {
     return &xdr_CREATE3res;
 }
 
 // Procedure 9: MKDIR - Create a directory
-inline auto proc_t_of(NFS3::MKDIR3args&)->decltype(&xdr_MKDIR3args)
+inline auto proc_t_of(NFS3::MKDIR3args&) -> decltype(&xdr_MKDIR3args)
 {
     return &xdr_MKDIR3args;
 }
 
-inline auto proc_t_of(NFS3::MKDIR3res&)->decltype(&xdr_MKDIR3res)
+inline auto proc_t_of(NFS3::MKDIR3res&) -> decltype(&xdr_MKDIR3res)
 {
     return &xdr_MKDIR3res;
 }
 
 // Procedure 10: SYMLINK - Create a symbolic link
-inline auto proc_t_of(NFS3::SYMLINK3args&)->decltype(&xdr_SYMLINK3args)
+inline auto proc_t_of(NFS3::SYMLINK3args&) -> decltype(&xdr_SYMLINK3args)
 {
     return &xdr_SYMLINK3args;
 }
 
-inline auto proc_t_of(NFS3::SYMLINK3res&)->decltype(&xdr_SYMLINK3res)
+inline auto proc_t_of(NFS3::SYMLINK3res&) -> decltype(&xdr_SYMLINK3res)
 {
     return &xdr_SYMLINK3res;
 }
 
 // Procedure 11: MKNOD - Create a special device
-inline auto proc_t_of(NFS3::MKNOD3args&)->decltype(&xdr_MKNOD3args)
+inline auto proc_t_of(NFS3::MKNOD3args&) -> decltype(&xdr_MKNOD3args)
 {
     return &xdr_MKNOD3args;
 }
 
-inline auto proc_t_of(NFS3::MKNOD3res&)->decltype(&xdr_MKNOD3res)
+inline auto proc_t_of(NFS3::MKNOD3res&) -> decltype(&xdr_MKNOD3res)
 {
     return &xdr_MKNOD3res;
 }
 
 // Procedure 12: REMOVE - Remove a File
-inline auto proc_t_of(NFS3::REMOVE3args&)->decltype(&xdr_REMOVE3args)
+inline auto proc_t_of(NFS3::REMOVE3args&) -> decltype(&xdr_REMOVE3args)
 {
     return &xdr_REMOVE3args;
 }
 
-inline auto proc_t_of(NFS3::REMOVE3res&)->decltype(&xdr_REMOVE3res)
+inline auto proc_t_of(NFS3::REMOVE3res&) -> decltype(&xdr_REMOVE3res)
 {
     return &xdr_REMOVE3res;
 }
 
 // Procedure 13: RMDIR - Remove a Directory
-inline auto proc_t_of(NFS3::RMDIR3args&)->decltype(&xdr_RMDIR3args)
+inline auto proc_t_of(NFS3::RMDIR3args&) -> decltype(&xdr_RMDIR3args)
 {
     return &xdr_RMDIR3args;
 }
 
-inline auto proc_t_of(NFS3::RMDIR3res&)->decltype(&xdr_RMDIR3res)
+inline auto proc_t_of(NFS3::RMDIR3res&) -> decltype(&xdr_RMDIR3res)
 {
     return &xdr_RMDIR3res;
 }
 
 // Procedure 14: RENAME - Rename a File or Directory
-inline auto proc_t_of(NFS3::RENAME3args&)->decltype(&xdr_RENAME3args)
+inline auto proc_t_of(NFS3::RENAME3args&) -> decltype(&xdr_RENAME3args)
 {
     return &xdr_RENAME3args;
 }
 
-inline auto proc_t_of(NFS3::RENAME3res&)->decltype(&xdr_RENAME3res)
+inline auto proc_t_of(NFS3::RENAME3res&) -> decltype(&xdr_RENAME3res)
 {
     return &xdr_RENAME3res;
 }
 
 // Procedure 15: LINK - Create Link to an object
-inline auto proc_t_of(NFS3::LINK3args&)->decltype(&xdr_LINK3args)
+inline auto proc_t_of(NFS3::LINK3args&) -> decltype(&xdr_LINK3args)
 {
     return &xdr_LINK3args;
 }
 
-inline auto proc_t_of(NFS3::LINK3res&)->decltype(&xdr_LINK3res)
+inline auto proc_t_of(NFS3::LINK3res&) -> decltype(&xdr_LINK3res)
 {
     return &xdr_LINK3res;
 }
 
 // Procedure 16: READDIR - Read From Directory
-inline auto proc_t_of(NFS3::READDIR3args&)->decltype(&xdr_READDIR3args)
+inline auto proc_t_of(NFS3::READDIR3args&) -> decltype(&xdr_READDIR3args)
 {
     return &xdr_READDIR3args;
 }
 
-inline auto proc_t_of(NFS3::READDIR3res&)->decltype(&xdr_READDIR3res)
+inline auto proc_t_of(NFS3::READDIR3res&) -> decltype(&xdr_READDIR3res)
 {
     return &xdr_READDIR3res;
 }
 
 // Procedure 17: READDIRPLUS - Extended read from directory
-inline auto proc_t_of(NFS3::READDIRPLUS3args&)->decltype(&xdr_READDIRPLUS3args)
+inline auto proc_t_of(NFS3::READDIRPLUS3args&) -> decltype(&xdr_READDIRPLUS3args)
 {
     return &xdr_READDIRPLUS3args;
 }
 
-inline auto proc_t_of(NFS3::READDIRPLUS3res&)->decltype(&xdr_READDIRPLUS3res)
+inline auto proc_t_of(NFS3::READDIRPLUS3res&) -> decltype(&xdr_READDIRPLUS3res)
 {
     return &xdr_READDIRPLUS3res;
 }
 
 // Procedure 18: FSSTAT - Get dynamic file system information
-inline auto proc_t_of(NFS3::FSSTAT3args&)->decltype(&xdr_FSSTAT3args)
+inline auto proc_t_of(NFS3::FSSTAT3args&) -> decltype(&xdr_FSSTAT3args)
 {
     return &xdr_FSSTAT3args;
 }
 
-inline auto proc_t_of(NFS3::FSSTAT3res&)->decltype(&xdr_FSSTAT3res)
+inline auto proc_t_of(NFS3::FSSTAT3res&) -> decltype(&xdr_FSSTAT3res)
 {
     return &xdr_FSSTAT3res;
 }
 
 // Procedure 19: FSINFO - Get static file system Information
-inline auto proc_t_of(NFS3::FSINFO3args&)->decltype(&xdr_FSINFO3args)
+inline auto proc_t_of(NFS3::FSINFO3args&) -> decltype(&xdr_FSINFO3args)
 {
     return &xdr_FSINFO3args;
 }
 
-inline auto proc_t_of(NFS3::FSINFO3res&)->decltype(&xdr_FSINFO3res)
+inline auto proc_t_of(NFS3::FSINFO3res&) -> decltype(&xdr_FSINFO3res)
 {
     return &xdr_FSINFO3res;
 }
 
 // Procedure 20: PATHCONF - Retrieve POSIX information
-inline auto proc_t_of(NFS3::PATHCONF3args&)->decltype(&xdr_PATHCONF3args)
+inline auto proc_t_of(NFS3::PATHCONF3args&) -> decltype(&xdr_PATHCONF3args)
 {
     return &xdr_PATHCONF3args;
 }
 
-inline auto proc_t_of(NFS3::PATHCONF3res&)->decltype(&xdr_PATHCONF3res)
+inline auto proc_t_of(NFS3::PATHCONF3res&) -> decltype(&xdr_PATHCONF3res)
 {
     return &xdr_PATHCONF3res;
 }
 
 // Procedure 21: COMMIT - Commit cached data on a server to stable storage
-inline auto proc_t_of(NFS3::COMMIT3args&)->decltype(&xdr_COMMIT3args)
+inline auto proc_t_of(NFS3::COMMIT3args&) -> decltype(&xdr_COMMIT3args)
 {
     return &xdr_COMMIT3args;
 }
 
-inline auto proc_t_of(NFS3::COMMIT3res&)->decltype(&xdr_COMMIT3res)
+inline auto proc_t_of(NFS3::COMMIT3res&) -> decltype(&xdr_COMMIT3res)
 {
     return &xdr_COMMIT3res;
 }
 
-extern "C"
-NST_PUBLIC
-const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
+extern "C" NST_PUBLIC const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
 
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS3::NFSProcedure proc);
 
@@ -472,5 +470,5 @@ std::ostream& operator<<(std::ostream& out, const NFS3::dirlistplus3& obj);
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS3_UTILS_H
+#endif // NFS3_UTILS_H
 //------------------------------------------------------------------------------

@@ -26,9 +26,9 @@
 
 #include "analysis/analyzers.h"
 #include "analysis/cifs_parser.h"
-#include "api/cifs_types.h"
-#include "api/cifs_pc_to_net.h"
 #include "api/cifs2_commands.h"
+#include "api/cifs_pc_to_net.h"
+#include "api/cifs_types.h"
 //------------------------------------------------------------------------------
 using namespace NST::filtration;
 using namespace NST::analysis;
@@ -42,19 +42,17 @@ using ::testing::_;
 
 namespace
 {
-
 class PluginMock : public IAnalyzer
 {
 public:
     // ISMBv2 interface
-    MOCK_METHOD3(readSMBv2, void(const SMBv2::ReadCommand *, const NST::API::SMBv2::ReadRequest *, const NST::API::SMBv2::ReadResponse *));
+    MOCK_METHOD3(readSMBv2, void(const SMBv2::ReadCommand*, const NST::API::SMBv2::ReadRequest*, const NST::API::SMBv2::ReadResponse*));
 
     // IAnalyzer interface
     void flush_statistics() {}
 };
 
-
-PluginMock* pluginMock;// pointer to mock
+PluginMock* pluginMock; // pointer to mock
 }
 //------------------------------------------------------------------------------
 Analyzers::Analyzers(const controller::Parameters& /*params*/)
@@ -62,9 +60,13 @@ Analyzers::Analyzers(const controller::Parameters& /*params*/)
     this->modules.push_back(pluginMock);
 }
 //------------------------------------------------------------------------------
-Parameters::Parameters(int /*argc*/, char** /*argv*/) {}
+Parameters::Parameters(int /*argc*/, char** /*argv*/)
+{
+}
 
-Parameters::~Parameters() {}
+Parameters::~Parameters()
+{
+}
 
 bool Parameters::show_help() const
 {
@@ -142,19 +144,32 @@ const std::string Plugin::usage_of(const std::string& /*path*/)
     return "";
 }
 
-DynamicLoad::DynamicLoad(const std::string &/*file*/) {}
+DynamicLoad::DynamicLoad(const std::string& /*file*/)
+{
+}
 
-DynamicLoad::~DynamicLoad() {}
+DynamicLoad::~DynamicLoad()
+{
+}
 
-template<typename plugin_get_entry_points_func>
+template <typename plugin_get_entry_points_func>
 void load_address_of(const std::string& /*name*/, plugin_get_entry_points_func& /*address*/)
-{}
+{
+}
 
-Plugin::Plugin(const std::string& path) : DynamicLoad(path) {}
+Plugin::Plugin(const std::string& path)
+    : DynamicLoad(path)
+{
+}
 
-PluginInstance::PluginInstance(const std::string& path, const std::string& /*args*/) : Plugin(path) {}
+PluginInstance::PluginInstance(const std::string& path, const std::string& /*args*/)
+    : Plugin(path)
+{
+}
 
-PluginInstance::~PluginInstance() {}
+PluginInstance::~PluginInstance()
+{
+}
 
 //------------------------------------------------------------------------------
 TEST(Parser, CIFSAsyncParser)
@@ -162,20 +177,20 @@ TEST(Parser, CIFSAsyncParser)
     pluginMock = new PluginMock;
 
     NST::controller::Parameters params(0, nullptr);
-    Analyzers analyzers(params);
+    Analyzers                   analyzers(params);
 
     NST::utils::FilteredDataQueue queue(1, 1);
-    NST::utils::FilteredData* data = queue.allocate();
-    NetworkSession s;
+    NST::utils::FilteredData*     data = queue.allocate();
+    NetworkSession                s;
     data->session = &s;
     queue.push(data);
     NST::utils::FilteredDataQueue::List list(queue);
-    NST::utils::FilteredDataQueue::Ptr el = list.get_current();
+    NST::utils::FilteredDataQueue::Ptr  el = list.get_current();
 
     CIFSv2::MessageHeader header;
-    header.head_code =  NST::API::SMBv2::pc_to_net<uint32_t>(0x424d53fe);// Protocol's marker
-    header.cmd_code = NST::API::SMBv2::SMBv2Commands::READ;
-    header.flags = static_cast<uint32_t>(CIFSv2::Flags::ASYNC_COMMAND);
+    header.head_code = NST::API::SMBv2::pc_to_net<uint32_t>(0x424d53fe); // Protocol's marker
+    header.cmd_code  = NST::API::SMBv2::SMBv2Commands::READ;
+    header.flags     = static_cast<uint32_t>(CIFSv2::Flags::ASYNC_COMMAND);
 
     el->data = reinterpret_cast<uint8_t*>(&header);
     el->dlen = sizeof(header);
@@ -184,7 +199,7 @@ TEST(Parser, CIFSAsyncParser)
 
     // Set conditions
     EXPECT_CALL(*pluginMock, readSMBv2(_, _, _))
-    .Times(1);
+        .Times(1);
 
     // Do
     parser.parse_data(el);
@@ -192,4 +207,3 @@ TEST(Parser, CIFSAsyncParser)
     delete pluginMock;
 }
 //------------------------------------------------------------------------------
-

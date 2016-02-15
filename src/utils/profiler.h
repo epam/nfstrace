@@ -45,16 +45,17 @@
  *     PROF;
  * ...
  */
-template<int id>
+template <int id>
 class Profiler
 {
-    const char* name = "";//!< Name of function
-    const static size_t reservedBytes = 50 * 1000;//!< Reserved - calls count
-    struct timespec startTime;//!< Timestamp of start function
+    const char*         name          = "";        //!< Name of function
+    const static size_t reservedBytes = 50 * 1000; //!< Reserved - calls count
+    struct timespec     startTime;                 //!< Timestamp of start function
 
     class Local
     {
         const char* name = "";
+
     public:
         std::vector<std::uint64_t> values;
         Local(const char* name)
@@ -69,8 +70,8 @@ class Profiler
             std::cout << name << "(" << id << "): calls count=" << values.size() << ", avg time=" << sum / values.size() << " nanosecs" << std::endl;
         }
     };
-public:
 
+public:
     /*! Constructor
      * \param name - name of function, which you are going to profile
      */
@@ -85,12 +86,11 @@ public:
         struct timespec stopTime;
         clock_gettime(CLOCK_REALTIME, &stopTime);
 
-        static Local local(name);// Time of vector initialization is not included into statistics
+        static Local local(name); // Time of vector initialization is not included into statistics
 
-        local.values.push_back(stopTime.tv_nsec - startTime.tv_nsec);// Assume, that time < 1 second!
+        local.values.push_back(stopTime.tv_nsec - startTime.tv_nsec); // Assume, that time < 1 second!
     }
-
 };
 //------------------------------------------------------------------------------
-#endif//PROFILER_H
+#endif // PROFILER_H
 //------------------------------------------------------------------------------

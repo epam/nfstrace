@@ -22,28 +22,18 @@
 #ifndef STATISTICS_WINDOW_H
 #define STATISTICS_WINDOW_H
 //------------------------------------------------------------------------------
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
 
 #include "../protocols/abstract_protocol.h"
 #include "main_window.h"
 //------------------------------------------------------------------------------
 class StatisticsWindow
 {
-    using ProtocolStatistic = std::vector<std::size_t>;
+    using ProtocolStatistic    = std::vector<std::size_t>;
     using StatisticsContainers = std::unordered_map<AbstractProtocol*, ProtocolStatistic>;
 
-private:
-    WINDOW* _window;
-    AbstractProtocol* _activeProtocol;
-    std::vector<std::string> _allProtocols;
-    std::unordered_map<AbstractProtocol*, unsigned int> _scrollOffset;
-    ProtocolStatistic _statistic;
-    void destroy();
-    bool canWrite(unsigned int);
-
 public:
-    StatisticsWindow() = delete;
     StatisticsWindow(MainWindow&, StatisticsContainers&);
     ~StatisticsWindow();
 
@@ -66,7 +56,17 @@ public:
     /*! Only set active protocol, do not update new protocol's commands.
     */
     void setProtocol(AbstractProtocol*);
+
+private:
+    void destroy();
+    bool canWrite(unsigned int);
+
+    WINDOW*                  _window;
+    AbstractProtocol*        _activeProtocol;
+    std::vector<std::string> _allProtocols;
+    std::unordered_map<AbstractProtocol*, unsigned int> _scrollOffset;
+    ProtocolStatistic _statistic;
 };
 //------------------------------------------------------------------------------
-#endif//STATISTICS_WINDOWS_H
+#endif //STATISTICS_WINDOWS_H
 //------------------------------------------------------------------------------

@@ -27,7 +27,7 @@
 #include "api/cifs_types.h"
 #include "protocols/netbios/netbios.h"
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
+#define NST_PUBLIC __attribute__((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -35,6 +35,7 @@ namespace protocols
 {
 namespace CIFSv1
 {
+// clang-format off
 
 using SMBv1Commands = NST::API::SMBv1::SMBv1Commands;
 
@@ -225,9 +226,11 @@ extern "C"
 NST_PUBLIC
 const char* print_cifs1_procedures(SMBv1Commands cmd_code);
 
+// clang-format on
+
 } // namespace CIFSv1
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//CIFS_HEADER_H
+#endif // CIFS_HEADER_H
 //------------------------------------------------------------------------------

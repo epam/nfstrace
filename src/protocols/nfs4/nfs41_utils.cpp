@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Author: Alexey Costroma 
+// Author: Alexey Costroma
 // Description: Helpers for parsing NFS structures.
 // Copyright (c) 2014 EPAM Systems
 //------------------------------------------------------------------------------
@@ -25,7 +25,7 @@
 #include "protocols/nfs4/nfs41_utils.h"
 //------------------------------------------------------------------------------
 using namespace NST::API::NFS41;
-using namespace NST::protocols::NFS;  // NFS helpers
+using namespace NST::protocols::NFS; // NFS helpers
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -33,6 +33,7 @@ namespace protocols
 {
 namespace NFS41
 {
+// clang-format off
 
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS41::NFSProcedure proc)
 {
@@ -8684,6 +8685,8 @@ xdr_CB_COMPOUND4res (XDR* xdrs, CB_COMPOUND4res* objp)
     }
     return TRUE;
 }
+
+// clang-format on
 
 } // namespace NFS41
 } // namespace protocols

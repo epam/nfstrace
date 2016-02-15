@@ -30,8 +30,7 @@ namespace NST
 {
 namespace API
 {
-
-template<typename ProcedureType>
+template <typename ProcedureType>
 struct Procedure
 {
     ProcedureType call;
@@ -45,5 +44,5 @@ struct Procedure
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//PROCEDURE_H
+#endif // PROCEDURE_H
 //------------------------------------------------------------------------------

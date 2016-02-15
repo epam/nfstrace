@@ -31,11 +31,10 @@ namespace NST
 {
 namespace filtration
 {
-
 /*!
  * Composite filtrator which composites both CIFS&NFS
  */
-template<typename Writer>
+template <typename Writer>
 class Filtrators
 {
     enum class FiltratorTypes
@@ -45,17 +44,17 @@ class Filtrators
         CIFS
     };
 
-    CIFSFiltrator<Writer> filtratorCIFS;//!< CIFS filtrator
-    RPCFiltrator<Writer> filtratorRPC;//!< RPC filtrator
-    FiltratorTypes currentFiltrator;//!< Indicates which filtrator is currently active?
+    CIFSFiltrator<Writer> filtratorCIFS;    //!< CIFS filtrator
+    RPCFiltrator<Writer>  filtratorRPC;     //!< RPC filtrator
+    FiltratorTypes        currentFiltrator; //!< Indicates which filtrator is currently active?
 public:
-    Filtrators() :
-        currentFiltrator(FiltratorTypes::DEFAULT)
+    Filtrators()
+        : currentFiltrator(FiltratorTypes::DEFAULT)
     {
     }
 
-    Filtrators(Filtrators&&)                 = delete;
-    Filtrators(const Filtrators&)            = delete;
+    Filtrators(Filtrators&&)      = delete;
+    Filtrators(const Filtrators&) = delete;
     Filtrators& operator=(const Filtrators&) = delete;
 
     /*!
@@ -64,7 +63,7 @@ public:
     inline void reset()
     {
         filtratorCIFS.reset();
-        filtratorRPC.reset ();
+        filtratorRPC.reset();
         currentFiltrator = FiltratorTypes::DEFAULT;
     }
 
@@ -77,14 +76,14 @@ public:
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {
         assert(w);
-        filtratorCIFS.set_writer (session_ptr, w, max_rpc_hdr);
-        filtratorRPC.set_writer (session_ptr, w, max_rpc_hdr);
+        filtratorCIFS.set_writer(session_ptr, w, max_rpc_hdr);
+        filtratorRPC.set_writer(session_ptr, w, max_rpc_hdr);
     }
 
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
-        filtratorCIFS.lost (n);
-        filtratorRPC.lost (n);
+        filtratorCIFS.lost(n);
+        filtratorRPC.lost(n);
     }
 
     /*!
@@ -94,16 +93,16 @@ public:
     inline void push(PacketInfo& info)
     {
         // is it RPC message?
-        if (currentFiltrator == FiltratorTypes::RPC || filtratorRPC.inProgress(info))
+        if(currentFiltrator == FiltratorTypes::RPC || filtratorRPC.inProgress(info))
         {
             currentFiltrator = FiltratorTypes::RPC;
-            filtratorRPC.push (info);
+            filtratorRPC.push(info);
         }
         // is it CIFS message?
-        else if (currentFiltrator == FiltratorTypes::CIFS || filtratorCIFS.inProgress(info))
+        else if(currentFiltrator == FiltratorTypes::CIFS || filtratorCIFS.inProgress(info))
         {
             currentFiltrator = FiltratorTypes::CIFS;
-            filtratorCIFS.push (info);
+            filtratorCIFS.push(info);
         }
         // it is Unknown message
         else
@@ -116,5 +115,5 @@ public:
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//FILTRATORS_H
+#endif // FILTRATORS_H
 //------------------------------------------------------------------------------

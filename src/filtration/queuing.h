@@ -32,27 +32,25 @@ namespace NST
 {
 namespace filtration
 {
-
 class Queueing
 {
     using Queue = NST::utils::FilteredDataQueue;
     using Data  = NST::utils::FilteredData;
 
 public:
-
     class Collection
     {
     public:
         inline Collection() noexcept
-        : queue   {nullptr}
-        , ptr     {nullptr}
-        , session {nullptr}
+            : queue{nullptr},
+              ptr{nullptr},
+              session{nullptr}
         {
         }
         inline Collection(Queueing* q, utils::NetworkSession* s) noexcept
-        : queue   {&q->queue}
-        , ptr     {nullptr}
-        , session {s}
+            : queue{&q->queue},
+              ptr{nullptr},
+              session{s}
         {
         }
         inline ~Collection()
@@ -62,13 +60,13 @@ public:
                 queue->deallocate(ptr);
             }
         }
-        Collection(Collection&&)                 = delete;
-        Collection(const Collection&)            = delete;
+        Collection(Collection&&)      = delete;
+        Collection(const Collection&) = delete;
         Collection& operator=(const Collection&) = delete;
 
         inline void set(Queueing& q, utils::NetworkSession* s)
         {
-            queue = &q.queue;
+            queue   = &q.queue;
             session = s;
         }
 
@@ -78,7 +76,7 @@ public:
             {
                 // we have a reference to queue, just do allocate and reset
                 ptr = queue->allocate();
-                if (!ptr)
+                if(!ptr)
                 {
                     LOG("free elements of the Queue are exhausted");
                 }
@@ -114,11 +112,11 @@ public:
         {
             assert(nullptr != ptr);
 
-            uint8_t* offset_ptr  { ptr->data + ptr->dlen };
-            const uint32_t avail { ptr->capacity() - ptr->dlen};
+            uint8_t*       offset_ptr{ptr->data + ptr->dlen};
+            const uint32_t avail{ptr->capacity() - ptr->dlen};
             if(len > avail) // inappropriate case. Must be one resize when get entire message size
             {
-                ptr->resize(ptr->dlen + len); // [! unbound extension !]
+                ptr->resize(ptr->dlen + len);       // [! unbound extension !]
                 offset_ptr = ptr->data + ptr->dlen; // update pointer
             }
             memcpy(offset_ptr, info.data, len);
@@ -148,26 +146,25 @@ public:
             ptr = nullptr;
         }
 
-        inline uint32_t data_size()  const { return ptr->dlen;       }
-        inline uint32_t capacity()   const { return ptr->capacity(); }
-        inline const uint8_t* data() const { return ptr->data;       }
-        inline operator bool()       const { return ptr != nullptr;  }
-
+        inline uint32_t       data_size() const { return ptr->dlen; }
+        inline uint32_t       capacity() const { return ptr->capacity(); }
+        inline const uint8_t* data() const { return ptr->data; }
+        inline operator bool() const { return ptr != nullptr; }
     private:
-        Queue* queue;
-        Data*  ptr;
+        Queue*                 queue;
+        Data*                  ptr;
         utils::NetworkSession* session;
     };
 
     Queueing(Queue& q)
-    : queue(q)
+        : queue(q)
     {
     }
     ~Queueing()
     {
     }
-    Queueing(Queueing&&)                 = delete;
-    Queueing(const Queueing&)            = delete;
+    Queueing(Queueing&&)      = delete;
+    Queueing(const Queueing&) = delete;
     Queueing& operator=(const Queueing&) = delete;
 
 private:
@@ -177,5 +174,5 @@ private:
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//QUEUING_H
+#endif // QUEUING_H
 //------------------------------------------------------------------------------

@@ -29,12 +29,11 @@ StatisticsCompositor::StatisticsCompositor(Statistics& procedures_stats, Statist
     : Statistics(operations_stats)
     , procedures_stats(procedures_stats)
 {
-    procedures_stats.for_each_session([&](const Session& session)
-    {
+    procedures_stats.for_each_session([&](const Session& session) {
         auto i = per_session_statistics.find(session);
-        if (i == per_session_statistics.end())
+        if(i == per_session_statistics.end())
         {
-            per_session_statistics.emplace(session, BreakdownCounter {proc_types_count});
+            per_session_statistics.emplace(session, BreakdownCounter{proc_types_count});
         }
     });
 }
@@ -45,33 +44,32 @@ void StatisticsCompositor::for_each_procedure(std::function<void(const Breakdown
 
     procedures_stats.for_each_procedure(on_procedure);
 
-    for (size_t procedure = procedures_stats.proc_types_count; procedure < proc_types_count; ++procedure)
+    for(size_t procedure = procedures_stats.proc_types_count; procedure < proc_types_count; ++procedure)
     {
         on_procedure(counter, procedure);
     }
 }
 
-void StatisticsCompositor::for_each_procedure_in_session(const Session& session, std::function<void (const BreakdownCounter&, size_t)> on_procedure) const
+void StatisticsCompositor::for_each_procedure_in_session(const Session& session, std::function<void(const BreakdownCounter&, size_t)> on_procedure) const
 {
     bool has_procedures_in_session = false;
 
-    procedures_stats.for_each_procedure_in_session(session, [&](const BreakdownCounter& breakdown, size_t proc)
-    {
+    procedures_stats.for_each_procedure_in_session(session, [&](const BreakdownCounter& breakdown, size_t proc) {
         on_procedure(breakdown, proc);
         has_procedures_in_session = true;
     });
 
-    if (!has_procedures_in_session)
+    if(!has_procedures_in_session)
     {
         BreakdownCounter empty(procedures_stats.proc_types_count);
-        for (size_t procedure = 0; procedure < procedures_stats.proc_types_count; ++procedure)
+        for(size_t procedure = 0; procedure < procedures_stats.proc_types_count; ++procedure)
         {
             on_procedure(empty, procedure);
         }
     }
 
     const BreakdownCounter& current = per_session_statistics.at(session);
-    for (size_t procedure = procedures_stats.proc_types_count; procedure < proc_types_count; ++procedure)
+    for(size_t procedure = procedures_stats.proc_types_count; procedure < proc_types_count; ++procedure)
     {
         on_procedure(current, procedure);
     }

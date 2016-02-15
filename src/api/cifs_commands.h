@@ -34,6 +34,7 @@ namespace API
  */
 namespace SMBv1
 {
+// clang-format off
 
 /*! CIFS v1 commands list
  */
@@ -344,9 +345,11 @@ struct InvalidResultType{} __attribute__ ((__packed__));                        
 struct NoAndxCmdArgumentType{} __attribute__ ((__packed__));                                           //!< No command's arguments
 struct NoAndxCmdResultType{} __attribute__ ((__packed__));                                             //!< No command's results
 
+// clang-format om
+
 } // namespace SMBv1
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//API_CIFS_COMMANDS_H
+#endif// API_CIFS_COMMANDS_H
 //------------------------------------------------------------------------------

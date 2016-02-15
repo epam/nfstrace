@@ -45,25 +45,23 @@ public:
     }
 };
 
-extern "C"
+extern "C" {
+const char* usage()
 {
+    return "No options";
+}
 
-    const char* usage()
-    {
-        return "No options";
-    }
+IAnalyzer* create(const char*)
+{
+    return new Analyzer();
+}
 
-    IAnalyzer* create(const char*)
-    {
-        return new Analyzer();
-    }
+void destroy(IAnalyzer* instance)
+{
+    delete instance;
+}
 
-    void destroy(IAnalyzer* instance)
-    {
-        delete instance;
-    }
+NST_PLUGIN_ENTRY_POINTS(&usage, &create, &destroy, nullptr)
 
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy, nullptr)
-
-}//extern "C"
+} //extern "C"
 //------------------------------------------------------------------------------

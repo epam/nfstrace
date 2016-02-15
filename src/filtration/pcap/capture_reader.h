@@ -32,7 +32,6 @@ namespace filtration
 {
 namespace pcap
 {
-
 class CaptureReader : public BaseReader
 {
 public:
@@ -45,20 +44,19 @@ public:
 
     struct Params
     {
-        std::string interface  { };
-        std::string filter     { };
-        int         snaplen    {0};
-        int         timeout_ms {0};
+        std::string interface{};
+        std::string filter{};
+        int         snaplen{0};
+        int         timeout_ms{0};
         int         buffer_size{0};
-        bool        promisc    {true};
-        Direction   direction  {Direction::INOUT};
+        bool        promisc{true};
+        Direction   direction{Direction::INOUT};
     };
 
     CaptureReader(const Params& params);
     ~CaptureReader() = default;
 
     void print_statistic(std::ostream& out) const override;
-
 };
 
 std::ostream& operator<<(std::ostream&, const CaptureReader::Params&);
@@ -67,5 +65,5 @@ std::ostream& operator<<(std::ostream&, const CaptureReader::Params&);
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//CAPTURE_READER_H
+#endif // CAPTURE_READER_H
 //------------------------------------------------------------------------------

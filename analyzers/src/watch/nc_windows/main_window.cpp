@@ -27,25 +27,23 @@
 //------------------------------------------------------------------------------
 void MainWindow::init()
 {
-    if (_window != nullptr)
+    if(_window != nullptr)
     {
         destroy();
     }
     _window = initscr();
-    if (_window == nullptr)
+    if(_window == nullptr)
     {
         throw std::runtime_error("Initialization of Main window failed.");
     }
     noecho();
     cbreak();
-    intrflush(stdscr, false);     // flush main window
-    curs_set(0);                  // disable blinking cursore
-
-    keypad(_window, true);        // init keyboard
-    timeout(200);                 // set keyboard timeout
-
-    start_color();                // set background color
-    if (_window != nullptr)
+    intrflush(stdscr, false); // flush main window
+    curs_set(0);              // disable blinking cursore
+    keypad(_window, true);    // init keyboard
+    timeout(200);             // set keyboard timeout
+    start_color();            // set background color
+    if(_window != nullptr)
     {
         werase(_window);
     }
@@ -63,14 +61,14 @@ void MainWindow::destroy()
 
 void MainWindow::cleanStdin(int key)
 {
-    while ((key != EOF) && (key != '\n') && (key != ' '))
+    while((key != EOF) && (key != '\n') && (key != ' '))
     {
         key = getch();
     }
 }
 
 MainWindow::MainWindow()
-: _window {nullptr}
+    : _window{nullptr}
 {
     init();
 }
@@ -84,7 +82,7 @@ int MainWindow::inputKeys()
 {
     int key = wgetch(_window);
 
-    if (key != KEY_UP && key != KEY_DOWN && key != KEY_LEFT && key != KEY_RIGHT)
+    if(key != KEY_UP && key != KEY_DOWN && key != KEY_LEFT && key != KEY_RIGHT)
     {
         key = 0;
     }
@@ -94,7 +92,7 @@ int MainWindow::inputKeys()
 
 void MainWindow::resize()
 {
-    if (_window != nullptr)
+    if(_window != nullptr)
     {
         destroy();
     }
@@ -103,7 +101,7 @@ void MainWindow::resize()
 
 void MainWindow::update() const
 {
-    if (_window != nullptr)
+    if(_window != nullptr)
     {
         refresh();
     }

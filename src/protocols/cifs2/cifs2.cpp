@@ -24,13 +24,13 @@
 #include <arpa/inet.h>
 #include <assert.h>
 
-#include "protocols/cifs2/cifs2.h"
-#include "protocols/cifs/cifs.h"
 #include "api/cifs_pc_to_net.h"
+#include "protocols/cifs/cifs.h"
+#include "protocols/cifs2/cifs2.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFSv2;
 
-# if NFSTRACE_BYTE_ORDER == NFSTRACE_BIG_ENDIAN
+#if NFSTRACE_BYTE_ORDER == NFSTRACE_BIG_ENDIAN
 
 inline uint64_t ntohll(uint64_t input)
 {
@@ -38,19 +38,18 @@ inline uint64_t ntohll(uint64_t input)
     return input;
 }
 
-# else
-#  if NFSTRACE_BYTE_ORDER == NFSTRACE_LITTLE_ENDIAN
+#else
+#if NFSTRACE_BYTE_ORDER == NFSTRACE_LITTLE_ENDIAN
 
 inline uint64_t ntohll(uint64_t input)
 {
     return be64toh(input);
 }
-#  endif
-# endif
+#endif
+#endif
 
-union SMBCode
-{
-    uint8_t codes[4];
+union SMBCode {
+    uint8_t  codes[4];
     uint32_t code;
 };
 
@@ -68,10 +67,10 @@ static inline uint32_t get_code()
 
 const NST::protocols::CIFSv2::MessageHeader* NST::protocols::CIFSv2::get_header(const uint8_t* data)
 {
-    static uint32_t code = get_code ();
+    static uint32_t code = get_code();
 
-    const MessageHeader* header (reinterpret_cast<const MessageHeader*>(data));
-    if (header->head_code == code)
+    const MessageHeader* header(reinterpret_cast<const MessageHeader*>(data));
+    if(header->head_code == code)
     {
         return header;
     }
@@ -85,13 +84,15 @@ bool MessageHeader::isFlag(const Flags flag) const
 
 void NST::protocols::CIFSv2::parseGuid(uint8_t (&guid)[16])
 {
-    Guid &p = reinterpret_cast<Guid&>(guid);
+    Guid& p = reinterpret_cast<Guid&>(guid);
     p.Data1 = le32toh(p.Data1);
     p.Data2 = le16toh(p.Data2);
     p.Data3 = le16toh(p.Data3);
 }
 
-void NST::protocols::CIFSv2::parse(SMBv2::ErrResponse*&) { }
+void NST::protocols::CIFSv2::parse(SMBv2::ErrResponse*&)
+{
+}
 void NST::protocols::CIFSv2::parse(SMBv2::NegotiateRequest*& p)
 {
     parseGuid(p->clientGUID);
@@ -100,6 +101,8 @@ void NST::protocols::CIFSv2::parse(SMBv2::NegotiateResponse*& p)
 {
     parseGuid(p->serverGUID);
 }
+
+// clang-format off
 void NST::protocols::CIFSv2::parse(SMBv2::SessionSetupRequest*&){ }
 void NST::protocols::CIFSv2::parse(SMBv2::SessionSetupResponse*&) { }
 void NST::protocols::CIFSv2::parse(SMBv2::LogOffRequest*&) { }
@@ -138,6 +141,7 @@ void NST::protocols::CIFSv2::parse(SMBv2::SetInfoRequest*&){ }
 void NST::protocols::CIFSv2::parse(SMBv2::SetInfoResponse*&){ }
 void NST::protocols::CIFSv2::parse(SMBv2::CancelResponce*&){ }
 void NST::protocols::CIFSv2::parse(SMBv2::CancelRequest*&){ }
+// clang-format on
 
 // TODO: This implementation currently copy of
 // epm-nfs/analyzers/src/cifs/cifs2_commands.cpp
@@ -148,6 +152,7 @@ const char* NST::protocols::CIFSv2::print_cifs2_procedures(SMBv2Commands cmd)
 {
     assert(cmd < SMBv2Commands::CMD_COUNT);
 
+    // clang-format off
     static const char* const commandNames[] =
     {
         "NEGOTIATE",        "SESSION SETUP",    "LOGOFF",           "TREE CONNECT",
@@ -156,7 +161,7 @@ const char* NST::protocols::CIFSv2::print_cifs2_procedures(SMBv2Commands cmd)
         "CANCEL",           "ECHO",             "QUERY DIRECTORY",  "CHANGE NOTIFY",
         "QUERY INFO",       "SET INFO",         "OPLOCK BREAK"
     };
+    // clang-format on
 
     return commandNames[static_cast<int>(cmd)];
 }
-

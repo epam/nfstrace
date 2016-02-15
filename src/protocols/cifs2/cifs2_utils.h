@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Author: Artsem Iliasau 
+// Author: Artsem Iliasau
 // Description: Helpers for parsing CIFSv2 structures.
 // Copyright (c) 2015 EPAM Systems
 //------------------------------------------------------------------------------
@@ -35,14 +35,13 @@ namespace protocols
 {
 namespace CIFSv2
 {
-
 namespace SMBv2 = NST::API::SMBv2;
 
 /*! Convert enum type to underlying integer type
  * \param e - instance of enumeration to be converted
  * \return integer representation of enumeration
  */
-template<typename E>
+template <typename E>
 inline constexpr auto to_integral(E e) -> typename std::underlying_type<E>::type
 {
     return static_cast<typename std::underlying_type<E>::type>(e);
@@ -71,7 +70,7 @@ std::ostream& operator<<(std::ostream& out, const SMBv2::SessionFlags value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::NTStatus value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::AccessMask value);
 std::ostream& operator<<(std::ostream& out, const SMBv2::CloseFlags value);
-std::ostream& operator<<(std::ostream& out, const SMBv2::SecurityMode value); 
+std::ostream& operator<<(std::ostream& out, const SMBv2::SecurityMode value);
 std::ostream& operator<<(std::ostream& out, Flags value);
 
 template <typename T>
@@ -84,7 +83,7 @@ std::ostream& print_enum(std::ostream& out, const std::string name, T value)
     print_hex(out, int_value);
     out << " " << (T)int_value;
     return out;
-} 
+}
 
 std::ostream& print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTypes infoType, const uint8_t infoClass);
 
@@ -92,5 +91,5 @@ std::ostream& print_info_levels(std::ostream& os, const NST::API::SMBv2::InfoTyp
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//CIFS2_UTILS_H
+#endif // CIFS2_UTILS_H
 //------------------------------------------------------------------------------

@@ -22,11 +22,11 @@
 #include "json_analyzer.h"
 //------------------------------------------------------------------------------
 
-JsonAnalyzer::JsonAnalyzer(std::size_t workersAmount, int port, const std::string& host, std::size_t maxServingDurationMs, int backlog) :
-    _jsonTcpService{*this, workersAmount, port, host, maxServingDurationMs, backlog},
-    _nfsV3Stat{},
-    _nfsV40Stat{},
-    _nfsV41Stat{}
+JsonAnalyzer::JsonAnalyzer(std::size_t workersAmount, int port, const std::string& host, std::size_t maxServingDurationMs, int backlog)
+    : _jsonTcpService{*this, workersAmount, port, host, maxServingDurationMs, backlog}
+    , _nfsV3Stat{}
+    , _nfsV40Stat{}
+    , _nfsV41Stat{}
 {
     _jsonTcpService.start();
 }
@@ -37,7 +37,7 @@ JsonAnalyzer::~JsonAnalyzer()
 }
 
 // NFS3
-// Procedures: 
+// Procedures:
 
 void JsonAnalyzer::null(const RPCProcedure* /*proc*/,
                         const struct NFS3::NULL3args* /*args*/,
@@ -194,7 +194,7 @@ void JsonAnalyzer::commit3(const RPCProcedure* /*proc*/,
 }
 
 // NFS4.0
-// Procedures: 
+// Procedures:
 
 void JsonAnalyzer::null4(const RPCProcedure* /*proc*/,
                          const struct NFS4::NULL4args* /*args*/,
@@ -477,8 +477,8 @@ void JsonAnalyzer::illegal40(const RPCProcedure* /* proc */,
 }
 
 // NFS4.1
-// Procedures: 
- 
+// Procedures:
+
 void JsonAnalyzer::compound41(const RPCProcedure* /*proc*/,
                               const struct NFS41::COMPOUND4args* /*args*/,
                               const struct NFS41::COMPOUND4res* /*res*/)
@@ -748,7 +748,7 @@ void JsonAnalyzer::backchannel_ctl41(const RPCProcedure* /* proc */,
 }
 
 void JsonAnalyzer::bind_conn_to_session41(const RPCProcedure* /* proc */,
-                                          const struct NFS41::BIND_CONN_TO_SESSION4args* /* args */, 
+                                          const struct NFS41::BIND_CONN_TO_SESSION4args* /* args */,
                                           const struct NFS41::BIND_CONN_TO_SESSION4res* res)
 {
     if(res) _nfsV41Stat.bind_conn_to_sessionOpsAmount++;

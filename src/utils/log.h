@@ -31,28 +31,33 @@
 #define DO_STRINGIZE(x) #x
 // TODO: DANGEROUS MACRO ! Passing custom client string as format to printf().
 // May be cause of SIGSEGV
-#define TRACE(...) {\
-    NST::utils::Log::message(__FILE__ ":" STRINGIZE(__LINE__) ": " __VA_ARGS__);\
-    NST::utils::Log::message("\n");\
-    NST::utils::Log::flush();\
-}
+#define TRACE(...)                                                                   \
+    {                                                                                \
+        NST::utils::Log::message(__FILE__ ":" STRINGIZE(__LINE__) ": " __VA_ARGS__); \
+        NST::utils::Log::message("\n");                                              \
+        NST::utils::Log::flush();                                                    \
+    }
 #endif
 
-#define LOG(...) {\
-    NST::utils::Log::message(__VA_ARGS__);\
-    NST::utils::Log::message("\n");\
-}
+#define LOG(...)                               \
+    {                                          \
+        NST::utils::Log::message(__VA_ARGS__); \
+        NST::utils::Log::message("\n");        \
+    }
 
-#define LOGONCE(...) {\
-    static bool notyet = true; \
-    if(notyet) { LOG(__VA_ARGS__); notyet = false; }\
-}
+#define LOGONCE(...)               \
+    {                              \
+        static bool notyet = true; \
+        if(notyet) {               \
+            LOG(__VA_ARGS__);      \
+            notyet = false;        \
+        }                          \
+    }
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace utils
 {
-
 class Log : private std::stringbuf, public std::ostream
 {
 public:
@@ -62,21 +67,23 @@ public:
     {
         explicit Global(const std::string& file_path);
         ~Global();
-        Global(const Global&)            = delete;
+        Global(const Global&) = delete;
         Global& operator=(const Global&) = delete;
-        void reopen();
+        void    reopen();
+
     private:
         std::string log_file_path;
     };
 
     Log();
     ~Log();
-    Log(const Log&)            = delete;
+    Log(const Log&) = delete;
     Log& operator=(const Log&) = delete;
 
     // lightweight logging
     static void message(const char* format, ...);
     static void flush();
+
 private:
     char buffer[256];
 };
@@ -84,5 +91,5 @@ private:
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//LOG_H
+#endif // LOG_H
 //------------------------------------------------------------------------------

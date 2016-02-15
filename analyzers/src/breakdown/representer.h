@@ -25,29 +25,29 @@
 #include <memory>
 #include <ostream>
 
-#include "commandrepresenter.h"
 #include "breakdowncounter.h"
+#include "commandrepresenter.h"
 #include "statistics.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace breakdown
 {
-
 /*! \class Represents statistics and sends it to screen
  */
 class Representer
 {
-    std::ostream& out;
+    std::ostream&                       out;
     std::unique_ptr<CommandRepresenter> cmd_representer;
-    size_t space_for_cmd_name;
+    size_t                              space_for_cmd_name;
 
-    void store_per_session(std::ostream& file,
-                           const Statistics& statistics,
-                           const Session& session,
+    void store_per_session(std::ostream&      file,
+                           const Statistics&  statistics,
+                           const Session&     session,
                            const std::string& ssession) const;
 
     void print_per_session(const Statistics& statistics, const Session& session, const std::string& ssession) const;
+
 protected:
     /**
      * @brief handler of one procedure output event
@@ -56,6 +56,7 @@ protected:
      * @param procedure - procedure ID
      */
     virtual void onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const;
+
 public:
     /**
      * @brief Representer's constructor
@@ -75,5 +76,5 @@ public:
 } // namespace breakdown
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//REPRESENTER_H
+#endif //REPRESENTER_H
 //------------------------------------------------------------------------------

@@ -30,15 +30,15 @@ namespace NST
 {
 namespace filtration
 {
-
 class ProcessingThread
 {
 protected:
     ProcessingThread(NST::controller::RunningStatus& s)
-    : status     (s)
-    , processing {}
+        : status(s)
+        , processing{}
     {
     }
+
 public:
     virtual ~ProcessingThread()
     {
@@ -50,12 +50,12 @@ public:
 
     void start()
     {
-        if(processing.joinable()) return;   // already started
+        if(processing.joinable()) return; // already started
 
         processing = std::thread(&ProcessingThread::thread, this);
     }
 
-    virtual void stop()= 0;
+    virtual void stop() = 0;
 
 private:
     virtual void run() = 0;
@@ -64,7 +64,7 @@ private:
     {
         try
         {
-            this->run();    // virtual call
+            this->run(); // virtual call
         }
         catch(...)
         {
@@ -74,11 +74,11 @@ private:
 
 protected:
     NST::controller::RunningStatus& status;
-    std::thread processing;
+    std::thread                     processing;
 };
 
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//PROCESSING_THREAD_H
+#endif // PROCESSING_THREAD_H
 //------------------------------------------------------------------------------

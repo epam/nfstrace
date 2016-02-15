@@ -30,7 +30,6 @@ namespace controller
 {
 namespace cmdline
 {
-
 struct Args
 {
     friend class CmdlineParser<Args>;
@@ -65,6 +64,7 @@ struct Args
     static const char* const dumping_mode;
     static const char* const analysis_mode;
     static const char* const draining_mode;
+
 private:
     static Opt options[num];
 
@@ -75,5 +75,5 @@ private:
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//CMDLINE_PARSER_H
+#endif // CMDLINE_PARSER_H
 //------------------------------------------------------------------------------

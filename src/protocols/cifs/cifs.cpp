@@ -25,9 +25,8 @@
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFSv1;
 using namespace NST::API;
-union SMBCode
-{
-    uint8_t codes[4];
+union SMBCode {
+    uint8_t  codes[4];
     uint32_t code;
 };
 
@@ -45,10 +44,10 @@ static inline uint32_t get_code()
 
 const NST::protocols::CIFSv1::MessageHeader* NST::protocols::CIFSv1::get_header(const uint8_t* data)
 {
-    static uint32_t code = get_code ();
+    static uint32_t code = get_code();
 
-    const MessageHeader* header (reinterpret_cast<const MessageHeader*>(data));
-    if (header->head_code == code)
+    const MessageHeader* header(reinterpret_cast<const MessageHeader*>(data));
+    if(header->head_code == code)
     {
         return header;
     }
@@ -64,6 +63,7 @@ const char* NST::protocols::CIFSv1::print_cifs1_procedures(SMBv1Commands cmd_cod
 {
     assert(cmd_code < SMBv1Commands::CMD_COUNT);
 
+    // clang-format off
     static const char* const commandNames[] =
     {
         "CREATE_DIRECTORY",       "DELETE_DIRECTORY",         "OPEN",                     "CREATE",
@@ -86,6 +86,7 @@ const char* NST::protocols::CIFSv1::print_cifs1_procedures(SMBv1Commands cmd_cod
         "CLOSE_PRINT_FILE",       "GET_PRINT_QUEUE",          "READ_BULK",                "WRITE_BULK",
         "WRITE_BULK_DATA",        "INVALID",                  "NO_ANDX_COMMAND"
     };
+    // clang-format on
 
     return commandNames[static_cast<int>(cmd_code)];
 }

@@ -33,7 +33,6 @@ namespace protocols
 {
 namespace ip
 {
-
 // Internet Protocol, version 4
 struct ipv4_header
 {
@@ -53,20 +52,21 @@ struct ipv4_header
         OFFMASK = 0x1fff  // mask for fragmenting bits
     };
 
-    uint8_t ipv4_vhl;           // header length and version
-    uint8_t ipv4_tos;           // type of service
-    uint16_t ipv4_len;          // total length
-    uint16_t ipv4_id;           // identification
-    uint16_t ipv4_fragmentation;// fragmentation
-    uint8_t ipv4_ttl;           // time to live
-    uint8_t ipv4_protocol;      // protocol
-    uint16_t ipv4_checksum;     // checksum
-    in_addr_t ipv4_src;         // source address
-    in_addr_t ipv4_dst;         // destination address
-} __attribute__ ((__packed__));
+    uint8_t   ipv4_vhl;           // header length and version
+    uint8_t   ipv4_tos;           // type of service
+    uint16_t  ipv4_len;           // total length
+    uint16_t  ipv4_id;            // identification
+    uint16_t  ipv4_fragmentation; // fragmentation
+    uint8_t   ipv4_ttl;           // time to live
+    uint8_t   ipv4_protocol;      // protocol
+    uint16_t  ipv4_checksum;      // checksum
+    in_addr_t ipv4_src;           // source address
+    in_addr_t ipv4_dst;           // destination address
+} __attribute__((__packed__));
 
 struct IPv4Header : private ipv4_header
 {
+    // clang-format off
     inline uint8_t  version()  const { return ipv4_vhl >> 4;        }
     inline uint8_t  ihl()      const { return (ipv4_vhl & 0x0f) << 2 /* *4 */; } // return number of bytes
     inline uint16_t length()   const { return ntohs(ipv4_len);      }
@@ -81,11 +81,12 @@ struct IPv4Header : private ipv4_header
     {
         return ipv4_fragmentation & htons(OFFMASK) /*offset() != 0*/;
     }
-} __attribute__ ((__packed__));
+    // clang-format on
+} __attribute__((__packed__));
 
 } // namespace ip
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//IPV4_HEADER_H
+#endif // IPV4_HEADER_H
 //------------------------------------------------------------------------------

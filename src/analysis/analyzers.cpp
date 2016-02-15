@@ -27,9 +27,8 @@ namespace NST
 {
 namespace analysis
 {
-
 Analyzers::Analyzers(const controller::Parameters& params)
-: _silent{false}
+    : _silent{false}
 {
     for(const auto& a : params.analysis_modules())
     {

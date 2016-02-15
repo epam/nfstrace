@@ -31,7 +31,6 @@ namespace NST
 {
 namespace analysis
 {
-
 class Plugin : private NST::utils::DynamicLoad
 {
 public:
@@ -40,12 +39,12 @@ public:
 
 protected:
     explicit Plugin(const std::string& path);
-    Plugin(const Plugin&)            = delete;
+    Plugin(const Plugin&) = delete;
     Plugin& operator=(const Plugin&) = delete;
 
-    plugin_usage_func   usage;
-    plugin_create_func  create;
-    plugin_destroy_func destroy;
+    plugin_usage_func        usage;
+    plugin_create_func       create;
+    plugin_destroy_func      destroy;
     plugin_requirements_func requirements;
 };
 
@@ -53,12 +52,12 @@ class PluginInstance : private Plugin
 {
 public:
     PluginInstance(const std::string& path, const std::string& args);
-    PluginInstance(const PluginInstance&)            = delete;
+    PluginInstance(const PluginInstance&) = delete;
     PluginInstance& operator=(const PluginInstance&) = delete;
     ~PluginInstance();
 
     inline IAnalyzer* instance() const { return analysis; }
-    inline bool silent(){ return isSilent(); }
+    inline bool       silent() { return isSilent(); }
 private:
     IAnalyzer* analysis;
 };
@@ -66,5 +65,5 @@ private:
 } // namespace analysis
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//PLUGIN_H
+#endif //PLUGIN_H
 //------------------------------------------------------------------------------

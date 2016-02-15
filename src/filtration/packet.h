@@ -22,9 +22,9 @@
 #ifndef PACKET_H
 #define PACKET_H
 //------------------------------------------------------------------------------
-#include <algorithm>    // for std::min()
+#include <algorithm> // for std::min()
 #include <cassert>
-#include <cstring>      // for memcpy()
+#include <cstring> // for memcpy()
 
 #include <pcap/pcap.h>
 
@@ -38,7 +38,6 @@ namespace NST
 {
 namespace filtration
 {
-
 using namespace NST::protocols;
 using namespace NST::protocols::ethernet;
 using namespace NST::protocols::ip;
@@ -56,43 +55,48 @@ struct PacketInfo
         friend struct Packet;
 
     public:
-        Dumped() : flag{false}{};
+        Dumped()
+            : flag{false} {};
         Dumped(const Dumped& in) = delete;
         ~Dumped(){};
 
     private:
-        inline      operator bool() const { return flag; }
+        inline operator bool() const { return flag; }
         inline void operator=(const bool stat) { flag = stat; }
-        bool flag;
+        bool                             flag;
     };
 
     inline PacketInfo(const pcap_pkthdr* h,
-                          const uint8_t* p,
-                          const uint32_t datalink)
-    : header   {h}
-    , packet   {p}
-    , eth      {nullptr}
-    , ipv4     {nullptr}
-    , ipv6     {nullptr}
-    , tcp      {nullptr}
-    , udp      {nullptr}
-    , data     {packet}
-    , dlen     {header->caplen}
-    , direction{Direction::Unknown}
-    , dumped   {}
+                      const uint8_t*     p,
+                      const uint32_t     datalink)
+        : header{h}
+        , packet{p}
+        , eth{nullptr}
+        , ipv4{nullptr}
+        , ipv6{nullptr}
+        , tcp{nullptr}
+        , udp{nullptr}
+        , data{packet}
+        , dlen{header->caplen}
+        , direction{Direction::Unknown}
+        , dumped{}
     {
         switch(datalink)
         {
-        case DLT_EN10MB:    check_eth(); break;
-        case DLT_LINUX_SLL: check_sll(); break;
+        case DLT_EN10MB:
+            check_eth();
+            break;
+        case DLT_LINUX_SLL:
+            check_sll();
+            break;
         }
     }
-    PacketInfo(const PacketInfo&)            = delete;
+    PacketInfo(const PacketInfo&) = delete;
     PacketInfo& operator=(const PacketInfo&) = delete;
-    void* operator new   (size_t ) = delete;   // only on stack
-    void* operator new[] (size_t ) = delete;   // only on stack
-    void  operator delete  (void*) = delete;   // only on stack
-    void  operator delete[](void*) = delete;   // only on stack
+    void* operator new(size_t)               = delete; // only on stack
+    void* operator new[](size_t)             = delete; // only on stack
+    void operator delete(void*)              = delete; // only on stack
+    void operator delete[](void*)            = delete; // only on stack
 
     inline void check_eth()
     {
@@ -104,8 +108,12 @@ struct PacketInfo
 
         switch(header->type())
         {
-        case ethernet_header::IP:   check_ipv4(); break;
-        case ethernet_header::IPV6: check_ipv6(); break;
+        case ethernet_header::IP:
+            check_ipv4();
+            break;
+        case ethernet_header::IPV6:
+            check_ipv6();
+            break;
         default:
             return;
         }
@@ -115,7 +123,7 @@ struct PacketInfo
 
     inline void check_sll()
     {
-    // TODO: add support Linux cooked sockets
+        // TODO: add support Linux cooked sockets
     }
 
     inline void check_ipv4() __attribute__((always_inline))
@@ -123,7 +131,7 @@ struct PacketInfo
         if(dlen < sizeof(IPv4Header)) return;
         auto header = reinterpret_cast<const IPv4Header*>(data);
 
-        if(header->version() != 4)  return;
+        if(header->version() != 4) return;
 
         /*
             IP packet may be fragmented by NIC or snaplen parameter of libpcap
@@ -139,16 +147,20 @@ struct PacketInfo
         }
 
         const uint32_t ihl = header->ihl();
-        if(dlen < ihl)             return; // truncated packet
+        if(dlen < ihl) return;               // truncated packet
         if((header->length()) < ihl) return; // incorrect packet
 
         data += ihl;
-        dlen = (std::min((uint16_t)dlen, header->length())) - ihl;  // trunk data to length of IP packet
+        dlen = (std::min((uint16_t)dlen, header->length())) - ihl; // trunk data to length of IP packet
 
         switch(header->protocol())
         {
-        case ip::NextProtocol::TCP: check_tcp(); break;
-        case ip::NextProtocol::UDP: check_udp(); break;
+        case ip::NextProtocol::TCP:
+            check_tcp();
+            break;
+        case ip::NextProtocol::UDP:
+            check_udp();
+            break;
         default:
             return;
         }
@@ -161,27 +173,31 @@ struct PacketInfo
         if(dlen < sizeof(IPv6Header)) return;
         auto header = reinterpret_cast<const IPv6Header*>(data);
 
-        if(header->version() != 6)  return;
+        if(header->version() != 6) return;
 
         data += sizeof(IPv6Header);
         dlen -= sizeof(IPv6Header);
 
         const uint32_t payload = header->payload_len();
-        if(payload == 0) return; // The length is set to zero when a Hop-by-Hop extension header carries a Jumbo Payload option
+        if(payload == 0) return;   // The length is set to zero when a Hop-by-Hop extension header carries a Jumbo Payload option
         if(dlen < payload) return; // truncated packet
 
         dlen = payload; // skip padding at the end
         // handling optional headers
         uint8_t htype = header->nexthdr();
-        switch_type:    // TODO: remove ugly goto
+    switch_type: // TODO: remove ugly goto
         switch(htype)
         {
-        case ip::NextProtocol::TCP: check_tcp(); break;
-        case ip::NextProtocol::UDP: check_udp(); break;
+        case ip::NextProtocol::TCP:
+            check_tcp();
+            break;
+        case ip::NextProtocol::UDP:
+            check_udp();
+            break;
 
         case ip::NextProtocol::HOPOPTS:
         {
-            auto hbh = reinterpret_cast<const ipv6_hbh*>(data);
+            auto               hbh = reinterpret_cast<const ipv6_hbh*>(data);
             const unsigned int size{1U + hbh->hbh_len};
 
             if(dlen < size) return; // truncated packet
@@ -195,7 +211,7 @@ struct PacketInfo
 
         case ip::NextProtocol::DSTOPTS:
         {
-            auto dest = reinterpret_cast<const ipv6_dest*>(data);
+            auto               dest = reinterpret_cast<const ipv6_dest*>(data);
             const unsigned int size{1U + dest->dest_len};
 
             if(dlen < size) return; // truncated packet
@@ -209,7 +225,7 @@ struct PacketInfo
 
         case ip::NextProtocol::ROUTING:
         {
-            auto route = reinterpret_cast<const ipv6_route*>(data);
+            auto               route = reinterpret_cast<const ipv6_route*>(data);
             const unsigned int size{1U + route->route_len};
 
             if(dlen < size) return; // truncated packet
@@ -239,7 +255,7 @@ struct PacketInfo
             goto switch_type;
         }
         case ip::NextProtocol::NONE:
-        default:    // unknown header
+        default: // unknown header
             return;
         }
 
@@ -248,10 +264,10 @@ struct PacketInfo
 
     inline void check_tcp() __attribute__((always_inline))
     {
-        if(dlen < sizeof(TCPHeader)) return;   // truncated TCP header
+        if(dlen < sizeof(TCPHeader)) return; // truncated TCP header
         auto header = reinterpret_cast<const TCPHeader*>(data);
 
-        uint8_t offset {header->offset()};
+        uint8_t offset{header->offset()};
         if(offset < 20 || offset > 60) return; // invalid length of TCP header
 
         if(dlen < offset) return; // truncated packet
@@ -268,8 +284,8 @@ struct PacketInfo
 
     inline void check_udp() __attribute__((always_inline))
     {
-        if(dlen < sizeof(UDPHeader)) return;   // fragmented UDP header
-        const UDPHeader* header {reinterpret_cast<const UDPHeader*>(data)};
+        if(dlen < sizeof(UDPHeader)) return; // fragmented UDP header
+        const UDPHeader* header{reinterpret_cast<const UDPHeader*>(data)};
 
         data += sizeof(UDPHeader);
         dlen -= sizeof(UDPHeader);
@@ -278,8 +294,8 @@ struct PacketInfo
     }
 
     // libpcap structures
-    const pcap_pkthdr*              header;
-    const uint8_t*                  packet; // real length is in header->caplen
+    const pcap_pkthdr* header;
+    const uint8_t*     packet; // real length is in header->caplen
 
     // all pointers point to packet array
 
@@ -289,33 +305,33 @@ struct PacketInfo
 
     // Internet Layer
     // IP version 4
-    const ip::IPv4Header*           ipv4;
+    const ip::IPv4Header* ipv4;
     // IP version 6
-    const ip::IPv6Header*           ipv6;
+    const ip::IPv6Header* ipv6;
 
     // Transport Layer
     // TCP
-    const tcp::TCPHeader*           tcp;
+    const tcp::TCPHeader* tcp;
     // UDP
-    const udp::UDPHeader*           udp;
+    const udp::UDPHeader* udp;
 
-    const uint8_t*                  data;  // pointer to packet data
-    uint32_t                        dlen;  // length of packet data
+    const uint8_t* data; // pointer to packet data
+    uint32_t       dlen; // length of packet data
 
     // Packet transmission direction, set after match packet to session
-    Direction                  direction;
+    Direction direction;
 
-    mutable Dumped                dumped;  // flag for dumped packet
+    mutable Dumped dumped; // flag for dumped packet
 };
 
 // PCAP packet in dynamic allocated memory
-struct Packet: public PacketInfo
+struct Packet : public PacketInfo
 {
-    Packet()                         = delete;
-    Packet(const Packet&)            = delete;
+    Packet()              = delete;
+    Packet(const Packet&) = delete;
     Packet& operator=(const Packet&) = delete;
 
-    Packet* next;     // pointer to next packet or nullptr
+    Packet* next; // pointer to next packet or nullptr
 
     static Packet* create(const PacketInfo& info, Packet* next)
     {
@@ -323,11 +339,11 @@ struct Packet: public PacketInfo
 
         // allocate memory for Packet structure and PCAP packet data
         // TODO: performance drop! improve data alignment!
-        uint8_t* memory    {  new uint8_t[sizeof(Packet) + sizeof(pcap_pkthdr) + info.header->caplen]};
+        uint8_t* memory{new uint8_t[sizeof(Packet) + sizeof(pcap_pkthdr) + info.header->caplen]};
 
-        Packet* fragment   { (Packet*)      ((uint8_t*)memory                                       )};
-        pcap_pkthdr* header{ (pcap_pkthdr*) ((uint8_t*)memory + sizeof(Packet)                      )};
-        uint8_t*  packet   { (uint8_t*)     ((uint8_t*)memory + sizeof(Packet) + sizeof(pcap_pkthdr))};
+        Packet*      fragment{(Packet*)((uint8_t*)memory)};
+        pcap_pkthdr* header{(pcap_pkthdr*)((uint8_t*)memory + sizeof(Packet))};
+        uint8_t*     packet{(uint8_t*)((uint8_t*)memory + sizeof(Packet) + sizeof(pcap_pkthdr))};
 
         // copy data
         *header = *info.header;                           // copy packet header
@@ -337,11 +353,11 @@ struct Packet: public PacketInfo
         fragment->packet = packet;
 
         // fix pointers from PacketInfo to point to owned copy of packet data
-        fragment->eth  = info.eth  ? (const ethernet::EthernetHeader*) (packet + ( ((const uint8_t*)info.eth ) - info.packet)) : nullptr;
-        fragment->ipv4 = info.ipv4 ? (const ip::IPv4Header*)           (packet + ( ((const uint8_t*)info.ipv4) - info.packet)) : nullptr;
-        fragment->ipv6 = info.ipv6 ? (const ip::IPv6Header*)           (packet + ( ((const uint8_t*)info.ipv6) - info.packet)) : nullptr;
-        fragment->tcp  = info.tcp  ? (const tcp::TCPHeader*)           (packet + ( ((const uint8_t*)info.tcp ) - info.packet)) : nullptr;
-        fragment->udp  = info.udp  ? (const udp::UDPHeader*)           (packet + ( ((const uint8_t*)info.udp ) - info.packet)) : nullptr;
+        fragment->eth  = info.eth ? (const ethernet::EthernetHeader*)(packet + (((const uint8_t*)info.eth) - info.packet)) : nullptr;
+        fragment->ipv4 = info.ipv4 ? (const ip::IPv4Header*)(packet + (((const uint8_t*)info.ipv4) - info.packet)) : nullptr;
+        fragment->ipv6 = info.ipv6 ? (const ip::IPv6Header*)(packet + (((const uint8_t*)info.ipv6) - info.packet)) : nullptr;
+        fragment->tcp  = info.tcp ? (const tcp::TCPHeader*)(packet + (((const uint8_t*)info.tcp) - info.packet)) : nullptr;
+        fragment->udp  = info.udp ? (const udp::UDPHeader*)(packet + (((const uint8_t*)info.udp) - info.packet)) : nullptr;
 
         fragment->data      = packet + (info.data - info.packet);
         fragment->dlen      = info.dlen;
@@ -355,7 +371,7 @@ struct Packet: public PacketInfo
 
     static void destroy(Packet* fragment)
     {
-        uint8_t* ptr { (uint8_t*)fragment };
+        uint8_t* ptr{(uint8_t*)fragment};
         delete[] ptr;
     }
 };
@@ -363,5 +379,5 @@ struct Packet: public PacketInfo
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//PACKET_H
+#endif // PACKET_H
 //------------------------------------------------------------------------------

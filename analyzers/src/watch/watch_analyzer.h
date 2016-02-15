@@ -26,11 +26,12 @@
 #include <condition_variable>
 
 #include <api/plugin_api.h> // include plugin development definitions
-#include "protocols/nfsv3_protocol.h"
-#include "protocols/nfsv4_protocol.h"
-#include "protocols/nfsv41_protocol.h"
+
 #include "protocols/cifsv1_protocol.h"
 #include "protocols/cifsv2_protocol.h"
+#include "protocols/nfsv3_protocol.h"
+#include "protocols/nfsv41_protocol.h"
+#include "protocols/nfsv4_protocol.h"
 #include "user_gui.h"
 //------------------------------------------------------------------------------
 class WatchAnalyzer : public IAnalyzer
@@ -110,8 +111,8 @@ public:
                          const struct NFS3::COMMIT3res*) override final;
     // NFS v4
     virtual void null4(const RPCProcedure*,
-                      const struct NFS4::NULL4args*,
-                      const struct NFS4::NULL4res*) override final;
+                       const struct NFS4::NULL4args*,
+                       const struct NFS4::NULL4res*) override final;
     virtual void compound4(const RPCProcedure*,
                            const struct NFS4::COMPOUND4args*,
                            const struct NFS4::COMPOUND4res*) override final;
@@ -492,9 +493,8 @@ public:
     virtual void breakOplockSMBv2(const SMBv2::BreakOpLockCommand*, const SMBv2::OplockAcknowledgment*, const SMBv2::OplockResponse*) override final;
 
 private:
-
     void count_proc(const RPCProcedure* proc);
-    void cifs_account(AbstractProtocol &protocol, int cmd_code);
+    void cifs_account(AbstractProtocol& protocol, int cmd_code);
     void nfs_account(const RPCProcedure*,
                      const unsigned int nfs_minor_vers = NFS_V41);
     void account40_op(const RPCProcedure*, const ProcEnumNFS4::NFSProcedure);
@@ -506,9 +506,9 @@ private:
     NFSv4Protocol  _nfsv4;
     NFSv3Protocol  _nfsv3;
 
-    std::vector<AbstractProtocol* > protocols;
-    UserGUI gui;
+    std::vector<AbstractProtocol*> protocols;
+    UserGUI                        gui;
 };
 //------------------------------------------------------------------------------
-#endif//WATCH_ANALYZER_H
+#endif //WATCH_ANALYZER_H
 //------------------------------------------------------------------------------

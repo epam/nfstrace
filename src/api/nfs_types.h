@@ -26,9 +26,8 @@ namespace NST
 {
 namespace API
 {
-
-static const unsigned int NFS_V40 {0};
-static const unsigned int NFS_V41 {1};
+static const unsigned int NFS_V40{0};
+static const unsigned int NFS_V41{1};
 
 //! struct ProcEnumNFS3 - containts all NFSv3 procedures
 struct ProcEnumNFS3
@@ -58,7 +57,7 @@ struct ProcEnumNFS3
         PATHCONF    = 20,
         COMMIT      = 21
     };
-    static const unsigned int count {22}; //!< amount of procedures
+    static const unsigned int count{22}; //!< amount of procedures
 };
 
 //! struct ProcEnumNFS4 - containts all NFSv4.0 procedures and operations
@@ -110,8 +109,8 @@ struct ProcEnumNFS4
         // Pleause, keep in mind that in all cases we suppose that NFSv4.0
         // operation ILLEGAL(10044) has the second position in ProcEnumNFS4
     };
-    static const unsigned int count      {41}; //!< amount of procedures & operations together
-    static const unsigned int count_proc {2};  //!< amount of procedures
+    static const unsigned int count{41};     //!< amount of procedures & operations together
+    static const unsigned int count_proc{2}; //!< amount of procedures
 };
 
 //! struct ProcEnumNFS41 - containts all NFSv4.1 procedures and operations
@@ -181,12 +180,12 @@ struct ProcEnumNFS41
         // Pleause, keep in mind that in all cases we suppose that NFSv4.1
         // operation ILLEGAL(10044) has the second position in ProcEnumNFS41
     };
-    static const unsigned int count      {59}; //!< amount of procedures & operations together
-    static const unsigned int count_proc {2};  //!< amount of procedures
+    static const unsigned int count{59};     //!< amount of procedures & operations together
+    static const unsigned int count_proc{2}; //!< amount of procedures
 };
 
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS_TYPES_H
+#endif // NFS_TYPES_H
 //------------------------------------------------------------------------------

@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "breakdowncounter.h"
 #include "nfsv3breakdownanalyzer.h"
+#include "breakdowncounter.h"
 #include "nfsv3commands.h"
 //------------------------------------------------------------------------------
 using namespace NST::breakdown;
@@ -100,7 +100,6 @@ void NFSv3BreakdownAnalyzer::rmdir3(const RPCProcedure* proc, const NFS3::RMDIR3
 {
     stats.account(proc, proc->call.ru.RM_cmb.cb_proc);
 }
-
 
 void NFSv3BreakdownAnalyzer::rename3(const RPCProcedure* proc, const NFS3::RENAME3args*, const NFS3::RENAME3res*)
 {

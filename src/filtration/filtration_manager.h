@@ -33,7 +33,6 @@ namespace NST
 {
 namespace filtration
 {
-
 class FiltrationManager
 {
     using Parameters        = NST::controller::Parameters;
@@ -43,26 +42,25 @@ class FiltrationManager
 public:
     FiltrationManager(RunningStatus&);
     ~FiltrationManager();
-    FiltrationManager(const FiltrationManager&)            = delete;
+    FiltrationManager(const FiltrationManager&) = delete;
     FiltrationManager& operator=(const FiltrationManager&) = delete;
 
-    void add_online_dumping  (const Parameters& params);  // dump to file
-    void add_offline_dumping (const Parameters& params);  // dump to file from input file
-    void add_online_analysis (const Parameters& params, FilteredDataQueue& queue);    // capture to queue
-    void add_offline_analysis(const std::string& ifile, FilteredDataQueue& queue);    // read file to queue
+    void add_online_dumping(const Parameters& params);                             // dump to file
+    void add_offline_dumping(const Parameters& params);                            // dump to file from input file
+    void add_online_analysis(const Parameters& params, FilteredDataQueue& queue);  // capture to queue
+    void add_offline_analysis(const std::string& ifile, FilteredDataQueue& queue); // read file to queue
 
     void start();
     void stop();
 
 private:
-
     RunningStatus& status;
 
-    std::vector< std::unique_ptr<class ProcessingThread> > threads;
+    std::vector<std::unique_ptr<class ProcessingThread>> threads;
 };
 
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//FILTRATION_MANAGER_H
+#endif // FILTRATION_MANAGER_H
 //------------------------------------------------------------------------------

@@ -22,52 +22,54 @@
 #ifndef FILTERED_DATA_H
 #define FILTERED_DATA_H
 //------------------------------------------------------------------------------
-#include <cstdint>
 #include <cassert>
+#include <cstdint>
 
 #include <sys/time.h>
 
-#include "utils/sessions.h"
 #include "utils/queue.h"
+#include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace utils
 {
-
 struct FilteredData
 {
     using Direction = NST::utils::Session::Direction;
+
 public:
     NetworkSession* session{nullptr}; // pointer to immutable session in Filtration
-    struct timeval  timestamp; // timestamp of last collected packet
-    Direction       direction; // direction of data transmission
+    struct timeval  timestamp;        // timestamp of last collected packet
+    Direction       direction;        // direction of data transmission
 
-    uint32_t    dlen{0};     // length of filtered data
-    uint8_t*    data{cache}; // pointer to data in memory. {Readonly. Always points to proper memory buffer}
+    uint32_t dlen{0};     // length of filtered data
+    uint8_t* data{cache}; // pointer to data in memory. {Readonly. Always points to proper memory buffer}
 
 private:
-    const static int CACHE_SIZE {4000};
-    uint8_t     cache[CACHE_SIZE];
-    uint8_t*    memory{nullptr};
-    uint32_t    memsize{0};
+    const static int CACHE_SIZE{4000};
+
+    uint8_t  cache[CACHE_SIZE];
+    uint8_t* memory{nullptr};
+    uint32_t memsize{0};
 
 public:
     // disable copying
-    FilteredData(const FilteredData&)            = delete;
+    FilteredData(const FilteredData&) = delete;
     FilteredData& operator=(const FilteredData&) = delete;
 
-    inline FilteredData() noexcept : data{cache}
+    FilteredData() noexcept : data{cache}
     {
     }
 
-    inline ~FilteredData() {
+    ~FilteredData()
+    {
         delete[] memory;
     }
 
-    inline uint32_t capacity() const
+    uint32_t capacity() const
     {
-        if (nullptr == memory)
+        if(nullptr == memory)
         {
             assert(data == cache);
             return CACHE_SIZE;
@@ -78,22 +80,22 @@ public:
     // Resize capacity with data safety
     void resize(uint32_t newsize)
     {
-        if (capacity() >= newsize) return; // not resize less
+        if(capacity() >= newsize) return; // not resize less
 
-        if (nullptr == memory)
+        if(nullptr == memory)
         {
             memory = new uint8_t[newsize];
-            if (dlen)
+            if(dlen)
             {
                 memcpy(memory, cache, dlen);
             }
             memsize = newsize;
-            data = memory;
+            data    = memory;
         }
         else // have some filled memory
         {
-            uint8_t* mem {new uint8_t[newsize]};
-            if (dlen)
+            uint8_t* mem{new uint8_t[newsize]};
+            if(dlen)
             {
                 memcpy(mem, memory, dlen);
             }
@@ -105,16 +107,16 @@ public:
     }
 
     // Reset data. Release free memory if allocated
-    inline void reset()
+    void reset()
     {
-        if (nullptr != memory)
+        if(nullptr != memory)
         {
             delete[] memory;
             memory = nullptr;
         }
         memsize = 0;
-        dlen = 0;
-        data = cache;
+        dlen    = 0;
+        data    = cache;
     }
 };
 
@@ -123,5 +125,5 @@ using FilteredDataQueue = Queue<FilteredData>;
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//FILTERED_DATA_H
+#endif // FILTERED_DATA_H
 //------------------------------------------------------------------------------

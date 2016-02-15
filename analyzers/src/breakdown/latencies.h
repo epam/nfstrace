@@ -30,7 +30,6 @@ namespace NST
 {
 namespace breakdown
 {
-
 /*!
  * \brief Latencies calculates latencies
  */
@@ -82,7 +81,7 @@ private:
     timeval min;
     timeval max;
 
-    uint64_t count;
+    uint64_t    count;
     long double avg;
     long double m2;
 };
@@ -97,5 +96,5 @@ double to_sec(const timeval& val);
 } // namespace breakdown
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//LATENCIES_H
+#endif //LATENCIES_H
 //------------------------------------------------------------------------------

@@ -21,9 +21,9 @@
 //------------------------------------------------------------------------------
 #include "controller/cmdline_args.h"
 //------------------------------------------------------------------------------
-#define LIVE  "live"
-#define DUMP  "dump"
-#define STAT  "stat"
+#define LIVE "live"
+#define DUMP "dump"
+#define STAT "stat"
 #define DRAIN "drain"
 //------------------------------------------------------------------------------
 namespace NST
@@ -32,6 +32,7 @@ namespace controller
 {
 namespace cmdline
 {
+// clang-format off
 
 const char* const Args::profiling_mode {LIVE};
 const char* const Args::dumping_mode   {DUMP};
@@ -63,6 +64,8 @@ Opt Args::options[Args::num] =
     {'v', "verbose",    Opt::REQ, "1",                   "specify verbosity level",                                                                   "0|1|2",    nullptr, false},
     {'h', "help",       Opt::NOA, "false",               "print help message and usage for modules passed with -a options, then exit",                nullptr,    nullptr, false}
 };
+
+// clang-format on
 
 } // namespace cmdline
 } // namespace controller

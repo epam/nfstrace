@@ -24,20 +24,21 @@
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 NFSv4Representer::NFSv4Representer(std::ostream& o, CommandRepresenter* cmdRep, size_t space_for_cmd_name, size_t count_of_compounds)
-    : Representer(o, cmdRep, space_for_cmd_name), count_of_compounds(count_of_compounds)
+    : Representer(o, cmdRep, space_for_cmd_name)
+    , count_of_compounds(count_of_compounds)
 {
 }
 
 void NFSv4Representer::onProcedureInfoPrinted(std::ostream& o, const BreakdownCounter& breakdown, unsigned procedure) const
 {
-    if (procedure == 0)
+    if(procedure == 0)
     {
         o << "Total procedures: " << breakdown.get_total_count()
-          << ". Per procedure:"   << std::endl;
+          << ". Per procedure:" << std::endl;
     }
-    if (procedure == count_of_compounds)
+    if(procedure == count_of_compounds)
     {
         o << "Total operations: " << breakdown.get_total_count()
-          << ". Per operation:"   << std::endl;
+          << ". Per operation:" << std::endl;
     }
 }

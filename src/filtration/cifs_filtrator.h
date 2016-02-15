@@ -27,28 +27,26 @@
 
 #include <pcap/pcap.h>
 
-#include "filtration/packet.h"
+#include "api/cifs2_commands.h"
 #include "filtration/filtratorimpl.h"
+#include "filtration/packet.h"
 #include "protocols/cifs/cifs.h"
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/netbios/netbios.h"
 #include "utils/log.h"
-#include "api/cifs2_commands.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
-
 using SMBv2Commands = NST::API::SMBv2::SMBv2Commands;
 
-template<typename Writer>
+template <typename Writer>
 class CIFSFiltrator : public FiltratorImpl<CIFSFiltrator<Writer>, Writer>
 {
     using BaseImpl = FiltratorImpl<CIFSFiltrator<Writer>, Writer>;
-    size_t rw_hdr_max {512}; // limit for SMB header to truncate messages
+    size_t rw_hdr_max{512}; // limit for SMB header to truncate messages
 public:
-
     CIFSFiltrator()
         : BaseImpl()
     {
@@ -99,7 +97,7 @@ public:
     {
         size_t length = 0;
         if(collection && collection.data_size() >= lengthOfBaseHeader())
-        {   //enough data is copied from previous packets to see its type
+        { //enough data is copied from previous packets to see its type
             if(isCIFSV1Header(collection.data()))
             {
                 length = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv1::RawMessageHeader);
@@ -109,29 +107,29 @@ public:
                 length = sizeof(NetBIOS::MessageHeader) + sizeof(CIFSv2::RawMessageHeader);
             }
             else
-            {   //got header but it is not CIFS
-                collection.reset();//dismiss copied data
-                info.dlen = 0;//skip entire packet
+            {                       //got header but it is not CIFS
+                collection.reset(); //dismiss copied data
+                info.dlen = 0;      //skip entire packet
                 return false;
             }
             return BaseImpl::collect_header(info, length, length);
         }
-        BaseImpl::collect_header(info, lengthOfBaseHeader(), lengthOfBaseHeader());//try to read base header
-        return false;//continue to read full header
+        BaseImpl::collect_header(info, lengthOfBaseHeader(), lengthOfBaseHeader()); //try to read base header
+        return false;                                                               //continue to read full header
     }
 
     inline bool find_and_read_message(PacketInfo& info, typename Writer::Collection& collection)
     {
-        if (const NetBIOS::MessageHeader* nb_header = NetBIOS::get_header(collection.data()))
+        if(const NetBIOS::MessageHeader* nb_header = NetBIOS::get_header(collection.data()))
         {
             const size_t length = nb_header->len() + sizeof(NetBIOS::MessageHeader);
-            if (const CIFSv1::MessageHeader* header = CIFSv1::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            if(const CIFSv1::MessageHeader* header = CIFSv1::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
                 BaseImpl::setMsgLen(length);
                 set_msg_size(header, length);
                 return BaseImpl::read_message(info);
             }
-            else if (const CIFSv2::MessageHeader* header = CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
+            else if(const CIFSv2::MessageHeader* header = CIFSv2::get_header(collection.data() + sizeof(NetBIOS::MessageHeader)))
             {
                 BaseImpl::setMsgLen(length);
                 set_msg_size(header, length);
@@ -144,7 +142,7 @@ public:
 private:
     inline void set_msg_size(const CIFSv1::MessageHeader* header, const size_t length)
     {
-        if ((header->cmd_code == CIFSv1::Commands::READ) || (header->cmd_code == CIFSv1::Commands::WRITE))
+        if((header->cmd_code == CIFSv1::Commands::READ) || (header->cmd_code == CIFSv1::Commands::WRITE))
         {
             return BaseImpl::setToBeCopied(std::min(length, rw_hdr_max));
         }
@@ -153,17 +151,16 @@ private:
 
     inline void set_msg_size(const CIFSv2::MessageHeader* header, const size_t length)
     {
-        if (((header->cmd_code == SMBv2Commands::READ) || (header->cmd_code == SMBv2Commands::WRITE)) && !header->nextCommand)
+        if(((header->cmd_code == SMBv2Commands::READ) || (header->cmd_code == SMBv2Commands::WRITE)) && !header->nextCommand)
         {
             return BaseImpl::setToBeCopied(std::min(length, rw_hdr_max));
         }
         BaseImpl::setToBeCopied(length);
     }
-
 };
 
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//CIFS_FILTRATOR_H
+#endif // CIFS_FILTRATOR_H
 //------------------------------------------------------------------------------

@@ -26,7 +26,10 @@
 using namespace NST::breakdown;
 //------------------------------------------------------------------------------
 
-Latencies::Latencies() : count {0}, avg {0}, m2 {0}
+Latencies::Latencies()
+    : count{0}
+    , avg{0}
+    , m2{0}
 {
     timerclear(&min);
     timerclear(&max);
@@ -34,7 +37,7 @@ Latencies::Latencies() : count {0}, avg {0}, m2 {0}
 
 void Latencies::add(const timeval& t)
 {
-    long double x = to_sec(t);
+    long double x     = to_sec(t);
     long double delta = x - avg;
     avg += delta / (++count);
     m2 += delta * (x - avg);
@@ -54,7 +57,7 @@ long double Latencies::get_avg() const
 
 long double Latencies::get_st_dev() const
 {
-    if (count < 2)
+    if(count < 2)
     {
         return 0;
     }
@@ -73,15 +76,15 @@ const timeval& Latencies::get_max() const
 
 void Latencies::set_range(const timeval& t)
 {
-    if (timercmp(&t, &min, < ))
+    if(timercmp(&t, &min, <))
     {
         min = t;
     }
-    if (min.tv_sec == 0 && min.tv_usec == 0)
+    if(min.tv_sec == 0 && min.tv_usec == 0)
     {
         min = t;
     }
-    if (timercmp(&t, &max, > ))
+    if(timercmp(&t, &max, >))
     {
         max = t;
     }

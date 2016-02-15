@@ -30,8 +30,8 @@
 #define NFSTRACE_BIG_ENDIAN __BIG_ENDIAN
 #define NFSTRACE_LITTLE_ENDIAN __LITTLE_ENDIAN
 #else
-#include <sys/param.h>
 #include <machine/endian.h>
+#include <sys/param.h>
 #define NFSTRACE_BYTE_ORDER BYTE_ORDER
 #define NFSTRACE_BIG_ENDIAN BIG_ENDIAN
 #define NFSTRACE_LITTLE_ENDIAN LITTLE_ENDIAN
@@ -43,19 +43,20 @@ namespace API
 {
 namespace SMBv2
 {
-
-# if NFSTRACE_BYTE_ORDER == NFSTRACE_BIG_ENDIAN
+#if NFSTRACE_BYTE_ORDER == NFSTRACE_BIG_ENDIAN
 
 // TODO: rename this function template to LEconstant2host
 
-template<class T>
+template <class T>
 constexpr T pc_to_net(T t)
 {
     static_assert(t == T{}, "try to not use pc_to_net w/o specialization");
     return t;
 }
 
-template<>
+// clang-format off
+
+template <>
 constexpr std::uint64_t pc_to_net(std::uint64_t t)
 {
     return ((t & 0xFF00000000000000) >> 56)
@@ -68,7 +69,7 @@ constexpr std::uint64_t pc_to_net(std::uint64_t t)
          | ((t & 0x00000000000000FF) << 56);
 }
 
-template<>
+template <>
 constexpr uint32_t pc_to_net(uint32_t t)
 {
     return ((t & 0xFF000000) >> 24)
@@ -77,61 +78,63 @@ constexpr uint32_t pc_to_net(uint32_t t)
          | ((t & 0x000000FF) << 24);
 }
 
-template<>
+template <>
 constexpr uint16_t pc_to_net(uint16_t t)
 {
     return ((t & 0xFF00) >> 8)
          | ((t & 0x00FF) << 8);
 }
 
-template<>
+// clang-format on
+
+template <>
 constexpr std::uint8_t pc_to_net(std::uint8_t v)
 {
     return v;
 }
 
-template<>
+template <>
 constexpr std::int64_t pc_to_net(std::int64_t v)
 {
     return pc_to_net((std::uint64_t)v);
 }
 
-template<>
+template <>
 constexpr std::int32_t pc_to_net(std::int32_t v)
 {
     return pc_to_net((std::uint32_t)v);
 }
 
-template<>
+template <>
 constexpr std::int16_t pc_to_net(std::int16_t v)
 {
     return pc_to_net((std::uint16_t)v);
 }
 
-template<>
+template <>
 constexpr std::int8_t pc_to_net(std::int8_t v)
 {
     return pc_to_net((std::uint8_t)v);
 }
 
-# else
-#  if NFSTRACE_BYTE_ORDER == NFSTRACE_LITTLE_ENDIAN
+#else
+#if NFSTRACE_BYTE_ORDER == NFSTRACE_LITTLE_ENDIAN
 
 /*!
  * Does nothing for Intel
  */
-template<class T>
+template <class T>
 constexpr T pc_to_net(T t)
 {
     return t;
 }
 
-#  endif
+#endif
 #endif
 
 } // SMBv2
 } // API
 } // NST
 //------------------------------------------------------------------------------
-#endif//PC_TO_NET_H
+#endif // PC_TO_NET_H
 //------------------------------------------------------------------------------

@@ -30,6 +30,7 @@ namespace API
 {
 namespace NFS3
 {
+// clang-format off
 
 const uint32_t NFS3_FHSIZE         {64};
 const uint32_t NFS3_COOKIEVERFSIZE {8};
@@ -951,9 +952,11 @@ typedef struct COMMIT3res COMMIT3res;
 
 #define NFS_V3 3
 
+// clang-format on
+
 } // namespace NFS3
 } // namespace API
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS3_TYPES_RPCGEN_H
+#endif // NFS3_TYPES_RPCGEN_H
 //------------------------------------------------------------------------------

@@ -26,15 +26,15 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "utils/filtered_data.h"
 #include "controller/controller.h"
 #include "controller/parameters.h"
+#include "utils/filtered_data.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
-
+// clang-format off
 Controller::Running::Running(Controller& i)
     : controller(i)
 {
@@ -57,7 +57,7 @@ Controller::Running::~Running()
         controller.analysis->stop();
     }
 }
-
+// clang-format off
 Controller::Controller(const Parameters& params) try
     : gout       {utils::Out::Level(params.verbose_level())}
     , glog       {params.log_path()}
@@ -65,37 +65,38 @@ Controller::Controller(const Parameters& params) try
     , analysis   {}
     , filtration {new FiltrationManager{status}}
 {
+    // clang-format on
     switch(params.running_mode())
     {
-        case RunningMode::Profiling:
-        {
-            analysis.reset(new AnalysisManager{status, params});
-            if(analysis->isSilent())
-                utils::Out::Global::set_level(utils::Out::Level::Silent);
+    case RunningMode::Profiling:
+    {
+        analysis.reset(new AnalysisManager{status, params});
+        if(analysis->isSilent())
+            utils::Out::Global::set_level(utils::Out::Level::Silent);
 
-            filtration->add_online_analysis(params, analysis->get_queue());
-        }
-        break;
-        case RunningMode::Dumping:
-        {
-            filtration->add_online_dumping(params);
-        }
-        break;
-        case RunningMode::Analysis:
-        {
-            analysis.reset(new AnalysisManager{status, params});
-            if(analysis->isSilent())
-                utils::Out::Global::set_level(utils::Out::Level::Silent);
+        filtration->add_online_analysis(params, analysis->get_queue());
+    }
+    break;
+    case RunningMode::Dumping:
+    {
+        filtration->add_online_dumping(params);
+    }
+    break;
+    case RunningMode::Analysis:
+    {
+        analysis.reset(new AnalysisManager{status, params});
+        if(analysis->isSilent())
+            utils::Out::Global::set_level(utils::Out::Level::Silent);
 
-            filtration->add_offline_analysis(params.input_file(),
-                                             analysis->get_queue());
-        }
-        break;
-        case RunningMode::Draining:
-        {
-            filtration->add_offline_dumping(params);
-        }
-        break;
+        filtration->add_offline_analysis(params.input_file(),
+                                         analysis->get_queue());
+    }
+    break;
+    case RunningMode::Draining:
+    {
+        filtration->add_offline_dumping(params);
+    }
+    break;
     }
     droproot(params.dropuser());
 }
@@ -188,7 +189,7 @@ void droproot(const std::string& dropuser)
     }
     else if(!dropuser.empty())
     {
-        struct passwd *pw = getpwnam(dropuser.c_str()); //get user uid & gid
+        struct passwd* pw = getpwnam(dropuser.c_str()); //get user uid & gid
 
         if(!pw)
         {

@@ -30,7 +30,6 @@ namespace NST
 {
 namespace analysis
 {
-
 namespace NFS3  = NST::API::NFS3;
 namespace NFS4  = NST::API::NFS4;
 namespace NFS41 = NST::API::NFS41;
@@ -38,13 +37,15 @@ namespace NFS41 = NST::API::NFS41;
 class PrintAnalyzer : public IAnalyzer
 {
 public:
-    PrintAnalyzer(std::ostream& o) : out(o)
+    PrintAnalyzer(std::ostream& o)
+        : out(o)
     {
     }
     ~PrintAnalyzer()
     {
     }
 
+    // clang-format off
     void closeFileSMBv2(const SMBv2::CloseFileCommand*,
                         const SMBv2::CloseRequest*,
                         const SMBv2::CloseResponse*) override final;
@@ -456,11 +457,11 @@ public:
     void nfs41_operation(const struct NFS41::SAVEFH4res*                res);
 
     void nfs41_operation(const struct NFS41::ILLEGAL4res*               res);
-
+    // clang-format on
     void flush_statistics() override final;
 
 private:
-    PrintAnalyzer(const PrintAnalyzer&)            = delete;
+    PrintAnalyzer(const PrintAnalyzer&) = delete;
     PrintAnalyzer& operator=(const PrintAnalyzer&) = delete;
 
     std::ostream& out;
@@ -469,5 +470,5 @@ private:
 } // namespace analysis
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//PRINT_ANALYZER_H
+#endif //PRINT_ANALYZER_H
 //------------------------------------------------------------------------------

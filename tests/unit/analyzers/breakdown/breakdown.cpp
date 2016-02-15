@@ -20,8 +20,8 @@
 */
 //------------------------------------------------------------------------------
 #include <cstdlib>
-#include <iostream>
 #include <ctime>
+#include <iostream>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -36,12 +36,12 @@ using ::testing::_;
 //------------------------------------------------------------------------------
 namespace
 {
-
 class BreakdownTest : public ::testing::Test
 {
 protected:
-    size_t count;
+    size_t  count;
     timeval t;
+
 public:
     void SetUp()
     {
@@ -53,12 +53,10 @@ public:
     {
     }
 };
-
 }
 //------------------------------------------------------------------------------
 TEST_F(BreakdownTest, count)
 {
-
     BreakdownCounter break_down(count);
 
     EXPECT_EQ(0U, break_down.get_total_count());
@@ -68,6 +66,5 @@ TEST_F(BreakdownTest, count)
     break_down[0].add(t);
 
     EXPECT_EQ(3U, break_down.get_total_count());
-
 }
 //------------------------------------------------------------------------------

@@ -32,19 +32,24 @@ namespace NST
 {
 namespace analysis
 {
-
 /*! \class It is class which can parse NFS messages and it called by ParserThread
  */
 class NFSParser
 {
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
 
-    Analyzers& analyzers;
+    Analyzers&        analyzers;
     Sessions<Session> sessions;
-public:
 
-    NFSParser(Analyzers& a) : analyzers(a) {}
-    NFSParser(NFSParser& c) : analyzers(c.analyzers) {}
+public:
+    NFSParser(Analyzers& a)
+        : analyzers(a)
+    {
+    }
+    NFSParser(NFSParser& c)
+        : analyzers(c.analyzers)
+    {
+    }
 
     /*! Function which will be called by ParserThread class
      * \param data - RPC packet
@@ -55,11 +60,11 @@ public:
     void parse_data(FilteredDataQueue::Ptr&& data);
     void analyze_nfs_procedure(FilteredDataQueue::Ptr&& call,
                                FilteredDataQueue::Ptr&& reply,
-                               Session* session);
+                               Session*                 session);
 };
 
 } // analysis
 } // NST
 //------------------------------------------------------------------------------
-#endif//NFS_PARSER_H
+#endif //NFS_PARSER_H
 //------------------------------------------------------------------------------

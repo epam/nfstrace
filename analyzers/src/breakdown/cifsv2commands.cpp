@@ -29,27 +29,27 @@ using namespace NST::breakdown;
 const char* NST::breakdown::SMBv2Commands::command_name(int cmd_code)
 {
     static std::map<Commands, const char*> cmdNames;
-    if (cmdNames.empty())
+    if(cmdNames.empty())
     {
-        cmdNames[Commands::NEGOTIATE]         = "NEGOTIATE";
-        cmdNames[Commands::SESSION_SETUP]     = "SESSION SETUP";
-        cmdNames[Commands::LOGOFF]            = "LOGOFF";
-        cmdNames[Commands::TREE_CONNECT]      = "TREE CONNECT";
-        cmdNames[Commands::TREE_DISCONNECT]   = "TREE DISCONNECT";
-        cmdNames[Commands::CREATE]            = "CREATE";
-        cmdNames[Commands::CLOSE]             = "CLOSE";
-        cmdNames[Commands::FLUSH]             = "FLUSH";
-        cmdNames[Commands::READ]              = "READ";
-        cmdNames[Commands::WRITE]             = "WRITE";
-        cmdNames[Commands::LOCK]              = "LOCK";
-        cmdNames[Commands::IOCTL]             = "IOCTL";
-        cmdNames[Commands::CANCEL]            = "CANCEL";
-        cmdNames[Commands::ECHO]              = "ECHO";
-        cmdNames[Commands::QUERY_DIRECTORY]   = "QUERY DIRECTORY";
-        cmdNames[Commands::CHANGE_NOTIFY]     = "CHANGE NOTIFY";
-        cmdNames[Commands::QUERY_INFO]        = "QUERY INFO";
-        cmdNames[Commands::SET_INFO]          = "SET INFO";
-        cmdNames[Commands::OPLOCK_BREAK]      = "OPLOCK BREAK";
+        cmdNames[Commands::NEGOTIATE]       = "NEGOTIATE";
+        cmdNames[Commands::SESSION_SETUP]   = "SESSION SETUP";
+        cmdNames[Commands::LOGOFF]          = "LOGOFF";
+        cmdNames[Commands::TREE_CONNECT]    = "TREE CONNECT";
+        cmdNames[Commands::TREE_DISCONNECT] = "TREE DISCONNECT";
+        cmdNames[Commands::CREATE]          = "CREATE";
+        cmdNames[Commands::CLOSE]           = "CLOSE";
+        cmdNames[Commands::FLUSH]           = "FLUSH";
+        cmdNames[Commands::READ]            = "READ";
+        cmdNames[Commands::WRITE]           = "WRITE";
+        cmdNames[Commands::LOCK]            = "LOCK";
+        cmdNames[Commands::IOCTL]           = "IOCTL";
+        cmdNames[Commands::CANCEL]          = "CANCEL";
+        cmdNames[Commands::ECHO]            = "ECHO";
+        cmdNames[Commands::QUERY_DIRECTORY] = "QUERY DIRECTORY";
+        cmdNames[Commands::CHANGE_NOTIFY]   = "CHANGE NOTIFY";
+        cmdNames[Commands::QUERY_INFO]      = "QUERY INFO";
+        cmdNames[Commands::SET_INFO]        = "SET INFO";
+        cmdNames[Commands::OPLOCK_BREAK]    = "OPLOCK BREAK";
     }
     return cmdNames[static_cast<Commands>(cmd_code)];
 }
@@ -62,27 +62,27 @@ size_t SMBv2Commands::commands_count()
 const char* NST::breakdown::SMBv2Commands::command_description(int cmd_code)
 {
     static std::map<Commands, const char*> cmdNames;
-    if (cmdNames.empty())
+    if(cmdNames.empty())
     {
-        cmdNames[Commands::NEGOTIATE]         = "NEGOTIATE";
-        cmdNames[Commands::SESSION_SETUP]     = "SESSION_SETUP";
-        cmdNames[Commands::LOGOFF]            = "LOGOFF";
-        cmdNames[Commands::TREE_CONNECT]      = "TREE_CONNECT";
-        cmdNames[Commands::TREE_DISCONNECT]   = "TREE_DISCONNECT";
-        cmdNames[Commands::CREATE]            = "CREATE";
-        cmdNames[Commands::CLOSE]             = "CLOSE";
-        cmdNames[Commands::FLUSH]             = "FLUSH";
-        cmdNames[Commands::READ]              = "READ";
-        cmdNames[Commands::WRITE]             = "WRITE";
-        cmdNames[Commands::LOCK]              = "LOCK";
-        cmdNames[Commands::IOCTL]             = "IOCTL";
-        cmdNames[Commands::CANCEL]            = "CANCEL";
-        cmdNames[Commands::ECHO]              = "ECHO";
-        cmdNames[Commands::QUERY_DIRECTORY]   = "QUERY_DIRECTORY";
-        cmdNames[Commands::CHANGE_NOTIFY]     = "CHANGE_NOTIFY";
-        cmdNames[Commands::QUERY_INFO]        = "QUERY_INFO";
-        cmdNames[Commands::SET_INFO]          = "SET_INFO";
-        cmdNames[Commands::OPLOCK_BREAK]      = "OPLOCK_BREAK";
+        cmdNames[Commands::NEGOTIATE]       = "NEGOTIATE";
+        cmdNames[Commands::SESSION_SETUP]   = "SESSION_SETUP";
+        cmdNames[Commands::LOGOFF]          = "LOGOFF";
+        cmdNames[Commands::TREE_CONNECT]    = "TREE_CONNECT";
+        cmdNames[Commands::TREE_DISCONNECT] = "TREE_DISCONNECT";
+        cmdNames[Commands::CREATE]          = "CREATE";
+        cmdNames[Commands::CLOSE]           = "CLOSE";
+        cmdNames[Commands::FLUSH]           = "FLUSH";
+        cmdNames[Commands::READ]            = "READ";
+        cmdNames[Commands::WRITE]           = "WRITE";
+        cmdNames[Commands::LOCK]            = "LOCK";
+        cmdNames[Commands::IOCTL]           = "IOCTL";
+        cmdNames[Commands::CANCEL]          = "CANCEL";
+        cmdNames[Commands::ECHO]            = "ECHO";
+        cmdNames[Commands::QUERY_DIRECTORY] = "QUERY_DIRECTORY";
+        cmdNames[Commands::CHANGE_NOTIFY]   = "CHANGE_NOTIFY";
+        cmdNames[Commands::QUERY_INFO]      = "QUERY_INFO";
+        cmdNames[Commands::SET_INFO]        = "SET_INFO";
+        cmdNames[Commands::OPLOCK_BREAK]    = "OPLOCK_BREAK";
     }
     return cmdNames[static_cast<Commands>(cmd_code)];
 }

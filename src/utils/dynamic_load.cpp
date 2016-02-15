@@ -28,7 +28,7 @@
 using namespace NST::utils;
 //------------------------------------------------------------------------------
 
-DynamicLoad::DynamicLoad(const std::string &file)
+DynamicLoad::DynamicLoad(const std::string& file)
 {
     handle = dlopen(file.c_str(), RTLD_LAZY);
     if(handle == nullptr)
@@ -42,7 +42,7 @@ DynamicLoad::~DynamicLoad()
     dlclose(handle);
 }
 
-void* DynamicLoad::get_symbol(const std::string &name)
+void* DynamicLoad::get_symbol(const std::string& name)
 {
     void* address = (dlsym)(handle, name.c_str());
     if(address == nullptr)

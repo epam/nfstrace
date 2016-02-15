@@ -23,100 +23,98 @@
 #include "json_analyzer.h"
 //------------------------------------------------------------------------------
 
-static constexpr int DefaultPort = 8888;
-static constexpr const char * DefaultHost = IpEndpoint::WildcardAddress;
-static constexpr std::size_t DefaultWorkersAmount = 10U;
-static constexpr int DefaultBacklog = 15;
+static constexpr int         DefaultPort                 = 8888;
+static constexpr const char* DefaultHost                 = IpEndpoint::WildcardAddress;
+static constexpr std::size_t DefaultWorkersAmount        = 10U;
+static constexpr int         DefaultBacklog              = 15;
 static constexpr std::size_t DefaultMaxServingDurationMs = 500U;
 
-extern "C"
+extern "C" {
+
+const char* usage()
 {
+    return "host - Network interface to listen (default is to listen all interfaces)\n"
+           "port - IP-port to bind to (default is 8888)\n"
+           "workers - Amount of worker threads (default is 10)\n"
+           "duration - Max serving duration in milliseconds (default is 500 ms)\n"
+           "backlog - Listen backlog (default is 15)";
+}
 
-    const char* usage()
+IAnalyzer* create(const char* opts)
+{
+    // Initializing plugin options with default values
+    int         backlog              = DefaultBacklog;
+    std::size_t maxServingDurationMs = DefaultMaxServingDurationMs;
+    std::string host{DefaultHost};
+    int         port          = DefaultPort;
+    std::size_t workersAmount = DefaultWorkersAmount;
+    // Parising plugin options
+    enum
     {
-        return "host - Network interface to listen (default is to listen all interfaces)\n"
-               "port - IP-port to bind to (default is 8888)\n"
-               "workers - Amount of worker threads (default is 10)\n"
-               "duration - Max serving duration in milliseconds (default is 500 ms)\n"
-               "backlog - Listen backlog (default is 15)";
-    }
-
-    IAnalyzer* create(const char* opts)
-    {
-        // Initializing plugin options with default values
-        int backlog = DefaultBacklog;
-        std::size_t maxServingDurationMs = DefaultMaxServingDurationMs;
-        std::string host{DefaultHost};
-        int port = DefaultPort;
-        std::size_t workersAmount = DefaultWorkersAmount;
-        // Parising plugin options
-        enum
-        {
-            BACKLOG_SUBOPT_INDEX = 0,
-            DURATION_SUBOPT_INDEX,
-            HOST_SUBOPT_INDEX,
-            PORT_SUBOPT_INDEX,
-            WORKERS_SUBOPT_INDEX
-        };
-        char backlogSubOptName[] = "backlog";
-        char durationSubOptName[] = "duration";
-        char hostSubOptName[] = "host";
-        char portSubOptName[] = "port";
-        char workersSubOptName[] = "workers";
-        char* const tokens[] =
+        BACKLOG_SUBOPT_INDEX = 0,
+        DURATION_SUBOPT_INDEX,
+        HOST_SUBOPT_INDEX,
+        PORT_SUBOPT_INDEX,
+        WORKERS_SUBOPT_INDEX
+    };
+    char        backlogSubOptName[]  = "backlog";
+    char        durationSubOptName[] = "duration";
+    char        hostSubOptName[]     = "host";
+    char        portSubOptName[]     = "port";
+    char        workersSubOptName[]  = "workers";
+    char* const tokens[] =
         {
             backlogSubOptName,
             durationSubOptName,
             hostSubOptName,
             portSubOptName,
             workersSubOptName,
-            NULL
-        };
-        std::size_t optsLen = strlen(opts);
-        std::vector<char> optsBuf{opts, opts + optsLen + 2};
-        char* optionp = &optsBuf[0];
-        char* valuep;
-        int optIndex;
-        while ((optIndex = getsubopt(&optionp, tokens, &valuep)) >= 0)
+            NULL};
+    std::size_t       optsLen = strlen(opts);
+    std::vector<char> optsBuf{opts, opts + optsLen + 2};
+    char*             optionp = &optsBuf[0];
+    char*             valuep;
+    int               optIndex;
+    while((optIndex = getsubopt(&optionp, tokens, &valuep)) >= 0)
+    {
+        try
         {
-            try
+            switch(optIndex)
             {
-                switch (optIndex)
-                {
-                case BACKLOG_SUBOPT_INDEX:
-                    backlog = std::stoi(valuep);
-                    break;
-                case DURATION_SUBOPT_INDEX:
-                    maxServingDurationMs = std::stoul(valuep);
-                    break;
-                case HOST_SUBOPT_INDEX:
-                    host = valuep;
-                    break;
-                case PORT_SUBOPT_INDEX:
-                    port = std::stoi(valuep);
-                    break;
-                case WORKERS_SUBOPT_INDEX:
-                    workersAmount = std::stoul(valuep);
-                    break;
-                default:
-                    throw std::runtime_error{std::string{"Invalid suboption index: "} + std::to_string(optIndex)};
-                }
-            }
-            catch (std::logic_error& e)
-            {
-                throw std::runtime_error{std::string{"Invalid value provided for '"} + tokens[optIndex] + "' suboption"};
+            case BACKLOG_SUBOPT_INDEX:
+                backlog = std::stoi(valuep);
+                break;
+            case DURATION_SUBOPT_INDEX:
+                maxServingDurationMs = std::stoul(valuep);
+                break;
+            case HOST_SUBOPT_INDEX:
+                host = valuep;
+                break;
+            case PORT_SUBOPT_INDEX:
+                port = std::stoi(valuep);
+                break;
+            case WORKERS_SUBOPT_INDEX:
+                workersAmount = std::stoul(valuep);
+                break;
+            default:
+                throw std::runtime_error{std::string{"Invalid suboption index: "} + std::to_string(optIndex)};
             }
         }
-        // Creating and returning plugin
-        return new JsonAnalyzer{workersAmount, port, host, maxServingDurationMs, backlog};
+        catch(std::logic_error& e)
+        {
+            throw std::runtime_error{std::string{"Invalid value provided for '"} + tokens[optIndex] + "' suboption"};
+        }
     }
+    // Creating and returning plugin
+    return new JsonAnalyzer{workersAmount, port, host, maxServingDurationMs, backlog};
+}
 
-    void destroy(IAnalyzer* instance)
-    {
-        delete instance;
-    }
+void destroy(IAnalyzer* instance)
+{
+    delete instance;
+}
 
-    NST_PLUGIN_ENTRY_POINTS (&usage, &create, &destroy, nullptr)
+NST_PLUGIN_ENTRY_POINTS(&usage, &create, &destroy, nullptr)
 
 } //extern "C"
 

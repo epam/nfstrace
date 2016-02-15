@@ -24,8 +24,8 @@
 //------------------------------------------------------------------------------
 #include <ostream>
 
-#include "api/nfs_types.h"
 #include "api/nfs41_types_rpcgen.h"
+#include "api/nfs_types.h"
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/rpc/rpc_header.h"
 //------------------------------------------------------------------------------
@@ -35,19 +35,18 @@ namespace protocols
 {
 namespace NFS41
 {
-
 namespace NFS41 = NST::API::NFS41;
 
 using ProcEnumNFS41 = API::ProcEnumNFS41;
 
-using Validator = rpc::RPCProgramValidator
-                <
-                    100003,                  // SunRPC/NFS program
-                    4,                       // v4
-                    ProcEnumNFS41::NFS_NULL, // NFSPROC41RPCGEN_NULL     (0)
-                    ProcEnumNFS41::COMPOUND  // NFSPROC41RPCGEN_COMPOUND (1)
-                >;
+using Validator = rpc::RPCProgramValidator<
+    100003,                  // SunRPC/NFS program
+    4,                       // v4
+    ProcEnumNFS41::NFS_NULL, // NFSPROC41RPCGEN_NULL     (0)
+    ProcEnumNFS41::COMPOUND  // NFSPROC41RPCGEN_COMPOUND (1)
+    >;
 
+// clang-format off
 bool_t xdr_nfs_ftype4 (XDR *, NFS41::nfs_ftype4*);
 bool_t xdr_nfsstat4 (XDR *, NFS41::nfsstat4*);
 bool_t xdr_attrlist4 (XDR *, NFS41::attrlist4*);
@@ -460,34 +459,33 @@ bool_t xdr_nfs_cb_argop4 (XDR *, NFS41::nfs_cb_argop4*);
 bool_t xdr_nfs_cb_resop4 (XDR *, NFS41::nfs_cb_resop4*);
 bool_t xdr_CB_COMPOUND4args (XDR *, NFS41::CB_COMPOUND4args*);
 bool_t xdr_CB_COMPOUND4res (XDR *, NFS41::CB_COMPOUND4res*);
+// clang-format on
 
 // Procedure 0: NULL - Do nothing
-inline auto proc_t_of(NFS41::NULL4args&)->decltype(&xdr_NULL4args)
+inline auto proc_t_of(NFS41::NULL4args&) -> decltype(&xdr_NULL4args)
 {
     return xdr_NULL4args;
 }
 
-inline auto proc_t_of(NFS41::NULL4res&)->decltype(&xdr_NULL4res)
+inline auto proc_t_of(NFS41::NULL4res&) -> decltype(&xdr_NULL4res)
 {
     return &xdr_NULL4res;
 }
 
 // Procedure 1: COMPOUND
-inline auto proc_t_of(NFS41::COMPOUND4args&)->decltype(&xdr_COMPOUND4args)
+inline auto proc_t_of(NFS41::COMPOUND4args&) -> decltype(&xdr_COMPOUND4args)
 {
     return &xdr_COMPOUND4args;
 }
 
-inline auto proc_t_of(NFS41::COMPOUND4res&)->decltype(&xdr_COMPOUND4res)
+inline auto proc_t_of(NFS41::COMPOUND4res&) -> decltype(&xdr_COMPOUND4res)
 {
     return &xdr_COMPOUND4res;
 }
 
-#define NST_PUBLIC __attribute__ ((visibility("default")))
+#define NST_PUBLIC __attribute__((visibility("default")))
 
-extern"C"
-NST_PUBLIC
-const char* print_nfs41_procedures(const ProcEnumNFS41::NFSProcedure proc);
+extern "C" NST_PUBLIC const char* print_nfs41_procedures(const ProcEnumNFS41::NFSProcedure proc);
 
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS41::NFSProcedure proc);
 std::ostream& operator<<(std::ostream& out, const NFS41::nfs_ftype4& obj);
@@ -625,5 +623,5 @@ std::ostream& operator<<(std::ostream& out, const NFS41::notify_deviceid_change4
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS41_UTILS_H
+#endif // NFS41_UTILS_H
 //------------------------------------------------------------------------------

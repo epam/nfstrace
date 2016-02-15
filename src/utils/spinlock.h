@@ -22,7 +22,7 @@
 #ifndef SPINLOCK_H
 #define SPINLOCK_H
 //------------------------------------------------------------------------------
-#include <mutex>    // for std::lock_guard
+#include <mutex> // for std::lock_guard
 
 #include <pthread.h>
 //------------------------------------------------------------------------------
@@ -30,7 +30,6 @@ namespace NST
 {
 namespace utils
 {
-
 class Spinlock
 {
 public:
@@ -38,7 +37,7 @@ public:
     {
         pthread_spin_init(&spinlock, PTHREAD_PROCESS_PRIVATE);
     }
-    Spinlock(const Spinlock&)            = delete;
+    Spinlock(const Spinlock&) = delete;
     Spinlock& operator=(const Spinlock&) = delete;
     ~Spinlock() noexcept
     {
@@ -69,5 +68,5 @@ private:
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//SPINLOCK_H
+#endif // SPINLOCK_H
 //------------------------------------------------------------------------------

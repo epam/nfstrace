@@ -33,24 +33,24 @@ namespace NST
 {
 namespace analysis
 {
-
 template <typename Parser>
 class ParserThread
 {
     using RunningStatus     = NST::controller::RunningStatus;
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
+
 public:
     ParserThread(Parser p, FilteredDataQueue& q, RunningStatus& s)
-    : status   (s)
-    , queue    (q)
-    , running  {ATOMIC_FLAG_INIT} // false
-    , parser(p)
+        : status(s)
+        , queue(q)
+        , running{ATOMIC_FLAG_INIT} // false
+        , parser(p)
     {
     }
 
     ~ParserThread()
     {
-        if (parsing.joinable()) stop();
+        if(parsing.joinable()) stop();
     }
 
     void start()
@@ -65,9 +65,7 @@ public:
         parsing.join();
     }
 
-
 private:
-
     inline void thread()
     {
         try
@@ -103,21 +101,20 @@ private:
             {
                 FilteredDataQueue::Ptr data = list.get_current();
                 parser.parse_data(data);
-            }
-            while(list);
+            } while(list);
         }
     }
 
-    RunningStatus& status;
+    RunningStatus&     status;
     FilteredDataQueue& queue;
 
-    std::thread parsing;
+    std::thread      parsing;
     std::atomic_flag running;
-    Parser parser;
+    Parser           parser;
 };
 
 } // namespace analysis
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFS_PARSER_THREAD_H
+#endif //NFS_PARSER_THREAD_H
 //------------------------------------------------------------------------------

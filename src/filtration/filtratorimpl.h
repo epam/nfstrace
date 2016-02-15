@@ -27,23 +27,23 @@ namespace NST
 {
 namespace filtration
 {
-
 /*!
  * Filtering TCP stream strategy (implementation)
  * Implemented via CRTP - Curiously recurring template pattern,
  * (see http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern)
  */
-template<typename Filtrator, typename Writer>
+template <typename Filtrator, typename Writer>
 class FiltratorImpl
 {
-    size_t msg_len;  //!< length of current message
-    size_t to_be_copied;  //!<  length of readable piece of message. Initially msg_len or 0 in case of unknown msg
+    size_t msg_len;                                 //!< length of current message
+    size_t to_be_copied;                            //!<  length of readable piece of message. Initially msg_len or 0 in case of unknown msg
     using Collection = typename Writer::Collection; //!< Type of collection
-    Collection collection;//!< storage for collection packet data
+    Collection collection;                          //!< storage for collection packet data
 
-    FiltratorImpl(FiltratorImpl&&)                 = delete;
-    FiltratorImpl(const FiltratorImpl&)            = delete;
+    FiltratorImpl(FiltratorImpl&&)      = delete;
+    FiltratorImpl(const FiltratorImpl&) = delete;
     FiltratorImpl& operator=(const FiltratorImpl&) = delete;
+
 public:
     FiltratorImpl()
     {
@@ -62,7 +62,7 @@ public:
      */
     inline void reset()
     {
-        msg_len = 0;
+        msg_len      = 0;
         to_be_copied = 0;
         collection.reset();
     }
@@ -73,25 +73,25 @@ public:
      */
     inline bool inProgress(PacketInfo& info)
     {
-        Filtrator* filtrator = static_cast<Filtrator* >(this);
+        Filtrator*       filtrator     = static_cast<Filtrator*>(this);
         constexpr size_t callHeaderLen = Filtrator::lengthOfBaseHeader();
-        if (msg_len || to_be_copied)
+        if(msg_len || to_be_copied)
         {
             return true;
         }
 
-        if (!collection) // collection isn't allocated
+        if(!collection) // collection isn't allocated
         {
             collection.allocate(); // allocate new collection from writer
         }
         const size_t data_size = collection.data_size();
 
-        if (data_size + info.dlen > callHeaderLen)
+        if(data_size + info.dlen > callHeaderLen)
         {
             static uint8_t buffer[callHeaderLen];
             const uint8_t* header = info.data;
 
-            if (data_size > 0)
+            if(data_size > 0)
             {
                 // Coping happends only once per TCP-session
                 memcpy(buffer, collection.data(), data_size);
@@ -100,7 +100,7 @@ public:
             }
 
             // It is right header
-            if (filtrator->isRightHeader(header))
+            if(filtrator->isRightHeader(header))
             {
                 return true;
             }
@@ -121,10 +121,10 @@ public:
      */
     inline void lost(const uint32_t n) // we are lost n bytes in sequence
     {
-        Filtrator* filtrator = static_cast<Filtrator* >(this);
-        if (msg_len != 0)
+        Filtrator* filtrator = static_cast<Filtrator*>(this);
+        if(msg_len != 0)
         {
-            if (to_be_copied == 0 && msg_len >= n)
+            if(to_be_copied == 0 && msg_len >= n)
             {
                 TRACE("We are lost %u bytes of payload marked for discard", n);
                 msg_len -= n;
@@ -147,48 +147,48 @@ public:
      */
     inline void push(PacketInfo& info)
     {
-        Filtrator* filtrator = static_cast<Filtrator* >(this);
+        Filtrator* filtrator = static_cast<Filtrator*>(this);
         assert(info.dlen != 0);
 
-        while (info.dlen) // loop over data in packet
+        while(info.dlen) // loop over data in packet
         {
-            if (msg_len)   // we are on-stream and we are looking to some message
+            if(msg_len) // we are on-stream and we are looking to some message
             {
-                if (to_be_copied)
+                if(to_be_copied)
                 {
                     // hdr_len != 0, readout a part of header of current message
-                    if (to_be_copied > info.dlen) // got new part of header (not the all!)
+                    if(to_be_copied > info.dlen) // got new part of header (not the all!)
                     {
                         //TRACE("got new part of header (not the all!)");
                         collection.push(info, info.dlen);
                         to_be_copied -= info.dlen;
                         msg_len -= info.dlen;
-                        info.dlen = 0;  // return from while
+                        info.dlen = 0; // return from while
                     }
                     else // hdr_len <= dlen, current message will be complete, also we have some additional data
                     {
                         //TRACE("current message will be complete, also we have some additional data");
                         collection.push(info, to_be_copied);
-                        info.dlen   -= to_be_copied;
-                        info.data   += to_be_copied;
+                        info.dlen -= to_be_copied;
+                        info.data += to_be_copied;
 
                         msg_len -= to_be_copied;
                         to_be_copied = 0;
 
                         collection.skip_first(Filtrator::lengthOfFirstSkipedPart());
-                        collection.complete(info);    // push complete message to queue
+                        collection.complete(info); // push complete message to queue
                     }
                 }
                 else
                 {
                     // message header is readout, discard the unused tail of message
-                    if (msg_len >= info.dlen) // discard whole new packet
+                    if(msg_len >= info.dlen) // discard whole new packet
                     {
                         //TRACE("discard whole new packet");
                         msg_len -= info.dlen;
                         return; //info.dlen = 0;  // return from while
                     }
-                    else  // discard only a part of packet payload related to current message
+                    else // discard only a part of packet payload related to current message
                     {
                         //TRACE("discard only a part of packet payload related to current message");
                         info.dlen -= msg_len;
@@ -211,24 +211,24 @@ public:
      */
     inline void find_message(PacketInfo& info)
     {
-        assert(msg_len == 0);   // Message still undetected
-        Filtrator* filtrator = static_cast<Filtrator* >(this);
+        assert(msg_len == 0); // Message still undetected
+        Filtrator* filtrator = static_cast<Filtrator*>(this);
 
-        if (!filtrator->collect_header(info, collection))
+        if(!filtrator->collect_header(info, collection))
         {
             return;
         }
 
-        assert(collection);     // collection must be initialized
+        assert(collection); // collection must be initialized
 
-        if (filtrator->find_and_read_message(info, collection))
+        if(filtrator->find_and_read_message(info, collection))
         {
             return;
         }
 
-        assert(msg_len == 0);   // message is not found
-        assert(to_be_copied == 0);   // header should be skipped
-        collection.reset();     // skip collected data
+        assert(msg_len == 0);      // message is not found
+        assert(to_be_copied == 0); // header should be skipped
+        collection.reset();        // skip collected data
         //[ Optimization ] skip data of current packet at all
         info.dlen = 0;
     }
@@ -244,7 +244,7 @@ protected:
         to_be_copied = value;
     }
 
-    inline void setWriterImpl(utils::NetworkSession* session_ptr,  Writer* w, uint32_t )
+    inline void setWriterImpl(utils::NetworkSession* session_ptr, Writer* w, uint32_t)
     {
         assert(w);
         collection.set(*w, session_ptr);
@@ -252,15 +252,15 @@ protected:
 
     inline bool collect_header(PacketInfo& info, size_t callHeaderLen, size_t replyHeaderLen)
     {
-        if (collection && (collection.data_size() > 0)) // collection is allocated
+        if(collection && (collection.data_size() > 0)) // collection is allocated
         {
             assert(collection.capacity() >= callHeaderLen);
-            const size_t tocopy {callHeaderLen - collection.data_size()};
+            const size_t tocopy{callHeaderLen - collection.data_size()};
             assert(tocopy != 0);
-            if (info.dlen < tocopy)
+            if(info.dlen < tocopy)
             {
                 collection.push(info, info.dlen);
-                info.data += info.dlen;// optimization
+                info.data += info.dlen; // optimization
                 info.dlen = 0;
                 return false;
             }
@@ -273,8 +273,8 @@ protected:
         }
         else // collection is empty
         {
-            collection.allocate(); // allocate new collection from writer
-            if (info.dlen >= callHeaderLen) // is data enough to message validation?
+            collection.allocate();         // allocate new collection from writer
+            if(info.dlen >= callHeaderLen) // is data enough to message validation?
             {
                 collection.push(info, callHeaderLen); // probability that message will be rejected / probability of valid message
                 info.data += callHeaderLen;
@@ -285,7 +285,7 @@ protected:
                 collection.push(info, info.dlen);
                 //info.data += info.dlen;//   optimization
                 size_t copied = info.dlen;
-                info.dlen = 0;
+                info.dlen     = 0;
                 return copied >= replyHeaderLen;
             }
         }
@@ -294,27 +294,26 @@ protected:
 
     inline bool read_message(PacketInfo& info)
     {
-        assert(msg_len != 0);   // message is found
+        assert(msg_len != 0); // message is found
         assert(msg_len >= collection.data_size());
         assert(to_be_copied <= msg_len);
-        Filtrator* filtrator = static_cast<Filtrator* >(this);
+        Filtrator* filtrator = static_cast<Filtrator*>(this);
 
-        const size_t written {collection.data_size()};
+        const size_t written{collection.data_size()};
         msg_len -= written; // substract how written (if written)
         to_be_copied -= std::min(to_be_copied, written);
-        if (0 == to_be_copied)   // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
-            // Next find message call will finding next message
+        if(0 == to_be_copied) // Avoid infinity loop when "msg len" == "data size(collection) (max_header)" {msg_len >= hdr_len}
+        // Next find message call will finding next message
         {
             collection.skip_first(filtrator->lengthOfFirstSkipedPart());
             collection.complete(info);
         }
         return true;
     }
-
 };
 
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//IFILTRATOR_H
+#endif // IFILTRATOR_H
 //------------------------------------------------------------------------------

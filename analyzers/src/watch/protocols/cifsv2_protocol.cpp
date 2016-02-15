@@ -20,10 +20,11 @@
 */
 //------------------------------------------------------------------------------
 #include <api/plugin_api.h> // include plugin development definitions
+
 #include "cifsv2_protocol.h"
 //------------------------------------------------------------------------------
 CIFSv2Protocol::CIFSv2Protocol()
-: AbstractProtocol {"CIFS v2", static_cast<std::size_t>(SMBv2::SMBv2Commands::CMD_COUNT)}
+    : AbstractProtocol{"CIFS v2", static_cast<std::size_t>(SMBv2::SMBv2Commands::CMD_COUNT)}
 {
 }
 
@@ -33,7 +34,10 @@ CIFSv2Protocol::~CIFSv2Protocol()
 
 const char* CIFSv2Protocol::printProcedure(std::size_t i)
 {
-    if ( i >= static_cast<std::size_t>(SMBv2::SMBv2Commands::CMD_COUNT)) { return nullptr; }
+    if(i >= static_cast<std::size_t>(SMBv2::SMBv2Commands::CMD_COUNT))
+    {
+        return nullptr;
+    }
     return print_cifs2_procedures(static_cast<SMBv2::SMBv2Commands>(i));
 }
 //------------------------------------------------------------------------------

@@ -32,7 +32,6 @@ namespace NST
 {
 namespace controller
 {
-
 class SignalHandler
 {
 public:
@@ -44,17 +43,17 @@ public:
     };
 
     SignalHandler(RunningStatus&);
-    SignalHandler(const SignalHandler&)            = delete;
+    SignalHandler(const SignalHandler&) = delete;
     SignalHandler& operator=(const SignalHandler&) = delete;
     ~SignalHandler();
 
 private:
-    std::thread handler;
+    std::thread      handler;
     std::atomic_flag running;
 };
 
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//SIGNAL_HANDLER_H
+#endif // SIGNAL_HANDLER_H
 //------------------------------------------------------------------------------

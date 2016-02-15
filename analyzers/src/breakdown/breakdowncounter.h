@@ -53,12 +53,12 @@ public:
      * \brief get_total_count returns total amount of commands
      * \return commands count
      */
-    uint64_t get_total_count () const;
+    uint64_t get_total_count() const;
 
 private:
-    void operator= (const BreakdownCounter&) = delete;
+    void                                   operator=(const BreakdownCounter&) = delete;
     std::vector<NST::breakdown::Latencies> latencies;
 };
 //------------------------------------------------------------------------------
-#endif//BREAKDOWNCOUNTER_H
+#endif //BREAKDOWNCOUNTER_H
 //------------------------------------------------------------------------------

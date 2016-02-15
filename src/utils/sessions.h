@@ -28,13 +28,12 @@
 
 #include "api/session.h"
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__ ((visibility("default")))
+#define NST_PUBLIC __attribute__((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace utils
 {
-
 using Session = NST::API::Session;
 
 // Network layer session
@@ -42,15 +41,14 @@ struct NetworkSession : public Session
 {
 public:
     NetworkSession()
-    : application {nullptr}
-    , direction   {Direction::Unknown}
+        : application{nullptr}
+        , direction{Direction::Unknown}
     {
     }
 
-    void*     application;  // pointer to application protocol implementation
+    void*     application; // pointer to application protocol implementation
     Direction direction;
 };
-
 
 // Application layer session
 struct ApplicationSession : public Session
@@ -63,14 +61,12 @@ private:
     std::string session_str;
 };
 
-extern "C"
-NST_PUBLIC
-void print_session(std::ostream& out, const Session& session);
+extern "C" NST_PUBLIC void print_session(std::ostream& out, const Session& session);
 
 std::ostream& operator<<(std::ostream& out, const Session& session);
 
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//SESSIONS_H
+#endif // SESSIONS_H
 //------------------------------------------------------------------------------

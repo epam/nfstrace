@@ -38,7 +38,6 @@ namespace NST
 {
 namespace filtration
 {
-
 struct MapperImpl
 {
     using Session        = NST::utils::Session;
@@ -48,9 +47,10 @@ struct MapperImpl
 
     static inline Session::Direction ipv4_direction(const Session& key)
     {
-        if(key.port[0] < key.port[1]) return Session::Source;
-        else
-        if(key.port[0] > key.port[1]) return Session::Destination;
+        if(key.port[0] < key.port[1])
+            return Session::Source;
+        else if(key.port[0] > key.port[1])
+            return Session::Destination;
 
         // Ok, ports are equal, compare addresses
         return (key.ip.v4.addr[0] < key.ip.v4.addr[1]) ? Session::Source : Session::Destination;
@@ -58,7 +58,7 @@ struct MapperImpl
 
     struct IPv4PortsKeyHash
     {
-        inline std::size_t operator() (const Session& key) const
+        inline std::size_t operator()(const Session& key) const
         {
             return key.port[0] +
                    key.port[1] +
@@ -69,7 +69,7 @@ struct MapperImpl
 
     struct IPv4PortsKeyEqual
     {
-        inline bool operator() (const Session& a, const Session& b) const
+        inline bool operator()(const Session& a, const Session& b) const
         {
             if((a.port[0] == b.port[0]) &&
                (a.port[1] == b.port[1]) &&
@@ -88,25 +88,26 @@ struct MapperImpl
 
     static inline Session::Direction ipv6_direction(const Session& key)
     {
-        if(key.port[0] < key.port[1]) return Session::Source;
-        else
-        if(key.port[0] > key.port[1]) return Session::Destination;
+        if(key.port[0] < key.port[1])
+            return Session::Source;
+        else if(key.port[0] > key.port[1])
+            return Session::Destination;
 
         // Ok, ports are equal, compare addresses
-        const uint32_t* s { key.ip.v6.addr_uint32[0] };
-        const uint32_t* d { key.ip.v6.addr_uint32[1] };
+        const uint32_t* s{key.ip.v6.addr_uint32[0]};
+        const uint32_t* d{key.ip.v6.addr_uint32[1]};
 
         if(s[0] != d[0]) return (s[0] < d[0]) ? Session::Source : Session::Destination;
         if(s[1] != d[1]) return (s[1] < d[1]) ? Session::Source : Session::Destination;
         if(s[2] != d[2]) return (s[2] < d[2]) ? Session::Source : Session::Destination;
 
-                         return (s[3] < d[3]) ? Session::Source : Session::Destination;
+        return (s[3] < d[3]) ? Session::Source : Session::Destination;
     }
 
     static inline void copy_ipv6(uint32_t dst[4], const uint8_t src[16])
     {
         // TODO:: fix alignment of src!
-        const uint32_t* s { reinterpret_cast<const uint32_t*>(src) };
+        const uint32_t* s{reinterpret_cast<const uint32_t*>(src)};
         dst[0] = s[0];
         dst[1] = s[1];
         dst[2] = s[2];
@@ -115,7 +116,7 @@ struct MapperImpl
 
     struct IPv6PortsKeyHash
     {
-        std::size_t operator() (const Session& key) const
+        std::size_t operator()(const Session& key) const
         {
             std::size_t ret = key.port[0] + key.port[1];
 
@@ -143,19 +144,17 @@ struct MapperImpl
                    a[3] == b[3];
         }
 
-        bool operator() (const Session& a, const Session& b) const
+        bool operator()(const Session& a, const Session& b) const
         {
             if((a.port[0] == b.port[0]) && (a.port[1] == b.port[1]))
             {
-                if( eq_ipv6_address(a.ip.v6.addr_uint32[0], b.ip.v6.addr_uint32[0] )
-                &&  eq_ipv6_address(a.ip.v6.addr_uint32[1], b.ip.v6.addr_uint32[1] ))
+                if(eq_ipv6_address(a.ip.v6.addr_uint32[0], b.ip.v6.addr_uint32[0]) && eq_ipv6_address(a.ip.v6.addr_uint32[1], b.ip.v6.addr_uint32[1]))
                     return true;
             }
 
             if((a.port[1] == b.port[0]) && (a.port[0] == b.port[1]))
             {
-                if( eq_ipv6_address(a.ip.v6.addr_uint32[1], b.ip.v6.addr_uint32[0] )
-                &&  eq_ipv6_address(a.ip.v6.addr_uint32[0], b.ip.v6.addr_uint32[1] ))
+                if(eq_ipv6_address(a.ip.v6.addr_uint32[1], b.ip.v6.addr_uint32[0]) && eq_ipv6_address(a.ip.v6.addr_uint32[0], b.ip.v6.addr_uint32[1]))
                     return true;
             }
             return false;
@@ -284,12 +283,10 @@ struct IPv6UDPMapper : private MapperImpl
 };
 
 // SessionsHash creates sessions and stores them in hash
-template
-<
-    typename Mapper,        // map PacketInfo& to SessionImpl*
-    typename SessionImpl,   // mapped type
-    typename Writer
->
+template <
+    typename Mapper,      // map PacketInfo& to SessionImpl*
+    typename SessionImpl, // mapped type
+    typename Writer>
 class SessionsHash
 {
 public:
@@ -301,9 +298,9 @@ public:
                                          typename Mapper::KeyEqual>;
 
     SessionsHash(Writer* w)
-    : sessions  { }
-    , writer    {w}
-    , max_hdr   {0}
+        : sessions{}
+        , writer{w}
+        , max_hdr{0}
     {
         max_hdr = controller::Parameters::rpcmsg_limit();
     }
@@ -323,7 +320,7 @@ public:
         auto i = sessions.find(key);
         if(i == sessions.end())
         {
-            std::unique_ptr<SessionImpl> ptr{ new SessionImpl{writer, max_hdr} };
+            std::unique_ptr<SessionImpl> ptr{new SessionImpl{writer, max_hdr}};
 
             auto res = sessions.emplace(key, ptr.get());
             if(res.second) // add new - success
@@ -343,11 +340,11 @@ public:
 private:
     Container sessions;
     Writer*   writer;
-    uint32_t max_hdr;
+    uint32_t  max_hdr;
 };
 
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//SESSIONS_HASH_H
+#endif // SESSIONS_HASH_H
 //------------------------------------------------------------------------------

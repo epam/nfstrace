@@ -28,7 +28,6 @@ namespace NST
 {
 namespace utils
 {
-
 class Out : public std::ostream
 {
 public:
@@ -44,20 +43,20 @@ public:
     {
         explicit Global(const Level verbose_level);
         ~Global();
-        Global(const Global&)            = delete;
+        Global(const Global&) = delete;
         Global& operator=(const Global&) = delete;
 
-        static Level get_level();     // return global level of verbosity
-        static void set_level(Level); // set global level of verbosity
+        static Level get_level();      // return global level of verbosity
+        static void  set_level(Level); // set global level of verbosity
     };
 
-    explicit Out(Level level=Level::Info);   // verbose level of message
+    explicit Out(Level level = Level::Info); // verbose level of message
     ~Out();
-    Out(const Out&)            = delete;
+    Out(const Out&) = delete;
     Out& operator=(const Out&) = delete;
 };
 
-inline bool operator >=(const Out::Level a, const Out::Level b)
+inline bool operator>=(const Out::Level a, const Out::Level b)
 {
     return (int)a >= (int)b;
 }
@@ -65,5 +64,5 @@ inline bool operator >=(const Out::Level a, const Out::Level b)
 } // namespace utils
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//OUT_H
+#endif // OUT_H
 //------------------------------------------------------------------------------

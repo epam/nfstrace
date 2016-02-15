@@ -31,19 +31,18 @@ namespace NST
 {
 namespace breakdown
 {
-
 /*! \brief Analyzer for NFS v4.1
  * Handles NFS v4.1 commands
  */
 class NFSv41BreakdownAnalyzer : virtual public IAnalyzer
 {
-    Statistics compound_stats; //!< Statistics
-    Statistics stats; //!< Statistics
-    NFSv4Representer representer; //!< Class for statistics representation
+    Statistics       compound_stats; //!< Statistics
+    Statistics       stats;          //!< Statistics
+    NFSv4Representer representer;    //!< Class for statistics representation
 public:
     NFSv41BreakdownAnalyzer(std::ostream& o = std::cout);
     // NFSv4.1 procedures
-    void compound41(const RPCProcedure*  proc,
+    void compound41(const RPCProcedure* proc,
                     const struct NFS41::COMPOUND4args*,
                     const struct NFS41::COMPOUND4res*) override final;
     // NFSv4.1 operations
@@ -69,7 +68,7 @@ public:
     void getattr41(const RPCProcedure* proc,
                    const struct NFS41::GETATTR4args*,
                    const struct NFS41::GETATTR4res* res) override final;
-    void getfh41(const RPCProcedure* proc,
+    void getfh41(const RPCProcedure*            proc,
                  const struct NFS41::GETFH4res* res) override final;
     void link41(const RPCProcedure* proc,
                 const struct NFS41::LINK4args*,
@@ -86,7 +85,7 @@ public:
     void lookup41(const RPCProcedure* proc,
                   const struct NFS41::LOOKUP4args*,
                   const struct NFS41::LOOKUP4res* res) override final;
-    void lookupp41(const RPCProcedure* proc,
+    void lookupp41(const RPCProcedure*              proc,
                    const struct NFS41::LOOKUPP4res* res) override final;
     void nverify41(const RPCProcedure* proc,
                    const struct NFS41::NVERIFY4args*,
@@ -106,9 +105,9 @@ public:
     void putfh41(const RPCProcedure* proc,
                  const struct NFS41::PUTFH4args*,
                  const struct NFS41::PUTFH4res* res) override final;
-    void putpubfh41(const RPCProcedure* proc,
+    void putpubfh41(const RPCProcedure*               proc,
                     const struct NFS41::PUTPUBFH4res* res) override final;
-    void putrootfh41(const RPCProcedure* proc,
+    void putrootfh41(const RPCProcedure*                proc,
                      const struct NFS41::PUTROOTFH4res* res) override final;
     void read41(const RPCProcedure* proc,
                 const struct NFS41::READ4args*,
@@ -116,7 +115,7 @@ public:
     void readdir41(const RPCProcedure* proc,
                    const struct NFS41::READDIR4args*,
                    const struct NFS41::READDIR4res* res) override final;
-    void readlink41(const RPCProcedure* proc,
+    void readlink41(const RPCProcedure*               proc,
                     const struct NFS41::READLINK4res* res) override final;
     void remove41(const RPCProcedure* proc,
                   const struct NFS41::REMOVE4args*,
@@ -127,9 +126,9 @@ public:
     void renew41(const RPCProcedure* proc,
                  const struct NFS41::RENEW4args*,
                  const struct NFS41::RENEW4res* res) override final;
-    void restorefh41(const RPCProcedure* proc,
+    void restorefh41(const RPCProcedure*                proc,
                      const struct NFS41::RESTOREFH4res* res) override final;
-    void savefh41(const RPCProcedure* proc,
+    void savefh41(const RPCProcedure*             proc,
                   const struct NFS41::SAVEFH4res* res) override final;
     void secinfo41(const RPCProcedure* proc,
                    const struct NFS41::SECINFO4args*,
@@ -209,7 +208,7 @@ public:
     void reclaim_complete41(const RPCProcedure* proc,
                             const struct NFS41::RECLAIM_COMPLETE4args*,
                             const struct NFS41::RECLAIM_COMPLETE4res* res) override final;
-    void illegal41(const RPCProcedure* proc,
+    void illegal41(const RPCProcedure*              proc,
                    const struct NFS41::ILLEGAL4res* res) override final;
 
     void flush_statistics() override;
@@ -218,5 +217,5 @@ public:
 } // namespace protocols
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//NFSV41BREAKDOWNANALYZER_H
+#endif //NFSV41BREAKDOWNANALYZER_H
 //------------------------------------------------------------------------------

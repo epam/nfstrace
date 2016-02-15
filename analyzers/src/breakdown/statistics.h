@@ -33,12 +33,11 @@ namespace NST
 {
 namespace breakdown
 {
-
 /*! \brief Comparator for sessions
  */
 struct Less
 {
-    bool operator() (const Session& a, const Session& b) const;
+    bool operator()(const Session& a, const Session& b) const;
 };
 
 /*! \brief All statistics data's container
@@ -46,7 +45,7 @@ struct Less
 struct Statistics
 {
     using PerSessionStatistics = std::map<Session, BreakdownCounter, Less>;
-    using ProceduresCount = std::vector<int>;
+    using ProceduresCount      = std::vector<int>;
 
     const size_t proc_types_count; //!< Count of types of procedures
 
@@ -86,27 +85,28 @@ struct Statistics
      * @param cmd_code - commands code
      * @param stats - statistics
      */
-    template<typename Cmd, typename Code>
+    template <typename Cmd, typename Code>
     void account(const Cmd* proc, Code cmd_code)
     {
-        timeval latency {0, 0};
-        const int cmd_index = static_cast<int>(cmd_code);
-        const Session& session = *proc->session;
+        timeval        latency{0, 0};
+        const int      cmd_index = static_cast<int>(cmd_code);
+        const Session& session   = *proc->session;
 
         // diff between 'reply' and 'call' timestamps
         timersub(proc->rtimestamp, proc->ctimestamp, &latency);
 
         account(cmd_index, session, latency);
     }
+
 protected:
     void account(const int cmd_index, const Session& session, const timeval latency);
 
-    BreakdownCounter counter; //!< Statistics for all sessions
+    BreakdownCounter     counter;                //!< Statistics for all sessions
     PerSessionStatistics per_session_statistics; //!< Statistics for each session
 };
 
 } // namespace breakdown
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif//STATISTICS_H
+#endif //STATISTICS_H
 //------------------------------------------------------------------------------

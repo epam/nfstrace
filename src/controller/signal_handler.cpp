@@ -20,13 +20,13 @@
 */
 //------------------------------------------------------------------------------
 #include <cerrno>
-#include <functional>   // std::ref
+#include <functional> // std::ref
 #include <system_error>
 
-#include <unistd.h>
 #include <pthread.h>
 #include <signal.h>
-#include <string.h>     // for strsignal()
+#include <string.h> // for strsignal()
+#include <unistd.h>
 
 #include <sys/wait.h>
 
@@ -36,10 +36,9 @@ namespace NST
 {
 namespace controller
 {
-
 SignalHandler::Signal::Signal(int sig)
-: std::runtime_error{::strsignal(sig)}
-, signal_number{sig}
+    : std::runtime_error{::strsignal(sig)}
+    , signal_number{sig}
 {
 }
 
@@ -50,8 +49,8 @@ static void handle_signals(const sigset_t    waitmask,
 {
     while(running.test_and_set())
     {
-        int signo {0};
-        const int err {::sigwait(&waitmask, &signo)};
+        int       signo{0};
+        const int err{::sigwait(&waitmask, &signo)};
         if(err != 0)
         {
             status.push(std::system_error{err, std::system_category(),
@@ -62,7 +61,7 @@ static void handle_signals(const sigset_t    waitmask,
         if(signo == SIGCHLD)
         {
             // wait childern(compression in dumping mode may call fork())
-            const pid_t pid {::wait(nullptr)};
+            const pid_t pid{::wait(nullptr)};
             if(pid == -1 && errno != ECHILD)
             {
                 status.push(std::system_error{errno, std::system_category(),
@@ -76,11 +75,13 @@ static void handle_signals(const sigset_t    waitmask,
     }
 }
 
-static void dummy(int) {}
+static void dummy(int)
+{
+}
 
 SignalHandler::SignalHandler(RunningStatus& s)
-: handler{}
-, running{ATOMIC_FLAG_INIT} // false
+    : handler{}
+    , running{ATOMIC_FLAG_INIT} // false
 {
     // set dummy handler for SIGCHLD to prevent ignoring it
     // in ::sigwait() on FreeBSD by default
@@ -95,16 +96,16 @@ SignalHandler::SignalHandler(RunningStatus& s)
 
     sigset_t mask;
     ::sigemptyset(&mask);
-    ::sigaddset(&mask, SIGINT);    // correct exit from program by Ctrl-C
-    ::sigaddset(&mask, SIGTERM);   // correct exit when SIGTERM has been received
-    ::sigaddset(&mask, SIGCHLD);   // stop sigwait-thread and wait children
-    ::sigaddset(&mask, SIGHUP);    // signal for losing terminal
-    ::sigaddset(&mask, SIGWINCH);  // signal for changing terminal size
+    ::sigaddset(&mask, SIGINT);   // correct exit from program by Ctrl-C
+    ::sigaddset(&mask, SIGTERM);  // correct exit when SIGTERM has been received
+    ::sigaddset(&mask, SIGCHLD);  // stop sigwait-thread and wait children
+    ::sigaddset(&mask, SIGHUP);   // signal for losing terminal
+    ::sigaddset(&mask, SIGWINCH); // signal for changing terminal size
     const int err = ::pthread_sigmask(SIG_BLOCK, &mask, nullptr);
     if(err != 0)
     {
         throw std::system_error(err, std::system_category(),
-                               "error in SignalHandler pthread_sigmask");
+                                "error in SignalHandler pthread_sigmask");
     }
 
     running.test_and_set();
@@ -121,4 +122,3 @@ SignalHandler::~SignalHandler()
 } // namespace controller
 } // namespace NST
 //------------------------------------------------------------------------------
-

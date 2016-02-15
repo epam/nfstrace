@@ -25,20 +25,18 @@
 #include <unistd.h>
 
 #include "analysis/plugin.h"
+#include "controller/build_info.h"
 #include "controller/cmdline_args.h"
 #include "controller/cmdline_parser.h"
 #include "controller/parameters.h"
-#include "controller/build_info.h"
 #include "filtration/pcap/network_interfaces.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
-
 namespace // implementation
 {
-
 static const class ParametersImpl* impl = nullptr;
 
 using CLI = NST::controller::cmdline::Args;
@@ -48,7 +46,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
     friend class NST::controller::Parameters;
 
     ParametersImpl(int argc, char** argv)
-    : rpc_message_limit{0}
+        : rpc_message_limit{0}
     {
         parse(argc, argv);
         if(get(CLI::ArgHelp).to_bool())
@@ -58,7 +56,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
 
             for(const auto& a : analysis_modules)
             {
-                const std::string& path {a.path};
+                const std::string& path{a.path};
                 try
                 {
                     std::cout << "Usage of " << path << ":\n";
@@ -84,27 +82,27 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
                     std::cout << i << '\n';
                     for(auto a : i) std::cout << '\t' << a << '\n';
                 }
-                std::cout << "[default]: " <<  interfaces.default_device() << '\n';
+                std::cout << "[default]: " << interfaces.default_device() << '\n';
             }
             else
             {
                 std::cerr << "Note: Reading list of network interfaces may "
-                             "require that you have special privileges." << std::endl;
+                             "require that you have special privileges."
+                          << std::endl;
             }
         }
 
         if(get(CLI::ArgEnum).is("-") || get(CLI::ArgEnum).is("plugins"))
         {
             std::cout << "\nAvailable plugins:" << std::endl;
-            DIR *dir;
+            DIR* dir;
 
             if((dir = opendir(MODULES_DIRECTORY_PATH)) != nullptr)
             {
-                struct dirent *ent;
+                struct dirent* ent;
                 while((ent = readdir(dir)) != nullptr)
                 {
-                    std::string full_path = std::string{MODULES_DIRECTORY_PATH}
-                                          + ent->d_name;
+                    std::string full_path = std::string{MODULES_DIRECTORY_PATH} + ent->d_name;
                     std::string plugin_usage;
                     try
                     {
@@ -114,13 +112,15 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
                         std::cout << plugin_usage << std::endl;
                         std::cout << std::endl;
                     }
-                    catch(std::runtime_error& e) { }
+                    catch(std::runtime_error& e)
+                    {
+                    }
                 }
                 closedir(dir);
             }
             else
             {
-                std::cerr << "Error: Can't access " << MODULES_DIRECTORY_PATH <<std::endl;
+                std::cerr << "Error: Can't access " << MODULES_DIRECTORY_PATH << std::endl;
             }
         }
 
@@ -128,10 +128,10 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
 
         // cashed values
         const std::string program_path(argv[0]);
-        size_t found {program_path.find_last_of("/\\")};
-        program = program_path.substr(found+1);
+        size_t            found{program_path.find_last_of("/\\")};
+        program = program_path.substr(found + 1);
 
-        const int limit {get(CLI::ArgMSize).to_int()};
+        const int limit{get(CLI::ArgMSize).to_int()};
         if(limit < 1 || limit > 4000)
         {
             throw cmdline::CLIError{std::string{"Invalid limit of RPC messages: "} + get(CLI::ArgMSize).to_cstr()};
@@ -139,17 +139,17 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
 
         rpc_message_limit = limit;
     }
-    virtual ~ParametersImpl(){}
-    ParametersImpl(const ParametersImpl&)            = delete;
+    virtual ~ParametersImpl() {}
+    ParametersImpl(const ParametersImpl&) = delete;
     ParametersImpl& operator=(const ParametersImpl&) = delete;
 
 protected:
-    void set_multiple_value(int index, char *const v) override
+    void set_multiple_value(int index, char* const v) override
     {
         if(index == CLI::ArgAnalyzers) // may have multiple values
         {
             const std::string arg{v};
-            size_t ind {arg.find('#')};
+            size_t            ind{arg.find('#')};
             if(ind == std::string::npos)
             {
                 analysis_modules.emplace_back(path_to_pam(arg));
@@ -167,7 +167,7 @@ private:
     std::string default_iofile() const
     {
         // create string: PROGRAMNAME-BPF-FILTER.pcap
-        std::string str { impl->program };
+        std::string str{impl->program};
         str.push_back('-');
         str.append(get(CLI::ArgFilter).to_cstr());
         str.append(".pcap");
@@ -191,8 +191,8 @@ private:
     }
 
     // cashed values
-    unsigned short rpc_message_limit;
-    std::string program;  // name of program in command line
+    unsigned short       rpc_message_limit;
+    std::string          program; // name of program in command line
     std::vector<AParams> analysis_modules;
 };
 
@@ -269,8 +269,7 @@ unsigned short Parameters::queue_capacity() const
     const int capacity = impl->get(CLI::ArgQSize).to_int();
     if(capacity < 1 || capacity > 65535)
     {
-        throw cmdline::CLIError(std::string{"Invalid value of queue capacity: "}
-                                 + impl->get(CLI::ArgQSize).to_cstr());
+        throw cmdline::CLIError(std::string{"Invalid value of queue capacity: "} + impl->get(CLI::ArgQSize).to_cstr());
     }
 
     return capacity;
@@ -290,12 +289,12 @@ int Parameters::verbose_level() const
 const Parameters::CaptureParams Parameters::capture_params() const
 {
     Parameters::CaptureParams params;
-    params.interface    = impl->get(CLI::ArgInterface);
-    params.filter       = impl->get(CLI::ArgFilter);
-    params.snaplen      = impl->get(CLI::ArgSnaplen).to_int();
-    params.timeout_ms   = impl->get(CLI::ArgTimeout).to_int();
-    params.buffer_size  = impl->get(CLI::ArgBSize).to_int() * 1024 * 1024; // MBytes
-    params.promisc      = impl->get(CLI::ArgPromisc).to_bool();
+    params.interface   = impl->get(CLI::ArgInterface);
+    params.filter      = impl->get(CLI::ArgFilter);
+    params.snaplen     = impl->get(CLI::ArgSnaplen).to_int();
+    params.timeout_ms  = impl->get(CLI::ArgTimeout).to_int();
+    params.buffer_size = impl->get(CLI::ArgBSize).to_int() * 1024 * 1024; // MBytes
+    params.promisc     = impl->get(CLI::ArgPromisc).to_bool();
 
     // check interface
     if(impl->is_default(CLI::ArgInterface))
@@ -306,22 +305,19 @@ const Parameters::CaptureParams Parameters::capture_params() const
     // check capture buffer size
     if(params.buffer_size < 1024 * 1024) // less than 1 MBytes
     {
-        throw cmdline::CLIError{std::string{"Invalid value of kernel buffer size: "}
-                                 + impl->get(CLI::ArgBSize).to_cstr()};
+        throw cmdline::CLIError{std::string{"Invalid value of kernel buffer size: "} + impl->get(CLI::ArgBSize).to_cstr()};
     }
 
     // check max length of raw captured UDP packet
     if(params.snaplen < 1 || params.snaplen > 65535)
     {
-        throw cmdline::CLIError{std::string{"Invalid value of max length of raw captured UDP packet: "}
-                                 + impl->get(CLI::ArgSnaplen).to_cstr()};
+        throw cmdline::CLIError{std::string{"Invalid value of max length of raw captured UDP packet: "} + impl->get(CLI::ArgSnaplen).to_cstr()};
     }
 
     // check the read timeout that will be used on a capture
     if(params.timeout_ms < 1)
     {
-        throw cmdline::CLIError{std::string{"Invalid value of read timeout that will be used on a capture: "}
-                                 + impl->get(CLI::ArgTimeout).to_cstr()};
+        throw cmdline::CLIError{std::string{"Invalid value of read timeout that will be used on a capture: "} + impl->get(CLI::ArgTimeout).to_cstr()};
     }
 
     // check and set capture direction
@@ -340,8 +336,7 @@ const Parameters::CaptureParams Parameters::capture_params() const
     }
     else
     {
-        throw cmdline::CLIError{std::string{"Unknown capturing direction: "}
-                                 + direction.to_cstr()};
+        throw cmdline::CLIError{std::string{"Unknown capturing direction: "} + direction.to_cstr()};
     }
 
     return params;

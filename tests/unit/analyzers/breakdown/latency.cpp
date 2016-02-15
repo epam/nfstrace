@@ -36,13 +36,13 @@ using ::testing::_;
 //------------------------------------------------------------------------------
 namespace
 {
-
 class LatencyTest : public ::testing::Test
 {
 protected:
-    size_t count;
+    size_t  count;
     timeval t1;
     timeval t2;
+
 public:
     void SetUp()
     {
@@ -60,12 +60,10 @@ public:
     {
     }
 };
-
 }
 //------------------------------------------------------------------------------
 TEST_F(LatencyTest, max_min)
 {
-
     Latencies latency;
 
     EXPECT_EQ(0U, latency.get_count());
@@ -80,7 +78,6 @@ TEST_F(LatencyTest, max_min)
 
     EXPECT_EQ(t1.tv_sec, latency.get_max().tv_sec);
     EXPECT_EQ(t1.tv_usec, latency.get_max().tv_usec);
-
 }
 
 TEST_F(LatencyTest, avg)
@@ -114,7 +111,7 @@ TEST_F(LatencyTest, convert_timeval_to_sec)
      */
 
     struct timeval input;
-    input.tv_sec = 0;
+    input.tv_sec  = 0;
     input.tv_usec = 500;
 
     const auto sec = to_sec(input);
@@ -123,9 +120,12 @@ TEST_F(LatencyTest, convert_timeval_to_sec)
 
     std::stringstream ss;
 
-    ss.precision(6); ss << std::fixed << sec << ' ';
-    ss.precision(4); ss << std::fixed << sec << ' ';
-    ss.precision(3); ss << std::fixed << sec;
+    ss.precision(6);
+    ss << std::fixed << sec << ' ';
+    ss.precision(4);
+    ss << std::fixed << sec << ' ';
+    ss.precision(3);
+    ss << std::fixed << sec;
 
     EXPECT_EQ("0.000500 0.0005 0.001", ss.str());
 }
