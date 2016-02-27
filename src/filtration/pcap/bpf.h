@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#ifndef BPF_H
-#define BPF_H
+#ifndef BPF_HEADER_H
+#define BPF_HEADER_H
 //------------------------------------------------------------------------------
 #include <pcap/pcap.h>
 
@@ -58,5 +58,5 @@ private:
 } // namespace filtration
 } // namespace NST
 //------------------------------------------------------------------------------
-#endif // BPF_H
+#endif // BPF_HEADER_H
 //------------------------------------------------------------------------------

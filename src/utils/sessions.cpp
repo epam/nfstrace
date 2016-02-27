@@ -25,6 +25,7 @@
 #include <netdb.h>
 #include <sys/socket.h> // for AF_INET/AF_INET6
 
+#include "api/plugin_api.h" // for NST_PUBLIC
 #include "utils/out.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
@@ -145,7 +146,7 @@ std::ostream& operator<<(std::ostream& out, const Session& session)
     return out;
 }
 
-void print_session(std::ostream& out, const Session& session)
+extern "C" NST_PUBLIC void print_session(std::ostream& out, const Session& session)
 {
     switch(session.ip_type)
     {

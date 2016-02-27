@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 #include <cassert>
 
+#include "api/plugin_api.h" // for NST_PUBLIC
 #include "protocols/cifs/cifs.h"
 //------------------------------------------------------------------------------
 using namespace NST::protocols::CIFSv1;
@@ -59,7 +60,7 @@ bool MessageHeader::isFlag(const Flags flag) const
     return static_cast<const uint8_t>(flag) & static_cast<const uint8_t>(flags);
 }
 
-const char* NST::protocols::CIFSv1::print_cifs1_procedures(SMBv1Commands cmd_code)
+extern "C" NST_PUBLIC const char* print_cifs1_procedures(SMBv1Commands cmd_code)
 {
     assert(cmd_code < SMBv1Commands::CMD_COUNT);
 

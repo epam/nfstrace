@@ -193,8 +193,6 @@ inline const Cmd command(Data& request, Data& response, Session* session)
     return cmd;
 }
 
-extern "C" NST_PUBLIC const char* print_cifs2_procedures(SMBv2Commands cmd_code);
-
 } // namespace CIFSv2
 } // namespace protocols
 } // namespace NST

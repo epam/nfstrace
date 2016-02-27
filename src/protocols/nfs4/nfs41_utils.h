@@ -483,10 +483,6 @@ inline auto proc_t_of(NFS41::COMPOUND4res&) -> decltype(&xdr_COMPOUND4res)
     return &xdr_COMPOUND4res;
 }
 
-#define NST_PUBLIC __attribute__((visibility("default")))
-
-extern "C" NST_PUBLIC const char* print_nfs41_procedures(const ProcEnumNFS41::NFSProcedure proc);
-
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS41::NFSProcedure proc);
 std::ostream& operator<<(std::ostream& out, const NFS41::nfs_ftype4& obj);
 std::ostream& operator<<(std::ostream& out, const NFS41::nfsstat4& obj);

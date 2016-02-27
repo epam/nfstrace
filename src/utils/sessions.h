@@ -28,7 +28,6 @@
 
 #include "api/session.h"
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -60,8 +59,6 @@ public:
 private:
     std::string session_str;
 };
-
-extern "C" NST_PUBLIC void print_session(std::ostream& out, const Session& session);
 
 std::ostream& operator<<(std::ostream& out, const Session& session);
 

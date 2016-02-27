@@ -27,7 +27,6 @@
 #include "api/cifs_types.h"
 #include "protocols/netbios/netbios.h"
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -221,10 +220,6 @@ inline const Cmd command(Data& request, Data& response, Session* session)
 
     return cmd;
 }
-
-extern "C"
-NST_PUBLIC
-const char* print_cifs1_procedures(SMBv1Commands cmd_code);
 
 // clang-format on
 

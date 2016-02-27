@@ -19,6 +19,7 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include "api/plugin_api.h" // for NST_PUBLIC
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs/nfs_utils.h"
 //------------------------------------------------------------------------------
@@ -32,7 +33,7 @@ namespace protocols
 {
 namespace NFS3
 {
-const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc)
+extern "C" NST_PUBLIC const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc)
 {
     // clang-format off
     static const char* const NFS3ProcedureTitles[ProcEnumNFS3::count] =
@@ -187,7 +188,7 @@ std::ostream& operator<<(std::ostream& out, const specdata3& obj)
 
 std::ostream& operator<<(std::ostream& out, const nfs_fh3& obj)
 {
-    NFS::print_nfs_fh(out, obj.data.data_val, obj.data.data_len);
+    print_nfs_fh(out, obj.data.data_val, obj.data.data_len);
     return out;
 }
 

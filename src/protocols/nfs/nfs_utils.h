@@ -28,7 +28,6 @@
 
 #include "utils/out.h"
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -85,10 +84,6 @@ void print_hex(std::ostream&         out,
 void print_hex(std::ostream&     out,
                const char* const val,
                const uint32_t    len);
-
-extern "C" NST_PUBLIC void print_nfs_fh(std::ostream&     out,
-                                        const char* const val,
-                                        const uint32_t    len);
 
 } // namespace NFS
 } // namespace protocols

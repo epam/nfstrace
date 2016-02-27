@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 #include <iomanip>
 
+#include "api/plugin_api.h" // for NST_PUBLIC
 #include "protocols/nfs/nfs_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
 //------------------------------------------------------------------------------
@@ -39,7 +40,8 @@ std::ostream& operator<<(std::ostream& out, const ProcEnumNFS4::NFSProcedure pro
 }
 
 // clang-format off
-const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc)
+
+extern "C" NST_PUBLIC const char* print_nfs4_procedures(const ProcEnumNFS4::NFSProcedure proc)
 {
     // In all cases we suppose, that NFSv4 operation ILLEGAL(10044)
     // has the second position in ProcEnumNFS4
@@ -316,9 +318,9 @@ std::ostream& operator<<(std::ostream& out, const settime4& obj)
 
 std::ostream& operator<<(std::ostream& out, const nfs_fh4& obj)
 {
-    NFS::print_nfs_fh(out,
-                      obj.nfs_fh4_val,
-                      obj.nfs_fh4_len);
+    print_nfs_fh(out,
+                 obj.nfs_fh4_val,
+                 obj.nfs_fh4_len);
     return out;
 }
 

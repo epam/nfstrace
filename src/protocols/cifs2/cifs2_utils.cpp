@@ -22,8 +22,9 @@
 #include <iostream>
 #include <type_traits>
 
-#include "cifs2.h"
-#include "cifs2_utils.h"
+#include "api/plugin_api.h" // for print_cifs2_procedures(value)
+#include "protocols/cifs2/cifs2.h"
+#include "protocols/cifs2/cifs2_utils.h"
 #include "protocols/nfs/nfs_utils.h"
 //------------------------------------------------------------------------------
 static const std::string flagDelimiter = " | ";
@@ -297,7 +298,7 @@ const char* enumToString(SessionFlagsBinding value)
 
 std::ostream& operator<<(std::ostream& out, const SMBv2::SMBv2Commands value)
 {
-    const char* strCommand = NST::protocols::CIFSv2::print_cifs2_procedures(value);
+    const char* strCommand = print_cifs2_procedures(value);
 
     out << "(" << strCommand << ")";
 

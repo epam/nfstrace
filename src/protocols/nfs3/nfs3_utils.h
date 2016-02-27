@@ -31,7 +31,6 @@
 #include "protocols/rpc/rpc_header.h"
 #include "protocols/xdr/xdr_decoder.h"
 //------------------------------------------------------------------------------
-#define NST_PUBLIC __attribute__((visibility("default")))
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -427,8 +426,6 @@ inline auto proc_t_of(NFS3::COMMIT3res&) -> decltype(&xdr_COMMIT3res)
 {
     return &xdr_COMMIT3res;
 }
-
-extern "C" NST_PUBLIC const char* print_nfs3_procedures(const ProcEnumNFS3::NFSProcedure proc);
 
 std::ostream& operator<<(std::ostream& out, const ProcEnumNFS3::NFSProcedure proc);
 

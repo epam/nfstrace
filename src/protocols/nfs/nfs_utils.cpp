@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 #include <iomanip>
 
+#include "api/plugin_api.h" // for NST_PUBLIC
 #include "protocols/nfs/nfs_utils.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -90,7 +91,7 @@ void print_hex(std::ostream& out, const char* const val, const uint32_t len)
     }
 }
 
-void print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len)
+extern "C" NST_PUBLIC void print_nfs_fh(std::ostream& out, const char* const val, const uint32_t len)
 {
     if(len)
     {

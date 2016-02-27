@@ -25,6 +25,7 @@
 #include <assert.h>
 
 #include "api/cifs_pc_to_net.h"
+#include "api/plugin_api.h" // for NST_PUBLIC
 #include "protocols/cifs/cifs.h"
 #include "protocols/cifs2/cifs2.h"
 //------------------------------------------------------------------------------
@@ -148,7 +149,7 @@ void NST::protocols::CIFSv2::parse(SMBv2::CancelRequest*&){ }
 // const std::string NST::breakdown::SMBv2Commands::command_name(int cmd_code)
 // Futre fix: We need to merege these enums
 // TODO: Move implementation to some common module
-const char* NST::protocols::CIFSv2::print_cifs2_procedures(SMBv2Commands cmd)
+extern "C" NST_PUBLIC const char* print_cifs2_procedures(SMBv2Commands cmd)
 {
     assert(cmd < SMBv2Commands::CMD_COUNT);
 
