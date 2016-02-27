@@ -29,7 +29,6 @@
 
 #include "api/cifs2_commands.h"
 #include "filtration/filtratorimpl.h"
-#include "filtration/packet.h"
 #include "protocols/cifs/cifs.h"
 #include "protocols/cifs2/cifs2.h"
 #include "protocols/netbios/netbios.h"

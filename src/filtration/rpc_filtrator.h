@@ -28,7 +28,6 @@
 #include <pcap/pcap.h>
 
 #include "filtration/filtratorimpl.h"
-#include "filtration/packet.h"
 #include "protocols/netbios/netbios.h"
 #include "protocols/nfs3/nfs3_utils.h"
 #include "protocols/nfs4/nfs4_utils.h"
