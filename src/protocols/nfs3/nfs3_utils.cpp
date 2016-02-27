@@ -19,8 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
-#include "api/plugin_api.h" // for NST_PUBLIC
 #include "protocols/nfs3/nfs3_utils.h"
+#include "api/plugin_api.h" // for NST_PUBLIC
 #include "protocols/nfs/nfs_utils.h"
 //------------------------------------------------------------------------------
 using namespace NST::API::NFS3;

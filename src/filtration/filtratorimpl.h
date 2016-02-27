@@ -23,6 +23,9 @@
 #ifndef IFILTRATOR_H
 #define IFILTRATOR_H
 //------------------------------------------------------------------------------
+#include "filtration/packet.h"
+#include "utils/log.h"
+//------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
