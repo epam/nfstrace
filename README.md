@@ -53,7 +53,7 @@ Since `nfstrace` is written in C++11 you have to use `gcc` >= 4.8 or
 `clang` >= 3.3.  Additionally, you need to install development version of
 `libpcap` (version 1.3 or newer).
 
-You can build `nfstrace` using [CMake](http://cmake.org) (version 2.8.12 or
+You can build `nfstrace` using [CMake](https://cmake.org/cmake/help/v3.3/index.html) (version 2.8.12 or
 newer). From the top level project's directory run:
 
     $ mkdir release
@@ -70,12 +70,17 @@ If you want to specify different installation prefix:
 
     $ cmake -DCMAKE_INSTALL_PREFIX=/your/path ../
 
+You can use different build tools, compilers, packaging systems with required parameters.
+Please refer to
+[CMake](https://cmake.org/cmake/help/v3.3/manual/cmake.1.html), 
+[CPack](https://cmake.org/cmake/help/v3.3/manual/cpack.1.html) and
+[Reference Manuals](https://cmake.org/cmake/help/v3.3/index.html).
+
 
 Installation
 ------------
 
-By default `nfstrace` will be installed to `/usr/`.
-After you build `nfstrace` simply run:
+You can install `nfstrace` to default location. After you build `nfstrace` simply run:
 
     $ sudo make install
 

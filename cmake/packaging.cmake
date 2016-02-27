@@ -1,3 +1,4 @@
+set (CPACK_PACKAGE_VENDOR "EPAM Systems")
 set (CPACK_PACKAGE_VERSION ${NST_VERSION})
 set (CPACK_PACKAGING_INSTALL_PREFIX "/usr")
 set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "NFS tracing/monitoring/capturing/statistic tool")
@@ -5,7 +6,6 @@ set (CPACK_PACKAGE_CONTACT "Nfstrace developers <nfstrace@epam.com>")
 
 set (CPACK_RPM_PACKAGE_GROUP "Applications/Internet")
 set (CPACK_RPM_PACKAGE_LICENSE "GPLv2")
-set (CPACK_RPM_PACKAGE_VENDOR "EPAM Systems")
 set (CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/man /usr/share/man/man8)
 set (CPACK_RPM_PACKAGE_REQUIRES "libpcap >= 1.3.0-1")
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux" AND EXISTS "/etc/os-release")
