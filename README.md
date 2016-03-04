@@ -14,18 +14,18 @@ determine NFS/CIFS procedures in raw network traffic. Furthermore, it performs
 filtration, dumping, compression, statistical analysis, visualization and
 provides the API for custom pluggable analysis modules.
 
-`nfstrace` is written in C++11 programming language and currently supports the
+`nfstrace` is written in C++11 programming language and supports the
 following protocols:
 
 - Ethernet
 - IPv4 | IPv6
-- UPD | TCP
+- UDP | TCP
 - NFSv3 | NFSv4 | NFSv4.1 | CIFSv1 | CIFSv2
 
 `nfstrace` has been tested on the following GNU/Linux and FreeBSD systems:
 
 - Debian Sid [packages](https://packages.debian.org/unstable/main/nfstrace) [build-logs](https://buildd.debian.org/status/logs.php?pkg=nfstrace)
-- Fedora 20
+- Fedora 23
 - OpenSUSE 13.2
 - Ubuntu 14.04/14.10
 - CentOS 7
