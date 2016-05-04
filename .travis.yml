@@ -4,7 +4,7 @@ language: cpp
 addons:
   apt:
     packages:
-      - ccache 
+      - ccache
 cache:
   apt: true
   directories:
@@ -15,24 +15,24 @@ cache:
 env:
   global:
     - DEPS_DIR="$HOME/install"
-    - CMAKE_DIR="$DEPS_DIR/cmake-3.3.2-Linux-x86_64" 
+    - CMAKE_DIR="$DEPS_DIR/cmake-3.5.2-Linux-x86_64"
     - CMAKE="$CMAKE_DIR/bin/cmake"
     - JSON_DIR="$DEPS_DIR/json-c-0.11"
-    - JSON_LIB="$JSON_DIR/install" 
+    - JSON_LIB="$JSON_DIR/install"
     - JSON_INCLUDE_DIR="$JSON_DIR"
     - LCOV_DIR="$DEPS_DIR/lcov-1.11"
     - LCOV="$LCOV_DIR/bin/lcov"
-    - GMOCK_DIR="$DEPS_DIR/gmock-1.7.0" 
+    - GTEST_DIR="$TRAVIS_BUILD_DIR/third_party/googletest"
 
 matrix:
   include:
     - os: linux
-      compiler: gcc-4.9 
+      compiler: gcc-4.9
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['texlive-latex-base','gcc-4.9','g++-4.9','libpcap-dev','valgrind']
-      env: 
+      env:
         # You can not set CXX directly as Travis CI will overwrite it. You need an intermediate variable like COMPILER
         - COMPILER=g++-4.9 CXX_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" C_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-4.9"
       fast_finish: true
@@ -42,11 +42,12 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test','llvm-toolchain-precise-3.5']
           packages: ['texlive-latex-base','clang-3.5','llvm-3.5-dev','libpcap-dev','valgrind']
-      env: 
+      env:
         - COMPILER=/usr/bin/clang++-3.5 gcov="/usr/bin/gcov-4.9"
       fast_finish: true
 
 before_install:
+  - git submodule update --init --recursive
   - uname -a
   - pwd
   - export
@@ -57,16 +58,11 @@ install:
   - gem install coveralls-lcov
   - |
     if [ ! -f "$CMAKE" ]; then
-      wget -O - --no-check-certificate https://cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz | tar xz && cp -r cmake-3.3.2-Linux-x86_64 $DEPS_DIR
-    else 
+      wget -O - --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.tar.gz | tar xz && cp -r cmake-3.5.2-Linux-x86_64 $DEPS_DIR
+    else
       echo "Using cached cmake"
     fi
   - |
-    if [ ! -f "$GMOCK_DIR/CMakeLists.txt" ]; then
-      wget -q https://googlemock.googlecode.com/files/gmock-1.7.0.zip && unzip gmock-1.7.0.zip -d $DEPS_DIR
-    else 
-      echo "Using cached gmock" 
-    fi
 
   # installing libjson-c from source because #'ondrej/php5-5.6' is disallowed source in travis-ci
   - |
@@ -90,7 +86,7 @@ before_script:
   - $LCOV --gcov-tool "/usr/bin/gcov-4.9" --directory . --zerocounters
 script:
   - mkdir debug && cd debug
-  - $CMAKE -DCMAKE_CXX_COMPILER="$COMPILER" -DCMAKE_BUILD_TYPE=DEBUG -DGMOCK_SOURCE_DIR=$GMOCK_DIR -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -DCMAKE_C_FLAGS="$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true" ../
+  - $CMAKE -DCMAKE_CXX_COMPILER="$COMPILER" -DCMAKE_BUILD_TYPE=DEBUG -DGTEST_SOURCE_DIR=$GTEST_DIR -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -DCMAKE_C_FLAGS="$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true" ../
   - make
   - make test
   - make documentation-pdflatex
