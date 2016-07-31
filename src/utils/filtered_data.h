@@ -58,7 +58,8 @@ public:
     FilteredData(const FilteredData&) = delete;
     FilteredData& operator=(const FilteredData&) = delete;
 
-    FilteredData() noexcept : data{cache}
+    FilteredData() noexcept
+        : data{cache}
     {
     }
 

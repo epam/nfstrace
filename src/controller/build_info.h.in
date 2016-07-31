@@ -29,7 +29,9 @@ constexpr unsigned int NST_VERSION =
     @NST_V_MAJOR@ * 1000 + @NST_V_MINOR@ * 100 + @NST_V_PATCH@;
 
 constexpr char PROGRAM_BUILD_INFO[]=
-    "@NST_VERSION_FULL@";
+    "@NST_VERSION_FULL@\n"
+    "built on @CMAKE_SYSTEM@\n"
+    "by C++ compiler @CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VERSION@ on @COMPILATION_DATE@";
 
 constexpr char MODULES_DIRECTORY_PATH[] = "@CMAKE_INSTALL_PREFIX@/lib/nfstrace/";
 

@@ -48,15 +48,12 @@ list (GET VERSION_LIST 2 NST_V_PATCH)
 set (NST_VERSION_FULL "${PROJECT_NAME} ${NST_VERSION} (${CMAKE_BUILD_TYPE})")
 
 if (DEFINED ENV{SOURCE_DATE_EPOCH})
-  execute_process(
-    COMMAND "date" "-u" "-d" "@$ENV{SOURCE_DATE_EPOCH}" "+%Y-%m-%d"
-    OUTPUT_VARIABLE COMPILATION_DATE 
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(
+      COMMAND "date" "-u" "-d" "@$ENV{SOURCE_DATE_EPOCH}" "+%Y-%m-%d"
+      OUTPUT_VARIABLE COMPILATION_DATE
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
 else ()
-  execute_process(
-    COMMAND "date" "+%Y-%m-%d"
-    OUTPUT_VARIABLE TIMESTAMP
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    string (TIMESTAMP COMPILATION_DATE "%Y-%m-%d")
 endif ()
 
 include_directories (src)

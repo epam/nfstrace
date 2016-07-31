@@ -42,15 +42,15 @@ public:
     {
     public:
         inline Collection() noexcept
-            : queue{nullptr},
-              ptr{nullptr},
-              session{nullptr}
+            : queue{nullptr}
+            , ptr{nullptr}
+            , session{nullptr}
         {
         }
         inline Collection(Queueing* q, utils::NetworkSession* s) noexcept
-            : queue{&q->queue},
-              ptr{nullptr},
-              session{s}
+            : queue{&q->queue}
+            , ptr{nullptr}
+            , session{s}
         {
         }
         inline ~Collection()

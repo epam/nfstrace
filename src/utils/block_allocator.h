@@ -38,13 +38,13 @@ class BlockAllocator
 
 public:
     BlockAllocator() noexcept
-        : chunk{0},
-          block{0},
-          limit{0},
-          nfree{0},
-          allocated{0},
-          blocks{nullptr},
-          list{nullptr}
+        : chunk{0}
+        , block{0}
+        , limit{0}
+        , nfree{0}
+        , allocated{0}
+        , blocks{nullptr}
+        , list{nullptr}
     {
     }
 

@@ -43,8 +43,10 @@ class Queue
 
     struct ElementDeleter
     {
-        ElementDeleter() noexcept : queue{nullptr} {}
-        explicit ElementDeleter(Queue* q) noexcept : queue{q} {}
+        explicit ElementDeleter(Queue* q = nullptr) noexcept
+            : queue{q}
+        {
+        }
         void operator()(T* const pointer) const
         {
             if(pointer /*&& queue - dont check - optimization*/)
