@@ -22,6 +22,7 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 //------------------------------------------------------------------------------
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 
@@ -117,21 +118,19 @@ public:
 
         Spinlock::Lock lock{a_spinlock};
         Element*       e{(Element*)allocator.allocate()}; // may throw std::bad_alloc
-        auto           ptr = &(e->data);
-        ::new(ptr) T; // only call constructor of T (placement)
-        return ptr;
+        return ::new(&(e->data)) T; // placement construction T
     }
 
     void deallocate(T* ptr)
     {
-        ptr->~T(); // placement allocation functions syntax is used
-        Element* e{(Element*)(((char*)ptr) - sizeof(Element*))};
+        ptr->~T(); // placement construction was used
+        Element* e{(Element*)(((char*)ptr) - offsetof(Element, data))};
         deallocate(e);
     }
 
     void push(T* ptr)
     {
-        Element*       e{(Element*)(((char*)ptr) - sizeof(Element*))};
+        Element*       e{(Element*)(((char*)ptr) - offsetof(Element, data))};
         Spinlock::Lock lock{q_spinlock};
         if(last)
         {
