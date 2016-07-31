@@ -22,120 +22,122 @@
 #ifndef BLOCK_ALLOCATOR_H
 #define BLOCK_ALLOCATOR_H
 //------------------------------------------------------------------------------
-#include <cstring> // for memset()
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <vector>
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace utils
 {
-// May throw std::bad_alloc() when memory is not enough
+// May throw std::bad_alloc during creation or allocation
 class BlockAllocator
 {
-    struct Chunk
+    struct Chunk // type for linking free chunks of memory in a list
     {
-        Chunk* next; // used only for free chunks in list
+        Chunk* next; // pointer to next chunk in a list
     };
 
-public:
-    BlockAllocator() noexcept
-        : chunk{0}
-        , block{0}
-        , limit{0}
-        , nfree{0}
-        , allocated{0}
-        , blocks{nullptr}
-        , list{nullptr}
-    {
-    }
+    using Chunks = std::unique_ptr<char[]>;
+    using Blocks = std::vector<Chunks>;
 
-    ~BlockAllocator()
+public:
+    constexpr static std::size_t padding = 16;
+
+    BlockAllocator() = default;
+    ~BlockAllocator() noexcept
     {
-        for(std::size_t i{0}; i < allocated; i++)
-        {
-            delete[]((char*)blocks[i]);
-        }
-        delete[] blocks;
+        assert(max_chunks() == free_chunks());
     }
 
     void init_allocation(std::size_t chunk_size,
                          std::size_t block_size,
                          std::size_t block_limit)
     {
-        chunk = chunk_size;
+        chunk = ((chunk_size + padding - 1) / padding) * padding;
+        assert(chunk % padding == 0);
+        assert(chunk >= chunk_size);
+        assert(chunk >= sizeof(Chunk));
         block = block_size;
+        assert(block >= 1);
         limit = block_limit;
+        assert(limit >= 1);
 
-        blocks = new Chunk*[limit];
-        memset(blocks, 0, sizeof(Chunk*) * limit);
-        list = new_block();
+        blocks.reserve(limit);
+        list = preallocate_block();
+        assert(list);
     }
 
     void* allocate()
     {
         if(list == nullptr)
         {
-            if(allocated == limit) // all blocks are allocated!
+            if(blocks.size() == limit) // all blocks are allocated!
             {
-                increase_blocks_limit();
+                // soft limit of blocks is reached
             }
 
-            list = new_block();
+            list = preallocate_block();
+            ++limit;
         }
 
-        Chunk* c{list};
+        Chunk* chunk = list;
+        assert(chunk);
         list = list->next;
         --nfree;
-        return c;
+        return chunk;
     }
 
-    void deallocate(void* ptr)
+    void deallocate(void* ptr) noexcept
     {
-        Chunk* c{(Chunk*)ptr};
-        c->next = list;
-        list    = c;
+        assert(ptr);
+        assert(std::any_of(std::begin(blocks), std::end(blocks),
+                           [&](const Chunks& chunks) {
+                               const auto b = reinterpret_cast<void*>(chunks.get());
+                               const auto e = reinterpret_cast<void*>(chunks.get() + block * chunk);
+                               return (b <= ptr) && (ptr < e);
+                           }));
+        Chunk* chunk = reinterpret_cast<Chunk*>(ptr);
+        chunk->next  = list;
+        list         = chunk;
         ++nfree;
     }
 
-    // limits
-    std::size_t max_chunks() const { return block * limit; }
-    std::size_t max_memory() const { return block * limit * chunk; }
-    std::size_t max_blocks() const { return limit; }
-    std::size_t free_chunks() const { return nfree; }
+    std::size_t max_chunks() const noexcept { return block * limit; }
+    std::size_t max_memory() const noexcept { return block * limit * chunk; }
+    std::size_t max_blocks() const noexcept { return limit; }
+    std::size_t free_chunks() const noexcept { return nfree; }
 private:
-    Chunk* new_block()
+    Chunk* getof(std::size_t i, const Chunks& chunks) const noexcept
     {
-        char* ptr{new char[block * chunk]};
-        for(std::size_t i{0}; i < block - 1; ++i)
+        assert(i < block);
+        return reinterpret_cast<Chunk*>(&chunks.get()[i * chunk]);
+    }
+
+    Chunk* preallocate_block()
+    {
+        Chunks chunks(new Chunks::element_type[block * chunk]); // switch to C++14
+
+        // link chunks to a list
+        for(std::size_t i = 0; i < block - 1; ++i)
         {
-            ((Chunk*)&ptr[i * chunk])->next = (Chunk*)&ptr[(i + 1) * chunk];
+            getof(i, chunks)->next = getof(i + 1, chunks);
         }
-        ((Chunk*)&ptr[(block - 1) * chunk])->next = nullptr;
-        blocks[allocated]                         = (Chunk*)ptr;
-        ++allocated;
+        getof(block - 1, chunks)->next = nullptr;
+        Chunk* first = getof(0, chunks);
+        blocks.emplace_back(std::move(chunks));
         nfree += block;
-        return (Chunk*)ptr;
+        return first;
     }
 
-    void increase_blocks_limit()
-    {
-        const std::size_t new_limit{limit * 2}; // increase soft limit by twice
-
-        Chunk** new_blocks{new Chunk*[new_limit]}; // allocate new array of blocks pointers
-        limit = new_limit;
-        memcpy(new_blocks, blocks, sizeof(Chunk*) * allocated);                  // copy pointers of existing blocks
-        memset(&new_blocks[allocated], 0, sizeof(Chunk*) * (limit - allocated)); // fill pointers for new blocks by NULL
-
-        delete[] blocks;     // delete old array of blocks pointers
-        blocks = new_blocks; // set new array
-    }
-
-    std::size_t chunk;     // chunk size
-    std::size_t block;     // num chunks in block
-    std::size_t limit;     // max blocks, soft limit
-    std::size_t nfree;     // num of avaliable chunks
-    std::size_t allocated; // num of allocated blocks, up to limit
-    Chunk**     blocks;    // array of blocks
-    Chunk*      list;      // list of free chunks
+    Chunk*      list  = nullptr; // head of list of free chunks
+    std::size_t chunk = 0;       // size of chunk
+    std::size_t block = 0;       // num chunks in block
+    std::size_t limit = 0;       // max blocks, soft limit
+    std::size_t nfree = 0;       // num of avaliable chunks
+    Blocks      blocks;          // array of blocks
 };
 
 } // namespace utils

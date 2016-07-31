@@ -118,7 +118,7 @@ public:
 
         Spinlock::Lock lock{a_spinlock};
         Element*       e{(Element*)allocator.allocate()}; // may throw std::bad_alloc
-        return ::new(&(e->data)) T; // placement construction T
+        return ::new(&(e->data)) T;                       // placement construction T
     }
 
     void deallocate(T* ptr)
