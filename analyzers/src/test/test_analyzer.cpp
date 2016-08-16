@@ -784,7 +784,7 @@ public:
         std::cout << "TestAnalyzer" << std::endl;
     }
 
-    virtual void flush_statistics()
+    virtual void flush_statistics() override
     {
         std::cout << "TestAnalyzer::flush_statistics()" << std::endl;
     }
