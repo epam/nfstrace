@@ -2,6 +2,7 @@
 =====
  - Switched to C++14 
  - GCC updated to version 6; Clang updated to version 3.8
+ - fixed calculation of struct's member offset on x32 platform (https://github.com/epam/nfstrace/issues/19)
 
 0.4.2
 =====
