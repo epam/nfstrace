@@ -1,3 +1,8 @@
+0.4.3
+=====
+ - Switched to C++14 
+ - GCC updated to version 6; Clang updated to version 3.8
+
 0.4.2
 =====
  - documentation converted to LaTeX format
