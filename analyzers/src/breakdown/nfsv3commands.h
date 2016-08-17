@@ -38,7 +38,7 @@ public:
     const char* command_description(int cmd_code) override final;
     const char* command_name(int cmd_code) override final;
     size_t      commands_count() override final;
-    const char* protocol_name();
+    const char* protocol_name() override final;
 };
 
 } // namespace breakdown

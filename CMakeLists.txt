@@ -3,12 +3,12 @@ project (nfstrace)
 
 # check compiler and packages ==================================================
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
-        message (FATAL_ERROR "GCC version must be at least 4.8")
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.1)
+        message (FATAL_ERROR "GCC version must be at least 5.1")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.3)
-        message (FATAL_ERROR "Clang version must be at least 3.3")
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.5)
+        message (FATAL_ERROR "Clang version must be at least 3.5")
     endif ()
 else ()
     message (WARNING "Compilation by ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} isn't tested")
@@ -30,7 +30,7 @@ if ("${PCAP_LIBRARY}" STREQUAL "PCAP_LIBRARY-NOTFOUND")
 endif ()
 
 # build application ============================================================
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Werror -Wextra -Wno-invalid-offsetof -fPIC -fvisibility=hidden")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pedantic -Wall -Werror -Wextra -Wno-invalid-offsetof -Wno-braced-scalar-init -fPIC -fvisibility=hidden")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--export-dynamic")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND "${INCLUDE_COVERAGE_INFO}")

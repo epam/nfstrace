@@ -14,7 +14,7 @@ determine NFS/CIFS procedures in raw network traffic. Furthermore, it performs
 filtration, dumping, compression, statistical analysis, visualization and
 provides the API for custom pluggable analysis modules.
 
-`nfstrace` is written in C++11 programming language and supports the
+`nfstrace` is written in C++ programming language and supports the
 following protocols:
 
 - Ethernet
@@ -49,11 +49,11 @@ External Dependencies
 Building
 --------
 
-Since `nfstrace` is written in C++11 you have to use `gcc` >= 4.8 or
-`clang` >= 3.3.  Additionally, you need to install development version of
+Since `nfstrace` is written in C++ you have to use `gcc` >= 6 or
+`clang` >= 3.8.  Additionally, you need to install development version of
 `libpcap` (version 1.3 or newer).
 
-You can build `nfstrace` using [CMake](https://cmake.org/cmake/help/v3.3/index.html) (version 2.8.12 or
+You can build `nfstrace` using [CMake](https://cmake.org/cmake/help/v3.5/index.html) (version 2.8.12 or
 newer). From the top level project's directory run:
 
     $ mkdir release

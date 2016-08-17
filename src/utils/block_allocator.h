@@ -118,7 +118,7 @@ private:
 
     Chunk* preallocate_block()
     {
-        Chunks chunks(new Chunks::element_type[block * chunk]); // switch to C++14
+        Chunks chunks(std::make_unique<Chunks::element_type[]>(block * chunk));
 
         // link chunks to a list
         for(std::size_t i = 0; i < block - 1; ++i)
