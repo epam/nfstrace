@@ -106,12 +106,8 @@ struct MapperImpl
 
     static inline void copy_ipv6(uint32_t dst[4], const uint8_t src[16])
     {
-        // TODO:: fix alignment of src!
-        const uint32_t* s{reinterpret_cast<const uint32_t*>(src)};
-        dst[0] = s[0];
-        dst[1] = s[1];
-        dst[2] = s[2];
-        dst[3] = s[3];
+        uint8_t* d{reinterpret_cast<uint8_t*>(dst)};
+        memcpy(d, src, sizeof(uint32_t) * 4);
     }
 
     struct IPv6PortsKeyHash
