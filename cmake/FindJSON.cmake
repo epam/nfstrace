@@ -17,23 +17,26 @@
 # in sid:
 # $ sudo apt-get install libjson-c-dev
 
-find_path(JSON_INCLUDE_DIR NAMES json-c/json.h json/json.h)
+
+#[[
+Debian and Ubuntu have json-c in /usr/include/json-c and jsoncpp in /usr/include/jsoncpp/json
+Arch and Fedora have json-c in /usr/include/json-c and jsoncpp in /usr/include/json
+Searching for json_c_version.h avoids finding json.h of jsoncpp.
+]]
+find_path(JSON_INCLUDE_DIR NAMES json_c_version.h json.h PATHS /usr/include/json-c /usr/include/json)
 find_library(JSON_LIBRARY NAMES json-c json)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(JSON DEFAULT_MSG
- JSON_LIBRARY
- JSON_INCLUDE_DIR
-)
+        JSON_LIBRARY JSON_INCLUDE_DIR
+        )
 
 if(JSON_FOUND)
-  set(JSON_LIBRARIES ${JSON_LIBRARY})
-  # hack to get old and new layout working:
-  set(JSON_INCLUDE_DIRS ${JSON_INCLUDE_DIR}/json-c
-    ${JSON_INCLUDE_DIR}/json)
+    set(JSON_LIBRARIES ${JSON_LIBRARY})
+    set(JSON_INCLUDE_DIRS ${JSON_INCLUDE_DIR})
 endif()
 
 mark_as_advanced(
-  JSON_LIBRARY
-  JSON_INCLUDE_DIR
+        JSON_LIBRARY
+        JSON_INCLUDE_DIRS
 )
