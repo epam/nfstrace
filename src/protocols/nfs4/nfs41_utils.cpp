@@ -1008,10 +1008,12 @@ std::ostream& operator<<(std::ostream& out, const createhow4& obj)
     {
     case createmode4::UNCHECKED4:
     case createmode4::GUARDED4:
-        return out << " attributes: " << obj.createhow4_u.createattrs;
+        out << " attributes: " << obj.createhow4_u.createattrs;
+        break;
     case createmode4::EXCLUSIVE4:
         out << " verifier: ";
         print_hex(out, obj.createhow4_u.createverf, NFS4_VERIFIER_SIZE);
+        break;
     case createmode4::EXCLUSIVE4_1:
         out << " verifier: ";
         print_hex(out, obj.createhow4_u.ch_createboth.cva_verf, NFS4_VERIFIER_SIZE);
@@ -1194,6 +1196,7 @@ std::ostream& operator<<(std::ostream& out, const open_none_delegation4& obj)
     case why_no_delegation4::WND4_CONTENTION:
         out << " server will push deleg: "
             << obj.open_none_delegation4_u.ond_server_will_push_deleg;
+	break;
     case why_no_delegation4::WND4_RESOURCE:
         out << " server will signal available: "
             << obj.open_none_delegation4_u.ond_server_will_signal_avail;
@@ -1330,6 +1333,7 @@ std::ostream& operator<<(std::ostream& out, const callback_sec_parms4& obj)
         break;
     case AUTH_SYS:
         out << obj.callback_sec_parms4_u.cbsp_sys_cred;
+        break;
     case RPCSEC_GSS:
         out << obj.callback_sec_parms4_u.cbsp_gss_handles;
     default: break;

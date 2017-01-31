@@ -931,6 +931,7 @@ void nfs4_ops_switch(Analyzers&                         analyzers,
                 &INFSv41::get_dir_delegation41,
                 &arg_t::opget_dir_delegation,
                 &res_t::opget_dir_delegation);
+        break;
     case ProcEnumNFS41::GETDEVICEINFO:
         analyze(analyzers, rpc_procedure, arg, res,
                 &INFSv41::getdeviceinfo41,
