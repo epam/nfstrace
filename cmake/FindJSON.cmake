@@ -17,6 +17,7 @@
 # in sid:
 # $ sudo apt-get install libjson-c-dev
 
+cmake_minimum_required (VERSION 3.0)
 
 #[[
 Debian and Ubuntu have json-c in /usr/include/json-c and jsoncpp in /usr/include/jsoncpp/json

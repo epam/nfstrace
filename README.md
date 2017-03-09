@@ -25,9 +25,9 @@ following protocols:
 `nfstrace` has been tested on the following GNU/Linux and FreeBSD systems:
 
 - Debian Sid [packages](https://packages.debian.org/unstable/main/nfstrace) [build-logs](https://buildd.debian.org/status/logs.php?pkg=nfstrace)
-- Fedora 23
+- Fedora 26
 - OpenSUSE 13.2
-- Ubuntu 14.04/14.10
+- Ubuntu 16.04 LTS
 - CentOS 7
 - Arch Linux
 - FreeBSD 10.1
@@ -42,7 +42,7 @@ External Dependencies
 --------
 
 - PCAP library (core component)
-- json library (used for libjson.so plugin)
+- JSON-C library (used for libjson.so plugin)
 - Curses (used for libwatch.so plugin)
 - GMock (used for testing)
 
@@ -53,7 +53,7 @@ Since `nfstrace` is written in C++ you have to use `gcc` >= 6 or
 `clang` >= 3.8.  Additionally, you need to install development version of
 `libpcap` (version 1.3 or newer).
 
-You can build `nfstrace` using [CMake](https://cmake.org/cmake/help/v3.5/index.html) (version 2.8.12 or
+You can build `nfstrace` using [CMake](https://cmake.org/cmake/help/v3.5/index.html) (version 3.0 or
 newer). From the top level project's directory run:
 
     $ mkdir release
@@ -65,6 +65,11 @@ If you want to use specific compiler you can set the `CC` and `CXX` environment
 variables:
 
     $ CC="path/to/clang" CXX="path/to/clang++" cmake -DCMAKE_BUILD_TYPE=release ../
+
+If you want to build unit-tests initialize [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) and
+provide a path to googltest directory via CMake option:
+
+    $ -DGTEST_SOURCE_DIR=/home/user/nfstrace/third_party/googletest
 
 If you want to specify different installation prefix:
 
