@@ -1,4 +1,5 @@
-sudo: false
+sudo: required
+dist: trusty
 language: cpp
 
 addons:
@@ -27,23 +28,23 @@ env:
 matrix:
   include:
     - os: linux
-      compiler: gcc-6
+      compiler: gcc
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['texlive-latex-base','gcc-6','g++-6','libpcap-dev','valgrind']
+          packages: ['texlive-latex-base','gcc-7','g++-7','libpcap-dev','valgrind']
       env:
         # You can not set CXX directly as Travis CI will overwrite it. You need an intermediate variable like COMPILER
-        - COMPILER=g++-6 CXX_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" C_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-6"
+        - COMPILER=g++-7 CXX_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" C_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-7"
       fast_finish: true
     - os: linux
-      compiler: clang-3.8
+      compiler: clang
       addons:
         apt:
-          sources: ['ubuntu-toolchain-r-test','llvm-toolchain-precise-3.8']
-          packages: ['texlive-latex-base','clang-3.8','llvm-3.8-dev','libpcap-dev','valgrind']
+          sources: ['ubuntu-toolchain-r-test','llvm-toolchain-trusty-5.0']
+          packages: ['texlive-latex-base','clang-5.0','llvm-5.0-dev','libpcap-dev','valgrind']
       env:
-        - COMPILER=/usr/bin/clang++-3.8 gcov="/usr/bin/gcov-6"
+        - COMPILER=/usr/bin/clang++-5.0 gcov="/usr/bin/gcov-7"
       fast_finish: true
 
 before_install:
@@ -83,7 +84,7 @@ install:
 before_script:
   - $CMAKE --version
   - gcov --version 
-  - $LCOV --gcov-tool "/usr/bin/gcov-6" --directory . --zerocounters
+  - $LCOV --gcov-tool "/usr/bin/gcov-7" --directory . --zerocounters
 script:
   - mkdir debug && cd debug
   - $CMAKE -DCMAKE_CXX_COMPILER="$COMPILER" -DCMAKE_BUILD_TYPE=DEBUG -DGTEST_SOURCE_DIR=$GTEST_DIR -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -DCMAKE_C_FLAGS="$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true" ../
@@ -95,8 +96,8 @@ script:
 after_success: 
   - |
     if [[ "$COMPILER" == "g++"* ]]; then
-      $LCOV --gcov-tool "/usr/bin/gcov-6" --compat-libtool --directory . --capture --output-file coverage.info # capture coverage info
-      $LCOV --gcov-tool "/usr/bin/gcov-6" --remove coverage.info 'tests/*' '/usr/*' '*gmock*' --output-file coverage.info # filter out system and test code
+      $LCOV --gcov-tool "/usr/bin/gcov-7" --compat-libtool --directory . --capture --output-file coverage.info # capture coverage info
+      $LCOV --gcov-tool "/usr/bin/gcov-7" --remove coverage.info 'tests/*' '/usr/*' '*gmock*' --output-file coverage.info # filter out system and test code
       coveralls-lcov coverage.info
     fi
   # - coveralls --gcov "$(which "${GCOV}")" --encoding iso-8859-1 || echo 'coveralls upload failed.'
