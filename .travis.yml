@@ -1,11 +1,12 @@
-sudo: required
+sudo: false
 dist: trusty
 language: cpp
 
 addons:
   apt:
-    packages:
-      - ccache
+    sources: ['ubuntu-toolchain-r-test','llvm-toolchain-trusty-5.0']
+    packages: ['gcc-7','g++-7','clang-5.0','llvm-5.0-dev','libpcap-dev','valgrind','ccache','texlive-latex-base']
+ 
 cache:
   apt: true
   directories:
@@ -24,11 +25,6 @@ env:
     - LCOV_DIR="$DEPS_DIR/lcov-1.11"
     - LCOV="$LCOV_DIR/bin/lcov"
     - GTEST_DIR="$TRAVIS_BUILD_DIR/third_party/googletest"
-    
-addons:
-  apt:
-    sources: ['ubuntu-toolchain-r-test','llvm-toolchain-trusty-5.0']
-    packages: ['texlive-latex-base','gcc-7','g++-7','clang-5.0','llvm-5.0-dev','libpcap-dev','valgrind']
 
 matrix:
   include:
