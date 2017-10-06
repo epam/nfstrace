@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/github/license/epam/nfstrace.svg)](http://opensource.org/licenses/GPL-2.0)
-[![Language](https://img.shields.io/badge/language-C++11-blue.svg)](https://isocpp.org)
+[![Language](https://img.shields.io/badge/language-C++14-blue.svg)](https://isocpp.org)
 [![Release](https://img.shields.io/github/release/epam/nfstrace.svg)](https://github.com/epam/nfstrace/releases/latest)
 [![Issues](https://img.shields.io/github/issues/epam/nfstrace.svg)](https://github.com/epam/nfstrace/issues?q=is%3Aopen+is%3Aissue)
 [![Build Status](https://img.shields.io/travis/epam/nfstrace/master.svg)](https://travis-ci.org/epam/nfstrace)
