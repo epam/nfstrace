@@ -24,25 +24,22 @@ env:
     - LCOV_DIR="$DEPS_DIR/lcov-1.11"
     - LCOV="$LCOV_DIR/bin/lcov"
     - GTEST_DIR="$TRAVIS_BUILD_DIR/third_party/googletest"
+    
+addons:
+  apt:
+    sources: ['ubuntu-toolchain-r-test','llvm-toolchain-trusty-5.0']
+    packages: ['texlive-latex-base','gcc-7','g++-7','clang-5.0','llvm-5.0-dev','libpcap-dev','valgrind']
 
 matrix:
   include:
     - os: linux
       compiler: gcc
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['texlive-latex-base','gcc-7','g++-7','libpcap-dev','valgrind']
       env:
         # You can not set CXX directly as Travis CI will overwrite it. You need an intermediate variable like COMPILER
         - COMPILER=g++-7 CXX_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" C_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-7"
       fast_finish: true
     - os: linux
       compiler: clang
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test','llvm-toolchain-trusty-5.0']
-          packages: ['texlive-latex-base','clang-5.0','llvm-5.0-dev','libpcap-dev','valgrind']
       env:
         - COMPILER=/usr/bin/clang++-5.0 gcov="/usr/bin/gcov-7"
       fast_finish: true
