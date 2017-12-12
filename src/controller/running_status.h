@@ -28,12 +28,14 @@
 #include <mutex>
 #include <condition_variable>
 #include <type_traits>
+
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
-class ProcessingDone : public std::runtime_error
+class ProcessingDone final : public std::runtime_error
 {
 public:
     explicit ProcessingDone(const std::string& in)
@@ -42,12 +44,10 @@ public:
     }
 };
 
-class RunningStatus
+class RunningStatus final : utils::noncopyable
 {
 public:
-    RunningStatus()                     = default;
-    RunningStatus(const RunningStatus&) = delete;
-    RunningStatus& operator=(const RunningStatus&) = delete;
+    RunningStatus() = default;
 
     template <typename ExceptionType>
     inline void push(const ExceptionType& e)
