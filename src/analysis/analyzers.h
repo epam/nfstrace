@@ -28,12 +28,13 @@
 #include "analysis/plugin.h"
 #include "api/plugin_api.h"
 #include "controller/parameters.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis
 {
-class Analyzers
+class Analyzers final : utils::noncopyable
 {
     using Storage  = std::vector<IAnalyzer*>;
     using Plugins  = std::vector<std::unique_ptr<PluginInstance>>;
@@ -41,8 +42,6 @@ class Analyzers
 
 public:
     Analyzers(const controller::Parameters& params);
-    Analyzers(const Analyzers&) = delete;
-    Analyzers& operator=(const Analyzers&) = delete;
 
     //! This function is used for passing ALL possible procedures to analyzers
     template <

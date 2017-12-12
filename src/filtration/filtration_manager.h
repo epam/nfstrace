@@ -28,12 +28,13 @@
 #include "controller/parameters.h"
 #include "controller/running_status.h"
 #include "utils/filtered_data.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
-class FiltrationManager
+class FiltrationManager final : utils::noncopyable
 {
     using Parameters        = NST::controller::Parameters;
     using RunningStatus     = NST::controller::RunningStatus;
@@ -42,8 +43,6 @@ class FiltrationManager
 public:
     FiltrationManager(RunningStatus&);
     ~FiltrationManager();
-    FiltrationManager(const FiltrationManager&) = delete;
-    FiltrationManager& operator=(const FiltrationManager&) = delete;
 
     void add_online_dumping(const Parameters& params);                             // dump to file
     void add_offline_dumping(const Parameters& params);                            // dump to file from input file

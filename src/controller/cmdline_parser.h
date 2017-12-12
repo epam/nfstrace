@@ -30,6 +30,8 @@
 #include <string>
 
 #include <getopt.h>
+
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -37,7 +39,7 @@ namespace controller
 {
 namespace cmdline
 {
-class CLIError : public std::runtime_error
+class CLIError final : public std::runtime_error
 {
 public:
     explicit CLIError(const std::string& msg)
@@ -46,16 +48,15 @@ public:
     }
 };
 
-struct Opt
+struct Opt final
 {
     // clang-format off
-    class Value
+    class Value final : utils::noncopyable
     {
     public:
-        Value(const char* const v) : value{v}{}
-        Value(Value&&)                       = default;
-        Value(const Value&)                  = delete;
-        Value& operator=(const Value&)       = delete;
+        explicit Value(const char* const v) : value{v}{}
+        Value(Value&& that) : value{that.value}{}
+
 
         operator std::string() const { return std::string{value};           }
         const char*  to_cstr() const { return value;                        }
@@ -82,13 +83,12 @@ struct Opt
 };
 
 template <typename CLI>
-class CmdlineParser
+class CmdlineParser : utils::noncopyable
 {
 public:
-    CmdlineParser()                     = default;
-    virtual ~CmdlineParser()            = default;
-    CmdlineParser(const CmdlineParser&) = delete;
-    CmdlineParser& operator=(const CmdlineParser&) = delete;
+    CmdlineParser()          = default;
+    virtual ~CmdlineParser() = default;
+
 
     void parse(int argc, char** argv);
     void validate();

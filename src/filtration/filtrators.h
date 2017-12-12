@@ -26,6 +26,7 @@
 #include "cifs_filtrator.h"
 #include "rpc_filtrator.h"
 #include "utils/log.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -35,7 +36,7 @@ namespace filtration
  * Composite filtrator which composites both CIFS&NFS
  */
 template <typename Writer>
-class Filtrators
+class Filtrators final : utils::noncopyable
 {
     enum class FiltratorTypes
     {
@@ -52,10 +53,6 @@ public:
         : currentFiltrator(FiltratorTypes::DEFAULT)
     {
     }
-
-    Filtrators(Filtrators&&)      = delete;
-    Filtrators(const Filtrators&) = delete;
-    Filtrators& operator=(const Filtrators&) = delete;
 
     /*!
      * resets state of filtrator

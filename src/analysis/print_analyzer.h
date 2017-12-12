@@ -25,6 +25,7 @@
 #include <ostream>
 
 #include "api/plugin_api.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -34,16 +35,14 @@ namespace NFS3  = NST::API::NFS3;
 namespace NFS4  = NST::API::NFS4;
 namespace NFS41 = NST::API::NFS41;
 
-class PrintAnalyzer : public IAnalyzer
+class PrintAnalyzer final : utils::noncopyable, public IAnalyzer
 {
 public:
     PrintAnalyzer(std::ostream& o)
         : out(o)
     {
     }
-    ~PrintAnalyzer()
-    {
-    }
+    ~PrintAnalyzer() override = default;
 
     // clang-format off
     void closeFileSMBv2(const SMBv2::CloseFileCommand*,
@@ -461,8 +460,6 @@ public:
     void flush_statistics() override final;
 
 private:
-    PrintAnalyzer(const PrintAnalyzer&) = delete;
-    PrintAnalyzer& operator=(const PrintAnalyzer&) = delete;
 
     std::ostream& out;
 };

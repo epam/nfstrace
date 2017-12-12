@@ -32,6 +32,7 @@
 #include "protocols/rpc/rpc_header.h"
 #include "utils/filtered_data.h"
 #include "utils/log.h"
+#include "utils/noncopyable.h"
 #include "utils/out.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
@@ -39,7 +40,7 @@ namespace NST
 {
 namespace analysis
 {
-class Session : public utils::ApplicationSession
+class Session final : utils::noncopyable, public utils::ApplicationSession
 {
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
 
@@ -50,9 +51,7 @@ public:
         utils::Out message;
         message << "Detect session " << str();
     }
-    ~Session()              = default;
-    Session(const Session&) = delete;
-    Session& operator=(const Session&) = delete;
+    ~Session() = default;
 
     void save_call_data(const std::uint64_t xid, FilteredDataQueue::Ptr&& data)
     {
@@ -89,15 +88,13 @@ private:
 };
 
 template <typename Session>
-class Sessions
+class Sessions final : utils::noncopyable
 {
 public:
     using MsgType = NST::protocols::rpc::MsgType;
 
-    Sessions()                = default;
-    ~Sessions()               = default;
-    Sessions(const Sessions&) = delete;
-    Sessions& operator=(const Sessions&) = delete;
+    Sessions() = default;
+    ~Sessions() = default;
 
     Session* get_session(utils::NetworkSession* app, NST::utils::Session::Direction dir, MsgType type)
     {

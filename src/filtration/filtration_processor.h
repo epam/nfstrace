@@ -39,6 +39,7 @@
 #include "protocols/nfs4/nfs4_utils.h"
 #include "protocols/rpc/rpc_header.h"
 #include "utils/log.h"
+#include "utils/noncopyable.h"
 #include "utils/out.h"
 #include "utils/profiler.h"
 #include "utils/sessions.h"
@@ -62,7 +63,7 @@ typedef MessageSet::value_type       Pair;
 
 // Represents UDP datagrams interchange between node A and node B
 template <typename Writer>
-struct UDPSession : public utils::NetworkSession
+struct UDPSession final : utils::noncopyable, public utils::NetworkSession
 {
 public:
     UDPSession(Writer* w, uint32_t max_rpc_hdr)
@@ -70,9 +71,6 @@ public:
         , nfs3_rw_hdr_max{max_rpc_hdr}
     {
     }
-    UDPSession(UDPSession&&)      = delete;
-    UDPSession(const UDPSession&) = delete;
-    UDPSession& operator=(const UDPSession&) = delete;
 
     void collect(PacketInfo& info)
     {
@@ -153,10 +151,10 @@ public:
 
 // Represents TCP conversation between node A and node B
 template <typename StreamReader>
-class TCPSession : public utils::NetworkSession
+class TCPSession final : utils::noncopyable, public utils::NetworkSession
 {
 public:
-    struct Flow
+    struct Flow final : utils::noncopyable
     {
         // Helpers for comparison sequence numbers
         // Idea for gt: either x > y, or y is much bigger (assume wrap)
@@ -167,18 +165,11 @@ public:
         inline static bool EQ_SEQ(uint32_t x, uint32_t y) { return (x) == (y); }
         friend class TCPSession<StreamReader>;
 
-        Flow()
-            : fragments{nullptr}
-            , sequence{0}
-        {
-        }
+        Flow() = default;
         ~Flow()
         {
             reset();
         }
-        Flow(Flow&&)      = delete;
-        Flow(const Flow&) = delete;
-        Flow& operator=(const Flow&) = delete;
 
         void reset()
         {
@@ -365,8 +356,8 @@ public:
 
     private:
         StreamReader reader;    // reader of acknowledged data stream
-        Packet*      fragments; // list of not yet acked fragments
-        uint32_t     sequence;
+        Packet*      fragments{nullptr}; // list of not yet acked fragments
+        uint32_t     sequence{0};
     };
 
     template <typename Writer>
@@ -375,9 +366,6 @@ public:
         flows[0].reader.set_writer(this, w, max_rpc_hdr);
         flows[1].reader.set_writer(this, w, max_rpc_hdr);
     }
-    TCPSession(TCPSession&&)      = delete;
-    TCPSession(const TCPSession&) = delete;
-    TCPSession& operator=(const TCPSession&) = delete;
 
     void collect(PacketInfo& info)
     {
@@ -397,7 +385,7 @@ template <
     typename Reader,
     typename Writer,
     typename Filtrator>
-class FiltrationProcessor
+class FiltrationProcessor final : utils::noncopyable
 {
 public:
     explicit FiltrationProcessor(std::unique_ptr<Reader>& r,

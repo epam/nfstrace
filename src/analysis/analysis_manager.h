@@ -30,12 +30,13 @@
 #include "controller/parameters.h"
 #include "controller/running_status.h"
 #include "utils/filtered_data.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis
 {
-class AnalysisManager
+class AnalysisManager final : utils::noncopyable
 {
     using Parameters        = NST::controller::Parameters;
     using RunningStatus     = NST::controller::RunningStatus;
@@ -43,9 +44,7 @@ class AnalysisManager
 
 public:
     AnalysisManager(RunningStatus& status, const Parameters& params);
-    AnalysisManager(const AnalysisManager&) = delete;
-    AnalysisManager& operator=(const AnalysisManager&) = delete;
-    ~AnalysisManager()                                 = default;
+    ~AnalysisManager() = default;
 
     FilteredDataQueue& get_queue() { return *queue; }
     void               start();

@@ -30,7 +30,7 @@ namespace controller
 {
 namespace cmdline
 {
-struct Args
+struct Args final
 {
     friend class CmdlineParser<Args>;
 

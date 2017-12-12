@@ -27,15 +27,16 @@
 #include <thread>
 
 #include "controller/running_status.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
-class SignalHandler
+class SignalHandler final : utils::noncopyable
 {
 public:
-    class Signal : public std::runtime_error
+    class Signal final : public std::runtime_error
     {
     public:
         explicit Signal(int sig);
@@ -43,8 +44,6 @@ public:
     };
 
     SignalHandler(RunningStatus&);
-    SignalHandler(const SignalHandler&) = delete;
-    SignalHandler& operator=(const SignalHandler&) = delete;
     ~SignalHandler();
 
 private:

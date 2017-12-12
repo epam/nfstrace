@@ -25,6 +25,7 @@
 //------------------------------------------------------------------------------
 #include "filtration/packet.h"
 #include "utils/log.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -36,16 +37,12 @@ namespace filtration
  * (see http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern)
  */
 template <typename Filtrator, typename Writer>
-class FiltratorImpl
+class FiltratorImpl : utils::noncopyable
 {
     size_t msg_len;                                 //!< length of current message
     size_t to_be_copied;                            //!<  length of readable piece of message. Initially msg_len or 0 in case of unknown msg
     using Collection = typename Writer::Collection; //!< Type of collection
     Collection collection;                          //!< storage for collection packet data
-
-    FiltratorImpl(FiltratorImpl&&)      = delete;
-    FiltratorImpl(const FiltratorImpl&) = delete;
-    FiltratorImpl& operator=(const FiltratorImpl&) = delete;
 
 public:
     FiltratorImpl()

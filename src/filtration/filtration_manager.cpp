@@ -47,7 +47,7 @@ namespace // unnamed
 template <
     typename Reader,
     typename Writer>
-class FiltrationImpl : public ProcessingThread
+class FiltrationImpl final : public ProcessingThread
 {
     using Processor = FiltrationProcessor<Reader, Writer, Filtrators<Writer>>;
 
@@ -60,9 +60,7 @@ public:
     {
         processor.reset(new Processor{reader, writer});
     }
-    ~FiltrationImpl()                     = default;
-    FiltrationImpl(const FiltrationImpl&) = delete;
-    FiltrationImpl& operator=(const FiltrationImpl&) = delete;
+    ~FiltrationImpl() = default;
 
     virtual void stop() override final
     {

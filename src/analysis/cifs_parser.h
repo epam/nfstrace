@@ -34,7 +34,7 @@ namespace analysis
 {
 /*! \class It is class which can parse CIFS messages and it called by ParserThread
  */
-class CIFSParser
+class CIFSParser final
 {
     using FilteredDataQueue = NST::utils::FilteredDataQueue; //!< Packets queue
 

@@ -27,6 +27,7 @@
 
 #include "filtration/dumping.h"
 #include "filtration/pcap/capture_reader.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -40,7 +41,7 @@ enum class RunningMode
     Draining
 };
 
-struct AParams
+struct AParams final
 {
     AParams(const std::string& p)
         : path{p}
@@ -65,7 +66,7 @@ enum class NetProtocol
     CIFS = 0x02  //!< CIFS protocol
 };
 
-class Parameters
+class Parameters : utils::noncopyable
 {
     using CaptureParams = filtration::pcap::CaptureReader::Params;
     using DumpingParams = filtration::Dumping::Params;
@@ -74,9 +75,6 @@ public:
     // initialize global instance
     Parameters(int argc, char** argv);
     ~Parameters();
-
-    Parameters(const Parameters&) = delete;
-    Parameters& operator=(const Parameters&) = delete;
 
     bool show_help() const;
     bool show_enum() const;

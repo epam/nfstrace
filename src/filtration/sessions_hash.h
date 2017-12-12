@@ -31,6 +31,7 @@
 
 #include "controller/parameters.h"
 #include "filtration/packet.h"
+#include "utils/noncopyable.h"
 #include "utils/out.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
@@ -56,7 +57,7 @@ struct MapperImpl
         return (key.ip.v4.addr[0] < key.ip.v4.addr[1]) ? Session::Source : Session::Destination;
     }
 
-    struct IPv4PortsKeyHash
+    struct IPv4PortsKeyHash final
     {
         inline std::size_t operator()(const Session& key) const
         {
@@ -67,7 +68,7 @@ struct MapperImpl
         }
     };
 
-    struct IPv4PortsKeyEqual
+    struct IPv4PortsKeyEqual final
     {
         inline bool operator()(const Session& a, const Session& b) const
         {
@@ -110,7 +111,7 @@ struct MapperImpl
         memcpy(d, src, sizeof(uint32_t) * 4);
     }
 
-    struct IPv6PortsKeyHash
+    struct IPv6PortsKeyHash final
     {
         std::size_t operator()(const Session& key) const
         {
@@ -130,7 +131,7 @@ struct MapperImpl
         }
     };
 
-    struct IPv6PortsKeyEqual
+    struct IPv6PortsKeyEqual final
     {
         static inline bool eq_ipv6_address(const uint32_t a[4], const uint32_t b[4])
         {
@@ -158,7 +159,7 @@ struct MapperImpl
     };
 };
 
-struct IPv4TCPMapper : private MapperImpl
+struct IPv4TCPMapper final : private MapperImpl
 {
     static inline void fill_hash_key(PacketInfo& info, Session& key)
     {
@@ -188,7 +189,7 @@ struct IPv4TCPMapper : private MapperImpl
     using KeyEqual = MapperImpl::IPv4PortsKeyEqual;
 };
 
-struct IPv4UDPMapper : private MapperImpl
+struct IPv4UDPMapper final : private MapperImpl
 {
     static inline void fill_hash_key(PacketInfo& info, Session& key)
     {
@@ -218,7 +219,7 @@ struct IPv4UDPMapper : private MapperImpl
     using KeyEqual = MapperImpl::IPv4PortsKeyEqual;
 };
 
-struct IPv6TCPMapper : private MapperImpl
+struct IPv6TCPMapper final : private MapperImpl
 {
     static inline void fill_hash_key(PacketInfo& info, Session& key)
     {
@@ -248,7 +249,7 @@ struct IPv6TCPMapper : private MapperImpl
     using KeyEqual = MapperImpl::IPv6PortsKeyEqual;
 };
 
-struct IPv6UDPMapper : private MapperImpl
+struct IPv6UDPMapper final : private MapperImpl
 {
     static inline void fill_hash_key(PacketInfo& info, Session& key)
     {
@@ -283,7 +284,7 @@ template <
     typename Mapper,      // map PacketInfo& to SessionImpl*
     typename SessionImpl, // mapped type
     typename Writer>
-class SessionsHash
+class SessionsHash final : utils::noncopyable
 {
 public:
     static_assert(std::is_convertible<SessionImpl, utils::NetworkSession>::value,

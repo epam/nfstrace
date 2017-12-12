@@ -25,6 +25,7 @@
 #include <pcap/pcap.h>
 
 #include "filtration/pcap/pcap_error.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -32,7 +33,7 @@ namespace filtration
 {
 namespace pcap
 {
-class BPF
+class BPF final : utils::noncopyable
 {
 public:
     BPF(pcap_t* handle, const char* filtration, bpf_u_int32 netmask)
@@ -42,8 +43,6 @@ public:
             throw PcapError("pcap_compile", pcap_geterr(handle));
         }
     }
-    BPF(const BPF&) = delete;
-    BPF& operator=(const BPF&) = delete;
     ~BPF()
     {
         pcap_freecode(&bpf);

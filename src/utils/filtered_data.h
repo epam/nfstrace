@@ -27,6 +27,7 @@
 
 #include <sys/time.h>
 
+#include "utils/noncopyable.h"
 #include "utils/queue.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
@@ -34,7 +35,7 @@ namespace NST
 {
 namespace utils
 {
-struct FilteredData
+struct FilteredData final : noncopyable
 {
     using Direction = NST::utils::Session::Direction;
 
@@ -54,10 +55,6 @@ private:
     uint32_t memsize{0};
 
 public:
-    // disable copying
-    FilteredData(const FilteredData&) = delete;
-    FilteredData& operator=(const FilteredData&) = delete;
-
     FilteredData() noexcept
         : data{cache}
     {

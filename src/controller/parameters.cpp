@@ -20,6 +20,7 @@
 */
 //------------------------------------------------------------------------------
 #include <iostream>
+#include <memory>
 
 #include <dirent.h>
 #include <unistd.h>
@@ -37,14 +38,14 @@ namespace controller
 {
 namespace // implementation
 {
-static const class ParametersImpl* impl = nullptr;
+static std::unique_ptr<const class ParametersImpl> impl;
 
 using CLI = NST::controller::cmdline::Args;
 
-class ParametersImpl : public cmdline::CmdlineParser<CLI>
+class ParametersImpl final : public cmdline::CmdlineParser<CLI>
 {
     friend class NST::controller::Parameters;
-
+public:
     ParametersImpl(int argc, char** argv)
         : rpc_message_limit{0}
     {
@@ -139,9 +140,7 @@ class ParametersImpl : public cmdline::CmdlineParser<CLI>
 
         rpc_message_limit = limit;
     }
-    virtual ~ParametersImpl() {}
-    ParametersImpl(const ParametersImpl&) = delete;
-    ParametersImpl& operator=(const ParametersImpl&) = delete;
+    ~ParametersImpl() override {}
 
 protected:
     void set_multiple_value(int index, char* const v) override
@@ -202,13 +201,12 @@ Parameters::Parameters(int argc, char** argv)
 {
     // init global instance only once
     if(impl) throw std::runtime_error{"initialized twice"};
-    impl = new ParametersImpl(argc, argv);
+    impl = std::make_unique<ParametersImpl>(argc, argv);
 }
 
 Parameters::~Parameters()
 {
-    delete impl;
-    impl = nullptr;
+    impl.reset();
 }
 
 bool Parameters::show_help() const

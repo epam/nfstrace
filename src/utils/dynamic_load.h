@@ -23,15 +23,17 @@
 #define DYNAMIC_LOAD_H
 //------------------------------------------------------------------------------
 #include <stdexcept>
+
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace utils
 {
-class DynamicLoad
+class DynamicLoad : noncopyable
 {
 public:
-    class DLException : public std::runtime_error
+    class DLException final : public std::runtime_error
     {
     public:
         explicit DLException(const std::string& msg)

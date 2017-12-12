@@ -25,20 +25,20 @@
 #include <mutex> // for std::lock_guard
 
 #include <pthread.h>
+
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace utils
 {
-class Spinlock
+class Spinlock final : noncopyable
 {
 public:
     Spinlock() noexcept
     {
         pthread_spin_init(&spinlock, PTHREAD_PROCESS_PRIVATE);
     }
-    Spinlock(const Spinlock&) = delete;
-    Spinlock& operator=(const Spinlock&) = delete;
     ~Spinlock() noexcept
     {
         pthread_spin_destroy(&spinlock);

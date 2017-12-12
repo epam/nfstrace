@@ -26,27 +26,23 @@
 
 #include "utils/filtered_data.h"
 #include "utils/log.h"
+#include "utils/noncopyable.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
-class Queueing
+class Queueing final : utils::noncopyable
 {
     using Queue = NST::utils::FilteredDataQueue;
     using Data  = NST::utils::FilteredData;
 
 public:
-    class Collection
+    class Collection final : utils::noncopyable
     {
     public:
-        inline Collection() noexcept
-            : queue{nullptr}
-            , ptr{nullptr}
-            , session{nullptr}
-        {
-        }
+        Collection() = default;
         inline Collection(Queueing* q, utils::NetworkSession* s) noexcept
             : queue{&q->queue}
             , ptr{nullptr}
@@ -60,9 +56,7 @@ public:
                 queue->deallocate(ptr);
             }
         }
-        Collection(Collection&&)      = delete;
-        Collection(const Collection&) = delete;
-        Collection& operator=(const Collection&) = delete;
+        Collection(Collection&&) = delete;
 
         inline void set(Queueing& q, utils::NetworkSession* s)
         {
@@ -151,9 +145,9 @@ public:
         inline const uint8_t* data() const { return ptr->data; }
         inline operator bool() const { return ptr != nullptr; }
     private:
-        Queue*                 queue;
-        Data*                  ptr;
-        utils::NetworkSession* session;
+        Queue*                 queue{nullptr};
+        Data*                  ptr{nullptr};
+        utils::NetworkSession* session{nullptr};
     };
 
     Queueing(Queue& q)
@@ -164,8 +158,6 @@ public:
     {
     }
     Queueing(Queueing&&)      = delete;
-    Queueing(const Queueing&) = delete;
-    Queueing& operator=(const Queueing&) = delete;
 
 private:
     Queue& queue;

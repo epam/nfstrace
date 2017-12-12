@@ -27,6 +27,7 @@
 #include <type_traits>
 
 #include "utils/block_allocator.h"
+#include "utils/noncopyable.h"
 #include "utils/spinlock.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -34,15 +35,15 @@ namespace NST
 namespace utils
 {
 template <typename T>
-class Queue
+class Queue final : noncopyable
 {
-    struct Element // an element of the queue
+    struct Element final : noncopyable
     {
         Element* prev;
         T        data;
     };
 
-    struct ElementDeleter
+    struct ElementDeleter final
     {
         explicit ElementDeleter(Queue* q = nullptr) noexcept
             : queue{q}
@@ -62,7 +63,7 @@ class Queue
 public:
     using Ptr = std::unique_ptr<T, ElementDeleter>;
 
-    class List // List of elements for client code
+    class List final : noncopyable
     {
     public:
         inline explicit List(Queue& q)
@@ -70,8 +71,6 @@ public:
         {
             ptr = queue->pop_list();
         }
-        List(const List&) = delete;
-        List& operator=(const List&) = delete;
         ~List()
         {
             while(ptr)

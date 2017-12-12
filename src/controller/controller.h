@@ -31,13 +31,14 @@
 #include "controller/signal_handler.h"
 #include "filtration/filtration_manager.h"
 #include "utils/log.h"
+#include "utils/noncopyable.h"
 #include "utils/out.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace controller
 {
-class ControllerError : public std::runtime_error
+class ControllerError final : public std::runtime_error
 {
 public:
     explicit ControllerError(const std::string& msg)
@@ -46,18 +47,15 @@ public:
     }
 };
 
-class Controller
+class Controller final : utils::noncopyable
 {
     using AnalysisManager   = NST::analysis::AnalysisManager;
     using FiltrationManager = NST::filtration::FiltrationManager;
 
-    class Running
+    class Running final : utils::noncopyable
     {
     public:
         inline Running(Controller&);
-        Running()               = delete;
-        Running(const Running&) = delete;
-        Running& operator=(const Running&) = delete;
         inline ~Running();
 
     private:
@@ -66,8 +64,6 @@ class Controller
 
 public:
     Controller(const Parameters&);
-    Controller(const Controller&) = delete;
-    Controller& operator=(const Controller&) = delete;
     ~Controller();
 
     int run();

@@ -45,15 +45,12 @@ namespace filtration
     TODO: add matching Calls and replies by XID of message
 */
 template <typename Writer>
-class RPCFiltrator : public FiltratorImpl<RPCFiltrator<Writer>, Writer>
+class RPCFiltrator final : public FiltratorImpl<RPCFiltrator<Writer>, Writer>
 {
     using BaseImpl = FiltratorImpl<RPCFiltrator<Writer>, Writer>;
 
 public:
-    RPCFiltrator()
-        : BaseImpl()
-    {
-    }
+    RPCFiltrator() = default;
 
     inline void set_writer(utils::NetworkSession* session_ptr, Writer* w, uint32_t max_rpc_hdr)
     {

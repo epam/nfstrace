@@ -31,7 +31,7 @@ namespace filtration
 {
 namespace pcap
 {
-class PcapError : public std::runtime_error
+class PcapError final : public std::runtime_error
 {
 public:
     explicit PcapError(const char* func, const char* errbuf)

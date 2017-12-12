@@ -32,6 +32,7 @@
 #include "protocols/ip/ip_header.h"
 #include "protocols/tcp/tcp_header.h"
 #include "protocols/udp/udp_header.h"
+#include "utils/noncopyable.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
@@ -45,7 +46,7 @@ using namespace NST::protocols::tcp;
 using namespace NST::protocols::udp;
 
 // Structure of pointers to captured pcap packet's headers. WITHOUT data.
-struct PacketInfo
+struct PacketInfo : utils::noncopyable
 {
     using Direction = NST::utils::Session::Direction;
 
@@ -91,8 +92,6 @@ struct PacketInfo
             break;
         }
     }
-    PacketInfo(const PacketInfo&) = delete;
-    PacketInfo& operator=(const PacketInfo&) = delete;
     void* operator new(size_t)               = delete; // only on stack
     void* operator new[](size_t)             = delete; // only on stack
     void operator delete(void*)              = delete; // only on stack
@@ -325,11 +324,9 @@ struct PacketInfo
 };
 
 // PCAP packet in dynamic allocated memory
-struct Packet : public PacketInfo
+struct Packet final : public PacketInfo
 {
-    Packet()              = delete;
-    Packet(const Packet&) = delete;
-    Packet& operator=(const Packet&) = delete;
+    Packet() = delete;
 
     Packet* next; // pointer to next packet or nullptr
 

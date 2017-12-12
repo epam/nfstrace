@@ -23,6 +23,8 @@
 #define LOG_H
 //------------------------------------------------------------------------------
 #include <sstream>
+
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 #ifdef NDEBUG
 #define TRACE(...)
@@ -58,18 +60,16 @@ namespace NST
 {
 namespace utils
 {
-class Log : private std::stringbuf, public std::ostream
+class Log final : noncopyable, private std::stringbuf, public std::ostream
 {
 public:
     // helper for creation and destruction logging subsystem
     // isn't thread-safe!
-    struct Global
+    struct Global final : noncopyable
     {
         explicit Global(const std::string& file_path);
         ~Global();
-        Global(const Global&) = delete;
-        Global& operator=(const Global&) = delete;
-        void    reopen();
+        void reopen();
 
     private:
         std::string log_file_path;
@@ -77,8 +77,6 @@ public:
 
     Log();
     ~Log();
-    Log(const Log&) = delete;
-    Log& operator=(const Log&) = delete;
 
     // lightweight logging
     static void message(const char* format, ...);

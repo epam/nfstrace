@@ -25,12 +25,13 @@
 #include <thread>
 
 #include "controller/running_status.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
-class ProcessingThread
+class ProcessingThread : utils::noncopyable
 {
 protected:
     ProcessingThread(NST::controller::RunningStatus& s)

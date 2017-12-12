@@ -28,6 +28,7 @@
 #include <sys/socket.h>
 
 #include "filtration/pcap/pcap_error.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -35,11 +36,11 @@ namespace filtration
 {
 namespace pcap
 {
-class NetworkInterfaces
+class NetworkInterfaces final : utils::noncopyable
 {
 public:
     class Interface;
-    class Address
+    class Address final
     {
         friend class Interface;
 
@@ -70,7 +71,7 @@ public:
         pcap_addr_t* addr;
     };
 
-    class Interface
+    class Interface final
     {
         friend class NetworkInterfaces;
 
@@ -136,8 +137,6 @@ public:
         throw std::runtime_error{"No suitable device found.\n Note: reading an ip address of a network device may require special privileges."};
     }
 
-    NetworkInterfaces(const NetworkInterfaces&) = delete;
-    NetworkInterfaces& operator=(const NetworkInterfaces&) = delete;
     void operator&()                                       = delete;
     void* operator new(size_t)                             = delete;
     void operator delete(void*)                            = delete;

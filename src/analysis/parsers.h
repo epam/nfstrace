@@ -33,7 +33,7 @@ namespace analysis
 /*!
  * Composite parser which parses both CIFS&NFS
  */
-class Parsers
+class Parsers final
 {
     using FilteredDataQueue = NST::utils::FilteredDataQueue;
     CIFSParser parser_cifs; //!< CIFS parser

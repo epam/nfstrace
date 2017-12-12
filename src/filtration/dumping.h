@@ -31,33 +31,24 @@
 #include "filtration/packet.h"
 #include "filtration/pcap/packet_dumper.h"
 #include "utils/log.h"
+#include "utils/noncopyable.h"
 #include "utils/sessions.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace filtration
 {
-class Dumping
+class Dumping final : utils::noncopyable
 {
 public:
-    class Collection
+    class Collection final : utils::noncopyable
     {
-    private:
         const static int cache_size{4096};
 
     public:
-        inline Collection()
-            : dumper{nullptr}
-            , buff_size{cache_size}
-            , payload{cache}
-            , payload_len{0}
-        {
-        }
+        inline Collection() = default;
         inline Collection(Dumping* d, utils::NetworkSession* /*unused*/)
             : dumper{d}
-            , buff_size{cache_size}
-            , payload{cache}
-            , payload_len{0}
         {
         }
         inline ~Collection()
@@ -65,9 +56,6 @@ public:
             if(payload != cache)
                 delete[] payload;
         }
-        Collection(Collection&&)      = delete;
-        Collection(const Collection&) = delete;
-        Collection& operator=(const Collection&) = delete;
 
         inline void set(Dumping& d, utils::NetworkSession* /*unused*/)
         {
@@ -132,14 +120,14 @@ public:
         inline const uint8_t* data() const { return payload; }
         inline operator bool() const { return dumper != nullptr; }
     private:
-        Dumping* dumper;
-        uint32_t buff_size;
-        uint8_t* payload;
+        Dumping* dumper{nullptr};
+        uint32_t buff_size{cache_size};
+        uint8_t* payload{cache};
         uint8_t  cache[cache_size];
-        uint32_t payload_len;
+        uint32_t payload_len{0};
     };
 
-    struct Params
+    struct Params final
     {
         std::string output_file{};
         std::string command{};
@@ -148,8 +136,6 @@ public:
 
     Dumping(pcap_t* const h, const Params& params);
     ~Dumping();
-    Dumping(const Dumping&) = delete;
-    Dumping& operator=(const Dumping&) = delete;
 
     inline void dump(const pcap_pkthdr* header, const u_char* packet)
     {

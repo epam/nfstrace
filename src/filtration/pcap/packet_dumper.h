@@ -25,6 +25,7 @@
 #include <pcap/pcap.h>
 
 #include "filtration/pcap/pcap_error.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -32,7 +33,7 @@ namespace filtration
 {
 namespace pcap
 {
-class PacketDumper
+class PacketDumper final : utils::noncopyable
 {
 public:
     PacketDumper(pcap_t* handle, const char* path)
@@ -43,8 +44,6 @@ public:
             throw PcapError{"pcap_dump_open", pcap_geterr(handle)};
         }
     }
-    PacketDumper(const PacketDumper&) = delete;
-    PacketDumper& operator=(const PacketDumper&) = delete;
     ~PacketDumper()
     {
         pcap_dump_close(dumper);

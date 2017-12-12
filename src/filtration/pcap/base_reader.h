@@ -28,6 +28,7 @@
 #include <pcap/pcap.h>
 
 #include "filtration/pcap/pcap_error.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
@@ -40,7 +41,7 @@ inline const char* library_version()
     return pcap_lib_version();
 }
 
-class BaseReader
+class BaseReader : utils::noncopyable
 {
 protected:
     BaseReader(const std::string& input)

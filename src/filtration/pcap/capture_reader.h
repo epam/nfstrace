@@ -32,7 +32,7 @@ namespace filtration
 {
 namespace pcap
 {
-class CaptureReader : public BaseReader
+class CaptureReader final : public BaseReader
 {
 public:
     enum class Direction : int
@@ -42,7 +42,7 @@ public:
         OUT,
     };
 
-    struct Params
+    struct Params final
     {
         std::string interface{};
         std::string filter{};
@@ -54,7 +54,7 @@ public:
     };
 
     CaptureReader(const Params& params);
-    ~CaptureReader() = default;
+    ~CaptureReader() override = default;
 
     void print_statistic(std::ostream& out) const override;
 };

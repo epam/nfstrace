@@ -23,12 +23,14 @@
 #define OUT_H
 //------------------------------------------------------------------------------
 #include <iostream>
+
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace utils
 {
-class Out : public std::ostream
+class Out final : noncopyable, public std::ostream
 {
 public:
     enum class Level : int // verbosity level
@@ -39,12 +41,10 @@ public:
     };
 
     // helper for creation and destruction global level of verbosity
-    struct Global
+    struct Global final : noncopyable
     {
         explicit Global(const Level verbose_level);
         ~Global();
-        Global(const Global&) = delete;
-        Global& operator=(const Global&) = delete;
 
         static Level get_level();      // return global level of verbosity
         static void  set_level(Level); // set global level of verbosity
@@ -52,8 +52,6 @@ public:
 
     explicit Out(Level level = Level::Info); // verbose level of message
     ~Out();
-    Out(const Out&) = delete;
-    Out& operator=(const Out&) = delete;
 };
 
 inline bool operator>=(const Out::Level a, const Out::Level b)

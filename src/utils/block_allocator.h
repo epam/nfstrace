@@ -27,15 +27,17 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace utils
 {
 // May throw std::bad_alloc during creation or allocation
-class BlockAllocator
+class BlockAllocator final : noncopyable
 {
-    struct Chunk // type for linking free chunks of memory in a list
+    struct Chunk final : noncopyable // type for linking free chunks of memory in a list
     {
         Chunk* next; // pointer to next chunk in a list
     };

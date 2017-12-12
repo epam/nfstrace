@@ -41,15 +41,12 @@ namespace filtration
 using SMBv2Commands = NST::API::SMBv2::SMBv2Commands;
 
 template <typename Writer>
-class CIFSFiltrator : public FiltratorImpl<CIFSFiltrator<Writer>, Writer>
+class CIFSFiltrator final : public FiltratorImpl<CIFSFiltrator<Writer>, Writer>
 {
     using BaseImpl = FiltratorImpl<CIFSFiltrator<Writer>, Writer>;
     size_t rw_hdr_max{512}; // limit for SMB header to truncate messages
 public:
-    CIFSFiltrator()
-        : BaseImpl()
-    {
-    }
+    CIFSFiltrator() = default;
 
     constexpr static size_t lengthOfReplyHeader()
     {

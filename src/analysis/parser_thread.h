@@ -28,13 +28,14 @@
 #include "analysis/analyzers.h"
 #include "controller/running_status.h"
 #include "utils/filtered_data.h"
+#include "utils/noncopyable.h"
 //------------------------------------------------------------------------------
 namespace NST
 {
 namespace analysis
 {
 template <typename Parser>
-class ParserThread
+class ParserThread final : utils::noncopyable
 {
     using RunningStatus     = NST::controller::RunningStatus;
     using FilteredDataQueue = NST::utils::FilteredDataQueue;

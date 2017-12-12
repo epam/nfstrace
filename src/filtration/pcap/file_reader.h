@@ -32,11 +32,11 @@ namespace filtration
 {
 namespace pcap
 {
-class FileReader : public BaseReader
+class FileReader final : public BaseReader
 {
 public:
     explicit FileReader(const std::string& file);
-    ~FileReader() = default;
+    ~FileReader() override = default;
 
     inline FILE*         get_file() { return pcap_file(handle); }
     void                 print_statistic(std::ostream& /*out*/) const override {}
