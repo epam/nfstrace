@@ -90,13 +90,13 @@ public:
     void deallocate(void* ptr) noexcept
     {
         assert(ptr);
+        Chunk* chunk = reinterpret_cast<Chunk*>(ptr);
         assert(std::any_of(std::begin(blocks), std::end(blocks),
                            [&](const Chunks& chunks) {
-                               const auto b = reinterpret_cast<void*>(chunks.get());
-                               const auto e = reinterpret_cast<void*>(chunks.get() + block * chunk);
-                               return (b <= ptr) && (ptr < e);
+                               const auto b = getof(0, chunks);
+                               const auto e = getof(block-1, chunks);
+                               return (b <= chunk) && (chunk <= e);
                            }));
-        Chunk* chunk = reinterpret_cast<Chunk*>(ptr);
         chunk->next  = list;
         list         = chunk;
         ++nfree;
