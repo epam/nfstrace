@@ -76,11 +76,6 @@ public:
     {
         if(list == nullptr)
         {
-            if(blocks.size() == limit) // all blocks are allocated!
-            {
-                // soft limit of blocks is reached
-            }
-
             list = preallocate_block();
             ++limit;
         }
