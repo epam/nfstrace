@@ -57,7 +57,8 @@ before_script:
   - gcov --version 
   - $LCOV --gcov-tool "/usr/bin/gcov-7" --directory . --zerocounters
 script:
-  - ctest --build-and-test . ./build --build-config debug \
+  - |
+    ctest --build-and-test . ./build --build-config debug \
           --build-generator 'Unix Makefiles' --parallel 4 --build-noclean --build-target all \
           --build-options \
           -DGTEST_SOURCE_DIR=$GTEST_DIR \
