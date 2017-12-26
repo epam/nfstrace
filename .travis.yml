@@ -58,13 +58,12 @@ before_script:
   - $LCOV --gcov-tool "/usr/bin/gcov-7" --directory . --zerocounters
 script:
   - |
-    ctest --build-and-test . ./build --build-config debug \
-          --build-generator 'Unix Makefiles' --parallel 4 --build-noclean --build-target all \
+    ctest --build-and-test . ./build --build-config debug --build-generator 'Unix Makefiles' --parallel 4 --build-target all \
           --build-options \
           -DGTEST_SOURCE_DIR=$GTEST_DIR \
           -DCMAKE_CXX_COMPILER="$COMPILER" \
-          -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -DCMAKE_C_FLAGS="$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true"
-  - cmake --build ./build --target test
+          -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -DCMAKE_C_FLAGS="$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true" \
+          --test-command ctest
   - cmake --build ./build --target documentation-pdflatex
   - ccache -s
 
