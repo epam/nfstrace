@@ -81,7 +81,7 @@ before_script:
 script:
   - mkdir debug && cd debug
   - $CMAKE -DCMAKE_CXX_COMPILER="$COMPILER" -DCMAKE_BUILD_TYPE=DEBUG -DGTEST_SOURCE_DIR=$GTEST_DIR -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -DCMAKE_C_FLAGS="$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true" ../
-  - make
+  - $CMAKE --build . -- -j 4
   - make test
   - make documentation-pdflatex
   - ccache -s
