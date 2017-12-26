@@ -32,7 +32,7 @@ matrix:
     - os: linux
       compiler: clang
       env:
-        - COMPILER=/usr/bin/clang++-5.0 gcov="/usr/bin/gcov-7"
+        - COMPILER=/usr/bin/clang++-5.0
       fast_finish: true
 
 before_install:
@@ -57,11 +57,14 @@ before_script:
   - gcov --version 
   - $LCOV --gcov-tool "/usr/bin/gcov-7" --directory . --zerocounters
 script:
-  - mkdir debug && cd debug
-  - cmake -DCMAKE_CXX_COMPILER="$COMPILER" -DCMAKE_BUILD_TYPE=DEBUG -DGTEST_SOURCE_DIR=$GTEST_DIR -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -DCMAKE_C_FLAGS="$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true" ../
-  - cmake --build . -- -j 4
-  - make test
-  - make documentation-pdflatex
+  - ctest --build-and-test . ./build --build-config debug \
+          --build-generator 'Unix Makefiles' --parallel 4 --build-noclean --build-target all \
+          --build-options \
+          -DGTEST_SOURCE_DIR=$GTEST_DIR \
+          -DCMAKE_CXX_COMPILER="$COMPILER" \
+          -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -DCMAKE_C_FLAGS="$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true"
+  - cmake --build ./build --target test
+  - cmake --build ./build --target documentation-pdflatex
   - ccache -s
 
 after_success: 
