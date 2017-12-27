@@ -4,8 +4,8 @@ language: cpp
 
 addons:
   apt:
-    sources: ['ubuntu-toolchain-r-test','llvm-toolchain-trusty-5.0']
-    packages: ['gcc-7','g++-7','clang-5.0','llvm-5.0-dev','libpcap-dev','libjson-c-dev','valgrind','ccache','texlive-latex-base']
+    sources: ['ubuntu-toolchain-r-test']
+    packages: ['gcc-7','g++-7','libpcap-dev','libjson-c-dev','valgrind','ccache','texlive-latex-base']
  
 cache:
   apt: true
@@ -19,7 +19,6 @@ env:
     - DEPS_DIR="$HOME/install"
     - LCOV_DIR="$DEPS_DIR/lcov-1.11"
     - LCOV="$LCOV_DIR/bin/lcov"
-    - GTEST_DIR="$TRAVIS_BUILD_DIR/third_party/googletest"
 
 matrix:
   include:
@@ -58,7 +57,7 @@ before_script:
 script:
   - |
     ctest --build-and-test . ./build --build-config debug --build-generator 'Unix Makefiles' --parallel 4 --build-target all \
-          --build-options -DGTEST_SOURCE_DIR=$GTEST_DIR -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DINCLUDE_COVERAGE_INFO="true" \
+          --build-options -DGTEST_SOURCE_DIR=$TRAVIS_BUILD_DIR/third_party/googletest -DINCLUDE_COVERAGE_INFO="true" \
           --test-command ctest
   - cmake --build ./build --target documentation-pdflatex
   - ccache -s
