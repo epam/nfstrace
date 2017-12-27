@@ -26,19 +26,17 @@ matrix:
     - os: linux
       compiler: gcc
       env:
-        # You can not set CXX directly as Travis CI will overwrite it. You need an intermediate variable like COMPILER
-        - COMPILER=g++-7 CXX_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" C_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-7"
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+        - CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-7"     
       fast_finish: true
     - os: linux
       compiler: clang
       env:
-        - COMPILER=/usr/bin/clang++-5.0
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
       fast_finish: true
 
 before_install:
-  - git submodule update --init --recursive
-  - uname -a
-  - pwd
+  - eval "${MATRIX_EVAL}"
   - export
 
 install:
@@ -56,13 +54,11 @@ before_script:
   - cmake --version
   - gcov --version 
   - $LCOV --gcov-tool "/usr/bin/gcov-7" --directory . --zerocounters
+
 script:
   - |
     ctest --build-and-test . ./build --build-config debug --build-generator 'Unix Makefiles' --parallel 4 --build-target all \
-          --build-options \
-          -DGTEST_SOURCE_DIR=$GTEST_DIR \
-          -DCMAKE_CXX_COMPILER="$COMPILER" \
-          -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -DCMAKE_C_FLAGS="$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true" \
+          --build-options -DGTEST_SOURCE_DIR=$GTEST_DIR -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DINCLUDE_COVERAGE_INFO="true" \
           --test-command ctest
   - cmake --build ./build --target documentation-pdflatex
   - ccache -s
@@ -74,5 +70,3 @@ after_success:
       $LCOV --gcov-tool "/usr/bin/gcov-7" --remove coverage.info 'tests/*' '/usr/*' '*gmock*' --output-file coverage.info # filter out system and test code
       coveralls-lcov coverage.info
     fi
-  # - coveralls --gcov "$(which "${GCOV}")" --encoding iso-8859-1 || echo 'coveralls upload failed.'
-
