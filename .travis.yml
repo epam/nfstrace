@@ -5,7 +5,7 @@ language: cpp
 addons:
   apt:
     sources: ['ubuntu-toolchain-r-test','llvm-toolchain-trusty-5.0']
-    packages: ['gcc-7','g++-7','clang-5.0','llvm-5.0-dev','libpcap-dev','libjson-c-dev','valgrind','ccache','texlive-latex-base']
+    packages: ['gcc-7','g++-7','clang-5.0','libpcap-dev','libjson-c-dev','valgrind','gcovr','ccache','texlive-latex-base']
  
 cache:
   apt: true
@@ -19,26 +19,23 @@ env:
     - DEPS_DIR="$HOME/install"
     - LCOV_DIR="$DEPS_DIR/lcov-1.11"
     - LCOV="$LCOV_DIR/bin/lcov"
-    - GTEST_DIR="$TRAVIS_BUILD_DIR/third_party/googletest"
 
 matrix:
   include:
     - os: linux
       compiler: gcc
       env:
-        # You can not set CXX directly as Travis CI will overwrite it. You need an intermediate variable like COMPILER
-        - COMPILER=g++-7 CXX_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" C_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-7"
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+        - CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-7"     
       fast_finish: true
     - os: linux
       compiler: clang
       env:
-        - COMPILER=/usr/bin/clang++-5.0
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
       fast_finish: true
 
 before_install:
-  - git submodule update --init --recursive
-  - uname -a
-  - pwd
+  - eval "${MATRIX_EVAL}"
   - export
 
 install:
@@ -53,26 +50,21 @@ install:
     fi
 
 before_script:
-  - cmake --version
   - gcov --version 
   - $LCOV --gcov-tool "/usr/bin/gcov-7" --directory . --zerocounters
+
 script:
   - |
     ctest --build-and-test . ./build --build-config debug --build-generator 'Unix Makefiles' --parallel 4 --build-target all \
-          --build-options \
-          -DGTEST_SOURCE_DIR=$GTEST_DIR \
-          -DCMAKE_CXX_COMPILER="$COMPILER" \
-          -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -DCMAKE_C_FLAGS="$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true" \
+          --build-options -DGTEST_SOURCE_DIR=$TRAVIS_BUILD_DIR/third_party/googletest -DINCLUDE_COVERAGE_INFO="true" \
           --test-command ctest
   - cmake --build ./build --target documentation-pdflatex
   - ccache -s
 
 after_success: 
   - |
-    if [[ "$COMPILER" == "g++"* ]]; then
+    if [[ "$CXX" == "g++"* ]]; then
       $LCOV --gcov-tool "/usr/bin/gcov-7" --compat-libtool --directory . --capture --output-file coverage.info # capture coverage info
       $LCOV --gcov-tool "/usr/bin/gcov-7" --remove coverage.info 'tests/*' '/usr/*' '*gmock*' --output-file coverage.info # filter out system and test code
       coveralls-lcov coverage.info
     fi
-  # - coveralls --gcov "$(which "${GCOV}")" --encoding iso-8859-1 || echo 'coveralls upload failed.'
-
