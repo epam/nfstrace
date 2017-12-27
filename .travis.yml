@@ -50,7 +50,6 @@ install:
     fi
 
 before_script:
-  - cmake --version
   - gcov --version 
   - $LCOV --gcov-tool "/usr/bin/gcov-7" --directory . --zerocounters
 
