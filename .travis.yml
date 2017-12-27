@@ -63,7 +63,7 @@ script:
 
 after_success: 
   - |
-    if [[ "$COMPILER" == "g++"* ]]; then
+    if [[ "$CXX" == "g++"* ]]; then
       $LCOV --gcov-tool "/usr/bin/gcov-7" --compat-libtool --directory . --capture --output-file coverage.info # capture coverage info
       $LCOV --gcov-tool "/usr/bin/gcov-7" --remove coverage.info 'tests/*' '/usr/*' '*gmock*' --output-file coverage.info # filter out system and test code
       coveralls-lcov coverage.info
