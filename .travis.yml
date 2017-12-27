@@ -4,7 +4,7 @@ language: cpp
 
 addons:
   apt:
-    sources: ['ubuntu-toolchain-r-test']
+    sources: ['ubuntu-toolchain-r-test','llvm-toolchain-trusty-5.0']
     packages: ['gcc-7','g++-7','clang-5.0','libpcap-dev','libjson-c-dev','valgrind','gcovr','ccache','texlive-latex-base']
  
 cache:
