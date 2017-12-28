@@ -39,7 +39,17 @@ matrix:
       env:
         - COMPILER=/usr/bin/clang++-5.0 gcov="/usr/bin/gcov-7"
       fast_finish: true
-
+    - os: linux
+      compiler: clang
+      env:
+        - COMPILER=/usr/bin/clang++-5.0 gcov="/usr/bin/gcov-7" CXX_FLAGS="-fsanitize=address"
+      fast_finish: true
+    - os: linux
+      compiler: clang
+      env:
+        - COMPILER=/usr/bin/clang++-5.0 gcov="/usr/bin/gcov-7" CXX_FLAGS="-fsanitize=thread"
+      fast_finish: true
+      
 before_install:
   - git submodule update --init --recursive
   - uname -a
