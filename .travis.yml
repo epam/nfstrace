@@ -5,7 +5,7 @@ language: cpp
 addons:
   apt:
     sources: ['ubuntu-toolchain-r-test','llvm-toolchain-trusty-5.0']
-    packages: ['gcc-7','g++-7','clang-5.0','llvm-5.0-dev','libpcap-dev','valgrind','ccache','texlive-latex-base']
+    packages: ['gcc-7','g++-7','clang-5.0','libpcap-dev','libjson-c-dev','valgrind','gcovr','ccache','texlive-latex-base']
  
 cache:
   apt: true
@@ -17,27 +17,21 @@ cache:
 env:
   global:
     - DEPS_DIR="$HOME/install"
-    - CMAKE_DIR="$DEPS_DIR/cmake-3.5.2-Linux-x86_64"
-    - CMAKE="$CMAKE_DIR/bin/cmake"
-    - JSON_DIR="$DEPS_DIR/json-c-0.11"
-    - JSON_LIB="$JSON_DIR/install"
-    - JSON_INCLUDE_DIR="$JSON_DIR"
     - LCOV_DIR="$DEPS_DIR/lcov-1.11"
     - LCOV="$LCOV_DIR/bin/lcov"
-    - GTEST_DIR="$TRAVIS_BUILD_DIR/third_party/googletest"
 
 matrix:
   include:
     - os: linux
       compiler: gcc
       env:
-        # You can not set CXX directly as Travis CI will overwrite it. You need an intermediate variable like COMPILER
-        - COMPILER=g++-7 CXX_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" C_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-7"
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+        - CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-7"     
       fast_finish: true
     - os: linux
       compiler: clang
       env:
-        - COMPILER=/usr/bin/clang++-5.0 gcov="/usr/bin/gcov-7"
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
       fast_finish: true
     - os: linux
       compiler: clang
@@ -51,31 +45,12 @@ matrix:
       fast_finish: true
       
 before_install:
-  - git submodule update --init --recursive
-  - uname -a
-  - pwd
+  - eval "${MATRIX_EVAL}"
   - export
-  - export PATH="$PATH:$JSON_LIB"
 
 install:
   - pip install --user --upgrade cpp-coveralls
   - gem install coveralls-lcov
-  - |
-    if [ ! -f "$CMAKE" ]; then
-      wget -O - --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.tar.gz | tar xz && cp -r cmake-3.5.2-Linux-x86_64 $DEPS_DIR
-    else
-      echo "Using cached cmake"
-    fi
-  - |
-
-  # installing libjson-c from source because #'ondrej/php5-5.6' is disallowed source in travis-ci
-  - |
-    if [ ! -f "$JSON_DIR/configure" ]; then
-      wget -O - --no-check-certificate https://s3.amazonaws.com/json-c_releases/releases/json-c-0.11.tar.gz | tar xz && cp -r json-c-0.11 $DEPS_DIR && (cd $JSON_DIR && mkdir -p $JSON_LIB && sh ./autogen.sh && ./configure --prefix=$JSON_LIB && make install)
-    else
-      echo "Using cached json"
-    fi
-
   - |
     if [ ! -f "$LCOV" ]; then
       wget -O - --no-check-certificate http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz | tar xz && cp -r lcov-1.11 $DEPS_DIR
@@ -85,23 +60,21 @@ install:
     fi
 
 before_script:
-  - $CMAKE --version
   - gcov --version 
   - $LCOV --gcov-tool "/usr/bin/gcov-7" --directory . --zerocounters
+
 script:
-  - mkdir debug && cd debug
-  - $CMAKE -DCMAKE_CXX_COMPILER="$COMPILER" -DCMAKE_BUILD_TYPE=DEBUG -DGTEST_SOURCE_DIR=$GTEST_DIR -D"CMAKE_CXX_FLAGS=$CXX_FLAGS" -DCMAKE_C_FLAGS="$C_FLAGS" -DINCLUDE_COVERAGE_INFO="true" ../
-  - make
-  - make test
-  - make documentation-pdflatex
+  - |
+    ctest --build-and-test . ./build --build-config debug --build-generator 'Unix Makefiles' --parallel 4 --build-target all \
+          --build-options -DGTEST_SOURCE_DIR=$TRAVIS_BUILD_DIR/third_party/googletest -DINCLUDE_COVERAGE_INFO="true" \
+          --test-command ctest
+  - cmake --build ./build --target documentation-pdflatex
   - ccache -s
 
 after_success: 
   - |
-    if [[ "$COMPILER" == "g++"* ]]; then
+    if [[ "$CXX" == "g++"* ]]; then
       $LCOV --gcov-tool "/usr/bin/gcov-7" --compat-libtool --directory . --capture --output-file coverage.info # capture coverage info
       $LCOV --gcov-tool "/usr/bin/gcov-7" --remove coverage.info 'tests/*' '/usr/*' '*gmock*' --output-file coverage.info # filter out system and test code
       coveralls-lcov coverage.info
     fi
-  # - coveralls --gcov "$(which "${GCOV}")" --encoding iso-8859-1 || echo 'coveralls upload failed.'
-
