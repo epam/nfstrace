@@ -144,12 +144,6 @@ public:
 
     Element* pop_list() // take out list of all queued elements
     {
-        volatile int arr[100] = {};
-        volatile int index = 100;
-        volatile int i = arr[index];
-        ++i;
-
-
         Element* list{nullptr};
         if(last)
         {
