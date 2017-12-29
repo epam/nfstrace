@@ -145,15 +145,12 @@ public:
     Element* pop_list() // take out list of all queued elements
     {
         Element* list{nullptr};
+        Spinlock::Lock lock{q_spinlock};
         if(last)
         {
-            Spinlock::Lock lock{q_spinlock};
-            if(last)
-            {
-                list       = first;
-                last->prev = nullptr; // set end of list
-                last = first = nullptr;
-            }
+            list       = first;
+            last->prev = nullptr; // set end of list
+            last = first = nullptr;
         }
         return list;
     }

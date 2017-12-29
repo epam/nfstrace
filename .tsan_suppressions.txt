@@ -1,0 +1,4 @@
+# ThreadSanitizer suppressions file 
+
+#Double checked locking false positive
+race:NST::utils::Queue<NST::utils::FilteredData>::pop_list
