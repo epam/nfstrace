@@ -80,3 +80,5 @@ after_success:
       $LCOV --gcov-tool "/usr/bin/gcov-7" --remove coverage.info 'tests/*' '/usr/*' '*gmock*' --output-file coverage.info # filter out system and test code
       coveralls-lcov coverage.info
     fi
+after_failure: 
+  - cat $TRAVIS_BUILD_DIR/build/Testing/Temporary/LastTest.log
