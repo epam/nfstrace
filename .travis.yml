@@ -5,7 +5,7 @@ language: cpp
 addons:
   apt:
     sources: ['ubuntu-toolchain-r-test']
-    packages: ['gcc-7','g++-7','libpcap-dev','libjson-c-dev','valgrind','gcovr','ccache','texlive-latex-base']
+    packages: ['libpcap-dev','libjson-c-dev','valgrind','gcovr','ccache','texlive-latex-base']
  
 cache:
   apt: true
@@ -24,6 +24,12 @@ matrix:
   include:
     - os: linux
       compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
         - CXXFLAGS="-g -O0 -fprofile-arcs -ftest-coverage -fPIC" CFLAGS="-g -O0 -fprofile-arcs -ftest-coverage" gcov="/usr/bin/gcov-7"     
