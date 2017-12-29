@@ -45,17 +45,10 @@ public:
         Collection() = default;
         inline Collection(Queueing* q, utils::NetworkSession* s) noexcept
             : queue{&q->queue}
-            , ptr{nullptr}
             , session{s}
         {
         }
-        inline ~Collection()
-        {
-            if(ptr)
-            {
-                queue->deallocate(ptr);
-            }
-        }
+        ~Collection() = default;
         Collection(Collection&&) = delete;
 
         inline void set(Queueing& q, utils::NetworkSession* s)
@@ -66,7 +59,7 @@ public:
 
         void allocate()
         {
-            if(nullptr == ptr)
+            if(!ptr)
             {
                 // we have a reference to queue, just do allocate and reset
                 ptr = queue->allocate();
@@ -79,11 +72,7 @@ public:
 
         void deallocate()
         {
-            if(ptr)
-            {
-                queue->deallocate(ptr);
-                ptr = nullptr;
-            }
+            ptr.reset();
         }
 
         inline void reset()
@@ -146,7 +135,7 @@ public:
         inline operator bool() const { return ptr != nullptr; }
     private:
         Queue*                 queue{nullptr};
-        Data*                  ptr{nullptr};
+        Queue::Ptr             ptr;
         utils::NetworkSession* session{nullptr};
     };
 

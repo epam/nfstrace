@@ -180,7 +180,7 @@ TEST(Parser, CIFSAsyncParser)
     Analyzers                   analyzers(params);
 
     NST::utils::FilteredDataQueue queue(1, 1);
-    NST::utils::FilteredData*     data = queue.allocate();
+    auto                          data = queue.allocate();
     NetworkSession                s;
     data->session = &s;
     queue.push(data);
