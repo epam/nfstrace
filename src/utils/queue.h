@@ -140,6 +140,11 @@ public:
 private:
     Element* pop_list() noexcept // take out list of all queued elements
     {
+    volatile int arr[100] = {};
+         volatile int index = 100;
+         volatile int i = arr[index];
+         ++i;
+    
         Element* list{nullptr};
         Spinlock::Lock lock{q_spinlock};
         if(last)
