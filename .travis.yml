@@ -4,8 +4,8 @@ language: cpp
 
 addons:
   apt:
-    sources: ['ubuntu-toolchain-r-test','llvm-toolchain-trusty-5.0']
-    packages: ['gcc-7','g++-7','clang-5.0','libpcap-dev','libjson-c-dev','valgrind','gcovr','ccache','texlive-latex-base']
+    sources: ['ubuntu-toolchain-r-test']
+    packages: ['gcc-7','g++-7','libpcap-dev','libjson-c-dev','valgrind','gcovr','ccache','texlive-latex-base']
  
 cache:
   apt: true
@@ -31,18 +31,18 @@ matrix:
     - os: linux
       compiler: clang
       env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+        - MATRIX_EVAL="CC=clang && CXX=clang++"
       fast_finish: true
     - os: linux
       compiler: clang
       env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+        - MATRIX_EVAL="CC=clang && CXX=clang++"
         - CXXFLAGS="-fsanitize=address"
       fast_finish: true
     - os: linux
       compiler: clang
       env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+        - MATRIX_EVAL="CC=clang && CXX=clang++"
         - CXXFLAGS="-fsanitize=thread"
       fast_finish: true
       
