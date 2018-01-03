@@ -84,11 +84,17 @@ void Dumping::exec_command() const
         for(std::string arg; ss >> arg;)
         {
             tokens.emplace_back(arg);
-            args.emplace_back(const_cast<char*>(tokens.back().c_str()));
         }
+
+        for(const std::string &token : tokens)
+        {
+            args.emplace_back(const_cast<char*>(token.c_str()));
+        }
+
         args.push_back(const_cast<char*>(name.c_str()));
         args.push_back(nullptr); // need termination null pointer
 
+        NST::utils::Log::flush(); // flush buffer
         if(execvp(args[0], &args[0]) == -1)
         {
             LOG("execvp(%s,%s %s) return: %s", args[0], command.c_str(), name.c_str(), strerror(errno));
