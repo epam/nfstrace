@@ -51,7 +51,7 @@ class Queue final : noncopyable
         }
         void operator()(T* const pointer) const
         {
-            if(pointer /*&& queue - dont check - optimization*/)
+            if(pointer && queue)
             {
                 queue->deallocate(pointer);
             }
@@ -66,32 +66,28 @@ public:
     class List final : noncopyable
     {
     public:
-        inline explicit List(Queue& q)
+        explicit List(Queue& q) noexcept
             : queue{&q}
         {
             ptr = queue->pop_list();
         }
-        ~List()
+        ~List() noexcept
         {
             while(ptr)
             {
-                free_current();
+                Element* tmp{ptr->prev};
+                queue->deallocate(ptr);
+                ptr = tmp;
             }
         }
 
-        operator bool() const { return ptr; }       // is empty?
-        const T& data() const { return ptr->data; } // get data
-        Ptr      get_current()                      // return element and switch to next
+        operator bool() const { return ptr; } // is empty?
+
+        Ptr get_current() // return element and switch to next
         {
             Element* tmp{ptr};
             ptr = ptr->prev;
             return Ptr{&tmp->data, ElementDeleter{queue}};
-        }
-        void free_current() // deallocate element and switch to next
-        {
-            Element* tmp{ptr->prev};
-            queue->deallocate(ptr);
-            ptr = tmp;
         }
 
     private:
@@ -110,26 +106,25 @@ public:
         List list{*this}; // deallocate items by destructor of List
     }
 
-    T* allocate()
+    Ptr allocate()
     {
         static_assert(std::is_nothrow_constructible<T>::value,
                       "The construction of T must not to throw any exception");
 
-        Spinlock::Lock lock{a_spinlock};
-        Element*       e{(Element*)allocator.allocate()}; // may throw std::bad_alloc
-        return ::new(&(e->data)) T;                       // placement construction T
+        Ptr out{nullptr, ElementDeleter{this}};
+
+        {
+            Spinlock::Lock lock{a_spinlock};
+            Element*       e{(Element*)allocator.allocate()}; // may throw std::bad_alloc
+            out.reset(&(e->data));
+        }
+        ::new(out.get()) T; // placement construction T
+        return out;
     }
 
-    void deallocate(T* ptr)
+    void push(Ptr& ptr)
     {
-        ptr->~T(); // placement construction was used
-        Element* e{(Element*)(((char*)ptr) - offsetof(Element, data))};
-        deallocate(e);
-    }
-
-    void push(T* ptr)
-    {
-        Element*       e{(Element*)(((char*)ptr) - offsetof(Element, data))};
+        Element*       e{(Element*)(((char*)ptr.release()) - offsetof(Element, data))};
         Spinlock::Lock lock{q_spinlock};
         if(last)
         {
@@ -142,7 +137,8 @@ public:
         }
     }
 
-    Element* pop_list() // take out list of all queued elements
+private:
+    Element* pop_list() noexcept // take out list of all queued elements
     {
         Element* list{nullptr};
         Spinlock::Lock lock{q_spinlock};
@@ -155,9 +151,15 @@ public:
         return list;
     }
 
-private:
+    void deallocate(T* ptr)
+    {
+        ptr->~T(); // placement construction was used
+        Element* e{(Element*)(((char*)ptr) - offsetof(Element, data))};
+        deallocate(e);
+    }
+
     // accessible from Queue::List and Queue::Ptr
-    void deallocate(Element* e)
+    void deallocate(Element* e) noexcept
     {
         Spinlock::Lock lock{a_spinlock};
         allocator.deallocate(e);
