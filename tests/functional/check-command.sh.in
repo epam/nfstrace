@@ -1,0 +1,25 @@
+set -e
+
+COMMAND="bzip2 -f -9"
+
+FIRST="first"
+FIRST_FULL=$FIRST.bz2
+
+SECOND="second"
+SECOND_FULL=$SECOND.bz2
+
+bzcat $1 | '${CMAKE_BINARY_DIR}/${PROJECT_NAME}' --mode=drain -I - -O $FIRST -v 0 --log=command.logfile.log -C $COMMAND
+
+bzcat $1 | '${CMAKE_BINARY_DIR}/${PROJECT_NAME}' --mode=drain -I - -O $SECOND -v 0 --log=command.logfile.log
+eval "$COMMAND $SECOND"
+
+cmp $FIRST_FULL $SECOND_FULL
+RESULT=$?
+
+rm -f $FIRST_FULL
+rm -f $FIRST
+rm -f $SECOND_FULL
+rm -f $SECOND
+
+exit $RESULT
+
