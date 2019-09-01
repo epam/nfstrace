@@ -48,11 +48,11 @@ public:
     inline NFSProcedure(xdr::XDRDecoder& c, xdr::XDRDecoder& r, const Session* s)
         : parg{&arg} // set pointer to argument
         , pres{&res} // set pointer to result
+	, arg{} // zero-initializer
+	, res{}
     {
         memset(&call, 0, sizeof(call));
         memset(&reply, 0, sizeof(reply));
-        memset(&arg, 0, sizeof(arg));
-        memset(&res, 0, sizeof(res));
 
         // fill call
         if(!xdr_callmsg(c.xdr(), &call))
