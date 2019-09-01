@@ -57,7 +57,7 @@ const NST::protocols::CIFSv1::MessageHeader* NST::protocols::CIFSv1::get_header(
 
 bool MessageHeader::isFlag(const Flags flag) const
 {
-    return static_cast<const uint8_t>(flag) & static_cast<const uint8_t>(flags);
+    return static_cast<uint8_t>(flag) & static_cast<uint8_t>(flags);
 }
 
 extern "C" NST_PUBLIC const char* print_cifs1_procedures(SMBv1Commands cmd_code)

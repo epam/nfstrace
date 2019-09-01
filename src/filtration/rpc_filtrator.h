@@ -80,11 +80,11 @@ public:
         const MessageHeader* const msg = rm->fragment();
         if(msg->type() == MsgType::REPLY)
         {
-            return RPCValidator::check(static_cast<const ReplyHeader* const>(msg));
+            return RPCValidator::check(static_cast<const ReplyHeader*>(msg));
         }
         if(msg->type() == MsgType::CALL)
         {
-            return RPCValidator::check(static_cast<const CallHeader* const>(msg));
+            return RPCValidator::check(static_cast<const CallHeader*>(msg));
         }
         return false;
     }
@@ -123,7 +123,7 @@ public:
         {
         case MsgType::CALL:
         {
-            auto call = static_cast<const CallHeader* const>(msg);
+            auto call = static_cast<const CallHeader*>(msg);
             if(RPCValidator::check(call))
             {
                 BaseImpl::setMsgLen(len); // length of current RPC message
@@ -164,7 +164,7 @@ public:
         break;
         case MsgType::REPLY:
         {
-            auto reply = static_cast<const ReplyHeader* const>(msg);
+            auto reply = static_cast<const ReplyHeader*>(msg);
             if(RPCValidator::check(reply))
             {
                 BaseImpl::setMsgLen(len); // length of current RPC message
