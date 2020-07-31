@@ -19,6 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <stdexcept>
+
 #include "analysis/analyzers.h"
 #include "analysis/print_analyzer.h"
 #include "utils/out.h"

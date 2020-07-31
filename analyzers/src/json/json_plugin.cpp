@@ -19,6 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <stdexcept>
+
 #include "api/plugin_api.h" // include plugin development definitions
 #include "json_analyzer.h"
 //------------------------------------------------------------------------------

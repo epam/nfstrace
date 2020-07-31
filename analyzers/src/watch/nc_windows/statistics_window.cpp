@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 #include <algorithm>
 #include <numeric>
+#include <stdexcept>
 
 #include <unistd.h>
 
