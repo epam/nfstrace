@@ -77,12 +77,12 @@ public:
     {
         // TODO: this code must be generalized with RPCFiltrator class
         uint32_t hdr_len{0};
-        auto     msg = reinterpret_cast<const MessageHeader* const>(info.data);
+        auto     msg = reinterpret_cast<const MessageHeader*>(info.data);
         switch(msg->type())
         {
         case MsgType::CALL:
         {
-            auto call = static_cast<const CallHeader* const>(msg);
+            auto call = static_cast<const CallHeader*>(msg);
             if(RPCValidator::check(call))
             {
                 if(NFS3Validator::check(call))
@@ -116,7 +116,7 @@ public:
         break;
         case MsgType::REPLY:
         {
-            auto reply = static_cast<const ReplyHeader* const>(msg);
+            auto reply = static_cast<const ReplyHeader*>(msg);
             if(RPCValidator::check(reply))
             {
                 // Truncate NFSv3 READ reply message to NFSv3-RW-limit
