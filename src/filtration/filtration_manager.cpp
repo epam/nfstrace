@@ -19,6 +19,8 @@
     along with Nfstrace.  If not, see <http://www.gnu.org/licenses/>.
 */
 //------------------------------------------------------------------------------
+#include <stdexcept>
+
 #include <sys/stat.h>
 
 #include "filtration/dumping.h"

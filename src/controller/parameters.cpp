@@ -23,6 +23,7 @@
 #include <memory>
 
 #include <dirent.h>
+#include <stdexcept>
 #include <unistd.h>
 
 #include "analysis/plugin.h"

@@ -23,6 +23,8 @@
 #define XDR_DECODER_H
 //------------------------------------------------------------------------------
 #include <utility>
+#include <stdexcept>
+
 #include <rpc/rpc.h>
 //------------------------------------------------------------------------------
 #include "api/nfs3_types_rpcgen.h"

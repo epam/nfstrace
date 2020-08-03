@@ -24,6 +24,7 @@
 #define CONTROLLER_H
 //------------------------------------------------------------------------------
 #include <memory>
+#include <stdexcept>
 
 #include "analysis/analysis_manager.h"
 #include "controller/parameters.h"

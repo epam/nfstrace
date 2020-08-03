@@ -27,6 +27,7 @@
 #include <list>
 #include <mutex>
 #include <condition_variable>
+#include <stdexcept>
 #include <type_traits>
 
 #include "utils/noncopyable.h"

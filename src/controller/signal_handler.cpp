@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 #include <cerrno>
 #include <functional> // std::ref
+#include <stdexcept>
 #include <system_error>
 
 #include <pthread.h>
