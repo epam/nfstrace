@@ -31,7 +31,6 @@ else ()
 endif ()
 
 set (CPACK_DEBIAN_PACKAGE_SECTION "admin")
-set (CPACK_DEBIAN_PACKAGE_DEPENDS "libpcap0.8 (>=1.3.0-1)")
-set (CPACK_DEBIAN_PACKAGE_DEPENDS "libjson-c2 (>=0.11)")
+set (CPACK_DEBIAN_PACKAGE_DEPENDS "libpcap0.8 (>=1.3.0-1), libjson-c2 (>=0.11)")
 
 include (CPack)
