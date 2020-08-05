@@ -194,7 +194,6 @@ FiltrationManager::FiltrationManager(RunningStatus& s)
 
 FiltrationManager::~FiltrationManager()
 {
-    stop(); // additional checking before cleaning table
 }
 
 void FiltrationManager::start()
