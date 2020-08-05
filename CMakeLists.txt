@@ -30,7 +30,7 @@ if ("${PCAP_LIBRARY}" STREQUAL "PCAP_LIBRARY-NOTFOUND")
 endif ()
 
 # build application ============================================================
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pedantic -Wall -Werror -Wextra -Wno-invalid-offsetof -Wno-braced-scalar-init -fPIC -fvisibility=hidden")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pedantic -Wall -Werror -Wextra -Wno-invalid-offsetof -fPIC -fvisibility=hidden")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--export-dynamic")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND "${INCLUDE_COVERAGE_INFO}")
