@@ -422,7 +422,7 @@ public:
 
     void stop()
     {
-        reader->break_loop();
+        reader->stop();
     }
 
     static void callback(u_char* user, const struct pcap_pkthdr* pkthdr, const u_char* packet)
