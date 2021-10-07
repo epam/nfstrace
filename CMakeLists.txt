@@ -1,5 +1,8 @@
 cmake_minimum_required (VERSION 3.0)
-project (nfstrace)
+project (nfstrace LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # check compiler and packages ==================================================
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -25,12 +28,26 @@ find_library(PCAP_LIBRARY
              NAMES pcap
              HINTS ${PCAP_ROOT_DIR}/lib)
 
-if ("${PCAP_LIBRARY}" STREQUAL "PCAP_LIBRARY-NOTFOUND")
+if (NOT PCAP_LIBRARY)
     message (FATAL_ERROR "Could NOT find PCAP")
 endif ()
 
+# See: https://fedoraproject.org/wiki/Changes/SunRPCRemoval
+find_file (FEDORA_FOUND fedora-release PATHS /etc)
+find_file (REDHAT_FOUND redhat-release PATHS /etc)
+if (FEDORA_FOUND OR REDHAT_FOUND)
+    find_library (TIRPC_LIBRARY NAMES tirpc)
+    find_path    (TIRPC_INCLUDE NAMES rpc/rpc.h PATHS /usr/include/tirpc)
+    if (TIRPC_LIBRARY AND TIRPC_INCLUDE)
+        include_directories (${TIRPC_INCLUDE})
+        link_libraries      (${TIRPC_LIBRARY})
+    else ()
+        message (FATAL_ERROR "${TIRPC_LIBRARY} ${TIRPC_INCLUDE} is required for Fedora/RedHat")
+    endif ()
+endif ()
+
 # build application ============================================================
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pedantic -Wall -Werror -Wextra -Wno-invalid-offsetof -Wno-error=address-of-packed-member -fPIC -fvisibility=hidden")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Werror -Wextra -Wno-invalid-offsetof -fPIC -fvisibility=hidden")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--export-dynamic")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND "${INCLUDE_COVERAGE_INFO}")

@@ -234,7 +234,7 @@ void WatchAnalyzer::get_dir_delegation40(const RPCProcedure* proc,
                                          const struct NFS4::GET_DIR_DELEGATION4args*,
                                          const struct NFS4::GET_DIR_DELEGATION4res* res) { if (res) { account40_op(proc, ProcEnumNFS4::NFSProcedure::GET_DIR_DELEGATION); } }
 void WatchAnalyzer::illegal40(const RPCProcedure* proc,
-                              const struct NFS4::ILLEGAL4res* res) { if (res) { account40_op(proc, ProcEnumNFS4::NFSProcedure::ILLEGAL); } }
+                              const struct NFS4::ILLEGAL4res* res) { if (res) { account40_op(proc, /*ProcEnumNFS4::NFSProcedure::ILLEGAL is mapped to 2 index*/ static_cast<ProcEnumNFS4::NFSProcedure>(2)); } }
 
 // NFSv4.1 procedures
 
@@ -406,7 +406,7 @@ void WatchAnalyzer::reclaim_complete41(const RPCProcedure* proc,
                                        const struct NFS41::RECLAIM_COMPLETE4args*,
                                        const struct NFS41::RECLAIM_COMPLETE4res* res) { if (res) { account41_op(proc, ProcEnumNFS41::NFSProcedure::RECLAIM_COMPLETE); } }
 void WatchAnalyzer::illegal41(const RPCProcedure* proc,
-                              const struct NFS41::ILLEGAL4res* res) { if (res) { account41_op(proc, ProcEnumNFS41::NFSProcedure::ILLEGAL); } }
+                              const struct NFS41::ILLEGAL4res* res) { if (res) { account41_op(proc, /*ProcEnumNFS41::NFSProcedure::ILLEGAL is mapped to 2 index*/ static_cast<ProcEnumNFS41::NFSProcedure>(2)); } }
 // CIFS v1
 void WatchAnalyzer::createDirectorySMBv1(const SMBv1::CreateDirectoryCommand* /*cmd*/, const SMBv1::CreateDirectoryArgumentType*, const SMBv1::CreateDirectoryResultType*)
 {
