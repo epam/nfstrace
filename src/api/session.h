@@ -62,7 +62,8 @@ struct Session
         {
             uint8_t  addr[2][16];
             uint32_t addr_uint32[2][4];
-        } __attribute__((__packed__)) v6;
+        } v6;
+        static_assert(sizeof(v6) == 32, "unexpected sizeof");
     } ip;
 };
 

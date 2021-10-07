@@ -4,7 +4,8 @@
 [![Issues](https://img.shields.io/github/issues/epam/nfstrace.svg)](https://github.com/epam/nfstrace/issues?q=is%3Aopen+is%3Aissue)
 [![Build Status](https://img.shields.io/travis/epam/nfstrace/master.svg)](https://travis-ci.org/epam/nfstrace)
 [![Coverage Status](http://img.shields.io/coveralls/epam/nfstrace/master.svg)](https://coveralls.io/r/epam/nfstrace?branch=master)
-NFSTRACE ![NFSTRACE Logo](docs/pictures/logo64.png "Logo")
+
+![NFSTRACE Logo](docs/pictures/logo64.png "Logo") NFSTRACE
 ========
 
 `nfstrace` is an NFS and CIFS tracing/monitoring/capturing/analyzing tool.
@@ -25,7 +26,7 @@ following protocols:
 `nfstrace` has been tested on the following GNU/Linux and FreeBSD systems:
 
 - Debian Sid [packages](https://packages.debian.org/unstable/main/nfstrace) [build-logs](https://buildd.debian.org/status/logs.php?pkg=nfstrace)
-- Fedora 26
+- Fedora 34
 - OpenSUSE 13.2
 - Ubuntu 16.04 LTS
 - CentOS 7
