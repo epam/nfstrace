@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # check compiler and packages ==================================================
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.1)
-        message (FATAL_ERROR "GCC version must be at least 5.1")
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.0)
+        message (FATAL_ERROR "GCC version must be at least 6.0")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.5)
@@ -32,18 +32,14 @@ if (NOT PCAP_LIBRARY)
     message (FATAL_ERROR "Could NOT find PCAP")
 endif ()
 
-# See: https://fedoraproject.org/wiki/Changes/SunRPCRemoval
-find_file (FEDORA_FOUND fedora-release PATHS /etc)
-find_file (REDHAT_FOUND redhat-release PATHS /etc)
-if (FEDORA_FOUND OR REDHAT_FOUND)
-    find_library (TIRPC_LIBRARY NAMES tirpc)
-    find_path    (TIRPC_INCLUDE NAMES rpc/rpc.h PATHS /usr/include/tirpc)
-    if (TIRPC_LIBRARY AND TIRPC_INCLUDE)
-        include_directories (${TIRPC_INCLUDE})
-        link_libraries      (${TIRPC_LIBRARY})
-    else ()
-        message (FATAL_ERROR "${TIRPC_LIBRARY} ${TIRPC_INCLUDE} is required for Fedora/RedHat")
-    endif ()
+# Sun RPC is removed from glibc, see: https://sourceware.org/pipermail/libc-announce/2020/000029.html
+find_library (TIRPC_LIBRARY NAMES tirpc)
+find_path    (TIRPC_INCLUDE NAMES rpc/rpc.h PATHS /usr/include/tirpc)
+if (TIRPC_LIBRARY AND TIRPC_INCLUDE)
+    include_directories (${TIRPC_INCLUDE})
+    link_libraries      (${TIRPC_LIBRARY})
+else ()
+    message (FATAL_ERROR "${TIRPC_LIBRARY} ${TIRPC_INCLUDE} is required for Fedora/RedHat")
 endif ()
 
 # build application ============================================================

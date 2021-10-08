@@ -43,6 +43,7 @@ External Dependencies
 --------
 
 - PCAP library (core component)
+- TI RPC (replacement for Sun RPC)
 - JSON-C library (used for libjson.so plugin)
 - Curses (used for libwatch.so plugin)
 - GMock (used for testing)
