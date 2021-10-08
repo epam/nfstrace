@@ -2,7 +2,7 @@
 [![Language](https://img.shields.io/badge/language-C++14-blue.svg)](https://isocpp.org)
 [![Release](https://img.shields.io/github/release/epam/nfstrace.svg)](https://github.com/epam/nfstrace/releases/latest)
 [![Issues](https://img.shields.io/github/issues/epam/nfstrace.svg)](https://github.com/epam/nfstrace/issues?q=is%3Aopen+is%3Aissue)
-[![Build Status](https://img.shields.io/travis/epam/nfstrace/master.svg)](https://travis-ci.org/epam/nfstrace)
+[![Build Status](https://github.com/epam/nfstrace/actions/workflows/cmake.yml/badge.svg)](https://github.com/epam/nfstrace/actions/workflows/cmake.yml)
 [![Coverage Status](http://img.shields.io/coveralls/epam/nfstrace/master.svg)](https://coveralls.io/r/epam/nfstrace?branch=master)
 
 ![NFSTRACE Logo](docs/pictures/logo64.png "Logo") NFSTRACE

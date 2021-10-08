@@ -1,0 +1,47 @@
+name: CMake
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        build_type: [ Debug ]
+
+    runs-on: ${{matrix.os}}
+
+    name: '${{matrix.os}} ${{matrix.build_type}}'
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+
+    - name: Install libraries
+      if: startsWith(matrix.os, 'ubuntu')
+      run: sudo apt install -y libpcap-dev ncurses-dev libjson-c-dev gcovr texlive-latex-extra build-essential
+
+    - name: Install ninja-build tool
+      uses: seanmiddleditch/gha-setup-ninja@v3
+
+    - name: Check environment
+      run: |
+        gcc --version
+        cmake --version
+        ninja --version
+
+    - name: Configure, Build and Test
+      run: |
+        ctest --build-and-test . ./build --build-config ${{matrix.build_type}} \
+          --build-generator 'Ninja' --parallel 4 --build-target all            \
+          --build-options -DGTEST_SOURCE_DIR=${{github.workspace}}/third_party/googletest -DINCLUDE_COVERAGE_INFO="true" \
+          --test-command ctest
+
+    - name: Build docs
+      run: cmake --build ./build --target documentation-pdflatex
+
+    - name: Build packages
+      working-directory: ./build
+      if: startsWith(matrix.os, 'ubuntu')
+      run: cpack -G DEB
