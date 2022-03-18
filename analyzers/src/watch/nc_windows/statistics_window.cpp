@@ -153,14 +153,14 @@ void StatisticsWindow::update(const ProtocolStatistic& d)
         }
         if(canWrite(line))
         {
-            mvwprintw(_window, line - (_scrollOffset.at(_activeProtocol)), FIRST_CHAR_POS + 25, "%d", m);
+            mvwprintw(_window, line - (_scrollOffset.at(_activeProtocol)), FIRST_CHAR_POS + 25, "%zu", m);
         }
         line++;
         for(unsigned int j = _activeProtocol->getGroupBegin(i); j < _activeProtocol->getGroupBegin(i + 1); j++)
         {
             if(canWrite(line))
             {
-                mvwprintw(_window, line - _scrollOffset.at(_activeProtocol), COUNTERS_POS, "%lu ", _statistic[j]);
+                mvwprintw(_window, line - _scrollOffset.at(_activeProtocol), COUNTERS_POS, "%lu ", static_cast<long unsigned int>(_statistic[j]));
                 mvwprintw(_window, line - _scrollOffset.at(_activeProtocol), PERSENT_POS, "%-3.2f%% ",
                           m > 0 ? static_cast<double>(_statistic[j]) / static_cast<double>(m) * 100.0 : 0.0);
             }
