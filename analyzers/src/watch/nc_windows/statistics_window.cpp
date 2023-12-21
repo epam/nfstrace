@@ -50,7 +50,7 @@ void StatisticsWindow::destroy()
 
 bool StatisticsWindow::canWrite(unsigned int i)
 {
-    return (i >= _scrollOffset.at(_activeProtocol) + STATISTICS::FIRST_OPERATION_LINE && i - _scrollOffset.at(_activeProtocol) + BORDER_SIZE < static_cast<unsigned int>(_window->_maxy));
+    return (i >= _scrollOffset.at(_activeProtocol) + STATISTICS::FIRST_OPERATION_LINE && i - _scrollOffset.at(_activeProtocol) + BORDER_SIZE < static_cast<unsigned int>(getmaxy(_window) - 1));
 }
 
 StatisticsWindow::StatisticsWindow(MainWindow& w, StatisticsContainers& c)
@@ -182,10 +182,10 @@ void StatisticsWindow::resize(MainWindow& m)
     {
         tmp_size = _activeProtocol->getAmount() + 2 * BORDER_SIZE + 2 * EMPTY_LINE + STATISTICS::PROTOCOLS_LINE + _activeProtocol->getGroups() * EMPTY_LINE * _activeProtocol->getGroups();
     }
-    if(m._window != nullptr && m._window->_maxy > GUI_HEADER_HEIGHT)
+    if(m._window != nullptr && getmaxy(m._window) - 1 > GUI_HEADER_HEIGHT)
     {
-        _window = subwin(m._window, std::min(static_cast<int>(m._window->_maxy - GUI_HEADER_HEIGHT), tmp_size),
-                         std::min(static_cast<int>(m._window->_maxx), GUI_LENGTH), GUI_HEADER_HEIGHT - BORDER_SIZE, 0);
+        _window = subwin(m._window, std::min(static_cast<int>(getmaxy(m._window) - 1 - GUI_HEADER_HEIGHT), tmp_size),
+                         std::min(static_cast<int>(getmaxx(m._window) - 1), GUI_LENGTH), GUI_HEADER_HEIGHT - BORDER_SIZE, 0);
         updateProtocol(_activeProtocol);
     }
 }

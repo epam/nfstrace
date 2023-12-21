@@ -87,7 +87,7 @@ void HeaderWindow::resize(MainWindow& m)
     }
     if(m._window != nullptr)
     {
-        _window = subwin(m._window, std::min(static_cast<int>(m._window->_maxy), GUI_HEADER_HEIGHT), std::min(static_cast<int>(m._window->_maxx), GUI_LENGTH), 0, 0);
+        _window = subwin(m._window, std::min(static_cast<int>(getmaxy(m._window) - 1 ), GUI_HEADER_HEIGHT), std::min(static_cast<int>(getmaxx(m._window) - 1 ), GUI_LENGTH), 0, 0);
     }
     if(_window != nullptr)
     {
