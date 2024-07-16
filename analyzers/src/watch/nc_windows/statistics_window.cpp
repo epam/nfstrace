@@ -50,7 +50,7 @@ void StatisticsWindow::destroy()
 
 bool StatisticsWindow::canWrite(unsigned int i)
 {
-    return (i >= _scrollOffset.at(_activeProtocol) + STATISTICS::FIRST_OPERATION_LINE && i - _scrollOffset.at(_activeProtocol) + BORDER_SIZE < static_cast<unsigned int>(_window->_maxy));
+    return (i >= _scrollOffset.at(_activeProtocol) + STATISTICS::FIRST_OPERATION_LINE && i - _scrollOffset.at(_activeProtocol) + BORDER_SIZE < static_cast<unsigned int>(getmaxy(_window)));
 }
 
 StatisticsWindow::StatisticsWindow(MainWindow& w, StatisticsContainers& c)
@@ -153,7 +153,7 @@ void StatisticsWindow::update(const ProtocolStatistic& d)
         }
         if(canWrite(line))
         {
-            mvwprintw(_window, line - (_scrollOffset.at(_activeProtocol)), FIRST_CHAR_POS + 25, "%d", m);
+            mvwprintw(_window, line - (_scrollOffset.at(_activeProtocol)), FIRST_CHAR_POS + 25, "%ld", m);
         }
         line++;
         for(unsigned int j = _activeProtocol->getGroupBegin(i); j < _activeProtocol->getGroupBegin(i + 1); j++)
@@ -182,10 +182,10 @@ void StatisticsWindow::resize(MainWindow& m)
     {
         tmp_size = _activeProtocol->getAmount() + 2 * BORDER_SIZE + 2 * EMPTY_LINE + STATISTICS::PROTOCOLS_LINE + _activeProtocol->getGroups() * EMPTY_LINE * _activeProtocol->getGroups();
     }
-    if(m._window != nullptr && m._window->_maxy > GUI_HEADER_HEIGHT)
+    if(m._window != nullptr && getmaxy(m._window) > GUI_HEADER_HEIGHT)
     {
-        _window = subwin(m._window, std::min(static_cast<int>(m._window->_maxy - GUI_HEADER_HEIGHT), tmp_size),
-                         std::min(static_cast<int>(m._window->_maxx), GUI_LENGTH), GUI_HEADER_HEIGHT - BORDER_SIZE, 0);
+        _window = subwin(m._window, std::min(static_cast<int>(getmaxy(m._window) - GUI_HEADER_HEIGHT), tmp_size),
+                         std::min(static_cast<int>(getmaxx(m._window)), GUI_LENGTH), GUI_HEADER_HEIGHT - BORDER_SIZE, 0);
         updateProtocol(_activeProtocol);
     }
 }
