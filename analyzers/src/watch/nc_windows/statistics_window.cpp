@@ -153,7 +153,7 @@ void StatisticsWindow::update(const ProtocolStatistic& d)
         }
         if(canWrite(line))
         {
-            mvwprintw(_window, line - (_scrollOffset.at(_activeProtocol)), FIRST_CHAR_POS + 25, "%d", m);
+            mvwprintw(_window, line - (_scrollOffset.at(_activeProtocol)), FIRST_CHAR_POS + 25, "%zu", m);
         }
         line++;
         for(unsigned int j = _activeProtocol->getGroupBegin(i); j < _activeProtocol->getGroupBegin(i + 1); j++)

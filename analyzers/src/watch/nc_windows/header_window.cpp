@@ -75,7 +75,7 @@ void HeaderWindow::update()
     /* tm starts with 0 month and 1900 year*/
     mvwprintw(_window, HEADER::DATE_LINE, FIRST_CHAR_POS, "Date: \t %d.%d.%d \t Time: %d:%d:%d  ", t->tm_mday, t->tm_mon + 1, t->tm_year + 1900, t->tm_hour, t->tm_min, t->tm_sec);
     mvwprintw(_window, HEADER::ELAPSED_LINE, FIRST_CHAR_POS, "Elapsed time:  \t %d days; %d:%d:%d times",
-              shift_time / SECINDAY, shift_time % SECINDAY / SECINHOUR, shift_time % SECINHOUR / SECINMIN, shift_time % SECINMIN);
+              (int)(shift_time / SECINDAY), (int)(shift_time % SECINDAY / SECINHOUR), (int)(shift_time % SECINHOUR / SECINMIN), (int)(shift_time % SECINMIN));
     wrefresh(_window);
 }
 
