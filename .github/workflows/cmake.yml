@@ -20,7 +20,7 @@ jobs:
 
     - name: Install libraries
       if: startsWith(matrix.os, 'ubuntu')
-      run: sudo apt install -y libpcap-dev ncurses-dev libjson-c-dev gcovr texlive-latex-extra build-essential
+      run: sudo apt install -y libpcap-dev libtirpc-dev ncurses-dev libjson-c-dev gcovr texlive-latex-extra build-essential
 
     - name: Install ninja-build tool
       uses: seanmiddleditch/gha-setup-ninja@v3
@@ -36,7 +36,7 @@ jobs:
         ctest --build-and-test . ./build --build-config ${{matrix.build_type}} \
           --build-generator 'Ninja' --parallel 4 --build-target all            \
           --build-options -DGTEST_SOURCE_DIR=${{github.workspace}}/third_party/googletest -DINCLUDE_COVERAGE_INFO="true" \
-          --test-command ctest
+          --test-command ctest --output-on-failure
 
     - name: Build docs
       run: cmake --build ./build --target documentation-pdflatex
