@@ -4,6 +4,7 @@
 [![Issues](https://img.shields.io/github/issues/epam/nfstrace.svg)](https://github.com/epam/nfstrace/issues?q=is%3Aopen+is%3Aissue)
 [![Build Status](https://github.com/epam/nfstrace/actions/workflows/cmake.yml/badge.svg)](https://github.com/epam/nfstrace/actions/workflows/cmake.yml)
 [![Coverage Status](http://img.shields.io/coveralls/epam/nfstrace/master.svg)](https://coveralls.io/r/epam/nfstrace?branch=master)
+[![Packaging status](https://repology.org/badge/tiny-repos/nfstrace.svg)](https://repology.org/project/nfstrace/versions)
 
 ![NFSTRACE Logo](docs/pictures/logo64.png "Logo") NFSTRACE
 ========
