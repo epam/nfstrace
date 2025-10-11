@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required (VERSION 3.5)
 
 # build analyzers ==============================================================
 add_library (testanalyzer MODULE src/test/test_analyzer.cpp)
