@@ -328,7 +328,7 @@ procedures and computes standard deviation of latency.
 Usage example:
 .RS 4
 .PP
-.B $ nfstrace \-m stat \-a libreakdown.so
+.B $ nfstrace \-m stat \-a libbreakdown.so
 .RE
 .PP
 Breakdown analyzer produces
